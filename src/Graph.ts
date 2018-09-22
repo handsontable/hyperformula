@@ -12,6 +12,10 @@ export class Graph {
     this.edges.set(id, new Set());
   }
 
+  addEdge(fromId: string, toId: string) {
+    return this.edges.get(fromId)!.add(toId)
+  }
+
   adjacentNodes(id: string) {
     return this.edges.get(id);
   }
