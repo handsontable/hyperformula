@@ -7,6 +7,9 @@ compile: ## Compile to javascript
 test: ## Run tests
 	@yarn jest
 
+coverage: ## Run tests and show coverage
+	@yarn jest --coverage
+
 clean: ## Clean compiled files
 	@rm -rf lib/
 
