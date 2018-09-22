@@ -9,11 +9,17 @@ export class Graph {
 
   addNode(id: string) {
     this.nodes.add(id);
-    this.edges.set(id, new Set());
+    if (!this.edges.has(id)) {
+      this.edges.set(id, new Set())
+    }
   }
 
   addEdge(fromId: string, toId: string) {
-    return this.edges.get(fromId)!.add(toId)
+    if (!this.nodes.has(fromId))
+      throw new Error(`Unknown node ${fromId}`)
+    if (!this.nodes.has(toId))
+      throw new Error(`Unknown node ${toId}`)
+    this.edges.get(fromId)!.add(toId);
   }
 
   adjacentNodes(id: string) {
