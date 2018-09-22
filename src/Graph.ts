@@ -1,20 +1,20 @@
-export class Graph {
-  private nodes : Set<string>;
-  private edges : Map<string,Set<string>>;
+export class Graph<T> {
+  private nodes : Set<T>;
+  private edges : Map<T,Set<T>>;
 
   constructor() {
     this.nodes = new Set();
     this.edges = new Map();
   }
 
-  addNode(id: string) {
+  addNode(id: T) {
     this.nodes.add(id);
     if (!this.edges.has(id)) {
       this.edges.set(id, new Set())
     }
   }
 
-  addEdge(fromId: string, toId: string) {
+  addEdge(fromId: T, toId: T) {
     if (!this.nodes.has(fromId))
       throw new Error(`Unknown node ${fromId}`)
     if (!this.nodes.has(toId))
@@ -22,7 +22,7 @@ export class Graph {
     this.edges.get(fromId)!.add(toId);
   }
 
-  adjacentNodes(id: string) {
+  adjacentNodes(id: T) {
     return this.edges.get(id);
   }
 
