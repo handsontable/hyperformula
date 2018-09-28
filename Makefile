@@ -10,6 +10,11 @@ compile: ## Compile to javascript
 regenerate-parser:
 	@yarn jison src/parser/parser.jison --outfile src/parser/parser.js
 
+check-parser-generation:
+	@yarn jison src/parser/parser.jison --outfile /tmp/parser.js
+	# Diff will end with exit code different than 0 if files differ
+	@diff src/parser/parser.js /tmp/parser.js > /dev/null
+
 test: ## Run tests
 	@yarn jest
 
