@@ -7,6 +7,9 @@ setup:
 compile: ## Compile to javascript
 	@yarn tsc
 
+regenerate-parser:
+	@yarn jison src/parser/parser.jison --outfile src/parser/parser.js
+
 test: ## Run tests
 	@yarn jest
 
