@@ -3,6 +3,7 @@
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
     "jest": "^23.6.0",
+    "jison": "^0.4.18",
     "ts-jest": "^23.10.1",
     "typescript": "^3.0.3"
   }
