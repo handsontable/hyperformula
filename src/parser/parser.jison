@@ -131,10 +131,10 @@ expression
       $$ = ASTNode('POSITIVE_OP', [$2])
     }
   | FUNCTION '(' ')' {
-      $$ = ASTNode($1+'_FUNC', [])
+      $$ = ASTNode('FUNCTION_CALL', [$1])
     }
   | FUNCTION '(' expseq ')' {
-      $$ = ASTNode($1+'_FUNC', $3)
+      $$ = ASTNode('FUNCTION_CALL', [$1, $3])
     }
   | cell
   | error

@@ -17,10 +17,6 @@ describe('Basic parser test', () => {
         expect(parser.parse("+2").type).toBe("POSITIVE_OP")
         expect(parser.parse("1&2").type).toBe("AND_OP")
 
-        // functions
-        expect(parser.parse("SUM()").type).toBe("SUM_FUNC")
-        expect(parser.parse("SUM(1,2)").type).toBe("SUM_FUNC")
-
         // cell addressing
         expect(parser.parse("A5").type).toBe("RELATIVE_CELL")
         expect(parser.parse("$A$5").type).toBe("ABSOLUTE_CELL")
@@ -32,5 +28,27 @@ describe('Basic parser test', () => {
         expect(parser.parse("$A$5:B5").type).toBe("CELL_RANGE")
         expect(parser.parse("A$5:B5").type).toBe("CELL_RANGE")
         expect(parser.parse("$A5:B5").type).toBe("CELL_RANGE")
+    })
+
+    it("function calls without arguments", () => {
+        const parser = new Parser()
+
+        const ast = parser.parse("SUM()")
+
+        expect(ast.type).toBe("FUNCTION_CALL")
+        expect(ast.args).toEqual(["SUM"])
+    })
+
+    it("function calls with arguments", () => {
+        const parser = new Parser()
+
+        const ast = parser.parse("SUM(1, 2)")
+
+        expect(ast.type).toBe("FUNCTION_CALL")
+        expect(ast.args[0]).toBe("SUM")
+        expect(ast.args[1]).toEqual([
+            { type: "NUMBER", args: ["1"] },
+            { type: "NUMBER", args: ["2"] },
+        ])
     })
 });

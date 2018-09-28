@@ -185,12 +185,12 @@ case 20:
 break;
 case 21:
 
-      this.$ = ASTNode($$[$0-2]+'_FUNC', [])
+      this.$ = ASTNode('FUNCTION_CALL', [$$[$0-2]])
     
 break;
 case 22:
 
-      this.$ = ASTNode($$[$0-3]+'_FUNC', $$[$0-1])
+      this.$ = ASTNode('FUNCTION_CALL', [$$[$0-3], $$[$0-1]])
     
 break;
 case 26:
