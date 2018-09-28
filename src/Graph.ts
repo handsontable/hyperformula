@@ -31,13 +31,7 @@ export class Graph<T> {
   }
 
   topologicalSort() : Array<T> {
-    const reversedEdges = new Map() as Map<T, Set<T>>
-    this.nodes.forEach((node) => reversedEdges.set(node, new Set()))
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      adjacentNodes.forEach((targetNode) => {
-        reversedEdges.get(targetNode)!.add(sourceNode)
-      })
-    });
+    const reversedEdges = this.reversedEdges()
     const nodesWithNoIncomingEdge = [] as Array<T>
     reversedEdges.forEach((sourceNodes, targetNode) => {
       if (sourceNodes.size === 0) {
@@ -56,5 +50,16 @@ export class Graph<T> {
       })
     }
     return topologicalOrdering
+  }
+
+  reversedEdges() {
+    const reversedEdges = new Map() as Map<T, Set<T>>
+    this.nodes.forEach((node) => reversedEdges.set(node, new Set()))
+    this.edges.forEach((adjacentNodes, sourceNode) => {
+      adjacentNodes.forEach((targetNode) => {
+        reversedEdges.get(targetNode)!.add(sourceNode)
+      })
+    });
+    return reversedEdges;
   }
 }
