@@ -62,11 +62,11 @@
 %left '%'
 %left UMINUS
 
-%start expressions
+%start formula
 
 %% /* language grammar */
 
-expressions
+formula
   : expression EOF {
       return $1;
     }
