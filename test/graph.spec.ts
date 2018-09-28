@@ -64,6 +64,13 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topologicalSort()).toEqual([]);
   })
 
+  it("#topologicalSort node is included even if he is not connected to anything", () => {
+    const graph = new Graph()
+    graph.addNode("foo")
+
+    expect(graph.topologicalSort()).toEqual(["foo"]);
+  })
+
   it("#topologicalSort for simple graph", () => {
     const graph = new Graph()
     graph.addNode("foo")
