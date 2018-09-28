@@ -29,4 +29,9 @@ export class Graph<T> {
   nodesCount() {
     return this.nodes.size
   }
+
+  topologicalSort() : Array<T> {
+    const topologicalOrdering = ([] as Array<T>);
+    return topologicalOrdering;
+  }
 }

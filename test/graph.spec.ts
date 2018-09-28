@@ -57,4 +57,10 @@ describe('Basic Graph manipulation', () => {
       graph.addEdge('origin', 'target')
     }).toThrowError(new Error('Unknown node target'))
   })
+
+  it("#topologicalSort for empty graph", () => {
+    const graph = new Graph()
+
+    expect(graph.topologicalSort()).toEqual([]);
+  })
 });
