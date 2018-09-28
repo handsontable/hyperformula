@@ -1,6 +1,9 @@
 typecheck: ## Typecheck the code
 	@yarn tsc --noEmit
 
+setup:
+	@yarn install
+
 compile: ## Compile to javascript
 	@yarn tsc
 
