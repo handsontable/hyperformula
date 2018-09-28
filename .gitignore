@@ -2,3 +2,4 @@ node_modules
 lib
 coverage
 .idea/
+yarn-error.log

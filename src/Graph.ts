@@ -1,14 +1,14 @@
 export class Graph<T> {
-  private nodes : Set<T>;
-  private edges : Map<T,Set<T>>;
+  private nodes : Set<T>
+  private edges : Map<T,Set<T>>
 
   constructor() {
-    this.nodes = new Set();
-    this.edges = new Map();
+    this.nodes = new Set()
+    this.edges = new Map()
   }
 
   addNode(id: T) {
-    this.nodes.add(id);
+    this.nodes.add(id)
     if (!this.edges.has(id)) {
       this.edges.set(id, new Set())
     }
@@ -19,14 +19,14 @@ export class Graph<T> {
       throw new Error(`Unknown node ${fromId}`)
     if (!this.nodes.has(toId))
       throw new Error(`Unknown node ${toId}`)
-    this.edges.get(fromId)!.add(toId);
+    this.edges.get(fromId)!.add(toId)
   }
 
   adjacentNodes(id: T) {
-    return this.edges.get(id);
+    return this.edges.get(id)
   }
 
   nodesCount() {
-    return this.nodes.size;
+    return this.nodes.size
   }
 }

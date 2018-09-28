@@ -1,3 +1,5 @@
+import { Ast } from './parser/parser'
+
 type VertexId = number;
 let nextVertexId = 0;
 const getNextVertexId = () : VertexId => {
@@ -12,8 +14,6 @@ export class Vertex {
   }
 }
 
-type Ast = string // Only for sake of type-checking, a legit tree in the future
-
 type CellValue = string | number;
 
 export class FormulaCellVertex extends Vertex {
@@ -23,6 +23,10 @@ export class FormulaCellVertex extends Vertex {
   constructor(formula: Ast) {
     super()
     this.formula = formula;
+  }
+
+  getFormula() : Ast {
+    return this.formula
   }
 }
 
