@@ -63,4 +63,28 @@ describe('Basic Graph manipulation', () => {
 
     expect(graph.topologicalSort()).toEqual([]);
   })
+
+  it("#topologicalSort for simple graph", () => {
+    const graph = new Graph()
+    graph.addNode("foo")
+    graph.addNode("bar")
+    graph.addEdge("bar", "foo")
+
+    expect(graph.topologicalSort()).toEqual(["bar", "foo"]);
+  })
+
+  it("#topologicalSort for more complex graph", () => {
+    const graph = new Graph()
+    graph.addNode("x0")
+    graph.addNode("x1")
+    graph.addNode("x2")
+    graph.addNode("x3")
+    graph.addNode("x4")
+    graph.addEdge("x0", "x2")
+    graph.addEdge("x1", "x2")
+    graph.addEdge("x2", "x3")
+    graph.addEdge("x4", "x3")
+
+    expect(graph.topologicalSort()).toEqual(["x0", "x1", "x4", "x2", "x3"]);
+  })
 });
