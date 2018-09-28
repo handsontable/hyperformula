@@ -13,7 +13,7 @@ regenerate-parser:
 check-parser-generation:
 	@yarn jison src/parser/parser.jison --outfile /tmp/parser.js
 	# Diff will end with exit code different than 0 if files differ
-	@diff src/parser/parser.js /tmp/parser.js > /dev/null
+	@diff --ignore-all-space src/parser/parser.js /tmp/parser.js > /dev/null
 
 test: ## Run tests
 	@yarn jest
