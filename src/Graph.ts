@@ -49,6 +49,9 @@ export class Graph<T> {
         }
       })
     }
+    if (topologicalOrdering.length !== this.nodes.size) {
+      throw new Error(`Graph has a cycle`)
+    }
     return topologicalOrdering
   }
 

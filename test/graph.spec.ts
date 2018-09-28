@@ -87,4 +87,30 @@ describe('Basic Graph manipulation', () => {
 
     expect(graph.topologicalSort()).toEqual(["x0", "x1", "x4", "x2", "x3"]);
   })
+
+  it("#topologicalSort raise an error if has a trivial cycle", () => {
+    const graph = new Graph()
+    graph.addNode("x1")
+    graph.addNode("x2")
+    graph.addEdge("x1", "x2")
+    graph.addEdge("x1", "x1")
+
+    expect(() => {
+      graph.topologicalSort()
+    }).toThrowError(new Error('Graph has a cycle'))
+  })
+
+  it("#topologicalSort raise an error if has a cycle", () => {
+    const graph = new Graph()
+    graph.addNode("x0")
+    graph.addNode("x1")
+    graph.addNode("x2")
+    graph.addEdge("x0", "x1")
+    graph.addEdge("x1", "x2")
+    graph.addEdge("x1", "x1")
+
+    expect(() => {
+      graph.topologicalSort()
+    }).toThrowError(new Error('Graph has a cycle'))
+  })
 });
