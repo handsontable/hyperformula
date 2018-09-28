@@ -5,13 +5,13 @@ jobs:
       - image: circleci/node:8.12-browsers
     steps:
       - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
+      # - restore_cache:
+      #     key: dependency-cache-{{ checksum "yarn.lock" }}
       - run: make setup
-      - save_cache:
-          key: dependency-cache-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
+      # - save_cache:
+      #     key: dependency-cache-{{ checksum "yarn.lock" }}
+      #     paths:
+      #       - node_modules
       - run: make typecheck
       - run: make check-parser-generation
       - run: make test
