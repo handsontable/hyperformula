@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8.12-browsers
+    steps:
+      - checkout
+      - run: make setup
+      - run: make typecheck
+      - run: make check-parser-generation
+      - run: make test
