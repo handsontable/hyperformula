@@ -35,4 +35,10 @@ describe('Integration', () => {
 
     expect(hoe.getCellValue('C1')).toBe('10')
   })
+
+  it("#loadSheet", () => {
+    hoe.loadSheet([['3', '=A1+42']])
+
+    expect(hoe.getCellValue('B1')).toBe('45')
+  })
 });

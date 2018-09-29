@@ -35,6 +35,9 @@ export class HandsOnEngine {
         const child1Result = this.computeFormula(child1) as string
         const child2Result = this.computeFormula(child2) as string
         return String(parseInt(child1Result) + parseInt(child2Result));
+      case AstNodeType.NUMBER:
+        const numberValue = parseInt(formula.args[0] as string)
+        return String(numberValue)
       default:
         throw Error("Unsupported formula")
     }
