@@ -6,15 +6,17 @@ const getNextVertexId = () : VertexId => {
   return nextVertexId++;
 }
 
-export class Vertex {
+export abstract class Vertex {
   public readonly id: VertexId;
 
-  constructor() {
+  protected constructor() {
     this.id = getNextVertexId();
   }
+
+  abstract getCellValue(): CellValue
 }
 
-type CellValue = string | number;
+export type CellValue = string | number;
 
 export class FormulaCellVertex extends Vertex {
   private cachedCellValue?: CellValue;
@@ -28,6 +30,14 @@ export class FormulaCellVertex extends Vertex {
   getFormula() : Ast {
     return this.formula
   }
+
+  getCellValue() {
+    if (this.cachedCellValue != null) {
+      return this.cachedCellValue
+    } else {
+      throw Error("Value of the formula cell is not computed.")
+    }
+  }
 }
 
 export class ValueCellVertex extends Vertex {
@@ -36,5 +46,9 @@ export class ValueCellVertex extends Vertex {
   constructor(cellValue: CellValue) {
     super()
     this.cellValue = cellValue;
+  }
+
+  getCellValue() {
+    return this.cellValue
   }
 }

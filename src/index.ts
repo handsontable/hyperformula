@@ -1,5 +1,5 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {Vertex} from "./Vertex";
+import {CellValue, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
 
 
@@ -9,5 +9,11 @@ export class HandsOnEngine {
 
   loadSheet(sheet : Sheet) {
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping)
+    graphBuilder.buildGraph(sheet)
+  }
+
+  getCellValue(address: string) : CellValue {
+    const vertex = this.addressMapping.get(address)!
+    return vertex.getCellValue()
   }
 }
