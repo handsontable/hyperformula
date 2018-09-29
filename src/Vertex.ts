@@ -31,6 +31,10 @@ export class FormulaCellVertex extends Vertex {
     return this.formula
   }
 
+  setCellValue(cellValue: CellValue) {
+     this.cachedCellValue = cellValue
+  }
+
   getCellValue() {
     if (this.cachedCellValue != null) {
       return this.cachedCellValue

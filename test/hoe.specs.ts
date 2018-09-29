@@ -23,4 +23,9 @@ describe('Integration', () => {
 
     expect(hoe.getCellValue("C2")).toBe('6')
   })
+
+  it("#loadSheet", () => {
+    hoe.loadSheet([['42', '=A1']])
+    expect(hoe.getCellValue('B1')).toBe('42')
+  })
 });

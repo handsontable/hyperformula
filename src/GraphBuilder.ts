@@ -44,12 +44,12 @@ export class GraphBuilder {
       })
     })
 
-    dependencies.forEach((cellDependencies: Array<string>, startCell: string) => {
-      cellDependencies.forEach((endCell: string) => {
-        if (this.addressMapping.has(startCell) && this.addressMapping.has(endCell)) {
+    dependencies.forEach((cellDependencies: Array<string>, endCell: string) => {
+      cellDependencies.forEach((startCell: string) => {
+        if (this.addressMapping.has(endCell) && this.addressMapping.has(startCell)) {
           this.graph.addEdge(this.addressMapping.get(startCell)!, this.addressMapping.get(endCell)!)
         } else {
-          throw Error(`One of this nodes does not exist in graph: ${startCell}, ${endCell}`)
+          throw Error(`One of this nodes does not exist in graph: ${endCell}, ${startCell}`)
         }
       })
     })

@@ -1,6 +1,7 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, Vertex} from "./Vertex";
+import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
+import {Ast} from "./parser/parser";
 
 
 export class HandsOnEngine {
@@ -10,6 +11,26 @@ export class HandsOnEngine {
   loadSheet(sheet : Sheet) {
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping)
     graphBuilder.buildGraph(sheet)
+
+    const vertices = this.graph.topologicalSort()
+
+    vertices.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex) {
+        const formula = vertex.getFormula()
+        const cellValue = this.computeFormula(formula)
+        vertex.setCellValue(cellValue)
+      }
+    })
+  }
+
+  computeFormula(formula : Ast) : CellValue {
+    if (formula.type == "RELATIVE_CELL") {
+      const address = formula.args[0]
+      const vertex = this.addressMapping.get(address as string)!
+      return vertex.getCellValue()
+    } else {
+      throw Error("Unsupported formula")
+    }
   }
 
   getCellValue(address: string) : CellValue {

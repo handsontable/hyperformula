@@ -1,3 +1,5 @@
+import {AstNodeType} from "../AstNodeType";
+
 declare interface Ast {
   type: string,
   args: [Ast | number | string]
