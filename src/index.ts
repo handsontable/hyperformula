@@ -2,7 +2,7 @@ import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
 import {Ast} from "./parser/parser";
-
+import {AstNodeType} from "./AstNodeType";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
@@ -24,12 +24,14 @@ export class HandsOnEngine {
   }
 
   computeFormula(formula : Ast) : CellValue {
-    if (formula.type == "RELATIVE_CELL") {
-      const address = formula.args[0]
-      const vertex = this.addressMapping.get(address as string)!
-      return vertex.getCellValue()
-    } else {
-      throw Error("Unsupported formula")
+    switch (formula.type) {
+      case AstNodeType.RELATIVE_CELL:
+        const address = formula.args[0]
+        const vertex = this.addressMapping.get(address as string)!
+        return vertex.getCellValue()
+        break
+      default:
+        throw Error("Unsupported formula")
     }
   }
 
