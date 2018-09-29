@@ -2,6 +2,7 @@ import {Parser} from './parser/parser'
 import {AstNodeType} from "./AstNodeType"
 import {Graph} from './Graph'
 import {FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
+import {AstBuilder} from "./parser/AstBuilder";
 // [
 //     ['', '', ''],
 //     ['', '', '']
@@ -13,6 +14,7 @@ const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
 
 export class GraphBuilder {
   private parser = new Parser()
+  private astBuilder = new AstBuilder()
 
   private graph: Graph<Vertex>
   private addressMapping: Map<string, Vertex>
@@ -31,7 +33,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (this.isFormula(cellContent)) {
-          let ast = this.parser.parse(cellContent.substr(1))
+          let ast = this.astBuilder.buildAst(this.parser.parse(cellContent.substr(1)))
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, this.getVertexDependencies(vertex, rowIndex, colIndex))

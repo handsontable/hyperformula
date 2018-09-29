@@ -1,13 +1,13 @@
 import {AstNodeType} from "../AstNodeType";
 
-declare interface Ast {
+declare interface RawAst {
   type: AstNodeType,
-  args: [Ast | number | string]
+  args: [RawAst | number | string]
 }
 
 declare class Parser {
   constructor()
-  parse(text: string) : Ast
+  parse(text: string) : RawAst
 }
 
-export { Parser, Ast }
+export { Parser, RawAst }

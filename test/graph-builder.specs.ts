@@ -10,7 +10,7 @@ describe('GraphBuilder', () => {
     let graphBuilder = new GraphBuilder(graph, addressMapping)
 
     graphBuilder.buildGraph([
-        ['1', 'A5', '=SUM(1,2,3)'],
+        ['1', 'A5', '2'],
         ['foo', 'bar', '=A2']
     ])
 

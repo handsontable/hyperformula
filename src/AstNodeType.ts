@@ -21,3 +21,51 @@ export enum AstNodeType {
 
   ARRAY = "ARRAY"
 }
+
+
+export abstract class Ast {}
+
+export class OpAst extends Ast {
+  args: Array<Ast>
+  constructor(args : Array<Ast>) {
+    super()
+    this.args = args
+  }
+
+  left() {
+    return this.args[0]
+  }
+
+  right() {
+    return this.args[1]
+  }
+}
+
+export class PlusOpAst extends OpAst {}
+export class MinusOpAst extends OpAst {}
+export class TimesOpAst extends OpAst {}
+export class DivOpAst extends OpAst {}
+
+export class RelativeCellAst extends Ast {
+  args: Array<string>
+  constructor(args : Array<string>) {
+    super()
+    this.args = args
+  }
+
+  getAddress() : string {
+    return this.args[0]
+  }
+}
+
+export class NumberAst extends Ast {
+  args: Array<string>
+  constructor(args : Array<string>) {
+    super()
+    this.args = args
+  }
+
+  getValue() : number {
+    return parseInt(this.args[0])
+  }
+}
