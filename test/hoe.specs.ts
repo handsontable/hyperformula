@@ -26,6 +26,13 @@ describe('Integration', () => {
 
   it("#loadSheet", () => {
     hoe.loadSheet([['42', '=A1']])
+
     expect(hoe.getCellValue('B1')).toBe('42')
+  })
+
+  it("#loadSheet", () => {
+    hoe.loadSheet([['3', '7', '=A1+B1']])
+
+    expect(hoe.getCellValue('C1')).toBe('10')
   })
 });
