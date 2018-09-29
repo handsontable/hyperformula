@@ -4,9 +4,12 @@ import {Vertex} from "../src/Vertex";
 
 describe('GraphBuilder', () => {
   it('#buildGraph', () => {
-    let graphBuilder = new GraphBuilder()
+    const graph = new Graph<Vertex>()
+    const addressMapping : Map<string, Vertex> = new Map()
 
-    let graph = graphBuilder.buildGraph([
+    let graphBuilder = new GraphBuilder(graph, addressMapping)
+
+    graphBuilder.buildGraph([
         ['1', 'A5', '=SUM(1,2,3)'],
         ['foo', 'bar', '=A2']
     ])

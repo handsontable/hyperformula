@@ -6,7 +6,7 @@ import {FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 //     ['', '', ''],
 //     ['', '', '']
 // ]
-type Sheet = Array<Array<string>>
+export type Sheet = Array<Array<string>>
 
 const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
@@ -14,9 +14,15 @@ const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
 export class GraphBuilder {
   private parser = new Parser()
 
-  buildGraph(sheet: Sheet): Graph<Vertex> {
-    let graph = new Graph<Vertex>()
-    let addressMapping: Map<string, Vertex> = new Map()
+  private graph: Graph<Vertex>
+  private addressMapping: Map<string, Vertex>
+
+  constructor(graph: Graph<Vertex>, addressMapping: Map<string, Vertex>) {
+    this.graph = graph
+    this.addressMapping = addressMapping
+  }
+
+  buildGraph(sheet: Sheet) {
     let dependencies: Map<string, Array<string>> = new Map()
 
     sheet.forEach((row, rowIndex) => {
@@ -27,28 +33,26 @@ export class GraphBuilder {
         if (this.isFormula(cellContent)) {
           let ast = this.parser.parse(cellContent.substr(1))
           vertex = new FormulaCellVertex(ast)
-          graph.addNode(vertex)
+          this.graph.addNode(vertex)
           dependencies.set(cellAddress, this.getVertexDependencies(vertex, rowIndex, colIndex))
         } else {
           vertex = new ValueCellVertex(cellContent)
-          graph.addNode(vertex)
+          this.graph.addNode(vertex)
         }
 
-        addressMapping.set(cellCoordinatesToLabel(rowIndex, colIndex), vertex)
+        this.addressMapping.set(cellCoordinatesToLabel(rowIndex, colIndex), vertex)
       })
     })
 
     dependencies.forEach((cellDependencies: Array<string>, startCell: string) => {
       cellDependencies.forEach((endCell: string) => {
-        if (addressMapping.has(startCell) && addressMapping.has(endCell)) {
-          graph.addEdge(addressMapping.get(startCell)!!, addressMapping.get(endCell)!!)
+        if (this.addressMapping.has(startCell) && this.addressMapping.has(endCell)) {
+          this.graph.addEdge(this.addressMapping.get(startCell)!!, this.addressMapping.get(endCell)!!)
         } else {
           throw Error(`One of this nodes does not exist in graph: ${startCell}, ${endCell}`)
         }
       })
     })
-
-    return graph
   }
 
   private getVertexDependencies(vertex: FormulaCellVertex, rowIndex: number, colIndex: number) : Array<string>{
