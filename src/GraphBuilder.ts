@@ -1,5 +1,5 @@
 import {Parser} from './parser/parser'
-import {AstNodeType} from "./AstNodeType"
+import {AstNodeType, RelativeCellAst} from "./AstNodeType"
 import {Graph} from './Graph'
 import {FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 import {AstBuilder} from "./parser/AstBuilder";
@@ -63,8 +63,8 @@ export class GraphBuilder {
 
     let dependencies = []
 
-    if (ast.type == AstNodeType.RELATIVE_CELL) {
-      dependencies.push(ast.args[0] as string)
+    if (ast instanceof RelativeCellAst) {
+      dependencies.push(ast.getAddress())
     }
 
     return dependencies

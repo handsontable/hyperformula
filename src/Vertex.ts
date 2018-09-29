@@ -1,4 +1,4 @@
-import { Ast } from './parser/parser'
+import {Ast} from "./AstNodeType";
 
 type VertexId = number;
 let nextVertexId = 0;
