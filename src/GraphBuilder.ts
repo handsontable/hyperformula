@@ -1,7 +1,7 @@
 import {Parser} from './parser/parser'
 import {AstNodeType, RelativeCellAst} from "./AstNodeType"
 import {Graph} from './Graph'
-import {FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 import {AstBuilder} from "./parser/AstBuilder";
 // [
 //     ['', '', ''],
@@ -48,11 +48,21 @@ export class GraphBuilder {
 
     dependencies.forEach((cellDependencies: Array<string>, endCell: string) => {
       cellDependencies.forEach((startCell: string) => {
-        if (this.addressMapping.has(endCell) && this.addressMapping.has(startCell)) {
-          this.graph.addEdge(this.addressMapping.get(startCell)!, this.addressMapping.get(endCell)!)
-        } else {
-          throw Error(`One of this nodes does not exist in graph: ${endCell}, ${startCell}`)
+        if (!this.addressMapping.has(endCell)) {
+          throw Error(`${endCell} does not exist in graph`)
         }
+
+        let vertex : Vertex
+
+        if (this.addressMapping.has(startCell)) {
+          vertex = this.addressMapping.get(startCell)!
+        } else {
+          vertex = new EmptyCellVertex()
+          this.graph.addNode(vertex)
+          this.addressMapping.set(startCell, vertex)
+        }
+
+        this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
       })
     })
   }
@@ -77,11 +87,11 @@ export class GraphBuilder {
 
 
 
-function cellCoordinatesToLabel(rowIndex: number, colIndex: number): string {
+export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): string {
   return columnIndexToLabel(colIndex) + (rowIndex + 1)
 }
 
-function columnIndexToLabel(column: number) {
+export function columnIndexToLabel(column: number) {
   let result = '';
 
   while (column >= 0) {

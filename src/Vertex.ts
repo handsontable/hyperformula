@@ -56,3 +56,13 @@ export class ValueCellVertex extends Vertex {
     return this.cellValue
   }
 }
+
+export class EmptyCellVertex extends Vertex {
+  constructor() {
+    super()
+  }
+
+  getCellValue() {
+    return '0'
+  }
+}

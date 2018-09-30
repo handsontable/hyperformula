@@ -41,4 +41,11 @@ describe('Integration', () => {
 
     expect(hoe.getCellValue('B1')).toBe('45')
   })
+
+  it("#loadSheet evaluate empty vertex", () => {
+    hoe.loadSheet([['=A5']])
+
+    expect(hoe.getCellValue('A1')).toBe('0')
+    expect(hoe.getCellValue('A5')).toBe('0')
+  })
 });
