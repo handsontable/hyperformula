@@ -36,7 +36,7 @@ export class GraphBuilder {
           let ast = this.astBuilder.buildAst(this.parser.parse(cellContent.substr(1)))
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
-          dependencies.set(cellAddress, this.getVertexDependencies(vertex, rowIndex, colIndex))
+          dependencies.set(cellAddress, this.getVertexDependencies(vertex))
         } else {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)
@@ -67,7 +67,7 @@ export class GraphBuilder {
     })
   }
 
-  private getVertexDependencies(vertex: FormulaCellVertex, rowIndex: number, colIndex: number) : Array<string>{
+  private getVertexDependencies(vertex: FormulaCellVertex) : Array<string>{
     /* TODO simplest case for =A5 like formulas */
     let ast = vertex.getFormula()
 
@@ -85,13 +85,11 @@ export class GraphBuilder {
   }
 }
 
-
-
 export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): string {
   return columnIndexToLabel(colIndex) + (rowIndex + 1)
 }
 
-export function columnIndexToLabel(column: number) {
+function columnIndexToLabel(column: number) {
   let result = '';
 
   while (column >= 0) {
