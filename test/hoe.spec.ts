@@ -48,4 +48,10 @@ describe('Integration', () => {
       hoe.loadSheet([['5','6','7','=A1+D1']])
     }).toThrowError(new Error('Graph has a cycle'))
   })
+
+  it("#loadSheet with a loop inside minus operator", () => {
+    expect(() => {
+      hoe.loadSheet([['5','=A1-B1']])
+    }).toThrowError(new Error('Graph has a cycle'))
+  })
 });
