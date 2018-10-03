@@ -40,6 +40,17 @@ describe('Basic Graph manipulation', () => {
     expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
   })
 
+  it('#addEdge removes multiple edges', () => {
+    const graph = new Graph();
+
+    graph.addNode("foo")
+    graph.addNode("bar")
+    graph.addEdge("foo", "bar")
+    graph.addEdge("foo", "bar")
+
+    expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
+  })
+
   it('#addEdge is raising an error when the origin node not present', () => {
     const graph = new Graph()
     graph.addNode('target')
@@ -93,6 +104,18 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge("x4", "x3")
 
     expect(graph.topologicalSort()).toEqual(["x0", "x1", "x4", "x2", "x3"]);
+  })
+
+  it("#topologicalSort for not connected graph", () => {
+    const graph = new Graph()
+    graph.addNode("x0")
+    graph.addNode("x1")
+    graph.addNode("x2")
+    graph.addNode("x3")
+    graph.addEdge("x0", "x2")
+    graph.addEdge("x1", "x3")
+
+    expect(graph.topologicalSort()).toEqual(["x0", "x1", "x2", "x3"]);
   })
 
   it("#topologicalSort raise an error if has a trivial cycle", () => {
