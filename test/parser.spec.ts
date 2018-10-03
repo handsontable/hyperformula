@@ -3,13 +3,12 @@ import {AstNodeType} from "../src/AstNodeType"
 
 
 describe('Basic parser test', () => {
-    it('#parse produces simple node with correct type', () => {
-        var parser = new Parser()
+    const parser = new Parser()
 
+    it('#parse produces simple node with correct type', () => {
         // operators
         expect(parser.parse("1").type).toBe(AstNodeType.NUMBER)
         expect(parser.parse("'foo'").type).toBe(AstNodeType.STRING)
-        expect(parser.parse("1+2").type).toBe(AstNodeType.PLUS_OP)
         expect(parser.parse("1-2").type).toBe(AstNodeType.MINUS_OP)
         expect(parser.parse("1*2").type).toBe(AstNodeType.TIMES_OP)
         expect(parser.parse("1/2").type).toBe(AstNodeType.DIV_OP)
@@ -31,9 +30,17 @@ describe('Basic parser test', () => {
         expect(parser.parse("$A5:B5").type).toBe(AstNodeType.CELL_RANGE)
     })
 
-    it("function calls without arguments", () => {
-        const parser = new Parser()
+    it("plus operator on literals", () => {
+        const ast = parser.parse("1+2")
 
+        expect(ast.type).toBe(AstNodeType.PLUS_OP)
+        expect(ast.args).toEqual([
+            { type: AstNodeType.NUMBER, args: ["1"] },
+            { type: AstNodeType.NUMBER, args: ["2"] },
+        ])
+    })
+
+    it("function calls without arguments", () => {
         const ast = parser.parse("SUM()")
 
         expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
@@ -41,8 +48,6 @@ describe('Basic parser test', () => {
     })
 
     it("function calls with arguments", () => {
-        const parser = new Parser()
-
         const ast = parser.parse("SUM(1, 2)")
 
         expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)

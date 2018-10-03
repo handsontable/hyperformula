@@ -25,26 +25,29 @@ export enum AstNodeType {
 
 export abstract class Ast {}
 
-export class OpAst extends Ast {
-  args: Array<Ast>
-  constructor(args : Array<Ast>) {
+export class BinaryOpAst extends Ast {
+  private leftNode: Ast;
+  private rightNode: Ast;
+
+  constructor(left: Ast, right: Ast) {
     super()
-    this.args = args
+    this.leftNode = left
+    this.rightNode = right
   }
 
   left() {
-    return this.args[0]
+    return this.leftNode
   }
 
   right() {
-    return this.args[1]
+    return this.rightNode
   }
 }
 
-export class PlusOpAst extends OpAst {}
-export class MinusOpAst extends OpAst {}
-export class TimesOpAst extends OpAst {}
-export class DivOpAst extends OpAst {}
+export class PlusOpAst extends BinaryOpAst {}
+export class MinusOpAst extends BinaryOpAst {}
+export class TimesOpAst extends BinaryOpAst {}
+export class DivOpAst extends BinaryOpAst {}
 
 export class RelativeCellAst extends Ast {
   args: Array<string>
@@ -59,13 +62,14 @@ export class RelativeCellAst extends Ast {
 }
 
 export class NumberAst extends Ast {
-  args: Array<string>
-  constructor(args : Array<string>) {
+  private value: string
+
+  constructor(value: string) {
     super()
-    this.args = args
+    this.value = value
   }
 
   getValue() : number {
-    return parseInt(this.args[0])
+    return parseInt(this.value)
   }
 }
