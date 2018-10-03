@@ -23,7 +23,7 @@ export class HandsOnEngine {
   }
 
   computeFormula(formula: Ast): CellValue {
-    switch (formula.kind) {
+    switch (formula.type) {
       case AstNodeType.RELATIVE_CELL: {
         const address = formula.address
         const vertex = this.addressMapping.get(address)!

@@ -66,7 +66,7 @@ export class GraphBuilder {
   }
 
   private getFormulaDependencies(ast: Ast) : Array<string> {
-    switch (ast.kind) {
+    switch (ast.type) {
       case AstNodeType.RELATIVE_CELL: {
         return [ast.address];
       }
