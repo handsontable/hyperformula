@@ -43,8 +43,8 @@ describe('Basic parser test', () => {
         expect(ast.type).toBe(RawAstNodeType.FUNCTION_CALL)
         expect(ast.args[0]).toBe("SUM")
         expect(ast.args[1]).toEqual([
-            { type: RawAstNodeType.NUMBER, args: ["1"] },
-            { type: RawAstNodeType.NUMBER, args: ["2"] },
+            { type: RawAstNodeType.NUMBER, args: [1] },
+            { type: RawAstNodeType.NUMBER, args: [2] },
         ])
     })
 });

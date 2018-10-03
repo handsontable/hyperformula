@@ -77,7 +77,7 @@ expression
       $$ = ASTNode('variableSequence', $1);
     }
   | number {
-      $$ = ASTNode('NUMBER', [$1])
+      $$ = ASTNode('NUMBER', [parseInt($1)])
     }
   | STRING {
       $$ = ASTNode('STRING', [$1])

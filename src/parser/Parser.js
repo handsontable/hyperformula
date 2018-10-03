@@ -95,7 +95,7 @@ case 2:
 break;
 case 3:
 
-      this.$ = ASTNode('NUMBER', [$$[$0]])
+      this.$ = ASTNode('NUMBER', [parseInt($$[$0])])
     
 break;
 case 4:

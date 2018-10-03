@@ -26,7 +26,7 @@ function buildAst(rawAst: RawAst) : Ast {
     case RawAstNodeType.TIMES_OP:
       return new TimesOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.NUMBER:
-      return new NumberAst(rawAst.args[0] as string)
+      return new NumberAst(rawAst.args[0] as number)
     default:
       throw Error("Unsupported AST node type")
   }
