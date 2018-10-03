@@ -2,7 +2,6 @@ import {FullParser} from './parser/FullParser'
 import {RelativeCellAst} from "./parser/Ast"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
-import {buildAst} from "./parser/AstBuilder";
 // [
 //     ['', '', ''],
 //     ['', '', '']
@@ -32,7 +31,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (this.isFormula(cellContent)) {
-          let ast = buildAst(this.parser.parse(cellContent.substr(1)))
+          let ast = this.parser.parse(cellContent.substr(1))
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, this.getVertexDependencies(vertex))

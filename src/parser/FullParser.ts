@@ -1,4 +1,6 @@
 import {Parser, RawAst} from './Parser'
+import {Ast} from './Ast'
+import {buildAst} from './AstBuilder'
 
 export class FullParser {
   private parser: Parser
@@ -7,9 +9,9 @@ export class FullParser {
     this.parser = new Parser()
   }
 
-  parse(text: string) : RawAst {
+  parse(text: string) : Ast {
     const rawAst = this.parser.parse(text)
-    return rawAst
+    return buildAst(rawAst)
   }
 }
 
