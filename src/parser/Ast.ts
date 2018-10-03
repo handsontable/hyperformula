@@ -1,50 +1,43 @@
-export abstract class Ast {}
+export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst;
 
-export class BinaryOpAst extends Ast {
-  private leftNode: Ast;
-  private rightNode: Ast;
+export enum Kinds {
+  NUMBER = "NUMBER",
 
-  constructor(left: Ast, right: Ast) {
-    super()
-    this.leftNode = left
-    this.rightNode = right
-  }
+  RELATIVE_CELL = "RELATIVE_CELL",
 
-  left() {
-    return this.leftNode
-  }
-
-  right() {
-    return this.rightNode
-  }
+  PLUS_OP = "PLUS_OP",
+  MINUS_OP = "MINUS_OP",
+  TIMES_OP = "TIMES_OP"
 }
 
-export class PlusOpAst extends BinaryOpAst {}
-export class MinusOpAst extends BinaryOpAst {}
-export class TimesOpAst extends BinaryOpAst {}
+export interface NumberAst {
+  kind: Kinds.NUMBER,
+  value: number,
+}
+export const buildNumberAst = (value: number): NumberAst => ({ kind: Kinds.NUMBER, value })
 
-export class RelativeCellAst extends Ast {
-  private address: string
+export interface RelativeCellAst {
+  kind: Kinds.RELATIVE_CELL,
+  address: string,
+}
+export const buildRelativeCellAst = (address: string): RelativeCellAst => ({ kind: Kinds.RELATIVE_CELL, address })
 
-  constructor(address: string) {
-    super()
-    this.address = address
-  }
-
-  getAddress() : string {
-    return this.address
-  }
+export interface BinaryOpAst {
+  left: Ast,
+  right: Ast,
 }
 
-export class NumberAst extends Ast {
-  private value: number
-
-  constructor(value: number) {
-    super()
-    this.value = value
-  }
-
-  getValue() : number {
-    return this.value
-  }
+export interface PlusOpAst extends BinaryOpAst {
+  kind: Kinds.PLUS_OP,
 }
+export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({ kind: Kinds.PLUS_OP, left, right })
+
+export interface MinusOpAst extends BinaryOpAst {
+  kind: Kinds.MINUS_OP,
+}
+export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({ kind: Kinds.MINUS_OP, left, right })
+
+export interface TimesOpAst extends BinaryOpAst {
+  kind: Kinds.TIMES_OP,
+}
+export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({ kind: Kinds.TIMES_OP, left, right })

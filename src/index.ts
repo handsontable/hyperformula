@@ -1,7 +1,7 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
-import {Ast, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
+import {Ast, Kinds, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
@@ -23,29 +23,31 @@ export class HandsOnEngine {
   }
 
   computeFormula(formula: Ast): CellValue {
-    if (formula instanceof RelativeCellAst) {
-      const address = formula.getAddress()
-      const vertex = this.addressMapping.get(address)!
-      return vertex.getCellValue()
-    } else if (formula instanceof PlusOpAst) {
-      const child1 = formula.left()
-      const child2 = formula.right()
-      const child1Result = this.computeFormula(child1) as string
-      const child2Result = this.computeFormula(child2) as string
-      return String(parseInt(child1Result) + parseInt(child2Result));
-    } else if (formula instanceof NumberAst) {
-      const numberValue = formula.getValue()
-      return String(numberValue)
-    } else if (formula instanceof MinusOpAst) {
-      const child1Result = this.computeFormula(formula.left()) as string
-      const child2Result = this.computeFormula(formula.right()) as string
-      return String(parseInt(child1Result) - parseInt(child2Result));
-    } else if (formula instanceof TimesOpAst) {
-      const child1Result = this.computeFormula(formula.left()) as string
-      const child2Result = this.computeFormula(formula.right()) as string
-      return String(parseInt(child1Result) * parseInt(child2Result));
-    } else {
-      throw Error("Unsupported formula")
+    switch (formula.kind) {
+      case Kinds.RELATIVE_CELL: {
+        const address = formula.address
+        const vertex = this.addressMapping.get(address)!
+        return vertex.getCellValue()
+      }
+      case Kinds.NUMBER: {
+        const numberValue = formula.value
+        return String(numberValue)
+      }
+      case Kinds.PLUS_OP: {
+        const child1Result = this.computeFormula(formula.left) as string
+        const child2Result = this.computeFormula(formula.right) as string
+        return String(parseInt(child1Result) + parseInt(child2Result));
+      }
+      case Kinds.MINUS_OP: {
+        const child1Result = this.computeFormula(formula.left) as string
+        const child2Result = this.computeFormula(formula.right) as string
+        return String(parseInt(child1Result) - parseInt(child2Result));
+      }
+      case Kinds.TIMES_OP: {
+        const child1Result = this.computeFormula(formula.left) as string
+        const child2Result = this.computeFormula(formula.right) as string
+        return String(parseInt(child1Result) * parseInt(child2Result));
+      }
     }
   }
 

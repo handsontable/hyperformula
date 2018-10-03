@@ -1,5 +1,5 @@
 import {FullParser} from './parser/FullParser'
-import {Ast, RelativeCellAst, PlusOpAst, MinusOpAst} from "./parser/Ast"
+import {Ast, Kinds} from "./parser/Ast"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 // [
@@ -66,14 +66,22 @@ export class GraphBuilder {
   }
 
   private getFormulaDependencies(ast: Ast) : Array<string> {
-    if (ast instanceof RelativeCellAst) {
-      return [ast.getAddress()];
-    } else if (ast instanceof PlusOpAst) {
-      return this.getFormulaDependencies(ast.left()).concat(this.getFormulaDependencies(ast.right()))
-    } else if (ast instanceof MinusOpAst) {
-      return this.getFormulaDependencies(ast.left()).concat(this.getFormulaDependencies(ast.right()))
-    } else {
-      return []
+    switch (ast.kind) {
+      case Kinds.RELATIVE_CELL: {
+        return [ast.address];
+      }
+      case Kinds.PLUS_OP: {
+        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
+      }
+      case Kinds.MINUS_OP: {
+        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
+      }
+      case Kinds.TIMES_OP: {
+        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
+      }
+      case Kinds.NUMBER: {
+        return []
+      }
     }
   }
 
