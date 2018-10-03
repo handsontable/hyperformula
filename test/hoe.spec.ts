@@ -48,6 +48,12 @@ describe('Integration', () => {
     expect(hoe.getCellValue('B1')).toBe('-40')
   })
 
+  it("#loadSheet evaluate times operator", () => {
+    hoe.loadSheet([['3', '=A1*6']])
+
+    expect(hoe.getCellValue('B1')).toBe('18')
+  })
+
   it("#loadSheet evaluate empty vertex", () => {
     hoe.loadSheet([['=A5']])
 
