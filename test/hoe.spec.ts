@@ -30,16 +30,22 @@ describe('Integration', () => {
     expect(hoe.getCellValue('B1')).toBe('42')
   })
 
-  it("#loadSheet evaluate sum operator", () => {
+  it("#loadSheet evaluate plus operator", () => {
     hoe.loadSheet([['3', '7', '=A1+B1']])
 
     expect(hoe.getCellValue('C1')).toBe('10')
   })
 
-  it("#loadSheet evaluate sum operator", () => {
+  it("#loadSheet evaluate plus operator", () => {
     hoe.loadSheet([['3', '=A1+42']])
 
     expect(hoe.getCellValue('B1')).toBe('45')
+  })
+
+  it("#loadSheet evaluate minus operator", () => {
+    hoe.loadSheet([['3', '=A1-43']])
+
+    expect(hoe.getCellValue('B1')).toBe('-40')
   })
 
   it("#loadSheet evaluate empty vertex", () => {
