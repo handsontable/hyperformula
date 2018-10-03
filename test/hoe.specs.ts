@@ -49,21 +49,21 @@ describe('Integration', () => {
     expect(hoe.getCellValue('A5')).toBe('0')
   })
 
-  /*it("#loadSheet evaluate empty vertex", () => {
+  it.skip("#loadSheet evaluate empty vertex", () => {
     hoe.loadSheet([['','=A1']])
 
     expect(hoe.getCellValue('B1')).toBe('0')
-  })*/
+  })
   
   it("loadSheet with a loop", () => {
         expect(() => {
 	      hoe.loadSheet([['=B1','=C1','=A1']])
     	}).toThrowError(new Error('Graph has a cycle'))
   })
-  /*
-  it("loadSheet with a loop", () => {
+  
+  it.skip("loadSheet with a loop", () => {
         expect(() => {
 	      hoe.loadSheet([['5','6','7','=A1+D1']])
     	}).toThrowError(new Error('Graph has a cycle'))
-  })*/
+  })
 });
