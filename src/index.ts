@@ -28,11 +28,11 @@ export class HandsOnEngine {
       const vertex = this.addressMapping.get(address)!
       return vertex.getCellValue()
     } else if (formula instanceof PlusOpAst) {
-        const child1 = formula.left()
-        const child2 = formula.right()
-        const child1Result = this.computeFormula(child1) as string
-        const child2Result = this.computeFormula(child2) as string
-        return String(parseInt(child1Result) + parseInt(child2Result));
+      const child1 = formula.left()
+      const child2 = formula.right()
+      const child1Result = this.computeFormula(child1) as string
+      const child2Result = this.computeFormula(child2) as string
+      return String(parseInt(child1Result) + parseInt(child2Result));
     } else if (formula instanceof NumberAst) {
       const numberValue = formula.getValue()
       return String(numberValue)
