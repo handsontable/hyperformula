@@ -62,13 +62,14 @@ export class RelativeCellAst extends Ast {
 }
 
 export class NumberAst extends Ast {
-  args: Array<string>
-  constructor(args : Array<string>) {
+  private value: string
+
+  constructor(value: string) {
     super()
-    this.args = args
+    this.value = value
   }
 
   getValue() : number {
-    return parseInt(this.args[0])
+    return parseInt(this.value)
   }
 }

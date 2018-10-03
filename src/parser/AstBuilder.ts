@@ -11,7 +11,7 @@ export function buildAst(rawAst: RawAst) : Ast {
     case AstNodeType.MINUS_OP:
       return new MinusOpAst(buildAst(rawAst.args[0] as RawAst), processArgs(rawAst.args as Array<RawAst>))
     case AstNodeType.NUMBER:
-      return new NumberAst(rawAst.args as Array<string>)
+      return new NumberAst(rawAst.args[0] as string)
     default:
       throw Error("Unsupported AST node type")
   }
