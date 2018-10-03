@@ -1,7 +1,7 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
-import {Ast, AstNodeType, NumberAst, PlusOpAst, RelativeCellAst} from "./AstNodeType";
+import {Ast, NumberAst, PlusOpAst, RelativeCellAst} from "./parser/Ast";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()

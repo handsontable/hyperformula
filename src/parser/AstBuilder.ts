@@ -1,5 +1,5 @@
 import {RawAst} from "./Parser";
-import {MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst, Ast} from "../AstNodeType";
+import {MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst, Ast} from "./Ast";
 import {RawAstNodeType} from "./RawAstNodeType"
 
 
