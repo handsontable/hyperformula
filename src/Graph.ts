@@ -31,10 +31,10 @@ export class Graph<T> {
   }
 
   topologicalSort() : Array<T> {
-    const reversedEdges = this.reversedEdges()
+    const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: Array<T> = []
-    reversedEdges.forEach((sourceNodes, targetNode) => {
-      if (sourceNodes.size === 0) {
+    incomingEdges.forEach((currentCount, targetNode) => {
+      if (currentCount === 0) {
         nodesWithNoIncomingEdge.push(targetNode)
       }
     })
@@ -43,8 +43,8 @@ export class Graph<T> {
       const currentNode = nodesWithNoIncomingEdge.shift() as T
       topologicalOrdering.push(currentNode)
       this.edges.get(currentNode)!.forEach((targetNode) => {
-        reversedEdges.get(targetNode)!.delete(currentNode)
-        if (reversedEdges.get(targetNode)!.size === 0) {
+        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
+        if (incomingEdges.get(targetNode) === 0) {
           nodesWithNoIncomingEdge.push(targetNode)
         }
       })
@@ -55,14 +55,14 @@ export class Graph<T> {
     return topologicalOrdering
   }
 
-  reversedEdges() : Map<T, Set<T>> {
-    const reversedEdges: Map<T, Set<T>> = new Map()
-    this.nodes.forEach((node) => reversedEdges.set(node, new Set()))
+  incomingEdges() : Map<T, number> {
+    const incomingEdges: Map<T, number> = new Map()
+    this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
     this.edges.forEach((adjacentNodes, sourceNode) => {
       adjacentNodes.forEach((targetNode) => {
-        reversedEdges.get(targetNode)!.add(sourceNode)
+        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
       })
     });
-    return reversedEdges;
+    return incomingEdges;
   }
 }
