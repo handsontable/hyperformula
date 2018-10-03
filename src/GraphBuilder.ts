@@ -70,12 +70,8 @@ export class GraphBuilder {
       case Kinds.RELATIVE_CELL: {
         return [ast.address];
       }
-      case Kinds.PLUS_OP: {
-        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
-      }
-      case Kinds.MINUS_OP: {
-        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
-      }
+      case Kinds.PLUS_OP:
+      case Kinds.MINUS_OP:
       case Kinds.TIMES_OP: {
         return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
       }
