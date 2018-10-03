@@ -1,5 +1,5 @@
 import {FullParser} from './parser/FullParser'
-import {RelativeCellAst} from "./parser/Ast"
+import {Ast, RelativeCellAst, PlusOpAst} from "./parser/Ast"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 // [
@@ -34,7 +34,7 @@ export class GraphBuilder {
           let ast = this.parser.parse(cellContent.substr(1))
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
-          dependencies.set(cellAddress, this.getVertexDependencies(vertex))
+          dependencies.set(cellAddress, this.getFormulaDependencies(vertex.getFormula()))
         } else {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)
@@ -65,17 +65,14 @@ export class GraphBuilder {
     })
   }
 
-  private getVertexDependencies(vertex: FormulaCellVertex) : Array<string>{
-    /* TODO simplest case for =A5 like formulas */
-    let ast = vertex.getFormula()
-
-    let dependencies = []
-
+  private getFormulaDependencies(ast: Ast) : Array<string> {
     if (ast instanceof RelativeCellAst) {
-      dependencies.push(ast.getAddress())
+      return [ast.getAddress()];
+    } else if (ast instanceof PlusOpAst) {
+      return this.getFormulaDependencies(ast.left()).concat(this.getFormulaDependencies(ast.right()))
+    } else {
+      return []
     }
-
-    return dependencies
   }
 
   private isFormula(cellContent: string): Boolean {

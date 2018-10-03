@@ -143,4 +143,14 @@ describe('Basic Graph manipulation', () => {
       graph.topologicalSort()
     }).toThrowError(new Error('Graph has a cycle'))
   })
+
+  it("#topologicalSort raise an error for one-element cycle", () => {
+    const graph = new Graph()
+    graph.addNode("x0")
+    graph.addEdge("x0", "x0")
+
+    expect(() => {
+      graph.topologicalSort()
+    }).toThrowError(new Error('Graph has a cycle'))
+  })
 });
