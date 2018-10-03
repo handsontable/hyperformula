@@ -1,5 +1,5 @@
 import {Parser, RawAst} from './Parser'
-import {Ast, MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst} from "./Ast";
+import {Ast, MinusOpAst, PlusOpAst, TimesOpAst, RelativeCellAst, NumberAst} from "./Ast";
 import {RawAstNodeType} from "./RawAstNodeType"
 
 export class FullParser {
@@ -23,6 +23,8 @@ function buildAst(rawAst: RawAst) : Ast {
       return new PlusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.MINUS_OP:
       return new MinusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
+    case RawAstNodeType.TIMES_OP:
+      return new TimesOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.NUMBER:
       return new NumberAst(rawAst.args[0] as string)
     default:

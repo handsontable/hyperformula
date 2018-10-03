@@ -1,5 +1,5 @@
 import {FullParser} from '../src/parser/FullParser'
-import {PlusOpAst, MinusOpAst, NumberAst, RelativeCellAst} from "../src/parser/Ast"
+import {PlusOpAst, MinusOpAst, TimesOpAst, NumberAst, RelativeCellAst} from "../src/parser/Ast"
 
 describe('Full parser test', () => {
   const parser = new FullParser()
@@ -31,6 +31,14 @@ describe('Full parser test', () => {
     const ast = parser.parse("1-A5") as MinusOpAst
 
     expect(ast).toBeInstanceOf(MinusOpAst)
+    expect(ast.left()).toBeInstanceOf(NumberAst)
+    expect(ast.right()).toBeInstanceOf(RelativeCellAst)
+  })
+
+  it("times operator on different nodes", () => {
+    const ast = parser.parse("1*A5") as TimesOpAst
+
+    expect(ast).toBeInstanceOf(TimesOpAst)
     expect(ast.left()).toBeInstanceOf(NumberAst)
     expect(ast.right()).toBeInstanceOf(RelativeCellAst)
   })
