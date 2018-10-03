@@ -6,7 +6,7 @@ import {RawAstNodeType} from "./RawAstNodeType"
 export function buildAst(rawAst: RawAst) : Ast {
   switch (rawAst.type) {
     case RawAstNodeType.RELATIVE_CELL:
-      return new RelativeCellAst(rawAst.args as Array<string>)
+      return new RelativeCellAst(rawAst.args[0] as string)
     case RawAstNodeType.PLUS_OP:
       return new PlusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.MINUS_OP:

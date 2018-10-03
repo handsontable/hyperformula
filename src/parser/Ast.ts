@@ -25,14 +25,15 @@ export class TimesOpAst extends BinaryOpAst {}
 export class DivOpAst extends BinaryOpAst {}
 
 export class RelativeCellAst extends Ast {
-  args: Array<string>
-  constructor(args : Array<string>) {
+  private address: string
+
+  constructor(address: string) {
     super()
-    this.args = args
+    this.address = address
   }
 
   getAddress() : string {
-    return this.args[0]
+    return this.address
   }
 }
 
