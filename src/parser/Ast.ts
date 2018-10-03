@@ -22,7 +22,6 @@ export class BinaryOpAst extends Ast {
 export class PlusOpAst extends BinaryOpAst {}
 export class MinusOpAst extends BinaryOpAst {}
 export class TimesOpAst extends BinaryOpAst {}
-export class DivOpAst extends BinaryOpAst {}
 
 export class RelativeCellAst extends Ast {
   private address: string
