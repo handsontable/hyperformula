@@ -3,9 +3,9 @@ import {AstNodeType} from "../src/AstNodeType"
 
 
 describe('Basic parser test', () => {
-    it('#parse produces simple node with correct type', () => {
-        var parser = new Parser()
+    const parser = new Parser()
 
+    it('#parse produces simple node with correct type', () => {
         // operators
         expect(parser.parse("1").type).toBe(AstNodeType.NUMBER)
         expect(parser.parse("'foo'").type).toBe(AstNodeType.STRING)
@@ -32,8 +32,6 @@ describe('Basic parser test', () => {
     })
 
     it("function calls without arguments", () => {
-        const parser = new Parser()
-
         const ast = parser.parse("SUM()")
 
         expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
@@ -41,8 +39,6 @@ describe('Basic parser test', () => {
     })
 
     it("function calls with arguments", () => {
-        const parser = new Parser()
-
         const ast = parser.parse("SUM(1, 2)")
 
         expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
