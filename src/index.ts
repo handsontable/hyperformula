@@ -1,7 +1,7 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
-import {Ast, Kinds, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
+import {Ast, AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
@@ -24,26 +24,26 @@ export class HandsOnEngine {
 
   computeFormula(formula: Ast): CellValue {
     switch (formula.kind) {
-      case Kinds.RELATIVE_CELL: {
+      case AstNodeType.RELATIVE_CELL: {
         const address = formula.address
         const vertex = this.addressMapping.get(address)!
         return vertex.getCellValue()
       }
-      case Kinds.NUMBER: {
+      case AstNodeType.NUMBER: {
         const numberValue = formula.value
         return String(numberValue)
       }
-      case Kinds.PLUS_OP: {
+      case AstNodeType.PLUS_OP: {
         const child1Result = this.computeFormula(formula.left) as string
         const child2Result = this.computeFormula(formula.right) as string
         return String(parseInt(child1Result) + parseInt(child2Result));
       }
-      case Kinds.MINUS_OP: {
+      case AstNodeType.MINUS_OP: {
         const child1Result = this.computeFormula(formula.left) as string
         const child2Result = this.computeFormula(formula.right) as string
         return String(parseInt(child1Result) - parseInt(child2Result));
       }
-      case Kinds.TIMES_OP: {
+      case AstNodeType.TIMES_OP: {
         const child1Result = this.computeFormula(formula.left) as string
         const child2Result = this.computeFormula(formula.right) as string
         return String(parseInt(child1Result) * parseInt(child2Result));

@@ -1,6 +1,5 @@
 import {Parser, RawAst} from './Parser'
-import {Ast, buildNumberAst, buildPlusOpAst, buildMinusOpAst, buildTimesOpAst, buildRelativeCellAst} from "./Ast";
-import {RawAstNodeType} from "./RawAstNodeType"
+import {Ast, buildNumberAst, buildPlusOpAst, buildMinusOpAst, buildTimesOpAst, buildRelativeCellAst, AstNodeType} from "./Ast";
 
 export class FullParser {
   private parser: Parser
@@ -17,15 +16,15 @@ export class FullParser {
 
 function buildAst(rawAst: RawAst) : Ast {
   switch (rawAst.type) {
-    case RawAstNodeType.RELATIVE_CELL:
+    case AstNodeType.RELATIVE_CELL:
       return buildRelativeCellAst(rawAst.args[0] as string)
-    case RawAstNodeType.PLUS_OP:
+    case AstNodeType.PLUS_OP:
       return buildPlusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
-    case RawAstNodeType.MINUS_OP:
+    case AstNodeType.MINUS_OP:
       return buildMinusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
-    case RawAstNodeType.TIMES_OP:
+    case AstNodeType.TIMES_OP:
       return buildTimesOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
-    case RawAstNodeType.NUMBER:
+    case AstNodeType.NUMBER:
       return buildNumberAst(rawAst.args[0] as number)
     default:
       throw Error("Unsupported AST node type")

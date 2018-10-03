@@ -1,7 +1,7 @@
-import {RawAstNodeType} from "./RawAstNodeType";
+import {AstNodeType} from "./Ast";
 
 declare interface RawAst {
-  type: RawAstNodeType,
+  type: AstNodeType,
   args: [RawAst | number | string]
 }
 

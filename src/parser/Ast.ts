@@ -1,26 +1,40 @@
 export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst;
 
-export enum Kinds {
+export enum AstNodeType {
   NUMBER = "NUMBER",
-
-  RELATIVE_CELL = "RELATIVE_CELL",
+  STRING = "STRING",
 
   PLUS_OP = "PLUS_OP",
   MINUS_OP = "MINUS_OP",
-  TIMES_OP = "TIMES_OP"
+  TIMES_OP = "TIMES_OP",
+  DIV_OP = "DIV_OP",
+  POW_OP = "POW_OP",
+  NEGATIVE_OP = "NEGATIVE_OP",
+  POSITIVE_OP = "POSITIVE_OP",
+  AND_OP = "AND_OP",
+
+  FUNCTION_CALL = "FUNCTION_CALL",
+
+  RELATIVE_CELL = "RELATIVE_CELL",
+  ABSOLUTE_CELL = "ABSOLUTE_CELL",
+  MIXED_CELL = "MIXED_CELL",
+
+  CELL_RANGE = "CELL_RANGE",
+
+  ARRAY = "ARRAY"
 }
 
 export interface NumberAst {
-  kind: Kinds.NUMBER,
+  kind: AstNodeType.NUMBER,
   value: number,
 }
-export const buildNumberAst = (value: number): NumberAst => ({ kind: Kinds.NUMBER, value })
+export const buildNumberAst = (value: number): NumberAst => ({ kind: AstNodeType.NUMBER, value })
 
 export interface RelativeCellAst {
-  kind: Kinds.RELATIVE_CELL,
+  kind: AstNodeType.RELATIVE_CELL,
   address: string,
 }
-export const buildRelativeCellAst = (address: string): RelativeCellAst => ({ kind: Kinds.RELATIVE_CELL, address })
+export const buildRelativeCellAst = (address: string): RelativeCellAst => ({ kind: AstNodeType.RELATIVE_CELL, address })
 
 export interface BinaryOpAst {
   left: Ast,
@@ -28,16 +42,16 @@ export interface BinaryOpAst {
 }
 
 export interface PlusOpAst extends BinaryOpAst {
-  kind: Kinds.PLUS_OP,
+  kind: AstNodeType.PLUS_OP,
 }
-export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({ kind: Kinds.PLUS_OP, left, right })
+export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({ kind: AstNodeType.PLUS_OP, left, right })
 
 export interface MinusOpAst extends BinaryOpAst {
-  kind: Kinds.MINUS_OP,
+  kind: AstNodeType.MINUS_OP,
 }
-export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({ kind: Kinds.MINUS_OP, left, right })
+export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({ kind: AstNodeType.MINUS_OP, left, right })
 
 export interface TimesOpAst extends BinaryOpAst {
-  kind: Kinds.TIMES_OP,
+  kind: AstNodeType.TIMES_OP,
 }
-export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({ kind: Kinds.TIMES_OP, left, right })
+export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({ kind: AstNodeType.TIMES_OP, left, right })

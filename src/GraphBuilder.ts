@@ -1,5 +1,5 @@
 import {FullParser} from './parser/FullParser'
-import {Ast, Kinds} from "./parser/Ast"
+import {Ast, AstNodeType} from "./parser/Ast"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 // [
@@ -67,15 +67,15 @@ export class GraphBuilder {
 
   private getFormulaDependencies(ast: Ast) : Array<string> {
     switch (ast.kind) {
-      case Kinds.RELATIVE_CELL: {
+      case AstNodeType.RELATIVE_CELL: {
         return [ast.address];
       }
-      case Kinds.PLUS_OP:
-      case Kinds.MINUS_OP:
-      case Kinds.TIMES_OP: {
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.TIMES_OP: {
         return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
       }
-      case Kinds.NUMBER: {
+      case AstNodeType.NUMBER: {
         return []
       }
     }
