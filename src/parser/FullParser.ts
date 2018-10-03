@@ -22,7 +22,7 @@ function buildAst(rawAst: RawAst) : Ast {
     case RawAstNodeType.PLUS_OP:
       return new PlusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.MINUS_OP:
-      return new MinusOpAst(buildAst(rawAst.args[0] as RawAst), processArgs(rawAst.args as Array<RawAst>))
+      return new MinusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
     case RawAstNodeType.NUMBER:
       return new NumberAst(rawAst.args[0] as string)
     default:
