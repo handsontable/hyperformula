@@ -67,8 +67,8 @@
 %% /* language grammar */
 
 formula
-  : expression EOF {
-      return $1;
+  : '=' expression EOF {
+      return $2;
     }
 ;
 

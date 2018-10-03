@@ -31,7 +31,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (this.isFormula(cellContent)) {
-          let ast = this.parser.parse(cellContent.substr(1))
+          let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, this.getFormulaDependencies(vertex.getFormula()))
