@@ -12,6 +12,10 @@ export class FullParser {
     const rawAst = this.parser.parse(text)
     return buildAst(rawAst)
   }
+
+  isFormula(text: string): Boolean {
+    return text.startsWith('=')
+  }
 }
 
 function buildAst(rawAst: RawAst) : Ast {

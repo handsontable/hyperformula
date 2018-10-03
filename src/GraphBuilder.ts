@@ -30,7 +30,7 @@ export class GraphBuilder {
         let cellAddress = cellCoordinatesToLabel(rowIndex, colIndex)
         let vertex = null
 
-        if (this.isFormula(cellContent)) {
+        if (this.parser.isFormula(cellContent)) {
           let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
@@ -79,10 +79,6 @@ export class GraphBuilder {
         return []
       }
     }
-  }
-
-  private isFormula(cellContent: string): Boolean {
-    return cellContent.startsWith('=')
   }
 }
 
