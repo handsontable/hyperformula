@@ -2,7 +2,7 @@ import {HandsOnEngine} from "../src";
 
 describe('BenchmarkA', () => {
   const rows = 10000
-  const millisecondsPerThousandRows = 400
+  const millisecondsPerThousandRows = 1500
 
   it('', () => {
     const hoe = new HandsOnEngine()
