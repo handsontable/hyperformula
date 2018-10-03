@@ -15,4 +15,5 @@ jobs:
       - run: make typecheck
       - run: make check-parser-generation
       - run: make test
+      - run: make benchmark
 

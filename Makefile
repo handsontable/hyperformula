@@ -18,6 +18,9 @@ check-parser-generation:
 test: ## Run tests
 	@yarn jest
 
+benchmark:
+	@yarn jest --config=jest.benchmark-config.js
+
 check: typecheck test
 
 coverage: ## Run tests and show coverage
@@ -29,6 +32,6 @@ clean: ## Clean compiled files
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test
+.PHONY: test coverage
 
 .DEFAULT_GOAL := help
