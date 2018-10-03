@@ -1,17 +1,17 @@
 import {RawAst} from "./Parser";
 import {MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst, Ast} from "../AstNodeType";
-import {AstNodeType} from "./AstNodeType"
+import {RawAstNodeType} from "./RawAstNodeType"
 
 
 export function buildAst(rawAst: RawAst) : Ast {
   switch (rawAst.type) {
-    case AstNodeType.RELATIVE_CELL:
+    case RawAstNodeType.RELATIVE_CELL:
       return new RelativeCellAst(rawAst.args as Array<string>)
-    case AstNodeType.PLUS_OP:
+    case RawAstNodeType.PLUS_OP:
       return new PlusOpAst(buildAst(rawAst.args[0] as RawAst), buildAst(rawAst.args[1] as RawAst))
-    case AstNodeType.MINUS_OP:
+    case RawAstNodeType.MINUS_OP:
       return new MinusOpAst(buildAst(rawAst.args[0] as RawAst), processArgs(rawAst.args as Array<RawAst>))
-    case AstNodeType.NUMBER:
+    case RawAstNodeType.NUMBER:
       return new NumberAst(rawAst.args[0] as string)
     default:
       throw Error("Unsupported AST node type")

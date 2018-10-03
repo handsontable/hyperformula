@@ -1,4 +1,4 @@
-export enum AstNodeType {
+export enum RawAstNodeType {
   NUMBER = "NUMBER",
   STRING = "STRING",
 
