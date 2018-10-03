@@ -9,7 +9,6 @@ describe('Basic parser test', () => {
         // operators
         expect(parser.parse("1").type).toBe(AstNodeType.NUMBER)
         expect(parser.parse("'foo'").type).toBe(AstNodeType.STRING)
-        expect(parser.parse("1+2").type).toBe(AstNodeType.PLUS_OP)
         expect(parser.parse("1-2").type).toBe(AstNodeType.MINUS_OP)
         expect(parser.parse("1*2").type).toBe(AstNodeType.TIMES_OP)
         expect(parser.parse("1/2").type).toBe(AstNodeType.DIV_OP)
@@ -29,6 +28,16 @@ describe('Basic parser test', () => {
         expect(parser.parse("$A$5:B5").type).toBe(AstNodeType.CELL_RANGE)
         expect(parser.parse("A$5:B5").type).toBe(AstNodeType.CELL_RANGE)
         expect(parser.parse("$A5:B5").type).toBe(AstNodeType.CELL_RANGE)
+    })
+
+    it("plus operator on literals", () => {
+        const ast = parser.parse("1+2")
+
+        expect(ast.type).toBe(AstNodeType.PLUS_OP)
+        expect(ast.args).toEqual([
+            { type: AstNodeType.NUMBER, args: ["1"] },
+            { type: AstNodeType.NUMBER, args: ["2"] },
+        ])
     })
 
     it("function calls without arguments", () => {
