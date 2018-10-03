@@ -1,4 +1,4 @@
-import {Parser} from './parser/parser'
+import {FullParser} from './parser/FullParser'
 import {AstNodeType, RelativeCellAst} from "./AstNodeType"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
@@ -13,7 +13,7 @@ const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
 
 export class GraphBuilder {
-  private parser = new Parser()
+  private parser = new FullParser()
 
   private graph: Graph<Vertex>
   private addressMapping: Map<string, Vertex>

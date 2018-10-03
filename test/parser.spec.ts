@@ -1,9 +1,8 @@
-import {Parser} from '../src/parser/parser'
+import {FullParser} from '../src/parser/FullParser'
 import {AstNodeType} from "../src/AstNodeType"
 
-
 describe('Basic parser test', () => {
-    const parser = new Parser()
+    const parser = new FullParser()
 
     it('#parse produces simple node with correct type', () => {
         // operators

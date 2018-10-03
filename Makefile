@@ -8,12 +8,12 @@ compile: ## Compile to javascript
 	@yarn tsc
 
 regenerate-parser:
-	@yarn jison src/parser/parser.jison --outfile src/parser/parser.js
+	@yarn jison src/parser/parser.jison --outfile src/parser/Parser.js
 
 check-parser-generation:
-	@yarn jison src/parser/parser.jison --outfile /tmp/parser.js
+	@yarn jison src/parser/parser.jison --outfile /tmp/Parser.js
 	# Diff will end with exit code different than 0 if files differ
-	@diff --ignore-all-space src/parser/parser.js /tmp/parser.js > /dev/null
+	@diff --ignore-all-space src/parser/Parser.js /tmp/Parser.js > /dev/null
 
 test: ## Run tests
 	@yarn jest
