@@ -25,7 +25,7 @@ export enum AstNodeType {
 
 export abstract class Ast {}
 
-export class OpAst extends Ast {
+export class BinaryOpAst extends Ast {
   args: Array<Ast>
   constructor(args : Array<Ast>) {
     super()
@@ -41,10 +41,10 @@ export class OpAst extends Ast {
   }
 }
 
-export class PlusOpAst extends OpAst {}
-export class MinusOpAst extends OpAst {}
-export class TimesOpAst extends OpAst {}
-export class DivOpAst extends OpAst {}
+export class PlusOpAst extends BinaryOpAst {}
+export class MinusOpAst extends BinaryOpAst {}
+export class TimesOpAst extends BinaryOpAst {}
+export class DivOpAst extends BinaryOpAst {}
 
 export class RelativeCellAst extends Ast {
   args: Array<string>
