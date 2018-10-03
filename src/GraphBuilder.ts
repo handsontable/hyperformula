@@ -1,5 +1,5 @@
 import {FullParser} from './parser/FullParser'
-import {AstNodeType, RelativeCellAst} from "./AstNodeType"
+import {RelativeCellAst} from "./AstNodeType"
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 import {buildAst} from "./parser/AstBuilder";

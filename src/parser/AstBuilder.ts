@@ -1,5 +1,6 @@
-import {RawAst} from "./parser";
-import {AstNodeType, MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst, Ast} from "../AstNodeType";
+import {RawAst} from "./Parser";
+import {MinusOpAst, PlusOpAst, RelativeCellAst, NumberAst, Ast} from "../AstNodeType";
+import {AstNodeType} from "./AstNodeType"
 
 
 export function buildAst(rawAst: RawAst) : Ast {

@@ -1,8 +1,8 @@
-import {AstNodeType} from "../AstNodeType";
+import {AstNodeType} from "./AstNodeType";
 
 declare interface RawAst {
   type: AstNodeType,
-    args: [RawAst | number | string]
+  args: [RawAst | number | string]
 }
 
 declare class Parser {
