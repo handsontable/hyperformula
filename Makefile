@@ -18,6 +18,8 @@ check-parser-generation:
 test: ## Run tests
 	@yarn jest
 
+check: typecheck test
+
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage
 
