@@ -8,9 +8,9 @@ export class AstBuilder {
       case AstNodeType.RELATIVE_CELL:
         return new RelativeCellAst(rawAst.args as Array<string>)
       case AstNodeType.PLUS_OP:
-        return new PlusOpAst(this.processArgs(rawAst.args as Array<RawAst>))
+        return new PlusOpAst(this.buildAst(rawAst.args[0] as RawAst), this.buildAst(rawAst.args[1] as RawAst))
       case AstNodeType.MINUS_OP:
-        return new MinusOpAst(this.processArgs(rawAst.args as Array<RawAst>))
+        return new MinusOpAst(this.buildAst(rawAst.args[0] as RawAst), this.processArgs(rawAst.args as Array<RawAst>))
       case AstNodeType.NUMBER:
         return new NumberAst(rawAst.args as Array<string>)
       default:

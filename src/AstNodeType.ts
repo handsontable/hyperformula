@@ -26,18 +26,21 @@ export enum AstNodeType {
 export abstract class Ast {}
 
 export class BinaryOpAst extends Ast {
-  args: Array<Ast>
-  constructor(args : Array<Ast>) {
+  private leftNode: Ast;
+  private rightNode: Ast;
+
+  constructor(left: Ast, right: Ast) {
     super()
-    this.args = args
+    this.leftNode = left
+    this.rightNode = right
   }
 
   left() {
-    return this.args[0]
+    return this.leftNode
   }
 
   right() {
-    return this.args[1]
+    return this.rightNode
   }
 }
 
