@@ -2,7 +2,7 @@ import {AstNodeType} from "./Ast";
 
 declare interface RawAst {
   type: AstNodeType,
-  args: [RawAst | number | string]
+  args: Array<RawAst | number | string>
 }
 
 declare class Parser {
