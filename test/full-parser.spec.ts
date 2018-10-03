@@ -43,6 +43,22 @@ describe('Full parser test', () => {
     expect(ast.right()).toBeInstanceOf(RelativeCellAst)
   })
 
+  it("joining nodes without braces", () => {
+    const ast = parser.parse("1 + 2 + 3") as TimesOpAst
+
+    expect(ast).toBeInstanceOf(PlusOpAst)
+    expect(ast.left()).toBeInstanceOf(PlusOpAst)
+    expect(ast.right()).toBeInstanceOf(NumberAst)
+  })
+
+  it("joining nodes with braces", () => {
+    const ast = parser.parse("1 + (2 + 3)") as TimesOpAst
+
+    expect(ast).toBeInstanceOf(PlusOpAst)
+    expect(ast.left()).toBeInstanceOf(NumberAst)
+    expect(ast.right()).toBeInstanceOf(PlusOpAst)
+  })
+
   it("relative cell reference", () => {
     const ast = parser.parse("A5") as RelativeCellAst
 
