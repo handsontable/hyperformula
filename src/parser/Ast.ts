@@ -26,10 +26,10 @@ export class DivOpAst extends BinaryOpAst {}
 
 export class RelativeCellAst extends Ast {
   args: Array<string>
-    constructor(args : Array<string>) {
-      super()
-      this.args = args
-    }
+  constructor(args : Array<string>) {
+    super()
+    this.args = args
+  }
 
   getAddress() : string {
     return this.args[0]
