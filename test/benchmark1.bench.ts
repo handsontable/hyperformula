@@ -33,11 +33,11 @@ describe('BenchmarkA', () => {
 
       runsData.push(timestampAfter - timestampBefore)
 
-      expect(hoe.getCellValue("A10000")).toBe('100')
-      expect(hoe.getCellValue("B10000")).toBe('200')
-      expect(hoe.getCellValue("C10000")).toBe('300')
-      expect(hoe.getCellValue("D10000")).toBe('400')
-      expect(hoe.getCellValue("E10000")).toBe('500')
+      expect(hoe.getCellValue("A10000")).toBe(100)
+      expect(hoe.getCellValue("B10000")).toBe(200)
+      expect(hoe.getCellValue("C10000")).toBe(300)
+      expect(hoe.getCellValue("D10000")).toBe(400)
+      expect(hoe.getCellValue("E10000")).toBe(500)
 
       currentRun++
     }
