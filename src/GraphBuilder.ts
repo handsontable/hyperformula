@@ -1,5 +1,6 @@
 import {FullParser} from './parser/FullParser'
 import {Ast, AstNodeType} from "./parser/Ast"
+import {getFormulaDependencies} from './parser/AstUtils'
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 // [
@@ -34,7 +35,7 @@ export class GraphBuilder {
           let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
-          dependencies.set(cellAddress, this.getFormulaDependencies(vertex.getFormula()))
+          dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
         } else {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)
@@ -63,22 +64,6 @@ export class GraphBuilder {
         this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
       })
     })
-  }
-
-  private getFormulaDependencies(ast: Ast) : Array<string> {
-    switch (ast.type) {
-      case AstNodeType.RELATIVE_CELL: {
-        return [ast.address];
-      }
-      case AstNodeType.PLUS_OP:
-      case AstNodeType.MINUS_OP:
-      case AstNodeType.TIMES_OP: {
-        return this.getFormulaDependencies(ast.left).concat(this.getFormulaDependencies(ast.right))
-      }
-      case AstNodeType.NUMBER: {
-        return []
-      }
-    }
   }
 }
 
