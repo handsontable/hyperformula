@@ -12,10 +12,6 @@ export class FullParser {
     const rawAst = this.parser.parse(text)
     return buildAst(rawAst)
   }
-
-  isFormula(text: string): Boolean {
-    return text.startsWith('=')
-  }
 }
 
 function buildAst(rawAst: RawAst) : Ast {
@@ -33,4 +29,8 @@ function buildAst(rawAst: RawAst) : Ast {
     default:
       throw Error("Unsupported AST node type")
   }
+}
+
+export function isFormula(text: string): Boolean {
+  return text.startsWith('=')
 }

@@ -1,4 +1,4 @@
-import {FullParser} from './parser/FullParser'
+import {FullParser, isFormula} from './parser/FullParser'
 import {Ast, AstNodeType} from "./parser/Ast"
 import {getFormulaDependencies} from './parser/AstUtils'
 import {Graph} from './Graph'
@@ -31,7 +31,7 @@ export class GraphBuilder {
         let cellAddress = cellCoordinatesToLabel(rowIndex, colIndex)
         let vertex = null
 
-        if (this.parser.isFormula(cellContent)) {
+        if (isFormula(cellContent)) {
           let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
