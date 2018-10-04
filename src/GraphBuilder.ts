@@ -38,11 +38,10 @@ export class GraphBuilder {
           dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
-          this.graph.addNode(vertex)
         } else {
           vertex = new ValueCellVertex(cellContent)
-          this.graph.addNode(vertex)
         }
+        this.graph.addNode(vertex)
 
         this.addressMapping.set(cellCoordinatesToLabel(rowIndex, colIndex), vertex)
       })
