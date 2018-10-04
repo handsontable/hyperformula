@@ -43,7 +43,7 @@ export class GraphBuilder {
         }
         this.graph.addNode(vertex)
 
-        this.addressMapping.set(cellCoordinatesToLabel(rowIndex, colIndex), vertex)
+        this.addressMapping.set(cellAddress, vertex)
       })
     })
 
