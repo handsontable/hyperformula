@@ -24,15 +24,15 @@ export class GraphBuilder {
   }
 
   buildGraph(sheet: Sheet) {
-    let dependencies: Map<string, Array<string>> = new Map()
+    const dependencies: Map<string, Array<string>> = new Map()
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
-        let cellAddress = cellCoordinatesToLabel(rowIndex, colIndex)
+        const cellAddress = cellCoordinatesToLabel(rowIndex, colIndex)
         let vertex = null
 
         if (isFormula(cellContent)) {
-          let ast = this.parser.parse(cellContent)
+          const ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
