@@ -36,6 +36,9 @@ export class GraphBuilder {
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
+        } else if (!isNaN(Number(cellContent))) {
+          vertex = new ValueCellVertex(Number(cellContent))
+          this.graph.addNode(vertex)
         } else {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)

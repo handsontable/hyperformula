@@ -16,7 +16,15 @@ export abstract class Vertex {
   abstract getCellValue(): CellValue
 }
 
-export type CellValue = string | number;
+export enum ErrorType {
+  ARG = "ARG"
+}
+export interface ArgError {
+  type: ErrorType.ARG
+}
+export const argError = (): ArgError => ({ type: ErrorType.ARG })
+export type CellError = ArgError
+export type CellValue = string | number | CellError
 
 export class FormulaCellVertex extends Vertex {
   private cachedCellValue?: CellValue;
@@ -63,6 +71,6 @@ export class EmptyCellVertex extends Vertex {
   }
 
   getCellValue() {
-    return '0'
+    return 0
   }
 }

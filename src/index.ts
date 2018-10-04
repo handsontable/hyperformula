@@ -1,5 +1,5 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, FormulaCellVertex, Vertex} from "./Vertex";
+import {CellValue, FormulaCellVertex, Vertex, argError} from "./Vertex";
 import {Graph} from "./Graph";
 import {Ast, AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
 
@@ -30,23 +30,34 @@ export class HandsOnEngine {
         return vertex.getCellValue()
       }
       case AstNodeType.NUMBER: {
-        const numberValue = formula.value
-        return String(numberValue)
+        return formula.value
       }
       case AstNodeType.PLUS_OP: {
-        const child1Result = this.computeFormula(formula.left) as string
-        const child2Result = this.computeFormula(formula.right) as string
-        return String(parseInt(child1Result) + parseInt(child2Result));
+        const leftResult = this.computeFormula(formula.left)
+        const rightResult = this.computeFormula(formula.right)
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
+          return leftResult + rightResult
+        } else {
+          return argError()
+        }
       }
       case AstNodeType.MINUS_OP: {
-        const child1Result = this.computeFormula(formula.left) as string
-        const child2Result = this.computeFormula(formula.right) as string
-        return String(parseInt(child1Result) - parseInt(child2Result));
+        const leftResult = this.computeFormula(formula.left)
+        const rightResult = this.computeFormula(formula.right)
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
+          return leftResult - rightResult
+        } else {
+          return argError()
+        }
       }
       case AstNodeType.TIMES_OP: {
-        const child1Result = this.computeFormula(formula.left) as string
-        const child2Result = this.computeFormula(formula.right) as string
-        return String(parseInt(child1Result) * parseInt(child2Result));
+        const leftResult = this.computeFormula(formula.left)
+        const rightResult = this.computeFormula(formula.right)
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
+          return leftResult * rightResult
+        } else {
+          return argError()
+        }
       }
     }
   }

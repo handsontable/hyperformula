@@ -12,7 +12,7 @@ describe('Integration', () => {
       ['1']
     ])
 
-    expect(hoe.getCellValue("A1")).toBe('1')
+    expect(hoe.getCellValue("A1")).toBe(1)
   });
 
   it("#loadSheet load simple sheet", () => {
@@ -21,20 +21,20 @@ describe('Integration', () => {
       ['4', '5', '6']
     ])
 
-    expect(hoe.getCellValue("C2")).toBe('6')
+    expect(hoe.getCellValue("C2")).toBe(6)
   })
 
   it("#loadSheet evaluate empty vertex", () => {
     hoe.loadSheet([['=A5']])
 
-    expect(hoe.getCellValue('A1')).toBe('0')
-    expect(hoe.getCellValue('A5')).toBe('0')
+    expect(hoe.getCellValue('A1')).toBe(0)
+    expect(hoe.getCellValue('A5')).toBe(0)
   })
 
   it.skip("#loadSheet evaluate empty vertex", () => {
     hoe.loadSheet([['','=A1']])
 
-    expect(hoe.getCellValue('B1')).toBe('0')
+    expect(hoe.getCellValue('B1')).toBe(0)
   })
   
   it("loadSheet with a loop", () => {
