@@ -8,21 +8,17 @@ import {
   buildRelativeCellAst,
   AstNodeType
 } from "./Ast";
-import {parseFormula, AstBuilder} from "../chevro";
+import {parseFormula} from "../chevro";
 
 export class FullParser {
   private parser: Parser
-  private builder: AstBuilder
 
   constructor() {
     this.parser = new Parser()
-    this.builder = new AstBuilder()
   }
 
   parse(text: string): Ast {
-    const cst = parseFormula(text)
-    const ast = this.builder.visit(cst)
-    return ast
+    return parseFormula(text)
   }
 }
 

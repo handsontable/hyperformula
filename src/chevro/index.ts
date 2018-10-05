@@ -3,7 +3,7 @@ import {
   Lexer,
   Parser,
   IToken,
-  CstNode
+  CstNode, tokenMatcher
 } from "chevrotain"
 
 import {
@@ -78,142 +78,100 @@ const FormulaLexer = new Lexer(allTokens)
 // A -> adresy
 // P -> procedury
 
-export class FormulaParser extends Parser {
+class FormulaParser extends Parser {
   constructor() {
-    super(allTokens)
+    super(allTokens, {outputCst: false})
     this.performSelfAnalysis()
   }
 
   public formula = this.RULE("formula", () => {
     this.CONSUME(EqualsOp)
-    this.SUBRULE(this.additionExpression)
+    return this.SUBRULE(this.additionExpression)
   })
 
+
   private additionExpression = this.RULE("additionExpression", () => {
-    this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
+    const lhs : Ast = this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
+    let rhs : Ast
+    let op : IToken
+
     this.MANY(() => {
-      this.CONSUME(AdditionOp)
-      this.SUBRULE2(this.additionExpression, {LABEL: "rhs"})
+      op = this.CONSUME(AdditionOp)
+      rhs = this.SUBRULE2(this.additionExpression)
     })
+
+    if (op! !== undefined && rhs! !== undefined) {
+      if (tokenMatcher(op!, PlusOp)) {
+        return buildPlusOpAst(lhs, rhs!)
+      } else if (tokenMatcher(op!, MinusOp)) {
+        return buildMinusOpAst(lhs, rhs!)
+      } else {
+        throw Error("Operator not supported")
+      }
+    } else {
+      return lhs
+    }
   })
 
   private multiplicationExpression = this.RULE("multiplicationExpression", () => {
-    this.SUBRULE(this.atomicExpression, {LABEL: "lhs"})
+    const lhs : Ast = this.SUBRULE(this.atomicExpression)
+    let rhs : Ast
+    let op : IToken
+
     this.MANY(() => {
-      this.CONSUME(MultiplicationOp)
-      this.SUBRULE2(this.multiplicationExpression, {LABEL: "rhs"})
+      op = this.CONSUME(MultiplicationOp)
+      rhs = this.SUBRULE2(this.multiplicationExpression)
     })
+
+    if (op! !== undefined && rhs! !== undefined) {
+      if (tokenMatcher(op!, TimesOp)) {
+        return buildTimesOpAst(lhs, rhs!)
+      } else {
+        throw Error("Operator not supported")
+      }
+    } else {
+      return lhs
+    }
   })
 
   private atomicExpression = this.RULE("atomicExpression", () => {
+    let result : Ast
     this.OR([
-      {ALT: () => this.SUBRULE(this.parenthesisExpression)},
-      {ALT: () => this.CONSUME(Number)},
-      {ALT: () => this.SUBRULE(this.relativeCellExpression)}
+      {
+        ALT: () => {
+          result = this.SUBRULE(this.parenthesisExpression)
+        }
+      },
+      {
+        ALT: () => {
+          const number = this.CONSUME(Number)
+          result = buildNumberAst(parseInt(number.image))
+        }
+      },
+      {
+        ALT: () => {
+          result = this.SUBRULE(this.relativeCellExpression)
+        }
+      }
     ])
+    return result!
   })
 
   private relativeCellExpression = this.RULE("relativeCellExpression", () => {
-    this.CONSUME(RelativeCell)
+    const address = this.CONSUME(RelativeCell)
+    return buildRelativeCellAst(address.image)
   })
 
   private parenthesisExpression = this.RULE("parenthesisExpression", () => {
     this.CONSUME(LParen)
-    this.SUBRULE(this.additionExpression)
+    const expression = this.SUBRULE(this.additionExpression)
     this.CONSUME(RParen)
+    return expression
   })
 }
 
-export const parser = new FormulaParser()
 
-export const Vistor = parser.getBaseCstVisitorConstructor()
-
-interface AdditionExpression {
-  lhs: CstNode
-  AdditionOp?: IToken[]
-  rhs?: CstNode
-}
-
-interface MultiplicationExpresion {
-  lhs: CstNode
-  MultiplicationOp?: IToken[]
-  rhs?: CstNode
-}
-
-interface RelativeCellExpression {
-  RelativeCell: IToken[]
-}
-
-interface AtomicCellExpression {
-  Number?: IToken[]
-  relativeCellExpression?: CstNode
-  parenthesisExpression?: CstNode
-}
-
-export class AstBuilder extends Vistor {
-  constructor() {
-    super()
-    this.validateVisitor()
-  }
-
-  additionExpression(ctx: AdditionExpression): Ast {
-    const lresult = this.visit(ctx.lhs)
-    if (ctx.rhs != undefined && ctx.AdditionOp != undefined) {
-      const rresult = this.visit(ctx.rhs)
-      switch (ctx.AdditionOp[0].tokenType!.tokenName) {
-        case "PlusOp":
-          return buildPlusOpAst(lresult, rresult)
-        case "MinusOp":
-          return buildMinusOpAst(lresult, rresult)
-        default:
-          throw Error("Expression not handled")
-      }
-    } else {
-      return lresult
-    }
-  }
-
-  multiplicationExpression(ctx: MultiplicationExpresion): Ast {
-    const lresult = this.visit(ctx.lhs)
-    if (ctx.rhs != undefined && ctx.MultiplicationOp != undefined) {
-      const rresult = this.visit(ctx.rhs)
-      switch (ctx.MultiplicationOp[0].tokenType!.tokenName) {
-        case "TimesOp":
-          return buildTimesOpAst(lresult, rresult)
-        default:
-          throw Error("Expression not handled")
-      }
-    } else {
-      return lresult
-    }
-  }
-
-  relativeCellExpression(ctx: RelativeCellExpression): Ast {
-    return buildRelativeCellAst(ctx.RelativeCell[0].image)
-  }
-
-  atomicExpression(ctx: AtomicCellExpression): Ast {
-    if (ctx.relativeCellExpression != undefined) {
-      return this.visit(ctx.relativeCellExpression)
-    }
-    if (ctx.parenthesisExpression != undefined) {
-      return this.visit(ctx.parenthesisExpression)
-    }
-    if (ctx.Number != undefined) {
-      return buildNumberAst(parseInt(ctx.Number[0].image))
-    }
-
-    throw Error("WUT")
-  }
-
-  parenthesisExpression(ctx: { additionExpression: CstNode }): Ast {
-    return this.visit(ctx.additionExpression)
-  }
-
-  formula(ctx: { additionExpression: CstNode }): Ast {
-    return this.visit(ctx.additionExpression)
-  }
-}
+const parser = new FormulaParser()
 
 export function parseFormula(text: string) {
   const lexResult = FormulaLexer.tokenize(text)
