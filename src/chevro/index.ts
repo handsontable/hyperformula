@@ -98,7 +98,7 @@ class FormulaParser extends Parser {
       op?: IToken
     } = {}
 
-    this.MANY(() => {
+    this.OPTION(() => {
       result.op = this.CONSUME(AdditionOp)
       result.rhs = this.SUBRULE2(this.additionExpression)
     })
@@ -124,7 +124,7 @@ class FormulaParser extends Parser {
       op?: IToken
     } = {}
 
-    this.MANY(() => {
+    this.OPTION(() => {
       result.op = this.CONSUME(MultiplicationOp)
       result.rhs = this.SUBRULE2(this.multiplicationExpression)
     })
