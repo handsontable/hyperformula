@@ -92,19 +92,22 @@ class FormulaParser extends Parser {
 
   private additionExpression = this.RULE("additionExpression", () => {
     const lhs : Ast = this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
-    let rhs : Ast
-    let op : IToken
+
+    let result : {
+      rhs?: Ast
+      op?: IToken
+    } = {}
 
     this.MANY(() => {
-      op = this.CONSUME(AdditionOp)
-      rhs = this.SUBRULE2(this.additionExpression)
+      result.op = this.CONSUME(AdditionOp)
+      result.rhs = this.SUBRULE2(this.additionExpression)
     })
 
-    if (op! !== undefined && rhs! !== undefined) {
-      if (tokenMatcher(op!, PlusOp)) {
-        return buildPlusOpAst(lhs, rhs!)
-      } else if (tokenMatcher(op!, MinusOp)) {
-        return buildMinusOpAst(lhs, rhs!)
+    if (result.op! !== undefined && result.rhs! !== undefined) {
+      if (tokenMatcher(result.op!, PlusOp)) {
+        return buildPlusOpAst(lhs, result.rhs!)
+      } else if (tokenMatcher(result.op!, MinusOp)) {
+        return buildMinusOpAst(lhs, result.rhs!)
       } else {
         throw Error("Operator not supported")
       }
@@ -115,17 +118,20 @@ class FormulaParser extends Parser {
 
   private multiplicationExpression = this.RULE("multiplicationExpression", () => {
     const lhs : Ast = this.SUBRULE(this.atomicExpression)
-    let rhs : Ast
-    let op : IToken
+
+    let result : {
+      rhs?: Ast
+      op?: IToken
+    } = {}
 
     this.MANY(() => {
-      op = this.CONSUME(MultiplicationOp)
-      rhs = this.SUBRULE2(this.multiplicationExpression)
+      result.op = this.CONSUME(MultiplicationOp)
+      result.rhs = this.SUBRULE2(this.multiplicationExpression)
     })
 
-    if (op! !== undefined && rhs! !== undefined) {
-      if (tokenMatcher(op!, TimesOp)) {
-        return buildTimesOpAst(lhs, rhs!)
+    if (result.op != undefined && result.rhs != undefined) {
+      if (tokenMatcher(result.op, TimesOp)) {
+        return buildTimesOpAst(lhs, result.rhs)
       } else {
         throw Error("Operator not supported")
       }
@@ -135,26 +141,26 @@ class FormulaParser extends Parser {
   })
 
   private atomicExpression = this.RULE("atomicExpression", () => {
-    let result : Ast
+    let result : { ast?: Ast } = {}
     this.OR([
       {
         ALT: () => {
-          result = this.SUBRULE(this.parenthesisExpression)
+          result.ast = this.SUBRULE(this.parenthesisExpression)
         }
       },
       {
         ALT: () => {
           const number = this.CONSUME(Number)
-          result = buildNumberAst(parseInt(number.image))
+          result.ast = buildNumberAst(parseInt(number.image))
         }
       },
       {
         ALT: () => {
-          result = this.SUBRULE(this.relativeCellExpression)
+          result.ast = this.SUBRULE(this.relativeCellExpression)
         }
       }
     ])
-    return result!
+    return result.ast
   })
 
   private relativeCellExpression = this.RULE("relativeCellExpression", () => {
