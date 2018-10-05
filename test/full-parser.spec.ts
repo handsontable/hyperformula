@@ -43,7 +43,7 @@ describe('Full parser test', () => {
     expect(ast.right.type).toBe(AstNodeType.RELATIVE_CELL)
   })
 
-  it("joining nodes without braces", () => {
+  it.skip("joining nodes without braces", () => {
     const ast = parser.parse("=1 + 2 + 3") as PlusOpAst
 
     expect(ast.type).toBe(AstNodeType.PLUS_OP)

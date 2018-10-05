@@ -570,6 +570,13 @@ chalk@~0.4.0:
     has-color "~0.1.0"
     strip-ansi "~0.1.0"
 
+chevrotain@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/chevrotain/-/chevrotain-4.1.0.tgz#61b3cf734e182b3164eb12c2c2452f4f5282337f"
+  integrity sha512-iwuK4FOV+vZlvKonoXVw6G+rXJm4jWk17aJFkm6FloVYcVSrAaJLdCdQo+IIyX98jm0WJVcdK9cllRZQpNBnBg==
+  dependencies:
+    regexp-to-ast "0.3.5"
+
 chownr@^1.0.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.1.1.tgz#54726b8b8fff4df053c42187e801fb4412df1494"
@@ -2992,6 +2999,11 @@ regex-not@^1.0.0, regex-not@^1.0.2:
   dependencies:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
+
+regexp-to-ast@0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.3.5.tgz#dedadd11bbb5f849df76b4e84b0b5335831c0473"
+  integrity sha512-1CJygtdvsfNFwiyjaMLBWtg2tfEqx/jSZ8S6TV+GlNL8kiH8rb4cm5Pb7A/C2BpyM/fA8ZJEudlCwi/jvAY+Ow==
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
