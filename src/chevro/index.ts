@@ -3,7 +3,7 @@ import {
   Lexer,
   Parser,
   IToken,
-  CstNode, tokenMatcher
+  tokenMatcher
 } from "chevrotain"
 
 import {
@@ -68,8 +68,6 @@ const allTokens = [
   MultiplicationOp
 ]
 
-const FormulaLexer = new Lexer(allTokens)
-
 // F -> '=' E
 // E -> M + E | M - E | M
 // M -> C * M | C / M | C
@@ -77,23 +75,21 @@ const FormulaLexer = new Lexer(allTokens)
 // N -> '(' E ')'
 // A -> adresy
 // P -> procedury
-
 class FormulaParser extends Parser {
   constructor() {
     super(allTokens, {outputCst: false})
     this.performSelfAnalysis()
   }
 
-  public formula = this.RULE("formula", () => {
+  public formula : AstRule = this.RULE("formula", () => {
     this.CONSUME(EqualsOp)
     return this.SUBRULE(this.additionExpression)
   })
 
+  private additionExpression : AstRule = this.RULE("additionExpression", () => {
+    const lhs: Ast = this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
 
-  private additionExpression = this.RULE("additionExpression", () => {
-    const lhs : Ast = this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
-
-    let result : {
+    let result: {
       rhs?: Ast
       op?: IToken
     } = {}
@@ -116,10 +112,10 @@ class FormulaParser extends Parser {
     }
   })
 
-  private multiplicationExpression = this.RULE("multiplicationExpression", () => {
-    const lhs : Ast = this.SUBRULE(this.atomicExpression)
+  private multiplicationExpression : AstRule = this.RULE("multiplicationExpression", () => {
+    const lhs: Ast = this.SUBRULE(this.atomicExpression)
 
-    let result : {
+    let result: {
       rhs?: Ast
       op?: IToken
     } = {}
@@ -140,35 +136,29 @@ class FormulaParser extends Parser {
     }
   })
 
-  private atomicExpression = this.RULE("atomicExpression", () => {
-    let result : { ast?: Ast } = {}
-    this.OR([
+  private atomicExpression : AstRule = this.RULE("atomicExpression", () => {
+    return this.OR([
       {
-        ALT: () => {
-          result.ast = this.SUBRULE(this.parenthesisExpression)
-        }
+        ALT: () => this.SUBRULE(this.parenthesisExpression)
       },
       {
         ALT: () => {
           const number = this.CONSUME(Number)
-          result.ast = buildNumberAst(parseInt(number.image))
+          return buildNumberAst(parseInt(number.image))
         }
       },
       {
-        ALT: () => {
-          result.ast = this.SUBRULE(this.relativeCellExpression)
-        }
+        ALT: () => this.SUBRULE(this.relativeCellExpression)
       }
     ])
-    return result.ast
   })
 
-  private relativeCellExpression = this.RULE("relativeCellExpression", () => {
+  private relativeCellExpression : AstRule = this.RULE("relativeCellExpression", () => {
     const address = this.CONSUME(RelativeCell)
     return buildRelativeCellAst(address.image)
   })
 
-  private parenthesisExpression = this.RULE("parenthesisExpression", () => {
+  private parenthesisExpression : AstRule = this.RULE("parenthesisExpression", () => {
     this.CONSUME(LParen)
     const expression = this.SUBRULE(this.additionExpression)
     this.CONSUME(RParen)
@@ -177,6 +167,9 @@ class FormulaParser extends Parser {
 }
 
 
+type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
+
+const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()
 
 export function parseFormula(text: string) {
