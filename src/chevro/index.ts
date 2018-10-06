@@ -87,23 +87,21 @@ class FormulaParser extends Parser {
   })
 
   private additionExpression : AstRule = this.RULE("additionExpression", () => {
-    const lhs: Ast = this.SUBRULE(this.multiplicationExpression, {LABEL: "lhs"})
+    let rhs : Ast | undefined
+    let op : IToken | undefined
 
-    let result: {
-      rhs?: Ast
-      op?: IToken
-    } = {}
+    const lhs: Ast = this.SUBRULE(this.multiplicationExpression)
 
     this.OPTION(() => {
-      result.op = this.CONSUME(AdditionOp)
-      result.rhs = this.SUBRULE2(this.additionExpression)
+      op = this.CONSUME(AdditionOp)
+      rhs = this.SUBRULE2(this.additionExpression)
     })
 
-    if (result.op! !== undefined && result.rhs! !== undefined) {
-      if (tokenMatcher(result.op!, PlusOp)) {
-        return buildPlusOpAst(lhs, result.rhs!)
-      } else if (tokenMatcher(result.op!, MinusOp)) {
-        return buildMinusOpAst(lhs, result.rhs!)
+    if (op !== undefined && rhs !== undefined) {
+      if (tokenMatcher(op, PlusOp)) {
+        return buildPlusOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, MinusOp)) {
+        return buildMinusOpAst(lhs, rhs)
       } else {
         throw Error("Operator not supported")
       }
@@ -113,21 +111,19 @@ class FormulaParser extends Parser {
   })
 
   private multiplicationExpression : AstRule = this.RULE("multiplicationExpression", () => {
+    let rhs : Ast | undefined
+    let op : IToken | undefined
+
     const lhs: Ast = this.SUBRULE(this.atomicExpression)
 
-    let result: {
-      rhs?: Ast
-      op?: IToken
-    } = {}
-
     this.OPTION(() => {
-      result.op = this.CONSUME(MultiplicationOp)
-      result.rhs = this.SUBRULE2(this.multiplicationExpression)
+      op = this.CONSUME(MultiplicationOp)
+      rhs = this.SUBRULE2(this.multiplicationExpression)
     })
 
-    if (result.op != undefined && result.rhs != undefined) {
-      if (tokenMatcher(result.op, TimesOp)) {
-        return buildTimesOpAst(lhs, result.rhs)
+    if (op != undefined && rhs != undefined) {
+      if (tokenMatcher(op, TimesOp)) {
+        return buildTimesOpAst(lhs, rhs)
       } else {
         throw Error("Operator not supported")
       }
