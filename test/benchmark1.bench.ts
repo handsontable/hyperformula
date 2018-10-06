@@ -1,4 +1,5 @@
 import {HandsOnEngine} from "../src";
+import {performance} from "perf_hooks";
 
 describe('BenchmarkA', () => {
   const rows = 10000
@@ -27,9 +28,9 @@ describe('BenchmarkA', () => {
     while (currentRun < numberOfRuns) {
       const hoe = new HandsOnEngine()
 
-      const timestampBefore = Date.now()
+      const timestampBefore = performance.now()
       hoe.loadSheet(sheet)
-      const timestampAfter = Date.now()
+      const timestampAfter = performance.now()
 
       runsData.push(timestampAfter - timestampBefore)
 
