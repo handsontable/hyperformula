@@ -69,8 +69,8 @@ const allTokens = [
 ]
 
 // F -> '=' E
-// E -> M + E | M - E | M
-// M -> C * M | C / M | C
+// E -> M + E | M - E | M    --->    M { + M }*
+// M -> C * M | C / M | C    --->    C { * C }*
 // C -> N | A | P | num
 // N -> '(' E ')'
 // A -> adresy
@@ -87,49 +87,41 @@ class FormulaParser extends Parser {
   })
 
   private additionExpression : AstRule = this.RULE("additionExpression", () => {
-    let rhs : Ast | undefined
-    let op : IToken | undefined
+    let lhs: Ast = this.SUBRULE(this.multiplicationExpression)
 
-    const lhs: Ast = this.SUBRULE(this.multiplicationExpression)
+    this.MANY(() => {
+      const op = this.CONSUME(AdditionOp)
+      const rhs = this.SUBRULE2(this.multiplicationExpression)
 
-    this.OPTION(() => {
-      op = this.CONSUME(AdditionOp)
-      rhs = this.SUBRULE2(this.additionExpression)
-    })
-
-    if (op !== undefined && rhs !== undefined) {
       if (tokenMatcher(op, PlusOp)) {
-        return buildPlusOpAst(lhs, rhs)
+        lhs = buildPlusOpAst(lhs, rhs)
       } else if (tokenMatcher(op, MinusOp)) {
-        return buildMinusOpAst(lhs, rhs)
+        lhs = buildMinusOpAst(lhs, rhs)
       } else {
         throw Error("Operator not supported")
       }
-    } else {
-      return lhs
-    }
+    })
+
+    return lhs
   })
 
+
+
   private multiplicationExpression : AstRule = this.RULE("multiplicationExpression", () => {
-    let rhs : Ast | undefined
-    let op : IToken | undefined
+    let lhs: Ast = this.SUBRULE(this.atomicExpression)
 
-    const lhs: Ast = this.SUBRULE(this.atomicExpression)
+    this.MANY(() => {
+      const op = this.CONSUME(MultiplicationOp)
+      const rhs = this.SUBRULE2(this.atomicExpression)
 
-    this.OPTION(() => {
-      op = this.CONSUME(MultiplicationOp)
-      rhs = this.SUBRULE2(this.multiplicationExpression)
-    })
-
-    if (op != undefined && rhs != undefined) {
       if (tokenMatcher(op, TimesOp)) {
-        return buildTimesOpAst(lhs, rhs)
+        lhs = buildTimesOpAst(lhs, rhs)
       } else {
         throw Error("Operator not supported")
       }
-    } else {
-      return lhs
-    }
+    })
+
+    return lhs
   })
 
   private atomicExpression : AstRule = this.RULE("atomicExpression", () => {
