@@ -4,7 +4,7 @@ import {performance} from "perf_hooks";
 describe('BenchmarkA', () => {
   const rows = 10000
   const millisecondsPerThousandRows = 1500
-  const numberOfRuns = 10
+  const numberOfRuns = 3
 
   it('', () => {
     let sheet = []
@@ -43,7 +43,7 @@ describe('BenchmarkA', () => {
       currentRun++
     }
     runsData.sort()
-    const medianRun = runsData[numberOfRuns / 2];
+      const medianRun = runsData[Math.trunc(numberOfRuns / 2)];
     console.warn(`Runs: ${runsData.map((v) => (v / 1000))} (in seconds)`)
     console.warn(`Median run: ${medianRun / 1000}`)
 
