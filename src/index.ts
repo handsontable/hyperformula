@@ -11,16 +11,7 @@ export class HandsOnEngine {
   loadSheet(sheet: Sheet) {
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping)
     graphBuilder.buildGraph(sheet)
-
-    const vertices = this.graph.topologicalSort()
-
-    vertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex) {
-        const formula = vertex.getFormula()
-        const cellValue = this.computeFormula(formula)
-        vertex.setCellValue(cellValue)
-      }
-    })
+    this.recomputeFormulas()
   }
 
   computeFormula(formula: Ast): CellValue {
@@ -81,6 +72,10 @@ export class HandsOnEngine {
       throw Error('Changes to cells other than simple values not supported')
     }
 
+    this.recomputeFormulas()
+  }
+
+  recomputeFormulas() {
     const vertices = this.graph.topologicalSort()
 
     vertices.forEach((vertex: Vertex) => {
