@@ -17,12 +17,10 @@ export class GraphBuilder {
 
   private graph: Graph<Vertex>
   private addressMapping: Map<string, Vertex>
-  private parsingTime: number
 
   constructor(graph: Graph<Vertex>, addressMapping: Map<string, Vertex>) {
     this.graph = graph
     this.addressMapping = addressMapping
-    this.parsingTime = 0
   }
 
   buildGraph(sheet: Sheet) {
@@ -34,10 +32,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
-          const beforeParsing = Date.now()
           let ast = this.parser.parse(cellContent)
-          const afterParsing = Date.now()
-          this.parsingTime += afterParsing - beforeParsing
           vertex = new FormulaCellVertex(ast)
           this.graph.addNode(vertex)
           dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
@@ -71,7 +66,6 @@ export class GraphBuilder {
         this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
       })
     })
-      console.warn(`Parsing took ${this.parsingTime / 1000}`)
   }
 }
 
