@@ -63,6 +63,10 @@ export class ValueCellVertex extends Vertex {
   getCellValue() {
     return this.cellValue
   }
+
+  setCellValue(cellValue: CellValue) {
+    this.cellValue = cellValue
+  }
 }
 
 export class EmptyCellVertex extends Vertex {

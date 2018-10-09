@@ -69,4 +69,14 @@ describe('Integration', () => {
       engine.loadSheet([['3','4','=B1*2+A1',]])
       expect(engine.getCellValue('C1')).toBe(11)
   })
+
+  it('#loadSheet change cell content', () => {
+    engine.loadSheet([
+      ['1', '=A1']
+    ])
+
+    engine.setCellContent('A1', '2')
+
+    expect(engine.getCellValue("B1")).toBe(2)
+  });
 });

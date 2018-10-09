@@ -1,7 +1,8 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, FormulaCellVertex, Vertex, argError} from "./Vertex";
+import {CellValue, FormulaCellVertex, ValueCellVertex, Vertex, argError} from "./Vertex";
 import {Graph} from "./Graph";
 import {Ast, AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
+import {FullParser, isFormula} from './parser/FullParser'
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
@@ -65,5 +66,29 @@ export class HandsOnEngine {
   getCellValue(address: string): CellValue {
     const vertex = this.addressMapping.get(address)!
     return vertex.getCellValue()
+  }
+
+  setCellContent(address: string, newCellContent: string) {
+    const parser = new FullParser()
+    const vertex = this.addressMapping.get(address)
+    if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
+      if (!isNaN(Number(newCellContent))) {
+        vertex.setCellValue(Number(newCellContent))
+      } else {
+        vertex.setCellValue(newCellContent)
+      }
+    } else {
+      throw Error('Changes to cells other than simple values not supported')
+    }
+
+    const vertices = this.graph.topologicalSort()
+
+    vertices.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex) {
+        const formula = vertex.getFormula()
+        const cellValue = this.computeFormula(formula)
+        vertex.setCellValue(cellValue)
+      }
+    })
   }
 }
