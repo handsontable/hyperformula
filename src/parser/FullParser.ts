@@ -1,5 +1,5 @@
 import { Ast } from "./Ast";
-import {parseFormula} from "../chevro";
+import {parseFormula} from "./FormulaParser";
 
 export class FullParser {
   parse(text: string): Ast {
