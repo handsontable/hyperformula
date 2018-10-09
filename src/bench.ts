@@ -24,10 +24,10 @@ while (prev < rows) {
 let runsData = []
 let currentRun = 0
 while (currentRun < numberOfRuns) {
-  const hoe = new HandsOnEngine()
+  const engine = new HandsOnEngine()
 
   const timestampBefore = Date.now()
-  hoe.loadSheet(sheet)
+  engine.loadSheet(sheet)
   const timestampAfter = Date.now()
 
   runsData.push(timestampAfter - timestampBefore)

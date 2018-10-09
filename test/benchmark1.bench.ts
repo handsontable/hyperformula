@@ -26,19 +26,19 @@ describe('BenchmarkA', () => {
     let runsData = []
     let currentRun = 0
     while (currentRun < numberOfRuns) {
-      const hoe = new HandsOnEngine()
+      const engine = new HandsOnEngine()
 
       const timestampBefore = performance.now()
-      hoe.loadSheet(sheet)
+      engine.loadSheet(sheet)
       const timestampAfter = performance.now()
 
       runsData.push(timestampAfter - timestampBefore)
 
-      expect(hoe.getCellValue("A10000")).toBe(100)
-      expect(hoe.getCellValue("B10000")).toBe(200)
-      expect(hoe.getCellValue("C10000")).toBe(300)
-      expect(hoe.getCellValue("D10000")).toBe(400)
-      expect(hoe.getCellValue("E10000")).toBe(500)
+      expect(engine.getCellValue("A10000")).toBe(100)
+      expect(engine.getCellValue("B10000")).toBe(200)
+      expect(engine.getCellValue("C10000")).toBe(300)
+      expect(engine.getCellValue("D10000")).toBe(400)
+      expect(engine.getCellValue("E10000")).toBe(500)
 
       currentRun++
     }
