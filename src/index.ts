@@ -7,10 +7,12 @@ import {FullParser, isFormula} from './parser/FullParser'
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
   private graph: Graph<Vertex> = new Graph()
+  private sortedVertices: Array<Vertex> = []
 
   loadSheet(sheet: Sheet) {
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping)
     graphBuilder.buildGraph(sheet)
+    this.sortedVertices = this.graph.topologicalSort()
     this.recomputeFormulas()
   }
 
@@ -76,9 +78,7 @@ export class HandsOnEngine {
   }
 
   recomputeFormulas() {
-    const vertices = this.graph.topologicalSort()
-
-    vertices.forEach((vertex: Vertex) => {
+    this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         const formula = vertex.getFormula()
         const cellValue = this.computeFormula(formula)
