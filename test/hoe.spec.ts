@@ -54,4 +54,19 @@ describe('Integration', () => {
       hoe.loadSheet([['5','=A1-B1']])
     }).toThrowError(new Error('Graph has a cycle'))
   })
+    
+  it("loadSheet with operator precedence", () => {
+      hoe.loadSheet([['=3*7*2-4*1+2']])
+      expect(hoe.getCellValue('A1')).toBe(40)
+  })
+
+  it("loadSheet with operator precedence and brackets", () => {
+      hoe.loadSheet([['=3*7+((2-4)*(1+2)+3)*2']])
+      expect(hoe.getCellValue('A1')).toBe(15)
+  })
+    
+  it("loadSheet with operator precedence with cells", () => {
+      hoe.loadSheet([['3','4','=B1*2+A1',]])
+      expect(hoe.getCellValue('C1')).toBe(11)
+  })
 });
