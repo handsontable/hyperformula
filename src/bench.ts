@@ -41,7 +41,8 @@ console.warn(`Runs: ${runsData.map((v) => (v / 1000))} (in seconds)`)
 console.warn(`Median run: ${medianRun / 1000}`)
 
 const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
+console.warn(`Expected to work in: ${millisecondsPerThousandRows} ms per 1000 rows`)
+console.warn(`Actual time: ${resultMillisecondsPerThousandRows} ms per 1000 rows`)
 if (resultMillisecondsPerThousandRows > millisecondsPerThousandRows) {
-  console.warn(`Expected to work in ${millisecondsPerThousandRows} ms per 1000 rows, but it did work ${resultMillisecondsPerThousandRows}`)
   process.exit(1)
 }
