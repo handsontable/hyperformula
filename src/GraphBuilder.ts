@@ -34,15 +34,14 @@ export class GraphBuilder {
         if (isFormula(cellContent)) {
           let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
-          this.graph.addNode(vertex)
           dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
         } else {
           vertex = new ValueCellVertex(cellContent)
         }
-        this.graph.addNode(vertex)
 
+        this.graph.addNode(vertex)
         this.addressMapping.set(cellAddress, vertex)
       })
     })
