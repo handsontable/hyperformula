@@ -1,7 +1,7 @@
 import {HandsOnEngine} from "../src";
 import {performance} from "perf_hooks";
 
-const rows = 10000
+const rows = 100000
 const millisecondsPerThousandRows = 150
 const numberOfRuns = 3
 
