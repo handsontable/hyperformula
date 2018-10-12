@@ -15,11 +15,11 @@ export class ParserWithCaching {
   parse(text: string): BetterAst {
     const lexerResult = tokenizeFormula(text);
     const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
-    if (this.cache.has(hash)) {
+    const cachedAst = this.cache.get(hash)
+    if (cachedAst) {
       this.statsCacheUsed++
-      const ast = this.cache.get(hash)!
       return {
-        ast,
+        ast: cachedAst,
         addresses,
       }
     } else {
