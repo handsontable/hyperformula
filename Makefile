@@ -1,7 +1,7 @@
 typecheck: ## Typecheck the code
 	@yarn tsc --noEmit
 
-setup:
+setup: ## Setup project
 	@yarn install
 
 compile: ## Compile to javascript
@@ -10,7 +10,7 @@ compile: ## Compile to javascript
 test: ## Run tests
 	@yarn jest
 
-benchmark:
+benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/01-simple-big.ts
 
 check: typecheck test
