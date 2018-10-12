@@ -1,7 +1,7 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, FormulaCellVertex, ValueCellVertex, Vertex, argError} from "./Vertex";
+import {cellError, CellValue, ErrorType, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
-import {Ast, AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst} from "./parser/Ast";
+import {Ast, AstNodeType} from "./parser/Ast";
 import {FullParser, isFormula} from './parser/FullParser'
 
 export class HandsOnEngine {
@@ -32,7 +32,7 @@ export class HandsOnEngine {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult + rightResult
         } else {
-          return argError()
+          return cellError(ErrorType.ARG)
         }
       }
       case AstNodeType.MINUS_OP: {
@@ -41,7 +41,7 @@ export class HandsOnEngine {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
-          return argError()
+          return cellError(ErrorType.ARG)
         }
       }
       case AstNodeType.TIMES_OP: {
@@ -50,7 +50,19 @@ export class HandsOnEngine {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
-          return argError()
+          return cellError(ErrorType.ARG)
+        }
+      }
+      case AstNodeType.DIV_OP: {
+        const leftResult = this.computeFormula(formula.left)
+        const rightResult = this.computeFormula(formula.right)
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
+          if (rightResult == 0) {
+            return cellError(ErrorType.DIV_BY_ZERO)
+          }
+          return leftResult / rightResult
+        } else {
+          return cellError(ErrorType.ARG)
         }
       }
     }

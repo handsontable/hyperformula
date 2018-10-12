@@ -17,13 +17,14 @@ export abstract class Vertex {
 }
 
 export enum ErrorType {
-  ARG = "ARG"
+  ARG = "ARG",
+  DIV_BY_ZERO = "DIV_BY_ZERO"
 }
-export interface ArgError {
-  type: ErrorType.ARG
+export interface CellError {
+  type: ErrorType
 }
-export const argError = (): ArgError => ({ type: ErrorType.ARG })
-export type CellError = ArgError
+export const cellError = (error: ErrorType): CellError => ({ type: error })
+
 export type CellValue = string | number | CellError
 
 export class FormulaCellVertex extends Vertex {

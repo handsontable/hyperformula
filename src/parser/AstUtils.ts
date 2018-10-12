@@ -7,9 +7,11 @@ export function getFormulaDependencies(ast: Ast) : Array<string> {
     }
     case AstNodeType.PLUS_OP:
     case AstNodeType.MINUS_OP:
-    case AstNodeType.TIMES_OP: {
+    case AstNodeType.TIMES_OP:
+    case AstNodeType.DIV_OP: {
       return getFormulaDependencies(ast.left).concat(getFormulaDependencies(ast.right))
     }
+
     case AstNodeType.NUMBER: {
       return []
     }

@@ -1,4 +1,4 @@
-export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst;
+export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst;
 
 export enum AstNodeType {
   NUMBER = "NUMBER",
@@ -55,3 +55,8 @@ export interface TimesOpAst extends BinaryOpAst {
   type: AstNodeType.TIMES_OP,
 }
 export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({ type: AstNodeType.TIMES_OP, left, right })
+
+export interface DivOpAst extends BinaryOpAst {
+  type: AstNodeType.DIV_OP,
+}
+export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({ type: AstNodeType.DIV_OP, left, right })

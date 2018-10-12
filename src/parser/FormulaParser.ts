@@ -7,7 +7,7 @@ import {
 } from "chevrotain"
 
 import {
-  Ast,
+  Ast, buildDivOpAst,
   buildMinusOpAst,
   buildNumberAst,
   buildPlusOpAst,
@@ -42,7 +42,7 @@ const LParen = createToken({name: "LParen", pattern: /\(/})
 const RParen = createToken({name: "RParen", pattern: /\)/})
 
 /* terminals */
-const Number = createToken({name: "Number", pattern: /[1-9]\d*/})
+const Number = createToken({name: "Number", pattern: /[0-9]\d*/})
 
 /* skipping whitespaces */
 const WhiteSpace = createToken({
@@ -116,6 +116,8 @@ class FormulaParser extends Parser {
 
       if (tokenMatcher(op, TimesOp)) {
         lhs = buildTimesOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, DivOp)) {
+        lhs = buildDivOpAst(lhs, rhs)
       } else {
         throw Error("Operator not supported")
       }
