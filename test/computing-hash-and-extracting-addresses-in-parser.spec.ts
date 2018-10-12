@@ -1,5 +1,5 @@
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {computeHashAndExtractAddresses} from '../src/parser/FullParser'
+import {computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 
 describe("computeHashAndExtractAddresses", () => {
   it("simple case", () => {

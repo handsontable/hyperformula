@@ -1,4 +1,4 @@
-import {ParserWithCaching, computeHashAndExtractAddresses} from '../src/parser/FullParser'
+import {ParserWithCaching, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
 import { AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst } from '../src/parser/Ast'
 
