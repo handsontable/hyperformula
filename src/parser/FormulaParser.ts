@@ -3,6 +3,7 @@ import {
   Lexer,
   Parser,
   IToken,
+  ILexingResult,
   tokenMatcher
 } from "chevrotain"
 
@@ -160,6 +161,10 @@ type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 
 const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()
+
+export function tokenizeFormula(text: string): ILexingResult {
+  return FormulaLexer.tokenize(text)
+}
 
 export function parseFormula(text: string) {
   const lexResult = FormulaLexer.tokenize(text)
