@@ -11,7 +11,7 @@ test: ## Run tests
 	@yarn jest
 
 benchmark:
-	@yarn ts-node src/bench.ts
+	@yarn ts-node benchmark/01-simple-big.ts
 
 check: typecheck test
 
@@ -24,6 +24,6 @@ clean: ## Clean compiled files
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test coverage
+.PHONY: test coverage benchmark
 
 .DEFAULT_GOAL := help
