@@ -42,7 +42,7 @@ const LParen = createToken({name: "LParen", pattern: /\(/})
 const RParen = createToken({name: "RParen", pattern: /\)/})
 
 /* terminals */
-const Number = createToken({name: "Number", pattern: /[0-9]\d*/})
+const NumberLiteral = createToken({name: "NumberLiteral", pattern: /(\d+(\.\d+)?)/})
 
 /* skipping whitespaces */
 const WhiteSpace = createToken({
@@ -62,7 +62,7 @@ const allTokens = [
   DivOp,
   LParen,
   RParen,
-  Number,
+  NumberLiteral,
   RelativeCell,
   AdditionOp,
   MultiplicationOp
@@ -81,12 +81,12 @@ class FormulaParser extends Parser {
     this.performSelfAnalysis()
   }
 
-  public formula : AstRule = this.RULE("formula", () => {
+  public formula: AstRule = this.RULE("formula", () => {
     this.CONSUME(EqualsOp)
     return this.SUBRULE(this.additionExpression)
   })
 
-  private additionExpression : AstRule = this.RULE("additionExpression", () => {
+  private additionExpression: AstRule = this.RULE("additionExpression", () => {
     let lhs: Ast = this.SUBRULE(this.multiplicationExpression)
 
     this.MANY(() => {
@@ -106,8 +106,7 @@ class FormulaParser extends Parser {
   })
 
 
-
-  private multiplicationExpression : AstRule = this.RULE("multiplicationExpression", () => {
+  private multiplicationExpression: AstRule = this.RULE("multiplicationExpression", () => {
     let lhs: Ast = this.SUBRULE(this.atomicExpression)
 
     this.MANY(() => {
@@ -126,15 +125,15 @@ class FormulaParser extends Parser {
     return lhs
   })
 
-  private atomicExpression : AstRule = this.RULE("atomicExpression", () => {
+  private atomicExpression: AstRule = this.RULE("atomicExpression", () => {
     return this.OR([
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression)
       },
       {
         ALT: () => {
-          const number = this.CONSUME(Number)
-          return buildNumberAst(parseInt(number.image))
+          const number = this.CONSUME(NumberLiteral)
+          return buildNumberAst(parseFloat(number.image))
         }
       },
       {
@@ -143,12 +142,12 @@ class FormulaParser extends Parser {
     ])
   })
 
-  private relativeCellExpression : AstRule = this.RULE("relativeCellExpression", () => {
+  private relativeCellExpression: AstRule = this.RULE("relativeCellExpression", () => {
     const address = this.CONSUME(RelativeCell)
     return buildRelativeCellAst(address.image)
   })
 
-  private parenthesisExpression : AstRule = this.RULE("parenthesisExpression", () => {
+  private parenthesisExpression: AstRule = this.RULE("parenthesisExpression", () => {
     this.CONSUME(LParen)
     const expression = this.SUBRULE(this.additionExpression)
     this.CONSUME(RParen)

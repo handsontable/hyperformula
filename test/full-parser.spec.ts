@@ -11,8 +11,33 @@ describe('Full parser test', () => {
     expect(ast.value).toBe(42)
   })
 
+  it("float literal", () => {
+    const ast = parser.parse("=3.14") as NumberAst
+
+    expect(ast.type).toBe(AstNodeType.NUMBER)
+    expect(ast.value).toBe(3.14)
+  })
+
+  it("leading zeros", () => {
+    const int = parser.parse("=01234") as NumberAst
+    const float = parser.parse("=03.14") as NumberAst
+
+    expect(int.type).toBe(AstNodeType.NUMBER)
+    expect(int.value).toBe(1234)
+    expect(float.type).toBe(AstNodeType.NUMBER)
+    expect(float.value).toBe(3.14)
+  })
+
   it("plus operator on literals", () => {
     const ast = parser.parse("=1+2") as PlusOpAst
+
+    expect(ast.type).toBe(AstNodeType.PLUS_OP)
+    expect(ast.left.type).toBe(AstNodeType.NUMBER)
+    expect(ast.right.type).toBe(AstNodeType.NUMBER)
+  })
+
+  it("plus operator on mixed number literals", () => {
+    const ast = parser.parse("=2 + 3.14") as PlusOpAst
 
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
