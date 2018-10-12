@@ -2,8 +2,8 @@ import {HandsOnEngine} from "../src";
 import {performance} from "perf_hooks";
 
 const rows = 10000
-const millisecondsPerThousandRows = 1500
-const numberOfRuns = 10
+const millisecondsPerThousandRows = 50
+const numberOfRuns = 3
 
 let sheet = []
 sheet.push(['100', '200', '300', '400', '500'])
@@ -35,7 +35,13 @@ while (currentRun < numberOfRuns) {
   currentRun++
 }
 runsData.sort()
-const medianRun = runsData[numberOfRuns / 2];
+const medianRun = runsData[Math.trunc(numberOfRuns / 2)];
+console.warn(`Number of rows: ${rows}`)
 console.warn(`Runs: ${runsData.map((v) => (v / 1000))} (in seconds)`)
 console.warn(`Median run: ${medianRun / 1000}`)
 
+const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
+if (resultMillisecondsPerThousandRows > millisecondsPerThousandRows) {
+  console.warn(`Expected to work in ${millisecondsPerThousandRows} ms per 1000 rows, but it did work ${resultMillisecondsPerThousandRows}`)
+  process.exit(1)
+}

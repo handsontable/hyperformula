@@ -11,7 +11,7 @@ test: ## Run tests
 	@yarn jest
 
 benchmark:
-	@yarn jest --config=jest.benchmark-config.js
+	@yarn ts-node src/bench.ts
 
 check: typecheck test
 
