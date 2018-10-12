@@ -33,6 +33,7 @@ while (currentRun < numberOfRuns) {
   const timestampAfter = Date.now()
 
   runsData.push(timestampAfter - timestampBefore)
+  console.warn(`Run ${currentRun}, cache used ${parser.statsCacheUsed} times`)
 
   currentRun++
 }

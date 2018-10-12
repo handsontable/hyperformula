@@ -1,6 +1,6 @@
 import {ParserWithCaching, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import { AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst } from '../src/parser/Ast'
+import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst} from '../src/parser/BetterAst'
 
 describe('ParserWithCaching', () => {
   it("integer literal", () => {
@@ -22,7 +22,7 @@ describe('ParserWithCaching', () => {
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
-    expect(ast.right.type).toBe(AstNodeType.RELATIVE_CELL)
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(bast.addresses).toEqual(["A5"])
   })
 
@@ -33,8 +33,8 @@ describe('ParserWithCaching', () => {
 
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
-    expect(ast.left.type).toBe(AstNodeType.RELATIVE_CELL)
-    expect(ast.right.type).toBe(AstNodeType.RELATIVE_CELL)
+    expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(bast.addresses).toEqual(["A6", "A5"])
   })
 

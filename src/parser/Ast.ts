@@ -1,8 +1,4 @@
 export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst;
-export interface BetterAst {
-  ast: Ast,
-  addresses: Array<string>,
-}
 
 export enum AstNodeType {
   NUMBER = "NUMBER",

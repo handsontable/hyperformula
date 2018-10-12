@@ -1,9 +1,10 @@
 import {tokenizeFormula, parseFromTokens} from "./FormulaParser";
 import {IToken} from "chevrotain"
-import {Ast, BetterAst, AstNodeType, buildRelativeCellAst} from './Ast'
+import {BetterAst, TemplateAst, buildCellReferenceAst, buildPlusOpAst, buildMinusOpAst, buildTimesOpAst, buildDivOpAst, buildNumberAst} from './BetterAst'
+import {Ast, AstNodeType} from "./Ast"
 
 export class ParserWithCaching {
-  private cache: Map<string, Ast> = new Map()
+  private cache: Map<string, TemplateAst> = new Map()
   public statsCacheUsed: number = 0
 
   parse(text: string): BetterAst {
@@ -38,16 +39,16 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]) => {
   return { addresses, hash }
 };
 
-const computeBetterAst = (ast: Ast, idx: number): [Ast, number] => {
+const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
   switch (ast.type) {
     case AstNodeType.RELATIVE_CELL: {
-      return [buildRelativeCellAst(idx.toString()), idx + 1]
+      return [buildCellReferenceAst(idx), idx + 1]
     }
     case AstNodeType.PLUS_OP: {
       const lhsResult = computeBetterAst(ast.left, idx)
       const rhsResult = computeBetterAst(ast.right, lhsResult[1])
       return [
-        { type: ast.type, left: lhsResult[0], right: rhsResult[0] },
+        buildPlusOpAst(lhsResult[0], rhsResult[0]),
         rhsResult[1]
       ]
     }
@@ -55,7 +56,7 @@ const computeBetterAst = (ast: Ast, idx: number): [Ast, number] => {
       const lhsResult = computeBetterAst(ast.left, idx)
       const rhsResult = computeBetterAst(ast.right, lhsResult[1])
       return [
-        { type: ast.type, left: lhsResult[0], right: rhsResult[0] },
+        buildMinusOpAst(lhsResult[0], rhsResult[0]),
         rhsResult[1]
       ]
     }
@@ -63,7 +64,7 @@ const computeBetterAst = (ast: Ast, idx: number): [Ast, number] => {
       const lhsResult = computeBetterAst(ast.left, idx)
       const rhsResult = computeBetterAst(ast.right, lhsResult[1])
       return [
-        { type: ast.type, left: lhsResult[0], right: rhsResult[0] },
+        buildTimesOpAst(lhsResult[0], rhsResult[0]),
         rhsResult[1]
       ]
     }
@@ -71,12 +72,12 @@ const computeBetterAst = (ast: Ast, idx: number): [Ast, number] => {
       const lhsResult = computeBetterAst(ast.left, idx)
       const rhsResult = computeBetterAst(ast.right, lhsResult[1])
       return [
-        { type: ast.type, left: lhsResult[0], right: rhsResult[0] },
+        buildDivOpAst(lhsResult[0], rhsResult[0]),
         rhsResult[1]
       ]
     }
     case AstNodeType.NUMBER: {
-      return [ast, idx]
+      return [buildNumberAst(ast.value), idx]
     }
   }
 }
