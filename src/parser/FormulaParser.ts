@@ -166,6 +166,11 @@ export function tokenizeFormula(text: string): ILexingResult {
   return FormulaLexer.tokenize(text)
 }
 
+export function parseFromTokens(lexResult: ILexingResult): Ast {
+  parser.input = lexResult.tokens
+  return parser.formula()
+}
+
 export function parseFormula(text: string) {
   const lexResult = FormulaLexer.tokenize(text)
   parser.input = lexResult.tokens

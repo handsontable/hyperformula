@@ -9,12 +9,14 @@ export class FullParser {
 }
 
 export class ParserWithCaching {
-  public cache: Map<string, Ast> = new Map()
+  private cache: Map<string, Ast> = new Map()
+  public statsCacheUsed: number = 0
 
   parse(text: string): BetterAst {
     const lexerResult = tokenizeFormula(text);
     const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
     if (this.cache.has(hash)) {
+      this.statsCacheUsed++
       const ast = this.cache.get(hash)!
       return {
         ast,
@@ -23,6 +25,7 @@ export class ParserWithCaching {
     } else {
       const ast = parseFromTokens(lexerResult)
       const [newAst, finalIdx] = computeBetterAst(ast, 0)
+      this.cache.set(hash, newAst)
       return { ast: newAst, addresses }
     }
   }
