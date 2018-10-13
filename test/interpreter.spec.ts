@@ -120,6 +120,18 @@ describe('Interpreter', () => {
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
 
+  it("div operator - ARG error on 1st operand", () => {
+    engine.loadSheet([['www', '=A1 / 42']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+  })
+
+  it("div operator - ARG error on 2nd operand", () => {
+    engine.loadSheet([['www', '=42 / A1']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+  })
+
   it("procedures - SUM without args", () => {
     engine.loadSheet([['=SUM()']])
 
