@@ -8,7 +8,11 @@ export class Interpreter {
     this.addressMapping = addressMapping
   }
 
-  public computeFormula(ast: TemplateAst, addresses: Array<string>): CellValue {
+  public computeFormula(formula: TemplateAst, addresses: Array<string>): CellValue {
+    return this.evaluateAst(formula, addresses)
+  }
+
+  private evaluateAst(ast: TemplateAst, addresses: Array<string>): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = addresses[ast.idx]
@@ -19,8 +23,8 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = this.computeFormula(ast.left, addresses)
-        const rightResult = this.computeFormula(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, addresses)
+        const rightResult = this.evaluateAst(ast.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult + rightResult
         } else {
@@ -28,8 +32,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = this.computeFormula(ast.left, addresses)
-        const rightResult = this.computeFormula(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, addresses)
+        const rightResult = this.evaluateAst(ast.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
@@ -37,8 +41,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = this.computeFormula(ast.left, addresses)
-        const rightResult = this.computeFormula(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, addresses)
+        const rightResult = this.evaluateAst(ast.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
@@ -46,8 +50,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = this.computeFormula(ast.left, addresses)
-        const rightResult = this.computeFormula(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, addresses)
+        const rightResult = this.evaluateAst(ast.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
             return cellError(ErrorType.DIV_BY_ZERO)
@@ -58,16 +62,16 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        return this.computeFunction(ast, addresses)
+        return this.evaluateFunction(ast, addresses)
       }
     }
   }
 
-  private computeFunction(ast : ProcedureAst, addresses: Array<string>): CellValue {
+  private evaluateFunction(ast : ProcedureAst, addresses: Array<string>): CellValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum : CellValue, arg) => {
-          const value = this.computeFormula(arg, addresses)
+          const value = this.evaluateAst(arg, addresses)
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
           } else {
