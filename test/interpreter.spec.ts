@@ -120,4 +120,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
+
+  it("procedures - SUM without args", () => {
+    engine.loadSheet([['=SUM()']])
+
+    expect(engine.getCellValue("A1")).toEqual(0)
+  })
+
+  it("procedures - SUM with args", () => {
+    engine.loadSheet([['=SUM(1; B1)', '3.14']])
+
+    expect(engine.getCellValue("A1")).toBeCloseTo(4.14)
+  })
 });
