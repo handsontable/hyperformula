@@ -1,4 +1,4 @@
-import {tokenizeFormula, parseFromTokens} from "./FormulaParser";
+import {tokenizeFormula, parseFromTokens, parseFormula} from "./FormulaParser";
 import {IToken} from "chevrotain"
 import {BetterAst, TemplateAst, buildCellReferenceAst, buildPlusOpAst, buildMinusOpAst, buildTimesOpAst, buildDivOpAst, buildNumberAst} from './BetterAst'
 import {Ast, AstNodeType} from "./Ast"
@@ -6,27 +6,49 @@ import {Ast, AstNodeType} from "./Ast"
 export class ParserWithCaching {
   private cache: Map<string, TemplateAst> = new Map()
   public statsCacheUsed: number = 0
+  private optimizationMode: string
+
+  constructor(optimizationMode = 'parser') {
+    this.optimizationMode = optimizationMode
+  }
 
   parse(text: string): BetterAst {
-    const lexerResult = tokenizeFormula(text);
-    const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
-    const cachedAst = this.cache.get(hash)
-    if (cachedAst) {
-      this.statsCacheUsed++
-      return {
-        ast: cachedAst,
-        addresses,
+    if (this.optimizationMode === 'lexer') {
+      const {hash, addresses} = computeHashAndExtractAddressesFromLexer(text);
+      const cachedAst = this.cache.get(hash)
+      if (cachedAst) {
+        this.statsCacheUsed++
+        return {
+          ast: cachedAst,
+          addresses,
+        }
+      } else {
+        const ast = parseFormula(text)
+        const [newAst, finalIdx] = computeBetterAst(ast, 0)
+        this.cache.set(hash, newAst)
+        return { ast: newAst, addresses }
       }
     } else {
-      const ast = parseFromTokens(lexerResult)
-      const [newAst, finalIdx] = computeBetterAst(ast, 0)
-      this.cache.set(hash, newAst)
-      return { ast: newAst, addresses }
+      const lexerResult = tokenizeFormula(text);
+      const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
+      const cachedAst = this.cache.get(hash)
+      if (cachedAst) {
+        this.statsCacheUsed++
+        return {
+          ast: cachedAst,
+          addresses,
+        }
+      } else {
+        const ast = parseFromTokens(lexerResult)
+        const [newAst, finalIdx] = computeBetterAst(ast, 0)
+        this.cache.set(hash, newAst)
+        return { ast: newAst, addresses }
+      }
     }
   }
 }
 
-export const computeHashAndExtractAddresses = (tokens: IToken[]) => {
+export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: Array<string>, hash: string } => {
   const addresses: Array<string> = []
   const hash = tokens.reduce((currentHash, token) => {
     if (token.tokenType!.tokenName === 'RelativeCell') {
@@ -82,7 +104,7 @@ const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
   }
 }
 
-export const computeHashAndExtractAddressesFromLexer = (code: string) => {
+export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<string>, hash: string } => {
   const cellRegex = /^[A-Za-z]+[0-9]+/
   const addresses = []
   let hash = ""
