@@ -104,8 +104,9 @@ const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
   }
 }
 
+export const stringRegex = /^'[^']*'/
+export const cellRegex = /^[A-Za-z]+[0-9]+/
 export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<string>, hash: string } => {
-  const cellRegex = /^[A-Za-z]+[0-9]+/
   const addresses = []
   let hash = ""
 
@@ -113,7 +114,7 @@ export const computeHashAndExtractAddressesFromLexer = (code: string): { address
   while (x < code.length) {
     if (code[x] === "'") {
       const subcode = code.slice(x)
-      const results = subcode.match(/^'[^']*'/)
+      const results = subcode.match(stringRegex)
       if (results) {
         hash = hash.concat(results[0])
         x += results[0].length
