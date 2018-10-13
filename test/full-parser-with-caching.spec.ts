@@ -1,6 +1,6 @@
 import {ParserWithCaching, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst} from '../src/parser/BetterAst'
+import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/BetterAst'
 
 describe('ParserWithCaching', () => {
   it("integer literal", () => {
@@ -56,4 +56,69 @@ describe('ParserWithCaching', () => {
 
     expect(parser.statsCacheUsed).toBe(0)
   })
+
+  it("SUM function without args", () => {
+    const parser = new ParserWithCaching()
+
+    const bast = parser.parse("=SUM()")
+    const ast = bast.ast as ProcedureAst
+
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe("SUM")
+    expect(ast.args.length).toBe(0)
+  })
+
+  it("SUM function with args", () => {
+    const parser = new ParserWithCaching()
+
+    const bast = parser.parse("=SUM(1; A1)")
+    const ast = bast.ast as ProcedureAst
+
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe("SUM")
+    expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
+    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE)
+  })
+
+
+  it.skip("joining nodes without braces", () => {
+    const parser = new ParserWithCaching()
+    const ast = parser.parse("=1 + 2 + 3").ast as PlusOpAst
+
+    expect(ast.type).toBe(AstNodeType.PLUS_OP)
+    expect(ast.left.type).toBe(AstNodeType.PLUS_OP)
+    expect(ast.right.type).toBe(AstNodeType.NUMBER)
+  })
+
+  it("joining nodes with braces", () => {
+    const parser = new ParserWithCaching()
+    const ast = parser.parse("=1 + (2 + 3)").ast as PlusOpAst
+
+    expect(ast.type).toBe(AstNodeType.PLUS_OP)
+    expect(ast.left.type).toBe(AstNodeType.NUMBER)
+    expect(ast.right.type).toBe(AstNodeType.PLUS_OP)
+  })
+
+
+  it("float literal", () => {
+    const parser = new ParserWithCaching()
+
+    const ast = parser.parse("=3.14").ast as NumberAst
+
+    expect(ast.type).toBe(AstNodeType.NUMBER)
+    expect(ast.value).toBe(3.14)
+  })
+
+  it("leading zeros", () => {
+    const parser = new ParserWithCaching()
+
+    const int = parser.parse("=01234").ast as NumberAst
+    const float = parser.parse("=03.14").ast as NumberAst
+
+    expect(int.type).toBe(AstNodeType.NUMBER)
+    expect(int.value).toBe(1234)
+    expect(float.type).toBe(AstNodeType.NUMBER)
+    expect(float.value).toBe(3.14)
+  })
+
 });

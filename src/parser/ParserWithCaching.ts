@@ -33,9 +33,8 @@ export class ParserWithCaching {
         }
       } else {
         const ast = parseFormula(text)
-        const [newAst, finalIdx] = computeBetterAst(ast, 0)
-        this.cache.set(hash, newAst)
-        return { ast: newAst, addresses }
+        this.cache.set(hash, ast)
+        return { ast: ast, addresses }
       }
     } else {
       const lexerResult = tokenizeFormula(text);
@@ -49,12 +48,15 @@ export class ParserWithCaching {
         }
       } else {
         const ast = parseFromTokens(lexerResult)
-        const [newAst, finalIdx] = computeBetterAst(ast, 0)
-        this.cache.set(hash, newAst)
-        return { ast: newAst, addresses }
+        this.cache.set(hash, ast)
+        return { ast: ast, addresses }
       }
     }
   }
+}
+
+export function isFormula(text: string): Boolean {
+  return text.startsWith('=')
 }
 
 export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: Array<string>, hash: string } => {

@@ -1,8 +1,9 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {cellError, CellValue, ErrorType, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
-import {Ast, AstNodeType} from "./parser/Ast";
-import {FullParser, isFormula} from './parser/FullParser'
+import {TemplateAst, AstNodeType} from "./parser/BetterAst";
+import {isFormula} from './parser/ParserWithCaching'
+import {BetterAst} from "./parser/BetterAst";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, Vertex> = new Map()
@@ -16,10 +17,10 @@ export class HandsOnEngine {
     this.recomputeFormulas()
   }
 
-  computeFormula(formula: Ast): CellValue {
+  computeFormula(formula: TemplateAst, addresses: Array<string>): CellValue {
     switch (formula.type) {
-      case AstNodeType.RELATIVE_CELL: {
-        const address = formula.address
+      case AstNodeType.CELL_REFERENCE: {
+        const address = addresses[formula.idx]
         const vertex = this.addressMapping.get(address)!
         return vertex.getCellValue()
       }
@@ -27,8 +28,8 @@ export class HandsOnEngine {
         return formula.value
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = this.computeFormula(formula.left)
-        const rightResult = this.computeFormula(formula.right)
+        const leftResult = this.computeFormula(formula.left, addresses)
+        const rightResult = this.computeFormula(formula.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult + rightResult
         } else {
@@ -36,8 +37,8 @@ export class HandsOnEngine {
         }
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = this.computeFormula(formula.left)
-        const rightResult = this.computeFormula(formula.right)
+        const leftResult = this.computeFormula(formula.left, addresses)
+        const rightResult = this.computeFormula(formula.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
@@ -45,8 +46,8 @@ export class HandsOnEngine {
         }
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = this.computeFormula(formula.left)
-        const rightResult = this.computeFormula(formula.right)
+        const leftResult = this.computeFormula(formula.left, addresses)
+        const rightResult = this.computeFormula(formula.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
@@ -54,8 +55,8 @@ export class HandsOnEngine {
         }
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = this.computeFormula(formula.left)
-        const rightResult = this.computeFormula(formula.right)
+        const leftResult = this.computeFormula(formula.left, addresses)
+        const rightResult = this.computeFormula(formula.right, addresses)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
             return cellError(ErrorType.DIV_BY_ZERO)
@@ -77,7 +78,6 @@ export class HandsOnEngine {
   }
 
   setCellContent(address: string, newCellContent: string) {
-    const parser = new FullParser()
     const vertex = this.addressMapping.get(address)
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
@@ -96,7 +96,7 @@ export class HandsOnEngine {
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         const formula = vertex.getFormula()
-        const cellValue = this.computeFormula(formula)
+        const cellValue = this.computeFormula(formula.ast, formula.addresses)
         vertex.setCellValue(cellValue)
       }
     })

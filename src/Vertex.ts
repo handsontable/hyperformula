@@ -1,4 +1,4 @@
-import {Ast} from "./parser/Ast";
+import {BetterAst} from "./parser/BetterAst";
 
 type VertexId = number;
 let nextVertexId = 0;
@@ -29,14 +29,14 @@ export type CellValue = string | number | CellError
 
 export class FormulaCellVertex extends Vertex {
   private cachedCellValue?: CellValue;
-  private formula: Ast;
+  private formula: BetterAst;
 
-  constructor(formula: Ast) {
+  constructor(formula: BetterAst) {
     super()
     this.formula = formula;
   }
 
-  getFormula() : Ast {
+  getFormula() : BetterAst {
     return this.formula
   }
 

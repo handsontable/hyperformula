@@ -1,6 +1,6 @@
-import {FullParser, isFormula} from './parser/FullParser'
+import {isFormula} from './parser/ParserWithCaching'
 import {Ast, AstNodeType} from "./parser/Ast"
-import {getFormulaDependencies} from './parser/AstUtils'
+import {ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
 // [
@@ -13,7 +13,7 @@ const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
 
 export class GraphBuilder {
-  private parser = new FullParser()
+  private parser = new ParserWithCaching()
 
   private graph: Graph<Vertex>
   private addressMapping: Map<string, Vertex>
@@ -34,7 +34,7 @@ export class GraphBuilder {
         if (isFormula(cellContent)) {
           let ast = this.parser.parse(cellContent)
           vertex = new FormulaCellVertex(ast)
-          dependencies.set(cellAddress, getFormulaDependencies(vertex.getFormula()))
+          dependencies.set(cellAddress, ast.addresses)
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
         } else {

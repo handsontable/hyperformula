@@ -1,4 +1,6 @@
-export type TemplateAst = NumberAst | CellReferenceAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst;
+import {Ast} from "./Ast";
+
+export type TemplateAst = NumberAst | CellReferenceAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
 export interface BetterAst {
   ast: TemplateAst,
   addresses: Array<string>,
@@ -11,6 +13,8 @@ export enum AstNodeType {
   MINUS_OP = "MINUS_OP",
   TIMES_OP = "TIMES_OP",
   DIV_OP = "DIV_OP",
+
+  FUNCTION_CALL = "FUNCTION_CALL",
 
   CELL_REFERENCE = "CELL_REFERENCE",
 }
@@ -51,3 +55,11 @@ export interface DivOpAst extends BinaryOpAst {
   type: AstNodeType.DIV_OP,
 }
 export const buildDivOpAst = (left: TemplateAst, right: TemplateAst): DivOpAst => ({ type: AstNodeType.DIV_OP, left, right })
+
+export interface ProcedureAst {
+  type: AstNodeType.FUNCTION_CALL,
+  procedureName: string,
+  args: TemplateAst[]
+}
+export const buildProcedureAst = (procedureName: string, args: TemplateAst[]): ProcedureAst => ({ type: AstNodeType.FUNCTION_CALL, procedureName, args })
+

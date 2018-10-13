@@ -8,13 +8,15 @@ import {
 } from "chevrotain"
 
 import {
-  Ast, buildDivOpAst,
+  TemplateAst as Ast,
+  buildDivOpAst,
   buildMinusOpAst,
   buildNumberAst,
-  buildPlusOpAst, buildProcedureAst,
-  buildRelativeCellAst,
+  buildPlusOpAst,
+  buildProcedureAst,
+  buildCellReferenceAst,
   buildTimesOpAst
-} from "../parser/Ast"
+} from "../parser/BetterAst"
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
 
@@ -86,9 +88,16 @@ const allTokens = [
 // A -> adresy
 // P -> procedury
 class FormulaParser extends Parser {
+  private cellCounter = 0
+
   constructor() {
     super(allTokens, {outputCst: false})
     this.performSelfAnalysis()
+  }
+
+  public reset() {
+    super.reset()
+    this.cellCounter = 0
   }
 
   public formula: AstRule = this.RULE("formula", () => {
@@ -170,8 +179,8 @@ class FormulaParser extends Parser {
   })
 
   private relativeCellExpression: AstRule = this.RULE("relativeCellExpression", () => {
-    const address = this.CONSUME(RelativeCell)
-    return buildRelativeCellAst(address.image)
+    this.CONSUME(RelativeCell)
+    return buildCellReferenceAst(this.cellCounter++)
   })
 
   private parenthesisExpression: AstRule = this.RULE("parenthesisExpression", () => {
