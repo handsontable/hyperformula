@@ -1,4 +1,4 @@
-import {AstNodeType, ProcedureAst, TemplateAst} from "../parser/BetterAst";
+import {AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, Vertex} from "../Vertex";
 
 export class Interpreter {

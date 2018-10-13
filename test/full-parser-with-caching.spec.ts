@@ -1,6 +1,6 @@
 import {ParserWithCaching, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/BetterAst'
+import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/Ast'
 
 describe('ParserWithCaching', () => {
   it("integer literal", () => {

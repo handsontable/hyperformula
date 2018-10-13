@@ -1,16 +1,6 @@
 import {parseFormula, parseFromTokens, tokenizeFormula} from "./FormulaParser";
 import {IToken} from "chevrotain"
-import {
-  BetterAst,
-  buildCellReferenceAst,
-  buildDivOpAst,
-  buildMinusOpAst,
-  buildNumberAst,
-  buildPlusOpAst,
-  buildTimesOpAst,
-  TemplateAst
-} from './BetterAst'
-import {Ast, AstNodeType} from "./Ast"
+import {Ast, TemplateAst} from "./Ast";
 
 export class ParserWithCaching {
   private cache: Map<string, TemplateAst> = new Map()
@@ -21,7 +11,7 @@ export class ParserWithCaching {
     this.optimizationMode = optimizationMode
   }
 
-  parse(text: string): BetterAst {
+  parse(text: string): Ast {
     if (this.optimizationMode === 'lexer') {
       const {hash, addresses} = computeHashAndExtractAddressesFromLexer(text);
       const cachedAst = this.cache.get(hash)
@@ -71,52 +61,6 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
   }, "");
   return { addresses, hash }
 };
-
-const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
-  switch (ast.type) {
-    case AstNodeType.RELATIVE_CELL: {
-      return [buildCellReferenceAst(idx), idx + 1]
-    }
-    case AstNodeType.PLUS_OP: {
-      const lhsResult = computeBetterAst(ast.left, idx)
-      const rhsResult = computeBetterAst(ast.right, lhsResult[1])
-      return [
-        buildPlusOpAst(lhsResult[0], rhsResult[0]),
-        rhsResult[1]
-      ]
-    }
-    case AstNodeType.MINUS_OP: {
-      const lhsResult = computeBetterAst(ast.left, idx)
-      const rhsResult = computeBetterAst(ast.right, lhsResult[1])
-      return [
-        buildMinusOpAst(lhsResult[0], rhsResult[0]),
-        rhsResult[1]
-      ]
-    }
-    case AstNodeType.TIMES_OP: {
-      const lhsResult = computeBetterAst(ast.left, idx)
-      const rhsResult = computeBetterAst(ast.right, lhsResult[1])
-      return [
-        buildTimesOpAst(lhsResult[0], rhsResult[0]),
-        rhsResult[1]
-      ]
-    }
-    case AstNodeType.DIV_OP: {
-      const lhsResult = computeBetterAst(ast.left, idx)
-      const rhsResult = computeBetterAst(ast.right, lhsResult[1])
-      return [
-        buildDivOpAst(lhsResult[0], rhsResult[0]),
-        rhsResult[1]
-      ]
-    }
-    case AstNodeType.NUMBER: {
-      return [buildNumberAst(ast.value), idx]
-    }
-    case AstNodeType.FUNCTION_CALL: {
-      throw Error("Node type not supported")
-    }
-  }
-}
 
 export const stringRegex = /^'[^']*'/
 export const cellRegex = /^[A-Za-z]+[0-9]+/

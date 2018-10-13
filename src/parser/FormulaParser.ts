@@ -16,7 +16,7 @@ import {
   buildProcedureAst,
   buildCellReferenceAst,
   buildTimesOpAst
-} from "../parser/BetterAst"
+} from "./Ast"
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
 
