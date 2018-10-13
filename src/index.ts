@@ -41,7 +41,7 @@ export class HandsOnEngine {
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         const formula = vertex.getFormula()
-        const cellValue = this.interpreter.computeFormula(formula.ast, formula.addresses)
+        const cellValue = this.interpreter.computeFormula(formula)
         vertex.setCellValue(cellValue)
       }
     })

@@ -1,4 +1,4 @@
-import {AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
+import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, Vertex} from "../Vertex";
 
 export class Interpreter {
@@ -8,8 +8,8 @@ export class Interpreter {
     this.addressMapping = addressMapping
   }
 
-  public computeFormula(formula: TemplateAst, addresses: Array<string>): CellValue {
-    return this.evaluateAst(formula, addresses)
+  public computeFormula(formula: Ast): CellValue {
+    return this.evaluateAst(formula.ast, formula.addresses)
   }
 
   private evaluateAst(ast: TemplateAst, addresses: Array<string>): CellValue {
