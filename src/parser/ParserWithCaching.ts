@@ -81,3 +81,28 @@ const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
     }
   }
 }
+
+export const computeHashAndExtractAddressesFromLexer = (code: string) => {
+  const cellRegex = /^[A-Za-z]+[0-9]+/
+  const addresses = []
+  let hash = ""
+
+  let x = 0
+  while (x < code.length) {
+    const subcode = code.slice(x)
+    const results = subcode.match(cellRegex)
+    if (results) {
+      addresses.push(results[0])
+      hash = hash.concat("#")
+      x += results[0].length
+    } else {
+      hash = hash.concat(code[x])
+      x++
+    }
+  }
+
+  return {
+    hash,
+    addresses
+  }
+};
