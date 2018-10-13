@@ -65,6 +65,9 @@ export class HandsOnEngine {
           return cellError(ErrorType.ARG)
         }
       }
+      case AstNodeType.FUNCTION_CALL: {
+        throw Error("Node type not supported")
+      }
     }
   }
 

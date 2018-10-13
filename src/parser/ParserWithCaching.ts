@@ -1,6 +1,15 @@
-import {tokenizeFormula, parseFromTokens, parseFormula} from "./FormulaParser";
+import {parseFormula, parseFromTokens, tokenizeFormula} from "./FormulaParser";
 import {IToken} from "chevrotain"
-import {BetterAst, TemplateAst, buildCellReferenceAst, buildPlusOpAst, buildMinusOpAst, buildTimesOpAst, buildDivOpAst, buildNumberAst} from './BetterAst'
+import {
+  BetterAst,
+  buildCellReferenceAst,
+  buildDivOpAst,
+  buildMinusOpAst,
+  buildNumberAst,
+  buildPlusOpAst,
+  buildTimesOpAst,
+  TemplateAst
+} from './BetterAst'
 import {Ast, AstNodeType} from "./Ast"
 
 export class ParserWithCaching {
@@ -100,6 +109,9 @@ const computeBetterAst = (ast: Ast, idx: number): [TemplateAst, number] => {
     }
     case AstNodeType.NUMBER: {
       return [buildNumberAst(ast.value), idx]
+    }
+    case AstNodeType.FUNCTION_CALL: {
+      throw Error("Node type not supported")
     }
   }
 }

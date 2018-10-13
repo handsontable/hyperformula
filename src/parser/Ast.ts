@@ -1,4 +1,4 @@
-export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst;
+export type Ast = NumberAst | RelativeCellAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
 
 export enum AstNodeType {
   NUMBER = "NUMBER",
@@ -60,3 +60,10 @@ export interface DivOpAst extends BinaryOpAst {
   type: AstNodeType.DIV_OP,
 }
 export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({ type: AstNodeType.DIV_OP, left, right })
+
+export interface ProcedureAst {
+  type: AstNodeType.FUNCTION_CALL,
+  procedureName: string,
+  args: Ast[]
+}
+export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({ type: AstNodeType.FUNCTION_CALL, procedureName, args })

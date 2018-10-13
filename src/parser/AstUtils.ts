@@ -15,5 +15,8 @@ export function getFormulaDependencies(ast: Ast) : Array<string> {
     case AstNodeType.NUMBER: {
       return []
     }
+    case AstNodeType.FUNCTION_CALL: {
+      throw Error("Node type not supported")
+    }
   }
 }

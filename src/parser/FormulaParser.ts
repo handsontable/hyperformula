@@ -11,7 +11,7 @@ import {
   Ast, buildDivOpAst,
   buildMinusOpAst,
   buildNumberAst,
-  buildPlusOpAst,
+  buildPlusOpAst, buildProcedureAst,
   buildRelativeCellAst,
   buildTimesOpAst
 } from "../parser/Ast"
@@ -42,8 +42,15 @@ const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]
 const LParen = createToken({name: "LParen", pattern: /\(/})
 const RParen = createToken({name: "RParen", pattern: /\)/})
 
+/* prcoedures */
+const ProcedureName = createToken({name: "ProcedureName", pattern: /[A-Za-z]+/})
+
 /* terminals */
 const NumberLiteral = createToken({name: "NumberLiteral", pattern: /(\d+(\.\d+)?)/})
+
+/* separator */
+const ArgSeparator = createToken({name: "ArgSeparator", pattern: /;/})
+
 
 /* skipping whitespaces */
 const WhiteSpace = createToken({
@@ -63,8 +70,10 @@ const allTokens = [
   DivOp,
   LParen,
   RParen,
-  NumberLiteral,
   RelativeCell,
+  ProcedureName,
+  ArgSeparator,
+  NumberLiteral,
   AdditionOp,
   MultiplicationOp
 ]
@@ -132,15 +141,32 @@ class FormulaParser extends Parser {
         ALT: () => this.SUBRULE(this.parenthesisExpression)
       },
       {
+        ALT: () => this.SUBRULE(this.relativeCellExpression)
+      },
+      {
+        ALT: () => this.SUBRULE(this.procedureExpression)
+      },
+      {
         ALT: () => {
           const number = this.CONSUME(NumberLiteral)
           return buildNumberAst(parseFloat(number.image))
         }
-      },
-      {
-        ALT: () => this.SUBRULE(this.relativeCellExpression)
       }
     ])
+  })
+
+  private procedureExpression: AstRule = this.RULE("procedureExpression", () => {
+    const procedureName = this.CONSUME(ProcedureName).image
+    let args: Ast[] = []
+    this.CONSUME(LParen)
+    this.MANY_SEP({
+      SEP: ArgSeparator,
+      DEF: () => {
+        args.push(this.SUBRULE(this.atomicExpression))
+      }
+    })
+    this.CONSUME(RParen)
+    return buildProcedureAst(procedureName, args)
   })
 
   private relativeCellExpression: AstRule = this.RULE("relativeCellExpression", () => {

@@ -1,5 +1,13 @@
 import {FullParser} from '../src/parser/FullParser'
-import { AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, RelativeCellAst } from '../src/parser/Ast'
+import {
+  AstNodeType,
+  NumberAst,
+  PlusOpAst,
+  MinusOpAst,
+  TimesOpAst,
+  RelativeCellAst,
+  ProcedureAst
+} from '../src/parser/Ast'
 
 describe('Full parser test', () => {
   const parser = new FullParser()
@@ -89,5 +97,22 @@ describe('Full parser test', () => {
 
     expect(ast.type).toBe(AstNodeType.RELATIVE_CELL)
     expect(ast.address).toBe("A5")
+  })
+
+  it("SUM function without args", () => {
+    const ast = parser.parse("=SUM()") as ProcedureAst
+
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe("SUM")
+    expect(ast.args.length).toBe(0)
+  })
+
+  it("SUM function with args", () => {
+    const ast = parser.parse("=SUM(1; A1)") as ProcedureAst
+
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe("SUM")
+    expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
+    expect(ast.args[1].type).toBe(AstNodeType.RELATIVE_CELL)
   })
 })
