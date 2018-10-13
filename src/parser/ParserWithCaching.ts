@@ -112,10 +112,13 @@ export const computeHashAndExtractAddressesFromLexer = (code: string): { address
   let x = 0
   while (x < code.length) {
     if (code[x] === "'") {
-      const results = code.match(/'.*'/)
+      const subcode = code.slice(x)
+      const results = subcode.match(/^'[^']*'/)
       if (results) {
         hash = hash.concat(results[0])
         x += results[0].length
+      } else {
+        throw Error('Unexpected parse error')
       }
     } else {
       const subcode = code.slice(x)

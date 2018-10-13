@@ -37,6 +37,23 @@ describe("computeHashAndExtractAddressesFromLexer", () => {
     })
   });
 
+  it("cell ref in string", () => {
+    const code = "='A5'+A4+'A6'"
+
+    expect(computeHashAndExtractAddressesFromLexer(code)).toEqual({
+      hash: "='A5'+#+'A6'",
+      addresses: ["A4"]
+    })
+  });
+
+  it("error in parsing", () => {
+    const code = "='fdsafdsa"
+
+    expect(() => {
+      computeHashAndExtractAddressesFromLexer(code)
+    }).toThrowError(new Error('Unexpected parse error'))
+  });
+
   it.skip("cell ref in string with escape", () => {
     const code = "='fdsaf\'A5'"
 
