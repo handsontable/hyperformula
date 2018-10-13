@@ -27,4 +27,22 @@ describe("computeHashAndExtractAddressesFromLexer", () => {
       addresses: ["A5", "A7"]
     })
   });
+
+  it("cell ref in string", () => {
+    const code = "='A5'"
+
+    expect(computeHashAndExtractAddressesFromLexer(code)).toEqual({
+      hash: "='A5'",
+      addresses: []
+    })
+  });
+
+  it.skip("cell ref in string with escape", () => {
+    const code = "='fdsaf\'A5'"
+
+    expect(computeHashAndExtractAddressesFromLexer(code)).toEqual({
+      hash: "='fdsaf\'A5'",
+      addresses: []
+    })
+  });
 })

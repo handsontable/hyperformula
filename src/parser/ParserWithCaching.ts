@@ -88,16 +88,31 @@ export const computeHashAndExtractAddressesFromLexer = (code: string) => {
   let hash = ""
 
   let x = 0
+  let processingString = false
   while (x < code.length) {
-    const subcode = code.slice(x)
-    const results = subcode.match(cellRegex)
-    if (results) {
-      addresses.push(results[0])
-      hash = hash.concat("#")
-      x += results[0].length
-    } else {
+    if (!processingString && code[x] === "'") {
+      processingString = true
       hash = hash.concat(code[x])
       x++
+      continue
+    } else if (processingString) {
+      if (code[x] === "'") {
+        processingString = false
+      }
+      hash = hash.concat(code[x])
+      x++
+      continue
+    } else {
+      const subcode = code.slice(x)
+      const results = subcode.match(cellRegex)
+      if (results) {
+        addresses.push(results[0])
+        hash = hash.concat("#")
+        x += results[0].length
+      } else {
+        hash = hash.concat(code[x])
+        x++
+      }
     }
   }
 
