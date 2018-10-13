@@ -1,6 +1,5 @@
 import {HandsOnEngine} from "../src";
 import {cellError, ErrorType} from "../src/Vertex";
-import {AstNodeType, NumberAst} from "../src/parser/Ast";
 
 describe('Interpreter', () => {
   let engine: HandsOnEngine
@@ -131,5 +130,17 @@ describe('Interpreter', () => {
     engine.loadSheet([['=SUM(1; B1)', '3.14']])
 
     expect(engine.getCellValue("A1")).toBeCloseTo(4.14)
+  })
+
+  it("procedures - SUM with bad args", () => {
+    engine.loadSheet([['=SUM(B1)', 'asdf']])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.ARG))
+  })
+
+  it("procedures - not known procedure", () => {
+    engine.loadSheet([['=FOO()']])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NAME))
   })
 });

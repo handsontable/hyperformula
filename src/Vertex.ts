@@ -18,7 +18,8 @@ export abstract class Vertex {
 
 export enum ErrorType {
   ARG = "ARG",
-  DIV_BY_ZERO = "DIV_BY_ZERO"
+  DIV_BY_ZERO = "DIV_BY_ZERO",
+  NAME = "NAME"
 }
 export interface CellError {
   type: ErrorType

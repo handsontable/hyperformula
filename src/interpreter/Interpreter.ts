@@ -76,7 +76,7 @@ export class Interpreter {
         }, 0)
       }
       default:
-        throw Error("Procedure not supported")
+        return cellError(ErrorType.NAME)
     }
   }
 }
