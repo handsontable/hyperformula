@@ -2,7 +2,7 @@ import {HandsOnEngine} from "../src";
 import {performance} from "perf_hooks";
 
 const rows = 100000
-const millisecondsPerThousandRows = 160
+const millisecondsPerThousandRows = 90
 const numberOfRuns = 3
 
 let sheet = []
