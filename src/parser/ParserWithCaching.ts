@@ -62,7 +62,7 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
   return { addresses, hash }
 };
 
-export const stringRegex = /^'[^']*'/
+export const stringRegex = /^[^']*'/
 export const cellRegex = /^[A-Za-z]+[0-9]+/
 export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<string>, hash: string } => {
   const addresses = []
@@ -71,14 +71,19 @@ export const computeHashAndExtractAddressesFromLexer = (code: string): { address
   let x = 0
   while (x < code.length) {
     if (code[x] === "'") {
-      const subcode = code.slice(x)
-      const results = subcode.match(stringRegex)
-      if (results) {
-        hash = hash.concat(results[0])
-        x += results[0].length
-      } else {
-        throw Error('Unexpected parse error')
-      }
+      hash = hash.concat(code[x])
+      x++
+
+      do {
+        const subcode = code.slice(x)
+        const results = subcode.match(stringRegex)
+        if (results) {
+          hash = hash.concat(results[0])
+          x += results[0].length
+        } else {
+          throw Error('Unexpected parse error')
+        }
+      } while(code[x - 2] === "\\")
     } else {
       const subcode = code.slice(x)
       const results = subcode.match(cellRegex)
