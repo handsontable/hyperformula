@@ -1,4 +1,4 @@
-export type TemplateAst = NumberAst | StringAst | CellReferenceAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
+export type TemplateAst = NumberAst | StringAst | CellReferenceAst | CellRangeAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
 export interface Ast {
   ast: TemplateAst,
   addresses: Array<string>,
@@ -16,6 +16,7 @@ export enum AstNodeType {
   FUNCTION_CALL = "FUNCTION_CALL",
 
   CELL_REFERENCE = "CELL_REFERENCE",
+  CELL_RANGE = "CELL_RANGE"
 }
 
 export interface NumberAst {
@@ -35,6 +36,13 @@ export interface CellReferenceAst {
   idx: number,
 }
 export const buildCellReferenceAst = (idx: number): CellReferenceAst => ({ type: AstNodeType.CELL_REFERENCE, idx })
+
+export interface CellRangeAst {
+  type: AstNodeType.CELL_RANGE,
+  from: TemplateAst,
+  to: TemplateAst,
+}
+export const buildCellRangeAst = (from: TemplateAst, to: TemplateAst): CellRangeAst => ({ type: AstNodeType.CELL_RANGE, from, to })
 
 export interface BinaryOpAst {
   left: TemplateAst,

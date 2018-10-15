@@ -1,6 +1,6 @@
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {AstNodeType, NumberAst, StringAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/Ast'
+import {AstNodeType, NumberAst, StringAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst, CellRangeAst} from '../src/parser/Ast'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -117,6 +117,20 @@ const sharedExamples = (optimizationMode: string) => {
     expect(int.value).toBe(1234)
     expect(float.type).toBe(AstNodeType.NUMBER)
     expect(float.value).toBe(3.14)
+  })
+
+  it("simple cell range", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const bast = parser.parse("=A1:B2")
+
+    const ast = bast.ast as CellRangeAst
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.from.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect((ast.from as CellReferenceAst).idx).toBe(0)
+    expect(ast.to.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect((ast.to as CellReferenceAst).idx).toBe(1)
+    expect(bast.addresses).toEqual(["A1", "B2"])
   })
 };
 

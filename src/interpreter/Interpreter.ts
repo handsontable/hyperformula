@@ -67,6 +67,9 @@ export class Interpreter {
       case AstNodeType.FUNCTION_CALL: {
         return this.evaluateFunction(ast, addresses)
       }
+      case AstNodeType.CELL_RANGE: {
+        throw Error('CELL_RANGE is not supported yet')
+      }
     }
   }
 

@@ -16,6 +16,7 @@ import {
   buildPlusOpAst,
   buildProcedureAst,
   buildCellReferenceAst,
+  buildCellRangeAst,
   buildTimesOpAst
 } from "./Ast"
 
@@ -40,6 +41,7 @@ const DivOp = createToken({name: "DivOp", pattern: /\//, categories: Multiplicat
 
 /* addresses */
 const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/})
+const RangeSeparator = createToken({name: "RangeSeparator", pattern: /:/})
 
 /* parenthesis */
 const LParen = createToken({name: "LParen", pattern: /\(/})
@@ -76,6 +78,7 @@ const allTokens = [
   DivOp,
   LParen,
   RParen,
+  RangeSeparator,
   RelativeCell,
   ProcedureName,
   ArgSeparator,
@@ -88,7 +91,7 @@ const allTokens = [
 // F -> '=' E
 // E -> M + E | M - E | M    --->    M { + M }*
 // M -> C * M | C / M | C    --->    C { * C }*
-// C -> N | A | P | num
+// C -> N | A:A | A | P | num
 // N -> '(' E ')'
 // A -> adresy
 // P -> procedury
@@ -149,10 +152,20 @@ class FormulaParser extends Parser {
     return lhs
   })
 
+  private cellRangeExpression: AstRule = this.RULE("cellRangeExpression", () => {
+    const fromCell: Ast = this.SUBRULE(this.relativeCellExpression)
+    this.CONSUME(RangeSeparator)
+    const toCell: Ast = this.SUBRULE2(this.relativeCellExpression)
+    return buildCellRangeAst(fromCell, toCell)
+  })
+
   private atomicExpression: AstRule = this.RULE("atomicExpression", () => {
     return this.OR([
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression)
+      },
+      {
+        ALT: () => this.SUBRULE(this.cellRangeExpression)
       },
       {
         ALT: () => this.SUBRULE(this.relativeCellExpression)
