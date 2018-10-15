@@ -30,6 +30,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue("C1")).toBe('www1')
   })
 
+  it("string literals in formula", () => {
+    engine.loadSheet([
+      ["='www'", "='1www'", "='www1'"]
+    ])
+
+    expect(engine.getCellValue("A1")).toBe('www')
+    expect(engine.getCellValue("B1")).toBe('1www')
+    expect(engine.getCellValue("C1")).toBe('www1')
+  })
+
   it("plus operator", () => {
     engine.loadSheet([['3', '7', '=A1+B1']])
 

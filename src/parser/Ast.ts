@@ -1,4 +1,4 @@
-export type TemplateAst = NumberAst | CellReferenceAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
+export type TemplateAst = NumberAst | StringAst | CellReferenceAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
 export interface Ast {
   ast: TemplateAst,
   addresses: Array<string>,
@@ -6,6 +6,7 @@ export interface Ast {
 
 export enum AstNodeType {
   NUMBER = "NUMBER",
+  STRING = "STRING",
 
   PLUS_OP = "PLUS_OP",
   MINUS_OP = "MINUS_OP",
@@ -22,6 +23,12 @@ export interface NumberAst {
   value: number,
 }
 export const buildNumberAst = (value: number): NumberAst => ({ type: AstNodeType.NUMBER, value })
+
+export interface StringAst {
+  type: AstNodeType.STRING,
+  value: string,
+}
+export const buildStringAst = (value: string): StringAst => ({ type: AstNodeType.STRING, value })
 
 export interface CellReferenceAst {
   type: AstNodeType.CELL_REFERENCE,

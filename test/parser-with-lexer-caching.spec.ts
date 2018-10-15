@@ -1,6 +1,6 @@
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {AstNodeType, NumberAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/Ast'
+import {AstNodeType, NumberAst, StringAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst} from '../src/parser/Ast'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -12,6 +12,16 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(42)
     expect(bast.addresses).toEqual([])
+  })
+
+  it("string literal", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const bast = parser.parse("='foobar'")
+
+    const ast = bast.ast as StringAst
+    expect(ast.type).toBe(AstNodeType.STRING)
+    expect(ast.value).toBe("foobar")
   })
 
   it("plus operator on different nodes", () => {

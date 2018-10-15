@@ -22,6 +22,9 @@ export class Interpreter {
       case AstNodeType.NUMBER: {
         return ast.value
       }
+      case AstNodeType.STRING: {
+        return ast.value
+      }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, addresses)
         const rightResult = this.evaluateAst(ast.right, addresses)

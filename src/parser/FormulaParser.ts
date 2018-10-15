@@ -12,6 +12,7 @@ import {
   buildDivOpAst,
   buildMinusOpAst,
   buildNumberAst,
+  buildStringAst,
   buildPlusOpAst,
   buildProcedureAst,
   buildCellReferenceAst,
@@ -53,6 +54,9 @@ const NumberLiteral = createToken({name: "NumberLiteral", pattern: /(\d+(\.\d+)?
 /* separator */
 const ArgSeparator = createToken({name: "ArgSeparator", pattern: /;/})
 
+/* string literal */
+const StringLiteral = createToken({name: "StringLiteral", pattern: /'([^'\\]*(\\.[^'\\]*)*)'/})
+
 
 /* skipping whitespaces */
 const WhiteSpace = createToken({
@@ -76,6 +80,7 @@ const allTokens = [
   ProcedureName,
   ArgSeparator,
   NumberLiteral,
+  StringLiteral,
   AdditionOp,
   MultiplicationOp
 ]
@@ -159,6 +164,12 @@ class FormulaParser extends Parser {
         ALT: () => {
           const number = this.CONSUME(NumberLiteral)
           return buildNumberAst(parseFloat(number.image))
+        }
+      },
+      {
+        ALT: () => {
+          const str = this.CONSUME(StringLiteral)
+          return buildStringAst(str.image.slice(1, -1))
         }
       }
     ])
