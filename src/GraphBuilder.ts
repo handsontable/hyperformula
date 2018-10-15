@@ -3,10 +3,6 @@ import {Ast, AstNodeType} from "./parser/Ast"
 import {ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
 import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
-// [
-//     ['', '', ''],
-//     ['', '', '']
-// ]
 export type Sheet = Array<Array<string>>
 
 const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
