@@ -17,7 +17,8 @@ import {
   buildProcedureAst,
   buildCellReferenceAst,
   buildCellRangeAst,
-  buildTimesOpAst
+  buildTimesOpAst,
+  CellReferenceAst
 } from "./Ast"
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
@@ -153,9 +154,9 @@ class FormulaParser extends Parser {
   })
 
   private cellRangeExpression: AstRule = this.RULE("cellRangeExpression", () => {
-    const fromCell: Ast = this.SUBRULE(this.relativeCellExpression)
+    const fromCell: CellReferenceAst = this.SUBRULE(this.relativeCellExpression)
     this.CONSUME(RangeSeparator)
-    const toCell: Ast = this.SUBRULE2(this.relativeCellExpression)
+    const toCell: CellReferenceAst = this.SUBRULE2(this.relativeCellExpression)
     return buildCellRangeAst(fromCell, toCell)
   })
 
@@ -202,7 +203,7 @@ class FormulaParser extends Parser {
     return buildProcedureAst(procedureName, args)
   })
 
-  private relativeCellExpression: AstRule = this.RULE("relativeCellExpression", () => {
+  private relativeCellExpression: CellReferenceAstRule = this.RULE("relativeCellExpression", () => {
     this.CONSUME(RelativeCell)
     return buildCellReferenceAst(this.cellCounter++)
   })
@@ -217,6 +218,7 @@ class FormulaParser extends Parser {
 
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
+type CellReferenceAstRule = (idxInCallingRule?: number, ...args: any[]) => (CellReferenceAst)
 
 const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()

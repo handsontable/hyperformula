@@ -39,10 +39,10 @@ export const buildCellReferenceAst = (idx: number): CellReferenceAst => ({ type:
 
 export interface CellRangeAst {
   type: AstNodeType.CELL_RANGE,
-  from: TemplateAst,
-  to: TemplateAst,
+  from: CellReferenceAst,
+  to: CellReferenceAst,
 }
-export const buildCellRangeAst = (from: TemplateAst, to: TemplateAst): CellRangeAst => ({ type: AstNodeType.CELL_RANGE, from, to })
+export const buildCellRangeAst = (from: CellReferenceAst, to: CellReferenceAst): CellRangeAst => ({ type: AstNodeType.CELL_RANGE, from, to })
 
 export interface BinaryOpAst {
   left: TemplateAst,
