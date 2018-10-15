@@ -79,4 +79,24 @@ describe('Integration', () => {
 
     expect(engine.getCellValue("B1")).toBe(2)
   });
+
+  it('#loadSheet change cell content which was formula throws error', () => {
+    engine.loadSheet([
+      ['1', '=A1']
+    ])
+
+    expect(() => {
+      engine.setCellContent('B1', '2')
+    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
+  });
+
+  it('#loadSheet change cell content to formula throws error', () => {
+    engine.loadSheet([
+      ['1', '2']
+    ])
+
+    expect(() => {
+      engine.setCellContent('B1', '=A1')
+    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
+  });
 });
