@@ -1,4 +1,5 @@
-import {computeHashAndExtractAddressesFromLexer} from '../src/parser/ParserWithCaching'
+import {computeHashAndExtractAddressesFromLexer, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
+import { tokenizeFormula } from '../src/parser/FormulaParser'
 
 const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses: Array<string> }) => {
   it("simple case", () => {
@@ -46,14 +47,6 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
     })
   });
 
-  it("error in parsing", () => {
-    const code = "='fdsafdsa"
-
-    expect(() => {
-      computeFunc(code)
-    }).toThrowError(new Error('Unexpected parse error'))
-  });
-
   it("cell ref in string with escape", () => {
     const code = "='fdsaf\\'A5'"
 
@@ -65,5 +58,42 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 }
 
 describe("computeHashAndExtractAddressesFromLexer", () => {
-  sharedExamples(computeHashAndExtractAddressesFromLexer);
+  const computeFunc = computeHashAndExtractAddressesFromLexer
+
+  sharedExamples(computeFunc)
+
+  it("error in parsing", () => {
+    const code = "='fdsafdsa"
+
+    expect(() => {
+      computeFunc(code)
+    }).toThrowError(new Error('Unexpected parse error'))
+  });
+})
+
+describe("computeHashAndExtractAddresses", () => {
+  const computeFunc = (code: string): { hash: string, addresses: Array<string> } => {
+    const tokens = tokenizeFormula(code).tokens
+    return computeHashAndExtractAddresses(tokens)
+  }
+
+  sharedExamples(computeFunc)
+
+  it("ignores whitespace", () => {
+    const code = "= 42"
+
+    expect(computeFunc(code)).toEqual({
+      hash: "=42",
+      addresses: []
+    })
+  })
+
+  it("same hash for formulas with different namespace", () => {
+    const code1 = "= 42 "
+    const code2 = "   =42"
+
+    const result1 = computeFunc(code1)
+    const result2 = computeFunc(code2)
+    expect(result1).toEqual(result2)
+  })
 })
