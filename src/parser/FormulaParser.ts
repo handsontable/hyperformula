@@ -154,10 +154,10 @@ class FormulaParser extends Parser {
   })
 
   private cellRangeExpression: AstRule = this.RULE("cellRangeExpression", () => {
-    const fromCell: CellReferenceAst = this.SUBRULE(this.relativeCellExpression)
-    this.CONSUME(RangeSeparator)
-    const toCell: CellReferenceAst = this.SUBRULE2(this.relativeCellExpression)
-    return buildCellRangeAst(fromCell, toCell)
+    this.CONSUME(RelativeCell)
+    this.CONSUME2(RangeSeparator)
+    this.CONSUME3(RelativeCell)
+    return buildCellRangeAst(this.cellCounter++)
   })
 
   private atomicExpression: AstRule = this.RULE("atomicExpression", () => {

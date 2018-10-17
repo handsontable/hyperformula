@@ -126,11 +126,8 @@ const sharedExamples = (optimizationMode: string) => {
 
     const ast = bast.ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.from.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.from.idx).toBe(0)
-    expect(ast.to.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.to.idx).toBe(1)
-    expect(bast.addresses).toEqual(["A1", "B2"])
+    expect(ast.idx).toBe(0)
+    expect(bast.addresses).toEqual(["A1:B2"])
   })
 };
 

@@ -51,19 +51,29 @@ export function isFormula(text: string): Boolean {
 
 export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: Array<string>, hash: string } => {
   const addresses: Array<string> = []
-  const hash = tokens.reduce((currentHash, token) => {
+  let hash = ""
+  let idx = 0
+  while (idx < tokens.length) {
+    const token = tokens[idx]
     if (token.tokenType!.tokenName === 'RelativeCell') {
-      addresses.push(token.image)
-      return currentHash.concat("#")
+      if (tokens[idx+1] && tokens[idx+2] && tokens[idx+1].tokenType!.tokenName === 'RangeSeparator' && tokens[idx+2].tokenType!.tokenName === 'RelativeCell') {
+        addresses.push(`${token.image}:${tokens[idx+2].image}`)
+        idx += 3
+      } else {
+        addresses.push(token.image)
+        idx++
+      }
+      hash = hash.concat("#")
     } else {
-      return currentHash.concat(token.image)
+      hash = hash.concat(token.image)
+      idx++
     }
-  }, "");
+  }
   return { addresses, hash }
 };
 
 export const stringRegex = /^[^']*'/
-export const cellRegex = /^[A-Za-z]+[0-9]+/
+export const cellRegex = /^[A-Za-z]+[0-9]+(:[A-Za-z]+[0-9]+)?/
 export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<string>, hash: string } => {
   const addresses = []
   let hash = ""
