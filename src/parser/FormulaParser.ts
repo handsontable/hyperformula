@@ -41,8 +41,8 @@ const TimesOp = createToken({name: "TimesOp", pattern: /\*/, categories: Multipl
 const DivOp = createToken({name: "DivOp", pattern: /\//, categories: MultiplicationOp})
 
 /* addresses */
-const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/})
-const RangeSeparator = createToken({name: "RangeSeparator", pattern: /:/})
+export const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/})
+export const RangeSeparator = createToken({name: "RangeSeparator", pattern: /:/})
 
 /* parenthesis */
 const LParen = createToken({name: "LParen", pattern: /\(/})
