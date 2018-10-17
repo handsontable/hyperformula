@@ -58,12 +58,13 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
     if (token.tokenType === RelativeCell) {
       if (tokens[idx+1] && tokens[idx+2] && tokens[idx+1].tokenType === RangeSeparator && tokens[idx+2].tokenType === RelativeCell) {
         addresses.push(`${token.image}:${tokens[idx+2].image}`)
+        hash = hash.concat("#:#")
         idx += 3
       } else {
         addresses.push(token.image)
+        hash = hash.concat("#")
         idx++
       }
-      hash = hash.concat("#")
     } else {
       hash = hash.concat(token.image)
       idx++
@@ -73,7 +74,8 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
 };
 
 export const stringRegex = /^[^']*'/
-export const cellRegex = /^[A-Za-z]+[0-9]+(:[A-Za-z]+[0-9]+)?/
+export const cellRegex = /^[A-Za-z]+[0-9]+/
+export const cellRangeRegex = /^[A-Za-z]+[0-9]+:[A-Za-z]+[0-9]+/
 export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<string>, hash: string } => {
   const addresses = []
   let hash = ""
@@ -96,14 +98,21 @@ export const computeHashAndExtractAddressesFromLexer = (code: string): { address
       } while(code[x - 2] === "\\")
     } else {
       const subcode = code.slice(x)
-      const results = subcode.match(cellRegex)
-      if (results) {
-        addresses.push(results[0])
-        hash = hash.concat("#")
-        x += results[0].length
+      const rangeResults = subcode.match(cellRangeRegex)
+      if (rangeResults) {
+        addresses.push(rangeResults[0])
+        hash = hash.concat("#:#")
+        x += rangeResults[0].length
       } else {
-        hash = hash.concat(code[x])
-        x++
+        const results = subcode.match(cellRegex)
+        if (results) {
+          addresses.push(results[0])
+          hash = hash.concat("#")
+          x += results[0].length
+        } else {
+          hash = hash.concat(code[x])
+          x++
+        }
       }
     }
   }

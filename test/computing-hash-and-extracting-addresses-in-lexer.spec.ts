@@ -55,6 +55,15 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
       addresses: []
     })
   });
+
+  it("cell range", () => {
+    const code = "=A5:B16"
+
+    expect(computeFunc(code)).toEqual({
+      hash: "=#:#",
+      addresses: ["A5:B16"]
+    })
+  });
 }
 
 describe("computeHashAndExtractAddressesFromLexer", () => {
