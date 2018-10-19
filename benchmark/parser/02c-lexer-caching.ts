@@ -1,5 +1,4 @@
-import {ParserWithCaching} from "../src/parser/ParserWithCaching";
-import {performance} from "perf_hooks";
+import {ParserWithCaching} from "../../src/parser/ParserWithCaching";
 
 const rows = 100000
 const millisecondsPerThousandRows = 160

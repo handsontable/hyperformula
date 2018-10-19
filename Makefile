@@ -12,6 +12,8 @@ test: ## Run tests
 
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/01-simple-big.ts
+	@echo
+	@yarn ts-node benchmark/03-sheet-a.ts
 
 check: typecheck test
 
