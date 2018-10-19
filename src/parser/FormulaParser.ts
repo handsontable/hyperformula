@@ -3,7 +3,9 @@ import {
   Lexer,
   Parser,
   ILexingResult,
-  tokenMatcher
+  tokenMatcher,
+  IAnyOrAlt,
+  OrMethodOpts
 } from "chevrotain"
 
 import {
@@ -98,6 +100,8 @@ const allTokens = [
 class FormulaParser extends Parser {
   private cellCounter = 0
 
+  private atomicExpCache : OrArg | undefined
+
   constructor() {
     super(allTokens, {outputCst: false})
     this.performSelfAnalysis()
@@ -160,7 +164,7 @@ class FormulaParser extends Parser {
   })
 
   private atomicExpression: AstRule = this.RULE("atomicExpression", () => {
-    return this.OR([
+    return this.OR(this.atomicExpCache || (this.atomicExpCache = [
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression)
       },
@@ -185,7 +189,7 @@ class FormulaParser extends Parser {
           return buildStringAst(str.image.slice(1, -1))
         }
       }
-    ])
+    ]))
   })
 
   private procedureExpression: AstRule = this.RULE("procedureExpression", () => {
@@ -218,6 +222,7 @@ class FormulaParser extends Parser {
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type CellReferenceAstRule = (idxInCallingRule?: number, ...args: any[]) => (CellReferenceAst)
+type OrArg = IAnyOrAlt<any>[] | OrMethodOpts<any>
 
 const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()
