@@ -1,6 +1,6 @@
-import {parseFormula, parseFromTokens, tokenizeFormula, RelativeCell, RangeSeparator} from "./FormulaParser";
+import {parseFormula, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken} from "chevrotain"
-import {Ast, TemplateAst} from "./Ast";
+import {Ast, AstNodeType, TemplateAst} from "./Ast";
 
 export class ParserWithCaching {
   private cache: Map<string, TemplateAst> = new Map()
@@ -29,17 +29,18 @@ export class ParserWithCaching {
     } else {
       const lexerResult = tokenizeFormula(text);
       const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
-      const cachedAst = this.cache.get(hash)
-      if (cachedAst) {
-        this.statsCacheUsed++
-        return {
-          ast: cachedAst,
-          addresses,
-        }
+      let ast = this.cache.get(hash)
+
+      if (ast) {
+        ++this.statsCacheUsed
       } else {
-        const ast = parseFromTokens(lexerResult)
+        ast = parseFromTokens(lexerResult)
         this.cache.set(hash, ast)
-        return { ast: ast, addresses }
+      }
+
+      return {
+        ast: ast,
+        addresses: ast.type === AstNodeType.ERROR ? [] : addresses
       }
     }
   }
