@@ -4,7 +4,8 @@ import {
   Parser,
   IToken,
   ILexingResult,
-  tokenMatcher
+  tokenMatcher,
+  EOF
 } from "chevrotain"
 
 import {
@@ -60,7 +61,6 @@ const ArgSeparator = createToken({name: "ArgSeparator", pattern: /;/})
 /* string literal */
 const StringLiteral = createToken({name: "StringLiteral", pattern: /'([^'\\]*(\\.[^'\\]*)*)'/})
 
-
 /* skipping whitespaces */
 const WhiteSpace = createToken({
   name: "WhiteSpace",
@@ -111,7 +111,9 @@ class FormulaParser extends Parser {
 
   public formula: AstRule = this.RULE("formula", () => {
     this.CONSUME(EqualsOp)
-    return this.SUBRULE(this.additionExpression)
+    const expression = this.SUBRULE(this.additionExpression)
+    this.CONSUME(EOF)
+    return expression
   })
 
   private additionExpression: AstRule = this.RULE("additionExpression", () => {
