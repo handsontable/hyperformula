@@ -1,4 +1,5 @@
 import {HandsOnEngine} from "../src";
+import {cellError, ErrorType} from "../src/Vertex";
 
 describe('Integration', () => {
   let engine: HandsOnEngine
@@ -99,4 +100,10 @@ describe('Integration', () => {
       engine.setCellContent('B1', '=A1')
     }).toThrowError(new Error('Changes to cells other than simple values not supported'))
   });
+
+  it.skip("#loadSheet - it should build graph without cycle but with formula with error", () => {
+    engine.loadSheet([['=A1B1']])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NAME))
+  })
 });

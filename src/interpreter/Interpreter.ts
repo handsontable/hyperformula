@@ -71,7 +71,7 @@ export class Interpreter {
         throw Error('CELL_RANGE is not supported yet')
       }
       case AstNodeType.ERROR: {
-        throw Error('ERROR is not supported yet')
+        return cellError(ErrorType.NAME)
       }
     }
   }

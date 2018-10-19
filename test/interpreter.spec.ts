@@ -165,4 +165,12 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NAME))
   })
+
+  it("errors - parsing errors", () => {
+    engine.loadSheet([['=A', '=A1C1', '=SUM(A)']])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue("B1")).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue("C1")).toEqual(cellError(ErrorType.NAME))
+  })
 });
