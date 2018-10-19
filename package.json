@@ -8,7 +8,6 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "chevrotain": "^4.1.0",
-    "global": "^4.3.2"
+    "chevrotain": "^4.1.0"
   }
 }
