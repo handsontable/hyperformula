@@ -2,10 +2,8 @@ import {
   createToken,
   Lexer,
   Parser,
-  IToken,
   ILexingResult,
-  tokenMatcher,
-  EOF
+  tokenMatcher
 } from "chevrotain"
 
 import {
@@ -19,7 +17,8 @@ import {
   buildCellReferenceAst,
   buildCellRangeAst,
   buildTimesOpAst,
-  CellReferenceAst
+  CellReferenceAst,
+  buildErrorAst
 } from "./Ast"
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
@@ -111,9 +110,7 @@ class FormulaParser extends Parser {
 
   public formula: AstRule = this.RULE("formula", () => {
     this.CONSUME(EqualsOp)
-    const expression = this.SUBRULE(this.additionExpression)
-    this.CONSUME(EOF)
-    return expression
+    return this.SUBRULE(this.additionExpression)
   })
 
   private additionExpression: AstRule = this.RULE("additionExpression", () => {
@@ -231,11 +228,23 @@ export function tokenizeFormula(text: string): ILexingResult {
 
 export function parseFromTokens(lexResult: ILexingResult): Ast {
   parser.input = lexResult.tokens
-  return parser.formula()
+
+  const ast = parser.formula()
+  const errors = parser.errors
+
+  if (errors.length > 0) {
+    return buildErrorAst(errors.map(e =>
+        ({
+          name: e.name,
+          message: e.message
+        })
+    ))
+  }
+
+  return ast
 }
 
-export function parseFormula(text: string) {
+export function parseFormula(text: string): Ast {
   const lexResult = FormulaLexer.tokenize(text)
-  parser.input = lexResult.tokens
-  return parser.formula()
+  return parseFromTokens(lexResult)
 }

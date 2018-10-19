@@ -1,6 +1,17 @@
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import {AstNodeType, NumberAst, StringAst, PlusOpAst, MinusOpAst, TimesOpAst, CellReferenceAst, ProcedureAst, CellRangeAst} from '../src/parser/Ast'
+import {
+  AstNodeType,
+  NumberAst,
+  StringAst,
+  PlusOpAst,
+  MinusOpAst,
+  TimesOpAst,
+  CellReferenceAst,
+  ProcedureAst,
+  CellRangeAst,
+  ErrorAst
+} from '../src/parser/Ast'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -128,6 +139,27 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.idx).toBe(0)
     expect(bast.addresses).toEqual(["A1:B2"])
+  })
+
+  it("parsing error - unexpected token", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=A").ast as ErrorAst
+    expect(ast.args[0].name).toBe("MismatchedTokenException")
+  })
+
+  it("parsing error - unexpected token", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=SUM(A)").ast as ErrorAst
+    expect(ast.args[0].name).toBe("MismatchedTokenException")
+  })
+
+  it("parsing error - not all input parsed", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=A1B1").ast as ErrorAst
+    expect(ast.args[0].name).toBe("NotAllInputParsedException")
   })
 };
 

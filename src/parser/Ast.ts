@@ -1,7 +1,13 @@
-export type TemplateAst = NumberAst | StringAst | CellReferenceAst | CellRangeAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst;
+import {IRecognitionException} from "chevrotain";
+
+export type TemplateAst = NumberAst | StringAst | CellReferenceAst | CellRangeAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst | ErrorAst;
 export interface Ast {
   ast: TemplateAst,
   addresses: Array<string>,
+}
+export type ParsingError = {
+  name: string,
+  message: string
 }
 
 export enum AstNodeType {
@@ -16,7 +22,9 @@ export enum AstNodeType {
   FUNCTION_CALL = "FUNCTION_CALL",
 
   CELL_REFERENCE = "CELL_REFERENCE",
-  CELL_RANGE = "CELL_RANGE"
+  CELL_RANGE = "CELL_RANGE",
+
+  ERROR = "ERROR"
 }
 
 export interface NumberAst {
@@ -74,4 +82,10 @@ export interface ProcedureAst {
   args: TemplateAst[]
 }
 export const buildProcedureAst = (procedureName: string, args: TemplateAst[]): ProcedureAst => ({ type: AstNodeType.FUNCTION_CALL, procedureName, args })
+
+export interface ErrorAst {
+  type: AstNodeType.ERROR,
+  args: ParsingError[]
+}
+export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type : AstNodeType.ERROR, args: args })
 
