@@ -14,17 +14,18 @@ export class ParserWithCaching {
   parse(text: string): Ast {
     if (this.optimizationMode === 'lexer') {
       const {hash, addresses} = computeHashAndExtractAddressesFromLexer(text);
-      const cachedAst = this.cache.get(hash)
-      if (cachedAst) {
-        this.statsCacheUsed++
-        return {
-          ast: cachedAst,
-          addresses,
-        }
+      let ast = this.cache.get(hash)
+
+      if (ast) {
+        ++this.statsCacheUsed
       } else {
-        const ast = parseFormula(text)
+        ast = parseFormula(text)
         this.cache.set(hash, ast)
-        return { ast: ast, addresses }
+      }
+
+      return {
+        ast: ast,
+        addresses: ast.type === AstNodeType.ERROR ? [] : addresses,
       }
     } else {
       const lexerResult = tokenizeFormula(text);
