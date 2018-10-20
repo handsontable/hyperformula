@@ -1,6 +1,8 @@
 import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, Vertex} from "../Vertex";
 
+export type ExpressionValue = CellValue | CellValue[][]
+
 export class Interpreter {
   private addressMapping: Map<string, Vertex>
 
@@ -9,10 +11,15 @@ export class Interpreter {
   }
 
   public computeFormula(formula: Ast): CellValue {
-    return this.evaluateAst(formula.ast, formula.addresses)
+    const result = this.evaluateAst(formula.ast, formula.addresses)
+    if (Array.isArray(result)) {
+      return cellError(ErrorType.ARG)
+    } else {
+      return result as CellValue
+    }
   }
 
-  private evaluateAst(ast: TemplateAst, addresses: Array<string>): CellValue {
+  private evaluateAst(ast: TemplateAst, addresses: Array<string>): ExpressionValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = addresses[ast.idx]
@@ -76,7 +83,7 @@ export class Interpreter {
     }
   }
 
-  private evaluateFunction(ast : ProcedureAst, addresses: Array<string>): CellValue {
+  private evaluateFunction(ast : ProcedureAst, addresses: Array<string>): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum : CellValue, arg) => {
