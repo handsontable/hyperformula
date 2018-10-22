@@ -52,8 +52,10 @@ export class GraphBuilder {
           const [rangeStart, rangeEnd] = startCell.split(":")
           const vertex = new RangeVertex()
           this.graph.addNode(vertex)
-          generateCellsFromRange(rangeStart, rangeEnd).forEach((cellFromRange) => {
-            this.graph.addEdge(this.addressMapping.get(cellFromRange)!, vertex)
+          generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
+            rowOfCells.forEach((cellFromRange) => {
+              this.graph.addEdge(this.addressMapping.get(cellFromRange)!, vertex)
+            })
           })
           this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
         } else {
@@ -87,21 +89,23 @@ function columnIndexToLabel(column: number) {
   return result.toUpperCase();
 }
 
-export const generateCellsFromRange = (rangeStart: string, rangeEnd: string): Array<string> => {
+export const generateCellsFromRange = (rangeStart: string, rangeEnd: string): string[][] => {
   const startColumn = rangeStart.charCodeAt(0)
   const endColumn = rangeEnd.charCodeAt(0)
   const startRow = Number(rangeStart[1])
   const endRow = Number(rangeEnd[1])
 
-  let result = []
-  let currentColumn = startColumn;
-  while (currentColumn <= endColumn) {
-    let currentRow = startRow
-    while (currentRow <= endRow) {
-      result.push(`${String.fromCharCode(currentColumn)}${currentRow}`)
-      currentRow++
+  const result = []
+  let currentRow = startRow
+  while (currentRow <= endRow) {
+    const rowResult = []
+    let currentColumn = startColumn;
+    while (currentColumn <= endColumn) {
+      rowResult.push(`${String.fromCharCode(currentColumn)}${currentRow}`)
+      currentColumn++
     }
-    currentColumn++
+    result.push(rowResult)
+    currentRow++
   }
   return result
 }
