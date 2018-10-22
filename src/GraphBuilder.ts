@@ -78,3 +78,22 @@ function columnIndexToLabel(column: number) {
 
   return result.toUpperCase();
 }
+
+export const generateCellsFromRange = (rangeStart: string, rangeEnd: string): Array<string> => {
+  const startColumn = rangeStart.charCodeAt(0)
+  const endColumn = rangeEnd.charCodeAt(0)
+  const startRow = Number(rangeStart[1])
+  const endRow = Number(rangeEnd[1])
+
+  let result = []
+  let currentColumn = startColumn;
+  while (currentColumn <= endColumn) {
+    let currentRow = startRow
+    while (currentRow <= endRow) {
+      result.push(`${String.fromCharCode(currentColumn)}${currentRow}`)
+      currentRow++
+    }
+    currentColumn++
+  }
+  return result
+}
