@@ -12,7 +12,9 @@ export abstract class Vertex {
   protected constructor() {
     this.id = getNextVertexId();
   }
+}
 
+export abstract class CellVertex extends Vertex {
   abstract getCellValue(): CellValue
 }
 
@@ -28,7 +30,7 @@ export const cellError = (error: ErrorType): CellError => ({ type: error })
 
 export type CellValue = string | number | CellError
 
-export class FormulaCellVertex extends Vertex {
+export class FormulaCellVertex extends CellVertex {
   private cachedCellValue?: CellValue;
   private formula: Ast;
 
@@ -54,7 +56,7 @@ export class FormulaCellVertex extends Vertex {
   }
 }
 
-export class ValueCellVertex extends Vertex {
+export class ValueCellVertex extends CellVertex {
   private cellValue: CellValue;
 
   constructor(cellValue: CellValue) {
@@ -71,12 +73,18 @@ export class ValueCellVertex extends Vertex {
   }
 }
 
-export class EmptyCellVertex extends Vertex {
+export class EmptyCellVertex extends CellVertex {
   constructor() {
     super()
   }
 
   getCellValue() {
     return 0
+  }
+}
+
+export class RangeVertex extends Vertex {
+  constructor() {
+    super()
   }
 }

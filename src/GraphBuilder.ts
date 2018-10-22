@@ -2,7 +2,7 @@ import {isFormula} from './parser/ParserWithCaching'
 import {Ast, AstNodeType} from "./parser/Ast"
 import {ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
-import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex"
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex, CellVertex, RangeVertex} from "./Vertex"
 export type Sheet = Array<Array<string>>
 
 const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -12,9 +12,9 @@ export class GraphBuilder {
   private parser = new ParserWithCaching()
 
   private graph: Graph<Vertex>
-  private addressMapping: Map<string, Vertex>
+  private addressMapping: Map<string, CellVertex>
 
-  constructor(graph: Graph<Vertex>, addressMapping: Map<string, Vertex>) {
+  constructor(graph: Graph<Vertex>, addressMapping: Map<string, CellVertex>) {
     this.graph = graph
     this.addressMapping = addressMapping
   }
@@ -48,17 +48,25 @@ export class GraphBuilder {
           throw Error(`${endCell} does not exist in graph`)
         }
 
-        let vertex : Vertex
-
-        if (this.addressMapping.has(startCell)) {
-          vertex = this.addressMapping.get(startCell)!
-        } else {
-          vertex = new EmptyCellVertex()
+        if (startCell.includes(":")) {
+          const [rangeStart, rangeEnd] = startCell.split(":")
+          const vertex = new RangeVertex()
           this.graph.addNode(vertex)
-          this.addressMapping.set(startCell, vertex)
+          generateCellsFromRange(rangeStart, rangeEnd).forEach((cellFromRange) => {
+            this.graph.addEdge(this.addressMapping.get(cellFromRange)!, vertex)
+          })
+          this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
+        } else {
+          let vertex : CellVertex
+          if (this.addressMapping.has(startCell)) {
+            vertex = this.addressMapping.get(startCell)!
+          } else {
+            vertex = new EmptyCellVertex()
+            this.graph.addNode(vertex)
+            this.addressMapping.set(startCell, vertex)
+          }
+          this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
         }
-
-        this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
       })
     })
   }

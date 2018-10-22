@@ -1,11 +1,11 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
+import {CellValue, FormulaCellVertex, ValueCellVertex, Vertex, CellVertex} from "./Vertex";
 import {Graph} from "./Graph";
 import {isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
 
 export class HandsOnEngine {
-  private addressMapping: Map<string, Vertex> = new Map()
+  private addressMapping: Map<string, CellVertex> = new Map()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Array<Vertex> = []
   private interpreter: Interpreter = new Interpreter(this.addressMapping)
