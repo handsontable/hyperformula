@@ -154,6 +154,13 @@ describe('Interpreter', () => {
     expect(engine.getCellValue("A1")).toBeCloseTo(4.14)
   })
 
+  it("procedures - SUM with range args", () => {
+    engine.loadSheet([['1', '2', '5'],
+                      ['3', '4', '=SUM(A1:B2)']])
+
+    expect(engine.getCellValue("C2")).toBeCloseTo(10)
+  })
+
   it("procedures - SUM with bad args", () => {
     engine.loadSheet([['=SUM(B1)', 'asdf']])
 

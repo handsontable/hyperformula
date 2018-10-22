@@ -1,5 +1,6 @@
 import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, CellVertex} from "../Vertex";
+import {generateCellsFromRange} from "../GraphBuilder";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -75,7 +76,16 @@ export class Interpreter {
         return this.evaluateFunction(ast, addresses)
       }
       case AstNodeType.CELL_RANGE: {
-        throw Error('CELL_RANGE is not supported yet')
+        const [beginRange, endRange] = addresses[ast.idx].split(":")
+        const rangeResult: CellValue[][] = []
+        generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
+          const rowResult: CellValue[] = []
+          rowOfCells.forEach((cellFromRange) => {
+            rowResult.push(this.addressMapping.get(cellFromRange)!.getCellValue())
+          })
+          rangeResult.push(rowResult)
+        })
+        return rangeResult
       }
       case AstNodeType.ERROR: {
         return cellError(ErrorType.NAME)
@@ -90,6 +100,15 @@ export class Interpreter {
           const value = this.evaluateAst(arg, addresses)
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
+          } else if (typeof currentSum === 'number' && Array.isArray(value)) {
+            const flattenRange: Array<CellValue> = [].concat.apply([], value)
+            return flattenRange.reduce((acc : CellValue, val: CellValue) => {
+              if (typeof acc === 'number' && typeof val === 'number') {
+                return acc + val
+              } else {
+                return cellError(ErrorType.ARG)
+              }
+            }, currentSum)
           } else {
             return cellError(ErrorType.ARG)
           }
