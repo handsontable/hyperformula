@@ -7,7 +7,7 @@ export enum StatType {
 }
 
 export class Statistics {
-  private stats: Map<StatType, number[]>
+  private stats: Map<StatType, number>
 
   private startTimes: Map<StatType, number>
 
@@ -34,8 +34,8 @@ export class Statistics {
     const startTime = this.startTimes.get(name)
 
     if (startTime) {
-      const values = this.stats.get(name) || []
-      values.push(now - startTime)
+      let values = this.stats.get(name) || 0
+      values += (now - startTime)
       this.stats.set(name, values)
       this.startTimes.delete(name)
     } else {
@@ -49,7 +49,7 @@ export class Statistics {
     this.end(name)
   }
 
-  snapshot(): Map<StatType, number[]> {
+  snapshot(): Map<StatType, number> {
     return new Map(this.stats)
   }
 

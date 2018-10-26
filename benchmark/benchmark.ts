@@ -21,11 +21,11 @@ export function benchmark(sheet: string[][], config: Config = {
     currentRun++
   }
 
-  const overall = stats.map(s => s.get(StatType.OVERALL)![0]).sort()
-  const evaluation = stats.map(s => s.get(StatType.EVALUATION)![0]).sort()
+  const overall = stats.map(s => s.get(StatType.OVERALL)!).sort()
+  const evaluation = stats.map(s => s.get(StatType.EVALUATION)!).sort()
   const medianRun = overall[Math.trunc(config.numberOfRuns / 2)];
-  const parsing = stats.map(s => s.get(StatType.PARSER)!.reduce((a, b) => a + b, 0)).sort()
-  const topSort = stats.map(s => s.get(StatType.TOP_SORT)![0]).sort()
+  const parsing = stats.map(s => s.get(StatType.PARSER)!).sort()
+  const topSort = stats.map(s => s.get(StatType.TOP_SORT)!).sort()
 
 
   console.warn(`Number of rows: ${rows}`)
