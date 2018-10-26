@@ -1,7 +1,7 @@
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
-import {StatType, Statistics} from "./statistics/Statistics";
+import {Statistics, StatType} from "./statistics/Statistics";
 
 export type Sheet = Array<Array<string>>
 
@@ -25,10 +25,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
-          this.stats.start(StatType.PARSER)
-          let ast = this.parser.parse(cellContent)
-          this.stats.end(StatType.PARSER)
-
+          let ast = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent))
           vertex = new FormulaCellVertex(ast)
           dependencies.set(cellAddress, Array.from(new Set(ast.addresses)))
         } else if (!isNaN(Number(cellContent))) {

@@ -45,8 +45,9 @@ export class Statistics {
 
   measure(name: StatType, func: () => any) {
     this.start(name)
-    func()
+    let result = func()
     this.end(name)
+    return result
   }
 
   snapshot(): Map<StatType, number> {
