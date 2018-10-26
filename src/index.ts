@@ -1,25 +1,45 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, FormulaCellVertex, ValueCellVertex, Vertex, CellVertex} from "./Vertex";
+import {CellValue, CellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
 import {isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
+import {StatType, Statistics} from "./statistics/Statistics";
 
 export class HandsOnEngine {
   private addressMapping: Map<string, CellVertex> = new Map()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Array<Vertex> = []
   private interpreter: Interpreter = new Interpreter(this.addressMapping)
+  private stats : Statistics = new Statistics()
 
   loadSheet(sheet: Sheet) {
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping)
-    graphBuilder.buildGraph(sheet)
-    this.sortedVertices = this.graph.topologicalSort()
-    this.recomputeFormulas()
+    this.stats.reset()
+    this.stats.start(StatType.OVERALL)
+
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
+
+    this.stats.measure(StatType.GRAPH_BUILD, () => {
+      graphBuilder.buildGraph(sheet)
+    })
+
+    this.stats.measure(StatType.TOP_SORT, () => {
+      this.sortedVertices = this.graph.topologicalSort()
+    })
+
+    this.stats.measure(StatType.EVALUATION, () => {
+      this.recomputeFormulas()
+    })
+
+    this.stats.end(StatType.OVERALL)
   }
 
   getCellValue(address: string): CellValue {
     const vertex = this.addressMapping.get(address)!
     return vertex.getCellValue()
+  }
+
+  getStats() {
+    return this.stats.snapshot()
   }
 
   setCellContent(address: string, newCellContent: string) {

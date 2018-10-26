@@ -1,13 +1,14 @@
 import {cellCoordinatesToLabel, GraphBuilder} from "../src/GraphBuilder";
 import {Graph} from "../src/Graph";
 import {Vertex, CellVertex} from "../src/Vertex";
+import {Statistics} from "../src/statistics/Statistics";
 
 describe('GraphBuilder', () => {
   it('#buildGraph', () => {
     const graph = new Graph<Vertex>()
     const addressMapping : Map<string, CellVertex> = new Map()
 
-    let graphBuilder = new GraphBuilder(graph, addressMapping)
+    let graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
 
     graphBuilder.buildGraph([
         ['1', 'A5', '2'],
@@ -21,7 +22,7 @@ describe('GraphBuilder', () => {
     const graph = new Graph<Vertex>()
     const addressMapping : Map<string, CellVertex> = new Map()
 
-    let graphBuilder = new GraphBuilder(graph, addressMapping)
+    let graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
 
     graphBuilder.buildGraph([
       ['1', '2', '0'],

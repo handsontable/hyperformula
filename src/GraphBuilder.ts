@@ -1,8 +1,8 @@
-import {isFormula} from './parser/ParserWithCaching'
-import {Ast, AstNodeType} from "./parser/Ast"
-import {ParserWithCaching} from './parser/ParserWithCaching'
+import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
-import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex, CellVertex, RangeVertex} from "./Vertex"
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
+import {StatType, Statistics} from "./statistics/Statistics";
+
 export type Sheet = Array<Array<string>>
 
 const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -11,12 +11,9 @@ const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
 export class GraphBuilder {
   private parser = new ParserWithCaching()
 
-  private graph: Graph<Vertex>
-  private addressMapping: Map<string, CellVertex>
-
-  constructor(graph: Graph<Vertex>, addressMapping: Map<string, CellVertex>) {
-    this.graph = graph
-    this.addressMapping = addressMapping
+  constructor(private graph: Graph<Vertex>,
+              private addressMapping: Map<string, CellVertex>,
+              private stats: Statistics) {
   }
 
   buildGraph(sheet: Sheet) {
@@ -28,7 +25,10 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
+          this.stats.start(StatType.PARSER)
           let ast = this.parser.parse(cellContent)
+          this.stats.end(StatType.PARSER)
+
           vertex = new FormulaCellVertex(ast)
           dependencies.set(cellAddress, Array.from(new Set(ast.addresses)))
         } else if (!isNaN(Number(cellContent))) {
