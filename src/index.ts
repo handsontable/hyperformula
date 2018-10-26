@@ -4,9 +4,10 @@ import {Graph} from "./Graph";
 import {cellAddressFromString, isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
 import {StatType, Statistics} from "./statistics/Statistics";
+import {AddressMapping} from "./AddressMapping"
 
 export class HandsOnEngine {
-  private addressMapping: Map<number, Map<number, CellVertex>> = new Map()
+  private addressMapping: AddressMapping = new AddressMapping()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Array<Vertex> = []
   private interpreter: Interpreter = new Interpreter(this.addressMapping)
@@ -35,7 +36,7 @@ export class HandsOnEngine {
 
   getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress)
-    const vertex = this.addressMapping.get(address.col)!.get(address.row)!
+    const vertex = this.addressMapping.getCell(address)!
     return vertex.getCellValue()
   }
 
@@ -45,7 +46,7 @@ export class HandsOnEngine {
 
   setCellContent(stringAddress: string, newCellContent: string) {
     const address = cellAddressFromString(stringAddress)
-    const vertex = this.addressMapping.get(address.col)!.get(address.row)!
+    const vertex = this.addressMapping.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))

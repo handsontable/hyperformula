@@ -1,13 +1,14 @@
 import {Ast, AstNodeType, ProcedureAst, TemplateAst, CellDependency} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, CellVertex, CellAddress} from "../Vertex";
 import {generateCellsFromRange} from "../GraphBuilder";
+import {AddressMapping} from "../AddressMapping"
 
 export type ExpressionValue = CellValue | CellValue[][]
 
 export class Interpreter {
-  private addressMapping: Map<number, Map<number, CellVertex>>
+  private addressMapping: AddressMapping
 
-  constructor(addressMapping: Map<number, Map<number, CellVertex>>) {
+  constructor(addressMapping: AddressMapping) {
     this.addressMapping = addressMapping
   }
 
@@ -24,7 +25,7 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = addresses[ast.idx] as CellAddress
-        const vertex = this.addressMapping.get(address.col)!.get(address.row)!
+        const vertex = this.addressMapping.getCell(address)!
         return vertex.getCellValue()
       }
       case AstNodeType.NUMBER: {
@@ -81,7 +82,7 @@ export class Interpreter {
         generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
           const rowResult: CellValue[] = []
           rowOfCells.forEach((cellFromRange) => {
-            rowResult.push(this.addressMapping.get(cellFromRange.col)!.get(cellFromRange.row)!.getCellValue())
+            rowResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
           })
           rangeResult.push(rowResult)
         })

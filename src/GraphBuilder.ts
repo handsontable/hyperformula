@@ -3,6 +3,7 @@ import {Graph} from './Graph'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, CellAddress} from "./Vertex"
 import {Statistics, StatType} from "./statistics/Statistics";
 import {CellDependency} from "./parser/Ast"
+import {AddressMapping} from "./AddressMapping"
 
 export type Sheet = Array<Array<string>>
 
@@ -13,7 +14,7 @@ export class GraphBuilder {
   private parser = new ParserWithCaching()
 
   constructor(private graph: Graph<Vertex>,
-              private addressMapping: Map<number, Map<number, CellVertex>>,
+              private addressMapping: AddressMapping,
               private stats: Statistics) {
   }
 
@@ -37,18 +38,13 @@ export class GraphBuilder {
 
         this.graph.addNode(vertex)
 
-        let colMapping = this.addressMapping.get(cellAddress.col)
-        if (!colMapping) {
-          colMapping = new Map()
-          this.addressMapping.set(cellAddress.col, colMapping)
-        }
-        colMapping.set(cellAddress.row, vertex)
+        this.addressMapping.setCell(cellAddress, vertex)
       })
     })
 
     dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: CellAddress) => {
       cellDependencies.forEach((startCell: CellDependency) => {
-        if (!this.addressMapping.has(endCell.col) || !this.addressMapping.get(endCell.col)!.has(endCell.row)) {
+        if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)
         }
 
@@ -58,26 +54,21 @@ export class GraphBuilder {
           this.graph.addNode(vertex)
           generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
-              this.graph.addEdge(this.addressMapping.get(cellFromRange.col)!.get(cellFromRange.row)!, vertex)
+              this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, vertex)
             })
           })
-          this.graph.addEdge(vertex, this.addressMapping.get(endCell.col)!.get(endCell.row)!)
+          this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
         } else {
           let vertex : CellVertex
-          if (this.addressMapping.has(startCell.col) && this.addressMapping.get(startCell.col)!.has(startCell.row)) {
-            vertex = this.addressMapping.get(startCell.col)!.get(startCell.row)!
+          if (this.addressMapping.has(startCell)) {
+            vertex = this.addressMapping.getCell(startCell)!
           } else {
             vertex = new EmptyCellVertex()
             this.graph.addNode(vertex)
 
-            let colMapping = this.addressMapping.get(startCell.col)
-            if (!colMapping) {
-              colMapping = new Map()
-              this.addressMapping.set(startCell.col, colMapping)
-            }
-            colMapping.set(startCell.row, vertex)
+            this.addressMapping.setCell(startCell, vertex)
           }
-          this.graph.addEdge(vertex, this.addressMapping.get(endCell.col)!.get(endCell.row)!)
+          this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
         }
       })
     })
