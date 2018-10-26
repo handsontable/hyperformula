@@ -23,7 +23,7 @@ export class GraphBuilder {
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
-        const cellAddress = cellCoordinatesToLabel(rowIndex, colIndex)
+        const cellAddress = { col: colIndex, row: rowIndex }
         let vertex = null
 
         if (isFormula(cellContent)) {
@@ -73,21 +73,6 @@ export class GraphBuilder {
       })
     })
   }
-}
-
-export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): CellAddress {
-  return { col: colIndex, row: rowIndex }
-}
-
-function columnIndexToLabel(column: number) {
-  let result = '';
-
-  while (column >= 0) {
-    result = String.fromCharCode((column % COLUMN_LABEL_BASE_LENGTH) + 97) + result;
-    column = Math.floor(column / COLUMN_LABEL_BASE_LENGTH) - 1;
-  }
-
-  return result.toUpperCase();
 }
 
 export const generateCellsFromRange = (rangeStart: CellAddress, rangeEnd: CellAddress): CellAddress[][] => {

@@ -1,4 +1,4 @@
-import {cellCoordinatesToLabel, GraphBuilder} from "../src/GraphBuilder";
+import {GraphBuilder} from "../src/GraphBuilder";
 import {Graph} from "../src/Graph";
 import {Vertex, CellVertex, CellAddress} from "../src/Vertex";
 import {Statistics} from "../src/statistics/Statistics";
