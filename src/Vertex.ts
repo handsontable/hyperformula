@@ -29,6 +29,7 @@ export interface CellError {
 export const cellError = (error: ErrorType): CellError => ({ type: error })
 
 export type CellValue = string | number | CellError
+export type CellAddress = string
 
 export class FormulaCellVertex extends CellVertex {
   private cachedCellValue?: CellValue;

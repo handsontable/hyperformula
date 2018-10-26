@@ -1,6 +1,6 @@
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, CellAddress} from "./Vertex"
 import {Statistics, StatType} from "./statistics/Statistics";
 
 export type Sheet = Array<Array<string>>
@@ -12,12 +12,12 @@ export class GraphBuilder {
   private parser = new ParserWithCaching()
 
   constructor(private graph: Graph<Vertex>,
-              private addressMapping: Map<string, CellVertex>,
+              private addressMapping: Map<CellAddress, CellVertex>,
               private stats: Statistics) {
   }
 
   buildGraph(sheet: Sheet) {
-    const dependencies: Map<string, Array<string>> = new Map()
+    const dependencies: Map<CellAddress, Array<CellAddress>> = new Map()
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
@@ -39,8 +39,8 @@ export class GraphBuilder {
       })
     })
 
-    dependencies.forEach((cellDependencies: Array<string>, endCell: string) => {
-      cellDependencies.forEach((startCell: string) => {
+    dependencies.forEach((cellDependencies: Array<CellAddress>, endCell: CellAddress) => {
+      cellDependencies.forEach((startCell: CellAddress) => {
         if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)
         }
@@ -71,7 +71,7 @@ export class GraphBuilder {
   }
 }
 
-export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): string {
+export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): CellAddress {
   return columnIndexToLabel(colIndex) + (rowIndex + 1)
 }
 
@@ -86,7 +86,7 @@ function columnIndexToLabel(column: number) {
   return result.toUpperCase();
 }
 
-export const generateCellsFromRange = (rangeStart: string, rangeEnd: string): string[][] => {
+export const generateCellsFromRange = (rangeStart: CellAddress, rangeEnd: CellAddress): CellAddress[][] => {
   const startColumn = rangeStart.charCodeAt(0)
   const endColumn = rangeEnd.charCodeAt(0)
   const startRow = Number(rangeStart[1])

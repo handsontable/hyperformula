@@ -1,13 +1,13 @@
 import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
-import {cellError, CellValue, ErrorType, CellVertex} from "../Vertex";
+import {cellError, CellValue, ErrorType, CellVertex, CellAddress} from "../Vertex";
 import {generateCellsFromRange} from "../GraphBuilder";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
 export class Interpreter {
-  private addressMapping: Map<string, CellVertex>
+  private addressMapping: Map<CellAddress, CellVertex>
 
-  constructor(addressMapping: Map<string, CellVertex>) {
+  constructor(addressMapping: Map<CellAddress, CellVertex>) {
     this.addressMapping = addressMapping
   }
 
