@@ -2,6 +2,7 @@ import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, CellAddress} from "./Vertex"
 import {Statistics, StatType} from "./statistics/Statistics";
+import {CellDependency} from "./parser/Ast"
 
 export type Sheet = Array<Array<string>>
 
@@ -12,12 +13,12 @@ export class GraphBuilder {
   private parser = new ParserWithCaching()
 
   constructor(private graph: Graph<Vertex>,
-              private addressMapping: Map<CellAddress, CellVertex>,
+              private addressMapping: Map<number, Map<number, CellVertex>>,
               private stats: Statistics) {
   }
 
   buildGraph(sheet: Sheet) {
-    const dependencies: Map<CellAddress, Array<CellAddress>> = new Map()
+    const dependencies: Map<CellAddress, Array<CellDependency>> = new Map()
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
@@ -35,36 +36,48 @@ export class GraphBuilder {
         }
 
         this.graph.addNode(vertex)
-        this.addressMapping.set(cellAddress, vertex)
+
+        let colMapping = this.addressMapping.get(cellAddress.col)
+        if (!colMapping) {
+          colMapping = new Map()
+          this.addressMapping.set(cellAddress.col, colMapping)
+        }
+        colMapping.set(cellAddress.row, vertex)
       })
     })
 
-    dependencies.forEach((cellDependencies: Array<CellAddress>, endCell: CellAddress) => {
-      cellDependencies.forEach((startCell: CellAddress) => {
-        if (!this.addressMapping.has(endCell)) {
+    dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: CellAddress) => {
+      cellDependencies.forEach((startCell: CellDependency) => {
+        if (!this.addressMapping.has(endCell.col) || !this.addressMapping.get(endCell.col)!.has(endCell.row)) {
           throw Error(`${endCell} does not exist in graph`)
         }
 
-        if (startCell.includes(":")) {
-          const [rangeStart, rangeEnd] = startCell.split(":")
+        if (Array.isArray(startCell)) {
+          const [rangeStart, rangeEnd] = startCell
           const vertex = new RangeVertex()
           this.graph.addNode(vertex)
           generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
-              this.graph.addEdge(this.addressMapping.get(cellFromRange)!, vertex)
+              this.graph.addEdge(this.addressMapping.get(cellFromRange.col)!.get(cellFromRange.row)!, vertex)
             })
           })
-          this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
+          this.graph.addEdge(vertex, this.addressMapping.get(endCell.col)!.get(endCell.row)!)
         } else {
           let vertex : CellVertex
-          if (this.addressMapping.has(startCell)) {
-            vertex = this.addressMapping.get(startCell)!
+          if (this.addressMapping.has(startCell.col) && this.addressMapping.get(startCell.col)!.has(startCell.row)) {
+            vertex = this.addressMapping.get(startCell.col)!.get(startCell.row)!
           } else {
             vertex = new EmptyCellVertex()
             this.graph.addNode(vertex)
-            this.addressMapping.set(startCell, vertex)
+
+            let colMapping = this.addressMapping.get(startCell.col)
+            if (!colMapping) {
+              colMapping = new Map()
+              this.addressMapping.set(startCell.col, colMapping)
+            }
+            colMapping.set(startCell.row, vertex)
           }
-          this.graph.addEdge(vertex, this.addressMapping.get(endCell)!)
+          this.graph.addEdge(vertex, this.addressMapping.get(endCell.col)!.get(endCell.row)!)
         }
       })
     })
@@ -72,7 +85,7 @@ export class GraphBuilder {
 }
 
 export function cellCoordinatesToLabel(rowIndex: number, colIndex: number): CellAddress {
-  return columnIndexToLabel(colIndex) + (rowIndex + 1)
+  return { col: colIndex, row: rowIndex }
 }
 
 function columnIndexToLabel(column: number) {
@@ -87,18 +100,13 @@ function columnIndexToLabel(column: number) {
 }
 
 export const generateCellsFromRange = (rangeStart: CellAddress, rangeEnd: CellAddress): CellAddress[][] => {
-  const startColumn = rangeStart.charCodeAt(0)
-  const endColumn = rangeEnd.charCodeAt(0)
-  const startRow = Number(rangeStart[1])
-  const endRow = Number(rangeEnd[1])
-
   const result = []
-  let currentRow = startRow
-  while (currentRow <= endRow) {
+  let currentRow = rangeStart.row
+  while (currentRow <= rangeEnd.row) {
     const rowResult = []
-    let currentColumn = startColumn;
-    while (currentColumn <= endColumn) {
-      rowResult.push(`${String.fromCharCode(currentColumn)}${currentRow}`)
+    let currentColumn = rangeStart.col;
+    while (currentColumn <= rangeEnd.col) {
+      rowResult.push({ row: currentRow, col: currentColumn })
       currentColumn++
     }
     result.push(rowResult)

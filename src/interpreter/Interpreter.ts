@@ -1,13 +1,13 @@
-import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
+import {Ast, AstNodeType, ProcedureAst, TemplateAst, CellDependency} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, CellVertex, CellAddress} from "../Vertex";
 import {generateCellsFromRange} from "../GraphBuilder";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
 export class Interpreter {
-  private addressMapping: Map<CellAddress, CellVertex>
+  private addressMapping: Map<number, Map<number, CellVertex>>
 
-  constructor(addressMapping: Map<CellAddress, CellVertex>) {
+  constructor(addressMapping: Map<number, Map<number, CellVertex>>) {
     this.addressMapping = addressMapping
   }
 
@@ -20,11 +20,11 @@ export class Interpreter {
     }
   }
 
-  private evaluateAst(ast: TemplateAst, addresses: Array<string>): ExpressionValue {
+  private evaluateAst(ast: TemplateAst, addresses: Array<CellDependency>): ExpressionValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const address = addresses[ast.idx]
-        const vertex = this.addressMapping.get(address)!
+        const address = addresses[ast.idx] as CellAddress
+        const vertex = this.addressMapping.get(address.col)!.get(address.row)!
         return vertex.getCellValue()
       }
       case AstNodeType.NUMBER: {
@@ -76,12 +76,12 @@ export class Interpreter {
         return this.evaluateFunction(ast, addresses)
       }
       case AstNodeType.CELL_RANGE: {
-        const [beginRange, endRange] = addresses[ast.idx].split(":")
+        const [beginRange, endRange] = addresses[ast.idx] as [CellAddress, CellAddress]
         const rangeResult: CellValue[][] = []
         generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
           const rowResult: CellValue[] = []
           rowOfCells.forEach((cellFromRange) => {
-            rowResult.push(this.addressMapping.get(cellFromRange)!.getCellValue())
+            rowResult.push(this.addressMapping.get(cellFromRange.col)!.get(cellFromRange.row)!.getCellValue())
           })
           rangeResult.push(rowResult)
         })
@@ -93,7 +93,7 @@ export class Interpreter {
     }
   }
 
-  private evaluateFunction(ast : ProcedureAst, addresses: Array<string>): ExpressionValue {
+  private evaluateFunction(ast : ProcedureAst, addresses: Array<CellDependency>): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum : CellValue, arg) => {

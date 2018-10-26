@@ -1,7 +1,11 @@
 import {computeHashAndExtractAddressesFromLexer, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
+import { CellAddress } from "../src/Vertex"
+import { CellDependency } from "../src/parser/Ast"
 
-const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses: Array<string> }) => {
+const cellAddress = (col: number, row: number): CellAddress => ({ col, row })
+
+const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses: Array<CellDependency> }) => {
   it("simple case", () => {
     const code = "=42"
 
@@ -16,7 +20,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#",
-      addresses: ["A5"]
+      addresses: [cellAddress(0, 4)]
     })
   })
 
@@ -25,7 +29,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#+#",
-      addresses: ["A5", "A7"]
+      addresses: [cellAddress(0, 4), cellAddress(0, 6)]
     })
   });
 
@@ -43,7 +47,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "='A5'+#+'A6'",
-      addresses: ["A4"]
+      addresses: [cellAddress(0, 3)]
     })
   });
 
@@ -61,7 +65,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#:#",
-      addresses: ["A5:B16"]
+      addresses: [[cellAddress(0, 4), cellAddress(1, 15)]]
     })
   });
 }
@@ -81,7 +85,7 @@ describe("computeHashAndExtractAddressesFromLexer", () => {
 })
 
 describe("computeHashAndExtractAddresses", () => {
-  const computeFunc = (code: string): { hash: string, addresses: Array<string> } => {
+  const computeFunc = (code: string): { hash: string, addresses: Array<CellDependency> } => {
     const tokens = tokenizeFormula(code).tokens
     return computeHashAndExtractAddresses(tokens)
   }

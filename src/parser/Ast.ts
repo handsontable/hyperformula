@@ -1,9 +1,11 @@
 import {IRecognitionException} from "chevrotain";
+import {CellAddress} from "../Vertex"
 
 export type TemplateAst = NumberAst | StringAst | CellReferenceAst | CellRangeAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst | ErrorAst;
+export type CellDependency = CellAddress | [CellAddress, CellAddress]
 export interface Ast {
   ast: TemplateAst,
-  addresses: Array<string>,
+  addresses: Array<CellDependency>,
 }
 export type ParsingError = {
   name: string,

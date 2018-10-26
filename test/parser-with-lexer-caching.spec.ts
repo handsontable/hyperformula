@@ -12,6 +12,9 @@ import {
   CellRangeAst,
   ErrorAst
 } from '../src/parser/Ast'
+import { CellAddress } from '../src/Vertex'
+
+const cellAddress = (col: number, row: number): CellAddress => ({ col, row })
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -44,7 +47,7 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
     expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(bast.addresses).toEqual(["A5"])
+    expect(bast.addresses).toEqual([cellAddress(0, 4)])
   })
 
   it("plus operator on different nodes with more addresses", () => {
@@ -56,7 +59,7 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(bast.addresses).toEqual(["A6", "A5"])
+    expect(bast.addresses).toEqual([cellAddress(0, 5), cellAddress(0, 4)])
   })
 
   it("it use cache for similar formulas", () => {
@@ -138,7 +141,7 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = bast.ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.idx).toBe(0)
-    expect(bast.addresses).toEqual(["A1:B2"])
+    expect(bast.addresses).toEqual([[cellAddress(0, 0), cellAddress(1, 1)]])
   })
 
   it("parsing error - unexpected token", () => {
