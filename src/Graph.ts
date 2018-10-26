@@ -30,17 +30,21 @@ export class Graph<T> {
     return this.nodes.size;
   }
 
+
   topologicalSort() : Array<T> {
     const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: Array<T> = []
+
     incomingEdges.forEach((currentCount, targetNode) => {
       if (currentCount === 0) {
         nodesWithNoIncomingEdge.push(targetNode)
       }
     })
+
+    let currentNodeIndex = 0;
     const topologicalOrdering: Array<T> = []
-    while (nodesWithNoIncomingEdge.length > 0) {
-      const currentNode = nodesWithNoIncomingEdge.shift() as T
+    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
+      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex] as T
       topologicalOrdering.push(currentNode)
       this.edges.get(currentNode)!.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
@@ -48,10 +52,13 @@ export class Graph<T> {
           nodesWithNoIncomingEdge.push(targetNode)
         }
       })
+      ++currentNodeIndex;
     }
+
     if (topologicalOrdering.length !== this.nodes.size) {
       throw new Error(`Graph has a cycle`)
     }
+
     return topologicalOrdering
   }
 
