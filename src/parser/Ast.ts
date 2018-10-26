@@ -1,4 +1,3 @@
-import {IRecognitionException} from "chevrotain";
 import {CellAddress} from "../Vertex"
 
 export type TemplateAst = NumberAst | StringAst | CellReferenceAst | CellRangeAst | PlusOpAst | MinusOpAst | TimesOpAst | DivOpAst | ProcedureAst | ErrorAst;
