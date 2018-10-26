@@ -26,6 +26,7 @@ export function benchmark(sheet: string[][], config: Config = {
   const medianRun = overall[Math.trunc(config.numberOfRuns / 2)];
   const parsing = stats.map(s => s.get(StatType.PARSER)!).sort()
   const topSort = stats.map(s => s.get(StatType.TOP_SORT)!).sort()
+  const buildGraph = stats.map(s => s.get(StatType.GRAPH_BUILD)!).sort()
 
 
   console.warn(`Number of rows: ${rows}`)
@@ -37,6 +38,8 @@ export function benchmark(sheet: string[][], config: Config = {
   console.warn(`Median parsing: ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   console.warn(`TopSort: ${topSort.map((v) => (v / 1000))}`)
   console.warn(`Median TopSort: ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
+  console.warn(`Median BuildGraph: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
 
   const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
   console.warn(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
