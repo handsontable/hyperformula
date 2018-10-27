@@ -1,10 +1,11 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellValue, CellVertex, FormulaCellVertex, ValueCellVertex, Vertex, CellAddress} from "./Vertex";
+import {CellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
 import {cellAddressFromString, isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
 import {StatType, Statistics} from "./statistics/Statistics";
 import {AddressMapping} from "./AddressMapping"
+import {CellAddress, CellValue} from "./Cell";
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()

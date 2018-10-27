@@ -1,23 +1,11 @@
 import {Ast} from "./parser/Ast";
+import {CellValue} from "./Cell";
 
 type VertexId = number;
 let nextVertexId = 0;
 const getNextVertexId = () : VertexId => {
   return nextVertexId++;
 }
-
-export enum ErrorType {
-  ARG = "ARG",
-  DIV_BY_ZERO = "DIV_BY_ZERO",
-  NAME = "NAME"
-}
-export interface CellError {
-  type: ErrorType
-}
-export const cellError = (error: ErrorType): CellError => ({ type: error })
-
-export type CellValue = string | number | CellError
-export type CellAddress = { col: number, row: number }
 
 
 export abstract class Vertex {

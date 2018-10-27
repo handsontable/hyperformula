@@ -1,8 +1,8 @@
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, CellAddress} from "./Vertex"
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
 import {Statistics, StatType} from "./statistics/Statistics";
-import {CellDependency} from "./parser/Ast"
+import {CellAddress, CellDependency, relativeCellAddress} from "./Cell"
 import {AddressMapping} from "./AddressMapping"
 
 export type Sheet = Array<Array<string>>
@@ -23,7 +23,7 @@ export class GraphBuilder {
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
-        const cellAddress = { col: colIndex, row: rowIndex }
+        const cellAddress = relativeCellAddress(colIndex, rowIndex)
         let vertex = null
 
         if (isFormula(cellContent)) {
@@ -82,7 +82,7 @@ export const generateCellsFromRange = (rangeStart: CellAddress, rangeEnd: CellAd
     const rowResult = []
     let currentColumn = rangeStart.col;
     while (currentColumn <= rangeEnd.col) {
-      rowResult.push({ row: currentRow, col: currentColumn })
+      rowResult.push(relativeCellAddress(currentColumn, currentRow))
       currentColumn++
     }
     result.push(rowResult)

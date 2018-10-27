@@ -1,27 +1,20 @@
-import {
-  createToken,
-  Lexer,
-  Parser,
-  ILexingResult,
-  tokenMatcher,
-  IAnyOrAlt,
-  OrMethodOpts
-} from "chevrotain"
+import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from "chevrotain"
 
 import {
-  TemplateAst as Ast,
+  buildCellRangeAst,
+  buildCellReferenceAst,
   buildDivOpAst,
+  buildErrorAst,
   buildMinusOpAst,
   buildNumberAst,
-  buildStringAst,
   buildPlusOpAst,
   buildProcedureAst,
-  buildCellReferenceAst,
-  buildCellRangeAst,
+  buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
-  buildErrorAst, AstNodeType, CellReferenceType
+  TemplateAst as Ast
 } from "./Ast"
+import {CellReferenceType} from "../Cell";
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
 
@@ -218,25 +211,25 @@ class FormulaParser extends Parser {
       {
         ALT: () => {
           this.CONSUME(RelativeCell)
-          return AstNodeType.CELL_REFERENCE_RELATIVE
+          return CellReferenceType.CELL_REFERENCE_RELATIVE
         }
       },
       {
         ALT: () => {
           this.CONSUME(AbsoluteRowCell)
-          return AstNodeType.CELL_REFERENCE_ABSOLUTE_ROW
+          return CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW
         }
       },
       {
         ALT: () => {
           this.CONSUME(AbsoluteColCell)
-          return AstNodeType.CELL_REFERENCE_ABSOLUTE_COL
+          return CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL
         }
       },
       {
         ALT: () => {
           this.CONSUME(AbsoluteCell)
-          return AstNodeType.CELL_REFERENCE_ABSOLUTE
+          return CellReferenceType.CELL_REFERENCE_ABSOLUTE
         }
       },
     ]))

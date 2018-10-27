@@ -1,9 +1,7 @@
 import {computeHashAndExtractAddressesFromLexer, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
-import { CellAddress } from "../src/Vertex"
-import { CellDependency } from "../src/parser/Ast"
-
-const cellAddress = (col: number, row: number): CellAddress => ({ col, row })
+import {CellAddress, relativeCellAddress} from "../src/Cell"
+import { CellDependency } from "../src/Cell"
 
 const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses: Array<CellDependency> }) => {
   it("simple case", () => {
@@ -20,7 +18,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#",
-      addresses: [cellAddress(0, 4)]
+      addresses: [relativeCellAddress(0, 4)]
     })
   })
 
@@ -29,7 +27,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#+#",
-      addresses: [cellAddress(0, 4), cellAddress(0, 6)]
+      addresses: [relativeCellAddress(0, 4), relativeCellAddress(0, 6)]
     })
   });
 
@@ -47,7 +45,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "='A5'+#+'A6'",
-      addresses: [cellAddress(0, 3)]
+      addresses: [relativeCellAddress(0, 3)]
     })
   });
 
@@ -65,7 +63,7 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
 
     expect(computeFunc(code)).toEqual({
       hash: "=#:#",
-      addresses: [[cellAddress(0, 4), cellAddress(1, 15)]]
+      addresses: [[relativeCellAddress(0, 4), relativeCellAddress(1, 15)]]
     })
   });
 }

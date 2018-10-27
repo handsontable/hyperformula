@@ -1,20 +1,15 @@
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
-import { tokenizeFormula } from '../src/parser/FormulaParser'
 import {
   AstNodeType,
-  NumberAst,
-  StringAst,
-  PlusOpAst,
-  MinusOpAst,
-  TimesOpAst,
-  CellReferenceAst,
-  ProcedureAst,
   CellRangeAst,
-  ErrorAst, Ast
+  CellReferenceAst,
+  ErrorAst,
+  NumberAst,
+  PlusOpAst,
+  ProcedureAst,
+  StringAst
 } from '../src/parser/Ast'
-import { CellAddress } from '../src/Vertex'
-
-const cellAddress = (col: number, row: number): CellAddress => ({ col, row })
+import {CellReferenceType, relativeCellAddress} from '../src/Cell'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -46,8 +41,8 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
-    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
-    expect(bast.addresses).toEqual([cellAddress(0, 4)])
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(bast.addresses).toEqual([relativeCellAddress(0, 4)])
   })
 
   it("plus operator on different nodes with more addresses", () => {
@@ -57,9 +52,9 @@ const sharedExamples = (optimizationMode: string) => {
 
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
-    expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
-    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
-    expect(bast.addresses).toEqual([cellAddress(0, 5), cellAddress(0, 4)])
+    expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(bast.addresses).toEqual([relativeCellAddress(0, 5), relativeCellAddress(0, 4)])
   })
 
   it("cell reference types", () => {
@@ -70,10 +65,10 @@ const sharedExamples = (optimizationMode: string) => {
     const cellAbsRow = parser.parse("=A$2").ast as CellReferenceAst
     const cellRel = parser.parse("=A2").ast as CellReferenceAst
 
-    expect(cellAbs.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE)
-    expect(cellAbsCol.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE_COL)
-    expect(cellAbsRow.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE_ROW)
-    expect(cellRel.type).toEqual(AstNodeType.CELL_REFERENCE_RELATIVE)
+    expect(cellAbs.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_RELATIVE)
+    expect(cellAbsCol.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
+    expect(cellAbsRow.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+    expect(cellRel.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE)
   })
 
   it("it use cache for similar formulas", () => {
@@ -111,7 +106,7 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe("SUM")
     expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
-    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
+    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE)
   })
 
   it("joining nodes without braces", () => {
@@ -153,9 +148,9 @@ const sharedExamples = (optimizationMode: string) => {
     const bast = parser.parse("=A1:B2")
 
     const ast = bast.ast as CellRangeAst
-    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.idx).toBe(0)
-    expect(bast.addresses).toEqual([[cellAddress(0, 0), cellAddress(1, 1)]])
+    expect(bast.addresses).toEqual([[relativeCellAddress(0, 0), relativeCellAddress(1, 1)]])
   })
 
   it("parsing error - unexpected token", () => {

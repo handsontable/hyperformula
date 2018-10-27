@@ -1,7 +1,8 @@
 import {parseFormula, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken} from "chevrotain"
-import {Ast, AstNodeType, TemplateAst, CellDependency} from "./Ast";
-import {CellAddress} from "../Vertex"
+import {Ast, AstNodeType, TemplateAst} from "./Ast";
+import {CellAddress, relativeCellAddress} from "../Cell"
+import {CellDependency} from "../Cell";
 
 export class ParserWithCaching {
   private cache: Map<string, TemplateAst> = new Map()
@@ -82,7 +83,7 @@ export const cellAddressFromString = (stringAddress: string): CellAddress => {
     return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
   }, 0) - 1
   const row = Number(result[2] as string) - 1
-  return { col, row }
+  return relativeCellAddress(col, row)
 }
 
 export const stringRegex = /^[^']*'/

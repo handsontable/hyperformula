@@ -1,4 +1,5 @@
-import { CellAddress, CellVertex } from "./Vertex"
+import { CellVertex } from "./Vertex"
+import {CellAddress} from "./Cell";
 
 export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()

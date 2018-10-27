@@ -1,7 +1,8 @@
-import {Ast, AstNodeType, CellDependency, ProcedureAst, TemplateAst} from "../parser/Ast";
-import {CellAddress, cellError, CellValue, ErrorType} from "../Vertex";
+import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
+import {ErrorType} from "../Cell";
 import {generateCellsFromRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
+import {CellAddress, CellDependency, cellError, CellValue} from "../Cell";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -23,7 +24,7 @@ export class Interpreter {
 
   private evaluateAst(ast: TemplateAst, addresses: Array<CellDependency>): ExpressionValue {
     switch (ast.type) {
-      case AstNodeType.CELL_REFERENCE_RELATIVE: {
+      case AstNodeType.CELL_REFERENCE: {
         const address = addresses[ast.idx] as CellAddress
         const vertex = this.addressMapping.getCell(address)!
         return vertex.getCellValue()
@@ -91,8 +92,6 @@ export class Interpreter {
       case AstNodeType.ERROR: {
         return cellError(ErrorType.NAME)
       }
-      default:
-        throw Error(`AstNodeType not ${ast.type} not handled`)
     }
   }
 

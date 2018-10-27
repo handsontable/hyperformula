@@ -1,5 +1,6 @@
 import {HandsOnEngine} from "../src";
-import {cellError, ErrorType} from "../src/Vertex";
+import {ErrorType} from "../src/Cell";
+import {cellError} from "../src/Cell";
 
 describe('Interpreter', () => {
   let engine: HandsOnEngine

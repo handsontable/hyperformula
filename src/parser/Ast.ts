@@ -1,4 +1,4 @@
-import {CellAddress} from "../Vertex"
+import {CellDependency, CellReferenceType} from "../Cell";
 
 export type TemplateAst =
     NumberAst
@@ -11,7 +11,6 @@ export type TemplateAst =
     | DivOpAst
     | ProcedureAst
     | ErrorAst;
-export type CellDependency = CellAddress | [CellAddress, CellAddress]
 
 export interface Ast {
   ast: TemplateAst,
@@ -34,21 +33,12 @@ export enum AstNodeType {
 
   FUNCTION_CALL = "FUNCTION_CALL",
 
-  CELL_REFERENCE_RELATIVE = "CELL_REFERENCE",
-  CELL_REFERENCE_ABSOLUTE = "CELL_REFERENCE_ABSOLUTE",
-  CELL_REFERENCE_ABSOLUTE_COL = "CELL_REFERENCE_ABSOLUTE_COL",
-  CELL_REFERENCE_ABSOLUTE_ROW = "CELL_REFERENCE_ABSOLUTE_ROW",
+  CELL_REFERENCE = "CELL_REFERENCE",
 
   CELL_RANGE = "CELL_RANGE",
 
   ERROR = "ERROR"
 }
-
-export type CellReferenceType =
-    AstNodeType.CELL_REFERENCE_RELATIVE
-    | AstNodeType.CELL_REFERENCE_ABSOLUTE
-    | AstNodeType.CELL_REFERENCE_ABSOLUTE_COL
-    | AstNodeType.CELL_REFERENCE_ABSOLUTE_ROW
 
 export interface NumberAst {
   type: AstNodeType.NUMBER,
@@ -64,10 +54,15 @@ export interface StringAst {
 export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.STRING, value})
 
 export interface CellReferenceAst {
-  type: CellReferenceType,
+  type: AstNodeType.CELL_REFERENCE,
+  referenceType: CellReferenceType,
   idx: number,
 }
-export const buildCellReferenceAst = (idx: number, type: CellReferenceType): CellReferenceAst => ({type: type, idx})
+export const buildCellReferenceAst = (idx: number, referenceType: CellReferenceType): CellReferenceAst => ({
+  type: AstNodeType.CELL_REFERENCE,
+  referenceType: referenceType,
+  idx
+})
 
 export interface CellRangeAst {
   type: AstNodeType.CELL_RANGE,
