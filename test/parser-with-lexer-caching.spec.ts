@@ -65,10 +65,10 @@ const sharedExamples = (optimizationMode: string) => {
     const cellAbsRow = parser.parse("=A$2").ast as CellReferenceAst
     const cellRel = parser.parse("=A2").ast as CellReferenceAst
 
-    expect(cellAbs.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_RELATIVE)
+    expect(cellAbs.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE)
     expect(cellAbsCol.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
     expect(cellAbsRow.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
-    expect(cellRel.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE)
+    expect(cellRel.referenceType).toEqual(CellReferenceType.CELL_REFERENCE_RELATIVE)
   })
 
   it("it use cache for similar formulas", () => {
@@ -148,7 +148,7 @@ const sharedExamples = (optimizationMode: string) => {
     const bast = parser.parse("=A1:B2")
 
     const ast = bast.ast as CellRangeAst
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.idx).toBe(0)
     expect(bast.addresses).toEqual([[relativeCellAddress(0, 0), relativeCellAddress(1, 1)]])
   })
