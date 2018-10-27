@@ -20,7 +20,7 @@ import {
   buildCellRangeAst,
   buildTimesOpAst,
   CellReferenceAst,
-  buildErrorAst
+  buildErrorAst, AstNodeType, CellReferenceType
 } from "./Ast"
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
@@ -44,6 +44,9 @@ const DivOp = createToken({name: "DivOp", pattern: /\//, categories: Multiplicat
 
 /* addresses */
 export const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/})
+export const AbsoluteColCell = createToken({name: "AbsoluteColCell", pattern: /\$[A-Za-z]+[0-9]+/})
+export const AbsoluteRowCell = createToken({name: "AbsoluteRowCell", pattern: /[A-Za-z]+\$[0-9]+/})
+export const AbsoluteCell = createToken({name: "AbsoluteCell", pattern: /\$[A-Za-z]+\$[0-9]+/})
 export const RangeSeparator = createToken({name: "RangeSeparator", pattern: /:/})
 
 /* parenthesis */
@@ -81,6 +84,9 @@ const allTokens = [
   LParen,
   RParen,
   RangeSeparator,
+  AbsoluteCell,
+  AbsoluteColCell,
+  AbsoluteRowCell,
   RelativeCell,
   ProcedureName,
   ArgSeparator,
@@ -100,7 +106,8 @@ const allTokens = [
 class FormulaParser extends Parser {
   private cellCounter = 0
 
-  private atomicExpCache : OrArg | undefined
+  private atomicExpCache: OrArg | undefined
+  private cellExpCache: OrArg | undefined
 
   constructor() {
     super(allTokens, {outputCst: false})
@@ -172,7 +179,7 @@ class FormulaParser extends Parser {
         ALT: () => this.SUBRULE(this.cellRangeExpression)
       },
       {
-        ALT: () => this.SUBRULE(this.relativeCellExpression)
+        ALT: () => this.SUBRULE(this.cellReference)
       },
       {
         ALT: () => this.SUBRULE(this.procedureExpression)
@@ -206,9 +213,34 @@ class FormulaParser extends Parser {
     return buildProcedureAst(procedureName, args)
   })
 
-  private relativeCellExpression: CellReferenceAstRule = this.RULE("relativeCellExpression", () => {
-    this.CONSUME(RelativeCell)
-    return buildCellReferenceAst(this.cellCounter++)
+  private cellReference: CellReferenceAstRule = this.RULE("cellReference", () => {
+    const cellType: CellReferenceType = this.OR(this.cellExpCache || (this.cellExpCache = [
+      {
+        ALT: () => {
+          this.CONSUME(RelativeCell)
+          return AstNodeType.CELL_REFERENCE_RELATIVE
+        }
+      },
+      {
+        ALT: () => {
+          this.CONSUME(AbsoluteRowCell)
+          return AstNodeType.CELL_REFERENCE_ABSOLUTE_ROW
+        }
+      },
+      {
+        ALT: () => {
+          this.CONSUME(AbsoluteColCell)
+          return AstNodeType.CELL_REFERENCE_ABSOLUTE_COL
+        }
+      },
+      {
+        ALT: () => {
+          this.CONSUME(AbsoluteCell)
+          return AstNodeType.CELL_REFERENCE_ABSOLUTE
+        }
+      },
+    ]))
+    return buildCellReferenceAst(this.cellCounter++, cellType)
   })
 
   private parenthesisExpression: AstRule = this.RULE("parenthesisExpression", () => {

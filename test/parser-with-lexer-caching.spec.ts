@@ -10,7 +10,7 @@ import {
   CellReferenceAst,
   ProcedureAst,
   CellRangeAst,
-  ErrorAst
+  ErrorAst, Ast
 } from '../src/parser/Ast'
 import { CellAddress } from '../src/Vertex'
 
@@ -46,7 +46,7 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
-    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
     expect(bast.addresses).toEqual([cellAddress(0, 4)])
   })
 
@@ -57,9 +57,23 @@ const sharedExamples = (optimizationMode: string) => {
 
     const ast = bast.ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
-    expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.left.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
+    expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
     expect(bast.addresses).toEqual([cellAddress(0, 5), cellAddress(0, 4)])
+  })
+
+  it("cell reference types", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const cellAbs = parser.parse("=$A$1").ast as CellReferenceAst
+    const cellAbsCol = parser.parse("=$A2").ast as CellReferenceAst
+    const cellAbsRow = parser.parse("=A$2").ast as CellReferenceAst
+    const cellRel = parser.parse("=A2").ast as CellReferenceAst
+
+    expect(cellAbs.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE)
+    expect(cellAbsCol.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE_COL)
+    expect(cellAbsRow.type).toEqual(AstNodeType.CELL_REFERENCE_ABSOLUTE_ROW)
+    expect(cellRel.type).toEqual(AstNodeType.CELL_REFERENCE_RELATIVE)
   })
 
   it("it use cache for similar formulas", () => {
@@ -97,7 +111,7 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe("SUM")
     expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
-    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE_RELATIVE)
   })
 
   it("joining nodes without braces", () => {

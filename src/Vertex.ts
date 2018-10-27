@@ -1,4 +1,4 @@
-import {Ast} from "./parser/Ast";
+import {Ast, CellReferenceType} from "./parser/Ast";
 
 type VertexId = number;
 let nextVertexId = 0;

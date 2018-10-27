@@ -1,5 +1,5 @@
-import {Ast, AstNodeType, ProcedureAst, TemplateAst, CellDependency} from "../parser/Ast";
-import {cellError, CellValue, ErrorType, CellVertex, CellAddress} from "../Vertex";
+import {Ast, AstNodeType, CellDependency, ProcedureAst, TemplateAst} from "../parser/Ast";
+import {CellAddress, cellError, CellValue, ErrorType} from "../Vertex";
 import {generateCellsFromRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
 
@@ -23,7 +23,7 @@ export class Interpreter {
 
   private evaluateAst(ast: TemplateAst, addresses: Array<CellDependency>): ExpressionValue {
     switch (ast.type) {
-      case AstNodeType.CELL_REFERENCE: {
+      case AstNodeType.CELL_REFERENCE_RELATIVE: {
         const address = addresses[ast.idx] as CellAddress
         const vertex = this.addressMapping.getCell(address)!
         return vertex.getCellValue()
@@ -91,19 +91,21 @@ export class Interpreter {
       case AstNodeType.ERROR: {
         return cellError(ErrorType.NAME)
       }
+      default:
+        throw Error(`AstNodeType not ${ast.type} not handled`)
     }
   }
 
-  private evaluateFunction(ast : ProcedureAst, addresses: Array<CellDependency>): ExpressionValue {
+  private evaluateFunction(ast: ProcedureAst, addresses: Array<CellDependency>): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
-        return ast.args.reduce((currentSum : CellValue, arg) => {
+        return ast.args.reduce((currentSum: CellValue, arg) => {
           const value = this.evaluateAst(arg, addresses)
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
           } else if (typeof currentSum === 'number' && Array.isArray(value)) {
             const flattenRange: Array<CellValue> = [].concat.apply([], value)
-            return flattenRange.reduce((acc : CellValue, val: CellValue) => {
+            return flattenRange.reduce((acc: CellValue, val: CellValue) => {
               if (typeof acc === 'number' && typeof val === 'number') {
                 return acc + val
               } else {
