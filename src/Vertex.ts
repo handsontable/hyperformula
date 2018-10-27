@@ -1,21 +1,9 @@
-import {Ast, CellReferenceType} from "./parser/Ast";
+import {Ast} from "./parser/Ast";
 
 type VertexId = number;
 let nextVertexId = 0;
 const getNextVertexId = () : VertexId => {
   return nextVertexId++;
-}
-
-export abstract class Vertex {
-  public readonly id: VertexId;
-
-  protected constructor() {
-    this.id = getNextVertexId();
-  }
-}
-
-export abstract class CellVertex extends Vertex {
-  abstract getCellValue(): CellValue
 }
 
 export enum ErrorType {
@@ -30,6 +18,19 @@ export const cellError = (error: ErrorType): CellError => ({ type: error })
 
 export type CellValue = string | number | CellError
 export type CellAddress = { col: number, row: number }
+
+
+export abstract class Vertex {
+  public readonly id: VertexId;
+
+  protected constructor() {
+    this.id = getNextVertexId();
+  }
+}
+
+export abstract class CellVertex extends Vertex {
+  abstract getCellValue(): CellValue
+}
 
 export class FormulaCellVertex extends CellVertex {
   private cachedCellValue?: CellValue;
