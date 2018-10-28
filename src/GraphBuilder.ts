@@ -7,9 +7,6 @@ import {AddressMapping} from "./AddressMapping"
 
 export type Sheet = Array<Array<string>>
 
-const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
-
 export class GraphBuilder {
   private parser = new ParserWithCaching()
 
