@@ -66,9 +66,14 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
 
 export const cellAddressFromString = (stringAddress: string): CellAddress => {
   const result = stringAddress.match(/([A-Z]+)([0-9]+)/)!
-  const col = result[1].split("").reduce((currentColumn, nextLetter) => {
-    return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
-  }, 0) - 1
+  let col
+  if (result[1].length === 1) {
+    col = result[1].charCodeAt(0) - 65
+  } else {
+    col = result[1].split("").reduce((currentColumn, nextLetter) => {
+      return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
+    }, 0) - 1;
+  }
   const row = Number(result[2] as string) - 1
   return relativeCellAddress(col, row)
 }
