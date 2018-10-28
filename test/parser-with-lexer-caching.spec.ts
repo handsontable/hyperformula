@@ -178,7 +178,3 @@ const sharedExamples = (optimizationMode: string) => {
 describe('ParserWithCaching - parser optimizations', () => {
   sharedExamples('parser')
 });
-
-describe('ParserWithCaching - lexer optimizations', () => {
-  sharedExamples('lexer')
-});

@@ -14,22 +14,7 @@ export class ParserWithCaching {
   }
 
   parse(text: string): Ast {
-    if (this.optimizationMode === 'lexer') {
-      const {hash, addresses} = computeHashAndExtractAddressesFromLexer(text);
-      let ast = this.cache.get(hash)
-
-      if (ast) {
-        ++this.statsCacheUsed
-      } else {
-        ast = parseFormula(text)
-        this.cache.set(hash, ast)
-      }
-
-      return {
-        ast: ast,
-        addresses: ast.type === AstNodeType.ERROR ? [] : addresses,
-      }
-    } else {
+    if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
       const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
       let ast = this.cache.get(hash)
@@ -45,6 +30,8 @@ export class ParserWithCaching {
         ast: ast,
         addresses: ast.type === AstNodeType.ERROR ? [] : addresses
       }
+    } else {
+      throw new Error("Unsupported optimization mode")
     }
   }
 }
@@ -85,54 +72,3 @@ export const cellAddressFromString = (stringAddress: string): CellAddress => {
   const row = Number(result[2] as string) - 1
   return relativeCellAddress(col, row)
 }
-
-export const stringRegex = /^[^']*'/
-export const cellRegex = /^[A-Za-z]+[0-9]+/
-export const cellRangeRegex = /^[A-Za-z]+[0-9]+:[A-Za-z]+[0-9]+/
-export const computeHashAndExtractAddressesFromLexer = (code: string): { addresses: Array<CellDependency>, hash: string } => {
-  const addresses: Array<CellDependency> = []
-  let hash = ""
-
-  let x = 0
-  while (x < code.length) {
-    if (code[x] === "'") {
-      hash = hash.concat(code[x])
-      x++
-
-      do {
-        const subcode = code.slice(x)
-        const results = subcode.match(stringRegex)
-        if (results) {
-          hash = hash.concat(results[0])
-          x += results[0].length
-        } else {
-          throw Error('Unexpected parse error')
-        }
-      } while(code[x - 2] === "\\")
-    } else {
-      const subcode = code.slice(x)
-      const rangeResults = subcode.match(cellRangeRegex)
-      if (rangeResults) {
-        const [beginRange, endRange] = rangeResults[0].split(":")
-        addresses.push([cellAddressFromString(beginRange), cellAddressFromString(endRange)])
-        hash = hash.concat("#:#")
-        x += rangeResults[0].length
-      } else {
-        const results = subcode.match(cellRegex)
-        if (results) {
-          addresses.push(cellAddressFromString(results[0]))
-          hash = hash.concat("#")
-          x += results[0].length
-        } else {
-          hash = hash.concat(code[x])
-          x++
-        }
-      }
-    }
-  }
-
-  return {
-    hash,
-    addresses
-  }
-};

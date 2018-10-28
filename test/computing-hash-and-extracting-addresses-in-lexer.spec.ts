@@ -1,4 +1,4 @@
-import {computeHashAndExtractAddressesFromLexer, computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
+import {computeHashAndExtractAddresses} from '../src/parser/ParserWithCaching'
 import { tokenizeFormula } from '../src/parser/FormulaParser'
 import {CellAddress, relativeCellAddress} from "../src/Cell"
 import { CellDependency } from "../src/Cell"
@@ -67,20 +67,6 @@ const sharedExamples = (computeFunc: (code: string) => { hash: string, addresses
     })
   });
 }
-
-describe("computeHashAndExtractAddressesFromLexer", () => {
-  const computeFunc = computeHashAndExtractAddressesFromLexer
-
-  sharedExamples(computeFunc)
-
-  it("error in parsing", () => {
-    const code = "='fdsafdsa"
-
-    expect(() => {
-      computeFunc(code)
-    }).toThrowError(new Error('Unexpected parse error'))
-  });
-})
 
 describe("computeHashAndExtractAddresses", () => {
   const computeFunc = (code: string): { hash: string, addresses: Array<CellDependency> } => {
