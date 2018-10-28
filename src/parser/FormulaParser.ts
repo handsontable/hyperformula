@@ -36,10 +36,11 @@ const TimesOp = createToken({name: "TimesOp", pattern: /\*/, categories: Multipl
 const DivOp = createToken({name: "DivOp", pattern: /\//, categories: MultiplicationOp})
 
 /* addresses */
-export const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/})
-export const AbsoluteColCell = createToken({name: "AbsoluteColCell", pattern: /\$[A-Za-z]+[0-9]+/})
-export const AbsoluteRowCell = createToken({name: "AbsoluteRowCell", pattern: /[A-Za-z]+\$[0-9]+/})
-export const AbsoluteCell = createToken({name: "AbsoluteCell", pattern: /\$[A-Za-z]+\$[0-9]+/})
+export const CellReference = createToken({name: "CellReference", pattern: Lexer.NA})
+export const RelativeCell = createToken({name: "RelativeCell", pattern: /[A-Za-z]+[0-9]+/, categories: CellReference})
+export const AbsoluteColCell = createToken({name: "AbsoluteColCell", pattern: /\$[A-Za-z]+[0-9]+/, categories: CellReference})
+export const AbsoluteRowCell = createToken({name: "AbsoluteRowCell", pattern: /[A-Za-z]+\$[0-9]+/, categories: CellReference})
+export const AbsoluteCell = createToken({name: "AbsoluteCell", pattern: /\$[A-Za-z]+\$[0-9]+/, categories: CellReference})
 export const RangeSeparator = createToken({name: "RangeSeparator", pattern: /:/})
 
 /* parenthesis */

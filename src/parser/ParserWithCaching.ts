@@ -1,5 +1,5 @@
 import {parseFormula, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
-import {IToken} from "chevrotain"
+import {IToken, tokenMatcher} from "chevrotain"
 import {Ast, AstNodeType, TemplateAst} from "./Ast";
 import {CellAddress, relativeCellAddress} from "../Cell"
 import {CellDependency} from "../Cell";
@@ -59,8 +59,8 @@ export const computeHashAndExtractAddresses = (tokens: IToken[]): { addresses: A
   let idx = 0
   while (idx < tokens.length) {
     const token = tokens[idx]
-    if (token.tokenType === RelativeCell) {
-      if (tokens[idx+1] && tokens[idx+2] && tokens[idx+1].tokenType === RangeSeparator && tokens[idx+2].tokenType === RelativeCell) {
+    if (tokenMatcher(token, RelativeCell)) {
+      if (tokens[idx+1] && tokens[idx+2] && tokenMatcher(tokens[idx+1],RangeSeparator) && tokenMatcher(tokens[idx+2], RelativeCell)) {
         addresses.push([cellAddressFromString(token.image), cellAddressFromString(tokens[idx+2].image)])
         hash = hash.concat("#:#")
         idx += 3
