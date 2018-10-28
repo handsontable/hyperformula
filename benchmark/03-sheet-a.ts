@@ -23,4 +23,4 @@ while (prev < rows) {
   ++prev
 }
 
-benchmark(sheet, { millisecondsPerThousandRows: 130, numberOfRuns: 3 })
+benchmark(sheet)
