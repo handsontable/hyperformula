@@ -7,7 +7,7 @@ export type Config = {
 }
 
 export function benchmark(sheet: string[][], config: Config = {
-  millisecondsPerThousandRows: 120,
+  millisecondsPerThousandRows: 50,
   numberOfRuns: 3
 }) {
   const stats = []
