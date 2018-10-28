@@ -207,7 +207,7 @@ class FormulaParser extends Parser {
     return buildProcedureAst(procedureName, args)
   })
 
-  private cellReference: CellReferenceAstRule = this.RULE("cellReference", () => {
+  private cellReference: AstRule = this.RULE("cellReference", () => {
     const cellType: CellReferenceType = this.OR(this.cellExpCache || (this.cellExpCache = [
       {
         ALT: () => {
@@ -247,7 +247,6 @@ class FormulaParser extends Parser {
 
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
-type CellReferenceAstRule = (idxInCallingRule?: number, ...args: any[]) => (CellReferenceAst)
 type OrArg = IAnyOrAlt<any>[] | OrMethodOpts<any>
 
 const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
