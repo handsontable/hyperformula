@@ -56,3 +56,16 @@ export const cellAddressFromString = (stringAddress: string, formulaAddress: Cel
     return relativeCellAddress(col - formulaAddress.col, row - formulaAddress.row)
   }
 }
+
+
+export const getAbsoluteAddress = (address: CellAddress, formulaAddress: CellAddress): CellAddress => {
+  if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
+    return address
+  } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+    return absoluteCellAddress(formulaAddress.col + address.col, address.row)
+  } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
+    return absoluteCellAddress(address.col, formulaAddress.row + address.row)
+  } else {
+    return absoluteCellAddress(formulaAddress.col + address.col, formulaAddress.row + address.row)
+  }
+}
