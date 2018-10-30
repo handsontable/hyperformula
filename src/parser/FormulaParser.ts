@@ -87,7 +87,8 @@ const allTokens = [
   NumberLiteral,
   StringLiteral,
   AdditionOp,
-  MultiplicationOp
+  MultiplicationOp,
+  CellReference
 ]
 
 // F -> '=' E
