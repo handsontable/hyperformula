@@ -1,6 +1,6 @@
-import {CellAddress, CellDependency, CellReferenceType} from "../Cell";
+import {CellAddress, CellDependency} from "../Cell";
 
-export type TemplateAst =
+export type Ast =
     NumberAst
     | StringAst
     | CellReferenceAst
@@ -11,11 +11,6 @@ export type TemplateAst =
     | DivOpAst
     | ProcedureAst
     | ErrorAst;
-
-export interface Ast {
-  ast: TemplateAst,
-  addresses: Array<CellDependency>,
-}
 
 export type ParsingError = {
   name: string,
@@ -71,15 +66,15 @@ export interface CellRangeAst {
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({type: AstNodeType.CELL_RANGE, start, end})
 
 export interface BinaryOpAst {
-  left: TemplateAst,
-  right: TemplateAst,
+  left: Ast,
+  right: Ast,
 }
 
 export interface PlusOpAst extends BinaryOpAst {
   type: AstNodeType.PLUS_OP,
 }
 
-export const buildPlusOpAst = (left: TemplateAst, right: TemplateAst): PlusOpAst => ({
+export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({
   type: AstNodeType.PLUS_OP,
   left,
   right
@@ -89,7 +84,7 @@ export interface MinusOpAst extends BinaryOpAst {
   type: AstNodeType.MINUS_OP,
 }
 
-export const buildMinusOpAst = (left: TemplateAst, right: TemplateAst): MinusOpAst => ({
+export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({
   type: AstNodeType.MINUS_OP,
   left,
   right
@@ -99,7 +94,7 @@ export interface TimesOpAst extends BinaryOpAst {
   type: AstNodeType.TIMES_OP,
 }
 
-export const buildTimesOpAst = (left: TemplateAst, right: TemplateAst): TimesOpAst => ({
+export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({
   type: AstNodeType.TIMES_OP,
   left,
   right
@@ -109,7 +104,7 @@ export interface DivOpAst extends BinaryOpAst {
   type: AstNodeType.DIV_OP,
 }
 
-export const buildDivOpAst = (left: TemplateAst, right: TemplateAst): DivOpAst => ({
+export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({
   type: AstNodeType.DIV_OP,
   left,
   right
@@ -118,10 +113,10 @@ export const buildDivOpAst = (left: TemplateAst, right: TemplateAst): DivOpAst =
 export interface ProcedureAst {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
-  args: TemplateAst[]
+  args: Ast[]
 }
 
-export const buildProcedureAst = (procedureName: string, args: TemplateAst[]): ProcedureAst => ({
+export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args

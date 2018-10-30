@@ -64,9 +64,14 @@ export class HandsOnEngine {
   recomputeFormulas() {
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
-        const formula = vertex.getFormula()
-        const cellValue = this.interpreter.computeFormula(formula)
-        vertex.setCellValue(cellValue)
+        const address = this.addressMapping.getAddress(vertex)
+        if (address != null) {
+          const formula = vertex.getFormula()
+          const cellValue = this.interpreter.computeFormula(formula, address)
+          vertex.setCellValue(cellValue)
+        } else {
+          throw Error("No address for this vertex")
+        }
       }
     })
   }

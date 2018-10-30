@@ -1,11 +1,10 @@
 import {parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
-import {Ast, AstNodeType, TemplateAst} from "./Ast";
-import {absoluteCellAddress, CellAddress, relativeCellAddress} from "../Cell"
-import {CellDependency} from "../Cell";
+import {Ast} from "./Ast";
+import {absoluteCellAddress, CellAddress, CellDependency, relativeCellAddress} from "../Cell"
 
 export class ParserWithCaching {
-  private cache: Map<string, TemplateAst> = new Map()
+  private cache: Map<string, Ast> = new Map()
   public statsCacheUsed: number = 0
   private optimizationMode: string
 
@@ -16,20 +15,17 @@ export class ParserWithCaching {
   parse(text: string, formulaAddress: CellAddress = absoluteCellAddress(0, 0)): Ast {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
-      const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
-      let ast = this.cache.get(hash)
+      // const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
+      // let ast = this.cache.get(hash)
+      //
+      // if (ast) {
+      //   ++this.statsCacheUsed
+      // } else {
+      let ast = parseFromTokens(lexerResult, formulaAddress)
+      // this.cache.set(hash, ast)
+      // }
 
-      if (ast) {
-        ++this.statsCacheUsed
-      } else {
-        ast = parseFromTokens(lexerResult, formulaAddress)
-        this.cache.set(hash, ast)
-      }
-
-      return {
-        ast: ast,
-        addresses: ast.type === AstNodeType.ERROR ? [] : addresses
-      }
+      return ast
     } else {
       throw new Error("Unsupported optimization mode")
     }

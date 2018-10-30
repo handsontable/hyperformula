@@ -1,8 +1,7 @@
-import {Ast, AstNodeType, ProcedureAst, TemplateAst} from "../parser/Ast";
-import {ErrorType} from "../Cell";
+import {Ast, AstNodeType, ProcedureAst} from "../parser/Ast";
+import {CellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress} from "../Cell";
 import {generateCellsFromRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
-import {CellAddress, CellDependency, cellError, CellValue} from "../Cell";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -13,8 +12,8 @@ export class Interpreter {
     this.addressMapping = addressMapping
   }
 
-  public computeFormula(formula: Ast): CellValue {
-    const result = this.evaluateAst(formula.ast, formula.addresses)
+  public computeFormula(formula: Ast, formulaAddress: CellAddress): CellValue {
+    const result = this.evaluateAst(formula, formulaAddress)
     if (Array.isArray(result)) {
       return cellError(ErrorType.ARG)
     } else {
@@ -22,10 +21,10 @@ export class Interpreter {
     }
   }
 
-  private evaluateAst(ast: TemplateAst, addresses: Array<CellDependency>): ExpressionValue {
+  private evaluateAst(ast: Ast, formulaAddress: CellAddress): ExpressionValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const address = addresses[ast.idx] as CellAddress
+        const address = getAbsoluteAddress(ast.reference, formulaAddress)
         const vertex = this.addressMapping.getCell(address)!
         return vertex.getCellValue()
       }
@@ -36,8 +35,8 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, addresses)
-        const rightResult = this.evaluateAst(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult + rightResult
         } else {
@@ -45,8 +44,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, addresses)
-        const rightResult = this.evaluateAst(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
@@ -54,8 +53,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = this.evaluateAst(ast.left, addresses)
-        const rightResult = this.evaluateAst(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
@@ -63,8 +62,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = this.evaluateAst(ast.left, addresses)
-        const rightResult = this.evaluateAst(ast.right, addresses)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
             return cellError(ErrorType.DIV_BY_ZERO)
@@ -75,10 +74,10 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        return this.evaluateFunction(ast, addresses)
+        return this.evaluateFunction(ast, formulaAddress)
       }
       case AstNodeType.CELL_RANGE: {
-        const [beginRange, endRange] = addresses[ast.idx] as [CellAddress, CellAddress]
+        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
         const rangeResult: CellValue[][] = []
         generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
           const rowResult: CellValue[] = []
@@ -95,11 +94,11 @@ export class Interpreter {
     }
   }
 
-  private evaluateFunction(ast: ProcedureAst, addresses: Array<CellDependency>): ExpressionValue {
+  private evaluateFunction(ast: ProcedureAst, formulaAddress: CellAddress): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum: CellValue, arg) => {
-          const value = this.evaluateAst(arg, addresses)
+          const value = this.evaluateAst(arg, formulaAddress)
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
           } else if (typeof currentSum === 'number' && Array.isArray(value)) {

@@ -11,8 +11,7 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
-  CellReferenceAst, TemplateAst,
-  TemplateAst as Ast
+  Ast
 } from "./Ast"
 import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType} from "../Cell";
 
@@ -115,7 +114,7 @@ class FormulaParser extends Parser {
     super.reset()
   }
 
-  public formulaWithContext(address: CellAddress): TemplateAst {
+  public formulaWithContext(address: CellAddress): Ast {
     this.formulaAddress = address;
     return this.formula();
   }
