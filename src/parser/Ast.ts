@@ -1,4 +1,4 @@
-import {CellDependency, CellReferenceType} from "../Cell";
+import {CellAddress, CellDependency, CellReferenceType} from "../Cell";
 
 export type TemplateAst =
     NumberAst
@@ -55,21 +55,20 @@ export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.
 
 export interface CellReferenceAst {
   type: AstNodeType.CELL_REFERENCE,
-  referenceType: CellReferenceType,
-  idx: number,
+  reference: CellAddress
 }
-export const buildCellReferenceAst = (idx: number, referenceType: CellReferenceType): CellReferenceAst => ({
+export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
   type: AstNodeType.CELL_REFERENCE,
-  referenceType: referenceType,
-  idx
+  reference: reference
 })
 
 export interface CellRangeAst {
   type: AstNodeType.CELL_RANGE,
-  idx: number,
+  start: CellAddress,
+  end: CellAddress
 }
 
-export const buildCellRangeAst = (idx: number): CellRangeAst => ({type: AstNodeType.CELL_RANGE, idx})
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({type: AstNodeType.CELL_RANGE, start, end})
 
 export interface BinaryOpAst {
   left: TemplateAst,

@@ -11,10 +11,10 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
-  CellReferenceAst,
+  CellReferenceAst, TemplateAst,
   TemplateAst as Ast
 } from "./Ast"
-import {CellReferenceType} from "../Cell";
+import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType} from "../Cell";
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
 
@@ -98,19 +98,25 @@ const allTokens = [
 // A -> adresy
 // P -> procedury
 class FormulaParser extends Parser {
-  private cellCounter = 0
+  private formulaAddress: CellAddress;
 
   private atomicExpCache: OrArg | undefined
   private cellExpCache: OrArg | undefined
 
   constructor() {
     super(allTokens, {outputCst: false})
+    this.formulaAddress = absoluteCellAddress(0, 0)
     this.performSelfAnalysis()
   }
 
   public reset() {
+    this.formulaAddress = absoluteCellAddress(0, 0)
     super.reset()
-    this.cellCounter = 0
+  }
+
+  public formulaWithContext(address: CellAddress): TemplateAst {
+    this.formulaAddress = address;
+    return this.formula();
   }
 
   public formula: AstRule = this.RULE("formula", () => {
@@ -158,10 +164,10 @@ class FormulaParser extends Parser {
   })
 
   private cellRangeExpression: AstRule = this.RULE("cellRangeExpression", () => {
-    this.CONSUME(RelativeCell)
+    const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
-    this.CONSUME3(RelativeCell)
-    return buildCellRangeAst(this.cellCounter++)
+    const end = this.CONSUME3(CellReference)
+    return buildCellRangeAst(cellAddressFromString(start.image, this.formulaAddress), cellAddressFromString(end.image, this.formulaAddress))
   })
 
   private atomicExpression: AstRule = this.RULE("atomicExpression", () => {
@@ -208,33 +214,8 @@ class FormulaParser extends Parser {
   })
 
   private cellReference: AstRule = this.RULE("cellReference", () => {
-    const cellType: CellReferenceType = this.OR(this.cellExpCache || (this.cellExpCache = [
-      {
-        ALT: () => {
-          this.CONSUME(RelativeCell)
-          return CellReferenceType.CELL_REFERENCE_RELATIVE
-        }
-      },
-      {
-        ALT: () => {
-          this.CONSUME(AbsoluteRowCell)
-          return CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW
-        }
-      },
-      {
-        ALT: () => {
-          this.CONSUME(AbsoluteColCell)
-          return CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL
-        }
-      },
-      {
-        ALT: () => {
-          this.CONSUME(AbsoluteCell)
-          return CellReferenceType.CELL_REFERENCE_ABSOLUTE
-        }
-      },
-    ]))
-    return buildCellReferenceAst(this.cellCounter++, cellType)
+    const cell = this.CONSUME(CellReference)
+    return buildCellReferenceAst(cellAddressFromString(cell.image, this.formulaAddress))
   })
 
   private parenthesisExpression: AstRule = this.RULE("parenthesisExpression", () => {
@@ -256,10 +237,10 @@ export function tokenizeFormula(text: string): ILexingResult {
   return FormulaLexer.tokenize(text)
 }
 
-export function parseFromTokens(lexResult: ILexingResult): Ast {
+export function parseFromTokens(lexResult: ILexingResult, formulaAddress: CellAddress): Ast {
   parser.input = lexResult.tokens
 
-  const ast = parser.formula()
+  const ast = parser.formulaWithContext(formulaAddress)
   const errors = parser.errors
 
   if (errors.length > 0) {
@@ -272,9 +253,4 @@ export function parseFromTokens(lexResult: ILexingResult): Ast {
   }
 
   return ast
-}
-
-export function parseFormula(text: string): Ast {
-  const lexResult = FormulaLexer.tokenize(text)
-  return parseFromTokens(lexResult)
 }

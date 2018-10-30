@@ -24,7 +24,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
-          let ast = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent))
+          let ast = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(ast)
           dependencies.set(cellAddress, Array.from(new Set(ast.addresses)))
         } else if (!isNaN(Number(cellContent))) {

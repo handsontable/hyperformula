@@ -1,7 +1,7 @@
-import {parseFormula, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
+import {parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
 import {Ast, AstNodeType, TemplateAst} from "./Ast";
-import {CellAddress, relativeCellAddress} from "../Cell"
+import {absoluteCellAddress, CellAddress, relativeCellAddress} from "../Cell"
 import {CellDependency} from "../Cell";
 
 export class ParserWithCaching {
@@ -13,7 +13,7 @@ export class ParserWithCaching {
     this.optimizationMode = optimizationMode
   }
 
-  parse(text: string): Ast {
+  parse(text: string, formulaAddress: CellAddress = absoluteCellAddress(0, 0)): Ast {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
       const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
@@ -22,7 +22,7 @@ export class ParserWithCaching {
       if (ast) {
         ++this.statsCacheUsed
       } else {
-        ast = parseFromTokens(lexerResult)
+        ast = parseFromTokens(lexerResult, formulaAddress)
         this.cache.set(hash, ast)
       }
 
