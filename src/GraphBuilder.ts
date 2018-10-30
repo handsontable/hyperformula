@@ -2,8 +2,16 @@ import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Graph} from './Graph'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
 import {Statistics, StatType} from "./statistics/Statistics";
-import {CellAddress, CellDependency, relativeCellAddress} from "./Cell"
+import {
+  absoluteCellAddress,
+  CellAddress,
+  CellDependency,
+  getAbsoluteAddress,
+  getAbsoluteDependency,
+  relativeCellAddress
+} from "./Cell"
 import {AddressMapping} from "./AddressMapping"
+import {getFormulaDependencies} from "./parser/Ast";
 
 export type Sheet = Array<Array<string>>
 
@@ -20,13 +28,13 @@ export class GraphBuilder {
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
-        const cellAddress = relativeCellAddress(colIndex, rowIndex)
+        const cellAddress = absoluteCellAddress(colIndex, rowIndex)
         let vertex = null
 
         if (isFormula(cellContent)) {
           let ast = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(ast)
-          dependencies.set(cellAddress, Array.from(new Set(ast.addresses)))
+          dependencies.set(cellAddress, Array.from(new Set(getFormulaDependencies(ast))))
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
         } else {
@@ -41,12 +49,14 @@ export class GraphBuilder {
 
     dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: CellAddress) => {
       cellDependencies.forEach((startCell: CellDependency) => {
+        const absStartCell = getAbsoluteDependency(startCell, endCell)
+
         if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)
         }
 
-        if (Array.isArray(startCell)) {
-          const [rangeStart, rangeEnd] = startCell
+        if (Array.isArray(absStartCell)) {
+          const [rangeStart, rangeEnd] = absStartCell
           const vertex = new RangeVertex()
           this.graph.addNode(vertex)
           generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
@@ -57,13 +67,13 @@ export class GraphBuilder {
           this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
         } else {
           let vertex : CellVertex
-          if (this.addressMapping.has(startCell)) {
-            vertex = this.addressMapping.getCell(startCell)!
+          if (this.addressMapping.has(absStartCell)) {
+            vertex = this.addressMapping.getCell(absStartCell)!
           } else {
             vertex = new EmptyCellVertex()
             this.graph.addNode(vertex)
 
-            this.addressMapping.setCell(startCell, vertex)
+            this.addressMapping.setCell(absStartCell, vertex)
           }
           this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
         }
