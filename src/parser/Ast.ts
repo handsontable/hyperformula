@@ -135,7 +135,7 @@ export function getFormulaDependencies(ast: Ast) : CellDependency[] {
       return Array.of(ast.reference);
     }
     case AstNodeType.CELL_RANGE: {
-      return [ast.start, ast.end] as [CellDependency, CellDependency]
+      return [[ast.start, ast.end]]
     }
     case AstNodeType.PLUS_OP:
     case AstNodeType.MINUS_OP:
