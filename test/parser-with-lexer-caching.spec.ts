@@ -9,7 +9,7 @@ import {
   ProcedureAst,
   StringAst
 } from '../src/parser/Ast'
-import {CellReferenceType, relativeCellAddress} from '../src/Cell'
+import {CellReferenceType, relativeCellAddress, absoluteCellAddress} from '../src/Cell'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -54,8 +54,8 @@ const sharedExamples = (optimizationMode: string) => {
   it("it use cache for similar formulas", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast1 = parser.parse("=A1")
-    const ast2 = parser.parse("=A2")
+    const ast1 = parser.parse("=A1", absoluteCellAddress(0, 0))
+    const ast2 = parser.parse("=A2", absoluteCellAddress(0, 1))
 
     expect(ast1).toEqual(ast2)
     expect(parser.statsCacheUsed).toBe(1)

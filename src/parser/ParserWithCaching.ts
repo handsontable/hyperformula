@@ -15,15 +15,15 @@ export class ParserWithCaching {
   parse(text: string, formulaAddress: CellAddress = absoluteCellAddress(0, 0)): Ast {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
-      // const {hash, addresses} = computeHashAndExtractAddresses(lexerResult.tokens);
-      // let ast = this.cache.get(hash)
-      //
-      // if (ast) {
-      //   ++this.statsCacheUsed
-      // } else {
-      let ast = parseFromTokens(lexerResult, formulaAddress)
-      // this.cache.set(hash, ast)
-      // }
+      const hash = computeHash(lexerResult.tokens, formulaAddress);
+      let ast = this.cache.get(hash)
+      
+      if (ast) {
+        ++this.statsCacheUsed
+      } else {
+        ast = parseFromTokens(lexerResult, formulaAddress)
+        this.cache.set(hash, ast)
+      }
 
       return ast
     } else {
