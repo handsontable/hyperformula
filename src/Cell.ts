@@ -33,7 +33,7 @@ export const absoluteRowCellAddress = (col: number, row: number) : CellAddress=>
 export type CellDependency = CellAddress | [CellAddress, CellAddress]
 
 
-export const cellAddressFromString = (stringAddress: string, formulaAddress: CellAddress): CellAddress => {
+export const cellAddressFromString = (stringAddress: string, baseAddress: CellAddress): CellAddress => {
   const result = stringAddress.match(/(\$?)([A-Z]+)(\$?)([0-9]+)/)!
 
   let col
@@ -49,11 +49,11 @@ export const cellAddressFromString = (stringAddress: string, formulaAddress: Cel
   if (result[1] === '$' && result[3] === '$') {
     return absoluteCellAddress(col, row)
   } else if (result[1] === '$') {
-    return absoluteColCellAddress(col, row - formulaAddress.row)
+    return absoluteColCellAddress(col, row - baseAddress.row)
   } else if (result[3] === '$') {
-    return absoluteRowCellAddress(col - formulaAddress.col, row)
+    return absoluteRowCellAddress(col - baseAddress.col, row)
   } else {
-    return relativeCellAddress(col - formulaAddress.col, row - formulaAddress.row)
+    return relativeCellAddress(col - baseAddress.col, row - baseAddress.row)
   }
 }
 
