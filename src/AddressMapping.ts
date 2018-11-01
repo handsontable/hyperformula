@@ -5,9 +5,6 @@ export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
   private reversedMapping: Map<CellVertex, CellAddress> = new Map()
 
-  constructor() {
-  }
-
   getCell(address: CellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
