@@ -128,25 +128,3 @@ export interface ErrorAst {
 }
 
 export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args: args})
-
-export function getFormulaDependencies(ast: Ast) : CellDependency[] {
-  switch (ast.type) {
-    case AstNodeType.CELL_REFERENCE: {
-      return Array.of(ast.reference);
-    }
-    case AstNodeType.CELL_RANGE: {
-      return [[ast.start, ast.end]]
-    }
-    case AstNodeType.PLUS_OP:
-    case AstNodeType.MINUS_OP:
-    case AstNodeType.TIMES_OP:
-    case AstNodeType.DIV_OP: {
-      return getFormulaDependencies(ast.left).concat(getFormulaDependencies(ast.right))
-    }
-    case AstNodeType.FUNCTION_CALL:
-      const childResults = ast.args.map(arg => getFormulaDependencies(arg))
-      return ([] as CellDependency[]).concat(...childResults)
-    default:
-      return []
-  }
-}

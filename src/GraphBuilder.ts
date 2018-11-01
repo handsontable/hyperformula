@@ -11,7 +11,6 @@ import {
   relativeCellAddress
 } from "./Cell"
 import {AddressMapping} from "./AddressMapping"
-import {getFormulaDependencies} from "./parser/Ast";
 
 export type Sheet = Array<Array<string>>
 
