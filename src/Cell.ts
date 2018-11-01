@@ -59,7 +59,7 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: CellAd
 
 export const getAbsoluteDependency = (address: CellDependency, formulaAddress: CellAddress): CellDependency => {
   if (Array.isArray(address)) {
-    return [getAbsoluteAddress(address[0], formulaAddress), getAbsoluteAddress(address[1], formulaAddress)] as [CellAddress, CellAddress]
+    return [getAbsoluteAddress(address[0], formulaAddress), getAbsoluteAddress(address[1], formulaAddress)]
   } else {
     return getAbsoluteAddress(address, formulaAddress)
   }
