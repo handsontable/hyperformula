@@ -7,7 +7,6 @@ import {
   CellAddress,
   CellDependency,
   getAbsoluteAddress,
-  getAbsoluteDependency,
   relativeCellAddress
 } from "./Cell"
 import {AddressMapping} from "./AddressMapping"
