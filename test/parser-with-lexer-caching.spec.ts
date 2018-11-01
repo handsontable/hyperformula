@@ -15,7 +15,7 @@ const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=42") as NumberAst
+    const ast = parser.parse("=42", absoluteCellAddress(0, 0)) as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(42)
   })
@@ -23,7 +23,7 @@ const sharedExamples = (optimizationMode: string) => {
   it("string literal", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("='foobar'") as StringAst
+    const ast = parser.parse("='foobar'", absoluteCellAddress(0, 0)) as StringAst
     expect(ast.type).toBe(AstNodeType.STRING)
     expect(ast.value).toBe("foobar")
   })
@@ -31,7 +31,7 @@ const sharedExamples = (optimizationMode: string) => {
   it("plus operator on different nodes", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=1+A5") as PlusOpAst
+    const ast = parser.parse("=1+A5", absoluteCellAddress(0, 0)) as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
     expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -40,10 +40,10 @@ const sharedExamples = (optimizationMode: string) => {
   it("cell reference types", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const cellAbs = parser.parse("=$A$1") as CellReferenceAst
-    const cellAbsCol = parser.parse("=$A2") as CellReferenceAst
-    const cellAbsRow = parser.parse("=A$2") as CellReferenceAst
-    const cellRel = parser.parse("=A2") as CellReferenceAst
+    const cellAbs = parser.parse("=$A$1", absoluteCellAddress(0, 0)) as CellReferenceAst
+    const cellAbsCol = parser.parse("=$A2", absoluteCellAddress(0, 0)) as CellReferenceAst
+    const cellAbsRow = parser.parse("=A$2", absoluteCellAddress(0, 0)) as CellReferenceAst
+    const cellRel = parser.parse("=A2", absoluteCellAddress(0, 0)) as CellReferenceAst
 
     expect(cellAbs.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE)
     expect(cellAbsCol.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
@@ -64,15 +64,15 @@ const sharedExamples = (optimizationMode: string) => {
   it("doesn't count cache for different formulas", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const bast1 = parser.parse("=A1")
-    const bast2 = parser.parse("=A2+A3")
+    const bast1 = parser.parse("=A1", absoluteCellAddress(0, 0))
+    const bast2 = parser.parse("=A2+A3", absoluteCellAddress(0, 0))
 
     expect(parser.statsCacheUsed).toBe(0)
   })
 
   it("SUM function without args", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse("=SUM()") as ProcedureAst
+    const ast = parser.parse("=SUM()", absoluteCellAddress(0, 0)) as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe("SUM")
     expect(ast.args.length).toBe(0)
@@ -80,7 +80,7 @@ const sharedExamples = (optimizationMode: string) => {
 
   it("SUM function with args", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse("=SUM(1; A1)") as ProcedureAst
+    const ast = parser.parse("=SUM(1; A1)", absoluteCellAddress(0, 0)) as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe("SUM")
     expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
@@ -89,7 +89,7 @@ const sharedExamples = (optimizationMode: string) => {
 
   it("joining nodes without braces", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse("=1 + 2 + 3") as PlusOpAst
+    const ast = parser.parse("=1 + 2 + 3", absoluteCellAddress(0, 0)) as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.right.type).toBe(AstNodeType.NUMBER)
@@ -97,7 +97,7 @@ const sharedExamples = (optimizationMode: string) => {
 
   it("joining nodes with braces", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse("=1 + (2 + 3)") as PlusOpAst
+    const ast = parser.parse("=1 + (2 + 3)", absoluteCellAddress(0, 0)) as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
     expect(ast.right.type).toBe(AstNodeType.PLUS_OP)
@@ -105,15 +105,15 @@ const sharedExamples = (optimizationMode: string) => {
 
   it("float literal", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse("=3.14") as NumberAst
+    const ast = parser.parse("=3.14", absoluteCellAddress(0, 0)) as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(3.14)
   })
 
   it("leading zeros", () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const int = parser.parse("=01234") as NumberAst
-    const float = parser.parse("=03.14") as NumberAst
+    const int = parser.parse("=01234", absoluteCellAddress(0, 0)) as NumberAst
+    const float = parser.parse("=03.14", absoluteCellAddress(0, 0)) as NumberAst
     expect(int.type).toBe(AstNodeType.NUMBER)
     expect(int.value).toBe(1234)
     expect(float.type).toBe(AstNodeType.NUMBER)
@@ -123,28 +123,28 @@ const sharedExamples = (optimizationMode: string) => {
   it("simple cell range", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=A1:B2") as CellRangeAst
+    const ast = parser.parse("=A1:B2", absoluteCellAddress(0, 0)) as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
   })
 
   it("parsing error - unexpected token", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=A") as ErrorAst
+    const ast = parser.parse("=A", absoluteCellAddress(0, 0)) as ErrorAst
     expect(ast.args[0].name).toBe("MismatchedTokenException")
   })
 
   it("parsing error - unexpected token", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=SUM(A)") as ErrorAst
+    const ast = parser.parse("=SUM(A)", absoluteCellAddress(0, 0)) as ErrorAst
     expect(ast.args[0].name).toBe("MismatchedTokenException")
   })
 
   it("parsing error - not all input parsed", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("=A1B1") as ErrorAst
+    const ast = parser.parse("=A1B1", absoluteCellAddress(0, 0)) as ErrorAst
     expect(ast.args[0].name).toBe("NotAllInputParsedException")
   })
 };

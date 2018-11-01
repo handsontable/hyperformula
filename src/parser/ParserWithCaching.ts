@@ -12,7 +12,7 @@ export class ParserWithCaching {
     this.optimizationMode = optimizationMode
   }
 
-  parse(text: string, formulaAddress: CellAddress = absoluteCellAddress(0, 0)): Ast {
+  parse(text: string, formulaAddress: CellAddress): Ast {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
       const hash = computeHash(lexerResult.tokens, formulaAddress);

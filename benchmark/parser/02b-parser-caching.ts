@@ -1,4 +1,5 @@
 import {ParserWithCaching} from "../../src/parser/ParserWithCaching";
+import {absoluteCellAddress} from "../../src/Cell"
 
 const rows = 100000
 const millisecondsPerThousandRows = 160
@@ -27,7 +28,7 @@ while (currentRun < numberOfRuns) {
 
   const timestampBefore = Date.now()
   flattenSheet.forEach((formula) => {
-    parser.parse(formula)
+    parser.parse(formula, absoluteCellAddress(0, 0))
   })
   const timestampAfter = Date.now()
 
