@@ -48,9 +48,7 @@ export class GraphBuilder {
     })
 
     dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: CellAddress) => {
-      cellDependencies.forEach((startCell: CellDependency) => {
-        const absStartCell = getAbsoluteDependency(startCell, endCell)
-
+      cellDependencies.forEach((absStartCell: CellDependency) => {
         if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)
         }
