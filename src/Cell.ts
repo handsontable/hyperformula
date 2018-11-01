@@ -36,7 +36,7 @@ export type SimpleCellAddress = {
 
 export const simpleCellAddress = (col: number, row: number) : SimpleCellAddress => ({ col, row })
 
-export type CellDependency = CellAddress | [CellAddress, CellAddress]
+export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
 
 
 export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {

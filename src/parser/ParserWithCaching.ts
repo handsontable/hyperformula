@@ -1,7 +1,7 @@
 import {parseFromTokens, RangeSeparator, CellReference, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
 import {Ast, AstNodeType} from "./Ast";
-import {absoluteCellAddress, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
+import {absoluteCellAddress, simpleCellAddressFromString, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
 
 export class ParserWithCaching {
   private cache: Map<string, Ast> = new Map()
@@ -49,11 +49,11 @@ export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): {
     if (tokenMatcher(token, CellReference)) {
       if (tokens[idx+1] && tokens[idx+2] && tokenMatcher(tokens[idx+1],RangeSeparator) && tokenMatcher(tokens[idx+2], CellReference)) {
         hash = hash.concat(`${cellHashFromToken(token, baseAddress)}:${cellHashFromToken(tokens[idx+2], baseAddress)}`)
-        dependencies.push([absoluteCellAddressFromString(token.image), absoluteCellAddressFromString(tokens[idx+2].image)])
+        dependencies.push([simpleCellAddressFromString(token.image), simpleCellAddressFromString(tokens[idx+2].image)])
         idx += 3
       } else {
         hash = hash.concat(cellHashFromToken(token, baseAddress))
-        dependencies.push(absoluteCellAddressFromString(token.image))
+        dependencies.push(simpleCellAddressFromString(token.image))
         idx++
       }
     } else {
@@ -80,20 +80,4 @@ const cellHashFromToken = (token: IToken, baseAddress: SimpleCellAddress): strin
       return `#${cellAddress.row}AR${cellAddress.col}`
     }
   }
-}
-
-export const absoluteCellAddressFromString = (stringAddress: string): CellAddress => {
-  const result = stringAddress.match(/\$?([A-Z]+)\$?([0-9]+)/)!
-
-  let col
-  if (result[1].length === 1) {
-    col = result[1].charCodeAt(0) - 65
-  } else {
-    col = result[1].split("").reduce((currentColumn, nextLetter) => {
-      return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
-    }, 0) - 1;
-  }
-
-  const row = Number(result[2] as string) - 1
-  return absoluteCellAddress(col, row)
 }

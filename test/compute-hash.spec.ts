@@ -1,6 +1,6 @@
 import { tokenizeFormula } from '../src/parser/FormulaParser'
 import { computeHash } from '../src/parser/ParserWithCaching'
-import { absoluteCellAddress, CellAddress, CellDependency } from '../src/Cell'
+import { absoluteCellAddress, simpleCellAddress, CellAddress, CellDependency } from '../src/Cell'
 
 
 describe("computeHash", () => {
@@ -20,7 +20,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#3R-1",
-      dependencies: [absoluteCellAddress(0, 4)]
+      dependencies: [simpleCellAddress(0, 4)]
     })
   })
 
@@ -29,7 +29,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#4A0",
-      dependencies: [absoluteCellAddress(0, 4)],
+      dependencies: [simpleCellAddress(0, 4)],
     })
   })
 
@@ -38,7 +38,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#3AC0",
-      dependencies: [absoluteCellAddress(0, 4)],
+      dependencies: [simpleCellAddress(0, 4)],
     })
   })
 
@@ -47,7 +47,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#4AR-1",
-      dependencies: [absoluteCellAddress(0, 4)],
+      dependencies: [simpleCellAddress(0, 4)],
     })
   })
 
@@ -56,7 +56,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#3R-1+#5R-1",
-      dependencies: [absoluteCellAddress(0, 4), absoluteCellAddress(0, 6)],
+      dependencies: [simpleCellAddress(0, 4), simpleCellAddress(0, 6)],
     })
   });
 
@@ -74,7 +74,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "='A5'+#2R-1+'A6'",
-      dependencies: [absoluteCellAddress(0, 3)],
+      dependencies: [simpleCellAddress(0, 3)],
     })
   });
 
@@ -92,7 +92,7 @@ describe("computeHash", () => {
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
       hash: "=#3R-1:#14R0",
-      dependencies: [[absoluteCellAddress(0, 4), absoluteCellAddress(1, 15)]]
+      dependencies: [[simpleCellAddress(0, 4), simpleCellAddress(1, 15)]]
     })
   });
 
