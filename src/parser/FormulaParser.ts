@@ -115,8 +115,8 @@ class FormulaParser extends Parser {
   }
 
   public formulaWithContext(address: CellAddress): Ast {
-    this.formulaAddress = address;
-    return this.formula();
+    this.formulaAddress = address
+    return this.formula()
   }
 
   public formula: AstRule = this.RULE("formula", () => {
@@ -249,7 +249,7 @@ export function parseFromTokens(lexResult: ILexingResult, formulaAddress: CellAd
           name: e.name,
           message: e.message
         })
-    ))
+      ))
   }
 
   return ast
