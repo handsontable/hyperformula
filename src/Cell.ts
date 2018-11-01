@@ -29,11 +29,17 @@ export const absoluteCellAddress = (col: number, row: number) : CellAddress=> ({
 export const absoluteColCellAddress = (col: number, row: number) : CellAddress=> ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
 export const absoluteRowCellAddress = (col: number, row: number) : CellAddress=> ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
 
+export type SimpleCellAddress = {
+  col: number,
+  row: number,
+}
+
+export const simpleCellAddress = (col: number, row: number) : SimpleCellAddress => ({ col, row })
 
 export type CellDependency = CellAddress | [CellAddress, CellAddress]
 
 
-export const cellAddressFromString = (stringAddress: string, baseAddress: CellAddress): CellAddress => {
+export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
   const result = stringAddress.match(/(\$?)([A-Z]+)(\$?)([0-9]+)/)!
 
   let col
@@ -57,7 +63,7 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: CellAd
   }
 }
 
-export const getAbsoluteAddress = (address: CellAddress, baseAddress: CellAddress): CellAddress => {
+export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCellAddress): CellAddress => {
   if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
     return address
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
@@ -67,4 +73,20 @@ export const getAbsoluteAddress = (address: CellAddress, baseAddress: CellAddres
   } else {
     return absoluteCellAddress(baseAddress.col + address.col, baseAddress.row + address.row)
   }
+}
+
+export const simpleCellAddressFromString = (stringAddress: string): SimpleCellAddress => {
+  const result = stringAddress.match(/\$?([A-Z]+)\$?([0-9]+)/)!
+
+  let col
+  if (result[1].length === 1) {
+    col = result[1].charCodeAt(0) - 65
+  } else {
+    col = result[1].split("").reduce((currentColumn, nextLetter) => {
+      return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
+    }, 0) - 1;
+  }
+
+  const row = Number(result[2] as string) - 1
+  return { col, row }
 }

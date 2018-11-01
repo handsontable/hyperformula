@@ -1,5 +1,5 @@
 import {Ast, AstNodeType, ProcedureAst} from "../parser/Ast";
-import {CellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress} from "../Cell";
+import {SimpleCellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress} from "../Cell";
 import {generateCellsFromRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
 
@@ -12,7 +12,7 @@ export class Interpreter {
     this.addressMapping = addressMapping
   }
 
-  public computeFormula(formula: Ast, formulaAddress: CellAddress): CellValue {
+  public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
     const result = this.evaluateAst(formula, formulaAddress)
     if (Array.isArray(result)) {
       return cellError(ErrorType.ARG)
@@ -21,7 +21,7 @@ export class Interpreter {
     }
   }
 
-  private evaluateAst(ast: Ast, formulaAddress: CellAddress): ExpressionValue {
+  private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): ExpressionValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
@@ -94,7 +94,7 @@ export class Interpreter {
     }
   }
 
-  private evaluateFunction(ast: ProcedureAst, formulaAddress: CellAddress): ExpressionValue {
+  private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum: CellValue, arg) => {

@@ -1,10 +1,10 @@
 import { CellVertex } from "./Vertex"
-import {CellAddress} from "./Cell";
+import {SimpleCellAddress} from "./Cell";
 
 export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 
-  getCell(address: CellAddress): CellVertex | null {
+  getCell(address: SimpleCellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       return null
@@ -12,7 +12,7 @@ export class AddressMapping {
     return colMapping.get(address.row) || null
   }
 
-  setCell(address: CellAddress, newVertex: CellVertex) {
+  setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     let colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       colMapping = new Map()
@@ -21,7 +21,7 @@ export class AddressMapping {
     colMapping.set(address.row, newVertex)
   }
 
-  has(address: CellAddress): boolean {
+  has(address: SimpleCellAddress): boolean {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       return false

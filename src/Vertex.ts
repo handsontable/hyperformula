@@ -1,5 +1,5 @@
 import {Ast} from "./parser/Ast";
-import {CellValue, CellAddress} from "./Cell";
+import {CellValue, SimpleCellAddress} from "./Cell";
 
 type VertexId = number;
 let nextVertexId = 0;
@@ -23,9 +23,9 @@ export abstract class CellVertex extends Vertex {
 export class FormulaCellVertex extends CellVertex {
   private cachedCellValue?: CellValue;
   private formula: Ast;
-  private cellAddress: CellAddress;
+  private cellAddress: SimpleCellAddress;
 
-  constructor(formula: Ast, cellAddress: CellAddress) {
+  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
     super()
     this.formula = formula;
     this.cellAddress = cellAddress;
@@ -35,7 +35,7 @@ export class FormulaCellVertex extends CellVertex {
     return this.formula
   }
 
-  getAddress() : CellAddress {
+  getAddress() : SimpleCellAddress {
     return this.cellAddress
   }
 

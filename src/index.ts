@@ -5,7 +5,7 @@ import {isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
 import {StatType, Statistics} from "./statistics/Statistics";
 import {AddressMapping} from "./AddressMapping"
-import {CellAddress, CellValue, cellAddressFromString, absoluteCellAddress} from "./Cell";
+import {CellAddress, SimpleCellAddress, CellValue, cellAddressFromString, absoluteCellAddress} from "./Cell";
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()

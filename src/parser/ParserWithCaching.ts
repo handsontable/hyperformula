@@ -1,7 +1,7 @@
 import {parseFromTokens, RangeSeparator, CellReference, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
 import {Ast, AstNodeType} from "./Ast";
-import {absoluteCellAddress, CellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
+import {absoluteCellAddress, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
 
 export class ParserWithCaching {
   private cache: Map<string, Ast> = new Map()
@@ -12,7 +12,7 @@ export class ParserWithCaching {
     this.optimizationMode = optimizationMode
   }
 
-  parse(text: string, formulaAddress: CellAddress): { ast: Ast, dependencies: CellDependency[] } {
+  parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text);
       const { hash, dependencies } = computeHash(lexerResult.tokens, formulaAddress);
@@ -40,7 +40,7 @@ export function isFormula(text: string): Boolean {
   return text.startsWith('=')
 }
 
-export const computeHash = (tokens: IToken[], baseAddress: CellAddress): { hash: string, dependencies: CellDependency[] } => {
+export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): { hash: string, dependencies: CellDependency[] } => {
   let hash = ""
   let dependencies: CellDependency[] = []
   let idx = 0
@@ -64,7 +64,7 @@ export const computeHash = (tokens: IToken[], baseAddress: CellAddress): { hash:
   return { hash, dependencies }
 }
 
-const cellHashFromToken = (token: IToken, baseAddress: CellAddress): string => {
+const cellHashFromToken = (token: IToken, baseAddress: SimpleCellAddress): string => {
   const cellAddress = cellAddressFromString(token.image, baseAddress)
   switch(cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
@@ -82,10 +82,10 @@ const cellHashFromToken = (token: IToken, baseAddress: CellAddress): string => {
   }
 }
 
-const absoluteCellAddressFromString = (stringAddress: string): CellAddress => {
+export const absoluteCellAddressFromString = (stringAddress: string): CellAddress => {
   const result = stringAddress.match(/\$?([A-Z]+)\$?([0-9]+)/)!
 
-    let col
+  let col
   if (result[1].length === 1) {
     col = result[1].charCodeAt(0) - 65
   } else {

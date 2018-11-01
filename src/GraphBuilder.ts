@@ -7,6 +7,8 @@ import {
   CellAddress,
   CellDependency,
   getAbsoluteAddress,
+  simpleCellAddress,
+  SimpleCellAddress,
   relativeCellAddress
 } from "./Cell"
 import {AddressMapping} from "./AddressMapping"
@@ -22,11 +24,11 @@ export class GraphBuilder {
   }
 
   buildGraph(sheet: Sheet) {
-    const dependencies: Map<CellAddress, Array<CellDependency>> = new Map()
+    const dependencies: Map<SimpleCellAddress, Array<CellDependency>> = new Map()
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
-        const cellAddress = absoluteCellAddress(colIndex, rowIndex)
+        const cellAddress = simpleCellAddress(colIndex, rowIndex)
         let vertex = null
 
         if (isFormula(cellContent)) {
@@ -45,7 +47,7 @@ export class GraphBuilder {
       })
     })
 
-    dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: CellAddress) => {
+    dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)

@@ -13,7 +13,7 @@ import {
   buildTimesOpAst,
   Ast
 } from "./Ast"
-import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType} from "../Cell";
+import {absoluteCellAddress, CellAddress, SimpleCellAddress, cellAddressFromString, CellReferenceType} from "../Cell";
 
 const EqualsOp = createToken({name: "EqualsOp", pattern: /=/})
 
@@ -98,7 +98,7 @@ const allTokens = [
 // A -> adresy
 // P -> procedury
 class FormulaParser extends Parser {
-  private formulaAddress?: CellAddress;
+  private formulaAddress?: SimpleCellAddress;
 
   private atomicExpCache: OrArg | undefined
   private cellExpCache: OrArg | undefined
@@ -108,7 +108,7 @@ class FormulaParser extends Parser {
     this.performSelfAnalysis()
   }
 
-  public formulaWithContext(address: CellAddress): Ast {
+  public formulaWithContext(address: SimpleCellAddress): Ast {
     this.formulaAddress = address
     return this.formula()
   }
@@ -231,7 +231,7 @@ export function tokenizeFormula(text: string): ILexingResult {
   return FormulaLexer.tokenize(text)
 }
 
-export function parseFromTokens(lexResult: ILexingResult, formulaAddress: CellAddress): Ast {
+export function parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
   parser.input = lexResult.tokens
 
   const ast = parser.formulaWithContext(formulaAddress)
