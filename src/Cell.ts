@@ -65,14 +65,14 @@ export const getAbsoluteDependency = (address: CellDependency, formulaAddress: C
   }
 }
 
-export const getAbsoluteAddress = (address: CellAddress, formulaAddress: CellAddress): CellAddress => {
+export const getAbsoluteAddress = (address: CellAddress, baseAddress: CellAddress): CellAddress => {
   if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
     return address
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-    return absoluteCellAddress(formulaAddress.col + address.col, address.row)
+    return absoluteCellAddress(baseAddress.col + address.col, address.row)
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-    return absoluteCellAddress(address.col, formulaAddress.row + address.row)
+    return absoluteCellAddress(address.col, baseAddress.row + address.row)
   } else {
-    return absoluteCellAddress(formulaAddress.col + address.col, formulaAddress.row + address.row)
+    return absoluteCellAddress(baseAddress.col + address.col, baseAddress.row + address.row)
   }
 }
