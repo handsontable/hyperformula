@@ -9,7 +9,7 @@ describe('Interpreter', () => {
     engine = new HandsOnEngine()
   })
 
-  it.only("relative addressing formula", () => {
+  it("relative addressing formula", () => {
     engine.loadSheet([['42', '=A1']])
 
     expect(engine.getCellValue('B1')).toBe(42)
