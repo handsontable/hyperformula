@@ -1,6 +1,6 @@
 import {parseFromTokens, RangeSeparator, CellReference, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
-import {Ast} from "./Ast";
+import {Ast, AstNodeType} from "./Ast";
 import {absoluteCellAddress, CellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
 
 export class ParserWithCaching {
@@ -25,7 +25,11 @@ export class ParserWithCaching {
         this.cache.set(hash, ast)
       }
 
-      return { ast, dependencies }
+      if (ast.type === AstNodeType.ERROR) {
+        return { ast, dependencies: [] }
+      } else {
+        return { ast, dependencies }
+      }
     } else {
       throw new Error("Unsupported optimization mode")
     }
