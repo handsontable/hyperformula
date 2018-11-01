@@ -98,20 +98,14 @@ const allTokens = [
 // A -> adresy
 // P -> procedury
 class FormulaParser extends Parser {
-  private formulaAddress: CellAddress;
+  private formulaAddress?: CellAddress;
 
   private atomicExpCache: OrArg | undefined
   private cellExpCache: OrArg | undefined
 
   constructor() {
     super(allTokens, {outputCst: false})
-    this.formulaAddress = absoluteCellAddress(0, 0)
     this.performSelfAnalysis()
-  }
-
-  public reset() {
-    this.formulaAddress = absoluteCellAddress(0, 0)
-    super.reset()
   }
 
   public formulaWithContext(address: CellAddress): Ast {
@@ -167,7 +161,7 @@ class FormulaParser extends Parser {
     const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
     const end = this.CONSUME3(CellReference)
-    return buildCellRangeAst(cellAddressFromString(start.image, this.formulaAddress), cellAddressFromString(end.image, this.formulaAddress))
+    return buildCellRangeAst(cellAddressFromString(start.image, this.formulaAddress!), cellAddressFromString(end.image, this.formulaAddress!))
   })
 
   private atomicExpression: AstRule = this.RULE("atomicExpression", () => {
@@ -215,7 +209,7 @@ class FormulaParser extends Parser {
 
   private cellReference: AstRule = this.RULE("cellReference", () => {
     const cell = this.CONSUME(CellReference)
-    return buildCellReferenceAst(cellAddressFromString(cell.image, this.formulaAddress))
+    return buildCellReferenceAst(cellAddressFromString(cell.image, this.formulaAddress!))
   })
 
   private parenthesisExpression: AstRule = this.RULE("parenthesisExpression", () => {
