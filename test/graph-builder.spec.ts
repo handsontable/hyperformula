@@ -20,7 +20,7 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(6)
   });
 
-  it.only('#buildGraph works with ranges', () => {
+  it('#buildGraph works with ranges', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
 
