@@ -9,7 +9,7 @@ describe("computeHash", () => {
   it("simple case", () => {
     const code = "=42"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=42",
       dependencies: [],
     })
@@ -18,7 +18,7 @@ describe("computeHash", () => {
   it("cell relative reference", () => {
     const code = "=A5"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#3R-1",
       dependencies: [simpleCellAddress(0, 4)]
     })
@@ -27,7 +27,7 @@ describe("computeHash", () => {
   it("cell absolute reference", () => {
     const code = "=$A$5"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#4A0",
       dependencies: [simpleCellAddress(0, 4)],
     })
@@ -36,7 +36,7 @@ describe("computeHash", () => {
   it("cell absolute col reference", () => {
     const code = "=$A5"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#3AC0",
       dependencies: [simpleCellAddress(0, 4)],
     })
@@ -45,7 +45,7 @@ describe("computeHash", () => {
   it("cell absolute row reference", () => {
     const code = "=A$5"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#4AR-1",
       dependencies: [simpleCellAddress(0, 4)],
     })
@@ -54,7 +54,7 @@ describe("computeHash", () => {
   it("more addresses", () => {
     const code = "=A5+A7"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#3R-1+#5R-1",
       dependencies: [simpleCellAddress(0, 4), simpleCellAddress(0, 6)],
     })
@@ -63,7 +63,7 @@ describe("computeHash", () => {
   it("cell ref in string", () => {
     const code = "='A5'"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "='A5'",
       dependencies: [],
     })
@@ -72,7 +72,7 @@ describe("computeHash", () => {
   it("cell ref between strings", () => {
     const code = "='A5'+A4+'A6'"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "='A5'+#2R-1+'A6'",
       dependencies: [simpleCellAddress(0, 3)],
     })
@@ -81,7 +81,7 @@ describe("computeHash", () => {
   it("cell ref in string with escape", () => {
     const code = "='fdsaf\\'A5'"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "='fdsaf\\'A5'",
       dependencies: []
     })
@@ -90,7 +90,7 @@ describe("computeHash", () => {
   it("cell range", () => {
     const code = "=A5:B16"
 
-    expect(computeFunc(code, absoluteCellAddress(1, 1))).toEqual({
+    expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
       hash: "=#3R-1:#14R0",
       dependencies: [[simpleCellAddress(0, 4), simpleCellAddress(1, 15)]]
     })
