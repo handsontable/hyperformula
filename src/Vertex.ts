@@ -1,5 +1,6 @@
 import {Ast} from "./parser/Ast";
 import {CellValue, SimpleCellAddress} from "./Cell";
+import {ExpressionValue} from "./interpreter/Interpreter";
 
 type VertexId = number;
 let nextVertexId = 0;
@@ -87,17 +88,12 @@ export class RangeVertex extends Vertex {
     this.valueCache = new Map()
   }
 
-  getRangeValue(functionName: string, functionImplementation: (start: SimpleCellAddress, end: SimpleCellAddress) => CellValue) {
-    let value = this.valueCache.get(functionName)
+  getRangeValue(functionName: string): CellValue | null{
+    return this.valueCache.get(functionName) || null
+  }
 
-    if (value) {
-      return value
-    } else {
-      value = functionImplementation(this.start, this.end)
-      this.valueCache.set(functionName, value)
-    }
-
-    return value
+  setCellValue(functionName: string, value: CellValue) {
+    this.valueCache.set(functionName, value)
   }
 
   getStart() :SimpleCellAddress {

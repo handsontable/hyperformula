@@ -172,6 +172,11 @@ describe('Interpreter', () => {
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.ARG))
   })
 
+  it("ranges - SUM range with not numeric values", () => {
+    engine.loadSheet([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
+    expect(engine.getCellValue("A4")).toEqual(cellError(ErrorType.ARG))
+  })
+
   it("procedures - not known procedure", () => {
     engine.loadSheet([['=FOO()']])
 

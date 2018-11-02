@@ -1,5 +1,5 @@
-import {Ast, AstNodeType, ProcedureAst} from "../parser/Ast";
-import {SimpleCellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress} from "../Cell";
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../parser/Ast";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {generateCellsFromRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
 
@@ -85,22 +85,50 @@ export class Interpreter {
     }
   }
 
+  private getRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[][] {
+    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+    const rangeResult: CellValue[][] = []
+    generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
+      const rowResult: CellValue[] = []
+      rowOfCells.forEach((cellFromRange) => {
+        rowResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+      })
+      rangeResult.push(rowResult)
+    })
+    return rangeResult
+  }
+
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): ExpressionValue {
+    const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
+    const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
+    const rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
+
+    if (!rangeVertex) {
+      throw Error("Range does not exists in graph")
+    }
+
+    let value = rangeVertex.getRangeValue(functionName)
+    if (!value) {
+      value = funcToCalc(this.getRangeValues(ast, formulaAddress) as CellValue[][])
+      rangeVertex.setCellValue(functionName, value)
+    }
+
+    return value
+  }
+
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
     switch (ast.procedureName) {
       case "SUM": {
         return ast.args.reduce((currentSum: CellValue, arg) => {
-          const value = this.evaluateAst(arg, formulaAddress)
+          let value
+          if (arg.type === AstNodeType.CELL_RANGE) {
+            value = this.evaluateRange(arg, formulaAddress, "SUM", rangeSum)
+          } else {
+            value = this.evaluateAst(arg, formulaAddress)
+          }
+
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
-          } else if (typeof currentSum === 'number' && Array.isArray(value)) {
-            const flattenRange: Array<CellValue> = [].concat.apply([], value)
-            return flattenRange.reduce((acc: CellValue, val: CellValue) => {
-              if (typeof acc === 'number' && typeof val === 'number') {
-                return acc + val
-              } else {
-                return cellError(ErrorType.ARG)
-              }
-            }, currentSum)
           } else {
             return cellError(ErrorType.ARG)
           }
@@ -110,4 +138,17 @@ export class Interpreter {
         return cellError(ErrorType.NAME)
     }
   }
+}
+
+export type RangeOperation = (rangeValues: CellValue[][]) => CellValue
+
+export function rangeSum(rangeValues: CellValue[][]): CellValue {
+  const flattenRange: Array<CellValue> = [].concat.apply([], rangeValues)
+  return flattenRange.reduce((acc: CellValue, val: CellValue) => {
+    if (typeof acc === 'number' && typeof val === 'number') {
+      return acc + val
+    } else {
+      return cellError(ErrorType.ARG)
+    }
+  })
 }
