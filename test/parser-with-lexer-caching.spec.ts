@@ -37,15 +37,22 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
   })
 
+  it("absolute cell reference", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=$B$3", absoluteCellAddress(1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(absoluteCellAddress(1, 2))
+  })
+
   it("cell reference types", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const cellAbs = parser.parse("=$A$1", absoluteCellAddress(0, 0)).ast as CellReferenceAst
     const cellAbsCol = parser.parse("=$A2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
     const cellAbsRow = parser.parse("=A$2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
     const cellRel = parser.parse("=A2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
 
-    expect(cellAbs.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE)
     expect(cellAbsCol.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
     expect(cellAbsRow.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
     expect(cellRel.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_RELATIVE)
