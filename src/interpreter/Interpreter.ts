@@ -77,16 +77,7 @@ export class Interpreter {
         return this.evaluateFunction(ast, formulaAddress)
       }
       case AstNodeType.CELL_RANGE: {
-        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-        const rangeResult: CellValue[][] = []
-        generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
-          const rowResult: CellValue[] = []
-          rowOfCells.forEach((cellFromRange) => {
-            rowResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-          })
-          rangeResult.push(rowResult)
-        })
-        return rangeResult
+        return cellError(ErrorType.VALUE)
       }
       case AstNodeType.ERROR: {
         return cellError(ErrorType.NAME)

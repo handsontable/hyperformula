@@ -1,6 +1,5 @@
 import {HandsOnEngine} from "../src";
-import {ErrorType} from "../src/Cell";
-import {cellError} from "../src/Cell";
+import {cellError, ErrorType} from "../src/Cell";
 
 describe('Interpreter', () => {
   let engine: HandsOnEngine
@@ -160,6 +159,11 @@ describe('Interpreter', () => {
                       ['3', '4', '=SUM(A1:B2)']])
 
     expect(engine.getCellValue("C2")).toBeCloseTo(10)
+  })
+
+  it("ranges - VALUE error when evaluating without context", () => {
+    engine.loadSheet([['1'], ['2'], ['=A1:A2']])
+    expect(engine.getCellValue("A3")).toEqual(cellError(ErrorType.VALUE))
   })
 
   it("procedures - SUM with bad args", () => {
