@@ -63,15 +63,15 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: Simple
   }
 }
 
-export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCellAddress): CellAddress => {
+export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCellAddress): SimpleCellAddress => {
   if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
     return address
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-    return absoluteCellAddress(baseAddress.col + address.col, address.row)
+    return simpleCellAddress(baseAddress.col + address.col, address.row)
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-    return absoluteCellAddress(address.col, baseAddress.row + address.row)
+    return simpleCellAddress(address.col, baseAddress.row + address.row)
   } else {
-    return absoluteCellAddress(baseAddress.col + address.col, baseAddress.row + address.row)
+    return simpleCellAddress(baseAddress.col + address.col, baseAddress.row + address.row)
   }
 }
 
