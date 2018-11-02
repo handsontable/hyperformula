@@ -1,8 +1,9 @@
-import { CellVertex } from "./Vertex"
+import {CellVertex, RangeVertex} from "./Vertex"
 import {SimpleCellAddress} from "./Cell";
 
 export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
+  private rangeMapping: Map<string, RangeVertex> = new Map()
 
   getCell(address: SimpleCellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
@@ -19,6 +20,16 @@ export class AddressMapping {
       this.mapping.set(address.col, colMapping)
     }
     colMapping.set(address.row, newVertex)
+  }
+
+  setRange(vertex: RangeVertex) {
+    const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
+    this.rangeMapping.set(key, vertex)
+  }
+
+  getRange(start: SimpleCellAddress, end: SimpleCellAddress) : RangeVertex | null {
+    const key = `${start.col},${start.row},${end.col},${end.row}`
+    return this.rangeMapping.get(key) || null
   }
 
   has(address: SimpleCellAddress): boolean {

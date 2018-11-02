@@ -63,6 +63,7 @@ export class GraphBuilder {
             })
           })
           this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
+          this.addressMapping.setRange(vertex)
         } else {
           let vertex : CellVertex
           if (this.addressMapping.has(absStartCell)) {

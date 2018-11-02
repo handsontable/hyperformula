@@ -99,4 +99,12 @@ export class RangeVertex extends Vertex {
 
     return value
   }
+
+  getStart() :SimpleCellAddress {
+    return this.start
+  }
+
+  getEnd(): SimpleCellAddress {
+    return this.end
+  }
 }
