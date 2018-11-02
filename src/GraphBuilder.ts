@@ -55,15 +55,21 @@ export class GraphBuilder {
 
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
-          const vertex = new RangeVertex(rangeStart, rangeEnd)
-          this.graph.addNode(vertex)
+          let rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
+          if (rangeVertex === null) {
+            rangeVertex = new RangeVertex(rangeStart, rangeEnd)
+            this.addressMapping.setRange(rangeVertex)
+          }
+
+          this.graph.addNode(rangeVertex)
+
           generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
-              this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, vertex)
+              this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, rangeVertex!)
             })
           })
-          this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
-          this.addressMapping.setRange(vertex)
+
+          this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
         } else {
           let vertex : CellVertex
           if (this.addressMapping.has(absStartCell)) {

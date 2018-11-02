@@ -43,4 +43,19 @@ describe('GraphBuilder', () => {
     const rangeVertex = Array.from(nodesB2)[0]!
     expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(relativeCellAddress(2, 1))!]))
   });
+
+  it("#loadSheet - it should build graph with only one RangeVertex", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([
+        ['1', '2', '0'],
+        ['3', '4', '=A1:B2'],
+        ['5', '6', '=A1:B2']
+    ])
+
+    expect(graph.nodesCount()).toBe(10)
+  })
 });
