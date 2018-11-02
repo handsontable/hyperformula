@@ -46,16 +46,23 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.reference).toEqual(absoluteCellAddress(1, 2))
   })
 
+  it("relative cell reference", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=B3", absoluteCellAddress(1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(0, 1))
+  })
+
   it("cell reference types", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const cellAbsCol = parser.parse("=$A2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
     const cellAbsRow = parser.parse("=A$2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
-    const cellRel = parser.parse("=A2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
 
     expect(cellAbsCol.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
     expect(cellAbsRow.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
-    expect(cellRel.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_RELATIVE)
   })
 
   it("it use cache for similar formulas", () => {
