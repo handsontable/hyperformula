@@ -96,6 +96,10 @@ export class RangeVertex extends Vertex {
     this.valueCache.set(functionName, value)
   }
 
+  clear() {
+    this.valueCache.clear()
+  }
+
   getStart() :SimpleCellAddress {
     return this.start
   }

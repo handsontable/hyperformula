@@ -107,4 +107,16 @@ describe('Integration', () => {
 
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NAME))
   })
+
+  it ("#loadSheet - changing value inside range", () => {
+    engine.loadSheet([
+        ['1', '0'],
+        ['2', '0'],
+        ['3', '=SUM(A1:A3)']
+    ])
+    expect(engine.getCellValue("B3")).toEqual(6)
+
+    engine.setCellContent("A1", "3")
+    expect(engine.getCellValue("B3")).toEqual(8)
+  })
 });

@@ -1,5 +1,5 @@
 import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from "./Vertex";
+import {CellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex";
 import {Graph} from "./Graph";
 import {isFormula} from './parser/ParserWithCaching'
 import {Interpreter} from "./interpreter/Interpreter";
@@ -68,6 +68,8 @@ export class HandsOnEngine {
         const formula = vertex.getFormula()
         const cellValue = this.interpreter.computeFormula(formula, address)
         vertex.setCellValue(cellValue)
+      } else if (vertex instanceof RangeVertex) {
+        vertex.clear()
       }
     })
   }
