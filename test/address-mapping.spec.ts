@@ -1,6 +1,6 @@
 import {AddressMapping} from "../src/AddressMapping"
-import {ValueCellVertex} from "../src/Vertex"
-import {relativeCellAddress} from "../src/Cell";
+import {RangeVertex, ValueCellVertex} from "../src/Vertex"
+import {relativeCellAddress, simpleCellAddress} from "../src/Cell";
 
 describe("AddressMapping", () => {
   it("simple set", () => {
@@ -79,5 +79,16 @@ describe("AddressMapping", () => {
     mapping.setCell(relativeCellAddress(0, 0), new ValueCellVertex(42))
 
     expect(mapping.has(relativeCellAddress(0, 0))).toBe(true)
+  })
+
+  it("range mapping", () => {
+    const mapping = new AddressMapping()
+
+    const start = simpleCellAddress(0, 0)
+    const end = simpleCellAddress(20, 50)
+    const vertex = new RangeVertex(start, end)
+    expect(mapping.getRange(start, end)).toBe(null)
+    mapping.setRange(vertex)
+    expect(mapping.getRange(start, end)).toBe(vertex)
   })
 })
