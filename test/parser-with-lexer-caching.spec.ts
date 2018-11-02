@@ -153,7 +153,9 @@ const sharedExamples = (optimizationMode: string) => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse("=A", absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.args[0].name).toBe("MismatchedTokenException")
+    expect(ast.args[0].message).toMatch(/Expecting token/)
   })
 
   it("parsing error - unexpected token", () => {
