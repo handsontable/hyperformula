@@ -55,7 +55,7 @@ export class GraphBuilder {
 
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
-          const vertex = new RangeVertex()
+          const vertex = new RangeVertex(rangeStart, rangeEnd)
           this.graph.addNode(vertex)
           generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {

@@ -80,7 +80,23 @@ export class EmptyCellVertex extends CellVertex {
 }
 
 export class RangeVertex extends Vertex {
-  constructor() {
+  private valueCache: Map<string, CellValue>
+
+  constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
     super()
+    this.valueCache = new Map()
+  }
+
+  getRangeValue(functionName: string, functionImplementation: (start: SimpleCellAddress, end: SimpleCellAddress) => CellValue) {
+    let value = this.valueCache.get(functionName)
+
+    if (value) {
+      return value
+    } else {
+      value = functionImplementation(this.start, this.end)
+      this.valueCache.set(functionName, value)
+    }
+
+    return value
   }
 }
