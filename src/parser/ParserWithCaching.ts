@@ -1,7 +1,7 @@
 import {parseFromTokens, RangeSeparator, CellReference, RelativeCell, tokenizeFormula} from "./FormulaParser";
 import {IToken, tokenMatcher} from "chevrotain"
 import {Ast, AstNodeType} from "./Ast";
-import {absoluteCellAddress, simpleCellAddressFromString, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
+import {absoluteCellAddress, getAbsoluteAddress, simpleCellAddressFromString, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
 
 export class ParserWithCaching {
   private cache: Map<string, Ast> = new Map()
@@ -48,12 +48,15 @@ export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): {
     const token = tokens[idx]
     if (tokenMatcher(token, CellReference)) {
       if (tokens[idx+1] && tokens[idx+2] && tokenMatcher(tokens[idx+1],RangeSeparator) && tokenMatcher(tokens[idx+2], CellReference)) {
-        hash = hash.concat(`${cellHashFromToken(token, baseAddress)}:${cellHashFromToken(tokens[idx+2], baseAddress)}`)
-        dependencies.push([simpleCellAddressFromString(token.image), simpleCellAddressFromString(tokens[idx+2].image)])
+        const cellAddress1 = cellAddressFromString(token.image, baseAddress)
+        const cellAddress2 = cellAddressFromString(tokens[idx+2].image, baseAddress)
+        hash = hash.concat(`${cellHashFromToken(cellAddress1)}:${cellHashFromToken(cellAddress2)}`)
+        dependencies.push([getAbsoluteAddress(cellAddress1, baseAddress), getAbsoluteAddress(cellAddress2, baseAddress)])
         idx += 3
       } else {
-        hash = hash.concat(cellHashFromToken(token, baseAddress))
-        dependencies.push(simpleCellAddressFromString(token.image))
+        const cellAddress = cellAddressFromString(token.image, baseAddress)
+        hash = hash.concat(cellHashFromToken(cellAddress))
+        dependencies.push(getAbsoluteAddress(cellAddress, baseAddress))
         idx++
       }
     } else {
@@ -64,8 +67,7 @@ export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): {
   return { hash, dependencies }
 }
 
-const cellHashFromToken = (token: IToken, baseAddress: SimpleCellAddress): string => {
-  const cellAddress = cellAddressFromString(token.image, baseAddress)
+const cellHashFromToken = (cellAddress: CellAddress): string => {
   switch(cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
       return `#${cellAddress.row}R${cellAddress.col}`
