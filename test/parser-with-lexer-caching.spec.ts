@@ -9,7 +9,7 @@ import {
   ProcedureAst,
   StringAst
 } from '../src/parser/Ast'
-import {CellReferenceType, relativeCellAddress, absoluteCellAddress} from '../src/Cell'
+import {CellReferenceType, relativeCellAddress, absoluteCellAddress, absoluteColCellAddress, absoluteRowCellAddress} from '../src/Cell'
 
 const sharedExamples = (optimizationMode: string) => {
   it("integer literal", () => {
@@ -55,14 +55,22 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.reference).toEqual(relativeCellAddress(0, 1))
   })
 
-  it("cell reference types", () => {
+  it("absolute column cell reference", () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const cellAbsCol = parser.parse("=$A2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
-    const cellAbsRow = parser.parse("=A$2", absoluteCellAddress(0, 0)).ast as CellReferenceAst
+    const ast = parser.parse("=$B3", absoluteCellAddress(1, 1)).ast as CellReferenceAst
 
-    expect(cellAbsCol.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
-    expect(cellAbsRow.reference.type).toEqual(CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(absoluteColCellAddress(1, 1))
+  })
+
+  it("absolute row cell reference", () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse("=B$3", absoluteCellAddress(1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(absoluteRowCellAddress(0, 2))
   })
 
   it("it use cache for similar formulas", () => {
