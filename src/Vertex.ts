@@ -92,7 +92,7 @@ export class RangeVertex extends Vertex {
     return this.valueCache.get(functionName) || null
   }
 
-  setCellValue(functionName: string, value: CellValue) {
+  setRangeValue(functionName: string, value: CellValue) {
     this.valueCache.set(functionName, value)
   }
 
@@ -100,7 +100,7 @@ export class RangeVertex extends Vertex {
     this.valueCache.clear()
   }
 
-  getStart() :SimpleCellAddress {
+  getStart(): SimpleCellAddress {
     return this.start
   }
 

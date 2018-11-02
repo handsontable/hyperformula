@@ -110,7 +110,7 @@ export class Interpreter {
     let value = rangeVertex.getRangeValue(functionName)
     if (!value) {
       value = funcToCalc(this.getRangeValues(ast, formulaAddress) as CellValue[][])
-      rangeVertex.setCellValue(functionName, value)
+      rangeVertex.setRangeValue(functionName, value)
     }
 
     return value
