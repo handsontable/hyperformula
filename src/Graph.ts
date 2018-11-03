@@ -26,6 +26,10 @@ export class Graph<T> {
     return this.edges.get(id)!
   }
 
+  hasNode(id: T): boolean {
+    return this.nodes.has(id)
+  }
+
   nodesCount(): number {
     return this.nodes.size;
   }

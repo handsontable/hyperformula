@@ -30,6 +30,20 @@ describe('Basic Graph manipulation', () => {
     expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
   })
 
+  it("#hasNode when there is node", () => {
+    const graph = new Graph()
+
+    graph.addNode("foo")
+
+    expect(graph.hasNode("foo")).toBe(true)
+  })
+
+  it("#hasNode when there is no node", () => {
+    const graph = new Graph()
+
+    expect(graph.hasNode("foo")).toBe(false)
+  })
+
   it('#adjacentNodes', () => {
     const graph = new Graph();
 
