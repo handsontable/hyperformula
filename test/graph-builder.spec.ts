@@ -1,11 +1,35 @@
 import {GraphBuilder} from "../src/GraphBuilder";
 import {Graph} from "../src/Graph";
-import {Vertex, CellVertex} from "../src/Vertex";
+import {Vertex, CellVertex, ValueCellVertex} from "../src/Vertex";
 import {Statistics} from "../src/statistics/Statistics";
 import {AddressMapping} from "../src/AddressMapping"
-import {CellAddress, CellReferenceType, relativeCellAddress} from "../src/Cell";
+import {CellAddress, CellReferenceType, relativeCellAddress, simpleCellAddress} from "../src/Cell";
 
 describe('GraphBuilder', () => {
+  it("build sheet with simple number cell", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([['42']])
+
+    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    expect(node).toBeInstanceOf(ValueCellVertex)
+    expect(node.getCellValue()).toBe(42)
+  })
+
+  it("build sheet with simple string cell", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([['foo']])
+
+    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    expect(node).toBeInstanceOf(ValueCellVertex)
+    expect(node.getCellValue()).toBe('foo')
+  })
+
   it('#buildGraph', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
