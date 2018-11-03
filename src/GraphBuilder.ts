@@ -107,7 +107,7 @@ export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: 
   return result
 }
 
-export const findSmallerRange = (addressMapping: AddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): ({smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress}) => {
+export const findSmallerRange = (addressMapping: AddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
   if (rangeEnd.row > rangeStart.row) {
     const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
     const rowLessVertex = addressMapping.getRange(rangeStart, rangeEndRowLess)
