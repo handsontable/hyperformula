@@ -63,7 +63,11 @@ export class GraphBuilder {
 
           this.graph.addNode(rangeVertex)
 
-          generateCellsFromRange(rangeStart, rangeEnd).forEach((rowOfCells) => {
+          const {smallerRangeVertex, restRangeStart, restRangeEnd} = this.findSmallerRange(rangeStart, rangeEnd)
+          if (smallerRangeVertex) {
+            this.graph.addEdge(smallerRangeVertex, rangeVertex)
+          }
+          generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
               this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, rangeVertex!)
             })
@@ -84,6 +88,25 @@ export class GraphBuilder {
         }
       })
     })
+  }
+
+  findSmallerRange(rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): ({smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress}) {
+    if (rangeEnd.row > rangeStart.row) {
+      const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
+      const rowLessVertex = this.addressMapping.getRange(rangeStart, rangeEndRowLess)
+      if (rowLessVertex) {
+        return {
+          smallerRangeVertex: rowLessVertex,
+          restRangeStart: rangeEnd,
+          restRangeEnd: rangeEnd,
+        }
+      }
+    }
+    return {
+      smallerRangeVertex: null,
+      restRangeStart: rangeStart,
+      restRangeEnd: rangeEnd,
+    }
   }
 }
 

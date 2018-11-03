@@ -26,10 +26,15 @@ export class Graph<T> {
     return this.edges.get(id);
   }
 
-  nodesCount() {
+  nodesCount(): number {
     return this.nodes.size;
   }
 
+  edgesCount(): number {
+    let result = 0
+    this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
+    return result
+  }
 
   topologicalSort() : Array<T> {
     const incomingEdges = this.incomingEdges()

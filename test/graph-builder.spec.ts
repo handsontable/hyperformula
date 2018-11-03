@@ -58,4 +58,22 @@ describe('GraphBuilder', () => {
 
     expect(graph.nodesCount()).toBe(10)
   })
+
+  it("build with range one row smaller", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([
+      ['1', '0'],
+      ['3', '=A1:A2'],
+      ['5', '=A1:A3'],
+    ])
+
+    expect(graph.edgesCount()).toBe(
+      2 + // from cells to range(A1:A2)
+      2 + // from A3 and range(A1:A2) to range(A1:A3)
+      2 // from range vertexes to formulas
+    )
+  })
 });
