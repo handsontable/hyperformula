@@ -36,7 +36,7 @@ export class Graph<T> {
     return result
   }
 
-  existsEdge(fromNode: T, toNode: T) {
+  existsEdge(fromNode: T, toNode: T): boolean {
     const nodeEdges = this.edges.get(fromNode)
     if (nodeEdges) {
       return nodeEdges.has(toNode)

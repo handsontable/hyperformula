@@ -69,6 +69,28 @@ describe('Basic Graph manipulation', () => {
     }).toThrowError(new Error('Unknown node target'))
   })
 
+  it("#existsEdge works", () => {
+    const graph = new Graph()
+    graph.addNode("foo")
+    graph.addNode("bar")
+    graph.addEdge("foo", "bar")
+
+    expect(graph.existsEdge("foo", "bar")).toBe(true)
+  })
+
+  it("#existsEdge when there is origin node but no edge", () => {
+    const graph = new Graph()
+    graph.addNode("foo")
+
+    expect(graph.existsEdge("foo", "bar")).toBe(false)
+  })
+
+  it("#existsEdge when there is no node", () => {
+    const graph = new Graph()
+
+    expect(graph.existsEdge("foo", "bar")).toBe(false)
+  })
+
   it("#topologicalSort for empty graph", () => {
     const graph = new Graph()
 
