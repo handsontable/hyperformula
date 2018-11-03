@@ -69,25 +69,28 @@ export class GraphBuilder {
           }
           generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
+              const vertex = this.getOrCreateVertex(cellFromRange)
               this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, rangeVertex!)
             })
           })
 
           this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
         } else {
-          let vertex : CellVertex
-          if (this.addressMapping.has(absStartCell)) {
-            vertex = this.addressMapping.getCell(absStartCell)!
-          } else {
-            vertex = new EmptyCellVertex()
-            this.graph.addNode(vertex)
-
-            this.addressMapping.setCell(absStartCell, vertex)
-          }
+          const vertex = this.getOrCreateVertex(absStartCell)
           this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
         }
       })
     })
+  }
+
+  private getOrCreateVertex(address: SimpleCellAddress): CellVertex {
+    let vertex = this.addressMapping.getCell(address)
+    if (!vertex) {
+      vertex = new EmptyCellVertex()
+      this.graph.addNode(vertex)
+      this.addressMapping.setCell(address, vertex)
+    }
+    return vertex
   }
 }
 

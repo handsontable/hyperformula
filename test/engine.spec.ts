@@ -119,4 +119,13 @@ describe('Integration', () => {
     engine.setCellContent("A1", "3")
     expect(engine.getCellValue("B3")).toEqual(8)
   })
+
+  it("#loadSheet - dependency before value", () => {
+    engine.loadSheet([
+        ['=B1', '1', '2'],
+        ['=SUM(B2:C2)', '1', '2']
+    ])
+    expect(engine.getCellValue("A1")).toBe(1)
+    expect(engine.getCellValue("A2")).toBe(3)
+  })
 });

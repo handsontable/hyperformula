@@ -100,4 +100,15 @@ describe('GraphBuilder', () => {
       2 // from range vertexes to formulas
     )
   })
+
+  it("#buildGraph should work even if range dependencies are empty", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+
+    let graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    graphBuilder.buildGraph([['1', '2', '=SUM(A1:B2)']])
+
+    expect(graph.nodesCount()).toBe(6)
+    expect(graph.edgesCount()).toBe(5)
+  })
 });
