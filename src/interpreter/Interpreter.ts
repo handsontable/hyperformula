@@ -85,15 +85,13 @@ export class Interpreter {
     }
   }
 
-  private getRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[][] {
+  private getRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-    const rangeResult: CellValue[][] = []
+    const rangeResult: CellValue[] = []
     generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
-      const rowResult: CellValue[] = []
       rowOfCells.forEach((cellFromRange) => {
-        rowResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
       })
-      rangeResult.push(rowResult)
     })
     return rangeResult
   }
@@ -110,8 +108,7 @@ export class Interpreter {
     let value = rangeVertex.getRangeValue(functionName)
     if (!value) {
       const rangeValues = this.getRangeValues(ast, formulaAddress)
-      const flattenRangeValues: Array<CellValue> = [].concat.apply([], rangeValues)
-      value = funcToCalc(flattenRangeValues)
+      value = funcToCalc(rangeValues)
       rangeVertex.setRangeValue(functionName, value)
     }
 
