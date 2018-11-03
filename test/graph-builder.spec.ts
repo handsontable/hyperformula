@@ -13,8 +13,8 @@ describe('GraphBuilder', () => {
     let graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
 
     graphBuilder.buildGraph([
-        ['1', 'A5', '2'],
-        ['foo', 'bar', '=A2']
+      ['1', 'A5', '2'],
+      ['foo', 'bar', 'A2']
     ])
 
     expect(graph.nodesCount()).toBe(6)
