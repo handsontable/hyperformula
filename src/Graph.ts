@@ -36,6 +36,14 @@ export class Graph<T> {
     return result
   }
 
+  existsEdge(fromNode: T, toNode: T) {
+    const nodeEdges = this.edges.get(fromNode)
+    if (nodeEdges) {
+      return nodeEdges.has(toNode)
+    }
+    return false
+  }
+
   topologicalSort() : Array<T> {
     const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: Array<T> = []

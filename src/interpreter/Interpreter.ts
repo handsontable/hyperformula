@@ -1,15 +1,19 @@
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../parser/Ast";
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
-import {generateCellsFromRange} from "../GraphBuilder";
+import {generateCellsFromRange, findSmallerRange} from "../GraphBuilder";
 import {AddressMapping} from "../AddressMapping"
+import {Graph} from "../Graph"
+import {Vertex} from "../Vertex"
 
 export type ExpressionValue = CellValue | CellValue[][]
 
 export class Interpreter {
-  private addressMapping: AddressMapping
+  private addressMapping: AddressMapping;
+  private graph: Graph<Vertex>;
 
-  constructor(addressMapping: AddressMapping) {
+  constructor(addressMapping: AddressMapping, graph: Graph<Vertex>) {
     this.addressMapping = addressMapping
+    this.graph = graph
   }
 
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
@@ -85,14 +89,25 @@ export class Interpreter {
     }
   }
 
-  private getRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
+  private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
-    generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
-      rowOfCells.forEach((cellFromRange) => {
-        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, beginRange, endRange)
+    const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
+    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+      rangeResult.push(smallerRangeVertex.getRangeValue(functionName)!)
+      generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
+        rowOfCells.forEach((cellFromRange) => {
+          rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+        })
       })
-    })
+    } else {
+      generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
+        rowOfCells.forEach((cellFromRange) => {
+          rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+        })
+      })
+    }
     return rangeResult
   }
 
@@ -107,7 +122,7 @@ export class Interpreter {
 
     let value = rangeVertex.getRangeValue(functionName)
     if (!value) {
-      const rangeValues = this.getRangeValues(ast, formulaAddress)
+      const rangeValues = this.getRangeValues(functionName, ast, formulaAddress)
       value = funcToCalc(rangeValues)
       rangeVertex.setRangeValue(functionName, value)
     }

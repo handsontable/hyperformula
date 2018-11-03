@@ -11,7 +11,7 @@ export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Array<Vertex> = []
-  private interpreter: Interpreter = new Interpreter(this.addressMapping)
+  private interpreter: Interpreter = new Interpreter(this.addressMapping, this.graph)
   private stats : Statistics = new Statistics()
 
   loadSheet(sheet: Sheet) {
