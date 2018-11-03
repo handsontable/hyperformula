@@ -109,7 +109,9 @@ export class Interpreter {
 
     let value = rangeVertex.getRangeValue(functionName)
     if (!value) {
-      value = funcToCalc(this.getRangeValues(ast, formulaAddress) as CellValue[][])
+      const rangeValues = this.getRangeValues(ast, formulaAddress)
+      const flattenRangeValues: Array<CellValue> = [].concat.apply([], rangeValues)
+      value = funcToCalc(flattenRangeValues)
       rangeVertex.setRangeValue(functionName, value)
     }
 
@@ -140,11 +142,10 @@ export class Interpreter {
   }
 }
 
-export type RangeOperation = (rangeValues: CellValue[][]) => CellValue
+export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
-export function rangeSum(rangeValues: CellValue[][]): CellValue {
-  const flattenRange: Array<CellValue> = [].concat.apply([], rangeValues)
-  return flattenRange.reduce((acc: CellValue, val: CellValue) => {
+export function rangeSum(rangeValues: CellValue[]): CellValue {
+  return rangeValues.reduce((acc: CellValue, val: CellValue) => {
     if (typeof acc === 'number' && typeof val === 'number') {
       return acc + val
     } else {
