@@ -3,7 +3,7 @@ import {Graph} from "../src/Graph";
 import {Vertex, CellVertex, ValueCellVertex} from "../src/Vertex";
 import {Statistics} from "../src/statistics/Statistics";
 import {AddressMapping} from "../src/AddressMapping"
-import {CellAddress, CellReferenceType, relativeCellAddress, simpleCellAddress} from "../src/Cell";
+import {CellAddress, CellReferenceType, simpleCellAddress} from "../src/Cell";
 
 describe('GraphBuilder', () => {
   it("build sheet with simple number cell", () => {
@@ -56,16 +56,16 @@ describe('GraphBuilder', () => {
     ])
 
     expect(graph.nodesCount()).toBe(7)
-    const nodesA1 = graph.adjacentNodes(addressMapping.getCell(relativeCellAddress(0, 0))!)!
-    const nodesA2 = graph.adjacentNodes(addressMapping.getCell(relativeCellAddress(0, 1))!)!
-    const nodesB1 = graph.adjacentNodes(addressMapping.getCell(relativeCellAddress(1, 0))!)!
-    const nodesB2 = graph.adjacentNodes(addressMapping.getCell(relativeCellAddress(1, 1))!)!
+    const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0))!)!
+    const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1))!)!
+    const nodesB1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(1, 0))!)!
+    const nodesB2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(1, 1))!)!
     expect(nodesA1).toEqual(nodesA2)
     expect(nodesA2).toEqual(nodesB1)
     expect(nodesB1).toEqual(nodesB2)
     expect(nodesB1.size).toEqual(1)
     const rangeVertex = Array.from(nodesB2)[0]!
-    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(relativeCellAddress(2, 1))!]))
+    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(simpleCellAddress(2, 1))!]))
   });
 
   it("#loadSheet - it should build graph with only one RangeVertex", () => {
