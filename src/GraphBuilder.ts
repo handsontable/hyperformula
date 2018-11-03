@@ -63,7 +63,7 @@ export class GraphBuilder {
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRangeStart, restRangeEnd} = this.findSmallerRange(rangeStart, rangeEnd)
+          const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, rangeStart, rangeEnd)
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
@@ -89,25 +89,6 @@ export class GraphBuilder {
       })
     })
   }
-
-  findSmallerRange(rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): ({smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress}) {
-    if (rangeEnd.row > rangeStart.row) {
-      const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
-      const rowLessVertex = this.addressMapping.getRange(rangeStart, rangeEndRowLess)
-      if (rowLessVertex) {
-        return {
-          smallerRangeVertex: rowLessVertex,
-          restRangeStart: rangeEnd,
-          restRangeEnd: rangeEnd,
-        }
-      }
-    }
-    return {
-      smallerRangeVertex: null,
-      restRangeStart: rangeStart,
-      restRangeEnd: rangeEnd,
-    }
-  }
 }
 
 export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): SimpleCellAddress[][] => {
@@ -124,4 +105,23 @@ export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: 
     currentRow++
   }
   return result
+}
+
+export const findSmallerRange = (addressMapping: AddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): ({smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress}) => {
+  if (rangeEnd.row > rangeStart.row) {
+    const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
+    const rowLessVertex = addressMapping.getRange(rangeStart, rangeEndRowLess)
+    if (rowLessVertex) {
+      return {
+        smallerRangeVertex: rowLessVertex,
+        restRangeStart: rangeEnd,
+        restRangeEnd: rangeEnd,
+      }
+    }
+  }
+  return {
+    smallerRangeVertex: null,
+    restRangeStart: rangeStart,
+    restRangeEnd: rangeEnd,
+  }
 }
