@@ -22,8 +22,8 @@ export class Graph<T> {
     this.edges.get(fromId)!.add(toId);
   }
 
-  adjacentNodes(id: T) {
-    return this.edges.get(id);
+  adjacentNodes(id: T): Set<T> {
+    return this.edges.get(id)!
   }
 
   nodesCount(): number {
