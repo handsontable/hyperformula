@@ -91,6 +91,25 @@ describe('Basic Graph manipulation', () => {
     expect(graph.existsEdge("foo", "bar")).toBe(false)
   })
 
+  it("#edgesCount when there is no nodes", () => {
+    const graph = new Graph()
+
+    expect(graph.edgesCount()).toBe(0)
+  })
+
+  it("#edgesCount counts edges from all nodes", () => {
+    const graph = new Graph()
+    graph.addNode("bar1")
+    graph.addNode("bar2")
+    graph.addNode("first")
+    graph.addEdge("first", "bar1")
+    graph.addNode("second")
+    graph.addEdge("second", "bar1")
+    graph.addEdge("second", "bar2")
+
+    expect(graph.edgesCount()).toBe(3)
+  })
+
   it("#topologicalSort for empty graph", () => {
     const graph = new Graph()
 
