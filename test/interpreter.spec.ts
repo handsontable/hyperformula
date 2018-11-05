@@ -158,7 +158,7 @@ describe('Interpreter', () => {
     engine.loadSheet([['1', '2', '5'],
                       ['3', '4', '=SUM(A1:B2)']])
 
-    expect(engine.getCellValue("C2")).toBeCloseTo(10)
+    expect(engine.getCellValue("C2")).toEqual(10)
   })
 
   it("ranges - VALUE error when evaluating without context", () => {
