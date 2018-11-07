@@ -70,7 +70,7 @@ export class GraphBuilder {
           generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
             rowOfCells.forEach((cellFromRange) => {
               const vertex = this.getOrCreateVertex(cellFromRange)
-              this.graph.addEdge(this.addressMapping.getCell(cellFromRange)!, rangeVertex!)
+              this.graph.addEdge(vertex, rangeVertex!)
             })
           })
 
