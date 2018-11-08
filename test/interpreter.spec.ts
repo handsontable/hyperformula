@@ -226,4 +226,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
   })
+
+  it("function ACOS for 1 (edge)", () => {
+    engine.loadSheet([["=ACOS(1)"]])
+
+    expect(engine.getCellValue("A1")).toEqual(0)
+  })
+
+  it("function ACOS for -1 (edge)", () => {
+    engine.loadSheet([["=ACOS(-1)"]])
+
+    expect(engine.getCellValue("A1")).toEqual(Math.PI)
+  })
 })
