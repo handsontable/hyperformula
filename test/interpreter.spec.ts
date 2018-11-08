@@ -203,51 +203,51 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NAME))
   })
 
-  it("function TRUE", () => {
+  it('function TRUE', () => {
     engine.loadSheet([['=TRUE()']])
 
-    expect(engine.getCellValue("A1")).toEqual(true)
+    expect(engine.getCellValue('A1')).toEqual(true)
   })
 
-  it("function FALSE", () => {
+  it('function FALSE', () => {
     engine.loadSheet([['=FALSE()']])
 
-    expect(engine.getCellValue("A1")).toEqual(false)
+    expect(engine.getCellValue('A1')).toEqual(false)
   })
 
-  it("function ACOS happy path", () => {
+  it('function ACOS happy path', () => {
     engine.loadSheet([['=ACOS(1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(0)
+    expect(engine.getCellValue('A1')).toEqual(0)
   })
 
-  it("function ACOS when value not numeric", () => {
+  it('function ACOS when value not numeric', () => {
     engine.loadSheet([["=ACOS('foo')"]])
 
-    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
   })
 
-  it("function ACOS for 1 (edge)", () => {
-    engine.loadSheet([["=ACOS(1)"]])
+  it('function ACOS for 1 (edge)', () => {
+    engine.loadSheet([['=ACOS(1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(0)
+    expect(engine.getCellValue('A1')).toEqual(0)
   })
 
-  it("function ACOS for -1 (edge)", () => {
-    engine.loadSheet([["=ACOS(-1)"]])
+  it('function ACOS for -1 (edge)', () => {
+    engine.loadSheet([['=ACOS(-1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(Math.PI)
+    expect(engine.getCellValue('A1')).toEqual(Math.PI)
   })
 
-  it("function ACOS when value too large", () => {
-    engine.loadSheet([["=ACOS(1.1)"]])
+  it('function ACOS when value too large', () => {
+    engine.loadSheet([['=ACOS(1.1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
   })
 
-  it("function ACOS when value too small", () => {
-    engine.loadSheet([["=ACOS(-1.1)"]])
+  it('function ACOS when value too small', () => {
+    engine.loadSheet([['=ACOS(-1.1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
   })
 })

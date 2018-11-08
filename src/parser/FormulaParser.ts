@@ -8,12 +8,12 @@ import {
   buildDivOpAst,
   buildErrorAst,
   buildMinusOpAst,
+  buildMinusUnaryOpAst,
   buildNumberAst,
   buildPlusOpAst,
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
-  buildMinusUnaryOpAst,
 } from './Ast'
 
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/})

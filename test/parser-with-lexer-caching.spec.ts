@@ -4,12 +4,12 @@ import {
   CellRangeAst,
   CellReferenceAst,
   ErrorAst,
+  MinusOpAst,
+  MinusUnaryOpAst,
   NumberAst,
   PlusOpAst,
-  MinusOpAst,
   ProcedureAst,
   StringAst,
-  MinusUnaryOpAst,
 } from '../src/parser/Ast'
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 

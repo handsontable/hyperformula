@@ -156,16 +156,16 @@ export class Interpreter {
           }
         }, 0)
       }
-      case "TRUE": {
+      case 'TRUE': {
         return true
       }
-      case "FALSE": {
+      case 'FALSE': {
         return false
       }
-      case "ACOS": {
+      case 'ACOS': {
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
         if (typeof arg === 'number' && -1 <= arg && arg <= 1) {
-          return Math.acos(arg);
+          return Math.acos(arg)
         } else {
           return cellError(ErrorType.NUM)
         }
