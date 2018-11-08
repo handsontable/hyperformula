@@ -19,6 +19,9 @@ benchmark: ## Run benchmarks
 
 check: typecheck test
 
+lint:
+	@yarn tslint --project tsconfig.json
+
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage
 
