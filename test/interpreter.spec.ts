@@ -262,4 +262,22 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
   })
+
+  it('function IF when value is true', () => {
+    engine.loadSheet([["=IF(TRUE(); 'yes'; 'no')"]])
+
+    expect(engine.getCellValue('A1')).toEqual('yes')
+  })
+
+  it('function IF when value is false', () => {
+    engine.loadSheet([["=IF(FALSE(); 'yes'; 'no')"]])
+
+    expect(engine.getCellValue('A1')).toEqual('no')
+  })
+
+  it('function IF when condition is weird type', () => {
+    engine.loadSheet([["=IF('foo'; 'yes'; 'no')"]])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })

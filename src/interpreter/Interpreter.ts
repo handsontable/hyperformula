@@ -178,6 +178,16 @@ export class Interpreter {
           return cellError(ErrorType.NUM)
         }
       }
+      case 'IF': {
+        const condition = this.evaluateAst(ast.args[0], formulaAddress)
+        if (condition === true) {
+          return this.evaluateAst(ast.args[1], formulaAddress)
+        } else if (condition === false) {
+          return this.evaluateAst(ast.args[2], formulaAddress)
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
       default:
         return cellError(ErrorType.NAME)
     }
