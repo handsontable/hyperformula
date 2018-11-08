@@ -3,6 +3,7 @@ export enum ErrorType {
   NAME = 'NAME',
   VALUE = 'VALUE',
   NUM = 'NUM',
+  NA = 'NA',
 }
 
 export enum CellReferenceType {

@@ -209,6 +209,12 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(true)
   })
 
+  it('function TRUE is 0-arity', () => {
+    engine.loadSheet([['=TRUE(1)']])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NA))
+  })
+
   it('function FALSE', () => {
     engine.loadSheet([['=FALSE()']])
 

@@ -157,7 +157,11 @@ export class Interpreter {
         }, 0)
       }
       case 'TRUE': {
-        return true
+        if (ast.args.length > 0) {
+          return cellError(ErrorType.NA)
+        } else {
+          return true
+        }
       }
       case 'FALSE': {
         return false
