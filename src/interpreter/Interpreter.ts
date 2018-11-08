@@ -164,7 +164,11 @@ export class Interpreter {
         }
       }
       case 'FALSE': {
-        return false
+        if (ast.args.length > 0) {
+          return cellError(ErrorType.NA)
+        } else {
+          return false
+        }
       }
       case 'ACOS': {
         const arg = this.evaluateAst(ast.args[0], formulaAddress)

@@ -212,13 +212,19 @@ describe('Interpreter', () => {
   it('function TRUE is 0-arity', () => {
     engine.loadSheet([['=TRUE(1)']])
 
-    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
   })
 
   it('function FALSE', () => {
     engine.loadSheet([['=FALSE()']])
 
     expect(engine.getCellValue('A1')).toEqual(false)
+  })
+
+  it('function FALSE is 0-arity', () => {
+    engine.loadSheet([['=FALSE(1)']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
   })
 
   it('function ACOS happy path', () => {
