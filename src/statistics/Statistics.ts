@@ -1,9 +1,9 @@
 export enum StatType {
-  OVERALL = "OVERALL",
-  PARSER = "PARSER",
-  GRAPH_BUILD = "GRAPH_BUILD",
-  EVALUATION = "EVALUATION",
-  TOP_SORT = "TOP_SORT"
+  OVERALL = 'OVERALL',
+  PARSER = 'PARSER',
+  GRAPH_BUILD = 'GRAPH_BUILD',
+  EVALUATION = 'EVALUATION',
+  TOP_SORT = 'TOP_SORT',
 }
 
 export class Statistics {
@@ -12,15 +12,15 @@ export class Statistics {
   private startTimes: Map<StatType, number>
 
   constructor() {
-    this.stats = new Map<StatType, any>();
-    this.startTimes = new Map<StatType, any>();
+    this.stats = new Map<StatType, any>()
+    this.startTimes = new Map<StatType, any>()
   }
 
-  reset() {
+  public reset() {
     this.stats.clear()
   }
 
-  start(name: StatType) {
+  public start(name: StatType) {
     if (this.startTimes.get(name)) {
       throw Error(`Statistics ${name} already started`)
     } else {
@@ -29,7 +29,7 @@ export class Statistics {
     }
   }
 
-  end(name: StatType) {
+  public end(name: StatType) {
     const now = Date.now()
     const startTime = this.startTimes.get(name)
 
@@ -43,14 +43,14 @@ export class Statistics {
     }
   }
 
-  measure(name: StatType, func: () => any) {
+  public measure(name: StatType, func: () => any) {
     this.start(name)
-    let result = func()
+    const result = func()
     this.end(name)
     return result
   }
 
-  snapshot(): Map<StatType, number> {
+  public snapshot(): Map<StatType, number> {
     return new Map(this.stats)
   }
 

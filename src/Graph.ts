@@ -1,46 +1,48 @@
 export class Graph<T> {
-  private nodes : Set<T>;
-  private edges : Map<T,Set<T>>;
+  private nodes: Set<T>
+  private edges: Map<T, Set<T>>
 
   constructor() {
-    this.nodes = new Set();
-    this.edges = new Map();
+    this.nodes = new Set()
+    this.edges = new Map()
   }
 
-  addNode(id: T) {
-    this.nodes.add(id);
+  public addNode(id: T) {
+    this.nodes.add(id)
     if (!this.edges.has(id)) {
       this.edges.set(id, new Set())
     }
   }
 
-  addEdge(fromId: T, toId: T) {
-    if (!this.nodes.has(fromId))
+  public addEdge(fromId: T, toId: T) {
+    if (!this.nodes.has(fromId)) {
       throw new Error(`Unknown node ${fromId}`)
-    if (!this.nodes.has(toId))
+    }
+    if (!this.nodes.has(toId)) {
       throw new Error(`Unknown node ${toId}`)
-    this.edges.get(fromId)!.add(toId);
+    }
+    this.edges.get(fromId)!.add(toId)
   }
 
-  adjacentNodes(id: T): Set<T> {
+  public adjacentNodes(id: T): Set<T> {
     return this.edges.get(id)!
   }
 
-  hasNode(id: T): boolean {
+  public hasNode(id: T): boolean {
     return this.nodes.has(id)
   }
 
-  nodesCount(): number {
-    return this.nodes.size;
+  public nodesCount(): number {
+    return this.nodes.size
   }
 
-  edgesCount(): number {
+  public edgesCount(): number {
     let result = 0
     this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
     return result
   }
 
-  existsEdge(fromNode: T, toNode: T): boolean {
+  public existsEdge(fromNode: T, toNode: T): boolean {
     const nodeEdges = this.edges.get(fromNode)
     if (nodeEdges) {
       return nodeEdges.has(toNode)
@@ -48,9 +50,9 @@ export class Graph<T> {
     return false
   }
 
-  topologicalSort() : Array<T> {
+  public topologicalSort(): T[] {
     const incomingEdges = this.incomingEdges()
-    const nodesWithNoIncomingEdge: Array<T> = []
+    const nodesWithNoIncomingEdge: T[] = []
 
     incomingEdges.forEach((currentCount, targetNode) => {
       if (currentCount === 0) {
@@ -58,8 +60,8 @@ export class Graph<T> {
       }
     })
 
-    let currentNodeIndex = 0;
-    const topologicalOrdering: Array<T> = []
+    let currentNodeIndex = 0
+    const topologicalOrdering: T[] = []
     while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
       const currentNode = nodesWithNoIncomingEdge[currentNodeIndex] as T
       topologicalOrdering.push(currentNode)
@@ -69,7 +71,7 @@ export class Graph<T> {
           nodesWithNoIncomingEdge.push(targetNode)
         }
       })
-      ++currentNodeIndex;
+      ++currentNodeIndex
     }
 
     if (topologicalOrdering.length !== this.nodes.size) {
@@ -79,14 +81,14 @@ export class Graph<T> {
     return topologicalOrdering
   }
 
-  incomingEdges() : Map<T, number> {
+  public incomingEdges(): Map<T, number> {
     const incomingEdges: Map<T, number> = new Map()
     this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
     this.edges.forEach((adjacentNodes, sourceNode) => {
       adjacentNodes.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
       })
-    });
-    return incomingEdges;
+    })
+    return incomingEdges
   }
 }

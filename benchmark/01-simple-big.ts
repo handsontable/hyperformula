@@ -1,8 +1,8 @@
-import {benchmark} from "./benchmark";
+import {benchmark} from './benchmark'
 
 const rows = 100000
 
-let sheet = []
+const sheet = []
 sheet.push(['100', '200', '300', '400', '500'])
 
 let prev = 1

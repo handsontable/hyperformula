@@ -1,15 +1,15 @@
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
-import {generateCellsFromRange, findSmallerRange} from "../GraphBuilder";
-import {AddressMapping} from "../AddressMapping"
-import {Graph} from "../Graph"
-import {Vertex} from "../Vertex"
+import {AddressMapping} from '../AddressMapping'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {Graph} from '../Graph'
+import {findSmallerRange, generateCellsFromRange} from '../GraphBuilder'
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
+import {Vertex} from '../Vertex'
 
 export type ExpressionValue = CellValue | CellValue[][]
 
 export class Interpreter {
-  private addressMapping: AddressMapping;
-  private graph: Graph<Vertex>;
+  private addressMapping: AddressMapping
+  private graph: Graph<Vertex>
 
   constructor(addressMapping: AddressMapping, graph: Graph<Vertex>) {
     this.addressMapping = addressMapping
@@ -117,7 +117,7 @@ export class Interpreter {
     const rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
 
     if (!rangeVertex) {
-      throw Error("Range does not exists in graph")
+      throw Error('Range does not exists in graph')
     }
 
     let value = rangeVertex.getRangeValue(functionName)
@@ -132,11 +132,11 @@ export class Interpreter {
 
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
     switch (ast.procedureName) {
-      case "SUM": {
+      case 'SUM': {
         return ast.args.reduce((currentSum: CellValue, arg) => {
           let value
           if (arg.type === AstNodeType.CELL_RANGE) {
-            value = this.evaluateRange(arg, formulaAddress, "SUM", rangeSum)
+            value = this.evaluateRange(arg, formulaAddress, 'SUM', rangeSum)
           } else {
             value = this.evaluateAst(arg, formulaAddress)
           }

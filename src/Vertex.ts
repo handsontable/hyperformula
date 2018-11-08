@@ -1,59 +1,59 @@
-import {Ast} from "./parser/Ast";
-import {CellValue, SimpleCellAddress} from "./Cell";
-import {ExpressionValue} from "./interpreter/Interpreter";
+import {CellValue, SimpleCellAddress} from './Cell'
+import {ExpressionValue} from './interpreter/Interpreter'
+import {Ast} from './parser/Ast'
 
 export abstract class Vertex {
 }
 
 export abstract class CellVertex extends Vertex {
-  abstract getCellValue(): CellValue
+  public abstract getCellValue(): CellValue
 }
 
 export class FormulaCellVertex extends CellVertex {
-  private cachedCellValue?: CellValue;
-  private formula: Ast;
-  private cellAddress: SimpleCellAddress;
+  private cachedCellValue?: CellValue
+  private formula: Ast
+  private cellAddress: SimpleCellAddress
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress) {
     super()
-    this.formula = formula;
-    this.cellAddress = cellAddress;
+    this.formula = formula
+    this.cellAddress = cellAddress
   }
 
-  getFormula() : Ast {
+  public getFormula(): Ast {
     return this.formula
   }
 
-  getAddress() : SimpleCellAddress {
+  public getAddress(): SimpleCellAddress {
     return this.cellAddress
   }
 
-  setCellValue(cellValue: CellValue) {
+  public setCellValue(cellValue: CellValue) {
      this.cachedCellValue = cellValue
   }
 
-  getCellValue() {
+  public getCellValue() {
     if (this.cachedCellValue != null) {
       return this.cachedCellValue
     } else {
-      throw Error("Value of the formula cell is not computed.")
+      throw Error('Value of the formula cell is not computed.')
     }
   }
 }
 
 export class ValueCellVertex extends CellVertex {
-  private cellValue: CellValue;
+  private cellValue: CellValue
 
   constructor(cellValue: CellValue) {
     super()
-    this.cellValue = cellValue;
+    this.cellValue = cellValue
   }
 
-  getCellValue() {
+  public getCellValue() {
     return this.cellValue
   }
 
-  setCellValue(cellValue: CellValue) {
+  public setCellValue(cellValue: CellValue) {
     this.cellValue = cellValue
   }
 }
@@ -63,7 +63,7 @@ export class EmptyCellVertex extends CellVertex {
     super()
   }
 
-  getCellValue() {
+  public getCellValue() {
     return 0
   }
 }
@@ -76,23 +76,23 @@ export class RangeVertex extends Vertex {
     this.valueCache = new Map()
   }
 
-  getRangeValue(functionName: string): CellValue | null{
+  public getRangeValue(functionName: string): CellValue | null {
     return this.valueCache.get(functionName) || null
   }
 
-  setRangeValue(functionName: string, value: CellValue) {
+  public setRangeValue(functionName: string, value: CellValue) {
     this.valueCache.set(functionName, value)
   }
 
-  clear() {
+  public clear() {
     this.valueCache.clear()
   }
 
-  getStart(): SimpleCellAddress {
+  public getStart(): SimpleCellAddress {
     return this.start
   }
 
-  getEnd(): SimpleCellAddress {
+  public getEnd(): SimpleCellAddress {
     return this.end
   }
 }

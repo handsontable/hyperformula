@@ -1,11 +1,11 @@
-import {ParserWithCaching} from "../../src/parser/ParserWithCaching";
-import {absoluteCellAddress} from "../../src/Cell"
+import {absoluteCellAddress} from '../../src/Cell'
+import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 const rows = 100000
 const millisecondsPerThousandRows = 160
 const numberOfRuns = 3
 
-let sheet = []
+const sheet = []
 
 let prev = 0
 while (prev < rows) {
@@ -19,9 +19,9 @@ while (prev < rows) {
 
   prev++
 }
-const flattenSheet: Array<string> = [].concat.apply([], sheet) // flatten
+const flattenSheet: string[] = [].concat.apply([], sheet) // flatten
 
-let runsData = []
+const runsData = []
 let currentRun = 0
 while (currentRun < numberOfRuns) {
   const parser = new ParserWithCaching()
@@ -38,11 +38,10 @@ while (currentRun < numberOfRuns) {
   currentRun++
 }
 runsData.sort()
-const medianRun = runsData[Math.trunc(numberOfRuns / 2)];
+const medianRun = runsData[Math.trunc(numberOfRuns / 2)]
 console.warn(`Number of rows: ${rows}`)
 console.warn(`Runs: ${runsData.map((v) => (v / 1000))} (in seconds)`)
 console.warn(`Median run: ${medianRun / 1000}`)
 
 const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
 console.warn(`Actual time: ${resultMillisecondsPerThousandRows} ms per 1000 rows`)
-

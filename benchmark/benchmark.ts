@@ -1,14 +1,14 @@
-import {HandsOnEngine} from "../src";
-import {StatType} from "../src/statistics/Statistics";
+import {HandsOnEngine} from '../src'
+import {StatType} from '../src/statistics/Statistics'
 
-export type Config = {
+export interface Config {
   millisecondsPerThousandRows: number,
   numberOfRuns: number
 }
 
 export function benchmark(sheet: string[][], config: Config = {
   millisecondsPerThousandRows: 50,
-  numberOfRuns: 3
+  numberOfRuns: 3,
 }) {
   const stats = []
   const rows = sheet.length
@@ -21,13 +21,12 @@ export function benchmark(sheet: string[][], config: Config = {
     currentRun++
   }
 
-  const overall = stats.map(s => s.get(StatType.OVERALL)!).sort()
-  const evaluation = stats.map(s => s.get(StatType.EVALUATION)!).sort()
-  const medianRun = overall[Math.trunc(config.numberOfRuns / 2)];
-  const parsing = stats.map(s => s.get(StatType.PARSER)!).sort()
-  const topSort = stats.map(s => s.get(StatType.TOP_SORT)!).sort()
-  const buildGraph = stats.map(s => s.get(StatType.GRAPH_BUILD)!).sort()
-
+  const overall = stats.map((s) => s.get(StatType.OVERALL)!).sort()
+  const evaluation = stats.map((s) => s.get(StatType.EVALUATION)!).sort()
+  const medianRun = overall[Math.trunc(config.numberOfRuns / 2)]
+  const parsing = stats.map((s) => s.get(StatType.PARSER)!).sort()
+  const topSort = stats.map((s) => s.get(StatType.TOP_SORT)!).sort()
+  const buildGraph = stats.map((s) => s.get(StatType.GRAPH_BUILD)!).sort()
 
   console.warn(`Number of rows: ${rows}`)
   console.warn(`Overall: ${overall.map((v) => (v / 1000))} (in seconds)`)

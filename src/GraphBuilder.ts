@@ -1,19 +1,19 @@
-import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
-import {Graph} from './Graph'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex"
-import {Statistics, StatType} from "./statistics/Statistics";
+import {AddressMapping} from './AddressMapping'
 import {
   absoluteCellAddress,
   CellAddress,
   CellDependency,
   getAbsoluteAddress,
+  relativeCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  relativeCellAddress
-} from "./Cell"
-import {AddressMapping} from "./AddressMapping"
+} from './Cell'
+import {Graph} from './Graph'
+import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
+import {Statistics, StatType} from './statistics/Statistics'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
-export type Sheet = Array<Array<string>>
+export type Sheet = string[][]
 
 export class GraphBuilder {
   private parser = new ParserWithCaching()
@@ -23,8 +23,8 @@ export class GraphBuilder {
               private stats: Statistics) {
   }
 
-  buildGraph(sheet: Sheet) {
-    const dependencies: Map<SimpleCellAddress, Array<CellDependency>> = new Map()
+  public buildGraph(sheet: Sheet) {
+    const dependencies: Map<SimpleCellAddress, CellDependency[]> = new Map()
 
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
@@ -32,7 +32,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
-          let parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+          const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
           dependencies.set(cellAddress, parseResult.dependencies)
         } else if (!isNaN(Number(cellContent))) {
@@ -47,7 +47,7 @@ export class GraphBuilder {
       })
     })
 
-    dependencies.forEach((cellDependencies: Array<CellDependency>, endCell: SimpleCellAddress) => {
+    dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (!this.addressMapping.has(endCell)) {
           throw Error(`${endCell} does not exist in graph`)
@@ -99,7 +99,7 @@ export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: 
   let currentRow = rangeStart.row
   while (currentRow <= rangeEnd.row) {
     const rowResult = []
-    let currentColumn = rangeStart.col;
+    let currentColumn = rangeStart.col
     while (currentColumn <= rangeEnd.col) {
       rowResult.push(relativeCellAddress(currentColumn, currentRow))
       currentColumn++

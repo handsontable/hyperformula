@@ -1,68 +1,68 @@
-import {Graph} from "../src/Graph";
+import {Graph} from '../src/Graph'
 
 describe('Basic Graph manipulation', () => {
   it('#addNode', () => {
     const graph = new Graph()
 
-    graph.addNode("foo")
+    graph.addNode('foo')
 
-    expect(graph.nodesCount()).toBe(1);
-  });
+    expect(graph.nodesCount()).toBe(1)
+  })
 
   it('#addNode for the second time', () => {
     const graph = new Graph()
 
-    graph.addNode("foo")
-    graph.addNode("foo")
+    graph.addNode('foo')
+    graph.addNode('foo')
 
-    expect(graph.nodesCount()).toBe(1);
+    expect(graph.nodesCount()).toBe(1)
   })
 
   it('#addNode for the second time doesnt reset adjacent nodes', () => {
     const graph = new Graph()
 
-    graph.addNode("foo")
-    graph.addNode("bar")
-    graph.addEdge("foo", "bar")
+    graph.addNode('foo')
+    graph.addNode('bar')
+    graph.addEdge('foo', 'bar')
 
-    graph.addNode("foo")
+    graph.addNode('foo')
 
-    expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
+    expect(graph.adjacentNodes('foo')).toEqual(new Set(['bar']))
   })
 
-  it("#hasNode when there is node", () => {
+  it('#hasNode when there is node', () => {
     const graph = new Graph()
 
-    graph.addNode("foo")
+    graph.addNode('foo')
 
-    expect(graph.hasNode("foo")).toBe(true)
+    expect(graph.hasNode('foo')).toBe(true)
   })
 
-  it("#hasNode when there is no node", () => {
+  it('#hasNode when there is no node', () => {
     const graph = new Graph()
 
-    expect(graph.hasNode("foo")).toBe(false)
+    expect(graph.hasNode('foo')).toBe(false)
   })
 
   it('#adjacentNodes', () => {
-    const graph = new Graph();
+    const graph = new Graph()
 
-    graph.addNode("foo")
-    graph.addNode("bar")
-    graph.addEdge("foo", "bar")
+    graph.addNode('foo')
+    graph.addNode('bar')
+    graph.addEdge('foo', 'bar')
 
-    expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
+    expect(graph.adjacentNodes('foo')).toEqual(new Set(['bar']))
   })
 
   it('#addEdge removes multiple edges', () => {
-    const graph = new Graph();
+    const graph = new Graph()
 
-    graph.addNode("foo")
-    graph.addNode("bar")
-    graph.addEdge("foo", "bar")
-    graph.addEdge("foo", "bar")
+    graph.addNode('foo')
+    graph.addNode('bar')
+    graph.addEdge('foo', 'bar')
+    graph.addEdge('foo', 'bar')
 
-    expect(graph.adjacentNodes("foo")).toEqual(new Set(["bar"]))
+    expect(graph.adjacentNodes('foo')).toEqual(new Set(['bar']))
   })
 
   it('#addEdge is raising an error when the origin node not present', () => {
@@ -83,129 +83,129 @@ describe('Basic Graph manipulation', () => {
     }).toThrowError(new Error('Unknown node target'))
   })
 
-  it("#existsEdge works", () => {
+  it('#existsEdge works', () => {
     const graph = new Graph()
-    graph.addNode("foo")
-    graph.addNode("bar")
-    graph.addEdge("foo", "bar")
+    graph.addNode('foo')
+    graph.addNode('bar')
+    graph.addEdge('foo', 'bar')
 
-    expect(graph.existsEdge("foo", "bar")).toBe(true)
+    expect(graph.existsEdge('foo', 'bar')).toBe(true)
   })
 
-  it("#existsEdge when there is origin node but no edge", () => {
+  it('#existsEdge when there is origin node but no edge', () => {
     const graph = new Graph()
-    graph.addNode("foo")
+    graph.addNode('foo')
 
-    expect(graph.existsEdge("foo", "bar")).toBe(false)
+    expect(graph.existsEdge('foo', 'bar')).toBe(false)
   })
 
-  it("#existsEdge when there is no node", () => {
+  it('#existsEdge when there is no node', () => {
     const graph = new Graph()
 
-    expect(graph.existsEdge("foo", "bar")).toBe(false)
+    expect(graph.existsEdge('foo', 'bar')).toBe(false)
   })
 
-  it("#edgesCount when there is no nodes", () => {
+  it('#edgesCount when there is no nodes', () => {
     const graph = new Graph()
 
     expect(graph.edgesCount()).toBe(0)
   })
 
-  it("#edgesCount counts edges from all nodes", () => {
+  it('#edgesCount counts edges from all nodes', () => {
     const graph = new Graph()
-    graph.addNode("bar1")
-    graph.addNode("bar2")
-    graph.addNode("first")
-    graph.addEdge("first", "bar1")
-    graph.addNode("second")
-    graph.addEdge("second", "bar1")
-    graph.addEdge("second", "bar2")
+    graph.addNode('bar1')
+    graph.addNode('bar2')
+    graph.addNode('first')
+    graph.addEdge('first', 'bar1')
+    graph.addNode('second')
+    graph.addEdge('second', 'bar1')
+    graph.addEdge('second', 'bar2')
 
     expect(graph.edgesCount()).toBe(3)
   })
 
-  it("#topologicalSort for empty graph", () => {
+  it('#topologicalSort for empty graph', () => {
     const graph = new Graph()
 
-    expect(graph.topologicalSort()).toEqual([]);
+    expect(graph.topologicalSort()).toEqual([])
   })
 
-  it("#topologicalSort node is included even if he is not connected to anything", () => {
+  it('#topologicalSort node is included even if he is not connected to anything', () => {
     const graph = new Graph()
-    graph.addNode("foo")
+    graph.addNode('foo')
 
-    expect(graph.topologicalSort()).toEqual(["foo"]);
+    expect(graph.topologicalSort()).toEqual(['foo'])
   })
 
-  it("#topologicalSort for simple graph", () => {
+  it('#topologicalSort for simple graph', () => {
     const graph = new Graph()
-    graph.addNode("foo")
-    graph.addNode("bar")
-    graph.addEdge("bar", "foo")
+    graph.addNode('foo')
+    graph.addNode('bar')
+    graph.addEdge('bar', 'foo')
 
-    expect(graph.topologicalSort()).toEqual(["bar", "foo"]);
+    expect(graph.topologicalSort()).toEqual(['bar', 'foo'])
   })
 
-  it("#topologicalSort for more complex graph", () => {
+  it('#topologicalSort for more complex graph', () => {
     const graph = new Graph()
-    graph.addNode("x0")
-    graph.addNode("x1")
-    graph.addNode("x2")
-    graph.addNode("x3")
-    graph.addNode("x4")
-    graph.addEdge("x0", "x2")
-    graph.addEdge("x1", "x2")
-    graph.addEdge("x2", "x3")
-    graph.addEdge("x4", "x3")
+    graph.addNode('x0')
+    graph.addNode('x1')
+    graph.addNode('x2')
+    graph.addNode('x3')
+    graph.addNode('x4')
+    graph.addEdge('x0', 'x2')
+    graph.addEdge('x1', 'x2')
+    graph.addEdge('x2', 'x3')
+    graph.addEdge('x4', 'x3')
 
-    expect(graph.topologicalSort()).toEqual(["x0", "x1", "x4", "x2", "x3"]);
+    expect(graph.topologicalSort()).toEqual(['x0', 'x1', 'x4', 'x2', 'x3'])
   })
 
-  it("#topologicalSort for not connected graph", () => {
+  it('#topologicalSort for not connected graph', () => {
     const graph = new Graph()
-    graph.addNode("x0")
-    graph.addNode("x1")
-    graph.addNode("x2")
-    graph.addNode("x3")
-    graph.addEdge("x0", "x2")
-    graph.addEdge("x1", "x3")
+    graph.addNode('x0')
+    graph.addNode('x1')
+    graph.addNode('x2')
+    graph.addNode('x3')
+    graph.addEdge('x0', 'x2')
+    graph.addEdge('x1', 'x3')
 
-    expect(graph.topologicalSort()).toEqual(["x0", "x1", "x2", "x3"]);
+    expect(graph.topologicalSort()).toEqual(['x0', 'x1', 'x2', 'x3'])
   })
 
-  it("#topologicalSort raise an error if has a trivial cycle", () => {
+  it('#topologicalSort raise an error if has a trivial cycle', () => {
     const graph = new Graph()
-    graph.addNode("x1")
-    graph.addNode("x2")
-    graph.addEdge("x1", "x2")
-    graph.addEdge("x1", "x1")
+    graph.addNode('x1')
+    graph.addNode('x2')
+    graph.addEdge('x1', 'x2')
+    graph.addEdge('x1', 'x1')
 
     expect(() => {
       graph.topologicalSort()
     }).toThrowError(new Error('Graph has a cycle'))
   })
 
-  it("#topologicalSort raise an error if has a cycle", () => {
+  it('#topologicalSort raise an error if has a cycle', () => {
     const graph = new Graph()
-    graph.addNode("x0")
-    graph.addNode("x1")
-    graph.addNode("x2")
-    graph.addEdge("x0", "x1")
-    graph.addEdge("x1", "x2")
-    graph.addEdge("x1", "x1")
+    graph.addNode('x0')
+    graph.addNode('x1')
+    graph.addNode('x2')
+    graph.addEdge('x0', 'x1')
+    graph.addEdge('x1', 'x2')
+    graph.addEdge('x1', 'x1')
 
     expect(() => {
       graph.topologicalSort()
     }).toThrowError(new Error('Graph has a cycle'))
   })
 
-  it("#topologicalSort raise an error for one-element cycle", () => {
+  it('#topologicalSort raise an error for one-element cycle', () => {
     const graph = new Graph()
-    graph.addNode("x0")
-    graph.addEdge("x0", "x0")
+    graph.addNode('x0')
+    graph.addEdge('x0', 'x0')
 
     expect(() => {
       graph.topologicalSort()
     }).toThrowError(new Error('Graph has a cycle'))
   })
-});
+})

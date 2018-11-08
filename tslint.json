@@ -1,13 +1,27 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "semicolon": [
+      true,
+      "never"
     ],
-    "jsRules": {},
-    "rules": {
-        "semicolon": [true, "never"],
-        "indent": [true, "spaces", 2],
-        "quotemark": [true, "single", "avoid-escape"]
-    },
-    "rulesDirectory": []
+    "indent": [
+      true,
+      "spaces",
+      2
+    ],
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "object-literal-sort-keys": [
+      false
+    ]
+  },
+  "rulesDirectory": []
 }
