@@ -111,4 +111,22 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(6)
     expect(graph.edgesCount()).toBe(5)
   })
+
+  it("optimization doesn't work if smaller range is after bigger", () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([
+      ['1', '0'],
+      ['3', '=A1:A3'],
+      ['5', '=A1:A2'],
+    ])
+
+    expect(graph.edgesCount()).toBe(
+      3 + // from 3 cells to range(A1:A2)
+      2 + // from 2 cells to range(A1:A2)
+      2 // from range vertexes to formulas
+    )
+  })
 });
