@@ -17,7 +17,7 @@ export interface CellError {
 }
 export const cellError = (error: ErrorType): CellError => ({type: error})
 
-export type CellValue = string | number | CellError
+export type CellValue = boolean | string | number | CellError
 
 export interface CellAddress {
   col: number,

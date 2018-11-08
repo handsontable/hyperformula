@@ -190,4 +190,10 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NAME))
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NAME))
   })
+
+  it("function TRUE", () => {
+    engine.loadSheet([['=TRUE()']])
+
+    expect(engine.getCellValue("A1")).toEqual(true)
+  })
 })
