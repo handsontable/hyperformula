@@ -164,7 +164,7 @@ export class Interpreter {
       }
       case "ACOS": {
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        if (typeof arg === 'number') {
+        if (typeof arg === 'number' && -1 <= arg && arg <= 1) {
           return Math.acos(arg);
         } else {
           return cellError(ErrorType.NUM)

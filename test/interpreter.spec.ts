@@ -238,4 +238,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(Math.PI)
   })
+
+  it("function ACOS when value too large", () => {
+    engine.loadSheet([["=ACOS(1.1)"]])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+  })
+
+  it("function ACOS when value too small", () => {
+    engine.loadSheet([["=ACOS(-1.1)"]])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+  })
 })
