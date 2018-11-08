@@ -1,11 +1,11 @@
-import {CellVertex, RangeVertex} from "./Vertex"
-import {SimpleCellAddress} from "./Cell";
+import {SimpleCellAddress} from './Cell'
+import {CellVertex, RangeVertex} from './Vertex'
 
 export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
-  getCell(address: SimpleCellAddress): CellVertex | null {
+  public getCell(address: SimpleCellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       return null
@@ -13,7 +13,7 @@ export class AddressMapping {
     return colMapping.get(address.row) || null
   }
 
-  setCell(address: SimpleCellAddress, newVertex: CellVertex) {
+  public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     let colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       colMapping = new Map()
@@ -22,17 +22,17 @@ export class AddressMapping {
     colMapping.set(address.row, newVertex)
   }
 
-  setRange(vertex: RangeVertex) {
+  public setRange(vertex: RangeVertex) {
     const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
     this.rangeMapping.set(key, vertex)
   }
 
-  getRange(start: SimpleCellAddress, end: SimpleCellAddress) : RangeVertex | null {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
     const key = `${start.col},${start.row},${end.col},${end.row}`
     return this.rangeMapping.get(key) || null
   }
 
-  has(address: SimpleCellAddress): boolean {
+  public has(address: SimpleCellAddress): boolean {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       return false

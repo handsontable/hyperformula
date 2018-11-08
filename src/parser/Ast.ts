@@ -1,38 +1,41 @@
-import {CellAddress, CellDependency} from "../Cell";
+import {CellAddress, CellDependency} from '../Cell'
 
 export type Ast =
     NumberAst
     | StringAst
     | CellReferenceAst
     | CellRangeAst
+    | MinusUnaryOpAst
     | PlusOpAst
     | MinusOpAst
     | TimesOpAst
     | DivOpAst
     | ProcedureAst
-    | ErrorAst;
+    | ErrorAst
 
-export type ParsingError = {
+export interface ParsingError {
   name: string,
   message: string
 }
 
 export enum AstNodeType {
-  NUMBER = "NUMBER",
-  STRING = "STRING",
+  NUMBER = 'NUMBER',
+  STRING = 'STRING',
 
-  PLUS_OP = "PLUS_OP",
-  MINUS_OP = "MINUS_OP",
-  TIMES_OP = "TIMES_OP",
-  DIV_OP = "DIV_OP",
+  MINUS_UNARY_OP = 'MINUS_UNARY_OP',
 
-  FUNCTION_CALL = "FUNCTION_CALL",
+  PLUS_OP = 'PLUS_OP',
+  MINUS_OP = 'MINUS_OP',
+  TIMES_OP = 'TIMES_OP',
+  DIV_OP = 'DIV_OP',
 
-  CELL_REFERENCE = "CELL_REFERENCE",
+  FUNCTION_CALL = 'FUNCTION_CALL',
 
-  CELL_RANGE = "CELL_RANGE",
+  CELL_REFERENCE = 'CELL_REFERENCE',
 
-  ERROR = "ERROR"
+  CELL_RANGE = 'CELL_RANGE',
+
+  ERROR = 'ERROR',
 }
 
 export interface NumberAst {
@@ -54,7 +57,7 @@ export interface CellReferenceAst {
 }
 export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
   type: AstNodeType.CELL_REFERENCE,
-  reference: reference
+  reference,
 })
 
 export interface CellRangeAst {
@@ -77,7 +80,7 @@ export interface PlusOpAst extends BinaryOpAst {
 export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({
   type: AstNodeType.PLUS_OP,
   left,
-  right
+  right,
 })
 
 export interface MinusOpAst extends BinaryOpAst {
@@ -87,7 +90,17 @@ export interface MinusOpAst extends BinaryOpAst {
 export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({
   type: AstNodeType.MINUS_OP,
   left,
-  right
+  right,
+})
+
+export interface MinusUnaryOpAst {
+  type: AstNodeType.MINUS_UNARY_OP,
+  value: Ast,
+}
+
+export const buildMinusUnaryOpAst = (value: Ast): MinusUnaryOpAst => ({
+  type: AstNodeType.MINUS_UNARY_OP,
+  value,
 })
 
 export interface TimesOpAst extends BinaryOpAst {
@@ -97,7 +110,7 @@ export interface TimesOpAst extends BinaryOpAst {
 export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({
   type: AstNodeType.TIMES_OP,
   left,
-  right
+  right,
 })
 
 export interface DivOpAst extends BinaryOpAst {
@@ -107,7 +120,7 @@ export interface DivOpAst extends BinaryOpAst {
 export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({
   type: AstNodeType.DIV_OP,
   left,
-  right
+  right,
 })
 
 export interface ProcedureAst {
@@ -119,7 +132,7 @@ export interface ProcedureAst {
 export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
-  args
+  args,
 })
 
 export interface ErrorAst {
@@ -127,4 +140,4 @@ export interface ErrorAst {
   args: ParsingError[]
 }
 
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args: args})
+export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})

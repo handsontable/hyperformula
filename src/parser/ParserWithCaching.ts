@@ -1,23 +1,23 @@
-import {parseFromTokens, RangeSeparator, CellReference, RelativeCell, tokenizeFormula} from "./FormulaParser";
-import {IToken, tokenMatcher} from "chevrotain"
-import {Ast, AstNodeType} from "./Ast";
-import {absoluteCellAddress, getAbsoluteAddress, simpleCellAddressFromString, CellAddress, SimpleCellAddress, CellDependency, relativeCellAddress, cellAddressFromString, CellReferenceType} from "../Cell"
+import {IToken, tokenMatcher} from 'chevrotain'
+import {absoluteCellAddress, CellAddress, cellAddressFromString, CellDependency, CellReferenceType, getAbsoluteAddress, relativeCellAddress, SimpleCellAddress, simpleCellAddressFromString} from '../Cell'
+import {Ast, AstNodeType} from './Ast'
+import {CellReference, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from './FormulaParser'
 
 export class ParserWithCaching {
-  private cache: Map<string, Ast> = new Map()
   public statsCacheUsed: number = 0
+  private cache: Map<string, Ast> = new Map()
   private optimizationMode: string
 
   constructor(optimizationMode = 'parser') {
     this.optimizationMode = optimizationMode
   }
 
-  parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
+  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
     if (this.optimizationMode === 'parser') {
-      const lexerResult = tokenizeFormula(text);
-      const { hash, dependencies } = computeHash(lexerResult.tokens, formulaAddress);
+      const lexerResult = tokenizeFormula(text)
+      const { hash, dependencies } = computeHash(lexerResult.tokens, formulaAddress)
       let ast = this.cache.get(hash)
-      
+
       if (ast) {
         ++this.statsCacheUsed
       } else {
@@ -31,7 +31,7 @@ export class ParserWithCaching {
         return { ast, dependencies }
       }
     } else {
-      throw new Error("Unsupported optimization mode")
+      throw new Error('Unsupported optimization mode')
     }
   }
 }
@@ -41,15 +41,15 @@ export function isFormula(text: string): Boolean {
 }
 
 export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): { hash: string, dependencies: CellDependency[] } => {
-  let hash = ""
-  let dependencies: CellDependency[] = []
+  let hash = ''
+  const dependencies: CellDependency[] = []
   let idx = 0
   while (idx < tokens.length) {
     const token = tokens[idx]
     if (tokenMatcher(token, CellReference)) {
-      if (tokens[idx+1] && tokens[idx+2] && tokenMatcher(tokens[idx+1],RangeSeparator) && tokenMatcher(tokens[idx+2], CellReference)) {
+      if (tokens[idx + 1] && tokens[idx + 2] && tokenMatcher(tokens[idx + 1], RangeSeparator) && tokenMatcher(tokens[idx + 2], CellReference)) {
         const cellAddress1 = cellAddressFromString(token.image, baseAddress)
-        const cellAddress2 = cellAddressFromString(tokens[idx+2].image, baseAddress)
+        const cellAddress2 = cellAddressFromString(tokens[idx + 2].image, baseAddress)
         hash = hash.concat(`${cellHashFromToken(cellAddress1)}:${cellHashFromToken(cellAddress2)}`)
         dependencies.push([getAbsoluteAddress(cellAddress1, baseAddress), getAbsoluteAddress(cellAddress2, baseAddress)])
         idx += 3
@@ -68,7 +68,7 @@ export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): {
 }
 
 const cellHashFromToken = (cellAddress: CellAddress): string => {
-  switch(cellAddress.type) {
+  switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
       return `#${cellAddress.row}R${cellAddress.col}`
     }

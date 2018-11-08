@@ -1,20 +1,20 @@
-import {GraphBuilder, Sheet} from "./GraphBuilder";
-import {CellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from "./Vertex";
-import {Graph} from "./Graph";
+import {AddressMapping} from './AddressMapping'
+import {absoluteCellAddress, CellAddress, cellAddressFromString, CellValue, SimpleCellAddress} from './Cell'
+import {Graph} from './Graph'
+import {GraphBuilder, Sheet} from './GraphBuilder'
+import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
-import {Interpreter} from "./interpreter/Interpreter";
-import {StatType, Statistics} from "./statistics/Statistics";
-import {AddressMapping} from "./AddressMapping"
-import {CellAddress, SimpleCellAddress, CellValue, cellAddressFromString, absoluteCellAddress} from "./Cell";
+import {Statistics, StatType} from './statistics/Statistics'
+import {CellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()
   private graph: Graph<Vertex> = new Graph()
-  private sortedVertices: Array<Vertex> = []
+  private sortedVertices: Vertex[] = []
   private interpreter: Interpreter = new Interpreter(this.addressMapping, this.graph)
-  private stats : Statistics = new Statistics()
+  private stats: Statistics = new Statistics()
 
-  loadSheet(sheet: Sheet) {
+  public loadSheet(sheet: Sheet) {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
@@ -35,17 +35,17 @@ export class HandsOnEngine {
     this.stats.end(StatType.OVERALL)
   }
 
-  getCellValue(stringAddress: string): CellValue {
+  public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
     const vertex = this.addressMapping.getCell(address)!
     return vertex.getCellValue()
   }
 
-  getStats() {
+  public getStats() {
     return this.stats.snapshot()
   }
 
-  setCellContent(stringAddress: string, newCellContent: string) {
+  public setCellContent(stringAddress: string, newCellContent: string) {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
     const vertex = this.addressMapping.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
@@ -61,7 +61,7 @@ export class HandsOnEngine {
     this.recomputeFormulas()
   }
 
-  recomputeFormulas() {
+  public recomputeFormulas() {
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress()
