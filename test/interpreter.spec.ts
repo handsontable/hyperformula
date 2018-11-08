@@ -21,7 +21,7 @@ describe('Interpreter', () => {
   })
 
   it('negative number literal', () => {
-    engine.loadSheet([['-3']])
+    engine.loadSheet([['=-3']])
 
     expect(engine.getCellValue('A1')).toBe(-3)
   })

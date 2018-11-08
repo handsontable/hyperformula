@@ -77,6 +77,10 @@ export class Interpreter {
           return cellError(ErrorType.ARG)
         }
       }
+      case AstNodeType.MINUS_UNARY_OP: {
+        const value = this.evaluateAst(ast.value, formulaAddress)
+        return -value
+      }
       case AstNodeType.FUNCTION_CALL: {
         return this.evaluateFunction(ast, formulaAddress)
       }
