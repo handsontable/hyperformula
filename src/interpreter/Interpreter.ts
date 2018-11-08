@@ -154,6 +154,14 @@ export class Interpreter {
       case "FALSE": {
         return false
       }
+      case "ACOS": {
+        const arg = this.evaluateAst(ast.args[0], formulaAddress)
+        if (typeof arg === 'number') {
+          return Math.acos(arg);
+        } else {
+          return cellError(ErrorType.NUM)
+        }
+      }
       default:
         return cellError(ErrorType.NAME)
     }

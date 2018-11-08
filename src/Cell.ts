@@ -3,6 +3,7 @@ export enum ErrorType {
   DIV_BY_ZERO = 'DIV_BY_ZERO',
   NAME = 'NAME',
   VALUE = 'VALUE',
+  NUM = 'NUM',
 }
 
 export enum CellReferenceType {

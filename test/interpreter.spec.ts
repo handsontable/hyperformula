@@ -202,4 +202,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(false)
   })
+
+  it("function ACOS happy path", () => {
+    engine.loadSheet([['=ACOS(1)']])
+
+    expect(engine.getCellValue("A1")).toEqual(0)
+  })
+
+  it("function ACOS when value not numeric", () => {
+    engine.loadSheet([["=ACOS('foo')"]])
+
+    expect(engine.getCellValue("A1")).toEqual(cellError(ErrorType.NUM))
+  })
 })
