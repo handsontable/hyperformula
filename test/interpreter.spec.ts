@@ -29,7 +29,7 @@ describe('Interpreter', () => {
   it('negative number literal - non numeric value', () => {
     engine.loadSheet([["=-'foo'"]])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('string literals', () => {
@@ -70,16 +70,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toBeCloseTo(5.14)
   })
 
-  it('plus operator - ARG error on 1st operand', () => {
+  it('plus operator - VALUE error on 1st operand', () => {
     engine.loadSheet([['www', '=A1+42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('plus operator - ARG error on 2nd operand', () => {
+  it('plus operator - VALUE error on 2nd operand', () => {
     engine.loadSheet([['www', '=42+A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('minus operator', () => {
@@ -88,16 +88,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toBe(-40)
   })
 
-  it('minus operator - ARG error on 1st operand', () => {
+  it('minus operator - VALUE error on 1st operand', () => {
     engine.loadSheet([['www', '=A1-42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('minus operator - ARG error on 2nd operand', () => {
+  it('minus operator - VALUE error on 2nd operand', () => {
     engine.loadSheet([['www', '=42-A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('times operator', () => {
@@ -106,16 +106,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toBe(18)
   })
 
-  it('times operator - ARG error on 1st operand', () => {
+  it('times operator - VALUE error on 1st operand', () => {
     engine.loadSheet([['www', '=A1*42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('times operator - ARG error on 2nd operand', () => {
+  it('times operator - VALUE error on 2nd operand', () => {
     engine.loadSheet([['www', '=42*A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('div operator - int result', () => {
@@ -142,16 +142,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('div operator - ARG error on 1st operand', () => {
+  it('div operator - VALUE error on 1st operand', () => {
     engine.loadSheet([['www', '=A1 / 42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('div operator - ARG error on 2nd operand', () => {
+  it('div operator - VALUE error on 2nd operand', () => {
     engine.loadSheet([['www', '=42 / A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('procedures - SUM without args', () => {
@@ -181,12 +181,12 @@ describe('Interpreter', () => {
   it('procedures - SUM with bad args', () => {
     engine.loadSheet([['=SUM(B1)', 'asdf']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('ranges - SUM range with not numeric values', () => {
     engine.loadSheet([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
-    expect(engine.getCellValue('A4')).toEqual(cellError(ErrorType.ARG))
+    expect(engine.getCellValue('A4')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('procedures - not known procedure', () => {

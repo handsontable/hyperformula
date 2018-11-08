@@ -19,7 +19,7 @@ export class Interpreter {
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
     const result = this.evaluateAst(formula, formulaAddress)
     if (Array.isArray(result)) {
-      return cellError(ErrorType.ARG)
+      return cellError(ErrorType.VALUE)
     } else {
       return result as CellValue
     }
@@ -44,7 +44,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult + rightResult
         } else {
-          return cellError(ErrorType.ARG)
+          return cellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.MINUS_OP: {
@@ -53,7 +53,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
-          return cellError(ErrorType.ARG)
+          return cellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.TIMES_OP: {
@@ -62,7 +62,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
-          return cellError(ErrorType.ARG)
+          return cellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.DIV_OP: {
@@ -74,7 +74,7 @@ export class Interpreter {
           }
           return leftResult / rightResult
         } else {
-          return cellError(ErrorType.ARG)
+          return cellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -82,7 +82,7 @@ export class Interpreter {
         if (typeof value === 'number') {
           return -value
         } else {
-          return cellError(ErrorType.ARG)
+          return cellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.FUNCTION_CALL: {
@@ -152,7 +152,7 @@ export class Interpreter {
           if (typeof currentSum === 'number' && typeof value === 'number') {
             return currentSum + value
           } else {
-            return cellError(ErrorType.ARG)
+            return cellError(ErrorType.VALUE)
           }
         }, 0)
       }
@@ -183,7 +183,7 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
     if (typeof acc === 'number' && typeof val === 'number') {
       return acc + val
     } else {
-      return cellError(ErrorType.ARG)
+      return cellError(ErrorType.VALUE)
     }
   })
 }
