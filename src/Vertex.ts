@@ -2,19 +2,7 @@ import {Ast} from "./parser/Ast";
 import {CellValue, SimpleCellAddress} from "./Cell";
 import {ExpressionValue} from "./interpreter/Interpreter";
 
-type VertexId = number;
-let nextVertexId = 0;
-const getNextVertexId = () : VertexId => {
-  return nextVertexId++;
-}
-
-
 export abstract class Vertex {
-  public readonly id: VertexId;
-
-  protected constructor() {
-    this.id = getNextVertexId();
-  }
 }
 
 export abstract class CellVertex extends Vertex {

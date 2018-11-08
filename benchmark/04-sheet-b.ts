@@ -1,6 +1,6 @@
 import {benchmark} from "./benchmark";
 
-const rows = 1000
+const rows = 10000
 
 let sheet = []
 sheet.push(['=1*E$1', '=SUM($A$1:A1)', '=A1', `=SUM(B1:B${rows})`, '5'])
@@ -18,4 +18,4 @@ while (prev < rows) {
   ++prev
 }
 
-benchmark(sheet, { millisecondsPerThousandRows: 1000, numberOfRuns: 3 })
+benchmark(sheet, { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
