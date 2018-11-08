@@ -20,6 +20,12 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toBe(3)
   })
 
+  it('negative number literal', () => {
+    engine.loadSheet([['-3']])
+
+    expect(engine.getCellValue('A1')).toBe(-3)
+  })
+
   it('string literals', () => {
     engine.loadSheet([
       ['www', '1www', 'www1'],

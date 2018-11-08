@@ -6,8 +6,10 @@ import {
   ErrorAst,
   NumberAst,
   PlusOpAst,
+  MinusOpAst,
   ProcedureAst,
   StringAst,
+  MinusUnaryOpAst,
 } from '../src/parser/Ast'
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 
@@ -18,6 +20,16 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = parser.parse('=42', absoluteCellAddress(0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(42)
+  })
+
+  it('negative integer literal', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=-42', absoluteCellAddress(0, 0)).ast as MinusUnaryOpAst
+    expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
+    const value = ast.value as NumberAst
+    expect(value.type).toBe(AstNodeType.NUMBER)
+    expect(value.value).toBe(42)
   })
 
   it('string literal', () => {
@@ -35,6 +47,15 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
     expect(ast.right.type).toBe(AstNodeType.CELL_REFERENCE)
+  })
+
+  it('minus operator', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=1-3', absoluteCellAddress(0, 0)).ast as MinusOpAst
+    expect(ast.type).toBe(AstNodeType.MINUS_OP)
+    expect(ast.left.type).toBe(AstNodeType.NUMBER)
+    expect(ast.right.type).toBe(AstNodeType.NUMBER)
   })
 
   it('absolute cell reference', () => {

@@ -13,6 +13,7 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
+  buildMinusUnaryOpAst,
 } from './Ast'
 
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/})
@@ -50,7 +51,7 @@ const RParen = createToken({name: 'RParen', pattern: /\)/})
 const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z]+/})
 
 /* terminals */
-const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /(\d+(\.\d+)?)/})
+const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
 
 /* separator */
 const ArgSeparator = createToken({name: 'ArgSeparator', pattern: /;/})
@@ -153,6 +154,21 @@ class FormulaParser extends Parser {
   })
 
   private atomicExpression: AstRule = this.RULE('atomicExpression', () => {
+    return this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(MinusOp)
+          const value = this.SUBRULE(this.positiveAtomicExpression)
+          return buildMinusUnaryOpAst(value)
+        },
+      },
+      {
+        ALT: () => this.SUBRULE2(this.positiveAtomicExpression),
+      },
+    ])
+  })
+
+  private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
     return this.OR(this.atomicExpCache || (this.atomicExpCache = [
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression),

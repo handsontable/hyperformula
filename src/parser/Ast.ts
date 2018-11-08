@@ -5,6 +5,7 @@ export type Ast =
     | StringAst
     | CellReferenceAst
     | CellRangeAst
+    | MinusUnaryOpAst
     | PlusOpAst
     | MinusOpAst
     | TimesOpAst
@@ -20,6 +21,8 @@ export interface ParsingError {
 export enum AstNodeType {
   NUMBER = 'NUMBER',
   STRING = 'STRING',
+
+  MINUS_UNARY_OP = 'MINUS_UNARY_OP',
 
   PLUS_OP = 'PLUS_OP',
   MINUS_OP = 'MINUS_OP',
@@ -88,6 +91,16 @@ export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({
   type: AstNodeType.MINUS_OP,
   left,
   right,
+})
+
+export interface MinusUnaryOpAst {
+  type: AstNodeType.MINUS_UNARY_OP,
+  value: Ast,
+}
+
+export const buildMinusUnaryOpAst = (value: Ast): MinusUnaryOpAst => ({
+  type: AstNodeType.MINUS_UNARY_OP,
+  value,
 })
 
 export interface TimesOpAst extends BinaryOpAst {
