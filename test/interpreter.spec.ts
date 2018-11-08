@@ -27,7 +27,7 @@ describe('Interpreter', () => {
   })
 
   it('negative number literal - non numeric value', () => {
-    engine.loadSheet([["=-'foo'"]])
+    engine.loadSheet([['=-"foo"']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
@@ -44,7 +44,7 @@ describe('Interpreter', () => {
 
   it('string literals in formula', () => {
     engine.loadSheet([
-      ["='www'", "='1www'", "='www1'"],
+      ['="www"', '="1www"', '="www1"'],
     ])
 
     expect(engine.getCellValue('A1')).toBe('www')
@@ -234,7 +234,7 @@ describe('Interpreter', () => {
   })
 
   it('function ACOS when value not numeric', () => {
-    engine.loadSheet([["=ACOS('foo')"]])
+    engine.loadSheet([['=ACOS("foo")']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
   })
@@ -264,31 +264,31 @@ describe('Interpreter', () => {
   })
 
   it('function IF when value is true', () => {
-    engine.loadSheet([["=IF(TRUE(); 'yes'; 'no')"]])
+    engine.loadSheet([['=IF(TRUE(); "yes"; "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF when value is false', () => {
-    engine.loadSheet([["=IF(FALSE(); 'yes'; 'no')"]])
+    engine.loadSheet([['=IF(FALSE(); "yes"; "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('no')
   })
 
   it('function IF when condition is weird type', () => {
-    engine.loadSheet([["=IF('foo'; 'yes'; 'no')"]])
+    engine.loadSheet([['=IF("foo"; "yes"; "no")']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('function IF works when only first part is given', () => {
-    engine.loadSheet([["=IF(TRUE(); 'yes')"]])
+    engine.loadSheet([['=IF(TRUE(); "yes")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF works when only first part is given and condition is falsey', () => {
-    engine.loadSheet([["=IF(FALSE(); 'yes')"]])
+    engine.loadSheet([['=IF(FALSE(); "yes")']])
 
     expect(engine.getCellValue('A1')).toEqual(false)
   })

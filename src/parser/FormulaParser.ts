@@ -57,7 +57,7 @@ const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/
 const ArgSeparator = createToken({name: 'ArgSeparator', pattern: /;/})
 
 /* string literal */
-const StringLiteral = createToken({name: 'StringLiteral', pattern: /'([^'\\]*(\\.[^'\\]*)*)'/})
+const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
 /* skipping whitespaces */
 const WhiteSpace = createToken({

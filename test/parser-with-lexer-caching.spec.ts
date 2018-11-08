@@ -35,7 +35,7 @@ const sharedExamples = (optimizationMode: string) => {
   it('string literal', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
-    const ast = parser.parse("='foobar'", absoluteCellAddress(0, 0)).ast as StringAst
+    const ast = parser.parse('="foobar"', absoluteCellAddress(0, 0)).ast as StringAst
     expect(ast.type).toBe(AstNodeType.STRING)
     expect(ast.value).toBe('foobar')
   })

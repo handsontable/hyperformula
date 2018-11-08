@@ -60,28 +60,28 @@ describe('computeHash', () => {
   })
 
   it('cell ref in string', () => {
-    const code = "='A5'"
+    const code = '="A5"'
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
-      hash: "='A5'",
+      hash: '="A5"',
       dependencies: [],
     })
   })
 
   it('cell ref between strings', () => {
-    const code = "='A5'+A4+'A6'"
+    const code = '="A5"+A4+"A6"'
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
-      hash: "='A5'+#2R-1+'A6'",
+      hash: '="A5"+#2R-1+"A6"',
       dependencies: [simpleCellAddress(0, 3)],
     })
   })
 
   it('cell ref in string with escape', () => {
-    const code = "='fdsaf\\'A5'"
+    const code = '="fdsaf\\"A5"'
 
     expect(computeFunc(code, absoluteCellAddress(1, 1))).toMatchObject({
-      hash: "='fdsaf\\'A5'",
+      hash: '="fdsaf\\"A5"',
       dependencies: [],
     })
   })
