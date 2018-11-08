@@ -196,4 +196,10 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue("A1")).toEqual(true)
   })
+
+  it("function FALSE", () => {
+    engine.loadSheet([['=FALSE()']])
+
+    expect(engine.getCellValue("A1")).toEqual(false)
+  })
 })

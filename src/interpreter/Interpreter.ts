@@ -151,6 +151,9 @@ export class Interpreter {
       case "TRUE": {
         return true
       }
+      case "FALSE": {
+        return false
+      }
       default:
         return cellError(ErrorType.NAME)
     }
