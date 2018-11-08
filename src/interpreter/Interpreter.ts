@@ -79,7 +79,11 @@ export class Interpreter {
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const value = this.evaluateAst(ast.value, formulaAddress)
-        return -value
+        if (typeof value === 'number') {
+          return -value
+        } else {
+          return cellError(ErrorType.ARG)
+        }
       }
       case AstNodeType.FUNCTION_CALL: {
         return this.evaluateFunction(ast, formulaAddress)

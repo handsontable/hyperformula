@@ -26,6 +26,12 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toBe(-3)
   })
 
+  it('negative number literal - non numeric value', () => {
+    engine.loadSheet([["=-'foo'"]])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.ARG))
+  })
+
   it('string literals', () => {
     engine.loadSheet([
       ['www', '1www', 'www1'],
