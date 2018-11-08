@@ -280,4 +280,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('function IF works when only first part is given', () => {
+    engine.loadSheet([["=IF(TRUE(); 'yes')"]])
+
+    expect(engine.getCellValue('A1')).toEqual('yes')
+  })
+
+  it('function IF works when only first part is given and condition is falsey', () => {
+    engine.loadSheet([["=IF(FALSE(); 'yes')"]])
+
+    expect(engine.getCellValue('A1')).toEqual(false)
+  })
 })

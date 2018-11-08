@@ -183,7 +183,11 @@ export class Interpreter {
         if (condition === true) {
           return this.evaluateAst(ast.args[1], formulaAddress)
         } else if (condition === false) {
-          return this.evaluateAst(ast.args[2], formulaAddress)
+          if (ast.args[2]) {
+            return this.evaluateAst(ast.args[2], formulaAddress)
+          } else {
+            return false
+          }
         } else {
           return cellError(ErrorType.VALUE)
         }
