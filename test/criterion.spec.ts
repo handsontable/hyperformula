@@ -20,4 +20,8 @@ describe('Criterion', () => {
   it('not equal', () => {
     expect(parseCriterion('<>0')).toEqual(buildCriterion(CriterionType.NOT_EQUAL, 0))
   })
+
+  it('equal', () => {
+    expect(parseCriterion('=0')).toEqual(buildCriterion(CriterionType.EQUAL, 0))
+  })
 })

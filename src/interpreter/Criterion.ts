@@ -4,6 +4,7 @@ export enum CriterionType {
   LESS_THAN = 'LESS_THAN',
   LESS_THAN_OR_EQUAL = 'LESS_THAN_OR_EQUAL',
   NOT_EQUAL = 'NOT_EQUAL',
+  EQUAL = 'EQUAL',
 }
 export interface Criterion {
   operator: CriterionType,
@@ -26,6 +27,8 @@ export const parseCriterion = (criterion: string): Criterion | null => {
     } else {
       return buildCriterion(CriterionType.LESS_THAN, Number(criterion.slice(1)))
     }
+  } else if (criterion[0] === '=') {
+    return buildCriterion(CriterionType.EQUAL, Number(criterion.slice(1)))
   }
   return null
 }
