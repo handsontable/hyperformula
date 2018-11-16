@@ -12,23 +12,21 @@ export interface Criterion {
 }
 export const buildCriterion = (operator: CriterionType, value: number) => ({ operator, value })
 
+const CRITERION_REGEX = /([<>=]+)(-?\d+\.?\d*)/
 export const parseCriterion = (criterion: string): Criterion | null => {
-  if (criterion[0] === '>') {
-    if (criterion[1] === '=') {
-      return buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, Number(criterion.slice(2)))
-    } else {
-      return buildCriterion(CriterionType.GREATER_THAN, Number(criterion.slice(1)))
+  const regexResult = criterion.match(CRITERION_REGEX)
+  if (regexResult) {
+    const value = Number(regexResult[2])
+    switch (regexResult[1]) {
+      case '>': return buildCriterion(CriterionType.GREATER_THAN, value)
+      case '>=': return buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, value)
+      case '<': return buildCriterion(CriterionType.LESS_THAN, value)
+      case '<=': return buildCriterion(CriterionType.LESS_THAN_OR_EQUAL, value)
+      case '<>': return buildCriterion(CriterionType.NOT_EQUAL, value)
+      case '=': return buildCriterion(CriterionType.EQUAL, value)
+      default: return null
     }
-  } else if (criterion[0] === '<') {
-    if (criterion[1] === '=') {
-      return buildCriterion(CriterionType.LESS_THAN_OR_EQUAL, Number(criterion.slice(2)))
-    } else if (criterion[1] === '>') {
-      return buildCriterion(CriterionType.NOT_EQUAL, Number(criterion.slice(2)))
-    } else {
-      return buildCriterion(CriterionType.LESS_THAN, Number(criterion.slice(1)))
-    }
-  } else if (criterion[0] === '=') {
-    return buildCriterion(CriterionType.EQUAL, Number(criterion.slice(1)))
+  } else {
+    return null
   }
-  return null
 }
