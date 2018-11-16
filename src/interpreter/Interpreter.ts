@@ -169,30 +169,7 @@ export class Interpreter {
         }, 0)
       }
       case 'SUMIF': {
-        const conditionRangeArg = ast.args[0]
-        if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
-          return cellError(ErrorType.VALUE)
-        }
-        const valuesRangeArg = ast.args[2]
-        if (valuesRangeArg.type !== AstNodeType.CELL_RANGE) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
-        const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
-        if (typeof criterionString !== 'string') {
-          return cellError(ErrorType.VALUE)
-        }
-        const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
-
-        const criterion = parseCriterion(criterionString)
-        if (criterion === null) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = computableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
-        return rangeSum(filteredValues)
+        return this.evaluateIfFunction(ast, formulaAddress, rangeSum)
       }
       case 'TRUE': {
         if (ast.args.length > 0) {
@@ -233,6 +210,33 @@ export class Interpreter {
       default:
         return cellError(ErrorType.NAME)
     }
+  }
+
+  private evaluateIfFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress, ifFunction: RangeOperation): ExpressionValue {
+    const conditionRangeArg = ast.args[0]
+    if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
+      return cellError(ErrorType.VALUE)
+    }
+    const valuesRangeArg = ast.args[2]
+    if (valuesRangeArg.type !== AstNodeType.CELL_RANGE) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+    if (typeof criterionString !== 'string') {
+      return cellError(ErrorType.VALUE)
+    }
+    const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+
+    const criterion = parseCriterion(criterionString)
+    if (criterion === null) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const criterionLambda = buildCriterionLambda(criterion)
+    const filteredValues = computableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
+    return ifFunction(filteredValues)
   }
 }
 
