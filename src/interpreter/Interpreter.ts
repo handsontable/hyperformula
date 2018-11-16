@@ -4,7 +4,7 @@ import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRange} from '../GraphBuilder'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
-import {Criterion, parseCriterion} from './Criterion'
+import {buildCriterionLambda, Criterion, parseCriterion} from './Criterion'
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -185,9 +185,8 @@ export class Interpreter {
         if (criterion === null) {
           return cellError(ErrorType.VALUE)
         } else {
-          const filteredValues = summableValues.filter((val, idx) => {
-            return (conditionValues[idx] > criterion.value)
-          })
+          const criterionLambda = buildCriterionLambda(criterion)
+          const filteredValues = summableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
           return rangeSum(filteredValues)
         }
       }

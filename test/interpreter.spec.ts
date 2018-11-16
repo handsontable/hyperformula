@@ -292,16 +292,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(false)
   })
 
-  it('function SUMIF simplest case', () => {
-    engine.loadSheet([
-      ['0', '3'],
-      ['1', '7'],
-      ['=SUMIF(A1:A2; ">0"; B1:B2)'],
-    ])
-
-    expect(engine.getCellValue('A3')).toEqual(7)
-  })
-
   it('function SUMIF error when 1st arg is not a range', () => {
     engine.loadSheet([
       ['=SUMIF(42; ">0"; B1:B2)'],
@@ -332,5 +322,71 @@ describe('Interpreter', () => {
     ])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function SUMIF usage of greater than operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3; ">1"; B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(7)
+  })
+
+  it('function SUMIF usage of greater than or equal operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3; ">=1"; B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(12)
+  })
+
+  it('function SUMIF usage of less than operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A2; "<1"; B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(3)
+  })
+
+  it('function SUMIF usage of less than or equal operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3; "<=1"; B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(8)
+  })
+
+  it('function SUMIF usage of equal operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3; "=1"; B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(5)
+  })
+
+  it('function SUMIF usage of not equal operator', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3; "<>1"; B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(10)
   })
 })

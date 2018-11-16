@@ -1,3 +1,5 @@
+import {CellValue} from '../Cell'
+
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
   GREATER_THAN_OR_EQUAL = 'GREATER_THAN_OR_EQUAL',
@@ -28,5 +30,65 @@ export const parseCriterion = (criterion: string): Criterion | null => {
     }
   } else {
     return null
+  }
+}
+
+export type CriterionLambda = (cellValue: CellValue) => boolean | null
+export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
+  switch (criterion.operator) {
+    case CriterionType.GREATER_THAN: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue > criterion.value
+        } else {
+          return null
+        }
+      }
+    }
+    case CriterionType.GREATER_THAN_OR_EQUAL: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue >= criterion.value
+        } else {
+          return null
+        }
+      }
+    }
+    case CriterionType.LESS_THAN: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue < criterion.value
+        } else {
+          return null
+        }
+      }
+    }
+    case CriterionType.LESS_THAN_OR_EQUAL: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue <= criterion.value
+        } else {
+          return null
+        }
+      }
+    }
+    case CriterionType.EQUAL: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue === criterion.value
+        } else {
+          return null
+        }
+      }
+    }
+    case CriterionType.NOT_EQUAL: {
+      return (cellValue) => {
+        if (typeof cellValue === 'number') {
+          return cellValue !== criterion.value
+        } else {
+          return null
+        }
+      }
+    }
   }
 }
