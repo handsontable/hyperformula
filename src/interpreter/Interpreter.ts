@@ -1,7 +1,7 @@
 import {AddressMapping} from '../AddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
 import {Graph} from '../Graph'
-import {findSmallerRange, generateCellsFromRange} from '../GraphBuilder'
+import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, parseCriterion} from './Criterion'
@@ -105,13 +105,13 @@ export class Interpreter {
     const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getRangeValue(functionName)!)
-      generateCellsFromRange(restRangeStart, restRangeEnd).forEach((cellFromRange) => {
+      for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
         rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-      })
+      }
     } else {
-      generateCellsFromRange(beginRange, endRange).forEach((cellFromRange) => {
+      for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
         rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-      })
+      }
     }
     return rangeResult
   }
@@ -138,9 +138,9 @@ export class Interpreter {
   private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
-    generateCellsFromRange(beginRange, endRange).forEach((cellFromRange) => {
+    for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
       rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-    })
+    }
     return rangeResult
   }
 
