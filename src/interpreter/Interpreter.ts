@@ -171,6 +171,27 @@ export class Interpreter {
       case 'SUMIF': {
         return this.evaluateIfFunction(ast, formulaAddress, rangeSum)
       }
+      case 'COUNTIF': {
+        const conditionRangeArg = ast.args[0]
+        if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
+          return cellError(ErrorType.VALUE)
+        }
+
+        const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+        const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+        if (typeof criterionString !== 'string') {
+          return cellError(ErrorType.VALUE)
+        }
+
+        const criterion = parseCriterion(criterionString)
+        if (criterion === null) {
+          return cellError(ErrorType.VALUE)
+        }
+
+        const criterionLambda = buildCriterionLambda(criterion)
+        const filteredValues = conditionValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
+        return filteredValues.length
+      }
       case 'TRUE': {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)

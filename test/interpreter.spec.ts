@@ -316,7 +316,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('function SUMIF error when criterion unparsable arg is not a range', () => {
+  it('function SUMIF error when criterion unparsable', () => {
     engine.loadSheet([
       ['=SUMIF(B1:B2; "%"; C1:C2)'],
     ])
@@ -388,5 +388,40 @@ describe('Interpreter', () => {
     ])
 
     expect(engine.getCellValue('A4')).toEqual(10)
+  })
+
+  it('function COUNTIF usage', () => {
+    engine.loadSheet([
+      ['0'],
+      ['1'],
+      ['2'],
+      ['=COUNTIF(A1:A3; ">=1")'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(2)
+  })
+
+  it('function COUNTIF error when 1st arg is not a range', () => {
+    engine.loadSheet([
+      ['=COUNTIF(42; ">0")'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function COUNTIF error when 2nd arg is not a string', () => {
+    engine.loadSheet([
+      ['=COUNTIF(C1:C2; 78)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function COUNTIF error when criterion unparsable', () => {
+    engine.loadSheet([
+      ['=COUNTIF(B1:B2; "%")'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 })
