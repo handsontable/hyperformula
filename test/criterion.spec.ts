@@ -36,4 +36,12 @@ describe('Criterion', () => {
   it('works with floats', () => {
     expect(parseCriterion('>=100.5')).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100.5))
   })
+
+  it('null when unknown operator', () => {
+    expect(parseCriterion('><0')).toEqual(null)
+  })
+
+  it('null when unparsable string', () => {
+    expect(parseCriterion('$fdsa')).toEqual(null)
+  })
 })
