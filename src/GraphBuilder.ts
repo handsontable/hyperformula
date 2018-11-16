@@ -67,11 +67,9 @@ export class GraphBuilder {
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
-            rowOfCells.forEach((cellFromRange) => {
-              const vertex = this.getOrCreateVertex(cellFromRange)
-              this.graph.addEdge(vertex, rangeVertex!)
-            })
+          generateCellsFromRange(restRangeStart, restRangeEnd).forEach((cellFromRange) => {
+            const vertex = this.getOrCreateVertex(cellFromRange)
+            this.graph.addEdge(vertex, rangeVertex!)
           })
 
           this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
@@ -94,17 +92,15 @@ export class GraphBuilder {
   }
 }
 
-export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): SimpleCellAddress[][] => {
+export const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): SimpleCellAddress[] => {
   const result = []
   let currentRow = rangeStart.row
   while (currentRow <= rangeEnd.row) {
-    const rowResult = []
     let currentColumn = rangeStart.col
     while (currentColumn <= rangeEnd.col) {
-      rowResult.push(relativeCellAddress(currentColumn, currentRow))
+      result.push(relativeCellAddress(currentColumn, currentRow))
       currentColumn++
     }
-    result.push(rowResult)
     currentRow++
   }
   return result

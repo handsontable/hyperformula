@@ -105,16 +105,12 @@ export class Interpreter {
     const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getRangeValue(functionName)!)
-      generateCellsFromRange(restRangeStart, restRangeEnd).forEach((rowOfCells) => {
-        rowOfCells.forEach((cellFromRange) => {
-          rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-        })
+      generateCellsFromRange(restRangeStart, restRangeEnd).forEach((cellFromRange) => {
+        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
       })
     } else {
-      generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
-        rowOfCells.forEach((cellFromRange) => {
-          rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-        })
+      generateCellsFromRange(beginRange, endRange).forEach((cellFromRange) => {
+        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
       })
     }
     return rangeResult
@@ -142,10 +138,8 @@ export class Interpreter {
   private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
-    generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
-      rowOfCells.forEach((cellFromRange) => {
-        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-      })
+    generateCellsFromRange(beginRange, endRange).forEach((cellFromRange) => {
+      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
     })
     return rangeResult
   }
