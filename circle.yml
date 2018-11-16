@@ -14,5 +14,6 @@ jobs:
       #       - node_modules
       - run: make typecheck
       - run: make test
+      - run: make lint
       - run: make benchmark
 
