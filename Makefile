@@ -18,6 +18,8 @@ benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/04-sheet-b.ts
 	@echo
 	@yarn ts-node benchmark/05-sheet-t.ts
+	@echo
+	@yarn ts-node benchmark/06-big-sum.ts
 
 check: typecheck test
 
