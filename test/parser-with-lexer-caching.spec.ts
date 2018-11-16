@@ -192,6 +192,14 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = parser.parse('=A1B1', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('NotAllInputParsedException')
   })
+
+  it('OFFSET parsing into cell reference', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; 0; 0; 0; 0)', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(1, 1))
+  })
 }
 
 describe('ParserWithCaching - parser optimizations', () => {

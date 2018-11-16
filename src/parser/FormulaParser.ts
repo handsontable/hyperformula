@@ -208,7 +208,11 @@ class FormulaParser extends Parser {
       },
     })
     this.CONSUME(RParen)
-    return buildProcedureAst(procedureName, args)
+    if (procedureName === 'OFFSET') {
+      return args[0]
+    } else {
+      return buildProcedureAst(procedureName, args)
+    }
   })
 
   private cellReference: AstRule = this.RULE('cellReference', () => {
