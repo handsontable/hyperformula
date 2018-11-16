@@ -2,11 +2,7 @@ import {CellAddress, relativeCellAddress, SimpleCellAddress} from '../src/Cell'
 import {generateCellsFromRangeGenerator} from '../src/GraphBuilder'
 
 const generateCellsFromRange = (rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): SimpleCellAddress[] => {
-  const result = []
-  for (const e of generateCellsFromRangeGenerator(rangeStart, rangeEnd)) {
-    result.push(e)
-  }
-  return result
+  return Array.from(generateCellsFromRangeGenerator(rangeStart, rangeEnd))
 }
 
 describe('generateCellsFromRange', () => {
