@@ -251,6 +251,16 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
+      case 'CONCATENATE': {
+        return ast.args.reduce((acc: CellValue, arg: Ast) => {
+          const argResult = this.evaluateAst(arg, formulaAddress)
+          if (typeof acc === 'string' && typeof argResult === 'string') {
+            return acc.concat(argResult)
+          } else {
+            return cellError(ErrorType.VALUE)
+          }
+        }, "")
+      }
       default:
         return cellError(ErrorType.NAME)
     }

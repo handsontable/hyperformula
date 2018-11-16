@@ -292,6 +292,12 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(false)
   })
 
+  it('function CONCATENATE works', () => {
+    engine.loadSheet([['John', 'Smith', '=CONCATENATE(A1; B1)']])
+
+    expect(engine.getCellValue('C1')).toEqual("JohnSmith")
+  })
+
   it('function SUMIF error when 1st arg is not a range', () => {
     engine.loadSheet([
       ['=SUMIF(42; ">0"; B1:B2)'],
