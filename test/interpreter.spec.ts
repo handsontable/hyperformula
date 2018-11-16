@@ -169,7 +169,7 @@ describe('Interpreter', () => {
   it('procedures - SUM with range args', () => {
     engine.loadSheet([['1', '2', '5'],
                       ['3', '4', '=SUM(A1:B2)']])
-    expect(engine.getCellValue("C2")).toEqual(10)
+    expect(engine.getCellValue('C2')).toEqual(10)
   })
 
   it('ranges - VALUE error when evaluating without context', () => {
@@ -290,5 +290,15 @@ describe('Interpreter', () => {
     engine.loadSheet([['=IF(FALSE(); "yes")']])
 
     expect(engine.getCellValue('A1')).toEqual(false)
+  })
+
+  it('function SUMIF simplest case', () => {
+    engine.loadSheet([
+      ['0', '3'],
+      ['1', '7'],
+      ['=SUMIF(A1:A2; ">0"; B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(7)
   })
 })

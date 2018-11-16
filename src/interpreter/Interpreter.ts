@@ -138,6 +138,17 @@ export class Interpreter {
     return value
   }
 
+  private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
+    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+    const rangeResult: CellValue[] = []
+    generateCellsFromRange(beginRange, endRange).forEach((rowOfCells) => {
+      rowOfCells.forEach((cellFromRange) => {
+        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+      })
+    })
+    return rangeResult
+  }
+
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
     switch (ast.procedureName) {
       case 'SUM': {
@@ -155,6 +166,26 @@ export class Interpreter {
             return cellError(ErrorType.VALUE)
           }
         }, 0)
+      }
+      case 'SUMIF': {
+        if (ast.args[0].type !== AstNodeType.CELL_RANGE) {
+          return cellError(ErrorType.VALUE)
+        }
+        const conditionValues = this.getPlainRangeValues(ast.args[0] as CellRangeAst, formulaAddress)
+        const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+        if (typeof criterionString !== 'string') {
+          return cellError(ErrorType.VALUE)
+        }
+        const criterion = parseCriterion(criterionString)
+        const summableValues = this.getPlainRangeValues(ast.args[2] as CellRangeAst, formulaAddress)
+        if (criterion === null) {
+          return cellError(ErrorType.VALUE)
+        } else {
+          const filteredValues = summableValues.filter((val, idx) => {
+            return (conditionValues[idx] > criterion.value)
+          })
+          return rangeSum(filteredValues)
+        }
       }
       case 'TRUE': {
         if (ast.args.length > 0) {
@@ -208,4 +239,20 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
       return cellError(ErrorType.VALUE)
     }
   })
+}
+
+export enum CriterionType {
+  GREATER_THAN = 'GREATER_THAN',
+}
+export interface Criterion {
+  operator: CriterionType,
+  value: number
+}
+export const buildCriterion = (operator: CriterionType, value: number) => ({ operator, value })
+
+export const parseCriterion = (criterion: string): Criterion | null => {
+  if (criterion[0] === '>') {
+    return buildCriterion(CriterionType.GREATER_THAN, Number(criterion.slice(1)))
+  }
+  return null
 }
