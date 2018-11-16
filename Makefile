@@ -17,7 +17,9 @@ benchmark: ## Run benchmarks
 	@echo
 	@yarn ts-node benchmark/04-sheet-b.ts
 
-check: lint typecheck test
+check: typecheck test
+
+full: check lint-fix
 
 lint: ## show linting errors
 	@yarn tslint --project tsconfig.json
