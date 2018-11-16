@@ -259,7 +259,7 @@ export class Interpreter {
           } else {
             return cellError(ErrorType.VALUE)
           }
-        }, "")
+        }, '')
       }
       default:
         return cellError(ErrorType.NAME)

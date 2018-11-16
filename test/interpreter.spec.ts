@@ -295,13 +295,13 @@ describe('Interpreter', () => {
   it('function CONCATENATE by default returns empty string', () => {
     engine.loadSheet([['=CONCATENATE()']])
 
-    expect(engine.getCellValue('A1')).toEqual("")
+    expect(engine.getCellValue('A1')).toEqual('')
   })
 
   it('function CONCATENATE works', () => {
     engine.loadSheet([['John', 'Smith', '=CONCATENATE(A1; B1)']])
 
-    expect(engine.getCellValue('C1')).toEqual("JohnSmith")
+    expect(engine.getCellValue('C1')).toEqual('JohnSmith')
   })
 
   it('function CONCATENATE returns error if one of the arguments is error', () => {
