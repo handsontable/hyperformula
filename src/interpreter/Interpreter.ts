@@ -183,7 +183,7 @@ export class Interpreter {
         if (typeof criterionString !== 'string') {
           return cellError(ErrorType.VALUE)
         }
-        const summableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+        const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
 
         const criterion = parseCriterion(criterionString)
         if (criterion === null) {
@@ -191,7 +191,7 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = summableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
+        const filteredValues = computableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
         return rangeSum(filteredValues)
       }
       case 'TRUE': {
