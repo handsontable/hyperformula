@@ -301,4 +301,36 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A3')).toEqual(7)
   })
+
+  it('function SUMIF error when 1st arg is not a range', () => {
+    engine.loadSheet([
+      ['=SUMIF(42; ">0"; B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function SUMIF error when 2nd arg is not a string', () => {
+    engine.loadSheet([
+      ['=SUMIF(C1:C2; 78; B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function SUMIF error when 3rd arg is not a range', () => {
+    engine.loadSheet([
+      ['=SUMIF(C1:C2; ">0"; 42)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function SUMIF error when criterion unparsable arg is not a range', () => {
+    engine.loadSheet([
+      ['=SUMIF(B1:B2; "%"; C1:C2)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })

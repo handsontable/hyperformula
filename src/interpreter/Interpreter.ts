@@ -177,6 +177,9 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
         const criterion = parseCriterion(criterionString)
+        if (ast.args[2].type !== AstNodeType.CELL_RANGE) {
+          return cellError(ErrorType.VALUE)
+        }
         const summableValues = this.getPlainRangeValues(ast.args[2] as CellRangeAst, formulaAddress)
         if (criterion === null) {
           return cellError(ErrorType.VALUE)
