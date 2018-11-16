@@ -24,4 +24,16 @@ describe('Criterion', () => {
   it('equal', () => {
     expect(parseCriterion('=0')).toEqual(buildCriterion(CriterionType.EQUAL, 0))
   })
+
+  it('works with bigger number', () => {
+    expect(parseCriterion('>=123')).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 123))
+  })
+
+  it('works with negative numbers', () => {
+    expect(parseCriterion('>=-123')).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, -123))
+  })
+
+  it('works with floats', () => {
+    expect(parseCriterion('>=100.5')).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100.5))
+  })
 })
