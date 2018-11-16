@@ -292,10 +292,22 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(false)
   })
 
+  it('function CONCATENATE by default returns empty string', () => {
+    engine.loadSheet([['=CONCATENATE()']])
+
+    expect(engine.getCellValue('A1')).toEqual("")
+  })
+
   it('function CONCATENATE works', () => {
     engine.loadSheet([['John', 'Smith', '=CONCATENATE(A1; B1)']])
 
     expect(engine.getCellValue('C1')).toEqual("JohnSmith")
+  })
+
+  it('function CONCATENATE returns error if one of the arguments is error', () => {
+    engine.loadSheet([['John', '=1/0', '=CONCATENATE(A1; B1)']])
+
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('function SUMIF error when 1st arg is not a range', () => {
