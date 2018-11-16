@@ -16,4 +16,8 @@ describe('Criterion', () => {
   it('less or equal than', () => {
     expect(parseCriterion('<=0')).toEqual(buildCriterion(CriterionType.LESS_THAN_OR_EQUAL, 0))
   })
+
+  it('not equal', () => {
+    expect(parseCriterion('<>0')).toEqual(buildCriterion(CriterionType.NOT_EQUAL, 0))
+  })
 })
