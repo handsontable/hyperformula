@@ -258,11 +258,21 @@ class FormulaParser extends Parser {
         }])
       }
 
-      return buildCellReferenceAst({
+      const topLeftCorner = {
         type: cellArg.reference.type,
         row: cellArg.reference.row + rowsArg.value,
         col: cellArg.reference.col + columnsArg.value,
-      })
+      }
+      if (width === 1 && height === 1) {
+        return buildCellReferenceAst(topLeftCorner)
+      } else {
+        const bottomRightCorner = {
+          type: topLeftCorner.type,
+          row: topLeftCorner.row + height - 1,
+          col: topLeftCorner.col + width - 1,
+        }
+        return buildCellRangeAst(topLeftCorner, bottomRightCorner)
+      }
     } else {
       return buildProcedureAst(procedureName, args)
     }
