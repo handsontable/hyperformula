@@ -219,11 +219,25 @@ class FormulaParser extends Parser {
           message: "First argument to OFFSET is not a reference",
         }])
       }
+      const columnsArg = args[1]
+      if (columnsArg.type !== AstNodeType.NUMBER) {
+        return buildErrorAst([{
+          name: "StaticOffsetError",
+          message: "Second argument to OFFSET is not a static number",
+        }])
+      }
+      const rowsArg = args[2]
+      if (rowsArg.type !== AstNodeType.NUMBER) {
+        return buildErrorAst([{
+          name: "StaticOffsetError",
+          message: "Third argument to OFFSET is not a static number",
+        }])
+      }
 
       return buildCellReferenceAst({
         type: cellArg.reference.type,
-        col: cellArg.reference.col + (args[1] as NumberAst).value,
-        row: cellArg.reference.row + (args[2] as NumberAst).value,
+        col: cellArg.reference.col + columnsArg.value,
+        row: cellArg.reference.row + rowsArg.value,
       })
     } else {
       return buildProcedureAst(procedureName, args)

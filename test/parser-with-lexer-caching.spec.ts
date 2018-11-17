@@ -224,6 +224,22 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.args[0].name).toBe('StaticOffsetError')
     expect(ast.args[0].message).toBe('First argument to OFFSET is not a reference')
   })
+
+  it('OFFSET second argument need to be static number', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; C3; 0; 0; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Second argument to OFFSET is not a static number')
+  })
+
+  it('OFFSET second argument need to be static number', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; 0; C3; 0; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Third argument to OFFSET is not a static number')
+  })
 }
 
 describe('ParserWithCaching - parser optimizations', () => {
