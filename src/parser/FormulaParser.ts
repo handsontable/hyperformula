@@ -213,18 +213,18 @@ class FormulaParser extends Parser {
     this.CONSUME(RParen)
     if (procedureName === 'OFFSET') {
       const cellArg = args[0]
-      if (cellArg.type === AstNodeType.CELL_REFERENCE) {
-        return buildCellReferenceAst({
-          type: cellArg.reference.type,
-          col: cellArg.reference.col + (args[1] as NumberAst).value,
-          row: cellArg.reference.row + (args[2] as NumberAst).value,
-        })
-      } else {
+      if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
         return buildErrorAst([{
           name: "StaticOffsetError",
           message: "First argument to OFFSET is not a reference",
         }])
       }
+
+      return buildCellReferenceAst({
+        type: cellArg.reference.type,
+        col: cellArg.reference.col + (args[1] as NumberAst).value,
+        row: cellArg.reference.row + (args[2] as NumberAst).value,
+      })
     } else {
       return buildProcedureAst(procedureName, args)
     }
