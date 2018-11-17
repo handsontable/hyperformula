@@ -233,6 +233,30 @@ class FormulaParser extends Parser {
           message: 'Third argument to OFFSET is not a static number',
         }])
       }
+      const heightArg = args[3]
+      let height
+      if (heightArg === undefined) {
+        height = 1
+      } else if (heightArg.type === AstNodeType.NUMBER) {
+        height = heightArg.value
+      } else {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fourth argument to OFFSET is not a static number',
+        }])
+      }
+      const widthArg = args[4]
+      let width
+      if (widthArg === undefined) {
+        width = 1
+      } else if (widthArg.type === AstNodeType.NUMBER) {
+        width = widthArg.value
+      } else {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fifth argument to OFFSET is not a static number',
+        }])
+      }
 
       return buildCellReferenceAst({
         type: cellArg.reference.type,

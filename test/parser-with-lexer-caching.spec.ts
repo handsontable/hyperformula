@@ -217,6 +217,14 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.reference).toEqual(relativeCellAddress(2, 1))
   })
 
+  it('OFFSET fourth and fifth argument is optional', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; 2; 3)', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(4, 3))
+  })
+
   it('OFFSET first argument need to be reference', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
@@ -233,12 +241,28 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.args[0].message).toBe('Second argument to OFFSET is not a static number')
   })
 
-  it('OFFSET second argument need to be static number', () => {
+  it('OFFSET third argument need to be static number', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse('=OFFSET(B2; 0; C3; 0; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('StaticOffsetError')
     expect(ast.args[0].message).toBe('Third argument to OFFSET is not a static number')
+  })
+
+  it('OFFSET fourth argument need to be static number', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; 0; 0; B3; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Fourth argument to OFFSET is not a static number')
+  })
+
+  it('OFFSET fifth argument need to be static number', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(B2; 0; 0; 0; B3)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Fifth argument to OFFSET is not a static number')
   })
 }
 
