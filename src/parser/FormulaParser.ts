@@ -219,15 +219,15 @@ class FormulaParser extends Parser {
           message: 'First argument to OFFSET is not a reference',
         }])
       }
-      const columnsArg = args[1]
-      if (columnsArg.type !== AstNodeType.NUMBER) {
+      const rowsArg = args[1]
+      if (rowsArg.type !== AstNodeType.NUMBER) {
         return buildErrorAst([{
           name: 'StaticOffsetError',
           message: 'Second argument to OFFSET is not a static number',
         }])
       }
-      const rowsArg = args[2]
-      if (rowsArg.type !== AstNodeType.NUMBER) {
+      const columnsArg = args[2]
+      if (columnsArg.type !== AstNodeType.NUMBER) {
         return buildErrorAst([{
           name: 'StaticOffsetError',
           message: 'Third argument to OFFSET is not a static number',
@@ -236,8 +236,8 @@ class FormulaParser extends Parser {
 
       return buildCellReferenceAst({
         type: cellArg.reference.type,
-        col: cellArg.reference.col + columnsArg.value,
         row: cellArg.reference.row + rowsArg.value,
+        col: cellArg.reference.col + columnsArg.value,
       })
     } else {
       return buildProcedureAst(procedureName, args)

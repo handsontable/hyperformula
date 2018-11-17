@@ -201,20 +201,20 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.reference).toEqual(relativeCellAddress(1, 1))
   })
 
-  it('OFFSET parsing into cell reference with column shift', () => {
+  it('OFFSET parsing into cell reference with row shift', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse('=OFFSET(B2; 1; 0; 0; 0)', absoluteCellAddress(0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(relativeCellAddress(2, 1))
+    expect(ast.reference).toEqual(relativeCellAddress(1, 2))
   })
 
-  it('OFFSET parsing into cell reference with row shift', () => {
+  it('OFFSET parsing into cell reference with column shift', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse('=OFFSET(B2; 0; 1; 0; 0)', absoluteCellAddress(0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(relativeCellAddress(1, 2))
+    expect(ast.reference).toEqual(relativeCellAddress(2, 1))
   })
 
   it('OFFSET first argument need to be reference', () => {
