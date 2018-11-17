@@ -3,6 +3,8 @@ import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, toke
 import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
+  NumberAst,
+  CellReferenceAst,
   buildCellRangeAst,
   buildCellReferenceAst,
   buildDivOpAst,
@@ -209,7 +211,12 @@ class FormulaParser extends Parser {
     })
     this.CONSUME(RParen)
     if (procedureName === 'OFFSET') {
-      return args[0]
+      const ref = (args[0] as CellReferenceAst).reference
+      return buildCellReferenceAst({
+        type: ref.type,
+        col: ref.col + (args[1] as NumberAst).value,
+        row: ref.row + (args[2] as NumberAst).value,
+      })
     } else {
       return buildProcedureAst(procedureName, args)
     }
