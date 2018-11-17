@@ -92,7 +92,7 @@ export class GraphBuilder {
   }
 }
 
-export const generateCellsFromRangeGenerator = function * (rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress) {
+export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress) {
   let currentRow = rangeStart.row
   while (currentRow <= rangeEnd.row) {
     let currentColumn = rangeStart.col

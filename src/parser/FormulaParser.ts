@@ -4,8 +4,6 @@ import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceTy
 import {
   Ast,
   AstNodeType,
-  NumberAst,
-  CellReferenceAst,
   buildCellRangeAst,
   buildCellReferenceAst,
   buildDivOpAst,
@@ -17,6 +15,8 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
+  CellReferenceAst,
+  NumberAst,
 } from './Ast'
 
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/})
@@ -215,22 +215,22 @@ class FormulaParser extends Parser {
       const cellArg = args[0]
       if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
         return buildErrorAst([{
-          name: "StaticOffsetError",
-          message: "First argument to OFFSET is not a reference",
+          name: 'StaticOffsetError',
+          message: 'First argument to OFFSET is not a reference',
         }])
       }
       const columnsArg = args[1]
       if (columnsArg.type !== AstNodeType.NUMBER) {
         return buildErrorAst([{
-          name: "StaticOffsetError",
-          message: "Second argument to OFFSET is not a static number",
+          name: 'StaticOffsetError',
+          message: 'Second argument to OFFSET is not a static number',
         }])
       }
       const rowsArg = args[2]
       if (rowsArg.type !== AstNodeType.NUMBER) {
         return buildErrorAst([{
-          name: "StaticOffsetError",
-          message: "Third argument to OFFSET is not a static number",
+          name: 'StaticOffsetError',
+          message: 'Third argument to OFFSET is not a static number',
         }])
       }
 

@@ -20,4 +20,3 @@ while (prev < rows) {
 }
 
 benchmark(sheet, { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
-

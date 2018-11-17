@@ -6,7 +6,7 @@ const sheet = []
 
 let prev = 0
 
-const prettyRandomString = (chars: number) => [...Array(chars)].map(i=>(~~(Math.random()*36)).toString(36)).join('')
+const prettyRandomString = (chars: number) => [...Array(chars)].map((i) => (~~(Math.random() * 36)).toString(36)).join('')
 
 while (prev < rows) {
   const rowToPush = [
