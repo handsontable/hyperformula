@@ -3,6 +3,7 @@ import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, toke
 import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
+  AstNodeType,
   NumberAst,
   CellReferenceAst,
   buildCellRangeAst,
@@ -211,12 +212,19 @@ class FormulaParser extends Parser {
     })
     this.CONSUME(RParen)
     if (procedureName === 'OFFSET') {
-      const ref = (args[0] as CellReferenceAst).reference
-      return buildCellReferenceAst({
-        type: ref.type,
-        col: ref.col + (args[1] as NumberAst).value,
-        row: ref.row + (args[2] as NumberAst).value,
-      })
+      const cellArg = args[0]
+      if (cellArg.type === AstNodeType.CELL_REFERENCE) {
+        return buildCellReferenceAst({
+          type: cellArg.reference.type,
+          col: cellArg.reference.col + (args[1] as NumberAst).value,
+          row: cellArg.reference.row + (args[2] as NumberAst).value,
+        })
+      } else {
+        return buildErrorAst([{
+          name: "StaticOffsetError",
+          message: "First argument to OFFSET is not a reference",
+        }])
+      }
     } else {
       return buildProcedureAst(procedureName, args)
     }

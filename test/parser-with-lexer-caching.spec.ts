@@ -216,6 +216,14 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(relativeCellAddress(1, 2))
   })
+
+  it('OFFSET first argument need to be reference', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const ast = parser.parse('=OFFSET(42; 0; 0; 0; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('First argument to OFFSET is not a reference')
+  })
 }
 
 describe('ParserWithCaching - parser optimizations', () => {
