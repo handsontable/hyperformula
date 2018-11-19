@@ -239,6 +239,12 @@ class FormulaParser extends Parser {
         height = 1
       } else if (heightArg.type === AstNodeType.NUMBER) {
         height = heightArg.value
+        if (height < 1) {
+          return buildErrorAst([{
+            name: 'StaticOffsetError',
+            message: 'Fourth argument to OFFSET is too small number',
+          }])
+        }
       } else {
         return buildErrorAst([{
           name: 'StaticOffsetError',
@@ -251,6 +257,12 @@ class FormulaParser extends Parser {
         width = 1
       } else if (widthArg.type === AstNodeType.NUMBER) {
         width = widthArg.value
+        if (width < 1) {
+          return buildErrorAst([{
+            name: 'StaticOffsetError',
+            message: 'Fifth argument to OFFSET is too small number',
+          }])
+        }
       } else {
         return buildErrorAst([{
           name: 'StaticOffsetError',

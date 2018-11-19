@@ -82,11 +82,27 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(ast.args[0].message).toBe('Fourth argument to OFFSET is not a static number')
   })
 
+  it('OFFSET fourth argument need to be static number bigger than 0', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(A1; 0; 0; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Fourth argument to OFFSET is too small number')
+  })
+
   it('OFFSET fifth argument need to be static number', () => {
     const parser = new ParserWithCaching('parser')
 
     const ast = parser.parse('=OFFSET(A1; 0; 0; 1; B3)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('StaticOffsetError')
     expect(ast.args[0].message).toBe('Fifth argument to OFFSET is not a static number')
+  })
+
+  it('OFFSET fifth argument need to be static number bigger than 0', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(A1; 0; 0; 1; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Fifth argument to OFFSET is too small number')
   })
 })
