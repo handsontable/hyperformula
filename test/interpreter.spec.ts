@@ -490,4 +490,23 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
   })
+
+  it('function OR usage', () => {
+    engine.loadSheet([
+      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(); TRUE(); FALSE())', '=OR("asdf")']
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function OR takes at least one argument', () => {
+    engine.loadSheet([
+      ['=OR()'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+  })
 })
