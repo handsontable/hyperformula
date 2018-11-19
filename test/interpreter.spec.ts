@@ -454,7 +454,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('D1')).toEqual(true)
   })
 
-  it('function ISERROR should return false', () => {
+  it('function ISERROR should return false for valid formulas', () => {
     engine.loadSheet([
       ['=ISERROR(1)', '=ISERROR(TRUE())',  '=ISERROR("foo")', '=ISERROR(ISERROR(1/0))', '=ISERROR(A1)'],
     ])
