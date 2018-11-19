@@ -17,6 +17,9 @@ export interface CellError {
   type: ErrorType
 }
 export const cellError = (error: ErrorType): CellError => ({type: error})
+export const isCellError = (value: any): value is CellError => {
+  return value.type !== undefined && value.type in ErrorType
+}
 
 export type CellValue = boolean | string | number | CellError
 

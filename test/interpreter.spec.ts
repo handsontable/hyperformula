@@ -442,4 +442,34 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('function ISERROR should return true for common errors', () => {
+    engine.loadSheet([
+        ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(SUM("foo"))', '=ISERROR(TRUE(1))'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(true)
+    expect(engine.getCellValue('B1')).toEqual(true)
+    expect(engine.getCellValue('C1')).toEqual(true)
+    expect(engine.getCellValue('D1')).toEqual(true)
+  })
+
+  it('function ISERROR should return false', () => {
+    engine.loadSheet([
+      ['=ISERROR(1)', '=ISERROR(TRUE())',  '=ISERROR("foo")', '=ISERROR(ISERROR(1/0))', '=ISERROR(A1)'],
+    ])
+    expect(engine.getCellValue('A1')).toEqual(false)
+    expect(engine.getCellValue('B1')).toEqual(false)
+    expect(engine.getCellValue('C1')).toEqual(false)
+    expect(engine.getCellValue('D1')).toEqual(false)
+    expect(engine.getCellValue('E1')).toEqual(false)
+  })
+
+  it('function ISERROR takes exactly one argument', () => {
+    engine.loadSheet([
+        ['=ISERROR(1; 2)', '=ISERROR()'],
+    ])
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+  })
 })

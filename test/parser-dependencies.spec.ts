@@ -18,7 +18,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.parse('=B2:C4', absoluteCellAddress(0, 0)).dependencies
 
     expect(dependencies).toEqual([
-      [simpleCellAddress(1, 1), simpleCellAddress(2, 3)]
+      [simpleCellAddress(1, 1), simpleCellAddress(2, 3)],
     ])
   })
 })

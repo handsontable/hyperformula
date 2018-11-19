@@ -1,10 +1,10 @@
 import {AddressMapping} from '../AddressMapping'
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
-import {buildCriterionLambda, Criterion, parseCriterion} from './Criterion'
+import {buildCriterionLambda, parseCriterion} from './Criterion'
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -254,6 +254,14 @@ export class Interpreter {
             return cellError(ErrorType.VALUE)
           }
         }, '')
+      }
+      case 'ISERROR': {
+        if (ast.args.length != 1) {
+          return cellError(ErrorType.NA)
+        } else {
+          const arg = this.evaluateAst(ast.args[0], formulaAddress)
+          return isCellError(arg)
+        }
       }
       default:
         return cellError(ErrorType.NAME)
