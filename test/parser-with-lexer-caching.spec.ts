@@ -130,6 +130,18 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE)
   })
 
+  it('SUM function with expression arg', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+    const ast = parser.parse('=SUM(1 / 2 + SUM(1;2))', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.args.length).toBe(1)
+    expect(ast.args[0].type).toBe(AstNodeType.PLUS_OP)
+
+    const arg = ast.args[0] as PlusOpAst
+    expect(arg.left.type).toBe(AstNodeType.DIV_OP)
+    expect(arg.right.type).toBe(AstNodeType.FUNCTION_CALL)
+  })
+
   it('joining nodes without braces', () => {
     const parser = new ParserWithCaching(optimizationMode)
     const ast = parser.parse('=1 + 2 + 3', absoluteCellAddress(0, 0)).ast as PlusOpAst
