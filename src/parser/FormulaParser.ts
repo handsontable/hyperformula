@@ -212,79 +212,7 @@ class FormulaParser extends Parser {
     })
     this.CONSUME(RParen)
     if (procedureName === 'OFFSET') {
-      const cellArg = args[0]
-      if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
-        return buildErrorAst([{
-          name: 'StaticOffsetError',
-          message: 'First argument to OFFSET is not a reference',
-        }])
-      }
-      const rowsArg = args[1]
-      if (rowsArg.type !== AstNodeType.NUMBER) {
-        return buildErrorAst([{
-          name: 'StaticOffsetError',
-          message: 'Second argument to OFFSET is not a static number',
-        }])
-      }
-      const columnsArg = args[2]
-      if (columnsArg.type !== AstNodeType.NUMBER) {
-        return buildErrorAst([{
-          name: 'StaticOffsetError',
-          message: 'Third argument to OFFSET is not a static number',
-        }])
-      }
-      const heightArg = args[3]
-      let height
-      if (heightArg === undefined) {
-        height = 1
-      } else if (heightArg.type === AstNodeType.NUMBER) {
-        height = heightArg.value
-        if (height < 1) {
-          return buildErrorAst([{
-            name: 'StaticOffsetError',
-            message: 'Fourth argument to OFFSET is too small number',
-          }])
-        }
-      } else {
-        return buildErrorAst([{
-          name: 'StaticOffsetError',
-          message: 'Fourth argument to OFFSET is not a static number',
-        }])
-      }
-      const widthArg = args[4]
-      let width
-      if (widthArg === undefined) {
-        width = 1
-      } else if (widthArg.type === AstNodeType.NUMBER) {
-        width = widthArg.value
-        if (width < 1) {
-          return buildErrorAst([{
-            name: 'StaticOffsetError',
-            message: 'Fifth argument to OFFSET is too small number',
-          }])
-        }
-      } else {
-        return buildErrorAst([{
-          name: 'StaticOffsetError',
-          message: 'Fifth argument to OFFSET is not a static number',
-        }])
-      }
-
-      const topLeftCorner = {
-        type: cellArg.reference.type,
-        row: cellArg.reference.row + rowsArg.value,
-        col: cellArg.reference.col + columnsArg.value,
-      }
-      if (width === 1 && height === 1) {
-        return buildCellReferenceAst(topLeftCorner)
-      } else {
-        const bottomRightCorner = {
-          type: topLeftCorner.type,
-          row: topLeftCorner.row + height - 1,
-          col: topLeftCorner.col + width - 1,
-        }
-        return buildCellRangeAst(topLeftCorner, bottomRightCorner)
-      }
+      return this.handleOffsetHeuristic(args)
     } else {
       return buildProcedureAst(procedureName, args)
     }
@@ -301,6 +229,82 @@ class FormulaParser extends Parser {
     this.CONSUME(RParen)
     return expression
   })
+
+  private handleOffsetHeuristic(args: Ast[]) {
+    const cellArg = args[0]
+    if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'First argument to OFFSET is not a reference',
+      }])
+    }
+    const rowsArg = args[1]
+    if (rowsArg.type !== AstNodeType.NUMBER) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Second argument to OFFSET is not a static number',
+      }])
+    }
+    const columnsArg = args[2]
+    if (columnsArg.type !== AstNodeType.NUMBER) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Third argument to OFFSET is not a static number',
+      }])
+    }
+    const heightArg = args[3]
+    let height
+    if (heightArg === undefined) {
+      height = 1
+    } else if (heightArg.type === AstNodeType.NUMBER) {
+      height = heightArg.value
+      if (height < 1) {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fourth argument to OFFSET is too small number',
+        }])
+      }
+    } else {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Fourth argument to OFFSET is not a static number',
+      }])
+    }
+    const widthArg = args[4]
+    let width
+    if (widthArg === undefined) {
+      width = 1
+    } else if (widthArg.type === AstNodeType.NUMBER) {
+      width = widthArg.value
+      if (width < 1) {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fifth argument to OFFSET is too small number',
+        }])
+      }
+    } else {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Fifth argument to OFFSET is not a static number',
+      }])
+    }
+
+    const topLeftCorner = {
+      type: cellArg.reference.type,
+      row: cellArg.reference.row + rowsArg.value,
+      col: cellArg.reference.col + columnsArg.value,
+    }
+    if (width === 1 && height === 1) {
+      return buildCellReferenceAst(topLeftCorner)
+    } else {
+      const bottomRightCorner = {
+        type: topLeftCorner.type,
+        row: topLeftCorner.row + height - 1,
+        col: topLeftCorner.col + width - 1,
+      }
+      return buildCellRangeAst(topLeftCorner, bottomRightCorner)
+    }
+  }
 
   constructor() {
     super(allTokens, {outputCst: false})
