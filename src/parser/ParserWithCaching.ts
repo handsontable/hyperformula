@@ -1,8 +1,8 @@
 import {absoluteCellAddress, CellAddress, cellAddressFromString, CellDependency, CellReferenceType, getAbsoluteAddress, relativeCellAddress, SimpleCellAddress, simpleCellAddressFromString} from '../Cell'
 import {Ast, AstNodeType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
-import {parseFromTokens, tokenizeFormula} from './FormulaParser'
 import {computeHash} from './computeHash'
+import {parseFromTokens, tokenizeFormula} from './FormulaParser'
 
 export class ParserWithCaching {
   public statsCacheUsed: number = 0

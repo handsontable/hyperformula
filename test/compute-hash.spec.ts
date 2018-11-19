@@ -1,6 +1,6 @@
 import { absoluteCellAddress, CellAddress, CellDependency, simpleCellAddress } from '../src/Cell'
-import { tokenizeFormula } from '../src/parser/FormulaParser'
 import { computeHash } from '../src/parser/computeHash'
+import { tokenizeFormula } from '../src/parser/FormulaParser'
 
 describe('computeHash', () => {
   const computeFunc = (code: string, address: CellAddress): string => computeHash(tokenizeFormula(code).tokens, address)
