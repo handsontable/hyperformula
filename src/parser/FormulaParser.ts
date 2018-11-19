@@ -207,7 +207,7 @@ class FormulaParser extends Parser {
     this.MANY_SEP({
       SEP: ArgSeparator,
       DEF: () => {
-        args.push(this.SUBRULE(this.atomicExpression))
+        args.push(this.SUBRULE(this.additionExpression))
       },
     })
     this.CONSUME(RParen)
