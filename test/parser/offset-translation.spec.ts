@@ -24,12 +24,28 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(ast.reference).toEqual(relativeCellAddress(4, 14))
   })
 
+  it('OFFSET parsing into cell reference with negative row shift', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(C3; -1; 0)', absoluteCellAddress(1, 1)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(1, 0))
+  })
+
   it('OFFSET parsing into cell reference with column shift', () => {
     const parser = new ParserWithCaching('parser')
 
     const ast = parser.parse('=OFFSET(F16; 0; 1)', absoluteCellAddress(1, 2)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(relativeCellAddress(5, 13))
+  })
+
+  it('OFFSET parsing into cell reference with negative column shift', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(C3; 0; -1)', absoluteCellAddress(1, 1)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(0, 1))
   })
 
   it('OFFSET parsing into cell reference with some height', () => {
@@ -71,7 +87,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(A1; 1.3; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('StaticOffsetError')
-    expect(ast.args[0].message).toBe('Second argument to OFFSET is not integer')
+    expect(ast.args[0].message).toBe('Second argument to OFFSET is not a static number')
   })
 
   it('OFFSET third argument need to be static number', () => {
@@ -87,7 +103,7 @@ describe('Parser - OFFSET to reference translation', () => {
 
     const ast = parser.parse('=OFFSET(A1; 0; 1.3)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('StaticOffsetError')
-    expect(ast.args[0].message).toBe('Third argument to OFFSET is not integer')
+    expect(ast.args[0].message).toBe('Third argument to OFFSET is not a static number')
   })
 
   it('OFFSET fourth argument need to be static number', () => {
@@ -136,5 +152,21 @@ describe('Parser - OFFSET to reference translation', () => {
     const ast = parser.parse('=OFFSET(A1; 0; 0; 1; 1.3)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].name).toBe('StaticOffsetError')
     expect(ast.args[0].message).toBe('Fifth argument to OFFSET is not integer')
+  })
+
+  it('OFFSET resulting reference out of the sheet in top left row', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(A1; -1; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Resulting reference is out of the sheet')
+  })
+
+  it('OFFSET resulting reference out of the sheet in top left column', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=OFFSET(A1; 0; -1)', absoluteCellAddress(0, 0)).ast as ErrorAst
+    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].message).toBe('Resulting reference is out of the sheet')
   })
 })

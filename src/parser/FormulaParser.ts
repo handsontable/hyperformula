@@ -239,27 +239,27 @@ class FormulaParser extends Parser {
       }])
     }
     const rowsArg = args[1]
-    if (rowsArg.type !== AstNodeType.NUMBER) {
+    let rowShift
+    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
+      rowShift = rowsArg.value
+    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
+      rowShift = -rowsArg.value.value
+    } else {
       return buildErrorAst([{
         name: 'StaticOffsetError',
         message: 'Second argument to OFFSET is not a static number',
       }])
-    } else if (!Number.isInteger(rowsArg.value)) {
-      return buildErrorAst([{
-        name: 'StaticOffsetError',
-        message: 'Second argument to OFFSET is not integer',
-      }])
     }
     const columnsArg = args[2]
-    if (columnsArg.type !== AstNodeType.NUMBER) {
+    let colShift
+    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
+      colShift = columnsArg.value
+    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
+      colShift = -columnsArg.value.value
+    } else {
       return buildErrorAst([{
         name: 'StaticOffsetError',
         message: 'Third argument to OFFSET is not a static number',
-      }])
-    } else if (!Number.isInteger(columnsArg.value)) {
-      return buildErrorAst([{
-        name: 'StaticOffsetError',
-        message: 'Third argument to OFFSET is not integer',
       }])
     }
     const heightArg = args[3]
@@ -311,8 +311,14 @@ class FormulaParser extends Parser {
 
     const topLeftCorner = {
       type: cellArg.reference.type,
-      row: cellArg.reference.row + rowsArg.value,
-      col: cellArg.reference.col + columnsArg.value,
+      row: cellArg.reference.row + rowShift,
+      col: cellArg.reference.col + colShift,
+    }
+    if (topLeftCorner.row < 0 || topLeftCorner.col < 0) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Resulting reference is out of the sheet',
+      }])
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)
