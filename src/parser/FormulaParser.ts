@@ -244,12 +244,22 @@ class FormulaParser extends Parser {
         name: 'StaticOffsetError',
         message: 'Second argument to OFFSET is not a static number',
       }])
+    } else if (!Number.isInteger(rowsArg.value)) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Second argument to OFFSET is not integer',
+      }])
     }
     const columnsArg = args[2]
     if (columnsArg.type !== AstNodeType.NUMBER) {
       return buildErrorAst([{
         name: 'StaticOffsetError',
         message: 'Third argument to OFFSET is not a static number',
+      }])
+    } else if (!Number.isInteger(columnsArg.value)) {
+      return buildErrorAst([{
+        name: 'StaticOffsetError',
+        message: 'Third argument to OFFSET is not integer',
       }])
     }
     const heightArg = args[3]
@@ -262,6 +272,11 @@ class FormulaParser extends Parser {
         return buildErrorAst([{
           name: 'StaticOffsetError',
           message: 'Fourth argument to OFFSET is too small number',
+        }])
+      } else if (!Number.isInteger(height)) {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fourth argument to OFFSET is not integer',
         }])
       }
     } else {
@@ -280,6 +295,11 @@ class FormulaParser extends Parser {
         return buildErrorAst([{
           name: 'StaticOffsetError',
           message: 'Fifth argument to OFFSET is too small number',
+        }])
+      } else if (!Number.isInteger(width)) {
+        return buildErrorAst([{
+          name: 'StaticOffsetError',
+          message: 'Fifth argument to OFFSET is not integer',
         }])
       }
     } else {
