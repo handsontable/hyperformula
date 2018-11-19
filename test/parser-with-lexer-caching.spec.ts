@@ -286,6 +286,13 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.args[0].name).toBe('StaticOffsetError')
     expect(ast.args[0].message).toBe('Fifth argument to OFFSET is not a static number')
   })
+
+  it('functions should not be case sensitive', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+    const ast = parser.parse('=sum(1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('SUM')
+  })
 }
 
 describe('ParserWithCaching - parser optimizations', () => {

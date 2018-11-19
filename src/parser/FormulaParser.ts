@@ -201,7 +201,7 @@ class FormulaParser extends Parser {
   })
 
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
-    const procedureName = this.CONSUME(ProcedureName).image
+    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase()
     const args: Ast[] = []
     this.CONSUME(LParen)
     this.MANY_SEP({
