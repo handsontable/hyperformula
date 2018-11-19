@@ -472,4 +472,22 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
   })
+
+  it('function AND usage', () => {
+    engine.loadSheet([
+        ['=AND(TRUE(); TRUE())', '=AND(TRUE(); FALSE())', '=AND(TRUE(); "asdf")']
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function AND takes at least one argument', () => {
+    engine.loadSheet([
+      ['=AND()'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+  })
 })

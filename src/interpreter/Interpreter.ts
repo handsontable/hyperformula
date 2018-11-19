@@ -245,6 +245,24 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
+      case 'AND': {
+        if (ast.args.length < 1) {
+          return cellError(ErrorType.NA)
+        }
+
+        let result: ExpressionValue = true
+        let index = 0
+        while (result === true && index < ast.args.length) {
+          const argValue = this.evaluateAst(ast.args[index], formulaAddress)
+          if (typeof argValue === 'boolean') {
+            result = argValue
+            ++index
+          } else {
+            result = cellError(ErrorType.VALUE)
+          }
+        }
+        return result
+      }
       case 'CONCATENATE': {
         return ast.args.reduce((acc: CellValue, arg: Ast) => {
           const argResult = this.evaluateAst(arg, formulaAddress)
