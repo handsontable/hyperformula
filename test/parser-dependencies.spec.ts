@@ -62,4 +62,13 @@ describe('Parsing collecting dependencies', () => {
       simpleCellAddress(2, 2),
     ])
   })
+
+  it('OFFSET call is correctly found as dependency', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const dependencies = parser.parse('=OFFSET(D4; 0; 0)', absoluteCellAddress(1, 1)).dependencies
+    expect(dependencies).toEqual([
+      simpleCellAddress(3, 3),
+    ])
+  })
 })
