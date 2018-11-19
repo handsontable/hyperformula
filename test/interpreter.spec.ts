@@ -280,6 +280,18 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
+  it('function IF when condition is number', () => {
+    engine.loadSheet([['=IF(1; "yes"; "no")']])
+
+    expect(engine.getCellValue('A1')).toEqual('yes')
+  })
+
+  it('function IF when condition is logic function', () => {
+    engine.loadSheet([['=IF(OR(1; FALSE()); "yes"; "no")']])
+
+    expect(engine.getCellValue('A1')).toEqual('yes')
+  })
+
   it('function IF works when only first part is given', () => {
     engine.loadSheet([['=IF(TRUE(); "yes")']])
 
@@ -475,12 +487,22 @@ describe('Interpreter', () => {
 
   it('function AND usage', () => {
     engine.loadSheet([
-        ['=AND(TRUE(); TRUE())', '=AND(TRUE(); FALSE())', '=AND(TRUE(); "asdf")']
+        ['=AND(TRUE(); TRUE())', '=AND(TRUE(); FALSE())', '=AND(TRUE(); "asdf")'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
     expect(engine.getCellValue('B1')).toBe(false)
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it ('function AND with numerical arguments', () => {
+    engine.loadSheet([
+        ['=AND(1)', '=AND(0)', '=AND(1; TRUE())'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toBe(true)
   })
 
   it('function AND takes at least one argument', () => {
@@ -493,13 +515,23 @@ describe('Interpreter', () => {
 
   it('function OR usage', () => {
     engine.loadSheet([
-      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(); TRUE(); FALSE())', '=OR("asdf")']
+      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(); TRUE(); FALSE())', '=OR("asdf")'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
     expect(engine.getCellValue('B1')).toBe(false)
     expect(engine.getCellValue('C1')).toBe(true)
     expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it ('function OR with numerical arguments', () => {
+    engine.loadSheet([
+      ['=OR(1)', '=OR(0)', '=OR(FALSE(); 42)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toBe(true)
   })
 
   it('function OR takes at least one argument', () => {

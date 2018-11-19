@@ -232,7 +232,7 @@ export class Interpreter {
         }
       }
       case 'IF': {
-        const condition = this.evaluateAst(ast.args[0], formulaAddress)
+        const condition = this.booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
         if (condition === true) {
           return this.evaluateAst(ast.args[1], formulaAddress)
         } else if (condition === false) {
@@ -254,12 +254,8 @@ export class Interpreter {
         let index = 0
         while (result === true && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          if (typeof argValue === 'boolean') {
-            result = argValue
-            ++index
-          } else {
-            result = cellError(ErrorType.VALUE)
-          }
+          result = this.booleanRepresentation(argValue)
+          ++index
         }
         return result
       }
@@ -272,14 +268,9 @@ export class Interpreter {
         let index = 0
         while (result === false && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          if (typeof argValue === 'boolean') {
-            result = argValue
-            ++index
-          }  else {
-            result = cellError(ErrorType.VALUE)
-          }
+          result = this.booleanRepresentation(argValue)
+          ++index
         }
-
         return result
       }
       case 'CONCATENATE': {
@@ -304,6 +295,17 @@ export class Interpreter {
         return cellError(ErrorType.NAME)
     }
   }
+
+  private booleanRepresentation(arg: ExpressionValue): ExpressionValue {
+    if (typeof arg === 'number') {
+      return arg !== 0
+    } else if (typeof arg === 'boolean') {
+      return arg
+    } else {
+      return cellError(ErrorType.VALUE)
+    }
+  }
+
 }
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
