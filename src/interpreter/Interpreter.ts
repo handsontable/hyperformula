@@ -292,6 +292,9 @@ export class Interpreter {
         }
       }
       case 'COLUMNS': {
+        if (ast.args.length !== 1) {
+          return cellError(ErrorType.NA)
+        }
         const rangeAst = ast.args[0]
         if (rangeAst.type === AstNodeType.CELL_RANGE) {
           return (rangeAst.end.col - rangeAst.start.col + 1)

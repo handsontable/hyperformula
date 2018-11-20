@@ -553,4 +553,11 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('function COLUMNS accepts exactly one argument', () => {
+    engine.loadSheet([['=COLUMNS()', '=COLUMNS(A1:B1; A2:B2)']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+  })
 })
