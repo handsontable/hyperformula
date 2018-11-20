@@ -547,4 +547,10 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(3)
   })
+
+  it('function COLUMNS returns error when argument of invalid type', () => {
+    engine.loadSheet([['=COLUMNS(A1)']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })
