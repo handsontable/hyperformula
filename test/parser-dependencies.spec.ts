@@ -71,4 +71,11 @@ describe('Parsing collecting dependencies', () => {
       simpleCellAddress(3, 3),
     ])
   })
+
+  it('COLUMNS arguments are not dependencies', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const dependencies = parser.parse('=COLUMNS(A1:B3)', absoluteCellAddress(1, 1)).dependencies
+    expect(dependencies).toEqual([])
+  })
 })
