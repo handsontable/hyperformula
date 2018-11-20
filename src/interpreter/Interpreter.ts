@@ -291,6 +291,10 @@ export class Interpreter {
           return isCellError(arg)
         }
       }
+      case 'COLUMNS': {
+        const rangeAst = ast.args[0] as CellRangeAst
+        return (rangeAst.end.col - rangeAst.start.col + 1)
+      }
       default:
         return cellError(ErrorType.NAME)
     }

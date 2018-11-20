@@ -541,4 +541,10 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
   })
+
+  it('function COLUMNS works', () => {
+    engine.loadSheet([['=COLUMNS(A1:C2)']])
+
+    expect(engine.getCellValue('A1')).toEqual(3)
+  })
 })
