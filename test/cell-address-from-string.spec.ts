@@ -20,4 +20,8 @@ describe('cellAddressFromString', () => {
   it('works for many letters', () => {
     expect(cellAddressFromString('ABC1', absoluteCellAddress(0, 0))).toEqual(relativeCellAddress(730, 0))
   })
+
+  it('is not case sensitive', () => {
+    expect(cellAddressFromString('abc1', absoluteCellAddress(0, 0))).toEqual(relativeCellAddress(730, 0))
+  })
 })

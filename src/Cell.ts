@@ -44,14 +44,14 @@ export const simpleCellAddress = (col: number, row: number): SimpleCellAddress =
 export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
 
 export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
-  const result = stringAddress.match(/(\$?)([A-Z]+)(\$?)([0-9]+)/)!
+  const result = stringAddress.match(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/)!
 
   let col
   if (result[2].length === 1) {
-    col = result[2].charCodeAt(0) - 65
+    col = result[2].toUpperCase().charCodeAt(0) - 65
   } else {
     col = result[2].split('').reduce((currentColumn, nextLetter) => {
-      return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
+      return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
     }, 0) - 1
   }
 

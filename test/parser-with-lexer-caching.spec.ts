@@ -1,5 +1,6 @@
 import {absoluteCellAddress, absoluteColCellAddress, absoluteRowCellAddress, CellReferenceType, relativeCellAddress} from '../src/Cell'
 import {
+  Ast,
   AstNodeType,
   CellRangeAst,
   CellReferenceAst,
@@ -210,6 +211,15 @@ const sharedExamples = (optimizationMode: string) => {
     const ast = parser.parse('=sum(1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
+  })
+
+  it('cell references should not be case sensitive', () => {
+    const parser = new ParserWithCaching('parser')
+
+    let ast = parser.parse('=d1', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.col).toBe(3)
+    expect(ast.reference.row).toBe(0)
   })
 }
 
