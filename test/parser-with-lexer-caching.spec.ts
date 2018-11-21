@@ -1,6 +1,12 @@
-import {absoluteCellAddress, absoluteColCellAddress, absoluteRowCellAddress, CellReferenceType, relativeCellAddress} from '../src/Cell'
 import {
-  Ast,
+  absoluteCellAddress,
+  absoluteColCellAddress,
+  absoluteRowCellAddress,
+  cellError,
+  ErrorType,
+  relativeCellAddress,
+} from '../src/Cell'
+import {
   AstNodeType,
   CellRangeAst,
   CellReferenceAst,
@@ -206,6 +212,18 @@ const sharedExamples = (optimizationMode: string) => {
     expect(ast.args[0].name).toBe('NotAllInputParsedException')
   })
 
+  it('errors - lexing errors', () => {
+    const parser = new ParserWithCaching(optimizationMode)
+
+    const input = ["='foo'", "=foo'bar", "=''''''", '=@']
+
+    input.forEach((formula) => {
+      const ast = parser.parse(formula, absoluteCellAddress(0, 0)).ast as ErrorAst
+      expect(ast.type).toBe(AstNodeType.ERROR)
+      expect(ast.args[0].name).toBe('LexingError')
+    })
+  })
+
   it('functions should not be case sensitive', () => {
     const parser = new ParserWithCaching(optimizationMode)
     const ast = parser.parse('=sum(1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
@@ -216,7 +234,7 @@ const sharedExamples = (optimizationMode: string) => {
   it('cell references should not be case sensitive', () => {
     const parser = new ParserWithCaching('parser')
 
-    let ast = parser.parse('=d1', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+    const ast = parser.parse('=d1', absoluteCellAddress(0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.col).toBe(3)
     expect(ast.reference.row).toBe(0)

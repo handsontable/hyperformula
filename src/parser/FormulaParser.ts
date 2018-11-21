@@ -230,6 +230,16 @@ class FormulaParser extends Parser {
     return expression
   })
 
+  constructor() {
+    super(allTokens, {outputCst: false})
+    this.performSelfAnalysis()
+  }
+
+  public formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
+  }
+
   private handleOffsetHeuristic(args: Ast[]) {
     const cellArg = args[0]
     if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
@@ -330,16 +340,6 @@ class FormulaParser extends Parser {
       }
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
-  }
-
-  constructor() {
-    super(allTokens, {outputCst: false})
-    this.performSelfAnalysis()
-  }
-
-  public formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
   }
 }
 

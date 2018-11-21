@@ -195,11 +195,13 @@ describe('Interpreter', () => {
   })
 
   it('errors - parsing errors', () => {
-    engine.loadSheet([['=A', '=A1C1', '=SUM(A)']])
+    engine.loadSheet([['=A', '=A1C1', '=SUM(A)', '=foo', '=)(asdf']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NAME))
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('E1')).toEqual(cellError(ErrorType.NAME))
   })
 
   it('function TRUE', () => {

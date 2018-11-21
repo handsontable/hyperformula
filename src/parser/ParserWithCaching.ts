@@ -1,5 +1,5 @@
-import {absoluteCellAddress, CellAddress, cellAddressFromString, CellDependency, CellReferenceType, getAbsoluteAddress, relativeCellAddress, SimpleCellAddress, simpleCellAddressFromString} from '../Cell'
-import {Ast, AstNodeType} from './Ast'
+import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {Ast, AstNodeType, buildErrorAst, ParsingError} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'
 import {parseFromTokens, tokenizeFormula} from './FormulaParser'
@@ -16,6 +16,17 @@ export class ParserWithCaching {
   public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
     if (this.optimizationMode === 'parser') {
       const lexerResult = tokenizeFormula(text)
+
+      if (lexerResult.errors.length > 0) {
+        const ast = buildErrorAst(lexerResult.errors.map((e) =>
+            ({
+              name: 'LexingError',
+              message: e.message,
+            }),
+        ))
+        return { ast, dependencies: [] }
+      }
+
       const hash = computeHash(lexerResult.tokens, formulaAddress)
 
       let cacheResult = this.cache.get(hash)
