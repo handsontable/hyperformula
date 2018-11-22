@@ -1,26 +1,26 @@
-import moment  from 'moment';
-import { Moment }  from 'moment';
+import moment  from 'moment'
+import { Moment }  from 'moment'
 
 const DATE_ZERO = moment({
   year: 1899,
   month: 11,
-  day: 30
+  day: 30,
 })
 
 const DATE_FORMAT = 'YYYY-MM-DD'
 
 export function toNumberDate(year: number, month: number, day: number): number {
   const date = moment({
-    year: year,
-    month: month-1,
-    day: day
+    year,
+    month: month - 1,
+    day,
   })
 
   return  momentToDateNumber(date)
 }
 
 export function dateNumberToMoment(dateNumber: number): Moment {
-  return DATE_ZERO.clone().add(dateNumber, "days")
+  return DATE_ZERO.clone().add(dateNumber, 'days')
 }
 
 export function dateNumberToString(dateNumber: number): string {
@@ -36,7 +36,7 @@ export function dateNumberToYearNumber(dateNumber: number): number {
 }
 
 export function momentToDateNumber(date: Moment) {
-  return Math.round(date.diff(DATE_ZERO, "days", true))
+  return Math.round(date.diff(DATE_ZERO, 'days', true))
 }
 
 export function stringToDateNumber(dateString: string): number | null {
