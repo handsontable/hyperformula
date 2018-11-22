@@ -1,5 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
+import {numberDateToString} from "../src/Date";
 
 describe('Interpreter', () => {
   let engine: HandsOnEngine
@@ -561,5 +562,15 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+  })
+
+  it('function DATE with 3 numerical arguments', () => {
+    engine.loadSheet([['=DATE(1900; 1; 1)', '=DATE(1900; 1; 2)', '=DATE(1915; 10; 24)']])
+
+    expect(engine.getCellValue('A1')).toEqual(1)
+    expect(numberDateToString(engine.getCellValue('A1') as number)).toEqual("1900-01-01")
+    expect(engine.getCellValue('B1')).toEqual(2)
+    expect(numberDateToString(engine.getCellValue('B1') as number)).toEqual("1900-01-02")
+    expect(numberDateToString(engine.getCellValue('C1') as number)).toEqual("1915-10-24")
   })
 })

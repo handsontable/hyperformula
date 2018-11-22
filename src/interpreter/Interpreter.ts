@@ -5,6 +5,7 @@ import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
 import {buildCriterionLambda, parseCriterion} from './Criterion'
+import {toNumberDate} from "../Date";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -301,6 +302,21 @@ export class Interpreter {
         } else {
           return cellError(ErrorType.VALUE)
         }
+      }
+      case 'DATE': {
+        if (ast.args.length !== 3) {
+          return cellError(ErrorType.NA)
+        }
+
+        const year = this.evaluateAst(ast.args[0], formulaAddress)
+        const month = this.evaluateAst(ast.args[1], formulaAddress)
+        const day = this.evaluateAst(ast.args[2], formulaAddress)
+
+        if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') {
+          return cellError(ErrorType.VALUE)
+        }
+
+        return toNumberDate(year, month, day)
       }
       default:
         return cellError(ErrorType.NAME)
