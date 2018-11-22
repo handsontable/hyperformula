@@ -16,8 +16,7 @@ export function toNumberDate(year: number, month: number, day: number): number {
     day: day
   })
 
-  const diff = momentToDateNumber(date)
-  return diff
+  return  momentToDateNumber(date)
 }
 
 export function dateNumberToMoment(dateNumber: number): Moment {
@@ -28,8 +27,12 @@ export function dateNumberToString(dateNumber: number): string {
   return dateNumberToMoment(dateNumber).format(DATE_FORMAT)
 }
 
-export function dateNumberToMonth(dateNumber: number): number {
+export function dateNumberToMonthNumber(dateNumber: number): number {
   return dateNumberToMoment(dateNumber).month() + 1
+}
+
+export function dateNumberToYearNumber(dateNumber: number): number {
+  return dateNumberToMoment(dateNumber).year()
 }
 
 export function momentToDateNumber(date: Moment) {

@@ -5,7 +5,7 @@ import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
 import {buildCriterionLambda, parseCriterion} from './Criterion'
-import {dateNumberToMonth, stringToDateNumber, toNumberDate} from "../Date";
+import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toNumberDate} from "../Date";
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -324,22 +324,40 @@ export class Interpreter {
         }
 
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
+        const dateNumber = this.dateNumberRepresentation(arg)
 
-        if (typeof arg === 'number') {
-          return dateNumberToMonth(arg)
-        } else if (typeof arg === 'string') {
-          let dateNumber = stringToDateNumber(arg)
-          if (dateNumber !== null) {
-            return dateNumberToMonth(dateNumber)
-          } else {
-            return cellError(ErrorType.VALUE)
-          }
+        if (dateNumber !== null) {
+          return dateNumberToMonthNumber(dateNumber)
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
+      case 'YEAR': {
+        if (ast.args.length !== 1) {
+          return cellError(ErrorType.NA)
+        }
+
+        const arg = this.evaluateAst(ast.args[0], formulaAddress)
+        const dateNumber = this.dateNumberRepresentation(arg)
+
+        if (dateNumber !== null) {
+          return dateNumberToYearNumber(dateNumber)
         } else {
           return cellError(ErrorType.VALUE)
         }
       }
       default:
         return cellError(ErrorType.NAME)
+    }
+  }
+
+  private dateNumberRepresentation(arg: ExpressionValue): number | null {
+    if (typeof arg === 'number') {
+      return arg
+    } else if (typeof arg === 'string') {
+      return stringToDateNumber(arg)
+    } else {
+      return null
     }
   }
 

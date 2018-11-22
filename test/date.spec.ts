@@ -1,4 +1,4 @@
-import { dateNumberToMonth, dateNumberToString, toNumberDate } from "../src/Date";
+import { dateNumberToMonthNumber, dateNumberToString, toNumberDate } from "../src/Date";
 
 describe('Date helpers', () => {
   it('#toNumberDate should return number representation of a date', () => {
@@ -14,9 +14,9 @@ describe('Date helpers', () => {
     expect(dateNumberToString(43465)).toEqual("2018-12-31")
   })
 
-  it("#dateNumberToMonth should return proper month number", () => {
-    expect(dateNumberToMonth(0)).toEqual(12)
-    expect(dateNumberToMonth(2)).toEqual(1)
-    expect(dateNumberToMonth(43465)).toEqual(12)
+  it("#dateNumberToMonthNumber should return proper month number", () => {
+    expect(dateNumberToMonthNumber(0)).toEqual(12)
+    expect(dateNumberToMonthNumber(2)).toEqual(1)
+    expect(dateNumberToMonthNumber(43465)).toEqual(12)
   })
 })

@@ -598,4 +598,29 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
   })
+
+  it('function YEAR with numerical arguments', () => {
+    engine.loadSheet([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
+
+    expect(engine.getCellValue('A1')).toEqual(1899)
+    expect(engine.getCellValue('B1')).toEqual(1900)
+    expect(engine.getCellValue('C1')).toEqual(2018)
+  })
+
+  it('function YEAR with string arguments', () => {
+    engine.loadSheet([['=YEAR("1899-12-31")', '=YEAR("1900-01-01")', '=YEAR("2018-12-31")']])
+
+    expect(engine.getCellValue('A1')).toEqual(1899)
+    expect(engine.getCellValue('B1')).toEqual(1900)
+    expect(engine.getCellValue('C1')).toEqual(2018)
+  })
+
+  it('function YEAR with wrong arguments', () => {
+    engine.loadSheet([['=YEAR("foo")', '=YEAR("2018-30-12")', '=YEAR(1; 2)', '=YEAR()']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
+  })
 })
