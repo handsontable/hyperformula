@@ -9,7 +9,7 @@ const DATE_ZERO = moment({
 
 const DATE_FORMAT = 'YYYY-MM-DD'
 
-export function toNumberDate(year: number, month: number, day: number): number {
+export function toDateNumber(year: number, month: number, day: number): number {
   const date = moment({
     year,
     month: month - 1,

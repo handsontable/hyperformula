@@ -1,6 +1,6 @@
 import {AddressMapping} from '../AddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toNumberDate} from '../Date'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
@@ -316,7 +316,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
 
-        return toNumberDate(year, month, day)
+        return toDateNumber(year, month, day)
       }
       case 'MONTH': {
         if (ast.args.length !== 1) {
