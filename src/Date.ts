@@ -1,4 +1,5 @@
-import moment from 'moment';
+import moment  from 'moment';
+import { Moment }  from 'moment';
 
 const DATE_ZERO = moment({
   year: 1899,
@@ -15,11 +16,27 @@ export function toNumberDate(year: number, month: number, day: number): number {
     day: day
   })
 
-  const diff = Math.round(date.diff(DATE_ZERO, "days", true))
+  const diff = momentToDateNumber(date)
   return diff
 }
 
-export function numberDateToString(date: number): string {
-  return DATE_ZERO.clone().add(date, "days").format(DATE_FORMAT)
+export function dateNumberToMoment(dateNumber: number): Moment {
+  return DATE_ZERO.clone().add(dateNumber, "days")
 }
 
+export function dateNumberToString(dateNumber: number): string {
+  return dateNumberToMoment(dateNumber).format(DATE_FORMAT)
+}
+
+export function dateNumberToMonth(dateNumber: number): number {
+  return dateNumberToMoment(dateNumber).month() + 1
+}
+
+export function momentToDateNumber(date: Moment) {
+  return Math.round(date.diff(DATE_ZERO, "days", true))
+}
+
+export function stringToDateNumber(dateString: string): number | null {
+  const date = moment(dateString, DATE_FORMAT)
+  return date.isValid() ? momentToDateNumber(date) : null
+}

@@ -1,4 +1,4 @@
-import {numberDateToString, toNumberDate} from "../src/Date";
+import { dateNumberToMonth, dateNumberToString, toNumberDate } from "../src/Date";
 
 describe('Date helpers', () => {
   it('#toNumberDate should return number representation of a date', () => {
@@ -8,9 +8,15 @@ describe('Date helpers', () => {
     expect(toNumberDate(2018, 12, 31)).toBe(43465)
   })
 
-  it ('#numberDateToString should return properly formatted  date', () => {
-    expect(numberDateToString(0)).toEqual("1899-12-30")
-    expect(numberDateToString(2)).toEqual("1900-01-01")
-    expect(numberDateToString(43465)).toEqual("2018-12-31")
+  it ('#dateNumberToString should return properly formatted  date', () => {
+    expect(dateNumberToString(0)).toEqual("1899-12-30")
+    expect(dateNumberToString(2)).toEqual("1900-01-01")
+    expect(dateNumberToString(43465)).toEqual("2018-12-31")
+  })
+
+  it("#dateNumberToMonth should return proper month number", () => {
+    expect(dateNumberToMonth(0)).toEqual(12)
+    expect(dateNumberToMonth(2)).toEqual(1)
+    expect(dateNumberToMonth(43465)).toEqual(12)
   })
 })

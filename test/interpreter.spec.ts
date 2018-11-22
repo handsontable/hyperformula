@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
-import {numberDateToString} from "../src/Date";
+import {dateNumberToString} from "../src/Date";
 
 describe('Interpreter', () => {
   let engine: HandsOnEngine
@@ -568,9 +568,34 @@ describe('Interpreter', () => {
     engine.loadSheet([['=DATE(1900; 1; 1)', '=DATE(1900; 1; 2)', '=DATE(1915; 10; 24)']])
 
     expect(engine.getCellValue('A1')).toEqual(2)
-    expect(numberDateToString(engine.getCellValue('A1') as number)).toEqual("1900-01-01")
+    expect(dateNumberToString(engine.getCellValue('A1') as number)).toEqual("1900-01-01")
     expect(engine.getCellValue('B1')).toEqual(3)
-    expect(numberDateToString(engine.getCellValue('B1') as number)).toEqual("1900-01-02")
-    expect(numberDateToString(engine.getCellValue('C1') as number)).toEqual("1915-10-24")
+    expect(dateNumberToString(engine.getCellValue('B1') as number)).toEqual("1900-01-02")
+    expect(dateNumberToString(engine.getCellValue('C1') as number)).toEqual("1915-10-24")
+  })
+
+  it('function MONTH with numerical arguments', () => {
+    engine.loadSheet([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
+
+    expect(engine.getCellValue('A1')).toEqual(12)
+    expect(engine.getCellValue('B1')).toEqual(1)
+    expect(engine.getCellValue('C1')).toEqual(12)
+  })
+
+  it('function MONTH with string arguments', () => {
+    engine.loadSheet([['=MONTH("1899-12-31")', '=MONTH("1900-01-01")', '=MONTH("2018-12-31")']])
+
+    expect(engine.getCellValue('A1')).toEqual(12)
+    expect(engine.getCellValue('B1')).toEqual(1)
+    expect(engine.getCellValue('C1')).toEqual(12)
+  })
+
+  it('function MONTH with wrong arguments', () => {
+    engine.loadSheet([['=MONTH("foo")', '=MONTH("2018-30-12")', '=MONTH(1; 2)', '=MONTH()']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
   })
 })
