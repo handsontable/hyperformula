@@ -3,7 +3,7 @@ import moment from 'moment';
 const DATE_ZERO = moment({
   year: 1899,
   month: 11,
-  day: 31
+  day: 30
 })
 
 const DATE_FORMAT = 'YYYY-MM-DD'
@@ -15,7 +15,7 @@ export function toNumberDate(year: number, month: number, day: number): number {
     day: day
   })
 
-  const diff = date.diff(DATE_ZERO, "days", true)
+  const diff = Math.round(date.diff(DATE_ZERO, "days", true))
   return diff
 }
 
