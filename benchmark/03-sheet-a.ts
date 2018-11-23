@@ -1,4 +1,4 @@
-import {benchmark} from './benchmark'
+import {benchmark, ExpectedValue} from './benchmark'
 
 const rows = 100000
 
@@ -14,18 +14,27 @@ sheet.push(['0', '1', '0', '0'])
 let prev = 1
 
 while (prev < rows) {
-  const rowToPush = [
+  let rowToPush = [
     `${prev}`,
     `=B${prev}*$E$2 + C${prev}*$E$3 + D${prev}*$E$4`,
     `=B${prev}*$F$2 + C${prev}*$F$3 + D${prev}*$F$4`,
     `=B${prev}*$G$2 + C${prev}*$G$3 + D${prev}*$G$4`,
   ]
   if (prev <= X.length) {
-    rowToPush.concat(X[prev - 1])
+    rowToPush = rowToPush.concat(X[prev - 1])
   }
 
   sheet.push(rowToPush)
   ++prev
 }
 
-benchmark(sheet, { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
+const expectedValues: ExpectedValue[] = [
+  { address: 'B2', value: 0.5 },
+  { address: 'C2', value: 0.1 },
+  { address: 'D2', value: 0.4 },
+  { address: 'B900', value: 0.32608695652173900000 },
+  { address: 'C900', value: 0.39130434782608700000 },
+  { address: 'D900', value: 0.28260869565217400000 },
+]
+
+benchmark(sheet, expectedValues, { millisecondsPerThousandRows: 60, numberOfRuns: 3 })

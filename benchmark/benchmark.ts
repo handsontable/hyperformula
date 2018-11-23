@@ -1,4 +1,6 @@
+import {type} from 'os'
 import {HandsOnEngine} from '../src'
+import {CellValue} from '../src/Cell'
 import {StatType} from '../src/statistics/Statistics'
 
 export interface Config {
@@ -6,7 +8,9 @@ export interface Config {
   numberOfRuns: number
 }
 
-export function benchmark(sheet: string[][], config: Config = {
+export interface ExpectedValue { address: string, value: CellValue}
+
+export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = {
   millisecondsPerThousandRows: 50,
   numberOfRuns: 3,
 }) {
@@ -14,11 +18,17 @@ export function benchmark(sheet: string[][], config: Config = {
   const rows = sheet.length
 
   let currentRun = 0
+
   while (currentRun < config.numberOfRuns) {
     const engine = new HandsOnEngine()
     engine.loadSheet(sheet)
     stats.push(engine.getStats())
     currentRun++
+
+    if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
+      console.error('Sheet validation error')
+      process.exit(1)
+    }
   }
 
   const overall = stats.map((s) => s.get(StatType.OVERALL)!).sort()
@@ -46,4 +56,26 @@ export function benchmark(sheet: string[][], config: Config = {
   if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
     process.exit(1)
   }
+}
+
+function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
+  let valid = true
+
+  for (let i = 0; i < expectedValues.length; ++i) {
+    let  actualValue = engine.getCellValue(expectedValues[i].address)
+    let  expectedValue = expectedValues[i].value
+
+    if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
+      expectedValue = (expectedValues[i].value as number).toPrecision(10)
+      actualValue = actualValue.toPrecision(10)
+    }
+
+    if (actualValue !== expectedValue) {
+      console.error(`expected ${expectedValues[i].value} but got ${actualValue}`)
+      valid = false
+      break
+    }
+  }
+
+  return valid
 }

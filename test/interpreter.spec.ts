@@ -271,7 +271,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toBe(0)
   })
 
-
   it('function ACOS wrong number of arguments', () => {
     engine.loadSheet([['=ACOS()', '=ACOS(1;-1)']])
 

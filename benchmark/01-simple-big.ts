@@ -1,4 +1,4 @@
-import {benchmark} from './benchmark'
+import {benchmark, ExpectedValue} from './benchmark'
 
 const rows = 100000
 
@@ -18,4 +18,12 @@ while (prev < rows) {
   prev++
 }
 
-benchmark(sheet, { millisecondsPerThousandRows: 150, numberOfRuns: 3 })
+const expectedValues: ExpectedValue[] = [
+  { address: 'A10', value: 100 },
+  { address: 'B100', value: 200 },
+  { address: 'C1000', value: 300 },
+  { address: 'D10000', value: 400 },
+  { address: 'E100000', value: 500 },
+]
+
+benchmark(sheet, expectedValues, { millisecondsPerThousandRows: 150, numberOfRuns: 3 })

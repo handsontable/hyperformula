@@ -19,4 +19,4 @@ while (prev < rows) {
   ++prev
 }
 
-benchmark(sheet, { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
+benchmark(sheet, [], { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
