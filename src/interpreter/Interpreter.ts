@@ -139,13 +139,8 @@ export class Interpreter {
     return value
   }
 
-  private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-    const rangeResult: CellValue[] = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-    }
-    return rangeResult
+  private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress) {
+    return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
@@ -189,7 +184,8 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = computableValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
+        const conditionValuesArr = Array.from(conditionValues)
+        const filteredValues = Array.from(computableValues).filter((val, idx) => criterionLambda(conditionValuesArr[idx]))
         return rangeSum(filteredValues)
       }
       case 'COUNTIF': {
@@ -210,7 +206,8 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = conditionValues.filter((val, idx) => criterionLambda(conditionValues[idx]))
+        const conditionValuesArr = Array.from(conditionValues)
+        const filteredValues = conditionValuesArr.filter((val, idx) => criterionLambda(conditionValuesArr[idx]))
         return filteredValues.length
       }
       case 'TRUE': {
@@ -392,4 +389,11 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
       return cellError(ErrorType.VALUE)
     }
   })
+}
+
+const getPlainRangeValues = function * (addressMapping: AddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress) {
+  const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+  for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+    yield addressMapping.getCell(cellFromRange)!.getCellValue()
+  }
 }
