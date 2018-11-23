@@ -225,8 +225,14 @@ export class Interpreter {
         }
       }
       case 'ACOS': {
+        if (ast.args.length !== 1) {
+          return cellError(ErrorType.NA)
+        }
+
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        if (typeof arg === 'number' && -1 <= arg && arg <= 1) {
+        if (typeof arg !== 'number') {
+          return cellError(ErrorType.VALUE)
+        } else if (-1 <= arg && arg <= 1) {
           return Math.acos(arg)
         } else {
           return cellError(ErrorType.NUM)

@@ -232,19 +232,19 @@ describe('Interpreter', () => {
   it('function ACOS happy path', () => {
     engine.loadSheet([['=ACOS(1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(0)
+    expect(engine.getCellValue('A1')).toBe(0)
   })
 
   it('function ACOS when value not numeric', () => {
     engine.loadSheet([['=ACOS("foo")']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('function ACOS for 1 (edge)', () => {
     engine.loadSheet([['=ACOS(1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(0)
+    expect(engine.getCellValue('A1')).toBe(0)
   })
 
   it('function ACOS for -1 (edge)', () => {
@@ -263,6 +263,20 @@ describe('Interpreter', () => {
     engine.loadSheet([['=ACOS(-1.1)']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
+  })
+
+  it('function ACOS happy path', () => {
+    engine.loadSheet([['=ACOS(1)']])
+
+    expect(engine.getCellValue('A1')).toBe(0)
+  })
+
+
+  it('function ACOS wrong number of arguments', () => {
+    engine.loadSheet([['=ACOS()', '=ACOS(1;-1)']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
   })
 
   it('function IF when value is true', () => {
