@@ -161,21 +161,30 @@ export class Interpreter {
         }, 0)
       }
       case 'SUMIF': {
+        let conditionValues
         const conditionRangeArg = ast.args[0]
-        if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
-          return cellError(ErrorType.VALUE)
-        }
-        const valuesRangeArg = ast.args[2]
-        if (valuesRangeArg.type !== AstNodeType.CELL_RANGE) {
+        if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
+          conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+        } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
+          conditionValues = [this.evaluateAst(conditionRangeArg, formulaAddress)][Symbol.iterator]()
+        } else {
           return cellError(ErrorType.VALUE)
         }
 
-        const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
         const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
         if (typeof criterionString !== 'string') {
           return cellError(ErrorType.VALUE)
         }
-        const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+
+        let computableValues
+        const valuesRangeArg = ast.args[2]
+        if (valuesRangeArg.type === AstNodeType.CELL_RANGE) {
+          computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+        } else if (valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
+          computableValues = [this.evaluateAst(valuesRangeArg, formulaAddress)][Symbol.iterator]()
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
 
         const criterion = parseCriterion(criterionString)
         if (criterion === null) {

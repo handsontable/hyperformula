@@ -8,7 +8,7 @@ describe('Function SUMIF', () => {
     engine = new HandsOnEngine()
   })
 
-  it('error when 1st arg is not a range', () => {
+  it('error when 1st arg is not a range or reference', () => {
     engine.loadSheet([
       ['=SUMIF(42; ">0"; B1:B2)'],
     ])
@@ -24,7 +24,7 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('error when 3rd arg is not a range', () => {
+  it('error when 3rd arg is not a range or reference', () => {
     engine.loadSheet([
       ['=SUMIF(C1:C2; ">0"; 42)'],
     ])
@@ -104,5 +104,14 @@ describe('Function SUMIF', () => {
     ])
 
     expect(engine.getCellValue('A4')).toEqual(10)
+  })
+
+  it('works when arguments are just references', () => {
+    engine.loadSheet([
+      ['2', '3'],
+      ['=SUMIF(A1; ">1"; B1)'],
+    ])
+
+    expect(engine.getCellValue('A2')).toEqual(3)
   })
 })
