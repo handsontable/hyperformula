@@ -1,4 +1,4 @@
-import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from 'src/Cell'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'

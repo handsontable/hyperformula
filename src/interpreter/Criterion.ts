@@ -1,4 +1,4 @@
-import {CellValue} from '../Cell'
+import {CellValue} from 'src/Cell'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',

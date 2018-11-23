@@ -1,11 +1,11 @@
-import {absoluteCellAddress, relativeCellAddress} from '../../src/Cell'
+import {absoluteCellAddress, relativeCellAddress} from 'src/Cell'
 import {
   AstNodeType,
   CellRangeAst,
   CellReferenceAst,
   ErrorAst,
-} from '../../src/parser/Ast'
-import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
+} from 'src/parser/Ast'
+import {ParserWithCaching} from 'src/parser/ParserWithCaching'
 
 describe('Parser - OFFSET to reference translation', () => {
   it('OFFSET parsing into cell reference', () => {

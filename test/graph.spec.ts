@@ -1,4 +1,4 @@
-import {Graph} from '../src/Graph'
+import {Graph} from 'src/Graph'
 
 describe('Basic Graph manipulation', () => {
   it('#addNode', () => {

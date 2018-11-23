@@ -5,7 +5,7 @@ import {
   cellError,
   ErrorType,
   relativeCellAddress,
-} from '../src/Cell'
+} from 'src/Cell'
 import {
   AstNodeType,
   CellRangeAst,
@@ -17,8 +17,8 @@ import {
   PlusOpAst,
   ProcedureAst,
   StringAst,
-} from '../src/parser/Ast'
-import {ParserWithCaching} from '../src/parser/ParserWithCaching'
+} from 'src/parser/Ast'
+import {ParserWithCaching} from 'src/parser/ParserWithCaching'
 
 const sharedExamples = (optimizationMode: string) => {
   it('integer literal', () => {

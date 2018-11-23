@@ -1,4 +1,4 @@
-import {absoluteCellAddress, cellAddressFromString, relativeCellAddress} from '../src/Cell'
+import {absoluteCellAddress, cellAddressFromString, relativeCellAddress} from 'src/Cell'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
