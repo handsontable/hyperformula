@@ -8,8 +8,6 @@ import {Vertex} from '../Vertex'
 import {buildCriterionLambda, CriterionLambda, parseCriterion} from './Criterion'
 import {split} from '../generatorUtils'
 
-export type ExpressionValue = CellValue | CellValue[][]
-
 export class Interpreter {
   private addressMapping: AddressMapping
   private graph: Graph<Vertex>
@@ -28,7 +26,7 @@ export class Interpreter {
     }
   }
 
-  private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): ExpressionValue {
+  private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
@@ -121,7 +119,7 @@ export class Interpreter {
     return rangeResult
   }
 
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): ExpressionValue {
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
     const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
     const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
     const rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
@@ -144,7 +142,7 @@ export class Interpreter {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
-  private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): ExpressionValue {
+  private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
       case 'SUM': {
         return ast.args.reduce((currentSum: CellValue, arg) => {
@@ -261,7 +259,7 @@ export class Interpreter {
           return cellError(ErrorType.NA)
         }
 
-        let result: ExpressionValue = true
+        let result: CellValue = true
         let index = 0
         while (result === true && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
@@ -275,7 +273,7 @@ export class Interpreter {
           return cellError(ErrorType.NA)
         }
 
-        let result: ExpressionValue = false
+        let result: CellValue = false
         let index = 0
         while (result === false && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
@@ -361,7 +359,7 @@ export class Interpreter {
     }
   }
 
-  private dateNumberRepresentation(arg: ExpressionValue): number | null {
+  private dateNumberRepresentation(arg: CellValue): number | null {
     if (typeof arg === 'number') {
       return arg
     } else if (typeof arg === 'string') {
@@ -371,7 +369,7 @@ export class Interpreter {
     }
   }
 
-  private booleanRepresentation(arg: ExpressionValue): ExpressionValue {
+  private booleanRepresentation(arg: CellValue): CellValue {
     if (typeof arg === 'number') {
       return arg !== 0
     } else if (typeof arg === 'boolean') {

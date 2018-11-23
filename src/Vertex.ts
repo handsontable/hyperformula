@@ -1,5 +1,4 @@
 import {CellValue, SimpleCellAddress} from './Cell'
-import {ExpressionValue} from './interpreter/Interpreter'
 import {Ast} from './parser/Ast'
 
 export abstract class Vertex {
