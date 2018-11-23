@@ -13,7 +13,7 @@ import {
   ErrorAst,
   MinusOpAst,
   MinusUnaryOpAst,
-  NumberAst,
+  NumberAst, ParsingErrorType,
   PlusOpAst,
   ProcedureAst,
   StringAst,
@@ -194,7 +194,7 @@ const sharedExamples = (optimizationMode: string) => {
 
     const ast = parser.parse('=A', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.args[0].name).toBe('MismatchedTokenException')
+    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
     expect(ast.args[0].message).toMatch(/Expecting token/)
   })
 
@@ -202,14 +202,14 @@ const sharedExamples = (optimizationMode: string) => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse('=SUM(A)', absoluteCellAddress(0, 0)).ast as ErrorAst
-    expect(ast.args[0].name).toBe('MismatchedTokenException')
+    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('parsing error - not all input parsed', () => {
     const parser = new ParserWithCaching(optimizationMode)
 
     const ast = parser.parse('=A1B1', absoluteCellAddress(0, 0)).ast as ErrorAst
-    expect(ast.args[0].name).toBe('NotAllInputParsedException')
+    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('errors - lexing errors', () => {
@@ -220,7 +220,7 @@ const sharedExamples = (optimizationMode: string) => {
     input.forEach((formula) => {
       const ast = parser.parse(formula, absoluteCellAddress(0, 0)).ast as ErrorAst
       expect(ast.type).toBe(AstNodeType.ERROR)
-      expect(ast.args[0].name).toBe('LexingError')
+      expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
     })
   })
 

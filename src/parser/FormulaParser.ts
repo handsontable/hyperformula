@@ -1,6 +1,6 @@
 import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
-import {absoluteCellAddress, CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, SimpleCellAddress} from '../Cell'
 import {
   Ast,
   AstNodeType,
@@ -15,8 +15,7 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
-  CellReferenceAst,
-  NumberAst,
+  ParsingErrorType,
 } from './Ast'
 
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/})
@@ -244,7 +243,7 @@ class FormulaParser extends Parser {
     const cellArg = args[0]
     if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        type: ParsingErrorType.StaticOffsetError,
         message: 'First argument to OFFSET is not a reference',
       }])
     }
@@ -256,7 +255,7 @@ class FormulaParser extends Parser {
       rowShift = -rowsArg.value.value
     } else {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        type: ParsingErrorType.StaticOffsetError,
         message: 'Second argument to OFFSET is not a static number',
       }])
     }
@@ -268,7 +267,7 @@ class FormulaParser extends Parser {
       colShift = -columnsArg.value.value
     } else {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        type: ParsingErrorType.StaticOffsetError,
         message: 'Third argument to OFFSET is not a static number',
       }])
     }
@@ -280,18 +279,18 @@ class FormulaParser extends Parser {
       height = heightArg.value
       if (height < 1) {
         return buildErrorAst([{
-          name: 'StaticOffsetError',
+          type: ParsingErrorType.StaticOffsetError,
           message: 'Fourth argument to OFFSET is too small number',
         }])
       } else if (!Number.isInteger(height)) {
         return buildErrorAst([{
-          name: 'StaticOffsetError',
+          type: ParsingErrorType.StaticOffsetError,
           message: 'Fourth argument to OFFSET is not integer',
         }])
       }
     } else {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        type: ParsingErrorType.StaticOffsetError,
         message: 'Fourth argument to OFFSET is not a static number',
       }])
     }
@@ -303,18 +302,18 @@ class FormulaParser extends Parser {
       width = widthArg.value
       if (width < 1) {
         return buildErrorAst([{
-          name: 'StaticOffsetError',
+          type: ParsingErrorType.StaticOffsetError,
           message: 'Fifth argument to OFFSET is too small number',
         }])
       } else if (!Number.isInteger(width)) {
         return buildErrorAst([{
-          name: 'StaticOffsetError',
+          type: ParsingErrorType.StaticOffsetError,
           message: 'Fifth argument to OFFSET is not integer',
         }])
       }
     } else {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        type: ParsingErrorType.StaticOffsetError,
         message: 'Fifth argument to OFFSET is not a static number',
       }])
     }
@@ -326,7 +325,7 @@ class FormulaParser extends Parser {
     }
     if (topLeftCorner.row < 0 || topLeftCorner.col < 0) {
       return buildErrorAst([{
-        name: 'StaticOffsetOutOfRangeError',
+        type: ParsingErrorType.StaticOffsetOutOfRangeError,
         message: 'Resulting reference is out of the sheet',
       }])
     }
@@ -362,7 +361,7 @@ export function parseFromTokens(lexResult: ILexingResult, formulaAddress: Simple
   if (errors.length > 0) {
     return buildErrorAst(errors.map((e) =>
         ({
-          name: e.name,
+          type: ParsingErrorType.ParserError,
           message: e.message,
         }),
       ))

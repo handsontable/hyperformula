@@ -1,5 +1,5 @@
 import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
-import {Ast, AstNodeType, buildErrorAst, ParsingError} from './Ast'
+import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'
 import {parseFromTokens, tokenizeFormula} from './FormulaParser'
@@ -20,7 +20,7 @@ export class ParserWithCaching {
       if (lexerResult.errors.length > 0) {
         const ast = buildErrorAst(lexerResult.errors.map((e) =>
             ({
-              name: 'LexingError',
+              type: ParsingErrorType.LexingError,
               message: e.message,
             }),
         ))

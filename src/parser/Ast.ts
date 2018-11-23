@@ -14,8 +14,15 @@ export type Ast =
     | ErrorAst
 
 export interface ParsingError {
-  name: string,
+  type: ParsingErrorType,
   message: string
+}
+
+export enum ParsingErrorType {
+  LexingError = 'LexingError',
+  ParserError = 'ParsingError',
+  StaticOffsetError = 'StaticOffsetError',
+  StaticOffsetOutOfRangeError = 'StaticOffsetOutOfRangeError',
 }
 
 export enum AstNodeType {
