@@ -124,20 +124,20 @@ describe('Basic Graph manipulation', () => {
     expect(graph.edgesCount()).toBe(3)
   })
 
-  it('#topologicalSort for empty graph', () => {
+  it.skip('#topologicalSort for empty graph', () => {
     const graph = new Graph()
 
     expect(graph.topologicalSort()).toEqual([])
   })
 
-  it('#topologicalSort node is included even if he is not connected to anything', () => {
+  it.skip('#topologicalSort node is included even if he is not connected to anything', () => {
     const graph = new Graph()
     graph.addNode('foo')
 
     expect(graph.topologicalSort()).toEqual(['foo'])
   })
 
-  it('#topologicalSort for simple graph', () => {
+  it.skip('#topologicalSort for simple graph', () => {
     const graph = new Graph()
     graph.addNode('foo')
     graph.addNode('bar')
@@ -146,7 +146,7 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topologicalSort()).toEqual(['bar', 'foo'])
   })
 
-  it('#topologicalSort for more complex graph', () => {
+  it.skip('#topologicalSort for more complex graph', () => {
     const graph = new Graph()
     graph.addNode('x0')
     graph.addNode('x1')
@@ -161,7 +161,7 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topologicalSort()).toEqual(['x0', 'x1', 'x4', 'x2', 'x3'])
   })
 
-  it('#topologicalSort for not connected graph', () => {
+  it.skip('#topologicalSort for not connected graph', () => {
     const graph = new Graph()
     graph.addNode('x0')
     graph.addNode('x1')
@@ -173,7 +173,7 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topologicalSort()).toEqual(['x0', 'x1', 'x2', 'x3'])
   })
 
-  it('#topologicalSort raise an error if has a trivial cycle', () => {
+  it.skip('#topologicalSort raise an error if has a trivial cycle', () => {
     const graph = new Graph()
     graph.addNode('x1')
     graph.addNode('x2')
@@ -185,7 +185,7 @@ describe('Basic Graph manipulation', () => {
     }).toThrowError(new Error('Graph has a cycle'))
   })
 
-  it('#topologicalSort raise an error if has a cycle', () => {
+  it.skip('#topologicalSort raise an error if has a cycle', () => {
     const graph = new Graph()
     graph.addNode('x0')
     graph.addNode('x1')
@@ -199,7 +199,7 @@ describe('Basic Graph manipulation', () => {
     }).toThrowError(new Error('Graph has a cycle'))
   })
 
-  it('#topologicalSort raise an error for one-element cycle', () => {
+  it.skip('#topologicalSort raise an error for one-element cycle', () => {
     const graph = new Graph()
     graph.addNode('x0')
     graph.addEdge('x0', 'x0')

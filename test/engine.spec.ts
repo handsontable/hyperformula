@@ -1,6 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {ErrorType} from '../src/Cell'
-import {cellError} from '../src/Cell'
+import {cellError, ErrorType} from '../src/Cell'
 
 describe('Integration', () => {
   let engine: HandsOnEngine
@@ -39,37 +38,39 @@ describe('Integration', () => {
     expect(engine.getCellValue('B1')).toBe(0)
   })
 
+
   it('loadSheet with a loop', () => {
-    expect(() => {
-      engine.loadSheet([['=B1', '=C1', '=A1']])
-    }).toThrowError(new Error('Graph has a cycle'))
+    engine.loadSheet([['=B1', '=C1', '=A1']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside plus operator', () => {
-    expect(() => {
-      engine.loadSheet([['5', '=A1+B1']])
-    }).toThrowError(new Error('Graph has a cycle'))
+    engine.loadSheet([['5', '=A1+B1']])
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside minus operator', () => {
-    expect(() => {
-      engine.loadSheet([['5', '=A1-B1']])
-    }).toThrowError(new Error('Graph has a cycle'))
+    engine.loadSheet([['5', '=A1-B1']])
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
   })
 
+
   it('loadSheet with operator precedence', () => {
-      engine.loadSheet([['=3*7*2-4*1+2']])
-      expect(engine.getCellValue('A1')).toBe(40)
+    engine.loadSheet([['=3*7*2-4*1+2']])
+    expect(engine.getCellValue('A1')).toBe(40)
   })
 
   it('loadSheet with operator precedence and brackets', () => {
-      engine.loadSheet([['=3*7+((2-4)*(1+2)+3)*2']])
-      expect(engine.getCellValue('A1')).toBe(15)
+    engine.loadSheet([['=3*7+((2-4)*(1+2)+3)*2']])
+    expect(engine.getCellValue('A1')).toBe(15)
   })
 
   it('loadSheet with operator precedence with cells', () => {
-      engine.loadSheet([['3', '4', '=B1*2+A1']])
-      expect(engine.getCellValue('C1')).toBe(11)
+    engine.loadSheet([['3', '4', '=B1*2+A1']])
+    expect(engine.getCellValue('C1')).toBe(11)
   })
 
   it('#loadSheet change cell content', () => {
@@ -108,11 +109,11 @@ describe('Integration', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
   })
 
-  it ('#loadSheet - changing value inside range', () => {
+  it('#loadSheet - changing value inside range', () => {
     engine.loadSheet([
-        ['1', '0'],
-        ['2', '0'],
-        ['3', '=SUM(A1:A3)'],
+      ['1', '0'],
+      ['2', '0'],
+      ['3', '=SUM(A1:A3)'],
     ])
     expect(engine.getCellValue('B3')).toEqual(6)
 
@@ -122,8 +123,8 @@ describe('Integration', () => {
 
   it('#loadSheet - dependency before value', () => {
     engine.loadSheet([
-        ['=B1', '1', '2'],
-        ['=SUM(B2:C2)', '1', '2'],
+      ['=B1', '1', '2'],
+      ['=SUM(B2:C2)', '1', '2'],
     ])
     expect(engine.getCellValue('A1')).toBe(1)
     expect(engine.getCellValue('A2')).toBe(3)

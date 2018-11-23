@@ -1,16 +1,17 @@
 import {AddressMapping} from './AddressMapping'
-import {absoluteCellAddress, CellAddress, cellAddressFromString, CellValue, SimpleCellAddress} from './Cell'
+import {absoluteCellAddress, cellAddressFromString, cellError, CellValue, ErrorType} from './Cell'
 import {Graph} from './Graph'
 import {GraphBuilder, Sheet} from './GraphBuilder'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
+  private verticesOnCycle: Vertex[] = []
   private interpreter: Interpreter = new Interpreter(this.addressMapping, this.graph)
   private stats: Statistics = new Statistics()
 
@@ -25,7 +26,7 @@ export class HandsOnEngine {
     })
 
     this.stats.measure(StatType.TOP_SORT, () => {
-      this.sortedVertices = this.graph.topologicalSort()
+      [this.sortedVertices, this.verticesOnCycle] = this.graph.topologicalSort()
     })
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -62,6 +63,13 @@ export class HandsOnEngine {
   }
 
   public recomputeFormulas() {
+    this.verticesOnCycle.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex) {
+        vertex.setCellValue(cellError(ErrorType.CYCLE))
+      } else {
+        throw Error('Only formula vertix can be on cycle')
+      }
+    })
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress()
