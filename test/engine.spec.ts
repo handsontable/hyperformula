@@ -38,7 +38,6 @@ describe('Integration', () => {
     expect(engine.getCellValue('B1')).toBe(0)
   })
 
-
   it('loadSheet with a loop', () => {
     engine.loadSheet([['=B1', '=C1', '=A1']])
 
@@ -56,7 +55,6 @@ describe('Integration', () => {
     engine.loadSheet([['5', '=A1-B1']])
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
   })
-
 
   it('loadSheet with operator precedence', () => {
     engine.loadSheet([['=3*7*2-4*1+2']])

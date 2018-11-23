@@ -1,4 +1,4 @@
-import {FormulaCellVertex} from "./Vertex";
+import {FormulaCellVertex} from './Vertex'
 
 export class Graph<T> {
   private nodes: Set<T>

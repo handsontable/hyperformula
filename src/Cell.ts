@@ -4,7 +4,7 @@ export enum ErrorType {
   VALUE = 'VALUE',
   NUM = 'NUM',
   NA = 'NA',
-  CYCLE = 'CYCLE'
+  CYCLE = 'CYCLE',
 }
 
 export enum CellReferenceType {
