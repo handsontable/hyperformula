@@ -637,7 +637,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
   })
 
-  it.skip('function OFFSET basic use', () => {
+  it('function OFFSET basic use', () => {
     engine.loadSheet([['5', '=OFFSET(B1; 0; -1)', '=OFFSET(A1; 0; 0)']])
 
     expect(engine.getCellValue('B1')).toEqual(5)

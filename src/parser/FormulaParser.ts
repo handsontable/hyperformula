@@ -1,6 +1,6 @@
 import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
-import {cellAddressFromString, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
   AstNodeType,
@@ -323,7 +323,21 @@ class FormulaParser extends Parser {
       row: cellArg.reference.row + rowShift,
       col: cellArg.reference.col + colShift,
     }
-    if (topLeftCorner.row < 0 || topLeftCorner.col < 0) {
+
+    let absoluteCol = topLeftCorner.col
+    let absoluteRow = topLeftCorner.row
+
+    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+        || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
+      absoluteRow = absoluteRow + this.formulaAddress!.row
+    }
+    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+        || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+      absoluteCol = absoluteCol + this.formulaAddress!.col
+    }
+
+
+    if (absoluteCol < 0 || absoluteRow < 0) {
       return buildErrorAst([{
         type: ParsingErrorType.StaticOffsetOutOfRangeError,
         message: 'Resulting reference is out of the sheet',
