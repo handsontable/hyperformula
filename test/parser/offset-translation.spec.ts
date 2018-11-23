@@ -158,7 +158,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = new ParserWithCaching('parser')
 
     const ast = parser.parse('=OFFSET(A1; -1; 0)', absoluteCellAddress(0, 0)).ast as ErrorAst
-    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].name).toBe('StaticOffsetOutOfRangeError')
     expect(ast.args[0].message).toBe('Resulting reference is out of the sheet')
   })
 
@@ -166,7 +166,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = new ParserWithCaching('parser')
 
     const ast = parser.parse('=OFFSET(A1; 0; -1)', absoluteCellAddress(0, 0)).ast as ErrorAst
-    expect(ast.args[0].name).toBe('StaticOffsetError')
+    expect(ast.args[0].name).toBe('StaticOffsetOutOfRangeError')
     expect(ast.args[0].message).toBe('Resulting reference is out of the sheet')
   })
 })

@@ -94,6 +94,9 @@ export class Interpreter {
         return cellError(ErrorType.VALUE)
       }
       case AstNodeType.ERROR: {
+        if (ast.args[0].name === 'StaticOffsetOutOfRangeError') {
+          return cellError(ErrorType.REF)
+        }
         return cellError(ErrorType.NAME)
       }
     }

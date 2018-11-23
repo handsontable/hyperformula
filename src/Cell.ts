@@ -5,6 +5,7 @@ export enum ErrorType {
   NUM = 'NUM',
   NA = 'NA',
   CYCLE = 'CYCLE',
+  REF = 'REF',
 }
 
 export enum CellReferenceType {

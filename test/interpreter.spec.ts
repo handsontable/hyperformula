@@ -636,4 +636,11 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
   })
+
+  it ('function OFFSET out of range', () => {
+    engine.loadSheet([['=OFFSET(A1; -1; 0)', '=OFFSET(A1; 0; -1)']])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.REF))
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.REF))
+  })
 })

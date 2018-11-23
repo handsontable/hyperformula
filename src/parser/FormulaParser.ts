@@ -326,7 +326,7 @@ class FormulaParser extends Parser {
     }
     if (topLeftCorner.row < 0 || topLeftCorner.col < 0) {
       return buildErrorAst([{
-        name: 'StaticOffsetError',
+        name: 'StaticOffsetOutOfRangeError',
         message: 'Resulting reference is out of the sheet',
       }])
     }
