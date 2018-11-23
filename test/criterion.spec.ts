@@ -1,4 +1,5 @@
 import {buildCriterion, CriterionType, parseCriterion} from '../src/interpreter/Criterion'
+import {cellError, ErrorType} from '../src/Cell'
 
 describe('Criterion', () => {
   it('greater than', () => {
@@ -43,5 +44,13 @@ describe('Criterion', () => {
 
   it('null when unparsable string', () => {
     expect(parseCriterion('$fdsa')).toEqual(null)
+  })
+
+  it('null when criterion being error', () => {
+    expect(parseCriterion(cellError(ErrorType.VALUE))).toEqual(null)
+  })
+
+  it('works with criterion being just value', () => {
+    expect(parseCriterion(100.5)).toEqual(buildCriterion(CriterionType.EQUAL, 100.5))
   })
 })
