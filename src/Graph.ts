@@ -52,7 +52,7 @@ export class Graph<T> {
     return false
   }
 
-  public topologicalSort(): [T[], T[]] {
+  public topologicalSort(): { sorted: T[], cycled: T[] } {
     const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: T[] = []
 
@@ -81,10 +81,10 @@ export class Graph<T> {
       for (let i = 0; i < topologicalOrdering.length; ++i) {
         nodesOnCycle.delete(topologicalOrdering[i])
       }
-      return [topologicalOrdering, Array.from(nodesOnCycle)]
+      return { sorted: topologicalOrdering, cycled: Array.from(nodesOnCycle) }
     }
 
-    return [topologicalOrdering, []]
+    return { sorted: topologicalOrdering, cycled: [] }
   }
 
   public incomingEdges(): Map<T, number> {

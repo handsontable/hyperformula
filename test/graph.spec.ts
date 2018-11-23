@@ -127,16 +127,16 @@ describe('Basic Graph manipulation', () => {
   it('#topologicalSort for empty graph', () => {
     const graph = new Graph()
 
-    expect(graph.topologicalSort()[0]).toEqual([])
-    expect(graph.topologicalSort()[1]).toEqual([])
+    expect(graph.topologicalSort().sorted).toEqual([])
+    expect(graph.topologicalSort().cycled).toEqual([])
   })
 
   it('#topologicalSort node is included even if he is not connected to anything', () => {
     const graph = new Graph()
     graph.addNode('foo')
 
-    expect(graph.topologicalSort()[0]).toEqual(['foo'])
-    expect(graph.topologicalSort()[1]).toEqual([])
+    expect(graph.topologicalSort().sorted).toEqual(['foo'])
+    expect(graph.topologicalSort().cycled).toEqual([])
   })
 
   it('#topologicalSort for simple graph', () => {
@@ -145,8 +145,8 @@ describe('Basic Graph manipulation', () => {
     graph.addNode('bar')
     graph.addEdge('bar', 'foo')
 
-    expect(graph.topologicalSort()[0]).toEqual(['bar', 'foo'])
-    expect(graph.topologicalSort()[1]).toEqual([])
+    expect(graph.topologicalSort().sorted).toEqual(['bar', 'foo'])
+    expect(graph.topologicalSort().cycled).toEqual([])
   })
 
   it('#topologicalSort for more complex graph', () => {
@@ -161,8 +161,8 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge('x2', 'x3')
     graph.addEdge('x4', 'x3')
 
-    expect(graph.topologicalSort()[0]).toEqual(['x0', 'x1', 'x4', 'x2', 'x3'])
-    expect(graph.topologicalSort()[1]).toEqual([])
+    expect(graph.topologicalSort().sorted).toEqual(['x0', 'x1', 'x4', 'x2', 'x3'])
+    expect(graph.topologicalSort().cycled).toEqual([])
   })
 
   it('#topologicalSort for not connected graph', () => {
@@ -174,8 +174,8 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge('x0', 'x2')
     graph.addEdge('x1', 'x3')
 
-    expect(graph.topologicalSort()[0]).toEqual(['x0', 'x1', 'x2', 'x3'])
-    expect(graph.topologicalSort()[1]).toEqual([])
+    expect(graph.topologicalSort().sorted).toEqual(['x0', 'x1', 'x2', 'x3'])
+    expect(graph.topologicalSort().cycled).toEqual([])
   })
 
   it('#topologicalSort returns vertices on trivial cycle', () => {
@@ -185,8 +185,8 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge('x1', 'x2')
     graph.addEdge('x1', 'x1')
 
-    expect(graph.topologicalSort()[0]).toEqual([])
-    expect(graph.topologicalSort()[1]).toEqual(['x1', 'x2'])
+    expect(graph.topologicalSort().sorted).toEqual([])
+    expect(graph.topologicalSort().cycled).toEqual(['x1', 'x2'])
   })
 
   it('#topologicalSort returns vertices on cycle', () => {
@@ -198,8 +198,8 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge('x1', 'x2')
     graph.addEdge('x1', 'x1')
 
-    expect(graph.topologicalSort()[0]).toEqual(['x0'])
-    expect(graph.topologicalSort()[1]).toEqual(['x1', 'x2'])
+    expect(graph.topologicalSort().sorted).toEqual(['x0'])
+    expect(graph.topologicalSort().cycled).toEqual(['x1', 'x2'])
   })
 
   it('#topologicalSort returns one-element cycle', () => {
@@ -207,7 +207,7 @@ describe('Basic Graph manipulation', () => {
     graph.addNode('x0')
     graph.addEdge('x0', 'x0')
 
-    expect(graph.topologicalSort()[0]).toEqual([])
-    expect(graph.topologicalSort()[1]).toEqual(['x0'])
+    expect(graph.topologicalSort().sorted).toEqual([])
+    expect(graph.topologicalSort().cycled).toEqual(['x0'])
   })
 })
