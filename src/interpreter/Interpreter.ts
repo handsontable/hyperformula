@@ -5,7 +5,7 @@ import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
-import {buildCriterionLambda, parseCriterion} from './Criterion'
+import {buildCriterionLambda, parseCriterion, CriterionLambda} from './Criterion'
 
 export type ExpressionValue = CellValue | CellValue[][]
 
@@ -184,8 +184,7 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const conditionValuesArr = Array.from(conditionValues)
-        const filteredValues = Array.from(computableValues).filter((val, idx) => criterionLambda(conditionValuesArr[idx]))
+        const filteredValues = Array.from(ifFilter(criterionLambda, conditionValues, computableValues))
         return rangeSum(filteredValues)
       }
       case 'COUNTIF': {
@@ -206,9 +205,13 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const conditionValuesArr = Array.from(conditionValues)
-        const filteredValues = conditionValuesArr.filter((val, idx) => criterionLambda(conditionValuesArr[idx]))
-        return filteredValues.length
+        let counter = 0
+        for (const e of conditionValues) {
+          if (criterionLambda(e)) {
+            counter++
+          }
+        }
+        return counter
       }
       case 'TRUE': {
         if (ast.args.length > 0) {
@@ -391,9 +394,60 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
   })
 }
 
-const getPlainRangeValues = function * (addressMapping: AddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress) {
+function * getPlainRangeValues(addressMapping: AddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
   const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
   for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
     yield addressMapping.getCell(cellFromRange)!.getCellValue()
+  }
+}
+
+function * empty<T>(): IterableIterator<T> {
+}
+
+function split<T>(iterable: IterableIterator<T>): { value?: T, rest: IterableIterator<T> } {
+  const iterator = iterable[Symbol.iterator]();
+  const { done, value } = iterator.next();
+
+  if (done) {
+    return { rest: empty() };
+  } else {
+    return { value, rest: iterator };
+  }
+};
+
+function first<T>(iterable: IterableIterator<T>): T | undefined {
+  const iterator: Iterator<T> = iterable[Symbol.iterator]();
+  const { done, value } = iterator.next();
+
+  if (!done) {
+    return value
+  }
+  return
+};
+
+function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {
+  const asSplit = split(iterable);
+
+  if (asSplit.hasOwnProperty('value')) {
+    const value = asSplit.value as T
+
+    if (fn(value)) {
+      yield value;
+    }
+    yield * filterWith(fn, asSplit.rest);
+  }
+}
+
+function * ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
+  const conditionalSplit = split(conditionalIterable)
+  const computableSplit = split(computableIterable)
+  if (conditionalSplit.hasOwnProperty('value') && computableSplit.hasOwnProperty('value')) {
+    const conditionalFirst = conditionalSplit.value as CellValue
+    const computableFirst = computableSplit.value as CellValue
+    if (criterionLambda(conditionalFirst)) {
+      yield computableFirst
+    }
+
+    yield * ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
   }
 }
