@@ -184,8 +184,8 @@ export class Interpreter {
         }
 
         const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = Array.from(ifFilter(criterionLambda, conditionValues, computableValues))
-        return rangeSum(filteredValues)
+        const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
+        return reduceSum(filteredValues)
       }
       case 'COUNTIF': {
         const conditionRangeArg = ast.args[0]
@@ -450,4 +450,16 @@ function * ifFilter(criterionLambda: CriterionLambda, conditionalIterable: Itera
 
     yield * ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
   }
+}
+
+function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
+  let acc = 0
+  for (const val of iterable) {
+    if (typeof acc === 'number' && typeof val === 'number') {
+      acc += val
+    } else {
+      return cellError(ErrorType.VALUE)
+    }
+  }
+  return acc
 }
