@@ -40,6 +40,18 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
+  it('error when different width dimension of arguments', () => {
+    engine.loadSheet([
+      ['=SUMIF(B1:C1; ">0"; B2:D2)'],
+      ['=SUMIF(B1; ">0"; B2:D2)'],
+      ['=SUMIF(B1:D1; ">0"; B2)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+  })
+
   it('usage of greater than operator', () => {
     engine.loadSheet([
       ['0', '3'],
