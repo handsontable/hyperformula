@@ -336,7 +336,6 @@ class FormulaParser extends Parser {
       absoluteCol = absoluteCol + this.formulaAddress!.col
     }
 
-
     if (absoluteCol < 0 || absoluteRow < 0) {
       return buildErrorAst([{
         type: ParsingErrorType.StaticOffsetOutOfRangeError,
