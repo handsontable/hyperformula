@@ -19,11 +19,7 @@ export class Interpreter {
 
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
     const result = this.evaluateAst(formula, formulaAddress)
-    if (Array.isArray(result)) {
-      return cellError(ErrorType.VALUE)
-    } else {
-      return result as CellValue
-    }
+    return result
   }
 
   private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
