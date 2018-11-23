@@ -181,5 +181,4 @@ module.exports = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-  moduleDirectories: ['node_modules', '<rootDir>']
 };

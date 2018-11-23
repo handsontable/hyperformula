@@ -1,5 +1,5 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from 'src/Cell'
+import {CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {CellReference, parseFromTokens, RangeSeparator, RelativeCell, tokenizeFormula} from './FormulaParser'
 
 export const computeHash = (tokens: IToken[], baseAddress: SimpleCellAddress): string => {

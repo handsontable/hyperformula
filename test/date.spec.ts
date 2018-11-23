@@ -1,4 +1,4 @@
-import { dateNumberToMonthNumber, dateNumberToString, toDateNumber } from 'src/Date'
+import { dateNumberToMonthNumber, dateNumberToString, toDateNumber } from '../src/Date'
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {

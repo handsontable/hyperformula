@@ -1,5 +1,5 @@
-import {absoluteCellAddress, simpleCellAddress} from 'src/Cell'
-import {ParserWithCaching} from 'src/parser/ParserWithCaching'
+import {absoluteCellAddress, simpleCellAddress} from '../src/Cell'
+import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {

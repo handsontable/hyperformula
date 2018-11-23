@@ -1,6 +1,6 @@
-import {AddressMapping} from 'src/AddressMapping'
-import {relativeCellAddress, simpleCellAddress} from 'src/Cell'
-import {RangeVertex, ValueCellVertex} from 'src/Vertex'
+import {AddressMapping} from '../src/AddressMapping'
+import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
+import {RangeVertex, ValueCellVertex} from '../src/Vertex'
 
 describe('AddressMapping', () => {
   it('simple set', () => {

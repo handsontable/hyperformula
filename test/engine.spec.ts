@@ -1,5 +1,5 @@
-import {HandsOnEngine} from 'src'
-import {cellError, ErrorType} from 'src/Cell'
+import {HandsOnEngine} from '../src'
+import {cellError, ErrorType} from '../src/Cell'
 
 describe('Integration', () => {
   let engine: HandsOnEngine

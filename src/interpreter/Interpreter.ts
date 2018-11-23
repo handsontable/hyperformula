@@ -1,12 +1,12 @@
-import {AddressMapping} from 'src/AddressMapping'
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from 'src/Cell'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from 'src/Date'
-import {Graph} from 'src/Graph'
-import {findSmallerRange, generateCellsFromRangeGenerator} from 'src/GraphBuilder'
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from 'src/parser/Ast'
-import {Vertex} from 'src/Vertex'
+import {AddressMapping} from '../AddressMapping'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
+import {Graph} from '../Graph'
+import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
+import {Vertex} from '../Vertex'
 import {buildCriterionLambda, CriterionLambda, parseCriterion} from './Criterion'
-import {split} from 'src/generatorUtils'
+import {split} from '../generatorUtils'
 
 export class Interpreter {
   private addressMapping: AddressMapping

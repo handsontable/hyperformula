@@ -1,4 +1,4 @@
-import {CellAddress, CellDependency} from 'src/Cell'
+import {CellAddress, CellDependency} from '../Cell'
 
 export type Ast =
     NumberAst

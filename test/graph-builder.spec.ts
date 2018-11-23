@@ -1,9 +1,9 @@
-import {AddressMapping} from 'src/AddressMapping'
-import {CellAddress, CellReferenceType, simpleCellAddress} from 'src/Cell'
-import {Graph} from 'src/Graph'
-import {GraphBuilder} from 'src/GraphBuilder'
-import {Statistics} from 'src/statistics/Statistics'
-import {CellVertex, ValueCellVertex, Vertex} from 'src/Vertex'
+import {AddressMapping} from '../src/AddressMapping'
+import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
+import {Graph} from '../src/Graph'
+import {GraphBuilder} from '../src/GraphBuilder'
+import {Statistics} from '../src/statistics/Statistics'
+import {CellVertex, ValueCellVertex, Vertex} from '../src/Vertex'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
