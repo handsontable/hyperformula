@@ -52,6 +52,18 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
   })
 
+  it('error when different height dimension of arguments', () => {
+    engine.loadSheet([
+      ['=SUMIF(B1:B2; ">0"; C1:C3)'],
+      ['=SUMIF(B1; ">0"; C1:C2)'],
+      ['=SUMIF(B1:B2; ">0"; C1)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+  })
+
   it('usage of greater than operator', () => {
     engine.loadSheet([
       ['0', '3'],

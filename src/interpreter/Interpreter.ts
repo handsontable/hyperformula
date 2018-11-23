@@ -162,14 +162,16 @@ export class Interpreter {
       }
       case 'SUMIF': {
         let conditionValues
-        let conditionWidth
+        let conditionWidth, conditionHeight
         const conditionRangeArg = ast.args[0]
         if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
           conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
           conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
+          conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
         } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
           conditionValues = [this.evaluateAst(conditionRangeArg, formulaAddress)][Symbol.iterator]()
           conditionWidth = 1
+          conditionHeight = 1
         } else {
           return cellError(ErrorType.VALUE)
         }
@@ -179,19 +181,24 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
 
-        let computableValues, computableWidth
+        let computableValues, computableWidth, computableHeight
         const valuesRangeArg = ast.args[2]
         if (valuesRangeArg.type === AstNodeType.CELL_RANGE) {
           computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
           computableWidth = getRangeWidth(valuesRangeArg, formulaAddress)
+          computableHeight = getRangeHeight(valuesRangeArg, formulaAddress)
         } else if (valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
           computableValues = [this.evaluateAst(valuesRangeArg, formulaAddress)][Symbol.iterator]()
           computableWidth = 1
+          computableHeight = 1
         } else {
           return cellError(ErrorType.VALUE)
         }
 
         if (conditionWidth !== computableWidth) {
+          return cellError(ErrorType.VALUE)
+        }
+        if (conditionHeight !== computableHeight) {
           return cellError(ErrorType.VALUE)
         }
 
@@ -448,4 +455,10 @@ const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
   const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)
   const absoluteEnd = getAbsoluteAddress(ast.end, baseAddress)
   return absoluteEnd.col - absoluteStart.col
+}
+
+const getRangeHeight = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
+  const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)
+  const absoluteEnd = getAbsoluteAddress(ast.end, baseAddress)
+  return absoluteEnd.row - absoluteStart.row
 }
