@@ -3,7 +3,7 @@ import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
 import {Statistics} from '../src/statistics/Statistics'
-import {CellVertex, ValueCellVertex, Vertex} from '../src/Vertex'
+import {CellVertex, ValueCellVertex, Vertex, EmptyCellVertex} from '../src/Vertex'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -28,6 +28,17 @@ describe('GraphBuilder', () => {
     const node = addressMapping.getCell(simpleCellAddress(0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
     expect(node.getCellValue()).toBe('foo')
+  })
+
+  it('building for cell with empty string should give empty vertex', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([['']])
+
+    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    expect(node).toBeInstanceOf(EmptyCellVertex)
   })
 
   it('#buildGraph', () => {
