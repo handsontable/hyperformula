@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
     "jest": "^23.6.0",
@@ -10,6 +11,7 @@
   },
   "dependencies": {
     "chevrotain": "^4.1.0",
+    "csv-parse": "^4.0.1",
     "moment": "^2.22.2"
   }
 }

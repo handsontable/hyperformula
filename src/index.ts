@@ -6,6 +6,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import parse from 'csv-parse/lib/sync'
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()
@@ -34,6 +35,10 @@ export class HandsOnEngine {
     })
 
     this.stats.end(StatType.OVERALL)
+  }
+
+  public loadCsvSheet(csv: string) {
+    this.loadSheet(parse(csv))
   }
 
   public getCellValue(stringAddress: string): CellValue {
