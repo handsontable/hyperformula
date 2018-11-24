@@ -1,3 +1,4 @@
+import parse from 'csv-parse/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {absoluteCellAddress, cellAddressFromString, cellError, CellValue, ErrorType} from './Cell'
 import {Graph} from './Graph'
@@ -6,7 +7,6 @@ import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import parse from 'csv-parse/lib/sync'
 
 export class HandsOnEngine {
   private addressMapping: AddressMapping = new AddressMapping()

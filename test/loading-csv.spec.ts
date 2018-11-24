@@ -12,21 +12,21 @@ describe('Loading CSV', () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value","Bar"`,
-    ].join("\n")
+    ].join('\n')
 
     engine.loadCsvSheet(str)
 
-    expect(engine.getCellValue('A1')).toBe("Some header")
-    expect(engine.getCellValue('B1')).toBe("Another header")
-    expect(engine.getCellValue('A2')).toBe("Some simple string value")
-    expect(engine.getCellValue('B2')).toBe("Bar")
+    expect(engine.getCellValue('A1')).toBe('Some header')
+    expect(engine.getCellValue('B1')).toBe('Another header')
+    expect(engine.getCellValue('A2')).toBe('Some simple string value')
+    expect(engine.getCellValue('B2')).toBe('Bar')
   })
 
   it('with some number', () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value",42`,
-    ].join("\n")
+    ].join('\n')
 
     engine.loadCsvSheet(str)
 
@@ -37,10 +37,10 @@ describe('Loading CSV', () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value","=B1"`,
-    ].join("\n")
+    ].join('\n')
 
     engine.loadCsvSheet(str)
 
-    expect(engine.getCellValue('B2')).toBe("Another header")
+    expect(engine.getCellValue('B2')).toBe('Another header')
   })
 })

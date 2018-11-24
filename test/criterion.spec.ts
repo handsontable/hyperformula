@@ -1,5 +1,5 @@
-import {buildCriterion, CriterionType, parseCriterion} from '../src/interpreter/Criterion'
 import {cellError, ErrorType} from '../src/Cell'
+import {buildCriterion, CriterionType, parseCriterion} from '../src/interpreter/Criterion'
 
 describe('Criterion', () => {
   it('greater than', () => {
