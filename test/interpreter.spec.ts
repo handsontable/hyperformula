@@ -558,4 +558,16 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('B1')).toEqual('some')
   })
+
+  it('function SPLIT bigger index', () => {
+    engine.loadSheet([['some words', '=SPLIT(A1; 1)']])
+
+    expect(engine.getCellValue('B1')).toEqual('words')
+  })
+
+  it('function SPLIT when 1st arg not a string', () => {
+    engine.loadSheet([['42', '=SPLIT(A1; 1)']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })

@@ -382,7 +382,10 @@ export class Interpreter {
         const stringArg = ast.args[0]
         const indexArg = ast.args[1]
 
-        const stringToSplit = this.evaluateAst(stringArg, formulaAddress) as string
+        const stringToSplit = this.evaluateAst(stringArg, formulaAddress)
+        if (typeof stringToSplit !== 'string') {
+          return cellError(ErrorType.VALUE)
+        }
         const indexToUse = this.evaluateAst(indexArg, formulaAddress) as number
 
         return stringToSplit.split(' ')[indexToUse]
