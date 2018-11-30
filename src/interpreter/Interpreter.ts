@@ -1,4 +1,3 @@
-import {type} from 'os'
 import {AddressMapping} from '../AddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
@@ -35,6 +34,9 @@ export class Interpreter {
       }
       case AstNodeType.STRING: {
         return ast.value
+      }
+      case AstNodeType.CONCATENATE_OP: {
+        return this.concatenate([ast.left, ast.right], formulaAddress)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -368,14 +370,7 @@ export class Interpreter {
         return result
       }
       case 'CONCATENATE': {
-        return ast.args.reduce((acc: CellValue, arg: Ast) => {
-          const argResult = this.evaluateAst(arg, formulaAddress)
-          if (typeof acc === 'string' && typeof argResult === 'string') {
-            return acc.concat(argResult)
-          } else {
-            return cellError(ErrorType.VALUE)
-          }
-        }, '')
+        return this.concatenate(ast.args, formulaAddress)
       }
       case 'ISERROR': {
         if (ast.args.length != 1) {
@@ -463,6 +458,17 @@ export class Interpreter {
       default:
         return cellError(ErrorType.NAME)
     }
+  }
+
+  private concatenate(args: Ast[], formulaAdress: SimpleCellAddress): CellValue {
+    return args.reduce((acc: CellValue, arg: Ast) => {
+      const argResult = this.evaluateAst(arg, formulaAdress)
+      if (typeof acc === 'string' && typeof argResult === 'string') {
+        return acc.concat(argResult)
+      } else {
+        return cellError(ErrorType.VALUE)
+      }
+    }, '')
   }
 
   private dateNumberRepresentation(arg: CellValue): number | null {
