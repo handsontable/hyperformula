@@ -386,7 +386,10 @@ export class Interpreter {
         if (typeof stringToSplit !== 'string') {
           return cellError(ErrorType.VALUE)
         }
-        const indexToUse = this.evaluateAst(indexArg, formulaAddress) as number
+        const indexToUse = this.evaluateAst(indexArg, formulaAddress)
+        if (typeof indexToUse !== 'number') {
+          return cellError(ErrorType.VALUE)
+        }
 
         return stringToSplit.split(' ')[indexToUse]
       }

@@ -570,4 +570,10 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('function SPLIT when 2nd arg not a number', () => {
+    engine.loadSheet([['some words', '=SPLIT(A1; "foo")']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })
