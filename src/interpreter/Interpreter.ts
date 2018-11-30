@@ -463,10 +463,12 @@ export class Interpreter {
   private concatenate(args: Ast[], formulaAddress: SimpleCellAddress): CellValue {
     return args.reduce((acc: CellValue, arg: Ast) => {
       const argResult = this.evaluateAst(arg, formulaAddress)
-      if (typeof acc === 'string' && typeof argResult === 'string') {
-        return acc.concat(argResult)
+      if (isCellError(acc)) {
+        return acc
+      } else if (isCellError(argResult)) {
+        return argResult
       } else {
-        return cellError(ErrorType.VALUE)
+        return (acc as string).concat(argResult.toString())
       }
     }, '')
   }

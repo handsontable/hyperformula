@@ -329,7 +329,7 @@ describe('Interpreter', () => {
   it('function CONCATENATE returns error if one of the arguments is error', () => {
     const engine = HandsOnEngine.buildFromArray([['John', '=1/0', '=CONCATENATE(A1; B1)']])
 
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('function COUNTIF usage', () => {
