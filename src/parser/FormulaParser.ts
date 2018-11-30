@@ -5,7 +5,7 @@ import {
   Ast,
   AstNodeType,
   buildCellRangeAst,
-  buildCellReferenceAst,
+  buildCellReferenceAst, buildConcatenateOpAst,
   buildDivOpAst, buildEqualsOpAst,
   buildErrorAst, buildGreaterThanOpAst, buildGreaterThanOrEqualOpAst, buildLessThanOpAst, buildLessThanOrEqualOpAst,
   buildMinusOpAst,
@@ -14,7 +14,7 @@ import {
   buildPlusOpAst,
   buildProcedureAst,
   buildStringAst,
-  buildTimesOpAst, EqualsOpAst,
+  buildTimesOpAst,
   ParsingErrorType,
 } from './Ast'
 
@@ -45,6 +45,8 @@ const GreaterThanOp = createToken({name: 'GreaterThanOp', pattern: />/, categori
 const LessThanOp = createToken({name: 'LessThanOp', pattern: /</, categories: BooleanOp})
 const GreaterThanOrEqualOp = createToken({name: 'GreaterThanOrEqualOp', pattern: />=/, categories: BooleanOp})
 const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern: /<=/, categories: BooleanOp})
+
+const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
@@ -80,16 +82,16 @@ const WhiteSpace = createToken({
 /* order is important, first pattern is used */
 const allTokens = [
   WhiteSpace,
+  PlusOp,
+  MinusOp,
+  TimesOp,
+  DivOp,
   EqualsOp,
   NotEqualOp,
   GreaterThanOrEqualOp,
   LessThanOrEqualOp,
   GreaterThanOp,
   LessThanOp,
-  PlusOp,
-  MinusOp,
-  TimesOp,
-  DivOp,
   LParen,
   RParen,
   RangeSeparator,
@@ -101,6 +103,7 @@ const allTokens = [
   ArgSeparator,
   NumberLiteral,
   StringLiteral,
+  ConcatenateOp,
   BooleanOp,
   AdditionOp,
   MultiplicationOp,
@@ -125,11 +128,11 @@ class FormulaParser extends Parser {
   private atomicExpCache: OrArg | undefined
 
   private booleanExpression: AstRule = this.RULE('booleanExpression', () => {
-    let lhs: Ast = this.SUBRULE(this.additionExpression)
+    let lhs: Ast = this.SUBRULE(this.concatenateExpression)
 
     this.MANY(() => {
       const op = this.CONSUME(BooleanOp)
-      const rhs = this.SUBRULE2(this.additionExpression)
+      const rhs = this.SUBRULE2(this.concatenateExpression)
 
       if (tokenMatcher(op, EqualsOp)) {
         lhs = buildEqualsOpAst(lhs, rhs)
@@ -146,6 +149,18 @@ class FormulaParser extends Parser {
       } else {
         throw Error('Operator not supported')
       }
+    })
+
+    return lhs
+  })
+
+  private concatenateExpression: AstRule = this.RULE('concatenateExpression', () => {
+    let lhs: Ast = this.SUBRULE(this.additionExpression)
+
+    this.MANY(() => {
+      this.CONSUME(ConcatenateOp)
+      const rhs = this.SUBRULE2(this.additionExpression)
+      lhs = buildConcatenateOpAst(lhs, rhs)
     })
 
     return lhs

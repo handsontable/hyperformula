@@ -1,5 +1,12 @@
 import {absoluteCellAddress} from '../../src/Cell'
-import {AstNodeType, EqualsOpAst, GreaterThanOpAst, LessThanOpAst} from '../../src/parser/Ast'
+import {
+  AstNodeType,
+  EqualsOpAst,
+  GreaterThanOpAst,
+  GreaterThanOrEqualOpAst,
+  LessThanOpAst,
+  LessThanOrEqualOpAst, NotEqualOpAst,
+} from '../../src/parser/Ast'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - Boolean operators', () => {
@@ -14,7 +21,7 @@ describe('Parser - Boolean operators', () => {
   it('Not equal operator', () => {
     const parser = new ParserWithCaching('parser')
 
-    const ast = parser.parse('=1<>2', absoluteCellAddress(0, 0)).ast as LessThanOpAst
+    const ast = parser.parse('=1<>2', absoluteCellAddress(0, 0)).ast as NotEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.NOT_EQUAL_OP)
   })
@@ -38,7 +45,7 @@ describe('Parser - Boolean operators', () => {
   it('Greater than or equal operator', () => {
     const parser = new ParserWithCaching('parser')
 
-    const ast = parser.parse('=1>=2', absoluteCellAddress(0, 0)).ast as GreaterThanOpAst
+    const ast = parser.parse('=1>=2', absoluteCellAddress(0, 0)).ast as GreaterThanOrEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.GREATER_THAN_OR_EQUAL_OP)
   })
@@ -46,7 +53,7 @@ describe('Parser - Boolean operators', () => {
   it('Less than or equal operator', () => {
     const parser = new ParserWithCaching('parser')
 
-    const ast = parser.parse('=1<=2', absoluteCellAddress(0, 0)).ast as LessThanOpAst
+    const ast = parser.parse('=1<=2', absoluteCellAddress(0, 0)).ast as LessThanOrEqualOpAst
 
     expect(ast.type).toBe(AstNodeType.LESS_THAN_OR_EQUAL_OP)
   })

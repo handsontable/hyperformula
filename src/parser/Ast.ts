@@ -5,6 +5,7 @@ export type Ast =
     | StringAst
     | CellReferenceAst
     | CellRangeAst
+    | ConcatenateOpAst
     | MinusUnaryOpAst
     | EqualsOpAst
     | NotEqualOpAst
@@ -36,6 +37,8 @@ export enum AstNodeType {
   STRING = 'STRING',
 
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
+
+  CONCATENATE_OP = 'CONCATENATE_OP',
 
   EQUALS_OP = 'EQUALS_OP',
   NOT_EQUAL_OP = 'NOT_EQUAL_OP',
@@ -98,6 +101,16 @@ export interface BinaryOpAst {
   left: Ast,
   right: Ast,
 }
+
+export interface ConcatenateOpAst extends BinaryOpAst {
+  type: AstNodeType.CONCATENATE_OP
+}
+
+export const buildConcatenateOpAst = (left: Ast, right: Ast): ConcatenateOpAst => ({
+  type: AstNodeType.CONCATENATE_OP,
+  left,
+  right,
+})
 
 export interface EqualsOpAst extends BinaryOpAst {
   type: AstNodeType.EQUALS_OP
