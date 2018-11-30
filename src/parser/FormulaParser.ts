@@ -6,7 +6,7 @@ import {
   AstNodeType,
   buildCellRangeAst,
   buildCellReferenceAst,
-  buildDivOpAst,
+  buildDivOpAst, buildEqualsOpAst,
   buildErrorAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
@@ -17,8 +17,6 @@ import {
   buildTimesOpAst,
   ParsingErrorType,
 } from './Ast'
-
-const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/})
 
 /* arithmetic */
 // abstract for + -
@@ -36,6 +34,12 @@ const MultiplicationOp = createToken({
 })
 const TimesOp = createToken({name: 'TimesOp', pattern: /\*/, categories: MultiplicationOp})
 const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: MultiplicationOp})
+
+const BooleanOp = createToken({
+  name: 'BooleanOp',
+  pattern: Lexer.NA,
+})
+const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/, categories: BooleanOp})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
@@ -87,6 +91,7 @@ const allTokens = [
   ArgSeparator,
   NumberLiteral,
   StringLiteral,
+  BooleanOp,
   AdditionOp,
   MultiplicationOp,
   CellReference,
@@ -103,12 +108,28 @@ class FormulaParser extends Parser {
 
   public formula: AstRule = this.RULE('formula', () => {
     this.CONSUME(EqualsOp)
-    return this.SUBRULE(this.additionExpression)
+    return this.SUBRULE(this.booleanExpression)
   })
   private formulaAddress?: SimpleCellAddress
 
   private atomicExpCache: OrArg | undefined
-  private cellExpCache: OrArg | undefined
+
+  private booleanExpression: AstRule = this.RULE('booleanExpression', () => {
+    let lhs: Ast = this.SUBRULE(this.additionExpression)
+
+    this.MANY(() => {
+      const op = this.CONSUME(BooleanOp)
+      const rhs = this.SUBRULE2(this.additionExpression)
+
+      if (tokenMatcher(op, EqualsOp)) {
+        lhs = buildEqualsOpAst(lhs, rhs)
+      } else {
+        throw Error('Operator not supported')
+      }
+    })
+
+    return lhs
+  })
 
   private additionExpression: AstRule = this.RULE('additionExpression', () => {
     let lhs: Ast = this.SUBRULE(this.multiplicationExpression)

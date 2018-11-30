@@ -6,6 +6,7 @@ export type Ast =
     | CellReferenceAst
     | CellRangeAst
     | MinusUnaryOpAst
+    | EqualsOpAst
     | PlusOpAst
     | MinusOpAst
     | TimesOpAst
@@ -30,6 +31,8 @@ export enum AstNodeType {
   STRING = 'STRING',
 
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
+
+  EQUALS_OP = 'EQUALS_OP',
 
   PLUS_OP = 'PLUS_OP',
   MINUS_OP = 'MINUS_OP',
@@ -79,6 +82,16 @@ export interface BinaryOpAst {
   left: Ast,
   right: Ast,
 }
+
+export interface EqualsOpAst extends BinaryOpAst {
+  type: AstNodeType.EQUALS_OP
+}
+
+export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
+  type: AstNodeType.EQUALS_OP,
+  left,
+  right,
+})
 
 export interface PlusOpAst extends BinaryOpAst {
   type: AstNodeType.PLUS_OP,
