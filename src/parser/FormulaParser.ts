@@ -7,14 +7,14 @@ import {
   buildCellRangeAst,
   buildCellReferenceAst,
   buildDivOpAst, buildEqualsOpAst,
-  buildErrorAst,
+  buildErrorAst, buildGreaterThanOpAst, buildLessThanOpAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNumberAst,
   buildPlusOpAst,
   buildProcedureAst,
   buildStringAst,
-  buildTimesOpAst,
+  buildTimesOpAst, EqualsOpAst,
   ParsingErrorType,
 } from './Ast'
 
@@ -40,6 +40,8 @@ const BooleanOp = createToken({
   pattern: Lexer.NA,
 })
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/, categories: BooleanOp})
+const GreaterThanOp = createToken({name: 'GreaterThanOp', pattern: />/, categories: BooleanOp})
+const LessThanOp = createToken({name: 'LessThanOp', pattern: /</, categories: BooleanOp})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
@@ -76,6 +78,8 @@ const WhiteSpace = createToken({
 const allTokens = [
   WhiteSpace,
   EqualsOp,
+  GreaterThanOp,
+  LessThanOp,
   PlusOp,
   MinusOp,
   TimesOp,
@@ -123,6 +127,10 @@ class FormulaParser extends Parser {
 
       if (tokenMatcher(op, EqualsOp)) {
         lhs = buildEqualsOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, GreaterThanOp)) {
+        lhs = buildGreaterThanOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, LessThanOp)) {
+        lhs = buildLessThanOpAst(lhs, rhs)
       } else {
         throw Error('Operator not supported')
       }

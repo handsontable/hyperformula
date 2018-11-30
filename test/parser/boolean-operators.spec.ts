@@ -10,4 +10,20 @@ describe('Parser - Boolean operators', () => {
 
     expect(ast.type).toBe(AstNodeType.EQUALS_OP)
   })
+
+  it('Greater than operator', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=1>2', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.GREATER_THAN_OP)
+  })
+
+  it('Less than operator', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=1<2', absoluteCellAddress(0, 0)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.LESS_THAN_OP)
+  })
 })

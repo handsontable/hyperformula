@@ -1,4 +1,4 @@
-import {CellAddress, CellDependency} from '../Cell'
+import {CellAddress} from '../Cell'
 
 export type Ast =
     NumberAst
@@ -7,6 +7,8 @@ export type Ast =
     | CellRangeAst
     | MinusUnaryOpAst
     | EqualsOpAst
+    | GreaterThanOpAst
+    | LessThanOpAst
     | PlusOpAst
     | MinusOpAst
     | TimesOpAst
@@ -33,6 +35,8 @@ export enum AstNodeType {
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
 
   EQUALS_OP = 'EQUALS_OP',
+  GREATER_THAN_OP = 'GREATER_THAN_OP',
+  LESS_THAN_OP = 'LESS_THAN_OP',
 
   PLUS_OP = 'PLUS_OP',
   MINUS_OP = 'MINUS_OP',
@@ -89,6 +93,26 @@ export interface EqualsOpAst extends BinaryOpAst {
 
 export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
   type: AstNodeType.EQUALS_OP,
+  left,
+  right,
+})
+
+export interface GreaterThanOpAst extends BinaryOpAst {
+  type: AstNodeType.GREATER_THAN_OP
+}
+
+export const buildGreaterThanOpAst = (left: Ast, right: Ast): GreaterThanOpAst => ({
+  type: AstNodeType.GREATER_THAN_OP,
+  left,
+  right,
+})
+
+export interface LessThanOpAst extends BinaryOpAst {
+  type: AstNodeType.LESS_THAN_OP
+}
+
+export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
+  type: AstNodeType.LESS_THAN_OP,
   left,
   right,
 })
