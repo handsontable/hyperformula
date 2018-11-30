@@ -30,6 +30,17 @@ describe('GraphBuilder', () => {
     expect(node.getCellValue()).toBe('foo')
   })
 
+  it('building for cell with empty string should give empty vertex', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+
+    graphBuilder.buildGraph([['']])
+
+    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    expect(node).toBeNull()
+  })
+
   it('#buildGraph', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
