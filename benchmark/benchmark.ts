@@ -1,4 +1,5 @@
 import parse from 'csv-parse/lib/sync'
+import * as fs from 'fs'
 import {type} from 'os'
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
@@ -6,7 +7,14 @@ import {StatType} from '../src/statistics/Statistics'
 
 export interface Config {
   millisecondsPerThousandRows: number,
-  numberOfRuns: number
+  numberOfRuns: number,
+  csvDump?: boolean
+}
+
+const defaultConfig = {
+  millisecondsPerThousandRows: 50,
+  numberOfRuns: 3,
+  csvDump: false,
 }
 
 export interface ExpectedValue { address: string, value: CellValue}
@@ -15,17 +23,17 @@ export function benchmarkCSV(csvString: string, config: Config) {
   benchmark(parse(csvString), [], config)
 }
 
-export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = {
-  millisecondsPerThousandRows: 50,
-  numberOfRuns: 3,
-}) {
+export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
+  config = Object.assign({}, defaultConfig, config)
+
   const stats = []
   const rows = sheet.length
 
   let currentRun = 0
+  let engine: HandsOnEngine | null = null
 
   while (currentRun < config.numberOfRuns) {
-    const engine = new HandsOnEngine()
+    engine = new HandsOnEngine()
     engine.loadSheet(sheet)
     stats.push(engine.getStats())
     currentRun++
@@ -60,6 +68,11 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   console.warn(`Actual time: ${resultMillisecondsPerThousandRows} ms per 1000 rows`)
   if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
     process.exit(1)
+  }
+
+  if (config.csvDump && engine !== null) {
+    const csvString = engine.exportAsCSV()
+    fs.writeFileSync('/tmp/dump.csv', csvString)
   }
 }
 

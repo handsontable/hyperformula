@@ -1,6 +1,15 @@
 import parse from 'csv-parse/lib/sync'
+import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
-import {absoluteCellAddress, cellAddressFromString, cellError, CellValue, ErrorType} from './Cell'
+import {
+  absoluteCellAddress,
+  cellAddressFromString, CellError,
+  cellError,
+  CellValue,
+  ErrorType,
+  isCellError,
+  simpleCellAddress,
+} from './Cell'
 import {Graph} from './Graph'
 import {GraphBuilder, Sheet} from './GraphBuilder'
 import {Interpreter} from './interpreter/Interpreter'
@@ -43,6 +52,35 @@ export class HandsOnEngine {
 
   public loadCsvSheet(csv: string) {
     this.loadSheet(parse(csv))
+  }
+
+  public exportAsCSV() {
+    const maxRow = this.addressMapping!.getMaximumRow()
+    const maxCol = this.addressMapping!.getMaximumCol()
+
+    const arr: Sheet = new Array(maxRow)
+    for (let i = 0; i < maxRow; i++) {
+      arr[i] = new Array(maxCol)
+
+      for (let j = 0; j < maxCol; j++) {
+        const cell = this.addressMapping!.getCell(simpleCellAddress(j, i))
+
+        if (cell == null) {
+          arr[i][j] = ''
+          continue
+        }
+
+        const cellValue = cell.getCellValue()
+
+        if (isCellError(cellValue)) {
+          arr[i][j] = `#${(cellValue as CellError).type}!`
+        } else {
+          arr[i][j] = cellValue.toString()
+        }
+      }
+    }
+
+    return stringify(arr)
   }
 
   public getCellValue(stringAddress: string): CellValue {
