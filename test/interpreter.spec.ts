@@ -576,4 +576,11 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('function SPLIT when index arg is not value within bounds', () => {
+    engine.loadSheet([['some words', '=SPLIT(A1; 17)', '=SPLIT(A1; -1)']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })

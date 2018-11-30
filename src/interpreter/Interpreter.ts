@@ -391,7 +391,13 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
 
-        return stringToSplit.split(' ')[indexToUse]
+        const splittedString = stringToSplit.split(' ')
+
+        if (indexToUse > splittedString.length || indexToUse < 0) {
+          return cellError(ErrorType.VALUE)
+        }
+
+        return splittedString[indexToUse]
       }
       default:
         return cellError(ErrorType.NAME)
