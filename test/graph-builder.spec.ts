@@ -54,7 +54,7 @@ describe('GraphBuilder', () => {
 
     expect(graph.nodesCount()).toBe(
       6 + // for the cells above
-      1 // for EmptyCellVertex
+      1, // for EmptyCellVertex
     )
   })
 
@@ -72,7 +72,7 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(
       6 + // for cells above
       1 + // for range vertex
-      1 // for EmptyCellVertex
+      1, // for EmptyCellVertex
     )
     const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0))!)!
     const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1))!)!
@@ -101,7 +101,7 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(
       9 + // for cells above
       1 + // for both ranges (reuse same ranges)
-      1 // for EmptyCellVertex
+      1, // for EmptyCellVertex
     )
   })
 
@@ -133,12 +133,12 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(
       3 + // for cells above
       1 + // for range vertex
-      1 // for EmptyCellVertex
+      1, // for EmptyCellVertex
     )
     expect(graph.edgesCount()).toBe(
       2 + // from cells to range vertex
       1 + // from EmptyCellVertex to range vertices
-      1 // from range to cell with SUM
+      1, // from range to cell with SUM
     )
   })
 

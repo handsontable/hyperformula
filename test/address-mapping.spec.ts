@@ -1,6 +1,6 @@
 import {AddressMapping, IAddressMapping} from '../src/AddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
-import {RangeVertex, ValueCellVertex, EmptyCellVertex} from '../src/Vertex'
+import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
 const sharedExamples = (builder: () => IAddressMapping) => {
   it('simple set', () => {
@@ -109,6 +109,6 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 }
 
-describe("AddressMapping", () => {
+describe('AddressMapping', () => {
   sharedExamples(() => new AddressMapping())
 })

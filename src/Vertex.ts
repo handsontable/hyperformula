@@ -58,7 +58,6 @@ export class ValueCellVertex extends CellVertex {
 }
 
 export class EmptyCellVertex extends CellVertex {
-  private static instance: EmptyCellVertex
 
   public static getSingletonInstance() {
     if (!EmptyCellVertex.instance) {
@@ -66,6 +65,7 @@ export class EmptyCellVertex extends CellVertex {
     }
     return EmptyCellVertex.instance
   }
+  private static instance: EmptyCellVertex
 
   constructor() {
     super()
