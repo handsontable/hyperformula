@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 
-describe('Parser - Boolean operators', () => {
+describe('Interpreter - Boolean operators', () => {
   it('Equals operator', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=1=2', '=1=1', '=1+2=3'],
