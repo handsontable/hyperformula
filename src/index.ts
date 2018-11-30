@@ -9,18 +9,22 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class HandsOnEngine {
-  private addressMapping: AddressMapping = new AddressMapping()
+  private addressMapping?: AddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
   private verticesOnCycle: Vertex[] = []
-  private interpreter: Interpreter = new Interpreter(this.addressMapping, this.graph)
+  private interpreter?: Interpreter
   private stats: Statistics = new Statistics()
 
   public loadSheet(sheet: Sheet) {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
+    const {maxRow, maxCol} = this.findBoundaries(sheet)
+    this.addressMapping = new AddressMapping(maxCol, maxRow)
+
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
+    this.interpreter = new Interpreter(this.addressMapping, this.graph)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       graphBuilder.buildGraph(sheet)
@@ -43,7 +47,7 @@ export class HandsOnEngine {
 
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping.getCell(address)!
+    const vertex = this.addressMapping!.getCell(address)!
     return vertex.getCellValue()
   }
 
@@ -53,7 +57,7 @@ export class HandsOnEngine {
 
   public setCellContent(stringAddress: string, newCellContent: string) {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping.getCell(address)!
+    const vertex = this.addressMapping!.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
@@ -79,11 +83,15 @@ export class HandsOnEngine {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()
-        const cellValue = this.interpreter.computeFormula(formula, address)
+        const cellValue = this.interpreter!.computeFormula(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {
         vertex.clear()
       }
     })
+  }
+
+  private findBoundaries(sheet: Sheet): ({ maxRow: number, maxCol: number }) {
+    return { maxRow: sheet.length, maxCol: (sheet[0] || []).length }
   }
 }
