@@ -26,6 +26,8 @@ export class GraphBuilder {
   public buildGraph(sheet: Sheet) {
     const dependencies: Map<SimpleCellAddress, CellDependency[]> = new Map()
 
+    this.graph.addNode(EmptyCellVertex.getSingletonInstance())
+
     sheet.forEach((row, rowIndex) => {
       row.forEach((cellContent, colIndex) => {
         const cellAddress = simpleCellAddress(colIndex, rowIndex)
@@ -72,27 +74,15 @@ export class GraphBuilder {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
           for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
-            const vertex = this.getOrCreateVertex(cellFromRange)
-            this.graph.addEdge(vertex, rangeVertex!)
+            this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
 
           this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
         } else {
-          const vertex = this.getOrCreateVertex(absStartCell)
-          this.graph.addEdge(vertex, this.addressMapping.getCell(endCell)!)
+          this.graph.addEdge(this.addressMapping.getCell(absStartCell), this.addressMapping.getCell(endCell)!)
         }
       })
     })
-  }
-
-  private getOrCreateVertex(address: SimpleCellAddress): CellVertex {
-    let vertex = this.addressMapping.getCell(address)
-    if (!vertex) {
-      vertex = new EmptyCellVertex()
-      this.graph.addNode(vertex)
-      this.addressMapping.setCell(address, vertex)
-    }
-    return vertex
   }
 }
 

@@ -38,7 +38,7 @@ describe('GraphBuilder', () => {
     graphBuilder.buildGraph([['']])
 
     const node = addressMapping.getCell(simpleCellAddress(0, 0))!
-    expect(node).toBeNull()
+    expect(node).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('#buildGraph', () => {
@@ -52,7 +52,10 @@ describe('GraphBuilder', () => {
       ['foo', 'bar', 'A2'],
     ])
 
-    expect(graph.nodesCount()).toBe(6)
+    expect(graph.nodesCount()).toBe(
+      6 + // for the cells above
+      1 // for EmptyCellVertex
+    )
   })
 
   it('#buildGraph works with ranges', () => {
@@ -66,7 +69,11 @@ describe('GraphBuilder', () => {
       ['3', '4', '=A1:B2'],
     ])
 
-    expect(graph.nodesCount()).toBe(7)
+    expect(graph.nodesCount()).toBe(
+      6 + // for cells above
+      1 + // for range vertex
+      1 // for EmptyCellVertex
+    )
     const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0))!)!
     const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1))!)!
     const nodesB1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(1, 0))!)!
@@ -91,7 +98,11 @@ describe('GraphBuilder', () => {
         ['5', '6', '=A1:B2'],
     ])
 
-    expect(graph.nodesCount()).toBe(10)
+    expect(graph.nodesCount()).toBe(
+      9 + // for cells above
+      1 + // for both ranges (reuse same ranges)
+      1 // for EmptyCellVertex
+    )
   })
 
   it('build with range one row smaller', () => {
@@ -119,8 +130,16 @@ describe('GraphBuilder', () => {
     const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
     graphBuilder.buildGraph([['1', '2', '=SUM(A1:B2)']])
 
-    expect(graph.nodesCount()).toBe(6)
-    expect(graph.edgesCount()).toBe(5)
+    expect(graph.nodesCount()).toBe(
+      3 + // for cells above
+      1 + // for range vertex
+      1 // for EmptyCellVertex
+    )
+    expect(graph.edgesCount()).toBe(
+      2 + // from cells to range vertex
+      1 + // from EmptyCellVertex to range vertices
+      1 // from range to cell with SUM
+    )
   })
 
   it("optimization doesn't work if smaller range is after bigger", () => {

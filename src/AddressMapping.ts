@@ -2,7 +2,7 @@ import {SimpleCellAddress} from './Cell'
 import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 
 export interface IAddressMapping {
-  getCell(address: SimpleCellAddress): CellVertex | null,
+  getCell(address: SimpleCellAddress): CellVertex,
   setCell(address: SimpleCellAddress, newVertex: CellVertex): void,
   getRange(start: SimpleCellAddress, end: SimpleCellAddress): void,
   setRange(vertex: RangeVertex): void,
@@ -17,12 +17,12 @@ export class AddressMapping implements IAddressMapping {
 
   constructor(private maxCol: number = 0, private maxRow: number = 0) { }
 
-  public getCell(address: SimpleCellAddress): CellVertex | null {
+  public getCell(address: SimpleCellAddress): CellVertex {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
-      return null
+      return EmptyCellVertex.getSingletonInstance()
     }
-    return colMapping.get(address.row) || null
+    return colMapping.get(address.row) || EmptyCellVertex.getSingletonInstance()
   }
 
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {

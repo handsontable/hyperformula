@@ -1,6 +1,6 @@
 import {AddressMapping, IAddressMapping} from '../src/AddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
-import {RangeVertex, ValueCellVertex} from '../src/Vertex'
+import {RangeVertex, ValueCellVertex, EmptyCellVertex} from '../src/Vertex'
 
 const sharedExamples = (builder: () => IAddressMapping) => {
   it('simple set', () => {
@@ -25,7 +25,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   it("get when there's even no column", () => {
     const mapping = builder()
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(null)
+    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when there was already something in that column', () => {
@@ -33,7 +33,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
 
     mapping.setCell(relativeCellAddress(0, 1), new ValueCellVertex(42))
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(null)
+    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it("set when there's already something in that column", () => {
