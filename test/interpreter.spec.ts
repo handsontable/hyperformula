@@ -552,4 +552,10 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.REF))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.REF))
   })
+
+  it('function SPLIT happy path', () => {
+    engine.loadSheet([['some words', '=SPLIT(A1; 0)']])
+
+    expect(engine.getCellValue('B1')).toEqual('some')
+  })
 })

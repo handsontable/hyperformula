@@ -378,6 +378,15 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
+      case 'SPLIT': {
+        const stringArg = ast.args[0]
+        const indexArg = ast.args[1]
+
+        const stringToSplit = this.evaluateAst(stringArg, formulaAddress) as string
+        const indexToUse = this.evaluateAst(indexArg, formulaAddress) as number
+
+        return stringToSplit.split(' ')[indexToUse]
+      }
       default:
         return cellError(ErrorType.NAME)
     }
