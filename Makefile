@@ -29,7 +29,7 @@ lint: ## show linting errors
 	@yarn tslint --project tsconfig.json
 
 lint-fix: ## fix linting errors
-	@yarn tslint --fix --project tsconfig.json
+	@yarn tslint --fix --project tsconfig.json > /dev/null
 
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage
