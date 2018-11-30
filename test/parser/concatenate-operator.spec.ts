@@ -1,5 +1,5 @@
 import {absoluteCellAddress} from '../../src/Cell'
-import {AstNodeType, ConcatenateOpAst, GreaterThanOpAst, ProcedureAst} from '../../src/parser/Ast'
+import {AstNodeType, ConcatenateOpAst, ProcedureAst} from '../../src/parser/Ast'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - Concatenate operators', () => {
