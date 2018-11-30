@@ -46,6 +46,26 @@ export class Interpreter {
           return leftResult === rightResult
         }
       }
+      case AstNodeType.GREATER_THAN_OP: {
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
+        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+          return leftResult > rightResult
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
+      case AstNodeType.LESS_THAN_OP: {
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
+        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+          return leftResult < rightResult
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
