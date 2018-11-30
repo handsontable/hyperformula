@@ -91,7 +91,7 @@ export interface CellRangeAst {
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({
   type: AstNodeType.CELL_RANGE,
   start,
-  end
+  end,
 })
 
 export interface BinaryOpAst {

@@ -2,14 +2,8 @@ import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 
 describe('Parser - Boolean operators', () => {
-  let engine: HandsOnEngine
-
-  beforeEach(() => {
-    engine = new HandsOnEngine()
-  })
-
   it('Equals operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=1=2', '=1=1', '=1+2=3'],
       ['="abc"="abc"', '="foo"="bar"', '="a"="foo"'],
       ['=TRUE()=TRUE()', '=FALSE()=FALSE()', '=TRUE()=FALSE()'],
@@ -29,7 +23,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Not equals operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=1<>2', '=1<>1', '=1+2<>3'],
       ['="abc"<>"abc"', '="foo"<>"bar"', '="a"<>"foo"'],
       ['=TRUE()<>TRUE()', '=FALSE()<>FALSE()', '=TRUE()<>FALSE()'],
@@ -49,7 +43,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator with number arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
         ['=1<2', '=2<2', '=-3<4', '=-4<-3'],
     ])
 
@@ -60,7 +54,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator with wrong arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
         ['=1<"foo"', '="foo"<"bar"', '=TRUE()<FALSE()'],
     ])
 
@@ -70,7 +64,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than operator with number arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=2>1', '=2>2', '=4>-3', '=-3>-4'],
     ])
 
@@ -81,7 +75,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than operator with wrong arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=1>"foo"', '="foo">"bar"', '=TRUE()>FALSE()'],
     ])
 
@@ -91,7 +85,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator with number arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=1<=2', '=2<=2', '=-3<=4', '=-4<=-3', '=5<=4'],
     ])
 
@@ -102,9 +96,8 @@ describe('Parser - Boolean operators', () => {
     expect(engine.getCellValue('E1')).toBe(false)
   })
 
-
   it('Greater than operator with number arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=2>=1', '=2>=2', '=4>=-3', '=-3>=-4', '=4>=5'],
     ])
 

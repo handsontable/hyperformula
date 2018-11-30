@@ -33,8 +33,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   let engine: HandsOnEngine | null = null
 
   while (currentRun < config.numberOfRuns) {
-    engine = new HandsOnEngine()
-    engine.loadSheet(sheet)
+    engine = HandsOnEngine.buildFromArray(sheet)
     stats.push(engine.getStats())
     currentRun++
 

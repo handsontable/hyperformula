@@ -19,9 +19,11 @@ import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class HandsOnEngine {
   public static buildFromCsv(csv: string): HandsOnEngine {
-    const engine = new HandsOnEngine()
-    engine.loadSheet(parse(csv))
-    return engine
+    return HandsOnEngine.buildFromArray(parse(csv))
+  }
+
+  public static buildFromArray(sheet: Sheet): HandsOnEngine {
+    return new HandsOnEngine(sheet)
   }
 
   private addressMapping?: AddressMapping
@@ -31,7 +33,7 @@ export class HandsOnEngine {
   private interpreter?: Interpreter
   private stats: Statistics = new Statistics()
 
-  public loadSheet(sheet: Sheet) {
+  constructor(sheet: Sheet) {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 

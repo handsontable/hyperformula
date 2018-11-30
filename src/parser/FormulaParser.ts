@@ -135,7 +135,7 @@ class FormulaParser extends Parser {
         lhs = buildEqualsOpAst(lhs, rhs)
       } else if (tokenMatcher(op, NotEqualOp)) {
         lhs = buildNotEqualOpAst(lhs, rhs)
-      }else if (tokenMatcher(op, GreaterThanOp)) {
+      } else if (tokenMatcher(op, GreaterThanOp)) {
         lhs = buildGreaterThanOpAst(lhs, rhs)
       } else if (tokenMatcher(op, LessThanOp)) {
         lhs = buildLessThanOpAst(lhs, rhs)

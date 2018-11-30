@@ -2,14 +2,8 @@ import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
 
 describe('Integration', () => {
-  let engine: HandsOnEngine
-
-  beforeEach(() => {
-    engine = new HandsOnEngine()
-  })
-
   it('#loadSheet load simple sheet', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1'],
     ])
 
@@ -17,7 +11,7 @@ describe('Integration', () => {
   })
 
   it('#loadSheet load simple sheet', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
     ])
@@ -26,20 +20,20 @@ describe('Integration', () => {
   })
 
   it('#loadSheet evaluate empty vertex', () => {
-    engine.loadSheet([['=A5']])
+    const engine = HandsOnEngine.buildFromArray([['=A5']])
 
     expect(engine.getCellValue('A1')).toBe(0)
     expect(engine.getCellValue('A5')).toBe(0)
   })
 
   it('#loadSheet evaluate empty vertex', () => {
-    engine.loadSheet([['', '=A1']])
+    const engine = HandsOnEngine.buildFromArray([['', '=A1']])
 
     expect(engine.getCellValue('B1')).toBe(0)
   })
 
   it('loadSheet with a loop', () => {
-    engine.loadSheet([['=B1', '=C1', '=A1']])
+    const engine = HandsOnEngine.buildFromArray([['=B1', '=C1', '=A1']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.CYCLE))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
@@ -47,32 +41,32 @@ describe('Integration', () => {
   })
 
   it('#loadSheet with a loop inside plus operator', () => {
-    engine.loadSheet([['5', '=A1+B1']])
+    const engine = HandsOnEngine.buildFromArray([['5', '=A1+B1']])
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside minus operator', () => {
-    engine.loadSheet([['5', '=A1-B1']])
+    const engine = HandsOnEngine.buildFromArray([['5', '=A1-B1']])
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
   })
 
   it('loadSheet with operator precedence', () => {
-    engine.loadSheet([['=3*7*2-4*1+2']])
+    const engine = HandsOnEngine.buildFromArray([['=3*7*2-4*1+2']])
     expect(engine.getCellValue('A1')).toBe(40)
   })
 
   it('loadSheet with operator precedence and brackets', () => {
-    engine.loadSheet([['=3*7+((2-4)*(1+2)+3)*2']])
+    const engine = HandsOnEngine.buildFromArray([['=3*7+((2-4)*(1+2)+3)*2']])
     expect(engine.getCellValue('A1')).toBe(15)
   })
 
   it('loadSheet with operator precedence with cells', () => {
-    engine.loadSheet([['3', '4', '=B1*2+A1']])
+    const engine = HandsOnEngine.buildFromArray([['3', '4', '=B1*2+A1']])
     expect(engine.getCellValue('C1')).toBe(11)
   })
 
   it('#loadSheet change cell content', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '=A1'],
     ])
 
@@ -82,7 +76,7 @@ describe('Integration', () => {
   })
 
   it('#loadSheet change cell content which was formula throws error', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '=A1'],
     ])
 
@@ -92,7 +86,7 @@ describe('Integration', () => {
   })
 
   it('#loadSheet change cell content to formula throws error', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
     ])
 
@@ -102,13 +96,13 @@ describe('Integration', () => {
   })
 
   it('#loadSheet - it should build graph without cycle but with formula with error', () => {
-    engine.loadSheet([['=A1B1']])
+    const engine = HandsOnEngine.buildFromArray([['=A1B1']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
   })
 
   it('#loadSheet - changing value inside range', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['3', '=SUM(A1:A3)'],
@@ -120,7 +114,7 @@ describe('Integration', () => {
   })
 
   it('#loadSheet - dependency before value', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=B1', '1', '2'],
       ['=SUM(B2:C2)', '1', '2'],
     ])

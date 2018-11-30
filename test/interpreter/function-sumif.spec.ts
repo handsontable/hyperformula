@@ -2,14 +2,8 @@ import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 
 describe('Function SUMIF', () => {
-  let engine: HandsOnEngine
-
-  beforeEach(() => {
-    engine = new HandsOnEngine()
-  })
-
   it('error when 1st arg is not a range or reference', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(42; ">0"; B1:B2)'],
     ])
 
@@ -17,7 +11,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when 2nd arg is not a string', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(C1:C2; 78; B1:B2)'],
     ])
 
@@ -25,7 +19,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when 3rd arg is not a range or reference', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(C1:C2; ">0"; 42)'],
     ])
 
@@ -33,7 +27,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when criterion unparsable', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(B1:B2; "%"; C1:C2)'],
     ])
 
@@ -41,7 +35,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when different width dimension of arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(B1:C1; ">0"; B2:D2)'],
       ['=SUMIF(B1; ">0"; B2:D2)'],
       ['=SUMIF(B1:D1; ">0"; B2)'],
@@ -53,7 +47,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when different height dimension of arguments', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SUMIF(B1:B2; ">0"; C1:C3)'],
       ['=SUMIF(B1; ">0"; C1:C2)'],
       ['=SUMIF(B1:B2; ">0"; C1)'],
@@ -65,7 +59,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of greater than operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -76,7 +70,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of greater than or equal operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -87,7 +81,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of less than operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -98,7 +92,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of less than or equal operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -109,7 +103,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of equal operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -120,7 +114,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of not equal operator', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -131,7 +125,7 @@ describe('Function SUMIF', () => {
   })
 
   it('works when arguments are just references', () => {
-    engine.loadSheet([
+    const engine = HandsOnEngine.buildFromArray([
       ['2', '3'],
       ['=SUMIF(A1; ">1"; B1)'],
     ])
