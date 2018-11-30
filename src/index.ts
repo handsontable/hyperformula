@@ -18,6 +18,12 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class HandsOnEngine {
+  public static buildFromCsv(csv: string): HandsOnEngine {
+    const engine = new HandsOnEngine()
+    engine.loadSheet(parse(csv))
+    return engine
+  }
+
   private addressMapping?: AddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
@@ -48,10 +54,6 @@ export class HandsOnEngine {
     })
 
     this.stats.end(StatType.OVERALL)
-  }
-
-  public loadCsvSheet(csv: string) {
-    this.loadSheet(parse(csv))
   }
 
   public exportAsCSV() {
