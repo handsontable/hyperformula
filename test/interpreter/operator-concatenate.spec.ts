@@ -1,4 +1,4 @@
-import {HandsOnEngine} from "../../src";
+import {HandsOnEngine} from '../../src'
 
 describe('Interpreter - concatenate operator', () => {
   it('Ampersand with string arguments', () => {
@@ -6,6 +6,6 @@ describe('Interpreter - concatenate operator', () => {
       ['="foo"&"bar"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe("foobar")
+    expect(engine.getCellValue('A1')).toBe('foobar')
   })
 })
