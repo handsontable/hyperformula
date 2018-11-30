@@ -28,6 +28,26 @@ describe('Parser - Boolean operators', () => {
     expect(engine.getCellValue('C3')).toBe(false)
   })
 
+  it('Not equals operator', () => {
+    engine.loadSheet([
+      ['=1<>2', '=1<>1', '=1+2<>3'],
+      ['="abc"<>"abc"', '="foo"<>"bar"', '="a"<>"foo"'],
+      ['=TRUE()<>TRUE()', '=FALSE()<>FALSE()', '=TRUE()<>FALSE()'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toBe(false)
+
+    expect(engine.getCellValue('A2')).toBe(false)
+    expect(engine.getCellValue('B2')).toBe(true)
+    expect(engine.getCellValue('C2')).toBe(true)
+
+    expect(engine.getCellValue('A3')).toBe(false)
+    expect(engine.getCellValue('B3')).toBe(false)
+    expect(engine.getCellValue('C3')).toBe(true)
+  })
+
   it('Less than operator with number arguments', () => {
     engine.loadSheet([
         ['=1<2', '=2<2', '=-3<4', '=-4<-3'],

@@ -46,6 +46,16 @@ export class Interpreter {
           return leftResult === rightResult
         }
       }
+      case AstNodeType.NOT_EQUAL_OP: {
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
+        if (typeof leftResult !== typeof rightResult) {
+          return cellError(ErrorType.VALUE)
+        } else {
+          return leftResult !== rightResult
+        }
+      }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
