@@ -20,6 +20,13 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual('words')
   })
 
+  it('function SPLIT when continuous delimeters', () => {
+    engine.loadSheet([['some  words', '=SPLIT(A1; 1)', '=SPLIT(A1; 2)']])
+
+    expect(engine.getCellValue('B1')).toEqual('')
+    expect(engine.getCellValue('C1')).toEqual('words')
+  })
+
   it('function SPLIT when 1st arg not a string', () => {
     engine.loadSheet([['42', '=SPLIT(A1; 1)']])
 
