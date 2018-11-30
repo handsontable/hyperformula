@@ -26,11 +26,11 @@ export class HandsOnEngine {
     return new HandsOnEngine(sheet)
   }
 
-  private addressMapping?: AddressMapping
+  private addressMapping: AddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
   private verticesOnCycle: Vertex[] = []
-  private interpreter?: Interpreter
+  private interpreter: Interpreter
   private stats: Statistics = new Statistics()
 
   constructor(sheet: Sheet) {
@@ -59,15 +59,15 @@ export class HandsOnEngine {
   }
 
   public exportAsCSV() {
-    const maxRow = this.addressMapping!.getMaximumRow()
-    const maxCol = this.addressMapping!.getMaximumCol()
+    const maxRow = this.addressMapping.getMaximumRow()
+    const maxCol = this.addressMapping.getMaximumCol()
 
     const arr: Sheet = new Array(maxRow)
     for (let i = 0; i < maxRow; i++) {
       arr[i] = new Array(maxCol)
 
       for (let j = 0; j < maxCol; j++) {
-        const cell = this.addressMapping!.getCell(simpleCellAddress(j, i))
+        const cell = this.addressMapping.getCell(simpleCellAddress(j, i))
 
         if (cell == null) {
           arr[i][j] = ''
@@ -89,7 +89,7 @@ export class HandsOnEngine {
 
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping!.getCell(address)!
+    const vertex = this.addressMapping.getCell(address)!
     return vertex.getCellValue()
   }
 
@@ -99,7 +99,7 @@ export class HandsOnEngine {
 
   public setCellContent(stringAddress: string, newCellContent: string) {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping!.getCell(address)!
+    const vertex = this.addressMapping.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
@@ -125,7 +125,7 @@ export class HandsOnEngine {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()
-        const cellValue = this.interpreter!.computeFormula(formula, address)
+        const cellValue = this.interpreter.computeFormula(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {
         vertex.clear()
