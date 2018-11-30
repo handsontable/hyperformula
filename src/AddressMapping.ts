@@ -39,4 +39,8 @@ export class AddressMapping {
     }
     return !!colMapping.get(address.row)
   }
+
+  public getMaximumRow(): number {
+    return 0
+  }
 }

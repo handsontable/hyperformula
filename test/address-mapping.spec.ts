@@ -100,4 +100,10 @@ describe('AddressMapping', () => {
 
     expect(mapping.getRange(start, end)).toBe(vertex)
   })
+
+  it('returns maximum row', () => {
+    const mapping = new AddressMapping()
+
+    expect(mapping.getMaximumRow()).toEqual(0)
+  })
 })
