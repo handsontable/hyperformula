@@ -1,7 +1,7 @@
 import {SimpleCellAddress} from './Cell'
 import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 
-interface IAddressMapping {
+export interface IAddressMapping {
   getCell(address: SimpleCellAddress): CellVertex | null,
   setCell(address: SimpleCellAddress, newVertex: CellVertex): void,
   getRange(start: SimpleCellAddress, end: SimpleCellAddress): void,
