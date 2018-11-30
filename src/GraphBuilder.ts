@@ -35,17 +35,19 @@ export class GraphBuilder {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
           dependencies.set(cellAddress, parseResult.dependencies)
+          this.graph.addNode(vertex)
+          this.addressMapping.setCell(cellAddress, vertex)
         } else if (cellContent === '') {
-          vertex = new EmptyCellVertex()
+          /* we don't care about empty cells here */
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
+          this.graph.addNode(vertex)
+          this.addressMapping.setCell(cellAddress, vertex)
         } else {
           vertex = new ValueCellVertex(cellContent)
+          this.graph.addNode(vertex)
+          this.addressMapping.setCell(cellAddress, vertex)
         }
-
-        this.graph.addNode(vertex)
-
-        this.addressMapping.setCell(cellAddress, vertex)
       })
     })
 
