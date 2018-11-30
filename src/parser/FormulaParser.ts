@@ -7,9 +7,9 @@ import {
   buildCellRangeAst,
   buildCellReferenceAst,
   buildDivOpAst, buildEqualsOpAst,
-  buildErrorAst, buildGreaterThanOpAst, buildLessThanOpAst,
+  buildErrorAst, buildGreaterThanOpAst, buildGreaterThanOrEqualOpAst, buildLessThanOpAst, buildLessThanOrEqualOpAst,
   buildMinusOpAst,
-  buildMinusUnaryOpAst,
+  buildMinusUnaryOpAst, buildNotEqualOpAst,
   buildNumberAst,
   buildPlusOpAst,
   buildProcedureAst,
@@ -40,8 +40,11 @@ const BooleanOp = createToken({
   pattern: Lexer.NA,
 })
 const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/, categories: BooleanOp})
+const NotEqualOp = createToken({name: 'NotEqualOp', pattern: /<>/, categories: BooleanOp})
 const GreaterThanOp = createToken({name: 'GreaterThanOp', pattern: />/, categories: BooleanOp})
 const LessThanOp = createToken({name: 'LessThanOp', pattern: /</, categories: BooleanOp})
+const GreaterThanOrEqualOp = createToken({name: 'GreaterThanOrEqualOp', pattern: />=/, categories: BooleanOp})
+const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern: /<=/, categories: BooleanOp})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
@@ -78,6 +81,9 @@ const WhiteSpace = createToken({
 const allTokens = [
   WhiteSpace,
   EqualsOp,
+  NotEqualOp,
+  GreaterThanOrEqualOp,
+  LessThanOrEqualOp,
   GreaterThanOp,
   LessThanOp,
   PlusOp,
@@ -127,10 +133,16 @@ class FormulaParser extends Parser {
 
       if (tokenMatcher(op, EqualsOp)) {
         lhs = buildEqualsOpAst(lhs, rhs)
-      } else if (tokenMatcher(op, GreaterThanOp)) {
+      } else if (tokenMatcher(op, NotEqualOp)) {
+        lhs = buildNotEqualOpAst(lhs, rhs)
+      }else if (tokenMatcher(op, GreaterThanOp)) {
         lhs = buildGreaterThanOpAst(lhs, rhs)
       } else if (tokenMatcher(op, LessThanOp)) {
         lhs = buildLessThanOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, GreaterThanOrEqualOp)) {
+        lhs = buildGreaterThanOrEqualOpAst(lhs, rhs)
+      } else if (tokenMatcher(op, LessThanOrEqualOp)) {
+        lhs = buildLessThanOrEqualOpAst(lhs, rhs)
       } else {
         throw Error('Operator not supported')
       }

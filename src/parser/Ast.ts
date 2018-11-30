@@ -7,8 +7,11 @@ export type Ast =
     | CellRangeAst
     | MinusUnaryOpAst
     | EqualsOpAst
+    | NotEqualOpAst
     | GreaterThanOpAst
     | LessThanOpAst
+    | LessThanOrEqualOpAst
+    | GreaterThanOrEqualOpAst
     | PlusOpAst
     | MinusOpAst
     | TimesOpAst
@@ -35,8 +38,11 @@ export enum AstNodeType {
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
 
   EQUALS_OP = 'EQUALS_OP',
+  NOT_EQUAL_OP = 'NOT_EQUAL_OP',
   GREATER_THAN_OP = 'GREATER_THAN_OP',
   LESS_THAN_OP = 'LESS_THAN_OP',
+  GREATER_THAN_OR_EQUAL_OP = 'GREATER_THAN_OR_EQUAL_OP',
+  LESS_THAN_OR_EQUAL_OP = 'LESS_THAN_OR_EQUAL_OP',
 
   PLUS_OP = 'PLUS_OP',
   MINUS_OP = 'MINUS_OP',
@@ -63,12 +69,14 @@ export interface StringAst {
   type: AstNodeType.STRING,
   value: string,
 }
+
 export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.STRING, value})
 
 export interface CellReferenceAst {
   type: AstNodeType.CELL_REFERENCE,
   reference: CellAddress
 }
+
 export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
   type: AstNodeType.CELL_REFERENCE,
   reference,
@@ -80,7 +88,11 @@ export interface CellRangeAst {
   end: CellAddress
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({type: AstNodeType.CELL_RANGE, start, end})
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({
+  type: AstNodeType.CELL_RANGE,
+  start,
+  end
+})
 
 export interface BinaryOpAst {
   left: Ast,
@@ -93,6 +105,16 @@ export interface EqualsOpAst extends BinaryOpAst {
 
 export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
   type: AstNodeType.EQUALS_OP,
+  left,
+  right,
+})
+
+export interface NotEqualOpAst extends BinaryOpAst {
+  type: AstNodeType.NOT_EQUAL_OP
+}
+
+export const buildNotEqualOpAst = (left: Ast, right: Ast): NotEqualOpAst => ({
+  type: AstNodeType.NOT_EQUAL_OP,
   left,
   right,
 })
@@ -113,6 +135,26 @@ export interface LessThanOpAst extends BinaryOpAst {
 
 export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
   type: AstNodeType.LESS_THAN_OP,
+  left,
+  right,
+})
+
+export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
+  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP
+}
+
+export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast): GreaterThanOrEqualOpAst => ({
+  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
+  left,
+  right,
+})
+
+export interface LessThanOrEqualOpAst extends BinaryOpAst {
+  type: AstNodeType.LESS_THAN_OR_EQUAL_OP
+}
+
+export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast): LessThanOrEqualOpAst => ({
+  type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
   left,
   right,
 })
