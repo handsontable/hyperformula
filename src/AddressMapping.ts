@@ -5,6 +5,8 @@ export class AddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
+  constructor(private maxCol: number = 0, private maxRow: number = 0) { }
+
   public getCell(address: SimpleCellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
@@ -41,6 +43,10 @@ export class AddressMapping {
   }
 
   public getMaximumRow(): number {
-    return 0
+    return this.maxRow
+  }
+
+  public getMaximumCol(): number {
+    return this.maxCol
   }
 }

@@ -101,9 +101,10 @@ describe('AddressMapping', () => {
     expect(mapping.getRange(start, end)).toBe(vertex)
   })
 
-  it('returns maximum row', () => {
-    const mapping = new AddressMapping()
+  it('returns maximum row/col for simplest case', () => {
+    const mapping = new AddressMapping(1, 2)
 
-    expect(mapping.getMaximumRow()).toEqual(0)
+    expect(mapping.getMaximumRow()).toEqual(2)
+    expect(mapping.getMaximumCol()).toEqual(1)
   })
 })
