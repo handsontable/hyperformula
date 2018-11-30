@@ -43,6 +43,12 @@ const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) =>
       collectDependencies(ast.value, dependenciesSet)
       return
     }
+    case AstNodeType.EQUALS_OP:
+    case AstNodeType.NOT_EQUAL_OP:
+    case AstNodeType.LESS_THAN_OP:
+    case AstNodeType.GREATER_THAN_OP:
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
     case AstNodeType.MINUS_OP:
     case AstNodeType.PLUS_OP:
     case AstNodeType.TIMES_OP:

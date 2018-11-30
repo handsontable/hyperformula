@@ -247,7 +247,7 @@ class FormulaParser extends Parser {
     this.MANY_SEP({
       SEP: ArgSeparator,
       DEF: () => {
-        args.push(this.SUBRULE(this.additionExpression))
+        args.push(this.SUBRULE(this.booleanExpression))
       },
     })
     this.CONSUME(RParen)
@@ -265,7 +265,7 @@ class FormulaParser extends Parser {
 
   private parenthesisExpression: AstRule = this.RULE('parenthesisExpression', () => {
     this.CONSUME(LParen)
-    const expression = this.SUBRULE(this.additionExpression)
+    const expression = this.SUBRULE(this.booleanExpression)
     this.CONSUME(RParen)
     return expression
   })
