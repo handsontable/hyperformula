@@ -2,6 +2,7 @@ import {type} from 'os'
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {StatType} from '../src/statistics/Statistics'
+import parse from "csv-parse/lib/sync";
 
 export interface Config {
   millisecondsPerThousandRows: number,
@@ -9,6 +10,10 @@ export interface Config {
 }
 
 export interface ExpectedValue { address: string, value: CellValue}
+
+export function benchmarkCSV(csvString: string, config: Config) {
+  benchmark(parse(csvString), [], config)
+}
 
 export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = {
   millisecondsPerThousandRows: 50,
