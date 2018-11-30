@@ -1,3 +1,4 @@
+import {type} from 'os'
 import {AddressMapping} from '../AddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
@@ -34,6 +35,16 @@ export class Interpreter {
       }
       case AstNodeType.STRING: {
         return ast.value
+      }
+      case AstNodeType.EQUALS_OP: {
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
+        if (typeof leftResult !== typeof rightResult) {
+          return cellError(ErrorType.VALUE)
+        } else {
+          return leftResult === rightResult
+        }
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

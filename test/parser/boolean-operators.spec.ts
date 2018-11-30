@@ -1,12 +1,5 @@
-import {absoluteCellAddress, relativeCellAddress} from '../../src/Cell'
-import {
-  AstNodeType,
-  BinaryOpAst,
-  CellReferenceAst,
-  EqualsOpAst,
-  GreaterThanOpAst,
-  LessThanOpAst
-} from '../../src/parser/Ast'
+import {absoluteCellAddress} from '../../src/Cell'
+import {AstNodeType, EqualsOpAst, GreaterThanOpAst, LessThanOpAst} from '../../src/parser/Ast'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - Boolean operators', () => {
