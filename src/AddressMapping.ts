@@ -1,7 +1,17 @@
 import {SimpleCellAddress} from './Cell'
 import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 
-export class AddressMapping {
+interface IAddressMapping {
+  getCell(address: SimpleCellAddress): CellVertex | null,
+  setCell(address: SimpleCellAddress, newVertex: CellVertex): void,
+  getRange(start: SimpleCellAddress, end: SimpleCellAddress): void,
+  setRange(vertex: RangeVertex): void,
+  has(address: SimpleCellAddress): boolean,
+  getMaximumRow(): number,
+  getMaximumCol(): number,
+}
+
+export class AddressMapping implements IAddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
