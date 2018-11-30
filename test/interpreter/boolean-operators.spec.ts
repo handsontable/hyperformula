@@ -69,4 +69,29 @@ describe('Parser - Boolean operators', () => {
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
   })
+
+  it('Less than operator with number arguments', () => {
+    engine.loadSheet([
+      ['=1<=2', '=2<=2', '=-3<=4', '=-4<=-3', '=5<=4'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(true)
+    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue('D1')).toBe(true)
+    expect(engine.getCellValue('E1')).toBe(false)
+  })
+
+
+  it('Greater than operator with number arguments', () => {
+    engine.loadSheet([
+      ['=2>=1', '=2>=2', '=4>=-3', '=-3>=-4', '=4>=5'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(true)
+    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue('D1')).toBe(true)
+    expect(engine.getCellValue('E1')).toBe(false)
+  })
 })
