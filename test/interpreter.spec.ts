@@ -178,8 +178,23 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
-  it('ranges - SUM range with not numeric values', () => {
+  it('ranges - SUM with bool', () => {
+    const engine = HandsOnEngine.buildFromArray([['=SUM(1;TRUE())']])
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('ranges - SUM with string', () => {
+    const engine = HandsOnEngine.buildFromArray([['=SUM(1;"foo")']])
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('ranges - SUM range with string values', () => {
     const engine = HandsOnEngine.buildFromArray([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
+    expect(engine.getCellValue('A4')).toEqual(3)
+  })
+
+  it('ranges - SUM range with bool values', () => {
+    const engine = HandsOnEngine.buildFromArray([['1'], ['2'], ['=TRUE()'], ['=SUM(A1:A3)']])
     expect(engine.getCellValue('A4')).toEqual(3)
   })
 
