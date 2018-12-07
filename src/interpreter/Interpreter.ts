@@ -501,8 +501,12 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
   return rangeValues.reduce((acc: CellValue, val: CellValue) => {
     if (typeof acc === 'number' && typeof val === 'number') {
       return acc + val
+    } else if (isCellError(acc)){
+      return acc
+    } else if (isCellError(val)) {
+      return val
     } else {
-      return cellError(ErrorType.VALUE)
+      return acc
     }
   })
 }

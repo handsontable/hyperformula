@@ -180,7 +180,7 @@ describe('Interpreter', () => {
 
   it('ranges - SUM range with not numeric values', () => {
     const engine = HandsOnEngine.buildFromArray([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
-    expect(engine.getCellValue('A4')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A4')).toEqual(3)
   })
 
   it('procedures - not known procedure', () => {
