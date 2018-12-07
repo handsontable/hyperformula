@@ -5,11 +5,18 @@ import {
   Ast,
   AstNodeType,
   buildCellRangeAst,
-  buildCellReferenceAst, buildConcatenateOpAst,
-  buildDivOpAst, buildEqualsOpAst,
-  buildErrorAst, buildGreaterThanOpAst, buildGreaterThanOrEqualOpAst, buildLessThanOpAst, buildLessThanOrEqualOpAst,
+  buildCellReferenceAst,
+  buildConcatenateOpAst,
+  buildDivOpAst,
+  buildEqualsOpAst,
+  buildErrorAst,
+  buildGreaterThanOpAst,
+  buildGreaterThanOrEqualOpAst,
+  buildLessThanOpAst,
+  buildLessThanOrEqualOpAst,
   buildMinusOpAst,
-  buildMinusUnaryOpAst, buildNotEqualOpAst,
+  buildMinusUnaryOpAst,
+  buildNotEqualOpAst,
   buildNumberAst,
   buildPlusOpAst,
   buildProcedureAst,
@@ -207,10 +214,20 @@ class FormulaParser extends Parser {
   })
 
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
-    const start = this.CONSUME(CellReference)
+    const start = this.SUBRULE(this.cellReference)
     this.CONSUME2(RangeSeparator)
-    const end = this.CONSUME3(CellReference)
-    return buildCellRangeAst(cellAddressFromString(start.image, this.formulaAddress!), cellAddressFromString(end.image, this.formulaAddress!))
+    const end = this.SUBRULE(this.endOfRangeExpression)
+
+    if (start.type === AstNodeType.CELL_REFERENCE && end.type === AstNodeType.CELL_REFERENCE) {
+      return buildCellRangeAst(start.reference, end.reference)
+    } else {
+      return buildErrorAst([
+        {
+          type: ParsingErrorType.ParserError,
+          message: ParsingErrorType.ParserError
+        }
+      ])
+    }
   })
 
   private atomicExpression: AstRule = this.RULE('atomicExpression', () => {
@@ -237,10 +254,10 @@ class FormulaParser extends Parser {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.cellReference),
+        ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.offsetExpression),
+        ALT: () => this.SUBRULE(this.cellReference),
       },
       {
         ALT: () => this.SUBRULE(this.procedureExpression),
@@ -274,7 +291,7 @@ class FormulaParser extends Parser {
     return buildProcedureAst(procedureName, args)
   })
 
-  private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
+  private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
     const args: Ast[] = []
     this.CONSUME(OffsetProcedureName)
     this.CONSUME(LParen)
@@ -286,6 +303,55 @@ class FormulaParser extends Parser {
     })
     this.CONSUME(RParen)
     return this.handleOffsetHeuristic(args)
+  })
+
+
+  private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
+    const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+
+    let end: Ast | undefined
+    this.OPTION(() => {
+      this.CONSUME(RangeSeparator)
+      end = this.SUBRULE(this.endOfRangeExpression)
+    })
+
+    if (end !== undefined) {
+      if (offsetProcedure.type === AstNodeType.CELL_REFERENCE && end.type === AstNodeType.CELL_REFERENCE) {
+        return buildCellRangeAst(offsetProcedure.reference, end!.reference)
+      } else if (offsetProcedure.type === AstNodeType.CELL_RANGE){
+        return buildErrorAst([
+          {
+            type: ParsingErrorType.RangeOffsetNotAllowed,
+            message: "Range offset not allowed here"
+          }
+        ])
+      }
+    }
+
+    return offsetProcedure
+  })
+
+  private endOfRangeExpression: AstRule = this.RULE("endOfRangeExpression", () => {
+    return this.OR([
+      {
+        ALT: () => this.SUBRULE(this.cellReference)
+      },
+      {
+        ALT: () => {
+          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+            return buildCellReferenceAst(offsetProcedure.reference)
+          } else {
+            return buildErrorAst([
+              {
+                type: ParsingErrorType.RangeOffsetNotAllowed,
+                message: "Range offset not allowed here"
+              }
+            ])
+          }
+        }
+      }
+    ])
   })
 
   private cellReference: AstRule = this.RULE('cellReference', () => {
@@ -301,7 +367,7 @@ class FormulaParser extends Parser {
   })
 
   constructor() {
-    super(allTokens, {outputCst: false})
+    super(allTokens, {outputCst: false, maxLookahead: 7})
     this.performSelfAnalysis()
   }
 
@@ -310,7 +376,7 @@ class FormulaParser extends Parser {
     return this.formula()
   }
 
-  private handleOffsetHeuristic(args: Ast[]) {
+  private handleOffsetHeuristic(args: Ast[]): Ast {
     const cellArg = args[0]
     if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([{
