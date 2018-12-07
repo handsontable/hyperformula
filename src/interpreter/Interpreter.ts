@@ -42,8 +42,15 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
+        if (isCellError(leftResult)) {
+          return leftResult
+        }
+        if (isCellError(leftResult)) {
+          return rightResult
+        }
+
         if (typeof leftResult !== typeof rightResult) {
-          return cellError(ErrorType.VALUE)
+          return false
         } else {
           return leftResult === rightResult
         }
