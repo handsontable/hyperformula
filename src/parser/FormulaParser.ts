@@ -120,9 +120,13 @@ const allTokens = [
 ]
 
 // F -> '=' E
-// E -> M + E | M - E | M    --->    M { + M }*
-// M -> C * M | C / M | C    --->    C { * C }*
-// C -> N | A:A | A | P | num
+// B -> K < B | K >= B ... | K
+// K -> E & K | E
+// E -> M + E | M - E | M
+// M -> C * M | C / M | C
+// C -> N | R | O | A | P | num
+// R -> A:OFFSET(..) | A:A
+// O -> OFFSET(..) | OFFSET(..):A | OFFSET(..):OFFSET(..)
 // N -> '(' E ')'
 // A -> adresy
 // P -> procedury
