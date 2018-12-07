@@ -18,8 +18,7 @@ export class Interpreter {
   }
 
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    const result = this.evaluateAst(formula, formulaAddress)
-    return result
+    return this.evaluateAst(formula, formulaAddress)
   }
 
   private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
