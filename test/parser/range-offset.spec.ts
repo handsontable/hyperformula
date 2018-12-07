@@ -19,7 +19,8 @@ describe('Parser - range offset', () => {
 
     const ast = parser.parse('=A1:OFFSET(B2; 0; 0; 2; 2)', absoluteCellAddress(0, 0)).ast as ErrorAst
     const ast2 = parser.parse('=OFFSET(A1;0;0;2;2):A2', absoluteCellAddress(0, 0)).ast as ErrorAst
-    expect(ast2.type).toBe(AstNodeType.ERROR)
+
+    expect(ast.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
     expect(ast2.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
   })
 })
