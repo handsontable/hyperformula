@@ -42,6 +42,28 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue('C3')).toBe(true)
   })
 
+  it("Equal operator with different types", () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['="foo"=1', '="foo"=TRUE()', '=1="foo"', '=TRUE()="foo"'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(false)
+    expect(engine.getCellValue('B1')).toBe(false)
+    expect(engine.getCellValue('C1')).toBe(false)
+    expect(engine.getCellValue('D1')).toBe(false)
+  })
+
+  it("Not Equal operator with different types", () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['="foo"<>1', '="foo"<>TRUE()', '=1<>"foo"', '=TRUE()<>"foo"'],
+    ])
+
+    expect(engine.getCellValue('A1')).toBe(true)
+    expect(engine.getCellValue('B1')).toBe(true)
+    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue('D1')).toBe(true)
+  })
+
   it('Less than operator with number arguments', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['=1<2', '=2<2', '=-3<4', '=-4<-3'],
