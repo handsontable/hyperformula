@@ -1,6 +1,6 @@
-import {ParserWithCaching} from "../../src/parser/ParserWithCaching";
-import {absoluteCellAddress, relativeCellAddress} from "../../src/Cell";
-import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParsingErrorType} from "../../src/parser/Ast";
+import {absoluteCellAddress, relativeCellAddress} from '../../src/Cell'
+import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParsingErrorType} from '../../src/parser/Ast'
+import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - range offset', () => {
   it('OFFSET - usage with range', () => {

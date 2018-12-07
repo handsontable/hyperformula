@@ -45,7 +45,6 @@ export const parseCriterion = (criterion: CellValue): Criterion | null => {
   return null
 }
 
-
 export type CriterionLambda = (cellValue: CellValue) => boolean | null
 export const buildCriterionLambda = (criterion: Criterion): CriterionLambda => {
   switch (criterion.operator) {

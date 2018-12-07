@@ -30,7 +30,7 @@ export enum ParsingErrorType {
   ParserError = 'ParsingError',
   StaticOffsetError = 'StaticOffsetError',
   StaticOffsetOutOfRangeError = 'StaticOffsetOutOfRangeError',
-  RangeOffsetNotAllowed = 'RangeOffsetNotAllowed'
+  RangeOffsetNotAllowed = 'RangeOffsetNotAllowed',
 }
 
 export enum AstNodeType {

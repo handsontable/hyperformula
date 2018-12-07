@@ -224,8 +224,8 @@ class FormulaParser extends Parser {
       return buildErrorAst([
         {
           type: ParsingErrorType.ParserError,
-          message: ParsingErrorType.ParserError
-        }
+          message: ParsingErrorType.ParserError,
+        },
       ])
     }
   })
@@ -299,12 +299,11 @@ class FormulaParser extends Parser {
       SEP: ArgSeparator,
       DEF: () => {
         args.push(this.SUBRULE(this.booleanExpression))
-      }
+      },
     })
     this.CONSUME(RParen)
     return this.handleOffsetHeuristic(args)
   })
-
 
   private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
     const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
@@ -318,12 +317,12 @@ class FormulaParser extends Parser {
     if (end !== undefined) {
       if (offsetProcedure.type === AstNodeType.CELL_REFERENCE && end.type === AstNodeType.CELL_REFERENCE) {
         return buildCellRangeAst(offsetProcedure.reference, end!.reference)
-      } else if (offsetProcedure.type === AstNodeType.CELL_RANGE){
+      } else if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
         return buildErrorAst([
           {
             type: ParsingErrorType.RangeOffsetNotAllowed,
-            message: "Range offset not allowed here"
-          }
+            message: 'Range offset not allowed here',
+          },
         ])
       }
     }
@@ -331,10 +330,10 @@ class FormulaParser extends Parser {
     return offsetProcedure
   })
 
-  private endOfRangeExpression: AstRule = this.RULE("endOfRangeExpression", () => {
+  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', () => {
     return this.OR([
       {
-        ALT: () => this.SUBRULE(this.cellReference)
+        ALT: () => this.SUBRULE(this.cellReference),
       },
       {
         ALT: () => {
@@ -345,12 +344,12 @@ class FormulaParser extends Parser {
             return buildErrorAst([
               {
                 type: ParsingErrorType.RangeOffsetNotAllowed,
-                message: "Range offset not allowed here"
-              }
+                message: 'Range offset not allowed here',
+              },
             ])
           }
-        }
-      }
+        },
+      },
     ])
   })
 
