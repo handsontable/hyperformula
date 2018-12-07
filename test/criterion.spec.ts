@@ -38,6 +38,10 @@ describe('Criterion', () => {
     expect(parseCriterion('>=100.5')).toEqual(buildCriterion(CriterionType.GREATER_THAN_OR_EQUAL, 100.5))
   })
 
+  it('works with strings', () => {
+    expect(parseCriterion('=asdf')).toEqual(buildCriterion(CriterionType.EQUAL, "asdf"))
+  })
+
   it('null when unknown operator', () => {
     expect(parseCriterion('><0')).toEqual(null)
   })
