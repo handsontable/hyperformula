@@ -169,4 +169,12 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(ast.args[0].type).toBe('StaticOffsetOutOfRangeError')
     expect(ast.args[0].message).toBe('Resulting reference is out of the sheet')
   })
+
+  it('OFFSET case insensitive', () => {
+    const parser = new ParserWithCaching('parser')
+
+    const ast = parser.parse('=oFfSeT(F16; 0; 0)', absoluteCellAddress(1, 2)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(relativeCellAddress(4, 13))
+  })
 })

@@ -61,6 +61,7 @@ const LParen = createToken({name: 'LParen', pattern: /\(/})
 const RParen = createToken({name: 'RParen', pattern: /\)/})
 
 /* prcoedures */
+const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: /OFFSET/i })
 const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z]+/})
 
 /* terminals */
@@ -99,6 +100,7 @@ const allTokens = [
   AbsoluteColCell,
   AbsoluteRowCell,
   RelativeCell,
+  OffsetProcedureName,
   ProcedureName,
   ArgSeparator,
   NumberLiteral,
@@ -238,6 +240,9 @@ class FormulaParser extends Parser {
         ALT: () => this.SUBRULE(this.cellReference),
       },
       {
+        ALT: () => this.SUBRULE(this.offsetExpression),
+      },
+      {
         ALT: () => this.SUBRULE(this.procedureExpression),
       },
       {
@@ -266,11 +271,21 @@ class FormulaParser extends Parser {
       },
     })
     this.CONSUME(RParen)
-    if (procedureName === 'OFFSET') {
-      return this.handleOffsetHeuristic(args)
-    } else {
-      return buildProcedureAst(procedureName, args)
-    }
+    return buildProcedureAst(procedureName, args)
+  })
+
+  private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
+    const args: Ast[] = []
+    this.CONSUME(OffsetProcedureName)
+    this.CONSUME(LParen)
+    this.MANY_SEP({
+      SEP: ArgSeparator,
+      DEF: () => {
+        args.push(this.SUBRULE(this.booleanExpression))
+      }
+    })
+    this.CONSUME(RParen)
+    return this.handleOffsetHeuristic(args)
   })
 
   private cellReference: AstRule = this.RULE('cellReference', () => {
