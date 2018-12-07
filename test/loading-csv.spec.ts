@@ -36,5 +36,7 @@ describe('Loading CSV', () => {
     const engine = HandsOnEngine.buildFromCsv(str)
 
     expect(engine.getCellValue('B2')).toBe('Another header')
+    expect(engine.getCellValue('A2')).toBe('Some simple string value')
+
   })
 })
