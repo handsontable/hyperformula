@@ -28,9 +28,7 @@ export class Interpreter {
         const vertex = this.addressMapping.getCell(address)!
         return vertex.getCellValue()
       }
-      case AstNodeType.NUMBER: {
-        return ast.value
-      }
+      case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
         return ast.value
       }
