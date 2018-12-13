@@ -188,13 +188,13 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
   
-  it('#ranges - SUM and + of 1 with "foo"', () => {
+  it('ranges - SUM and + of 1 with "foo"', () => {
       const engine = HandsOnEngine.buildFromArray([
           ['1','foo'],
           ['=A1+B1','=SUM(A1:B1)'],
     ])
     expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A1')).toEqual(1) //why B2 doesn't work?
+    expect(engine.getCellValue('B2')).toEqual(1)
   })
 
   it('ranges - SUM range with string values', () => {
