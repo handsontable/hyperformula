@@ -570,4 +570,30 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.REF))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.REF))
   })
+
+  it ('function OFFSET returns bigger range', () => {
+      const engine = HandsOnEngine.buildFromArray([
+          ['=SUM(OFFSET(A1; 0; 1;2;1))','5','6'],
+          ['2','3','4'],
+      ])
+
+    expect(engine.getCellValue('A1')).toEqual(8)
+  })
+
+  it ('function OFFSET returns rectangular range and fails', () => {
+      const engine = HandsOnEngine.buildFromArray([
+          ['=OFFSET(A1; 0; 1;2;1))']
+      ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
+  })
+  
+  it ('function OFFSET used twice in a range', () => {
+      const engine = HandsOnEngine.buildFromArray([
+          ['5','6','=SUM(OFFSET(A2;-1;0):OFFSET(A2;0;1))'],
+          ['2','3','4'],
+      ])
+
+    expect(engine.getCellValue('C1')).toEqual(16)
+  })
 })
