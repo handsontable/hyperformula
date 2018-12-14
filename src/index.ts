@@ -37,7 +37,7 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    const {maxRow, maxCol} = this.findBoundaries(sheet)
+    const {maxRow, maxCol, fill} = findBoundaries(sheet)
     this.addressMapping = new AddressMapping(maxCol, maxRow)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
@@ -132,8 +132,28 @@ export class HandsOnEngine {
       }
     })
   }
+}
 
-  private findBoundaries(sheet: Sheet): ({ maxRow: number, maxCol: number }) {
-    return { maxRow: sheet.length, maxCol: (sheet[0] || []).length }
+export function findBoundaries(sheet: Sheet): ({ maxRow: number, maxCol: number, fill: number }) {
+  let maxWidth = 0
+  let cellsCount = 0
+  for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
+    const currentRowWidth = sheet[currentRow].length
+    if (maxWidth === undefined || maxWidth < currentRowWidth) {
+      maxWidth = currentRowWidth
+    }
+    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
+      const currentValue = sheet[currentRow][currentCol]
+      if (currentValue !== "") {
+        cellsCount++
+      }
+    }
+  }
+  const sheetSize = sheet.length * maxWidth
+
+  return {
+    maxRow: Math.max(sheet.length - 1, 0),
+    maxCol: Math.max(maxWidth - 1, 0),
+    fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
   }
 }
