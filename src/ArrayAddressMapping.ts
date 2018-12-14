@@ -6,10 +6,10 @@ export class ArrayAddressMapping implements IAddressMapping {
   private mapping: Array<Array<CellVertex>>
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
-  constructor(private maxCol: number, private maxRow: number) {
-    this.mapping = new Array(maxRow + 1)
-    for (let i = 0; i <= maxRow; i++) {
-      this.mapping[i] = new Array(maxCol + 1)
+  constructor(private width: number, private height: number) {
+    this.mapping = new Array(height)
+    for (let i = 0; i < height; i++) {
+      this.mapping[i] = new Array(width)
     }
   }
 
@@ -35,11 +35,11 @@ export class ArrayAddressMapping implements IAddressMapping {
     return !!this.mapping[address.row][address.col]
   }
 
-  public getMaximumRow(): number {
-    return this.maxRow
+  public getHeight(): number {
+    return this.height
   }
 
-  public getMaximumCol(): number {
-    return this.maxCol
+  public getWidth(): number {
+    return this.width
   }
 }

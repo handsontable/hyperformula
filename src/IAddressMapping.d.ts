@@ -7,6 +7,6 @@ export interface IAddressMapping {
   getRange(start: SimpleCellAddress, end: SimpleCellAddress): void,
   setRange(vertex: RangeVertex): void,
   has(address: SimpleCellAddress): boolean,
-  getMaximumRow(): number,
-  getMaximumCol(): number,
+  getHeight(): number,
+  getWidth(): number,
 }

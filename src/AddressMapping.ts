@@ -6,7 +6,7 @@ export class AddressMapping implements IAddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
-  constructor(private maxCol: number = 0, private maxRow: number = 0) { }
+  constructor(private width: number = 0, private height: number = 0) { }
 
   public getCell(address: SimpleCellAddress): CellVertex {
     const colMapping = this.mapping.get(address.col)
@@ -43,11 +43,11 @@ export class AddressMapping implements IAddressMapping {
     return !!colMapping.get(address.row)
   }
 
-  public getMaximumRow(): number {
-    return this.maxRow
+  public getHeight(): number {
+    return this.height
   }
 
-  public getMaximumCol(): number {
-    return this.maxCol
+  public getWidth(): number {
+    return this.width
   }
 }

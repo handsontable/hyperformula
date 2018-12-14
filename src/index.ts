@@ -37,8 +37,8 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    const {maxRow, maxCol, fill} = findBoundaries(sheet)
-    this.addressMapping = new AddressMapping(maxCol, maxRow)
+    const {height, width, fill} = findBoundaries(sheet)
+    this.addressMapping = new AddressMapping(width, height)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
     this.interpreter = new Interpreter(this.addressMapping, this.graph)
@@ -59,14 +59,14 @@ export class HandsOnEngine {
   }
 
   public exportAsCSV() {
-    const maxRow = this.addressMapping.getMaximumRow()
-    const maxCol = this.addressMapping.getMaximumCol()
+    const sheetHeight = this.addressMapping.getHeight()
+    const sheetWidth = this.addressMapping.getWidth()
 
-    const arr: Sheet = new Array(maxRow)
-    for (let i = 0; i < maxRow; i++) {
-      arr[i] = new Array(maxCol)
+    const arr: Sheet = new Array(sheetHeight)
+    for (let i = 0; i < sheetHeight; i++) {
+      arr[i] = new Array(sheetWidth)
 
-      for (let j = 0; j < maxCol; j++) {
+      for (let j = 0; j < sheetWidth; j++) {
         const cell = this.addressMapping.getCell(simpleCellAddress(j, i))
 
         if (cell == null) {
@@ -134,7 +134,7 @@ export class HandsOnEngine {
   }
 }
 
-export function findBoundaries(sheet: Sheet): ({ maxRow: number, maxCol: number, fill: number }) {
+export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
   let maxWidth = 0
   let cellsCount = 0
   for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
@@ -152,8 +152,8 @@ export function findBoundaries(sheet: Sheet): ({ maxRow: number, maxCol: number,
   const sheetSize = sheet.length * maxWidth
 
   return {
-    maxRow: Math.max(sheet.length - 1, 0),
-    maxCol: Math.max(maxWidth - 1, 0),
+    height: sheet.length,
+    width: maxWidth,
     fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
   }
 }

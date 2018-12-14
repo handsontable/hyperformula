@@ -5,15 +5,12 @@ describe("findBoundaries", () => {
     expect(findBoundaries([
       ["1", "2"],
       ["1", "2", "3"],
-    ])).toMatchObject({
-      maxRow: 1,
-      maxCol: 2,
-    })
+    ])).toMatchObject({ height: 2, width: 3 })
   })
 
   it("returns sane dimensions for empty cases", () => {
-    expect(findBoundaries([])).toMatchObject({ maxRow: 0, maxCol: 0 })
-    expect(findBoundaries([[]])).toMatchObject({ maxRow: 0, maxCol: 0 })
+    expect(findBoundaries([])).toMatchObject({ height: 0, width: 0 })
+    expect(findBoundaries([[]])).toMatchObject({ height: 1, width: 0 })
   })
 
   it("calculate correct fill for array with different size", () => {
