@@ -34,6 +34,12 @@ lint-fix: ## fix linting errors
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage
 
+doc:
+	@yarn typedoc --out doc
+
+servedoc:
+	@yarn http-server doc -p 5005
+
 clean: ## Clean compiled files
 	@rm -rf lib/
 

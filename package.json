@@ -4,6 +4,7 @@
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
+    "http-server": "^0.11.1",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.1",
     "ts-node": "^7.0.1",
