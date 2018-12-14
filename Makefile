@@ -35,7 +35,7 @@ coverage: ## Run tests and show coverage
 	@yarn jest --coverage
 
 doc:
-	@yarn typedoc --out doc
+	@yarn typedoc --options .typedoc.js
 
 servedoc:
 	@yarn http-server doc -p 5005
