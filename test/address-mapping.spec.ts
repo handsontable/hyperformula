@@ -38,6 +38,12 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
     expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
+  it('get when asking for out of the row bound cell', () => {
+    const mapping = builder(1, 1)
+
+    expect(mapping.getCell(relativeCellAddress(0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+  })
+
   it("set when there's already something in that column", () => {
     const mapping = builder(1, 2)
     const vertex0 = new ValueCellVertex(42)

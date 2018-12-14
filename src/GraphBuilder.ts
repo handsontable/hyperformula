@@ -1,4 +1,4 @@
-import {AddressMapping} from './AddressMapping'
+import {IAddressMapping} from './IAddressMapping'
 import {
   absoluteCellAddress,
   CellAddress,
@@ -19,7 +19,7 @@ export class GraphBuilder {
   private parser = new ParserWithCaching()
 
   constructor(private graph: Graph<Vertex>,
-              private addressMapping: AddressMapping,
+              private addressMapping: IAddressMapping,
               private stats: Statistics) {
   }
 
@@ -98,7 +98,7 @@ export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCell
   }
 }
 
-export const findSmallerRange = (addressMapping: AddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
+export const findSmallerRange = (addressMapping: IAddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
   if (rangeEnd.row > rangeStart.row) {
     const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
     const rowLessVertex = addressMapping.getRange(rangeStart, rangeEndRowLess)

@@ -1,4 +1,4 @@
-import {AddressMapping} from '../AddressMapping'
+import {IAddressMapping} from '../IAddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {split} from '../generatorUtils'
@@ -9,10 +9,10 @@ import {Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 
 export class Interpreter {
-  private addressMapping: AddressMapping
+  private addressMapping: IAddressMapping
   private graph: Graph<Vertex>
 
-  constructor(addressMapping: AddressMapping, graph: Graph<Vertex>) {
+  constructor(addressMapping: IAddressMapping, graph: Graph<Vertex>) {
     this.addressMapping = addressMapping
     this.graph = graph
   }
@@ -545,7 +545,7 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
   })
 }
 
-function * getPlainRangeValues(addressMapping: AddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+function * getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
   const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
   for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
     yield addressMapping.getCell(cellFromRange)!.getCellValue()

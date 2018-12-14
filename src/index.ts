@@ -1,6 +1,8 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
+import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {AddressMapping} from './AddressMapping'
+import {IAddressMapping} from './IAddressMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString, CellError,
@@ -17,6 +19,8 @@ import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
+const fillThreshold = 0.8
+
 export class HandsOnEngine {
   public static buildFromCsv(csv: string): HandsOnEngine {
     return HandsOnEngine.buildFromArray(parse(csv))
@@ -26,7 +30,7 @@ export class HandsOnEngine {
     return new HandsOnEngine(sheet)
   }
 
-  private addressMapping: AddressMapping
+  private addressMapping: IAddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
   private verticesOnCycle: Vertex[] = []
@@ -38,7 +42,11 @@ export class HandsOnEngine {
     this.stats.start(StatType.OVERALL)
 
     const {height, width, fill} = findBoundaries(sheet)
-    this.addressMapping = new AddressMapping(width, height)
+    if (fill > fillThreshold) {
+      this.addressMapping = new ArrayAddressMapping(width, height)
+    } else {
+      this.addressMapping = new AddressMapping(width, height)
+    }
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
     this.interpreter = new Interpreter(this.addressMapping, this.graph)

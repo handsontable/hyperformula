@@ -14,7 +14,11 @@ export class ArrayAddressMapping implements IAddressMapping {
   }
 
   public getCell(address: SimpleCellAddress): CellVertex {
-    return this.mapping[address.row][address.col] || EmptyCellVertex.getSingletonInstance()
+    const row = this.mapping[address.row]
+    if (!row) {
+      return EmptyCellVertex.getSingletonInstance()
+    }
+    return row[address.col] || EmptyCellVertex.getSingletonInstance()
   }
 
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
@@ -32,7 +36,11 @@ export class ArrayAddressMapping implements IAddressMapping {
   }
 
   public has(address: SimpleCellAddress): boolean {
-    return !!this.mapping[address.row][address.col]
+    const row = this.mapping[address.row]
+    if (!row) {
+      return false
+    }
+    return !!row[address.col]
   }
 
   public getHeight(): number {
