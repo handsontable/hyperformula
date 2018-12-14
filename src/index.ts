@@ -21,7 +21,15 @@ import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 const fillThreshold = 0.8
 
+
+/**
+ * Engine for one sheet
+ */
 export class HandsOnEngine {
+  /**
+   * Builds engine for sheet from CSV string representation
+   * @param csv - csv representation of sheet
+   */
   public static buildFromCsv(csv: string): HandsOnEngine {
     return HandsOnEngine.buildFromArray(parse(csv))
   }

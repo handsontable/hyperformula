@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@microsoft/tsdoc": "^0.12.4",
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
@@ -7,6 +8,7 @@
     "ts-jest": "^23.10.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
+    "typedoc": "^0.13.0",
     "typescript": "^3.0.3"
   },
   "dependencies": {

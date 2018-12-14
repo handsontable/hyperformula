@@ -8,6 +8,9 @@ export class AddressMapping implements IAddressMapping {
 
   constructor(private width: number = 0, private height: number = 0) { }
 
+  /**
+   * This function get cells content
+   */
   public getCell(address: SimpleCellAddress): CellVertex {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
