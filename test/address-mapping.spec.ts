@@ -85,7 +85,6 @@ const sharedExamples = (builder: () => IAddressMapping) => {
     const mapping = builder()
     const start = simpleCellAddress(0, 0)
     const end = simpleCellAddress(20, 50)
-    const vertex = new RangeVertex(start, end)
 
     expect(mapping.getRange(start, end)).toBe(null)
   })
