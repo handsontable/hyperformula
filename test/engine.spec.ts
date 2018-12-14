@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../src'
-import {cellError, ErrorType} from '../src/Cell'
 import {AddressMapping} from '../src/AddressMapping'
 import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
+import {cellError, ErrorType} from '../src/Cell'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -130,7 +130,7 @@ describe('Integration', () => {
       ['', '', '1'],
     ])
 
-    expect(engine["addressMapping"]).toBeInstanceOf(AddressMapping)
+    expect(engine.addressMapping).toBeInstanceOf(AddressMapping)
   })
 
   it('#loadSheet - choose ArrayAddressMapping when dense matrix', () => {
@@ -139,6 +139,6 @@ describe('Integration', () => {
       ['1', '1'],
     ])
 
-    expect(engine["addressMapping"]).toBeInstanceOf(ArrayAddressMapping)
+    expect(engine.addressMapping).toBeInstanceOf(ArrayAddressMapping)
   })
 })

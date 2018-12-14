@@ -1,8 +1,7 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
-import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {AddressMapping} from './AddressMapping'
-import {IAddressMapping} from './IAddressMapping'
+import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString, CellError,
@@ -14,6 +13,7 @@ import {
 } from './Cell'
 import {Graph} from './Graph'
 import {GraphBuilder, Sheet} from './GraphBuilder'
+import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -152,7 +152,7 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
     }
     for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
       const currentValue = sheet[currentRow][currentCol]
-      if (currentValue !== "") {
+      if (currentValue !== '') {
         cellsCount++
       }
     }

@@ -1,9 +1,9 @@
-import {IAddressMapping} from '../IAddressMapping'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {split} from '../generatorUtils'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
+import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
@@ -286,7 +286,6 @@ export class Interpreter {
         const conditionRangeArg = ast.args[0]
         const valuesRangeArg = ast.args[2]
 
-
         if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type == AstNodeType.CELL_RANGE) {
           const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
           const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
@@ -298,7 +297,7 @@ export class Interpreter {
           }
 
           return this.evaluateRangeSumif(ast, formulaAddress, criterionString, criterion)
-        } else if(conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type == AstNodeType.CELL_REFERENCE) {
+        } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type == AstNodeType.CELL_REFERENCE) {
           return this.evaluateCellSumif(ast, formulaAddress, criterion)
         } else {
           return cellError(ErrorType.VALUE)

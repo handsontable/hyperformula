@@ -1,9 +1,9 @@
 import {SimpleCellAddress} from './Cell'
-import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 import {IAddressMapping} from './IAddressMapping'
+import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 
 export class ArrayAddressMapping implements IAddressMapping {
-  private mapping: Array<Array<CellVertex>>
+  private mapping: CellVertex[][]
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
   constructor(private width: number, private height: number) {

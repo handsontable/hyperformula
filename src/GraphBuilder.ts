@@ -1,4 +1,3 @@
-import {IAddressMapping} from './IAddressMapping'
 import {
   absoluteCellAddress,
   CellAddress,
@@ -9,6 +8,7 @@ import {
   SimpleCellAddress,
 } from './Cell'
 import {Graph} from './Graph'
+import {IAddressMapping} from './IAddressMapping'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'

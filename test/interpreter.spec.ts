@@ -187,14 +187,14 @@ describe('Interpreter', () => {
     const engine = HandsOnEngine.buildFromArray([['=SUM(1;"foo")']])
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
-  
+
   it('ranges - SUM and + of 1 with "foo"', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['1','foo'],
-          ['=A1+B1','=SUM(A1:B1)'],
+          ['1', 'foo'],
+          ['=A1+B1', '=SUM(A1:B1)'],
     ])
-    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B2')).toEqual(1)
+      expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
+      expect(engine.getCellValue('B2')).toEqual(1)
   })
 
   it('ranges - SUM range with string values', () => {
@@ -573,27 +573,27 @@ describe('Interpreter', () => {
 
   it ('function OFFSET returns bigger range', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['=SUM(OFFSET(A1; 0; 1;2;1))','5','6'],
-          ['2','3','4'],
+          ['=SUM(OFFSET(A1; 0; 1;2;1))', '5', '6'],
+          ['2', '3', '4'],
       ])
 
-    expect(engine.getCellValue('A1')).toEqual(8)
+      expect(engine.getCellValue('A1')).toEqual(8)
   })
 
   it ('function OFFSET returns rectangular range and fails', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['=OFFSET(A1; 0; 1;2;1))']
+          ['=OFFSET(A1; 0; 1;2;1))'],
       ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
+      expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
   })
-  
+
   it ('function OFFSET used twice in a range', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['5','6','=SUM(OFFSET(A2;-1;0):OFFSET(A2;0;1))'],
-          ['2','3','4'],
+          ['5', '6', '=SUM(OFFSET(A2;-1;0):OFFSET(A2;0;1))'],
+          ['2', '3', '4'],
       ])
 
-    expect(engine.getCellValue('C1')).toEqual(16)
+      expect(engine.getCellValue('C1')).toEqual(16)
   })
 })

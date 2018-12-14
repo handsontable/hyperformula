@@ -1,7 +1,7 @@
 import {AddressMapping} from '../src/AddressMapping'
-import {IAddressMapping} from '../src/IAddressMapping'
 import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
+import {IAddressMapping} from '../src/IAddressMapping'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
 const sharedExamples = (builder: (width: number, height: number) => IAddressMapping) => {
