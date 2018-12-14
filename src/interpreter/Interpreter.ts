@@ -4,9 +4,9 @@ import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toD
 import {split} from '../generatorUtils'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
 import {Vertex} from '../Vertex'
-import {buildCriterionLambda, CriterionLambda, parseCriterion} from './Criterion'
+import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 
 export class Interpreter {
   private addressMapping: AddressMapping
@@ -215,12 +215,7 @@ export class Interpreter {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
-  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string): CellValue {
-    const criterion = parseCriterion(criterionString)
-    if (criterion === null) {
-      return cellError(ErrorType.VALUE)
-    }
-
+  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const conditionRangeArg = ast.args[0] as CellRangeAst
     const valuesRangeArg = ast.args[2] as CellRangeAst
 
@@ -248,6 +243,17 @@ export class Interpreter {
     }
   }
 
+  private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
+    const conditionReferenceArg = ast.args[0] as CellReferenceAst
+    const valuesReferenceArg = ast.args[2] as CellReferenceAst
+
+    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]()
+    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]()
+    const criterionLambda = buildCriterionLambda(criterion)
+    const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
+    return reduceSum(filteredValues)
+  }
+
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
       case 'SUM': {
@@ -272,6 +278,11 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
 
+        const criterion = parseCriterion(criterionString)
+        if (criterion === null) {
+          return cellError(ErrorType.VALUE)
+        }
+
         const conditionRangeArg = ast.args[0]
         const valuesRangeArg = ast.args[2]
 
@@ -286,9 +297,9 @@ export class Interpreter {
             return cellError(ErrorType.VALUE)
           }
 
-          return this.evaluateRangeSumif(ast, formulaAddress, criterionString)
+          return this.evaluateRangeSumif(ast, formulaAddress, criterionString, criterion)
         } else if(conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type == AstNodeType.CELL_REFERENCE) {
-          throw new Error("SUMIF for cell values")
+          return this.evaluateCellSumif(ast, formulaAddress, criterion)
         } else {
           return cellError(ErrorType.VALUE)
         }
