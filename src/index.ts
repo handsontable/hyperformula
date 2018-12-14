@@ -21,7 +21,6 @@ import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 const fillThreshold = 0.8
 
-
 /**
  * Engine for one sheet
  */
@@ -49,12 +48,7 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    const {height, width, fill} = findBoundaries(sheet)
-    if (fill > fillThreshold) {
-      this.addressMapping = new ArrayAddressMapping(width, height)
-    } else {
-      this.addressMapping = new AddressMapping(width, height)
-    }
+    this.addressMapping = buildAddressMapping(sheet)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
     this.interpreter = new Interpreter(this.addressMapping, this.graph)
@@ -171,5 +165,14 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
     height: sheet.length,
     width: maxWidth,
     fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
+  }
+}
+
+export function buildAddressMapping(sheet: Sheet): IAddressMapping {
+  const {height, width, fill} = findBoundaries(sheet)
+  if (fill > fillThreshold) {
+    return new ArrayAddressMapping(width, height)
+  } else {
+    return new AddressMapping(width, height)
   }
 }
