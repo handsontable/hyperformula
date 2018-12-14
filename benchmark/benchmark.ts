@@ -62,16 +62,16 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   console.warn(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
   console.warn(`Median BuildGraph: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
 
+  if (config.csvDump && engine !== null) {
+    const csvString = engine.exportAsCSV()
+    fs.writeFileSync('/tmp/dump.csv', csvString)
+  }
+
   const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
   console.warn(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
   console.warn(`Actual time: ${resultMillisecondsPerThousandRows} ms per 1000 rows`)
   if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
     process.exit(1)
-  }
-
-  if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCSV()
-    fs.writeFileSync('/tmp/dump.csv', csvString)
   }
 }
 
