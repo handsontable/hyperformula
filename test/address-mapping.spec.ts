@@ -1,5 +1,6 @@
-import {AddressMapping, ArrayAddressMapping} from '../src/AddressMapping'
+import {AddressMapping} from '../src/AddressMapping'
 import {IAddressMapping} from '../src/IAddressMapping'
+import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 

@@ -2,27 +2,23 @@ import {SimpleCellAddress} from './Cell'
 import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
 import {IAddressMapping} from './IAddressMapping'
 
-export class AddressMapping implements IAddressMapping {
-  private mapping: Map<number, Map<number, CellVertex>> = new Map()
+export class ArrayAddressMapping implements IAddressMapping {
+  private mapping: Array<Array<CellVertex>>
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
-  constructor(private maxCol: number = 0, private maxRow: number = 0) { }
+  constructor(private maxCol: number, private maxRow: number) {
+    this.mapping = new Array(maxRow + 1)
+    for (let i = 0; i <= maxRow; i++) {
+      this.mapping[i] = new Array(maxCol + 1)
+    }
+  }
 
   public getCell(address: SimpleCellAddress): CellVertex {
-    const colMapping = this.mapping.get(address.col)
-    if (!colMapping) {
-      return EmptyCellVertex.getSingletonInstance()
-    }
-    return colMapping.get(address.row) || EmptyCellVertex.getSingletonInstance()
+    return this.mapping[address.row][address.col] || EmptyCellVertex.getSingletonInstance()
   }
 
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
-    let colMapping = this.mapping.get(address.col)
-    if (!colMapping) {
-      colMapping = new Map()
-      this.mapping.set(address.col, colMapping)
-    }
-    colMapping.set(address.row, newVertex)
+    this.mapping[address.row][address.col] = newVertex
   }
 
   public setRange(vertex: RangeVertex) {
@@ -36,11 +32,7 @@ export class AddressMapping implements IAddressMapping {
   }
 
   public has(address: SimpleCellAddress): boolean {
-    const colMapping = this.mapping.get(address.col)
-    if (!colMapping) {
-      return false
-    }
-    return !!colMapping.get(address.row)
+    return !!this.mapping[address.row][address.col]
   }
 
   public getMaximumRow(): number {
