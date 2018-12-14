@@ -1,4 +1,4 @@
-import {AddressMapping, IAddressMapping} from '../src/AddressMapping'
+import {AddressMapping, IAddressMapping, ArrayAddressMapping} from '../src/AddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
@@ -110,4 +110,8 @@ const sharedExamples = (builder: (maxCol: number, maxRow: number) => IAddressMap
 
 describe('AddressMapping', () => {
   sharedExamples((maxCol, maxRow) => new AddressMapping(maxCol, maxRow))
+})
+
+describe('ArrayAddressMapping', () => {
+  sharedExamples((maxCol, maxRow) => new ArrayAddressMapping(maxCol, maxRow))
 })
