@@ -2,9 +2,9 @@ import {AddressMapping, IAddressMapping} from '../src/AddressMapping'
 import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
-const sharedExamples = (builder: () => IAddressMapping) => {
+const sharedExamples = (builder: (maxCol: number, maxRow: number) => IAddressMapping) => {
   it('simple set', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
     const vertex = new ValueCellVertex(42)
     const address = relativeCellAddress(0, 0)
 
@@ -14,7 +14,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('set and using different reference when get', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
     const vertex = new ValueCellVertex(42)
 
     mapping.setCell(relativeCellAddress(0, 0), vertex)
@@ -23,13 +23,13 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it("get when there's even no column", () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
 
     expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when there was already something in that column', () => {
-    const mapping = builder()
+    const mapping = builder(0, 1)
 
     mapping.setCell(relativeCellAddress(0, 1), new ValueCellVertex(42))
 
@@ -37,7 +37,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it("set when there's already something in that column", () => {
-    const mapping = builder()
+    const mapping = builder(0, 1)
     const vertex0 = new ValueCellVertex(42)
     const vertex1 = new ValueCellVertex(42)
     mapping.setCell(relativeCellAddress(0, 0), vertex0)
@@ -49,7 +49,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('set overrides old value', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
     const vertex0 = new ValueCellVertex(42)
     const vertex1 = new ValueCellVertex(42)
     mapping.setCell(relativeCellAddress(0, 0), vertex0)
@@ -60,13 +60,13 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it("has when there's even no column", () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
 
     expect(mapping.has(relativeCellAddress(0, 0))).toBe(false)
   })
 
   it('has when there was already something in that column', () => {
-    const mapping = builder()
+    const mapping = builder(0, 1)
 
     mapping.setCell(relativeCellAddress(0, 1), new ValueCellVertex(42))
 
@@ -74,7 +74,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('has when there is a value', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
 
     mapping.setCell(relativeCellAddress(0, 0), new ValueCellVertex(42))
 
@@ -82,7 +82,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('range mapping when there is none', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
     const start = simpleCellAddress(0, 0)
     const end = simpleCellAddress(20, 50)
 
@@ -90,7 +90,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('setting range mapping', () => {
-    const mapping = builder()
+    const mapping = builder(0, 0)
     const start = simpleCellAddress(0, 0)
     const end = simpleCellAddress(20, 50)
     const vertex = new RangeVertex(start, end)
@@ -101,7 +101,7 @@ const sharedExamples = (builder: () => IAddressMapping) => {
   })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping(1, 2)
+    const mapping = builder(1, 2)
 
     expect(mapping.getMaximumRow()).toEqual(2)
     expect(mapping.getMaximumCol()).toEqual(1)
@@ -109,5 +109,5 @@ const sharedExamples = (builder: () => IAddressMapping) => {
 }
 
 describe('AddressMapping', () => {
-  sharedExamples(() => new AddressMapping())
+  sharedExamples((maxCol, maxRow) => new AddressMapping(maxCol, maxRow))
 })
