@@ -1,5 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
+import {AddressMapping} from '../src/AddressMapping'
+import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -120,5 +122,23 @@ describe('Integration', () => {
     ])
     expect(engine.getCellValue('A1')).toBe(1)
     expect(engine.getCellValue('A2')).toBe(3)
+  })
+
+  it('#loadSheet - choose AddressMapping when sparse matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', ''],
+      ['', '', '1'],
+    ])
+
+    expect(engine["addressMapping"]).toBeInstanceOf(AddressMapping)
+  })
+
+  it('#loadSheet - choose ArrayAddressMapping when dense matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1'],
+      ['1', '1'],
+    ])
+
+    expect(engine["addressMapping"]).toBeInstanceOf(ArrayAddressMapping)
   })
 })
