@@ -3,3 +3,5 @@ lib
 coverage
 .idea/
 yarn-error.log
+doc/
+
