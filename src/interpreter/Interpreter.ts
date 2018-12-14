@@ -215,6 +215,39 @@ export class Interpreter {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
+  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string): CellValue {
+    const criterion = parseCriterion(criterionString)
+    if (criterion === null) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const conditionRangeArg = ast.args[0] as CellRangeAst
+    const valuesRangeArg = ast.args[2] as CellRangeAst
+
+    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
+    const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
+
+    const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row};${criterionString})`
+    const conditionRangeVertex = this.addressMapping.getRange(conditionRangeStart, conditionRangeEnd)
+
+    if (!conditionRangeVertex) {
+      throw Error('Range does not exists in graph')
+    }
+
+    const rangeValue = conditionRangeVertex.getRangeValue(criterionHash)
+    if (!rangeValue) {
+      const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+      const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+      const criterionLambda = buildCriterionLambda(criterion)
+      const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
+      const reducedSum = reduceSum(filteredValues)
+      conditionRangeVertex.setRangeValue(criterionHash, reducedSum)
+      return reducedSum
+    } else {
+      return rangeValue
+    }
+  }
+
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
       case 'SUM': {
@@ -234,55 +267,31 @@ export class Interpreter {
         }, 0)
       }
       case 'SUMIF': {
-        let conditionValues
-        let conditionWidth, conditionHeight
-        const conditionRangeArg = ast.args[0]
-        if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
-          conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
-          conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
-          conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
-        } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
-          conditionValues = [this.evaluateAst(conditionRangeArg, formulaAddress)][Symbol.iterator]()
-          conditionWidth = 1
-          conditionHeight = 1
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
-
         const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
         if (typeof criterionString !== 'string') {
           return cellError(ErrorType.VALUE)
         }
 
-        let computableValues, computableWidth, computableHeight
+        const conditionRangeArg = ast.args[0]
         const valuesRangeArg = ast.args[2]
-        if (valuesRangeArg.type === AstNodeType.CELL_RANGE) {
-          computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
-          computableWidth = getRangeWidth(valuesRangeArg, formulaAddress)
-          computableHeight = getRangeHeight(valuesRangeArg, formulaAddress)
-        } else if (valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
-          computableValues = [this.evaluateAst(valuesRangeArg, formulaAddress)][Symbol.iterator]()
-          computableWidth = 1
-          computableHeight = 1
+
+
+        if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type == AstNodeType.CELL_RANGE) {
+          const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
+          const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
+          const valuesWidth = getRangeWidth(valuesRangeArg, formulaAddress)
+          const valuesHeight = getRangeHeight(valuesRangeArg, formulaAddress)
+
+          if (conditionWidth !== valuesWidth || conditionHeight !== valuesHeight) {
+            return cellError(ErrorType.VALUE)
+          }
+
+          return this.evaluateRangeSumif(ast, formulaAddress, criterionString)
+        } else if(conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type == AstNodeType.CELL_REFERENCE) {
+          throw new Error("SUMIF for cell values")
         } else {
           return cellError(ErrorType.VALUE)
         }
-
-        if (conditionWidth !== computableWidth) {
-          return cellError(ErrorType.VALUE)
-        }
-        if (conditionHeight !== computableHeight) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const criterion = parseCriterion(criterionString)
-        if (criterion === null) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const criterionLambda = buildCriterionLambda(criterion)
-        const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
-        return reduceSum(filteredValues)
       }
       case 'COUNTIF': {
         const conditionRangeArg = ast.args[0]
