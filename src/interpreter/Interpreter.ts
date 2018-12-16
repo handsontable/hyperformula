@@ -174,6 +174,30 @@ export class Interpreter {
     }
   }
 
+  private getSumifRangeValues(functionHash: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): [CellValue | null, CellValue[]] {
+    let [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+
+    const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
+    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, beginRange, endRange)
+
+    let smallerRangeResult = null
+    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+      smallerRangeResult = smallerRangeVertex.getRangeValue(functionHash)
+    }
+
+    if (smallerRangeResult !== null) {
+      beginRange = restRangeStart
+      endRange = restRangeEnd
+    }
+
+    let rangeResult = []
+    for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+    }
+
+    return [smallerRangeResult, rangeResult]
+  }
+
   private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
@@ -493,6 +517,7 @@ export class Interpreter {
     const valuesRangeEnd = getAbsoluteAddress(valuesRangeArg.end, formulaAddress)
 
     const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row};${criterionString})`
+    const smallerRangeCriterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row-1};${criterionString})`
 
     const valuesRangeVertex = this.addressMapping.getRange(valuesRangeStart, valuesRangeEnd)
     if (!valuesRangeVertex) {
@@ -501,13 +526,18 @@ export class Interpreter {
 
     const rangeValue = valuesRangeVertex.getRangeValue(criterionHash)
     if (!rangeValue) {
+      const [smallerRange, values] = this.getSumifRangeValues(smallerRangeCriterionHash, valuesRangeArg, formulaAddress)
+
+      let conditions = Array.from(this.getPlainRangeValues(conditionRangeArg, formulaAddress))
+      conditions = conditions.slice(conditions.length - values.length)
+
       const criterionLambda = buildCriterionLambda(criterion)
 
-      const values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
-      const conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+      const filteredValues = ifFilter(criterionLambda, conditions.values(), values.values())
+      const toReduce = Array.from(filteredValues)
+      toReduce.push(smallerRange || 0)
 
-      const filteredValues = ifFilter(criterionLambda, conditions, values)
-      const reducedSum = reduceSum(filteredValues)
+      const reducedSum = reduceSum(toReduce.values())
 
       valuesRangeVertex.setRangeValue(criterionHash, reducedSum)
       return reducedSum
