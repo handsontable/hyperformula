@@ -12,7 +12,7 @@ while (prev <= rows) {
   const rowToPush = [
     prettyRandomString(30),
     prettyRandomString(30),
-    `=CONCATENATE(A${prev}; B${prev})`,
+    `=CONCATENATE(A${prev}, B${prev})`,
   ]
 
   sheet.push(rowToPush)
