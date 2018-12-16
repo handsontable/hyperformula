@@ -24,14 +24,14 @@ describe('Integration', () => {
   it('#loadSheet evaluate empty vertex', () => {
     const engine = HandsOnEngine.buildFromArray([['=A5']])
 
-    expect(engine.getCellValue('A1')).toBe(0)
-    expect(engine.getCellValue('A5')).toBe(0)
+    expect(engine.getCellValue('A1')).toBe('')
+    expect(engine.getCellValue('A5')).toBe('')
   })
 
   it('#loadSheet evaluate empty vertex', () => {
     const engine = HandsOnEngine.buildFromArray([['', '=A1']])
 
-    expect(engine.getCellValue('B1')).toBe(0)
+    expect(engine.getCellValue('B1')).toBe('')
   })
 
   it('loadSheet with a loop', () => {
