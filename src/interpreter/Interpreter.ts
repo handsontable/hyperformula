@@ -533,11 +533,11 @@ export class Interpreter {
 
       const criterionLambda = buildCriterionLambda(criterion)
 
-      const filteredValues = ifFilter(criterionLambda, conditions.values(), values.values())
+      const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), values[Symbol.iterator]())
       const toReduce = Array.from(filteredValues)
       toReduce.push(smallerRange || 0)
 
-      const reducedSum = reduceSum(toReduce.values())
+      const reducedSum = reduceSum(toReduce[Symbol.iterator]())
 
       valuesRangeVertex.setRangeValue(criterionHash, reducedSum)
       return reducedSum
