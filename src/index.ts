@@ -77,7 +77,7 @@ export class HandsOnEngine {
   /**
    * Returns value of the cell with the given address
    *
-   * @param stringAddress - cell coordinates (eq. 'A1')
+   * @param stringAddress - cell coordinates (e.g. 'A1')
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
@@ -115,7 +115,7 @@ export class HandsOnEngine {
       }
     }
 
-    return stringify(arr, { delimiter: Config.CSV_DELIMITER })
+    return stringify(arr, { delimiter: ','})
   }
 
   /**
@@ -128,7 +128,7 @@ export class HandsOnEngine {
   /**
    * Sets content of a cell with given address
    *
-   * @param stringAddress - cell coordinates (eq. 'A1')
+   * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
   public setCellContent(stringAddress: string, newCellContent: string) {

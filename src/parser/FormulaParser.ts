@@ -121,27 +121,62 @@ const allTokens = [
   CellReference,
 ]
 
-// F -> '=' E
-// B -> K < B | K >= B ... | K
-// K -> E & K | E
-// E -> M + E | M - E | M
-// M -> C * M | C / M | C
-// C -> N | R | O | A | P | num
-// R -> A:OFFSET(..) | A:A
-// O -> OFFSET(..) | OFFSET(..):A | OFFSET(..):OFFSET(..)
-// N -> '(' E ')'
-// A -> adresy
-// P -> procedury
+/**
+ * LL(k) formula parser described using Chevrotain DSL
+ *
+ * It is equivalent to the grammar below:
+ *
+ * F -> '=' E <br/>
+ * B -> K < B | K >= B ... | K <br/>
+ * K -> E & K | E <br/>
+ * E -> M + E | M - E | M <br/>
+ * M -> C * M | C / M | C <br/>
+ * C -> N | R | O | A | P | num <br/>
+ * N -> '(' E ')' <br/>
+ * R -> A:OFFSET(..) | A:A <br/>
+ * O -> OFFSET(..) | OFFSET(..):A | OFFSET(..):OFFSET(..) <br/>
+ * A -> A1 | $A1 | A$1 | $A$1 <br/>
+ * P -> SUM(..) <br/>
+ */
 class FormulaParser extends Parser {
 
+  /**
+   * Address of the cell in which formula is located
+   */
+  private formulaAddress?: SimpleCellAddress
+
+  /**
+   * Cache for positiveAtomicExpression alternatives
+   */
+  private atomicExpCache: OrArg | undefined
+
+  constructor() {
+    super(allTokens, {outputCst: false, maxLookahead: 7})
+    this.performSelfAnalysis()
+  }
+
+
+  /**
+   * Entry rule wrapper that sets formula address
+   *
+   * @param address - address of the cell in which formula is located
+   */
+  public formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
+  }
+
+  /**
+   * Entry rule
+   */
   public formula: AstRule = this.RULE('formula', () => {
     this.CONSUME(EqualsOp)
     return this.SUBRULE(this.booleanExpression)
   })
-  private formulaAddress?: SimpleCellAddress
 
-  private atomicExpCache: OrArg | undefined
-
+  /**
+   * Rule for boolean expression (e.g. 1 <= A1)
+   */
   private booleanExpression: AstRule = this.RULE('booleanExpression', () => {
     let lhs: Ast = this.SUBRULE(this.concatenateExpression)
 
@@ -169,6 +204,9 @@ class FormulaParser extends Parser {
     return lhs
   })
 
+  /**
+   * Rule for concatenation operator expression (e.g. "=" & A1)
+   */
   private concatenateExpression: AstRule = this.RULE('concatenateExpression', () => {
     let lhs: Ast = this.SUBRULE(this.additionExpression)
 
@@ -181,6 +219,9 @@ class FormulaParser extends Parser {
     return lhs
   })
 
+  /**
+   * Rule for addition category operators (e.g. 1 + A1, 1 - A1)
+   */
   private additionExpression: AstRule = this.RULE('additionExpression', () => {
     let lhs: Ast = this.SUBRULE(this.multiplicationExpression)
 
@@ -200,6 +241,9 @@ class FormulaParser extends Parser {
     return lhs
   })
 
+  /**
+   * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
+   */
   private multiplicationExpression: AstRule = this.RULE('multiplicationExpression', () => {
     let lhs: Ast = this.SUBRULE(this.atomicExpression)
 
@@ -219,6 +263,9 @@ class FormulaParser extends Parser {
     return lhs
   })
 
+  /**
+   * Rule for atomic expressions, which is positive atomic expression or negation of it
+   */
   private atomicExpression: AstRule = this.RULE('atomicExpression', () => {
     return this.OR([
       {
@@ -234,6 +281,9 @@ class FormulaParser extends Parser {
     ])
   })
 
+  /**
+   * Rule for positive atomic expressions
+   */
   private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
     return this.OR(this.atomicExpCache || (this.atomicExpCache = [
       {
@@ -266,6 +316,9 @@ class FormulaParser extends Parser {
     ]))
   })
 
+  /**
+   * Rule for procedure expressions: SUM(1,A1)
+   */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
     const procedureName = this.CONSUME(ProcedureName).image.toUpperCase()
     const args: Ast[] = []
@@ -280,20 +333,14 @@ class FormulaParser extends Parser {
     return buildProcedureAst(procedureName, args)
   })
 
-  private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
-    const args: Ast[] = []
-    this.CONSUME(OffsetProcedureName)
-    this.CONSUME(LParen)
-    this.MANY_SEP({
-      SEP: ArgSeparator,
-      DEF: () => {
-        args.push(this.SUBRULE(this.booleanExpression))
-      },
-    })
-    this.CONSUME(RParen)
-    return this.handleOffsetHeuristic(args)
-  })
-
+  /**
+   * Rule for expressions that start with OFFSET() function
+   *
+   * OFFSET() function can occur as cell reference or part of cell range.
+   * In order to preserve LL(k) properties, expressions that starts with OFFSET() functions needs to have separate rule.
+   *
+   * Proper {@link Ast} node type is built depending on the presence of {@link RangeSeparator}
+   */
   private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
     const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
 
@@ -319,6 +366,26 @@ class FormulaParser extends Parser {
     return offsetProcedure
   })
 
+  /**
+   * Rule for OFFSET() function expression
+   */
+  private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
+    const args: Ast[] = []
+    this.CONSUME(OffsetProcedureName)
+    this.CONSUME(LParen)
+    this.MANY_SEP({
+      SEP: ArgSeparator,
+      DEF: () => {
+        args.push(this.SUBRULE(this.booleanExpression))
+      },
+    })
+    this.CONSUME(RParen)
+    return this.handleOffsetHeuristic(args)
+  })
+
+  /**
+   * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
+   */
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.SUBRULE(this.cellReference) as CellReferenceAst
     this.CONSUME2(RangeSeparator)
@@ -336,6 +403,11 @@ class FormulaParser extends Parser {
     return buildCellRangeAst(start.reference, end.reference)
   })
 
+  /**
+   * Rule for end of range expression
+   *
+   * End of range may be a cell reference or OFFSET() function call
+   */
   private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', () => {
     return this.OR([
       {
@@ -359,11 +431,17 @@ class FormulaParser extends Parser {
     ])
   })
 
+  /**
+   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1)
+   */
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference)
     return buildCellReferenceAst(cellAddressFromString(cell.image, this.formulaAddress!))
   })
 
+  /**
+   * Rule for parenthesis expression
+   */
   private parenthesisExpression: AstRule = this.RULE('parenthesisExpression', () => {
     this.CONSUME(LParen)
     const expression = this.SUBRULE(this.booleanExpression)
@@ -371,16 +449,11 @@ class FormulaParser extends Parser {
     return expression
   })
 
-  constructor() {
-    super(allTokens, {outputCst: false, maxLookahead: 7})
-    this.performSelfAnalysis()
-  }
-
-  public formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
-  }
-
+  /**
+   * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
+   *
+   * @param args - OFFSET function arguments
+   */
   private handleOffsetHeuristic(args: Ast[]): Ast {
     const cellArg = args[0]
     if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
@@ -497,16 +570,28 @@ class FormulaParser extends Parser {
   }
 }
 
+
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = Array<IAnyOrAlt<any>> | OrMethodOpts<any>
 
 const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()
 
+/**
+ * Returns Lexer tokens from formula string
+ *
+ * @param text - string representation of a formula
+ */
 export function tokenizeFormula(text: string): ILexingResult {
   return FormulaLexer.tokenize(text)
 }
 
+/**
+ * Parses tokenized formula and builds abstract syntax tree
+ *
+ * @param lexResult - tokenized formula
+ * @param formulaAddress - address of the cell in which formula is located
+ */
 export function parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
   parser.input = lexResult.tokens
 
