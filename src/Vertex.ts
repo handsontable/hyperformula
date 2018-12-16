@@ -72,7 +72,7 @@ export class EmptyCellVertex extends CellVertex {
   }
 
   public getCellValue() {
-    return ""
+    return 0
   }
 }
 
