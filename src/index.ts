@@ -4,7 +4,8 @@ import {AddressMapping} from './AddressMapping'
 import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {
   absoluteCellAddress,
-  cellAddressFromString, CellError,
+  cellAddressFromString,
+  CellError,
   cellError,
   CellValue,
   ErrorType,
@@ -24,18 +25,6 @@ import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
  * Engine for one sheet
  */
 export class HandsOnEngine {
-  /**
-   * Builds engine for sheet from CSV string representation
-   * @param csv - csv representation of sheet
-   */
-  public static buildFromCsv(csv: string): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
-  }
-
-  public static buildFromArray(sheet: Sheet): HandsOnEngine {
-    return new HandsOnEngine(sheet)
-  }
-
   private addressMapping: IAddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
@@ -67,7 +56,40 @@ export class HandsOnEngine {
     this.stats.end(StatType.OVERALL)
   }
 
-  public exportAsCSV() {
+  /**
+   * Builds engine for sheet from CSV string representation
+   *
+   * @param csv - csv representation of sheet
+   */
+  public static buildFromCsv(csv: string): HandsOnEngine {
+    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
+  }
+
+  /**
+   * Builds engine for sheet from two-dimmensional array representation
+   *
+   * @param sheet - two-dimmensional array representation of sheet
+   */
+  public static buildFromArray(sheet: Sheet): HandsOnEngine {
+    return new HandsOnEngine(sheet)
+  }
+
+  /**
+   * Returns value of the cell with the given address
+   *
+   * @param stringAddress - cell coordinates (eq. 'A1')
+   */
+  public getCellValue(stringAddress: string): CellValue {
+    const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
+    const vertex = this.addressMapping.getCell(address)!
+    return vertex.getCellValue()
+  }
+
+
+  /**
+   * Creates CSV string out of sheet content
+   */
+  public exportAsCSV(): string {
     const sheetHeight = this.addressMapping.getHeight()
     const sheetWidth = this.addressMapping.getWidth()
 
@@ -93,19 +115,22 @@ export class HandsOnEngine {
       }
     }
 
-    return stringify(arr)
+    return stringify(arr, { delimiter: Config.CSV_DELIMITER })
   }
 
-  public getCellValue(stringAddress: string): CellValue {
-    const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping.getCell(address)!
-    return vertex.getCellValue()
-  }
-
+  /**
+   * Returns snapshot of a computation time statistics
+   */
   public getStats() {
     return this.stats.snapshot()
   }
 
+  /**
+   * Sets content of a cell with given address
+   *
+   * @param stringAddress - cell coordinates (eq. 'A1')
+   * @param newCellContent - new cell content
+   */
   public setCellContent(stringAddress: string, newCellContent: string) {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
     const vertex = this.addressMapping.getCell(address)!
@@ -122,7 +147,10 @@ export class HandsOnEngine {
     this.recomputeFormulas()
   }
 
-  public recomputeFormulas() {
+  /**
+   * Recalculates  formulas in the topological sort order
+   */
+  private recomputeFormulas() {
     this.verticesOnCycle.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
         vertex.setCellValue(cellError(ErrorType.CYCLE))
@@ -143,6 +171,11 @@ export class HandsOnEngine {
   }
 }
 
+/**
+ * Returns actual width, height and fill ratio of a sheet
+ *
+ * @param sheet - two-dimmensional array sheet representation
+ */
 export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
   let maxWidth = 0
   let cellsCount = 0
@@ -167,6 +200,11 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
   }
 }
 
+/**
+ * Creates right address mapping implementation based on fill ration of a sheet
+ *
+ * @param sheet - two-dimmensional array sheet representation
+ */
 export function buildAddressMapping(sheet: Sheet): IAddressMapping {
   const {height, width, fill} = findBoundaries(sheet)
   if (fill > Config.ADDRESS_MAPPING_FILL_THRESHOLD) {
