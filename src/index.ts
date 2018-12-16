@@ -20,8 +20,6 @@ import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
-const fillThreshold = 0.8
-
 /**
  * Engine for one sheet
  */
@@ -171,7 +169,7 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
 
 export function buildAddressMapping(sheet: Sheet): IAddressMapping {
   const {height, width, fill} = findBoundaries(sheet)
-  if (fill > fillThreshold) {
+  if (fill > Config.ADDRESS_MAPPING_FILL_THRESHOLD) {
     return new ArrayAddressMapping(width, height)
   } else {
     return new AddressMapping(width, height)
