@@ -132,4 +132,20 @@ describe('Function SUMIF', () => {
 
     expect(engine.getCellValue('A2')).toEqual(3)
   })
+
+  it('works for subranges with different conditions', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1', '=SUMIF(A1:A1;"="&A1;B1:B1)'],
+      ['2', '1', '=SUMIF(A1:A2;"="&A2;B1:B2)'],
+      ['1', '1', '=SUMIF(A1:A3;"="&A3;B1:B3)'],
+      ['3', '1', '=SUMIF(A1:A4;"="&A4;B1:B4)'],
+      ['1', '1', '=SUMIF(A1:A5;"="&A5;B1:B5)'],
+    ])
+
+    expect(engine.getCellValue('C1')).toEqual(1)
+    expect(engine.getCellValue('C2')).toEqual(1)
+    expect(engine.getCellValue('C3')).toEqual(2)
+    expect(engine.getCellValue('C4')).toEqual(1)
+    expect(engine.getCellValue('C5')).toEqual(3)
+  })
 })

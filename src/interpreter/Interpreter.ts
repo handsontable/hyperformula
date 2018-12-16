@@ -1,11 +1,11 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {CellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {split} from '../generatorUtils'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
-import {Vertex} from '../Vertex'
+import {RangeVertex, Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 
 export class Interpreter {
@@ -174,6 +174,7 @@ export class Interpreter {
     }
   }
 
+
   private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
@@ -181,14 +182,12 @@ export class Interpreter {
     const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getRangeValue(functionName)!)
-      for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
-        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-      }
-    } else {
-      for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-        rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-      }
     }
+
+    for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
+      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+    }
+
     return rangeResult
   }
 
@@ -215,44 +214,6 @@ export class Interpreter {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
-  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeArg = ast.args[0] as CellRangeAst
-    const valuesRangeArg = ast.args[2] as CellRangeAst
-
-    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
-    const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
-
-    const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row};${criterionString})`
-    const conditionRangeVertex = this.addressMapping.getRange(conditionRangeStart, conditionRangeEnd)
-
-    if (!conditionRangeVertex) {
-      throw Error('Range does not exists in graph')
-    }
-
-    const rangeValue = conditionRangeVertex.getRangeValue(criterionHash)
-    if (!rangeValue) {
-      const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
-      const computableValues = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
-      const criterionLambda = buildCriterionLambda(criterion)
-      const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
-      const reducedSum = reduceSum(filteredValues)
-      conditionRangeVertex.setRangeValue(criterionHash, reducedSum)
-      return reducedSum
-    } else {
-      return rangeValue
-    }
-  }
-
-  private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
-    const conditionReferenceArg = ast.args[0] as CellReferenceAst
-    const valuesReferenceArg = ast.args[2] as CellReferenceAst
-
-    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]()
-    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]()
-    const criterionLambda = buildCriterionLambda(criterion)
-    const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
-    return reduceSum(filteredValues)
-  }
 
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
@@ -286,7 +247,7 @@ export class Interpreter {
         const conditionRangeArg = ast.args[0]
         const valuesRangeArg = ast.args[2]
 
-        if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type == AstNodeType.CELL_RANGE) {
+        if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
           const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
           const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
           const valuesWidth = getRangeWidth(valuesRangeArg, formulaAddress)
@@ -297,7 +258,7 @@ export class Interpreter {
           }
 
           return this.evaluateRangeSumif(ast, formulaAddress, criterionString, criterion)
-        } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type == AstNodeType.CELL_REFERENCE) {
+        } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
           return this.evaluateCellSumif(ast, formulaAddress, criterion)
         } else {
           return cellError(ErrorType.VALUE)
@@ -523,6 +484,50 @@ export class Interpreter {
     }
   }
 
+  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
+    const conditionRangeArg = ast.args[0] as CellRangeAst
+    const valuesRangeArg = ast.args[2] as CellRangeAst
+
+    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
+    const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
+
+    const valuesRangeStart = getAbsoluteAddress(valuesRangeArg.start, formulaAddress)
+    const valuesRangeEnd = getAbsoluteAddress(valuesRangeArg.end, formulaAddress)
+
+    const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row};${criterionString})`
+
+    const valuesRangeVertex = this.addressMapping.getRange(valuesRangeStart, valuesRangeEnd)
+    if (!valuesRangeVertex) {
+      throw Error('Range does not exists in graph')
+    }
+
+    const rangeValue = valuesRangeVertex.getRangeValue(criterionHash)
+    if (!rangeValue) {
+      const criterionLambda = buildCriterionLambda(criterion)
+
+      const values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+      const conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+
+      const filteredValues = ifFilter(criterionLambda, conditions, values)
+      let reducedSum = reduceSum(filteredValues)
+
+      valuesRangeVertex.setRangeValue(criterionHash, reducedSum)
+      return reducedSum
+    } else {
+      return rangeValue
+    }
+  }
+
+  private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
+    const conditionReferenceArg = ast.args[0] as CellReferenceAst
+    const valuesReferenceArg = ast.args[2] as CellReferenceAst
+
+    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]()
+    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]()
+    const criterionLambda = buildCriterionLambda(criterion)
+    const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
+    return reduceSum(filteredValues)
+  }
 }
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
@@ -544,14 +549,14 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
   })
 }
 
-function * getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+export function* getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
   const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
   for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
     yield addressMapping.getCell(cellFromRange)!.getCellValue()
   }
 }
 
-function * ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
+export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
   const conditionalSplit = split(conditionalIterable)
   const computableSplit = split(computableIterable)
   if (conditionalSplit.hasOwnProperty('value') && computableSplit.hasOwnProperty('value')) {
@@ -561,17 +566,22 @@ function * ifFilter(criterionLambda: CriterionLambda, conditionalIterable: Itera
       yield computableFirst
     }
 
-    yield * ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
+    yield* ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
   }
 }
 
-function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
+export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
   let acc = 0
   for (const val of iterable) {
+    if (isCellError(acc)) {
+      return acc
+    }
+    if (isCellError(val)) {
+      return val
+    }
+
     if (typeof acc === 'number' && typeof val === 'number') {
-      acc += val
-    } else {
-      return cellError(ErrorType.VALUE)
+      acc = acc + val
     }
   }
   return acc
