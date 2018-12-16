@@ -4,8 +4,8 @@ import {cellError, ErrorType} from '../src/Cell'
 describe('Loading CSV', () => {
   it('with only strings', () => {
     const str = [
-      `"Some header";"Another header"`,
-      `"Some simple string value";"Bar"`,
+      `"Some header","Another header"`,
+      `"Some simple string value","Bar"`,
     ].join('\n')
 
     const engine = HandsOnEngine.buildFromCsv(str)
@@ -18,8 +18,8 @@ describe('Loading CSV', () => {
 
   it('with some number', () => {
     const str = [
-      `"Some header";"Another header"`,
-      `"Some simple string value";42`,
+      `"Some header","Another header"`,
+      `"Some simple string value",42`,
     ].join('\n')
 
     const engine = HandsOnEngine.buildFromCsv(str)
@@ -29,8 +29,8 @@ describe('Loading CSV', () => {
 
   it('with some formula', () => {
     const str = [
-      `"Some header";"Another header"`,
-      `"Some simple string value";"=B1"`,
+      `"Some header","Another header"`,
+      `"Some simple string value","=B1"`,
     ].join('\n')
 
     const engine = HandsOnEngine.buildFromCsv(str)
