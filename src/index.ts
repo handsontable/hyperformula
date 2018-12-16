@@ -19,7 +19,7 @@ import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
-import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, EmptyCellVertex} from './Vertex'
 
 /**
  * Engine for one sheet
@@ -100,7 +100,7 @@ export class HandsOnEngine {
       for (let j = 0; j < sheetWidth; j++) {
         const cell = this.addressMapping.getCell(simpleCellAddress(j, i))
 
-        if (cell == null) {
+        if (cell == null || cell === EmptyCellVertex.getSingletonInstance()) {
           arr[i][j] = ''
           continue
         }
