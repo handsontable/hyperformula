@@ -89,7 +89,7 @@ export class HandsOnEngine {
   /**
    * Creates CSV string out of sheet content
    */
-  public exportAsCSV(): string {
+  public exportAsCsv(): string {
     const sheetHeight = this.addressMapping.getHeight()
     const sheetWidth = this.addressMapping.getWidth()
 

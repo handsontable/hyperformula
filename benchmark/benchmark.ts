@@ -63,7 +63,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   console.warn(`Median BuildGraph: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
 
   if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCSV()
+    const csvString = engine.exportAsCsv()
     fs.writeFileSync('/tmp/dump.csv', csvString)
   }
 
