@@ -156,7 +156,7 @@ describe('Interpreter', () => {
   })
 
   it('procedures - SUM with args', () => {
-    const engine = HandsOnEngine.buildFromArray([['=SUM(1; B1)', '3.14']])
+    const engine = HandsOnEngine.buildFromArray([['=SUM(1, B1)', '3.14']])
 
     expect(engine.getCellValue('A1')).toBeCloseTo(4.14)
   })
@@ -179,12 +179,12 @@ describe('Interpreter', () => {
   })
 
   it('ranges - SUM with bool', () => {
-    const engine = HandsOnEngine.buildFromArray([['=SUM(1;TRUE())']])
+    const engine = HandsOnEngine.buildFromArray([['=SUM(1,TRUE())']])
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('ranges - SUM with string', () => {
-    const engine = HandsOnEngine.buildFromArray([['=SUM(1;"foo")']])
+    const engine = HandsOnEngine.buildFromArray([['=SUM(1,"foo")']])
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
@@ -290,50 +290,50 @@ describe('Interpreter', () => {
   })
 
   it('function ACOS wrong number of arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=ACOS()', '=ACOS(1;-1)']])
+    const engine = HandsOnEngine.buildFromArray([['=ACOS()', '=ACOS(1,-1)']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
   })
 
   it('function IF when value is true', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(TRUE(); "yes"; "no")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(TRUE(), "yes", "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF when value is false', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(FALSE(); "yes"; "no")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(FALSE(), "yes", "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('no')
   })
 
   it('function IF when condition is weird type', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF("foo"; "yes"; "no")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF("foo", "yes", "no")']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
   })
 
   it('function IF when condition is number', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(1; "yes"; "no")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(1, "yes", "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF when condition is logic function', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(OR(1; FALSE()); "yes"; "no")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(OR(1, FALSE()), "yes", "no")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF works when only first part is given', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(TRUE(); "yes")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(TRUE(), "yes")']])
 
     expect(engine.getCellValue('A1')).toEqual('yes')
   })
 
   it('function IF works when only first part is given and condition is falsey', () => {
-    const engine = HandsOnEngine.buildFromArray([['=IF(FALSE(); "yes")']])
+    const engine = HandsOnEngine.buildFromArray([['=IF(FALSE(), "yes")']])
 
     expect(engine.getCellValue('A1')).toEqual(false)
   })
@@ -345,13 +345,13 @@ describe('Interpreter', () => {
   })
 
   it('function CONCATENATE works', () => {
-    const engine = HandsOnEngine.buildFromArray([['John', 'Smith', '=CONCATENATE(A1; B1)']])
+    const engine = HandsOnEngine.buildFromArray([['John', 'Smith', '=CONCATENATE(A1, B1)']])
 
     expect(engine.getCellValue('C1')).toEqual('JohnSmith')
   })
 
   it('function CONCATENATE returns error if one of the arguments is error', () => {
-    const engine = HandsOnEngine.buildFromArray([['John', '=1/0', '=CONCATENATE(A1; B1)']])
+    const engine = HandsOnEngine.buildFromArray([['John', '=1/0', '=CONCATENATE(A1, B1)']])
 
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
@@ -361,7 +361,7 @@ describe('Interpreter', () => {
       ['0'],
       ['1'],
       ['2'],
-      ['=COUNTIF(A1:A3; ">=1")'],
+      ['=COUNTIF(A1:A3, ">=1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(2)
@@ -369,7 +369,7 @@ describe('Interpreter', () => {
 
   it('function COUNTIF error when 1st arg is not a range', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=COUNTIF(42; ">0")'],
+      ['=COUNTIF(42, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
@@ -377,7 +377,7 @@ describe('Interpreter', () => {
 
   it('function COUNTIF error when 2nd arg is not a string', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=COUNTIF(C1:C2; 78)'],
+      ['=COUNTIF(C1:C2, 78)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
@@ -385,7 +385,7 @@ describe('Interpreter', () => {
 
   it('function COUNTIF error when criterion unparsable', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=COUNTIF(B1:B2; "%")'],
+      ['=COUNTIF(B1:B2, "%")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
@@ -415,7 +415,7 @@ describe('Interpreter', () => {
 
   it('function ISERROR takes exactly one argument', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['=ISERROR(1; 2)', '=ISERROR()'],
+        ['=ISERROR(1, 2)', '=ISERROR()'],
     ])
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
@@ -423,7 +423,7 @@ describe('Interpreter', () => {
 
   it('function AND usage', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['=AND(TRUE(); TRUE())', '=AND(TRUE(); FALSE())', '=AND(TRUE(); "asdf")'],
+        ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())', '=AND(TRUE(), "asdf")'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
@@ -433,7 +433,7 @@ describe('Interpreter', () => {
 
   it ('function AND with numerical arguments', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['=AND(1)', '=AND(0)', '=AND(1; TRUE())'],
+        ['=AND(1)', '=AND(0)', '=AND(1, TRUE())'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
@@ -451,7 +451,7 @@ describe('Interpreter', () => {
 
   it('function OR usage', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(); TRUE(); FALSE())', '=OR("asdf")'],
+      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
@@ -462,7 +462,7 @@ describe('Interpreter', () => {
 
   it ('function OR with numerical arguments', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=OR(1)', '=OR(0)', '=OR(FALSE(); 42)'],
+      ['=OR(1)', '=OR(0)', '=OR(FALSE(), 42)'],
     ])
 
     expect(engine.getCellValue('A1')).toBe(true)
@@ -491,14 +491,14 @@ describe('Interpreter', () => {
   })
 
   it('function COLUMNS accepts exactly one argument', () => {
-    const engine = HandsOnEngine.buildFromArray([['=COLUMNS()', '=COLUMNS(A1:B1; A2:B2)']])
+    const engine = HandsOnEngine.buildFromArray([['=COLUMNS()', '=COLUMNS(A1:B1, A2:B2)']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
   })
 
   it('function DATE with 3 numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=DATE(1900; 1; 1)', '=DATE(1900; 1; 2)', '=DATE(1915; 10; 24)']])
+    const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
 
     expect(engine.getCellValue('A1')).toEqual(2)
     expect(dateNumberToString(engine.getCellValue('A1') as number)).toEqual('1900-01-01')
@@ -524,7 +524,7 @@ describe('Interpreter', () => {
   })
 
   it('function MONTH with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH("foo")', '=MONTH("2018-30-12")', '=MONTH(1; 2)', '=MONTH()']])
+    const engine = HandsOnEngine.buildFromArray([['=MONTH("foo")', '=MONTH("2018-30-12")', '=MONTH(1, 2)', '=MONTH()']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
@@ -549,7 +549,7 @@ describe('Interpreter', () => {
   })
 
   it('function YEAR with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR("foo")', '=YEAR("2018-30-12")', '=YEAR(1; 2)', '=YEAR()']])
+    const engine = HandsOnEngine.buildFromArray([['=YEAR("foo")', '=YEAR("2018-30-12")', '=YEAR(1, 2)', '=YEAR()']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
@@ -558,14 +558,14 @@ describe('Interpreter', () => {
   })
 
   it('function OFFSET basic use', () => {
-    const engine = HandsOnEngine.buildFromArray([['5', '=OFFSET(B1; 0; -1)', '=OFFSET(A1; 0; 0)']])
+    const engine = HandsOnEngine.buildFromArray([['5', '=OFFSET(B1, 0, -1)', '=OFFSET(A1, 0, 0)']])
 
     expect(engine.getCellValue('B1')).toEqual(5)
     expect(engine.getCellValue('C1')).toEqual(5)
   })
 
   it ('function OFFSET out of range', () => {
-    const engine = HandsOnEngine.buildFromArray([['=OFFSET(A1; -1; 0)', '=OFFSET(A1; 0; -1)']])
+    const engine = HandsOnEngine.buildFromArray([['=OFFSET(A1, -1, 0)', '=OFFSET(A1, 0, -1)']])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.REF))
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.REF))
@@ -573,7 +573,7 @@ describe('Interpreter', () => {
 
   it ('function OFFSET returns bigger range', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['=SUM(OFFSET(A1; 0; 1;2;1))', '5', '6'],
+          ['=SUM(OFFSET(A1, 0, 1,2,1))', '5', '6'],
           ['2', '3', '4'],
       ])
 
@@ -582,7 +582,7 @@ describe('Interpreter', () => {
 
   it ('function OFFSET returns rectangular range and fails', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['=OFFSET(A1; 0; 1;2;1))'],
+          ['=OFFSET(A1, 0, 1,2,1))'],
       ])
 
       expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
@@ -590,7 +590,7 @@ describe('Interpreter', () => {
 
   it ('function OFFSET used twice in a range', () => {
       const engine = HandsOnEngine.buildFromArray([
-          ['5', '6', '=SUM(OFFSET(A2;-1;0):OFFSET(A2;0;1))'],
+          ['5', '6', '=SUM(OFFSET(A2,-1,0):OFFSET(A2,0,1))'],
           ['2', '3', '4'],
       ])
 

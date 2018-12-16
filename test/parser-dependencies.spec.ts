@@ -55,7 +55,7 @@ describe('Parsing collecting dependencies', () => {
   it('goes inside function call arguments', () => {
     const parser = new ParserWithCaching('parser')
 
-    const dependencies = parser.parse('=SUM(B2; C3)', absoluteCellAddress(0, 0)).dependencies
+    const dependencies = parser.parse('=SUM(B2, C3)', absoluteCellAddress(0, 0)).dependencies
 
     expect(dependencies).toEqual([
       simpleCellAddress(1, 1),
@@ -66,7 +66,7 @@ describe('Parsing collecting dependencies', () => {
   it('OFFSET call is correctly found as dependency', () => {
     const parser = new ParserWithCaching('parser')
 
-    const dependencies = parser.parse('=OFFSET(D4; 0; 0)', absoluteCellAddress(1, 1)).dependencies
+    const dependencies = parser.parse('=OFFSET(D4, 0, 0)', absoluteCellAddress(1, 1)).dependencies
     expect(dependencies).toEqual([
       simpleCellAddress(3, 3),
     ])

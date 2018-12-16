@@ -130,7 +130,7 @@ const sharedExamples = (optimizationMode: string) => {
 
   it('SUM function with args', () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse('=SUM(1; A1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    const ast = parser.parse('=SUM(1, A1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
     expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
@@ -139,7 +139,7 @@ const sharedExamples = (optimizationMode: string) => {
 
   it('SUM function with expression arg', () => {
     const parser = new ParserWithCaching(optimizationMode)
-    const ast = parser.parse('=SUM(1 / 2 + SUM(1;2))', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args.length).toBe(1)
     expect(ast.args[0].type).toBe(AstNodeType.PLUS_OP)

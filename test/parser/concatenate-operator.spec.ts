@@ -15,7 +15,7 @@ describe('Parser - Concatenate operators', () => {
   it('Greater than operator as function parameter', () => {
     const parser = new ParserWithCaching('parser')
 
-    const ast = parser.parse('=CONCATENATE("="&A6;"foo")', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    const ast = parser.parse('=CONCATENATE("="&A6,"foo")', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args[0].type).toBe(AstNodeType.CONCATENATE_OP)
   })
