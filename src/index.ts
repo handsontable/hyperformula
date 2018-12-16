@@ -18,6 +18,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {Config} from "./Config";
 
 const fillThreshold = 0.8
 
@@ -30,7 +31,7 @@ export class HandsOnEngine {
    * @param csv - csv representation of sheet
    */
   public static buildFromCsv(csv: string): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv))
+    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
   }
 
   public static buildFromArray(sheet: Sheet): HandsOnEngine {

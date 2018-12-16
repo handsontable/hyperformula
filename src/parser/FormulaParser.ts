@@ -25,6 +25,7 @@ import {
   CellReferenceAst,
   ParsingErrorType,
 } from './Ast'
+import {Config} from "../Config";
 
 /* arithmetic */
 // abstract for + -
@@ -76,7 +77,7 @@ const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z]+/})
 const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
 
 /* separator */
-const ArgSeparator = createToken({name: 'ArgSeparator', pattern: /;/})
+const ArgSeparator = createToken({name: 'ArgSeparator', pattern: Config.FUNCTION_ARG_SEPARATOR})
 
 /* string literal */
 const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})

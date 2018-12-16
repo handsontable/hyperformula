@@ -1,9 +1,9 @@
 import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
-import {type} from 'os'
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {StatType} from '../src/statistics/Statistics'
+import {Config as EngineConfig} from "../src/Config";
 
 export interface Config {
   millisecondsPerThousandRows: number,
@@ -20,7 +20,7 @@ const defaultConfig = {
 export interface ExpectedValue { address: string, value: CellValue}
 
 export function benchmarkCSV(csvString: string, config: Config) {
-  benchmark(parse(csvString, {  delimiter: ';' }), [], config)
+  benchmark(parse(csvString, {  delimiter: EngineConfig.CSV_DELIMITER }), [], config)
 }
 
 export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
