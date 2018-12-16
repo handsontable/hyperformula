@@ -2,8 +2,8 @@ import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
+import {Config as EngineConfig} from '../src/Config'
 import {StatType} from '../src/statistics/Statistics'
-import {Config as EngineConfig} from "../src/Config";
 
 export interface Config {
   millisecondsPerThousandRows: number,

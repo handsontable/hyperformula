@@ -11,6 +11,7 @@ import {
   isCellError,
   simpleCellAddress,
 } from './Cell'
+import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilder, Sheet} from './GraphBuilder'
 import {IAddressMapping} from './IAddressMapping'
@@ -18,7 +19,6 @@ import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import {Config} from "./Config";
 
 const fillThreshold = 0.8
 

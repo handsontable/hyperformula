@@ -174,7 +174,6 @@ export class Interpreter {
     }
   }
 
-
   private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
@@ -213,7 +212,6 @@ export class Interpreter {
   private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress) {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
-
 
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
@@ -509,7 +507,7 @@ export class Interpreter {
       const conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
 
       const filteredValues = ifFilter(criterionLambda, conditions, values)
-      let reducedSum = reduceSum(filteredValues)
+      const reducedSum = reduceSum(filteredValues)
 
       valuesRangeVertex.setRangeValue(criterionHash, reducedSum)
       return reducedSum

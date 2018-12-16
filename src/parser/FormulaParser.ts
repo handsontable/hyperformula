@@ -1,6 +1,7 @@
 import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
 import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
+import {Config} from '../Config'
 import {
   Ast,
   AstNodeType,
@@ -25,7 +26,6 @@ import {
   CellReferenceAst,
   ParsingErrorType,
 } from './Ast'
-import {Config} from "../Config";
 
 /* arithmetic */
 // abstract for + -
