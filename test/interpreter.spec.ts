@@ -197,6 +197,15 @@ describe('Interpreter', () => {
       expect(engine.getCellValue('B2')).toEqual(1)
   })
 
+  it.skip('ranges - SUM and + of 1 with "foo"', () => {
+      const engine = HandsOnEngine.buildFromArray([
+          ['1', 'foo'],
+          ['=A1+B1', '=SUM(A1:B1)'],
+    ])
+      expect(engine.getCellValue('A2')).toEqual(1)
+      expect(engine.getCellValue('B2')).toEqual(1)
+  })
+
   it('ranges - SUM range with string values', () => {
     const engine = HandsOnEngine.buildFromArray([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
     expect(engine.getCellValue('A4')).toEqual(3)
@@ -596,4 +605,14 @@ describe('Interpreter', () => {
 
       expect(engine.getCellValue('C1')).toEqual(16)
   })
+
+  it ('function OFFSET as a reference inside SUM', () => {
+      const engine = HandsOnEngine.buildFromArray([
+          ['0', '0', '10'],
+          ['5', '6', '=SUM(SUM(OFFSET(C2,-1,0),A2),-B2)'],
+      ])
+
+      expect(engine.getCellValue('C2')).toEqual(9)
+  })
+  
 })
