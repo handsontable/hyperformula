@@ -23,6 +23,12 @@ if (!fs.existsSync(actualCsvPath)) {
   process.exit(1)
 }
 
+let columnsToIgnore: number[] = []
+if (process.argv[4]) {
+  columnsToIgnore = process.argv[4].split(",").map((e: string) => Number(e))
+}
+console.warn(`Will ignore columns: ${columnsToIgnore}`)
+
 const expectedCsvString = fs.readFileSync(expectedCsvPath, { encoding: 'utf8' })
 const actualCsvString = fs.readFileSync(actualCsvPath, { encoding: 'utf8' })
 
@@ -45,6 +51,9 @@ for(let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
   for(let currentColumnIdx = 0; currentColumnIdx < width; currentColumnIdx++) {
     const expectedValue = expectedArray[currentRowIdx][currentColumnIdx]
     const actualValue = actualArray[currentRowIdx][currentColumnIdx]
+    if (columnsToIgnore.indexOf(currentColumnIdx) >= 0) {
+      continue
+    }
     if (expectedValue !== actualValue) {
       differences.push([currentRowIdx, currentColumnIdx, expectedValue, actualValue])
     }
