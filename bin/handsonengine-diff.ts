@@ -5,7 +5,7 @@ import {findBoundaries} from '../src'
 
 // Config
 const CSV_DELIMITER = ","
-const FLOAT_ROUND = 10
+const FLOAT_ROUND = 2
 
 if (process.argv.length < 4) {
   console.warn('Usage:\nyarn ts-node bin/handsonengine-diff expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
@@ -49,10 +49,18 @@ const {width, height} = expectedArrayBoundaries
 const differences: Array<[number, number, string, string]> = []
 for(let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
   for(let currentColumnIdx = 0; currentColumnIdx < width; currentColumnIdx++) {
-    const expectedValue = expectedArray[currentRowIdx][currentColumnIdx]
-    const actualValue = actualArray[currentRowIdx][currentColumnIdx]
+    const expectedRawValue = expectedArray[currentRowIdx][currentColumnIdx]
+    const actualRawValue = actualArray[currentRowIdx][currentColumnIdx]
     if (columnsToIgnore.indexOf(currentColumnIdx) >= 0) {
       continue
+    }
+    let expectedValue = expectedRawValue
+    let actualValue = actualRawValue
+    if (!isNaN(Number(expectedValue)) && expectedValue !== '') {
+      expectedValue = Number(expectedValue).toFixed(FLOAT_ROUND)
+    }
+    if (!isNaN(Number(actualValue)) && actualValue !== '') {
+      actualValue = Number(actualValue).toFixed(FLOAT_ROUND)
     }
     if (expectedValue !== actualValue) {
       differences.push([currentRowIdx, currentColumnIdx, expectedValue, actualValue])
@@ -64,3 +72,7 @@ differences.forEach((e: [number, number, string, string]) => {
   const [currentRowIdx, currentColumnIdx, expectedValue, actualValue] = e;
   console.warn(`In cell R${currentRowIdx}C${currentColumnIdx} expected '${expectedValue}' but got '${actualValue}'`)
 })
+
+if (differences.length > 0) {
+  process.exit(1)
+}
