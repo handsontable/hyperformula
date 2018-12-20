@@ -141,6 +141,14 @@ const allTokens = [
 class FormulaParser extends Parser {
 
   /**
+   * Entry rule
+   */
+  public formula: AstRule = this.RULE('formula', () => {
+    this.CONSUME(EqualsOp)
+    return this.SUBRULE(this.booleanExpression)
+  })
+
+  /**
    * Address of the cell in which formula is located
    */
   private formulaAddress?: SimpleCellAddress
@@ -149,30 +157,6 @@ class FormulaParser extends Parser {
    * Cache for positiveAtomicExpression alternatives
    */
   private atomicExpCache: OrArg | undefined
-
-  constructor() {
-    super(allTokens, {outputCst: false, maxLookahead: 7})
-    this.performSelfAnalysis()
-  }
-
-
-  /**
-   * Entry rule wrapper that sets formula address
-   *
-   * @param address - address of the cell in which formula is located
-   */
-  public formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
-  }
-
-  /**
-   * Entry rule
-   */
-  public formula: AstRule = this.RULE('formula', () => {
-    this.CONSUME(EqualsOp)
-    return this.SUBRULE(this.booleanExpression)
-  })
 
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
@@ -449,6 +433,21 @@ class FormulaParser extends Parser {
     return expression
   })
 
+  constructor() {
+    super(allTokens, {outputCst: false, maxLookahead: 7})
+    this.performSelfAnalysis()
+  }
+
+  /**
+   * Entry rule wrapper that sets formula address
+   *
+   * @param address - address of the cell in which formula is located
+   */
+  public formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
+  }
+
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
    *
@@ -569,7 +568,6 @@ class FormulaParser extends Parser {
     }
   }
 }
-
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = Array<IAnyOrAlt<any>> | OrMethodOpts<any>

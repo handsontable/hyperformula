@@ -19,12 +19,30 @@ import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {Statistics, StatType} from './statistics/Statistics'
-import {FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex, EmptyCellVertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 /**
  * Engine for one sheet
  */
 export class HandsOnEngine {
+
+  /**
+   * Builds engine for sheet from CSV string representation
+   *
+   * @param csv - csv representation of sheet
+   */
+  public static buildFromCsv(csv: string): HandsOnEngine {
+    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
+  }
+
+  /**
+   * Builds engine for sheet from two-dimmensional array representation
+   *
+   * @param sheet - two-dimmensional array representation of sheet
+   */
+  public static buildFromArray(sheet: Sheet): HandsOnEngine {
+    return new HandsOnEngine(sheet)
+  }
   private addressMapping: IAddressMapping
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
@@ -57,24 +75,6 @@ export class HandsOnEngine {
   }
 
   /**
-   * Builds engine for sheet from CSV string representation
-   *
-   * @param csv - csv representation of sheet
-   */
-  public static buildFromCsv(csv: string): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
-  }
-
-  /**
-   * Builds engine for sheet from two-dimmensional array representation
-   *
-   * @param sheet - two-dimmensional array representation of sheet
-   */
-  public static buildFromArray(sheet: Sheet): HandsOnEngine {
-    return new HandsOnEngine(sheet)
-  }
-
-  /**
    * Returns value of the cell with the given address
    *
    * @param stringAddress - cell coordinates (e.g. 'A1')
@@ -84,7 +84,6 @@ export class HandsOnEngine {
     const vertex = this.addressMapping.getCell(address)!
     return vertex.getCellValue()
   }
-
 
   /**
    * Creates CSV string out of sheet content

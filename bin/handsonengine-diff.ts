@@ -1,10 +1,10 @@
+import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
-import parse from 'csv-parse/lib/sync'
 import {findBoundaries} from '../src'
 
 // Config
-const CSV_DELIMITER = ","
+const CSV_DELIMITER = ','
 const FLOAT_ROUND = 2
 
 if (process.argv.length < 4) {
@@ -25,7 +25,7 @@ if (!fs.existsSync(actualCsvPath)) {
 
 let columnsToIgnore: number[] = []
 if (process.argv[4]) {
-  columnsToIgnore = process.argv[4].split(",").map((e: string) => Number(e))
+  columnsToIgnore = process.argv[4].split(',').map((e: string) => Number(e))
 }
 console.warn(`Will ignore columns: ${columnsToIgnore}`)
 
@@ -47,8 +47,8 @@ if (expectedArrayBoundaries.height !== actualArrayBoundaries.height || expectedA
 const {width, height} = expectedArrayBoundaries
 
 const differences: Array<[number, number, string, string]> = []
-for(let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
-  for(let currentColumnIdx = 0; currentColumnIdx < width; currentColumnIdx++) {
+for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
+  for (let currentColumnIdx = 0; currentColumnIdx < width; currentColumnIdx++) {
     const expectedRawValue = expectedArray[currentRowIdx][currentColumnIdx]
     const actualRawValue = actualArray[currentRowIdx][currentColumnIdx]
     if (columnsToIgnore.indexOf(currentColumnIdx) >= 0) {
@@ -69,7 +69,7 @@ for(let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
 }
 
 differences.forEach((e: [number, number, string, string]) => {
-  const [currentRowIdx, currentColumnIdx, expectedValue, actualValue] = e;
+  const [currentRowIdx, currentColumnIdx, expectedValue, actualValue] = e
   console.warn(`In cell R${currentRowIdx}C${currentColumnIdx} expected '${expectedValue}' but got '${actualValue}'`)
 })
 
