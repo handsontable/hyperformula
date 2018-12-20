@@ -1,5 +1,8 @@
 import {FormulaCellVertex} from './Vertex'
 
+/**
+ * Provides graph structure
+ */
 export class Graph<T> {
   private nodes: Set<T>
   private edges: Map<T, Set<T>>
@@ -9,6 +12,11 @@ export class Graph<T> {
     this.edges = new Map()
   }
 
+  /**
+   * Adds node to a graph
+   *
+   * @param id - a node to be added
+   */
   public addNode(id: T) {
     this.nodes.add(id)
     if (!this.edges.has(id)) {
@@ -16,6 +24,14 @@ export class Graph<T> {
     }
   }
 
+  /**
+   * Adds edge between nodes.
+   *
+   * The nodes had to be added to the graph before, or the error will be raised
+   *
+   * @param fromId - node from which edge is outcoming
+   * @param toId - node to which edge is incoming
+   */
   public addEdge(fromId: T, toId: T) {
     if (!this.nodes.has(fromId)) {
       throw new Error(`Unknown node ${fromId}`)
@@ -26,24 +42,46 @@ export class Graph<T> {
     this.edges.get(fromId)!.add(toId)
   }
 
+  /**
+   * Returns nodes adjacent to given node
+   *
+   * @param id - node to which adjacent nodes we want to retrieve
+   */
   public adjacentNodes(id: T): Set<T> {
     return this.edges.get(id)!
   }
 
+  /**
+   * Checks whether a node is present in graph
+   *
+   * @param id - node to check
+   */
   public hasNode(id: T): boolean {
     return this.nodes.has(id)
   }
 
+  /**
+   * Returns number of nodes in graph
+   */
   public nodesCount(): number {
     return this.nodes.size
   }
 
+  /**
+   * Returns number of edges in graph
+   */
   public edgesCount(): number {
     let result = 0
     this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
     return result
   }
 
+  /**
+   * Checks whether exists edge between nodes
+   *
+   * @param fromNode - node from which edge is outcoming
+   * @param toNode - node to which edge is incoming
+   */
   public existsEdge(fromNode: T, toNode: T): boolean {
     const nodeEdges = this.edges.get(fromNode)
     if (nodeEdges) {
@@ -52,6 +90,10 @@ export class Graph<T> {
     return false
   }
 
+  /**
+   * Returns topological order of nodes.
+   *
+   */
   public topologicalSort(): { sorted: T[], cycled: T[] } {
     const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: T[] = []
@@ -87,6 +129,9 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
+  /**
+   * Builds a mapping from nodes to the count of their incoming edges.
+   */
   public incomingEdges(): Map<T, number> {
     const incomingEdges: Map<T, number> = new Map()
     this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
