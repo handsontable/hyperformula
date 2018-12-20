@@ -147,7 +147,7 @@ export class HandsOnEngine {
   }
 
   /**
-   * Recalculates  formulas in the topological sort order
+   * Recalculates formulas in the topological sort order
    */
   private recomputeFormulas() {
     this.verticesOnCycle.forEach((vertex: Vertex) => {
@@ -200,7 +200,7 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
 }
 
 /**
- * Creates right address mapping implementation based on fill ration of a sheet
+ * Creates right address mapping implementation based on fill ratio of a sheet
  *
  * @param sheet - two-dimmensional array sheet representation
  */
