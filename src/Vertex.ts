@@ -152,12 +152,13 @@ export class RangeVertex extends Vertex {
     this.functionCache.set(functionName, value)
   }
 
-  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): [CellValue | null, CriterionLambda | null] {
+  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): CellValue | null {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     if (values) {
-      return values.get(criterionString) || [null, null]
+      const value = values.get(criterionString)
+      return value ? value[0] : null
     }
-    return [null, null]
+    return null
   }
 
   public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {

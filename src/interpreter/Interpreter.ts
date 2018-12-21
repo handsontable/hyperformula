@@ -532,7 +532,7 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    const [rangeValue ] = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
+    const rangeValue = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
