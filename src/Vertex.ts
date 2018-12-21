@@ -124,7 +124,7 @@ export class EmptyCellVertex extends CellVertex {
  */
 export class RangeVertex extends Vertex {
   private functionCache: Map<string, CellValue>
-  private criterionFuncitonCache: Map<string, [CellValue, Criterion]>
+  private criterionFuncitonCache: Map<string, Map<string, [CellValue, Criterion]>>
 
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
     super()
@@ -151,25 +151,28 @@ export class RangeVertex extends Vertex {
     this.functionCache.set(functionName, value)
   }
 
-  /**
-   * Returns cached value stored for given function with criterion
-   *
-   * @param hash - name of the function with additional parameters
-   */
-  public getCriterionFunctionValue(hash: string): [CellValue | null, Criterion | null] {
-    return this.criterionFuncitonCache.get(hash) || [null, null]
+
+
+
+  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): [CellValue | null, Criterion | null] {
+    const values = this.getCriterionFunctionValues(functionName, leftCorner)
+    if (values) {
+      return values.get(criterionString) || [null, null]
+    }
+    return [null, null]
   }
 
-  /**
-   * Stores cached value for given function with criterion
-   *
-   * @param hash - name of the function with additional parameters
-   * @param criterion - cached criterion
-   * @param value - cached value
-   */
-  public setCriterionFunctionValue(hash: string, criterion: Criterion, value: CellValue) {
-    this.criterionFuncitonCache.set(hash, [value, criterion])
+  public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, Criterion]> {
+    return this.criterionFuncitonCache.get(`${functionName},${leftCorner.col},${leftCorner.row}`) || new Map();
   }
+
+  public setCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string, criterion: Criterion, value: CellValue) {
+    const values = this.getCriterionFunctionValues(functionName, leftCorner)
+    values.set(criterionString, [value, criterion])
+    this.criterionFuncitonCache.set(`${functionName},${leftCorner.col},${leftCorner.row}`, values)
+  }
+
+
 
   /**
    * Clears function cache
