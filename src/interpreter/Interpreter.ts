@@ -516,8 +516,8 @@ export class Interpreter {
     const valuesRangeStart = getAbsoluteAddress(valuesRangeArg.start, formulaAddress)
     const valuesRangeEnd = getAbsoluteAddress(valuesRangeArg.end, formulaAddress)
 
-    const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row};${criterionString})`
-    const smallerRangeCriterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row},${conditionRangeEnd.col},${conditionRangeEnd.row - 1};${criterionString})`
+    const criterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row};${criterionString})`
+    const smallerRangeCriterionHash = `SUMIF(${conditionRangeStart.col},${conditionRangeStart.row};${criterionString})`
 
     const valuesRangeVertex = this.addressMapping.getRange(valuesRangeStart, valuesRangeEnd)
     if (!valuesRangeVertex) {
