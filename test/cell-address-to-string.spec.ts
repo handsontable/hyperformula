@@ -1,4 +1,4 @@
-import {simpleCellAddress, cellAddressToString} from '../src/Cell'
+import {cellAddressToString, simpleCellAddress} from '../src/Cell'
 
 describe('cellAddressToString', () => {
   it('is zero based', () => {

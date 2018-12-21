@@ -98,12 +98,12 @@ export const simpleCellAddressFromString = (stringAddress: string): SimpleCellAd
 }
 
 export function cellAddressToString(address: SimpleCellAddress): string {
-  let result = '';
+  let result = ''
   let column = address.col
 
   while (column >= 0) {
-    result = String.fromCharCode((column % 26) + 97) + result;
-    column = Math.floor(column / 26) - 1;
+    result = String.fromCharCode((column % 26) + 97) + result
+    column = Math.floor(column / 26) - 1
   }
 
   return `${result.toUpperCase()}${address.row + 1}`
