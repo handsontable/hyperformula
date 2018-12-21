@@ -175,13 +175,13 @@ export class Interpreter {
     }
   }
 
-  private getCriterionRangeValues(functionName: string, condtitionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
+  private getCriterionRangeValues(functionName: string, conditionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
     const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
 
     let smallerRangeResult = null
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerRangeResult = smallerRangeVertex.getCriterionFunctionValues(functionName, condtitionLeftCorner)
+      smallerRangeResult = smallerRangeVertex.getCriterionFunctionValues(functionName, conditionLeftCorner)
     }
 
     if (smallerRangeVertex !== null) {
