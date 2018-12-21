@@ -61,7 +61,7 @@ export class Statistics {
    * @param func - function to call
    * @returns result of the function call
    */
-  public measure(name: StatType, func: () => any) {
+  public measure<T>(name: StatType, func: () => T): T {
     this.start(name)
     const result = func()
     this.end(name)
