@@ -532,7 +532,7 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    const rangeValue = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
+    let rangeValue = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
@@ -540,8 +540,6 @@ export class Interpreter {
 
       let conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
       let restConditions = conditions.slice(conditions.length - values.length)
-
-      let actualValue
 
       /* copy old cache and actualize values */
       const cache: CriterionCache = new Map()
@@ -552,12 +550,12 @@ export class Interpreter {
         cache.set(key, [reducedSum, criterionLambda])
 
         if (key === criterionString) {
-          actualValue = reducedSum
+          rangeValue = reducedSum
         }
       })
 
       /* if there was no previous value for this criterion, we need to calculate it from scratch */
-      if (!actualValue) {
+      if (!rangeValue) {
         const criterionLambda = buildCriterionLambda(criterion)
         const values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
 
@@ -565,11 +563,11 @@ export class Interpreter {
         const reducedSum = reduceSum(filteredValues)
         cache.set(criterionString, [reducedSum, criterionLambda])
 
-        actualValue = reducedSum
+        rangeValue = reducedSum
       }
 
       valuesRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
-      return actualValue
+      return rangeValue
     }
   }
 
