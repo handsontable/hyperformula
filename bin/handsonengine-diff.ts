@@ -9,9 +9,16 @@ const CSV_DELIMITER = ','
 const FLOAT_ROUND = 2
 
 if (process.argv.length < 4) {
-  console.warn('Usage:\nyarn ts-node bin/handsonengine-diff expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
+  console.warn('Usage:\nyarn ts-node bin/handsonengine-diff formulas.csv expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
   process.exit(1)
 }
+
+const formulasCsvPath = path.resolve(process.cwd(), process.argv[2])
+if (!fs.existsSync(formulasCsvPath)) {
+  console.warn(`File ${formulasCsvPath} does not exist.`)
+  process.exit(1)
+}
+
 const expectedCsvPath = path.resolve(process.cwd(), process.argv[2])
 if (!fs.existsSync(expectedCsvPath)) {
   console.warn(`File ${expectedCsvPath} does not exist.`)
@@ -30,24 +37,28 @@ if (process.argv[4]) {
 }
 console.warn(`Will ignore columns: ${columnsToIgnore}`)
 
+const formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
 const expectedCsvString = fs.readFileSync(expectedCsvPath, { encoding: 'utf8' })
 const actualCsvString = fs.readFileSync(actualCsvPath, { encoding: 'utf8' })
 
+const formulasArray = parse(formulasCsvString, { delimiter: CSV_DELIMITER })
 const expectedArray = parse(expectedCsvString, { delimiter: CSV_DELIMITER })
 const actualArray = parse(actualCsvString, { delimiter: CSV_DELIMITER })
 
 // errors on not matching size
+const formulasArrayBoundaries = findBoundaries(formulasArray)
 const expectedArrayBoundaries = findBoundaries(expectedArray)
 const actualArrayBoundaries = findBoundaries(actualArray)
-if (expectedArrayBoundaries.height !== actualArrayBoundaries.height || expectedArrayBoundaries.width !== actualArrayBoundaries.width) {
+if (expectedArrayBoundaries.height !== actualArrayBoundaries.height || expectedArrayBoundaries.width !== actualArrayBoundaries.width || expectedArrayBoundaries.height !== formulasArrayBoundaries.height || expectedArrayBoundaries.width !== formulasArrayBoundaries.width) {
   console.warn(`Different sheet boundaries.`)
+  console.warn(`Formulas sheet: width=${formulasArrayBoundaries.width}, height=${formulasArrayBoundaries.height}`)
   console.warn(`Expected sheet: width=${expectedArrayBoundaries.width}, height=${expectedArrayBoundaries.height}`)
   console.warn(`Actual sheet: width=${actualArrayBoundaries.width}, height=${actualArrayBoundaries.height}`)
   process.exit(1)
 }
 const {width, height} = expectedArrayBoundaries
 
-const differences: Array<[number, number, string, string]> = []
+const differences: Array<[number, number, string, string, string]> = []
 for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
   for (let currentColumnIdx = 0; currentColumnIdx < width; currentColumnIdx++) {
     const expectedRawValue = expectedArray[currentRowIdx][currentColumnIdx]
@@ -64,14 +75,14 @@ for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
       actualValue = Number(actualValue).toFixed(FLOAT_ROUND)
     }
     if (expectedValue !== actualValue) {
-      differences.push([currentRowIdx, currentColumnIdx, expectedValue, actualValue])
+      differences.push([currentRowIdx, currentColumnIdx, expectedValue, actualValue, formulasArray[currentRowIdx][currentColumnIdx]])
     }
   }
 }
 
-differences.forEach((e: [number, number, string, string]) => {
-  const [currentRowIdx, currentColumnIdx, expectedValue, actualValue] = e
-  console.warn(`In cell ${cellAddressToString(simpleCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'`)
+differences.forEach((e: [number, number, string, string, string]) => {
+  const [currentRowIdx, currentColumnIdx, expectedValue, actualValue, formulaString] = e
+  console.warn(`In cell ${cellAddressToString(simpleCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
 })
 
 if (differences.length > 0) {
