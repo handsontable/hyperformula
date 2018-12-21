@@ -10,8 +10,6 @@ import {CellVertex, EmptyCellVertex} from './Vertex'
 export class AddressMapping implements IAddressMapping {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 
-  constructor(private width: number = 0, private height: number = 0) { }
-
   /**
    * Returns cell content
    *
@@ -57,13 +55,17 @@ export class AddressMapping implements IAddressMapping {
    * Returns height of stored sheet
    */
   public getHeight(): number {
-    return this.height
+    let currentMax = 0
+    this.mapping.forEach((colMapping) => {
+      currentMax = Math.max(currentMax, Math.max(...Array.from(colMapping.keys())) + 1)
+    })
+    return currentMax
   }
 
   /**
    * Returns width of stored sheet
    */
   public getWidth(): number {
-    return this.width
+    return Math.max(0, Math.max(...Array.from(this.mapping.keys())) + 1)
   }
 }

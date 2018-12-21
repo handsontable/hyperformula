@@ -211,6 +211,6 @@ export function buildAddressMapping(sheet: Sheet): IAddressMapping {
   if (fill > Config.ADDRESS_MAPPING_FILL_THRESHOLD) {
     return new ArrayAddressMapping(width, height)
   } else {
-    return new AddressMapping(width, height)
+    return new AddressMapping()
   }
 }

@@ -88,19 +88,28 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
 
     expect(mapping.has(relativeCellAddress(0, 0))).toBe(true)
   })
-
-  it('returns maximum row/col for simplest case', () => {
-    const mapping = builder(1, 2)
-
-    expect(mapping.getHeight()).toEqual(2)
-    expect(mapping.getWidth()).toEqual(1)
-  })
 }
 
 describe('AddressMapping', () => {
-  sharedExamples((maxCol, maxRow) => new AddressMapping(maxCol, maxRow))
+  sharedExamples((maxCol, maxRow) => new AddressMapping())
+
+  it('returns maximum row/col for simplest case', () => {
+    const mapping = new AddressMapping()
+
+    mapping.setCell(simpleCellAddress(3, 15), new ValueCellVertex(42))
+
+    expect(mapping.getHeight()).toEqual(16)
+    expect(mapping.getWidth()).toEqual(4)
+  })
 })
 
 describe('ArrayAddressMapping', () => {
   sharedExamples((maxCol, maxRow) => new ArrayAddressMapping(maxCol, maxRow))
+
+  it('returns maximum row/col for simplest case', () => {
+    const mapping = new ArrayAddressMapping(1, 2)
+
+    expect(mapping.getHeight()).toEqual(2)
+    expect(mapping.getWidth()).toEqual(1)
+  })
 })
