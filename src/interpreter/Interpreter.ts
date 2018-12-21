@@ -1,4 +1,4 @@
-import {CellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {split} from '../generatorUtils'
@@ -7,7 +7,7 @@ import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
-import {CriterionCache, EmptyCellVertex, RangeVertex, Vertex} from '../Vertex'
+import {CriterionCache, EmptyCellVertex, Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 import {Functions} from './Functions'
 
@@ -519,6 +519,7 @@ export class Interpreter {
   }
 
   private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
+    const functionName = 'SUMIF'
     const conditionRangeArg = ast.args[0] as CellRangeAst
     const valuesRangeArg = ast.args[2] as CellRangeAst
 
@@ -531,45 +532,44 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    const [rangeValue ] = valuesRangeVertex.getCriterionFunctionValue('SUMIF', conditionRangeStart, criterionString)
+    const [rangeValue ] = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
-      const [smallerCache, values] = this.getCriterionRangeValues('SUMIF', conditionRangeStart, valuesRangeStart, valuesRangeEnd)
+      const [smallerCache, values] = this.getCriterionRangeValues(functionName, conditionRangeStart, valuesRangeStart, valuesRangeEnd)
 
       let conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+      let restConditions = conditions.slice(conditions.length - values.length)
 
-      let smallerConditions = Array.from(conditions)
-      conditions = smallerConditions[Symbol.iterator]()
-
-      smallerConditions = smallerConditions.slice(smallerConditions.length - values.length)
+      let actualValue
 
       /* copy old cache and actualize values */
       const cache: CriterionCache = new Map()
       smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-        const filteredValues = ifFilter(criterionLambda, smallerConditions[Symbol.iterator](), values[Symbol.iterator]())
-        const toReduce = Array.from(filteredValues)
-        toReduce.push(value)
-        const reducedSum = reduceSum(toReduce[Symbol.iterator]())
+        const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
+        let reducedSum = reduceSum(filteredValues)
+        reducedSum = add(reducedSum, value)
         cache.set(key, [reducedSum, criterionLambda])
+
+        if (key === criterionString) {
+          actualValue = reducedSum
+        }
       })
 
       /* if there was no previous value for this criterion, we need to calculate it from scratch */
-      if (!cache.get(criterionString)) {
+      if (!actualValue) {
         const criterionLambda = buildCriterionLambda(criterion)
         const values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
 
         const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), values[Symbol.iterator]())
-        const toReduce = Array.from(filteredValues)
-        const reducedSum = reduceSum(toReduce[Symbol.iterator]())
+        const reducedSum = reduceSum(filteredValues)
         cache.set(criterionString, [reducedSum, criterionLambda])
+
+        actualValue = reducedSum
       }
 
-      valuesRangeVertex.setCriterionFunctionValues('SUMIF', conditionRangeStart, cache)
-
-      const [value] = valuesRangeVertex.getCriterionFunctionValue('SUMIF', conditionRangeStart, criterionString)
-
-      return value!
+      valuesRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
+      return actualValue
     }
   }
 
@@ -604,11 +604,13 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
   })
 }
 
-export function* getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
   const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+  const result: CellValue[] = []
   for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-    yield addressMapping.getCell(cellFromRange)!.getCellValue()
+    result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
   }
+  return result
 }
 
 export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
@@ -625,19 +627,24 @@ export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable:
   }
 }
 
-export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
-  let acc = 0
-  for (const val of iterable) {
-    if (isCellError(acc)) {
-      return acc
-    }
-    if (isCellError(val)) {
-      return val
-    }
+export function add(left: CellValue, right: CellValue): CellValue {
+  if (isCellError(left)) {
+    return left
+  }
+  if (isCellError(right)) {
+    return right
+  }
+  if (typeof left === 'number' && typeof right === 'number') {
+    return left + right
+  }
 
-    if (typeof acc === 'number' && typeof val === 'number') {
-      acc = acc + val
-    }
+  return left
+}
+
+export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
+  let acc: CellValue = 0
+  for (const val of iterable) {
+    acc = add(acc, val)
   }
   return acc
 }
