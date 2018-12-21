@@ -12,15 +12,11 @@ import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '
 import {Functions} from './Functions'
 
 export class Interpreter {
-  private addressMapping: IAddressMapping
-  private rangeMapping: RangeMapping
-  private graph: Graph<Vertex>
-
-  constructor(addressMapping: IAddressMapping, rangeMapping: RangeMapping, graph: Graph<Vertex>) {
-    this.addressMapping = addressMapping
-    this.rangeMapping = rangeMapping
-    this.graph = graph
-  }
+  constructor(
+    private readonly addressMapping: IAddressMapping,
+    private readonly rangeMapping: RangeMapping,
+    private readonly graph: Graph<Vertex>,
+  ) { }
 
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
     return this.evaluateAst(formula, formulaAddress)
