@@ -148,4 +148,32 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue('C4')).toEqual(1)
     expect(engine.getCellValue('C5')).toEqual(3)
   })
+
+  it('works for subranges with inequality', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1', '=SUMIF(A1:A1,">2",B1:B1)'],
+      ['2', '1', '=SUMIF(A1:A2,">2",B1:B2)'],
+      ['3', '1', '=SUMIF(A1:A3,">2",B1:B3)'],
+      ['4', '1', '=SUMIF(A1:A4,">2",B1:B4)'],
+    ])
+
+    expect(engine.getCellValue('C1')).toEqual(0)
+    expect(engine.getCellValue('C2')).toEqual(0)
+    expect(engine.getCellValue('C3')).toEqual(1)
+    expect(engine.getCellValue('C4')).toEqual(2)
+  })
+
+  it('works for subranges with more interesting criterions', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1', '=SUMIF(A1:A1,"=1",B1:B1)'],
+      ['2', '1', '=SUMIF(A1:A2,"<=2",B1:B2)'],
+      ['1', '1', '=SUMIF(A1:A3,"<2",B1:B3)'],
+      ['1', '1', '=SUMIF(A1:A4,">4",B1:B4)'],
+    ])
+
+    expect(engine.getCellValue('C1')).toEqual(1)
+    expect(engine.getCellValue('C2')).toEqual(2)
+    expect(engine.getCellValue('C3')).toEqual(2)
+    expect(engine.getCellValue('C4')).toEqual(0)
+  })
 })
