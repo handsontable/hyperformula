@@ -18,6 +18,7 @@ import {GraphBuilder, Sheet} from './GraphBuilder'
 import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
+import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
@@ -44,6 +45,7 @@ export class HandsOnEngine {
     return new HandsOnEngine(sheet)
   }
   private addressMapping: IAddressMapping
+  private rangeMapping: RangeMapping = new RangeMapping()
   private graph: Graph<Vertex> = new Graph()
   private sortedVertices: Vertex[] = []
   private verticesOnCycle: Vertex[] = []
@@ -56,8 +58,8 @@ export class HandsOnEngine {
 
     this.addressMapping = buildAddressMapping(sheet)
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.stats)
-    this.interpreter = new Interpreter(this.addressMapping, this.graph)
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats)
+    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       graphBuilder.buildGraph(sheet)

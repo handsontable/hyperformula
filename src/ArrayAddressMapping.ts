@@ -1,15 +1,14 @@
 import {SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
-import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
+import {CellVertex, EmptyCellVertex} from './Vertex'
 
 /**
- * Mapping from cell addresses to vertices and ranges to range vertices
+ * Mapping from cell addresses to vertices
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
   */
 export class ArrayAddressMapping implements IAddressMapping {
   private mapping: CellVertex[][]
-  private rangeMapping: Map<string, RangeVertex> = new Map()
 
   /**
    * @param width - width of the stored sheet
@@ -43,27 +42,6 @@ export class ArrayAddressMapping implements IAddressMapping {
     */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     this.mapping[address.row][address.col] = newVertex
-  }
-
-  /**
-   * Saves range vertex
-   *
-   * @param vertex - vertex to save
-    */
-  public setRange(vertex: RangeVertex) {
-    const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
-    this.rangeMapping.set(key, vertex)
-  }
-
-  /**
-   * Returns associated vertex for given range
-   *
-   * @param start - top-left corner of the range
-   * @param end - bottom-right corner of the range
-    */
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
-    const key = `${start.col},${start.row},${end.col},${end.row}`
-    return this.rangeMapping.get(key) || null
   }
 
   /**

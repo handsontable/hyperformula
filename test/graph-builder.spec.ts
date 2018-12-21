@@ -2,6 +2,7 @@ import {AddressMapping} from '../src/AddressMapping'
 import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
+import {RangeMapping} from '../src/RangeMapping'
 import {Statistics} from '../src/statistics/Statistics'
 import {CellVertex, EmptyCellVertex, ValueCellVertex, Vertex} from '../src/Vertex'
 
@@ -9,7 +10,7 @@ describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([['42']])
 
@@ -21,7 +22,7 @@ describe('GraphBuilder', () => {
   it('build sheet with simple string cell', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([['foo']])
 
@@ -33,7 +34,7 @@ describe('GraphBuilder', () => {
   it('building for cell with empty string should give empty vertex', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([['']])
 
@@ -45,7 +46,7 @@ describe('GraphBuilder', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([
       ['1', 'A5', '2'],
@@ -62,7 +63,7 @@ describe('GraphBuilder', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([
       ['1', '2', '0'],
@@ -90,7 +91,7 @@ describe('GraphBuilder', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([
         ['1', '2', '0'],
@@ -108,7 +109,7 @@ describe('GraphBuilder', () => {
   it('build with range one row smaller', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([
       ['1', '0'],
@@ -127,7 +128,7 @@ describe('GraphBuilder', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
     graphBuilder.buildGraph([['1', '2', '=SUM(A1:B2)']])
 
     expect(graph.nodesCount()).toBe(
@@ -145,7 +146,7 @@ describe('GraphBuilder', () => {
   it("optimization doesn't work if smaller range is after bigger", () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new Statistics())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics())
 
     graphBuilder.buildGraph([
       ['1', '0'],

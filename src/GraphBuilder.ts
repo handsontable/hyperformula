@@ -10,6 +10,7 @@ import {
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
+import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
@@ -20,6 +21,7 @@ export class GraphBuilder {
 
   constructor(private graph: Graph<Vertex>,
               private addressMapping: IAddressMapping,
+              private rangeMapping: RangeMapping,
               private stats: Statistics) {
   }
 
@@ -61,15 +63,15 @@ export class GraphBuilder {
 
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
-          let rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
+          let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
           if (rangeVertex === null) {
             rangeVertex = new RangeVertex(rangeStart, rangeEnd)
-            this.addressMapping.setRange(rangeVertex)
+            this.rangeMapping.setRange(rangeVertex)
           }
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, rangeStart, rangeEnd)
+          const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, rangeStart, rangeEnd)
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
@@ -98,10 +100,10 @@ export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCell
   }
 }
 
-export const findSmallerRange = (addressMapping: IAddressMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
+export const findSmallerRange = (rangeMapping: RangeMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
   if (rangeEnd.row > rangeStart.row) {
     const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
-    const rowLessVertex = addressMapping.getRange(rangeStart, rangeEndRowLess)
+    const rowLessVertex = rangeMapping.getRange(rangeStart, rangeEndRowLess)
     if (rowLessVertex) {
       return {
         smallerRangeVertex: rowLessVertex,

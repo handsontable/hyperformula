@@ -89,25 +89,6 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
     expect(mapping.has(relativeCellAddress(0, 0))).toBe(true)
   })
 
-  it('range mapping when there is none', () => {
-    const mapping = builder(1, 1)
-    const start = simpleCellAddress(0, 0)
-    const end = simpleCellAddress(20, 50)
-
-    expect(mapping.getRange(start, end)).toBe(null)
-  })
-
-  it('setting range mapping', () => {
-    const mapping = builder(1, 1)
-    const start = simpleCellAddress(0, 0)
-    const end = simpleCellAddress(20, 50)
-    const vertex = new RangeVertex(start, end)
-
-    mapping.setRange(vertex)
-
-    expect(mapping.getRange(start, end)).toBe(vertex)
-  })
-
   it('returns maximum row/col for simplest case', () => {
     const mapping = builder(1, 2)
 

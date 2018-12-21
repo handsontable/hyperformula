@@ -6,16 +6,19 @@ import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
+import {RangeMapping} from '../RangeMapping'
 import {CriterionCache, EmptyCellVertex, RangeVertex, Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 import {Functions} from './Functions'
 
 export class Interpreter {
   private addressMapping: IAddressMapping
+  private rangeMapping: RangeMapping
   private graph: Graph<Vertex>
 
-  constructor(addressMapping: IAddressMapping, graph: Graph<Vertex>) {
+  constructor(addressMapping: IAddressMapping, rangeMapping: RangeMapping, graph: Graph<Vertex>) {
     this.addressMapping = addressMapping
+    this.rangeMapping = rangeMapping
     this.graph = graph
   }
 
@@ -177,8 +180,8 @@ export class Interpreter {
   }
 
   private getCriterionRangeValues(functionName: string, condtitionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
-    const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, beginRange, endRange)
+    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
+    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
 
     let smallerRangeResult = null
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
@@ -201,8 +204,8 @@ export class Interpreter {
   private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, beginRange, endRange)
-    const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
+    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
+    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
@@ -217,7 +220,7 @@ export class Interpreter {
   private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
     const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
     const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
-    const rangeVertex = this.addressMapping.getRange(rangeStart, rangeEnd)
+    const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
 
     if (!rangeVertex) {
       throw Error('Range does not exists in graph')
@@ -527,7 +530,7 @@ export class Interpreter {
     const valuesRangeStart = getAbsoluteAddress(valuesRangeArg.start, formulaAddress)
     const valuesRangeEnd = getAbsoluteAddress(valuesRangeArg.end, formulaAddress)
 
-    const valuesRangeVertex = this.addressMapping.getRange(valuesRangeStart, valuesRangeEnd)
+    const valuesRangeVertex = this.rangeMapping.getRange(valuesRangeStart, valuesRangeEnd)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
     }
