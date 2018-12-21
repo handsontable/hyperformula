@@ -27,11 +27,13 @@ export class Interpreter {
 
   }
 
-  public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    return this.evaluateAst(formula, formulaAddress)
-  }
-
-  private evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  /**
+   * Calculates cell value from formula abstract syntax tree
+   *
+   * @param formula - abstract syntax tree of formula
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
@@ -184,6 +186,32 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Returns list of values for given range and function name
+   *
+   * If range is dependent on smaller range, list will contain value of smaller range for this function
+   * and values of cells that are not present in smaller range
+   *
+   * @param functionName - function name (e.g. SUM)
+   * @param ast - cell range ast
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
+    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+    const rangeResult: CellValue[] = []
+    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
+    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
+    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
+    }
+
+    for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
+      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+    }
+
+    return rangeResult
+  }
+
   private getCriterionRangeValues(functionName: string, conditionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
     const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
@@ -206,22 +234,14 @@ export class Interpreter {
     return [smallerRangeResult || new Map(), rangeResult]
   }
 
-  private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-    const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
-    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
-    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
-    }
-
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-    }
-
-    return rangeResult
-  }
-
+  /**
+   * Performs range operation on given range
+   *
+   * @param ast - cell range ast
+   * @param formulaAddress - address of the cell in which formula is located
+   * @param functionName - function name to use as cache key
+   * @param funcToCalc - range operation
+   */
   private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
     const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
     const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
@@ -245,6 +265,12 @@ export class Interpreter {
     return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
   }
 
+  /**
+   * Calculates value of procedure formula based on procedure name
+   *
+   * @param ast - procedure abstract syntax tree
+   * @param formulaAddress - address of the cell in which formula is located
+   */
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
       case Functions[Config.LANGUAGE].SUM: {
@@ -510,6 +536,12 @@ export class Interpreter {
     }
   }
 
+  /**
+   *
+   *
+   * @param args
+   * @param formulaAddress
+   */
   private concatenate(args: Ast[], formulaAddress: SimpleCellAddress): CellValue {
     return args.reduce((acc: CellValue, arg: Ast) => {
       const argResult = this.evaluateAst(arg, formulaAddress)
@@ -523,6 +555,14 @@ export class Interpreter {
     }, '')
   }
 
+  /**
+   * Converts cell value to date number representation (days after 12th Dec 1899)
+   *
+   * If value is a number simply returns value
+   * If value is a string, it tries to parse it with known format
+   *
+   * @param arg
+   */
   private dateNumberRepresentation(arg: CellValue): number | null {
     if (typeof arg === 'number') {
       return arg
@@ -533,6 +573,14 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Converts cell value to boolean representation
+   *
+   * if value is a boolean simply returns value
+   * if value is a number return true if value is different than 0
+   *
+   * @param arg
+   */
   private booleanRepresentation(arg: CellValue): CellValue {
     if (typeof arg === 'number') {
       return arg !== 0

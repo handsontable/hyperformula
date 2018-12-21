@@ -163,7 +163,7 @@ export class HandsOnEngine {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()
-        const cellValue = this.interpreter.computeFormula(formula, address)
+        const cellValue = this.interpreter.evaluateAst(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {
         vertex.clear()
