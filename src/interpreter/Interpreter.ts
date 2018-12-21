@@ -5,7 +5,7 @@ import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
-import {CriterionCache, RangeVertex, Vertex} from '../Vertex'
+import {CriterionCache, RangeVertex, Vertex, EmptyCellVertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 
 export class Interpreter {
@@ -389,6 +389,19 @@ export class Interpreter {
         } else {
           const arg = this.evaluateAst(ast.args[0], formulaAddress)
           return isCellError(arg)
+        }
+      }
+      case 'ISBLANK': {
+        if (ast.args.length != 1) {
+          return cellError(ErrorType.NA)
+        }
+        const arg = ast.args[0]
+        if (arg.type === AstNodeType.CELL_REFERENCE) {
+          const address = getAbsoluteAddress(arg.reference, formulaAddress)
+          const vertex = this.addressMapping.getCell(address)
+          return (vertex === EmptyCellVertex.getSingletonInstance())
+        } else {
+          return false
         }
       }
       case 'COLUMNS': {
