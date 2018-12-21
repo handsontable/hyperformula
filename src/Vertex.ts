@@ -119,7 +119,6 @@ export class EmptyCellVertex extends CellVertex {
   }
 }
 
-
 export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 /**
  * Represents vertex bound to range
@@ -153,9 +152,6 @@ export class RangeVertex extends Vertex {
     this.functionCache.set(functionName, value)
   }
 
-
-
-
   public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): [CellValue | null, CriterionLambda | null] {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     if (values) {
@@ -165,16 +161,22 @@ export class RangeVertex extends Vertex {
   }
 
   public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {
-    return this.criterionFuncitonCache.get(`${functionName},${leftCorner.col},${leftCorner.row}`) || new Map();
+    return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map();
+  }
+
+  public setCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress, values: CriterionCache) {
+    this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
   }
 
   public setCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string, criterion: CriterionLambda, value: CellValue) {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     values.set(criterionString, [value, criterion])
-    this.criterionFuncitonCache.set(`${functionName},${leftCorner.col},${leftCorner.row}`, values)
+    this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
   }
 
-
+  private criterionFunctioncache(functionName: string, leftCorner: SimpleCellAddress) {
+    return `${functionName},${leftCorner.col},${leftCorner.row}`
+  }
 
   /**
    * Clears function cache
