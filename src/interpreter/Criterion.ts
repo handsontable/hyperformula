@@ -14,7 +14,7 @@ export interface Criterion {
 }
 export const buildCriterion = (operator: CriterionType, value: number | string) => ({ operator, value })
 
-const ANY_CRITERION_REGEX = /([<>=]+)(.+)/
+const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
 export const parseCriterion = (criterion: CellValue): Criterion | null => {
   if (typeof criterion === 'number') {
@@ -24,7 +24,9 @@ export const parseCriterion = (criterion: CellValue): Criterion | null => {
 
     if (regexResult) {
       const value = Number(regexResult[2])
-      if (isNaN(value)) {
+      if (regexResult[1] === '=' && regexResult[2] === '') {
+        return buildCriterion(CriterionType.EQUAL, '')
+      } else if (isNaN(value)) {
         switch (regexResult[1]) {
           case '=': return buildCriterion(CriterionType.EQUAL, regexResult[2])
         }

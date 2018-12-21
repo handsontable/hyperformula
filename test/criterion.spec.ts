@@ -42,6 +42,10 @@ describe('Criterion', () => {
     expect(parseCriterion('=asdf')).toEqual(buildCriterion(CriterionType.EQUAL, 'asdf'))
   })
 
+  it('works with empty string', () => {
+    expect(parseCriterion('=')).toEqual(buildCriterion(CriterionType.EQUAL, ''))
+  })
+
   it('null when unknown operator', () => {
     expect(parseCriterion('><0')).toEqual(null)
   })
