@@ -119,7 +119,11 @@ export class EmptyCellVertex extends CellVertex {
   }
 }
 
+/**
+* Represents cache structure for one criterion
+*/
 export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
+
 /**
  * Represents vertex bound to range
  */
@@ -152,6 +156,13 @@ export class RangeVertex extends Vertex {
     this.functionCache.set(functionName, value)
   }
 
+  /**
+   * Returns cached value stored for given function name, left corner of condition range and criterion text representation
+   *
+   * @param functionName - name of the function
+   * @param leftCorner - left corner of condition range
+   * @param criterionString - criterion text (ex. '<=5')
+   */
   public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): CellValue | null {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     if (values) {
@@ -161,17 +172,25 @@ export class RangeVertex extends Vertex {
     return null
   }
 
+  /**
+   * Returns all cached values stored for given criterion function
+   *
+   * @param functionName - name of the function
+   * @param leftCorner - left corner of condition range
+   */
   public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {
     return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map()
   }
 
-  public setCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress, values: CriterionCache) {
-    this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
-  }
 
-  public setCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string, criterion: CriterionLambda, value: CellValue) {
-    const values = this.getCriterionFunctionValues(functionName, leftCorner)
-    values.set(criterionString, [value, criterion])
+  /**
+   * Stores all values for given criterion function
+   *
+   * @param functionName - name of the function
+   * @param leftCorner - left corner of condition range
+   * @param values - map with values
+   */
+  public setCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress, values: CriterionCache) {
     this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
   }
 

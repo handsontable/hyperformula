@@ -1,6 +1,6 @@
 import {simpleCellAddress} from '../src/Cell'
 import {buildCriterionLambda, parseCriterion} from '../src/interpreter/Criterion'
-import {RangeVertex} from '../src/Vertex'
+import {CriterionCache, RangeVertex} from '../src/Vertex'
 
 describe('RangeVertex with cache', () => {
   it('cache for criterion fuctions empty', () => {
@@ -18,8 +18,12 @@ describe('RangeVertex with cache', () => {
     const criterionString2 = '=1'
     const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!)
 
-    rangeVertex.setCriterionFunctionValue('SUMIF', simpleCellAddress(1, 1), criterionString1, criterion1, 10)
-    rangeVertex.setCriterionFunctionValue('SUMIF', simpleCellAddress(1, 1), criterionString2, criterion2, 20)
+    let criterionCache: CriterionCache = new Map()
+
+    criterionCache.set(criterionString1, [10, criterion1])
+    criterionCache.set(criterionString2, [20, criterion2])
+
+    rangeVertex.setCriterionFunctionValues('SUMIF', simpleCellAddress(1, 1), criterionCache)
 
     expect(rangeVertex.getCriterionFunctionValues('SUMIF', simpleCellAddress(1, 1)).size).toBe(2)
     expect(rangeVertex.getCriterionFunctionValue('SUMIF', simpleCellAddress(1, 1), criterionString1)).toEqual(10)
