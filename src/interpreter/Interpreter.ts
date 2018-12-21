@@ -517,11 +517,11 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    const [rangeValue, ] = valuesRangeVertex.getCriterionFunctionValue("SUMIF", conditionRangeStart, criterionString)
+    const [rangeValue ] = valuesRangeVertex.getCriterionFunctionValue('SUMIF', conditionRangeStart, criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
-      const [smallerCache, values] = this.getCriterionRangeValues("SUMIF", conditionRangeStart, valuesRangeStart, valuesRangeEnd)
+      const [smallerCache, values] = this.getCriterionRangeValues('SUMIF', conditionRangeStart, valuesRangeStart, valuesRangeEnd)
 
       let conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
 
@@ -531,9 +531,9 @@ export class Interpreter {
       smallerConditions = smallerConditions.slice(smallerConditions.length - values.length)
 
       /* copy old cache and actualize values */
-      const cache : CriterionCache = new Map();
+      const cache: CriterionCache = new Map()
       smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-        let filteredValues = ifFilter(criterionLambda, smallerConditions[Symbol.iterator](), values[Symbol.iterator]())
+        const filteredValues = ifFilter(criterionLambda, smallerConditions[Symbol.iterator](), values[Symbol.iterator]())
         const toReduce = Array.from(filteredValues)
         toReduce.push(value)
         const reducedSum = reduceSum(toReduce[Symbol.iterator]())
@@ -543,7 +543,7 @@ export class Interpreter {
       /* if there was no previous value for this criterion, we need to calculate it from scratch */
       if (!cache.get(criterionString)) {
         const criterionLambda = buildCriterionLambda(criterion)
-        let values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
+        const values = this.getPlainRangeValues(valuesRangeArg, formulaAddress)
 
         const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), values[Symbol.iterator]())
         const toReduce = Array.from(filteredValues)
@@ -551,9 +551,9 @@ export class Interpreter {
         cache.set(criterionString, [reducedSum, criterionLambda])
       }
 
-      valuesRangeVertex.setCriterionFunctionValues("SUMIF", conditionRangeStart, cache)
+      valuesRangeVertex.setCriterionFunctionValues('SUMIF', conditionRangeStart, cache)
 
-      const [value, ] = valuesRangeVertex.getCriterionFunctionValue("SUMIF", conditionRangeStart, criterionString)
+      const [value] = valuesRangeVertex.getCriterionFunctionValue('SUMIF', conditionRangeStart, criterionString)
 
       return value!
     }

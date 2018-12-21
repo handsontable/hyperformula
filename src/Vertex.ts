@@ -1,6 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
+import {Criterion, CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
-import {Criterion, CriterionLambda} from "./interpreter/Criterion";
 
 /**
  * Abstract class for any vertex
@@ -161,7 +161,7 @@ export class RangeVertex extends Vertex {
   }
 
   public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {
-    return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map();
+    return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map()
   }
 
   public setCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress, values: CriterionCache) {
@@ -172,10 +172,6 @@ export class RangeVertex extends Vertex {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     values.set(criterionString, [value, criterion])
     this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
-  }
-
-  private criterionFunctioncache(functionName: string, leftCorner: SimpleCellAddress) {
-    return `${functionName},${leftCorner.col},${leftCorner.row}`
   }
 
   /**
@@ -198,5 +194,9 @@ export class RangeVertex extends Vertex {
    */
   public getEnd(): SimpleCellAddress {
     return this.end
+  }
+
+  private criterionFunctioncache(functionName: string, leftCorner: SimpleCellAddress) {
+    return `${functionName},${leftCorner.col},${leftCorner.row}`
   }
 }
