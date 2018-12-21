@@ -3,4 +3,6 @@ export class Config {
   public static readonly FUNCTION_ARG_SEPARATOR = ','
 
   public static readonly ADDRESS_MAPPING_FILL_THRESHOLD = 0.8
+
+  public static readonly LANGUAGE = 'EN'
 }

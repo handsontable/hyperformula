@@ -1,4 +1,5 @@
 import {CellAddress, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {Config} from '../Config'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
 import {split} from '../generatorUtils'
 import {Graph} from '../Graph'
@@ -7,6 +8,7 @@ import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
 import {CriterionCache, EmptyCellVertex, RangeVertex, Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
+import {Functions} from './Functions'
 
 export class Interpreter {
   private addressMapping: IAddressMapping
@@ -237,7 +239,7 @@ export class Interpreter {
 
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
-      case 'SUM': {
+      case Functions[Config.LANGUAGE].SUM: {
         return ast.args.reduce((currentSum: CellValue, arg) => {
           let value
           if (arg.type === AstNodeType.CELL_RANGE) {
@@ -253,7 +255,7 @@ export class Interpreter {
           }
         }, 0)
       }
-      case 'SUMIF': {
+      case Functions[Config.LANGUAGE].SUMIF: {
         const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
         if (typeof criterionString !== 'string') {
           return cellError(ErrorType.VALUE)
@@ -284,7 +286,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case 'COUNTIF': {
+      case Functions[Config.LANGUAGE].COUNTIF: {
         const conditionRangeArg = ast.args[0]
         if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
           return cellError(ErrorType.VALUE)
@@ -310,21 +312,21 @@ export class Interpreter {
         }
         return counter
       }
-      case 'TRUE': {
+      case Functions[Config.LANGUAGE].TRUE: {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)
         } else {
           return true
         }
       }
-      case 'FALSE': {
+      case Functions[Config.LANGUAGE].FALSE: {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)
         } else {
           return false
         }
       }
-      case 'ACOS': {
+      case Functions[Config.LANGUAGE].ACOS: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -338,7 +340,7 @@ export class Interpreter {
           return cellError(ErrorType.NUM)
         }
       }
-      case 'IF': {
+      case Functions[Config.LANGUAGE].IF: {
         const condition = this.booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
         if (condition === true) {
           return this.evaluateAst(ast.args[1], formulaAddress)
@@ -352,7 +354,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case 'AND': {
+      case Functions[Config.LANGUAGE].AND: {
         if (ast.args.length < 1) {
           return cellError(ErrorType.NA)
         }
@@ -366,7 +368,7 @@ export class Interpreter {
         }
         return result
       }
-      case 'OR': {
+      case Functions[Config.LANGUAGE].OR: {
         if (ast.args.length < 1) {
           return cellError(ErrorType.NA)
         }
@@ -380,10 +382,10 @@ export class Interpreter {
         }
         return result
       }
-      case 'CONCATENATE': {
+      case Functions[Config.LANGUAGE].CONCATENATE: {
         return this.concatenate(ast.args, formulaAddress)
       }
-      case 'ISERROR': {
+      case Functions[Config.LANGUAGE].ISERROR: {
         if (ast.args.length != 1) {
           return cellError(ErrorType.NA)
         } else {
@@ -391,7 +393,7 @@ export class Interpreter {
           return isCellError(arg)
         }
       }
-      case 'ISBLANK': {
+      case Functions[Config.LANGUAGE].ISBLANK: {
         if (ast.args.length != 1) {
           return cellError(ErrorType.NA)
         }
@@ -404,7 +406,7 @@ export class Interpreter {
           return false
         }
       }
-      case 'COLUMNS': {
+      case Functions[Config.LANGUAGE].COLUMNS: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -415,7 +417,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case 'DATE': {
+      case Functions[Config.LANGUAGE].DATE: {
         if (ast.args.length !== 3) {
           return cellError(ErrorType.NA)
         }
@@ -430,7 +432,7 @@ export class Interpreter {
 
         return toDateNumber(year, month, day)
       }
-      case 'MONTH': {
+      case Functions[Config.LANGUAGE].MONTH: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -444,7 +446,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case 'YEAR': {
+      case Functions[Config.LANGUAGE].YEAR: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -458,7 +460,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case 'SPLIT': {
+      case Functions[Config.LANGUAGE].SPLIT: {
         const stringArg = ast.args[0]
         const indexArg = ast.args[1]
 
