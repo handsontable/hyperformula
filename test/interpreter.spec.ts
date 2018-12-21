@@ -497,66 +497,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
   })
 
-  it('function DATE with 3 numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
-
-    expect(engine.getCellValue('A1')).toEqual(2)
-    expect(dateNumberToString(engine.getCellValue('A1') as number)).toEqual('1900-01-01')
-    expect(engine.getCellValue('B1')).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue('B1') as number)).toEqual('1900-01-02')
-    expect(dateNumberToString(engine.getCellValue('C1') as number)).toEqual('1915-10-24')
-  })
-
-  it('function MONTH with numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
-
-    expect(engine.getCellValue('A1')).toEqual(12)
-    expect(engine.getCellValue('B1')).toEqual(1)
-    expect(engine.getCellValue('C1')).toEqual(12)
-  })
-
-  it('function MONTH with string arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH("1899-12-31")', '=MONTH("1900-01-01")', '=MONTH("2018-12-31")']])
-
-    expect(engine.getCellValue('A1')).toEqual(12)
-    expect(engine.getCellValue('B1')).toEqual(1)
-    expect(engine.getCellValue('C1')).toEqual(12)
-  })
-
-  it('function MONTH with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH("foo")', '=MONTH("2018-30-12")', '=MONTH(1, 2)', '=MONTH()']])
-
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
-  })
-
-  it('function YEAR with numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
-
-    expect(engine.getCellValue('A1')).toEqual(1899)
-    expect(engine.getCellValue('B1')).toEqual(1900)
-    expect(engine.getCellValue('C1')).toEqual(2018)
-  })
-
-  it('function YEAR with string arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR("1899-12-31")', '=YEAR("1900-01-01")', '=YEAR("2018-12-31")']])
-
-    expect(engine.getCellValue('A1')).toEqual(1899)
-    expect(engine.getCellValue('B1')).toEqual(1900)
-    expect(engine.getCellValue('C1')).toEqual(2018)
-  })
-
-  it('function YEAR with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR("foo")', '=YEAR("2018-30-12")', '=YEAR(1, 2)', '=YEAR()']])
-
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
-  })
-
   it('function OFFSET basic use', () => {
     const engine = HandsOnEngine.buildFromArray([['5', '=OFFSET(B1, 0, -1)', '=OFFSET(A1, 0, 0)']])
 

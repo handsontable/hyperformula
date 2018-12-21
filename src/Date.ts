@@ -1,5 +1,6 @@
 import moment  from 'moment'
 import { Moment }  from 'moment'
+import {Config} from './Config'
 
 const DATE_ZERO = moment({
   year: 1899,
@@ -7,7 +8,7 @@ const DATE_ZERO = moment({
   day: 30,
 })
 
-const DATE_FORMAT = 'YYYY-MM-DD'
+const DATE_FORMAT = Config.DATE_FORMAT
 
 export function toDateNumber(year: number, month: number, day: number): number {
   const date = moment({
@@ -25,6 +26,10 @@ export function dateNumberToMoment(dateNumber: number): Moment {
 
 export function dateNumberToString(dateNumber: number): string {
   return dateNumberToMoment(dateNumber).format(DATE_FORMAT)
+}
+
+export function dateNumebrToStringFormat(dateNumber: number, format: string): string {
+  return dateNumberToMoment(dateNumber).format(format.toUpperCase())
 }
 
 export function dateNumberToMonthNumber(dateNumber: number): number {

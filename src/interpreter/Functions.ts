@@ -17,5 +17,6 @@ export const Functions = {
     YEAR: 'YEAR',
     SPLIT: 'SPLIT',
     ISBLANK: 'ISBLANK',
+    TEXT: 'TEXT',
   },
 }

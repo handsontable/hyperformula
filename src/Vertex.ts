@@ -182,7 +182,6 @@ export class RangeVertex extends Vertex {
     return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map()
   }
 
-
   /**
    * Stores all values for given criterion function
    *

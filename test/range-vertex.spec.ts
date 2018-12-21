@@ -18,7 +18,7 @@ describe('RangeVertex with cache', () => {
     const criterionString2 = '=1'
     const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!)
 
-    let criterionCache: CriterionCache = new Map()
+    const criterionCache: CriterionCache = new Map()
 
     criterionCache.set(criterionString1, [10, criterion1])
     criterionCache.set(criterionString2, [20, criterion2])

@@ -1,6 +1,12 @@
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, stringToDateNumber, toDateNumber} from '../Date'
+import {
+  dateNumberToMonthNumber,
+  dateNumberToYearNumber,
+  dateNumebrToStringFormat,
+  stringToDateNumber,
+  toDateNumber,
+} from '../Date'
 import {split} from '../generatorUtils'
 import {Graph} from '../Graph'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
@@ -12,11 +18,14 @@ import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '
 import {Functions} from './Functions'
 
 export class Interpreter {
+
   constructor(
     private readonly addressMapping: IAddressMapping,
     private readonly rangeMapping: RangeMapping,
     private readonly graph: Graph<Vertex>,
-  ) { }
+  ) {
+
+  }
 
   public computeFormula(formula: Ast, formulaAddress: SimpleCellAddress): CellValue {
     return this.evaluateAst(formula, formulaAddress)
@@ -459,6 +468,22 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
+      case Functions[Config.LANGUAGE].TEXT: {
+        if (ast.args.length !== 2) {
+          return cellError(ErrorType.NA)
+        }
+
+        const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
+        const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
+
+        const dateNumber = this.dateNumberRepresentation(dateArg)
+
+        if (dateNumber !== null && typeof formatArg === 'string') {
+          return dateNumebrToStringFormat(dateNumber, formatArg)
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
       case Functions[Config.LANGUAGE].SPLIT: {
         const stringArg = ast.args[0]
         const indexArg = ast.args[1]
@@ -538,8 +563,8 @@ export class Interpreter {
     } else {
       const [smallerCache, values] = this.getCriterionRangeValues(functionName, conditionRangeStart, valuesRangeStart, valuesRangeEnd)
 
-      let conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
-      let restConditions = conditions.slice(conditions.length - values.length)
+      const conditions = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
+      const restConditions = conditions.slice(conditions.length - values.length)
 
       /* copy old cache and actualize values */
       const cache: CriterionCache = new Map()
