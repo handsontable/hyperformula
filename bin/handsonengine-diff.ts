@@ -8,7 +8,7 @@ import {cellAddressToString, simpleCellAddress} from '../src/Cell'
 const CSV_DELIMITER = ','
 const FLOAT_ROUND = 2
 
-if (process.argv.length < 4) {
+if (process.argv.length < 5) {
   console.warn('Usage:\nyarn ts-node bin/handsonengine-diff formulas.csv expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
   process.exit(1)
 }
@@ -19,21 +19,21 @@ if (!fs.existsSync(formulasCsvPath)) {
   process.exit(1)
 }
 
-const expectedCsvPath = path.resolve(process.cwd(), process.argv[2])
+const expectedCsvPath = path.resolve(process.cwd(), process.argv[3])
 if (!fs.existsSync(expectedCsvPath)) {
   console.warn(`File ${expectedCsvPath} does not exist.`)
   process.exit(1)
 }
 
-const actualCsvPath = path.resolve(process.cwd(), process.argv[3])
+const actualCsvPath = path.resolve(process.cwd(), process.argv[4])
 if (!fs.existsSync(actualCsvPath)) {
   console.warn(`File ${actualCsvPath} does not exist.`)
   process.exit(1)
 }
 
 let columnsToIgnore: number[] = []
-if (process.argv[4]) {
-  columnsToIgnore = process.argv[4].split(',').map((e: string) => Number(e))
+if (process.argv[5]) {
+  columnsToIgnore = process.argv[5].split(',').map((e: string) => Number(e))
 }
 console.warn(`Will ignore columns: ${columnsToIgnore}`)
 
