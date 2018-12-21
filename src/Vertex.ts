@@ -1,6 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {Ast} from './parser/Ast'
-import {Criterion} from "./interpreter/Criterion";
+import {Criterion, CriterionLambda} from "./interpreter/Criterion";
 
 /**
  * Abstract class for any vertex
@@ -119,12 +119,14 @@ export class EmptyCellVertex extends CellVertex {
   }
 }
 
+
+export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 /**
  * Represents vertex bound to range
  */
 export class RangeVertex extends Vertex {
   private functionCache: Map<string, CellValue>
-  private criterionFuncitonCache: Map<string, Map<string, [CellValue, Criterion]>>
+  private criterionFuncitonCache: Map<string, CriterionCache>
 
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
     super()
@@ -154,7 +156,7 @@ export class RangeVertex extends Vertex {
 
 
 
-  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): [CellValue | null, Criterion | null] {
+  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): [CellValue | null, CriterionLambda | null] {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     if (values) {
       return values.get(criterionString) || [null, null]
@@ -162,11 +164,11 @@ export class RangeVertex extends Vertex {
     return [null, null]
   }
 
-  public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, Criterion]> {
+  public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {
     return this.criterionFuncitonCache.get(`${functionName},${leftCorner.col},${leftCorner.row}`) || new Map();
   }
 
-  public setCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string, criterion: Criterion, value: CellValue) {
+  public setCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string, criterion: CriterionLambda, value: CellValue) {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
     values.set(criterionString, [value, criterion])
     this.criterionFuncitonCache.set(`${functionName},${leftCorner.col},${leftCorner.row}`, values)

@@ -1,6 +1,6 @@
 import {RangeVertex} from "../src/Vertex";
 import {simpleCellAddress} from "../src/Cell";
-import {parseCriterion} from "../src/interpreter/Criterion";
+import {buildCriterionLambda, parseCriterion} from "../src/interpreter/Criterion";
 
 describe('RangeVertex with cache', () => {
   it('cache for criterion fuctions empty', () => {
@@ -13,10 +13,10 @@ describe('RangeVertex with cache', () => {
     const rangeVertex = new RangeVertex(simpleCellAddress(1,1), simpleCellAddress(1,10));
 
     const criterionString1 = '>=0'
-    const criterion1 = parseCriterion(criterionString1)!
+    const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!)
 
     const criterionString2 = '=1'
-    const criterion2 = parseCriterion(criterionString2)!
+    const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!)
 
     rangeVertex.setCriterionFunctionValue("SUMIF", simpleCellAddress(1,1), criterionString1, criterion1, 10)
     rangeVertex.setCriterionFunctionValue("SUMIF", simpleCellAddress(1,1), criterionString2, criterion2, 20)
