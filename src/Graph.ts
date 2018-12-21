@@ -15,12 +15,12 @@ export class Graph<T> {
   /**
    * Adds node to a graph
    *
-   * @param id - a node to be added
+   * @param node - a node to be added
    */
-  public addNode(id: T) {
-    this.nodes.add(id)
-    if (!this.edges.has(id)) {
-      this.edges.set(id, new Set())
+  public addNode(node: T) {
+    this.nodes.add(node)
+    if (!this.edges.has(node)) {
+      this.edges.set(node, new Set())
     }
   }
 
@@ -29,35 +29,35 @@ export class Graph<T> {
    *
    * The nodes had to be added to the graph before, or the error will be raised
    *
-   * @param fromId - node from which edge is outcoming
-   * @param toId - node to which edge is incoming
+   * @param fromNode - node from which edge is outcoming
+   * @param toNode - node to which edge is incoming
    */
-  public addEdge(fromId: T, toId: T) {
-    if (!this.nodes.has(fromId)) {
-      throw new Error(`Unknown node ${fromId}`)
+  public addEdge(fromNode: T, toNode: T) {
+    if (!this.nodes.has(fromNode)) {
+      throw new Error(`Unknown node ${fromNode}`)
     }
-    if (!this.nodes.has(toId)) {
-      throw new Error(`Unknown node ${toId}`)
+    if (!this.nodes.has(toNode)) {
+      throw new Error(`Unknown node ${toNode}`)
     }
-    this.edges.get(fromId)!.add(toId)
+    this.edges.get(fromNode)!.add(toNode)
   }
 
   /**
    * Returns nodes adjacent to given node
    *
-   * @param id - node to which adjacent nodes we want to retrieve
+   * @param node - node to which adjacent nodes we want to retrieve
    */
-  public adjacentNodes(id: T): Set<T> {
-    return this.edges.get(id)!
+  public adjacentNodes(node: T): Set<T> {
+    return this.edges.get(node)!
   }
 
   /**
    * Checks whether a node is present in graph
    *
-   * @param id - node to check
+   * @param node - node to check
    */
-  public hasNode(id: T): boolean {
-    return this.nodes.has(id)
+  public hasNode(node: T): boolean {
+    return this.nodes.has(node)
   }
 
   /**
