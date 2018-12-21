@@ -618,9 +618,9 @@ chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0:
     supports-color "^5.3.0"
 
 chevrotain@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/chevrotain/-/chevrotain-4.1.0.tgz#61b3cf734e182b3164eb12c2c2452f4f5282337f"
-  integrity sha512-iwuK4FOV+vZlvKonoXVw6G+rXJm4jWk17aJFkm6FloVYcVSrAaJLdCdQo+IIyX98jm0WJVcdK9cllRZQpNBnBg==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chevrotain/-/chevrotain-4.1.1.tgz#e1e601bf099e96e6a3377671b7d5a40c631cf8ce"
+  integrity sha512-NQky1HQyiAzxsxpq4Ppt47SYO2U3JLtmfs85QPf3kYSzGBjjp5AA8kqjH8hCjGFRpaQ781QOk1ragQIOkBgUTA==
   dependencies:
     regexp-to-ast "0.3.5"
 
