@@ -776,14 +776,14 @@ cssstyle@^1.0.0:
     cssom "0.3.x"
 
 csv-parse@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.0.1.tgz#4ad438352cbf12d5317d0fb9d588e53473293851"
-  integrity sha512-ehkwejEj05wwO7Q9JD+YSI6dNMIauHIroNU1RALrmRrqPoZIwRnfBtgq5GkU6i2RxZOJqjo3dtI1NrVSXvaimA==
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-4.2.0.tgz#6f3c09c5a46c06f19ca642a7b3104908d45b048c"
+  integrity sha512-t8KGN+ZKIYUUqXznAIZ723KI3IBILImjhN8VUfAod/VCtn/IpW3R24PYCxl81g4/z4R9DruTVyvavyiw2VRLgw==
 
 csv-stringify@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-5.0.0.tgz#7248acd769a6cf74201fd43ded7b806dd51aff1f"
-  integrity sha512-Zb2k2+oZcmQDn0nd0XpMTd8W+B2JfjI3kVfZBijYnw7zAx+K627z4LfvCfhP7B7dwyLmuzLOeuhW6T9HWIpQXg==
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-5.1.2.tgz#0c594ff13f3ae30d40348805eeb0d1f4faf1d9c2"
+  integrity sha512-rvNEMy8IwVe/gnCjnF4a/3cxKPm8oaAZEBB8RIzlx9HcNrLrn3NlgacUIFZBRH86tKF76WVA13nkFF0mX7G2EQ==
   dependencies:
     lodash.get "~4.4.2"
 
