@@ -1,5 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {Ast} from './parser/Ast'
+import {Criterion} from "./interpreter/Criterion";
 
 /**
  * Abstract class for any vertex
@@ -122,11 +123,13 @@ export class EmptyCellVertex extends CellVertex {
  * Represents vertex bound to range
  */
 export class RangeVertex extends Vertex {
-  private valueCache: Map<string, CellValue>
+  private functionCache: Map<string, CellValue>
+  private criterionFuncitonCache: Map<string, [CellValue, Criterion]>
 
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
     super()
-    this.valueCache = new Map()
+    this.functionCache = new Map()
+    this.criterionFuncitonCache = new Map()
   }
 
   /**
@@ -134,8 +137,8 @@ export class RangeVertex extends Vertex {
    *
    * @param functionName - name of the function
    */
-  public getRangeValue(functionName: string): CellValue | null {
-    return this.valueCache.get(functionName) || null
+  public getFunctionValue(functionName: string): CellValue | null {
+    return this.functionCache.get(functionName) || null
   }
 
   /**
@@ -144,15 +147,36 @@ export class RangeVertex extends Vertex {
    * @param functionName - name of the function
    * @param value - cached value
    */
-  public setRangeValue(functionName: string, value: CellValue) {
-    this.valueCache.set(functionName, value)
+  public setFunctionValue(functionName: string, value: CellValue) {
+    this.functionCache.set(functionName, value)
+  }
+
+  /**
+   * Returns cached value stored for given function with criterion
+   *
+   * @param hash - name of the function with additional parameters
+   */
+  public getCriterionFunctionValue(hash: string): [CellValue | null, Criterion | null] {
+    return this.criterionFuncitonCache.get(hash) || [null, null]
+  }
+
+  /**
+   * Stores cached value for given function with criterion
+   *
+   * @param hash - name of the function with additional parameters
+   * @param criterion - cached criterion
+   * @param value - cached value
+   */
+  public setCriterionFunctionValue(hash: string, criterion: Criterion, value: CellValue) {
+    this.criterionFuncitonCache.set(hash, [value, criterion])
   }
 
   /**
    * Clears function cache
    */
   public clear() {
-    this.valueCache.clear()
+    this.functionCache.clear()
+    this.criterionFuncitonCache.clear()
   }
 
   /**

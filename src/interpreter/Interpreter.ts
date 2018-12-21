@@ -182,7 +182,7 @@ export class Interpreter {
 
     let smallerRangeResult = null
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerRangeResult = smallerRangeVertex.getRangeValue(functionHash)
+      smallerRangeResult = smallerRangeVertex.getFunctionValue(functionHash)
     }
 
     if (smallerRangeResult !== null) {
@@ -204,7 +204,7 @@ export class Interpreter {
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.addressMapping, beginRange, endRange)
     const currentRangeVertex = this.addressMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      rangeResult.push(smallerRangeVertex.getRangeValue(functionName)!)
+      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
 
     for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
@@ -223,11 +223,11 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    let value = rangeVertex.getRangeValue(functionName)
+    let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, ast, formulaAddress)
       value = funcToCalc(rangeValues)
-      rangeVertex.setRangeValue(functionName, value)
+      rangeVertex.setFunctionValue(functionName, value)
     }
 
     return value
@@ -524,7 +524,7 @@ export class Interpreter {
       throw Error('Range does not exists in graph')
     }
 
-    const rangeValue = valuesRangeVertex.getRangeValue(criterionHash)
+    const rangeValue = valuesRangeVertex.getFunctionValue(criterionHash)
     if (!rangeValue) {
       const [smallerRange, values] = this.getSumifRangeValues(smallerRangeCriterionHash, valuesRangeArg, formulaAddress)
 
@@ -539,7 +539,7 @@ export class Interpreter {
 
       const reducedSum = reduceSum(toReduce[Symbol.iterator]())
 
-      valuesRangeVertex.setRangeValue(criterionHash, reducedSum)
+      valuesRangeVertex.setFunctionValue(criterionHash, reducedSum)
       return reducedSum
     } else {
       return rangeValue
