@@ -6,21 +6,26 @@ export enum StatType {
   TOP_SORT = 'TOP_SORT',
 }
 
+/**
+ * Provides tracking performance statistics to the engine
+ */
 export class Statistics {
-  private stats: Map<StatType, number>
+  private readonly stats: Map<StatType, number> = new Map<StatType, number>()
+  private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
 
-  private startTimes: Map<StatType, number>
-
-  constructor() {
-    this.stats = new Map<StatType, any>()
-    this.startTimes = new Map<StatType, any>()
-  }
-
-  public reset() {
+  /**
+   * Resets statistics
+   */
+  public reset(): void {
     this.stats.clear()
   }
 
-  public start(name: StatType) {
+  /**
+   * Starts tracking particular statistic.
+   *
+   * @param name - statistic to start tracking
+   */
+  public start(name: StatType): void {
     if (this.startTimes.get(name)) {
       throw Error(`Statistics ${name} already started`)
     } else {
@@ -29,7 +34,13 @@ export class Statistics {
     }
   }
 
-  public end(name: StatType) {
+  /**
+   * Stops tracking particular statistic.
+   * Raise error if tracking statistic wasn't started.
+   *
+   * @param name - statistic to stop tracking
+   */
+  public end(name: StatType): void {
     const now = Date.now()
     const startTime = this.startTimes.get(name)
 
@@ -43,6 +54,13 @@ export class Statistics {
     }
   }
 
+  /**
+   * Measure given statistic as execution of given function.
+   *
+   * @param name - statistic to track
+   * @param func - function to call
+   * @returns result of the function call
+   */
   public measure(name: StatType, func: () => any) {
     this.start(name)
     const result = func()
@@ -50,8 +68,10 @@ export class Statistics {
     return result
   }
 
+  /**
+   * Returns the snapshot of current results
+   */
   public snapshot(): Map<StatType, number> {
     return new Map(this.stats)
   }
-
 }
