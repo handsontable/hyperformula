@@ -246,7 +246,7 @@ describe('ParserWithCaching', () => {
     const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }))
 
     const ast1 = parser1.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
-    const ast2 = parser2.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    const ast2 = parser2.parse('=SUM(1; 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
 
     expect(ast1.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast2.type).toBe(AstNodeType.FUNCTION_CALL)

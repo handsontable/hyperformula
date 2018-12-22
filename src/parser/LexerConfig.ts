@@ -66,7 +66,7 @@ export interface ILexerConfig {
 }
 export const buildLexerConfig = (config: Config): ILexerConfig => {
   /* separator */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: Config.FUNCTION_ARG_SEPARATOR})
+  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
 
   /* order is important, first pattern is used */
   const allTokens = [
