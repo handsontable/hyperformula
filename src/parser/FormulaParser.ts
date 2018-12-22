@@ -572,16 +572,23 @@ class FormulaParser extends Parser {
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = Array<IAnyOrAlt<any>> | OrMethodOpts<any>
 
-const FormulaLexer = new Lexer(allTokens, {ensureOptimizations: true})
 const parser = new FormulaParser()
 
-/**
- * Returns Lexer tokens from formula string
- *
- * @param text - string representation of a formula
- */
-export function tokenizeFormula(text: string): ILexingResult {
-  return FormulaLexer.tokenize(text)
+export class FormulaLexer {
+  private readonly lexer: Lexer
+
+  constructor() {
+    this.lexer = new Lexer(allTokens, { ensureOptimizations: true })
+  }
+
+  /**
+   * Returns Lexer tokens from formula string
+   *
+   * @param text - string representation of a formula
+   */
+  public tokenizeFormula(text: string): ILexingResult {
+    return this.lexer.tokenize(text)
+  }
 }
 
 /**
