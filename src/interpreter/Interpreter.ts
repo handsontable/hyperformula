@@ -568,7 +568,7 @@ export class Interpreter {
     if (typeof arg === 'number') {
       return arg
     } else if (typeof arg === 'string') {
-      return stringToDateNumber(arg)
+      return stringToDateNumber(arg, this.config.dateFormat)
     } else {
       return null
     }
