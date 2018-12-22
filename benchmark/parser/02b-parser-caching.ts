@@ -20,7 +20,7 @@ while (prev < rows) {
 
   prev++
 }
-const flattenSheet: string[] = [].concat.apply([], sheet) // flatten
+const flattenSheet: string[] = ([] as string[]).concat([], ...sheet) // flatten
 
 const runsData = []
 let currentRun = 0
