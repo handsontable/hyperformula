@@ -51,15 +51,18 @@ export class HandsOnEngine {
   private verticesOnCycle: Vertex[] = []
   private interpreter: Interpreter
   private stats: Statistics = new Statistics()
+  private readonly config: Config
 
   constructor(sheet: Sheet, config: Config) {
+    this.config = config
+
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats)
-    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph)
+    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       graphBuilder.buildGraph(sheet)

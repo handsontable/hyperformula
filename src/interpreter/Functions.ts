@@ -1,4 +1,10 @@
-export const Functions = {
+interface IFunctions {
+  [language: string]: {
+    [functionName: string]: string,
+  }
+}
+
+export const Functions: IFunctions = {
   EN: {
     SUM: 'SUM',
     SUMIF: 'SUMIF',

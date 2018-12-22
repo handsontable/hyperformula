@@ -23,6 +23,7 @@ export class Interpreter {
     private readonly addressMapping: IAddressMapping,
     private readonly rangeMapping: RangeMapping,
     private readonly graph: Graph<Vertex>,
+    private readonly config: Config,
   ) {
 
   }
@@ -273,7 +274,7 @@ export class Interpreter {
    */
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
-      case Functions[Config.LANGUAGE].SUM: {
+      case Functions[this.config.language].SUM: {
         return ast.args.reduce((currentSum: CellValue, arg) => {
           let value
           if (arg.type === AstNodeType.CELL_RANGE) {
@@ -289,7 +290,7 @@ export class Interpreter {
           }
         }, 0)
       }
-      case Functions[Config.LANGUAGE].SUMIF: {
+      case Functions[this.config.language].SUMIF: {
         const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
         if (typeof criterionString !== 'string') {
           return cellError(ErrorType.VALUE)
@@ -320,7 +321,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].COUNTIF: {
+      case Functions[this.config.language].COUNTIF: {
         const conditionRangeArg = ast.args[0]
         if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
           return cellError(ErrorType.VALUE)
@@ -346,21 +347,21 @@ export class Interpreter {
         }
         return counter
       }
-      case Functions[Config.LANGUAGE].TRUE: {
+      case Functions[this.config.language].TRUE: {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)
         } else {
           return true
         }
       }
-      case Functions[Config.LANGUAGE].FALSE: {
+      case Functions[this.config.language].FALSE: {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)
         } else {
           return false
         }
       }
-      case Functions[Config.LANGUAGE].ACOS: {
+      case Functions[this.config.language].ACOS: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -374,7 +375,7 @@ export class Interpreter {
           return cellError(ErrorType.NUM)
         }
       }
-      case Functions[Config.LANGUAGE].IF: {
+      case Functions[this.config.language].IF: {
         const condition = this.booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
         if (condition === true) {
           return this.evaluateAst(ast.args[1], formulaAddress)
@@ -388,7 +389,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].AND: {
+      case Functions[this.config.language].AND: {
         if (ast.args.length < 1) {
           return cellError(ErrorType.NA)
         }
@@ -402,7 +403,7 @@ export class Interpreter {
         }
         return result
       }
-      case Functions[Config.LANGUAGE].OR: {
+      case Functions[this.config.language].OR: {
         if (ast.args.length < 1) {
           return cellError(ErrorType.NA)
         }
@@ -416,10 +417,10 @@ export class Interpreter {
         }
         return result
       }
-      case Functions[Config.LANGUAGE].CONCATENATE: {
+      case Functions[this.config.language].CONCATENATE: {
         return this.concatenate(ast.args, formulaAddress)
       }
-      case Functions[Config.LANGUAGE].ISERROR: {
+      case Functions[this.config.language].ISERROR: {
         if (ast.args.length != 1) {
           return cellError(ErrorType.NA)
         } else {
@@ -427,7 +428,7 @@ export class Interpreter {
           return isCellError(arg)
         }
       }
-      case Functions[Config.LANGUAGE].ISBLANK: {
+      case Functions[this.config.language].ISBLANK: {
         if (ast.args.length != 1) {
           return cellError(ErrorType.NA)
         }
@@ -440,7 +441,7 @@ export class Interpreter {
           return false
         }
       }
-      case Functions[Config.LANGUAGE].COLUMNS: {
+      case Functions[this.config.language].COLUMNS: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -451,7 +452,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].DATE: {
+      case Functions[this.config.language].DATE: {
         if (ast.args.length !== 3) {
           return cellError(ErrorType.NA)
         }
@@ -466,7 +467,7 @@ export class Interpreter {
 
         return toDateNumber(year, month, day)
       }
-      case Functions[Config.LANGUAGE].MONTH: {
+      case Functions[this.config.language].MONTH: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -480,7 +481,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].YEAR: {
+      case Functions[this.config.language].YEAR: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
         }
@@ -494,7 +495,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].TEXT: {
+      case Functions[this.config.language].TEXT: {
         if (ast.args.length !== 2) {
           return cellError(ErrorType.NA)
         }
@@ -510,7 +511,7 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
-      case Functions[Config.LANGUAGE].SPLIT: {
+      case Functions[this.config.language].SPLIT: {
         const stringArg = ast.args[0]
         const indexArg = ast.args[1]
 
