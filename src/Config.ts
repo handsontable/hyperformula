@@ -6,4 +6,12 @@ export class Config {
 
   public static readonly LANGUAGE = 'EN'
   public static readonly DATE_FORMAT = 'MM/DD/YYYY'
+
+  constructor({
+    public readonly csvDelimiter,
+    public readonly functionArgSeparator,
+    public readonly addressMappingFillThreshold,
+    public readonly language,
+    public readonly dateFormat,
+  })
 }
