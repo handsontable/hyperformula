@@ -3,7 +3,6 @@ import {
   CellAddress,
   CellDependency,
   getAbsoluteAddress,
-  relativeCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
@@ -93,7 +92,7 @@ export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCell
   while (currentRow <= rangeEnd.row) {
     let currentColumn = rangeStart.col
     while (currentColumn <= rangeEnd.col) {
-      yield relativeCellAddress(currentColumn, currentRow)
+      yield simpleCellAddress(currentColumn, currentRow)
       currentColumn++
     }
     currentRow++
