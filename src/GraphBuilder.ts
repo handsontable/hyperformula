@@ -6,6 +6,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
+import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
@@ -16,12 +17,14 @@ import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVe
 export type Sheet = string[][]
 
 export class GraphBuilder {
-  private parser = new ParserWithCaching()
+  private parser: ParserWithCaching
 
   constructor(private graph: Graph<Vertex>,
               private addressMapping: IAddressMapping,
               private rangeMapping: RangeMapping,
-              private stats: Statistics) {
+              private stats: Statistics,
+              private readonly config: Config) {
+    this.parser = new ParserWithCaching(config)
   }
 
   public buildGraph(sheet: Sheet) {

@@ -1,4 +1,5 @@
 import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'
@@ -9,7 +10,9 @@ export class ParserWithCaching {
   private cache: Cache = new Cache()
   private lexer: FormulaLexer
 
-  constructor() {
+  constructor(
+    private readonly config: Config,
+  ) {
     this.lexer = new FormulaLexer()
   }
 

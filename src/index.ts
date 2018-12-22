@@ -61,7 +61,7 @@ export class HandsOnEngine {
 
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats)
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {

@@ -1,4 +1,5 @@
 import {absoluteCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 const rows = 100000
@@ -24,7 +25,7 @@ const flattenSheet: string[] = ([] as string[]).concat([], ...sheet) // flatten
 const runsData = []
 let currentRun = 0
 while (currentRun < numberOfRuns) {
-  const parser = new ParserWithCaching()
+  const parser = new ParserWithCaching(new Config())
 
   const timestampBefore = Date.now()
   flattenSheet.forEach((formula) => {

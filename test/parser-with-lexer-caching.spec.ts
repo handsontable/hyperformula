@@ -6,6 +6,7 @@ import {
   ErrorType,
   relativeCellAddress,
 } from '../src/Cell'
+import {Config} from '../src/Config'
 import {
   AstNodeType,
   CellRangeAst,
@@ -22,7 +23,7 @@ import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=42', absoluteCellAddress(0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
@@ -30,7 +31,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('negative integer literal', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=-42', absoluteCellAddress(0, 0)).ast as MinusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
@@ -40,7 +41,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('string literal', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('="foobar"', absoluteCellAddress(0, 0)).ast as StringAst
     expect(ast.type).toBe(AstNodeType.STRING)
@@ -48,7 +49,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('plus operator on different nodes', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=1+A5', absoluteCellAddress(0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
@@ -57,7 +58,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('minus operator', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=1-3', absoluteCellAddress(0, 0)).ast as MinusOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_OP)
@@ -66,7 +67,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute cell reference', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=$B$3', absoluteCellAddress(1, 1)).ast as CellReferenceAst
 
@@ -75,7 +76,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('relative cell reference', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=B3', absoluteCellAddress(1, 1)).ast as CellReferenceAst
 
@@ -84,7 +85,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute column cell reference', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=$B3', absoluteCellAddress(1, 1)).ast as CellReferenceAst
 
@@ -93,7 +94,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute row cell reference', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=B$3', absoluteCellAddress(1, 1)).ast as CellReferenceAst
 
@@ -102,7 +103,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('it use cache for similar formulas', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast1 = parser.parse('=A1', absoluteCellAddress(0, 0)).ast
     const ast2 = parser.parse('=A2', absoluteCellAddress(0, 1)).ast
@@ -112,7 +113,7 @@ describe('ParserWithCaching', () => {
   })
 
   it("doesn't count cache for different formulas", () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const bast1 = parser.parse('=A1', absoluteCellAddress(0, 0)).ast
     const bast2 = parser.parse('=A2+A3', absoluteCellAddress(0, 0)).ast
@@ -121,7 +122,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function without args', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=SUM()', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -129,7 +130,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with args', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=SUM(1, A1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -138,7 +139,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with expression arg', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args.length).toBe(1)
@@ -150,7 +151,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes without braces', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=1 + 2 + 3', absoluteCellAddress(0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.PLUS_OP)
@@ -158,7 +159,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes with braces', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=1 + (2 + 3)', absoluteCellAddress(0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
@@ -166,14 +167,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('float literal', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=3.14', absoluteCellAddress(0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(3.14)
   })
 
   it('leading zeros', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const int = parser.parse('=01234', absoluteCellAddress(0, 0)).ast as NumberAst
     const float = parser.parse('=03.14', absoluteCellAddress(0, 0)).ast as NumberAst
     expect(int.type).toBe(AstNodeType.NUMBER)
@@ -183,14 +184,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('simple cell range', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=A1:B2', absoluteCellAddress(0, 0)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
   })
 
   it('parsing error - unexpected token', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=A', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -199,21 +200,21 @@ describe('ParserWithCaching', () => {
   })
 
   it('parsing error - unexpected token', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=SUM(A)', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('parsing error - not all input parsed', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=A1B1', absoluteCellAddress(0, 0)).ast as ErrorAst
     expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('errors - lexing errors', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const input = ["='foo'", "=foo'bar", "=''''''", '=@']
 
@@ -225,14 +226,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('functions should not be case sensitive', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
     const ast = parser.parse('=sum(1)', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
   })
 
   it('cell references should not be case sensitive', () => {
-    const parser = new ParserWithCaching()
+    const parser = new ParserWithCaching(new Config())
 
     const ast = parser.parse('=d1', absoluteCellAddress(0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
