@@ -128,7 +128,7 @@ describe('Integration', () => {
     const addressMapping = buildAddressMapping([
       ['', '', ''],
       ['', '', '1'],
-    ])
+    ], 0.8)
 
     expect(addressMapping).toBeInstanceOf(AddressMapping)
   })
@@ -137,7 +137,7 @@ describe('Integration', () => {
     const addressMapping = buildAddressMapping([
       ['1', '1'],
       ['1', '1'],
-    ])
+    ], 0.8)
 
     expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
   })

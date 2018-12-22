@@ -32,8 +32,8 @@ export class HandsOnEngine {
    *
    * @param csv - csv representation of sheet
    */
-  public static buildFromCsv(csv: string): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, {  delimiter: Config.CSV_DELIMITER }))
+  public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
+    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }))
   }
 
   /**
@@ -41,8 +41,8 @@ export class HandsOnEngine {
    *
    * @param sheet - two-dimmensional array representation of sheet
    */
-  public static buildFromArray(sheet: Sheet): HandsOnEngine {
-    return new HandsOnEngine(sheet)
+  public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
+    return new HandsOnEngine(sheet, config)
   }
   private addressMapping: IAddressMapping
   private rangeMapping: RangeMapping = new RangeMapping()
@@ -52,11 +52,11 @@ export class HandsOnEngine {
   private interpreter: Interpreter
   private stats: Statistics = new Statistics()
 
-  constructor(sheet: Sheet) {
+  constructor(sheet: Sheet, config: Config) {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    this.addressMapping = buildAddressMapping(sheet)
+    this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph)
@@ -206,9 +206,9 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
  *
  * @param sheet - two-dimmensional array sheet representation
  */
-export function buildAddressMapping(sheet: Sheet): IAddressMapping {
+export function buildAddressMapping(sheet: Sheet, threshold: number): IAddressMapping {
   const {height, width, fill} = findBoundaries(sheet)
-  if (fill > Config.ADDRESS_MAPPING_FILL_THRESHOLD) {
+  if (fill > threshold) {
     return new ArrayAddressMapping(width, height)
   } else {
     return new AddressMapping()
