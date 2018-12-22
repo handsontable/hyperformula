@@ -1,4 +1,4 @@
-import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
+import {createToken, IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher, TokenType} from 'chevrotain'
 
 import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
@@ -89,37 +89,45 @@ const WhiteSpace = createToken({
   group: Lexer.SKIPPED,
 })
 
-/* order is important, first pattern is used */
-const allTokens = [
-  WhiteSpace,
-  PlusOp,
-  MinusOp,
-  TimesOp,
-  DivOp,
-  EqualsOp,
-  NotEqualOp,
-  GreaterThanOrEqualOp,
-  LessThanOrEqualOp,
-  GreaterThanOp,
-  LessThanOp,
-  LParen,
-  RParen,
-  RangeSeparator,
-  AbsoluteCell,
-  AbsoluteColCell,
-  AbsoluteRowCell,
-  RelativeCell,
-  OffsetProcedureName,
-  ProcedureName,
-  ArgSeparator,
-  NumberLiteral,
-  StringLiteral,
-  ConcatenateOp,
-  BooleanOp,
-  AdditionOp,
-  MultiplicationOp,
-  CellReference,
-]
+export interface ILexerConfig {
+  allTokens: TokenType[],
+}
+export const buildLexerConfig = (config: Config): ILexerConfig => {
+  /* order is important, first pattern is used */
+  const allTokens = [
+    WhiteSpace,
+    PlusOp,
+    MinusOp,
+    TimesOp,
+    DivOp,
+    EqualsOp,
+    NotEqualOp,
+    GreaterThanOrEqualOp,
+    LessThanOrEqualOp,
+    GreaterThanOp,
+    LessThanOp,
+    LParen,
+    RParen,
+    RangeSeparator,
+    AbsoluteCell,
+    AbsoluteColCell,
+    AbsoluteRowCell,
+    RelativeCell,
+    OffsetProcedureName,
+    ProcedureName,
+    ArgSeparator,
+    NumberLiteral,
+    StringLiteral,
+    ConcatenateOp,
+    BooleanOp,
+    AdditionOp,
+    MultiplicationOp,
+    CellReference,
+  ]
+  return {
+    allTokens
+  }
+}
 
 /**
  * LL(k) formula parser described using Chevrotain DSL
@@ -138,7 +146,7 @@ const allTokens = [
  * A -> A1 | $A1 | A$1 | $A$1 <br/>
  * P -> SUM(..) <br/>
  */
-class FormulaParser extends Parser {
+export class FormulaParser extends Parser {
 
   /**
    * Entry rule
@@ -147,6 +155,8 @@ class FormulaParser extends Parser {
     this.CONSUME(EqualsOp)
     return this.SUBRULE(this.booleanExpression)
   })
+
+  private lexerConfig: ILexerConfig
 
   /**
    * Address of the cell in which formula is located
@@ -433,8 +443,9 @@ class FormulaParser extends Parser {
     return expression
   })
 
-  constructor() {
-    super(allTokens, {outputCst: false, maxLookahead: 7})
+  constructor(lexerConfig: ILexerConfig) {
+    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
+    this.lexerConfig = lexerConfig
     this.performSelfAnalysis()
   }
 
@@ -567,18 +578,40 @@ class FormulaParser extends Parser {
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
   }
+
+  /**
+   * Parses tokenized formula and builds abstract syntax tree
+   *
+   * @param lexResult - tokenized formula
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
+    this.input = lexResult.tokens
+
+    const ast = this.formulaWithContext(formulaAddress)
+    const errors = this.errors
+
+    if (errors.length > 0) {
+      return buildErrorAst(errors.map((e) =>
+        ({
+          type: ParsingErrorType.ParserError,
+          message: e.message,
+        }),
+      ))
+    }
+
+    return ast
+  }
 }
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = Array<IAnyOrAlt<any>> | OrMethodOpts<any>
 
-const parser = new FormulaParser()
-
 export class FormulaLexer {
   private readonly lexer: Lexer
 
-  constructor() {
-    this.lexer = new Lexer(allTokens, { ensureOptimizations: true })
+  constructor(lexerConfig: ILexerConfig) {
+    this.lexer = new Lexer(lexerConfig.allTokens, { ensureOptimizations: true })
   }
 
   /**
@@ -589,28 +622,4 @@ export class FormulaLexer {
   public tokenizeFormula(text: string): ILexingResult {
     return this.lexer.tokenize(text)
   }
-}
-
-/**
- * Parses tokenized formula and builds abstract syntax tree
- *
- * @param lexResult - tokenized formula
- * @param formulaAddress - address of the cell in which formula is located
- */
-export function parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
-  parser.input = lexResult.tokens
-
-  const ast = parser.formulaWithContext(formulaAddress)
-  const errors = parser.errors
-
-  if (errors.length > 0) {
-    return buildErrorAst(errors.map((e) =>
-        ({
-          type: ParsingErrorType.ParserError,
-          message: e.message,
-        }),
-      ))
-  }
-
-  return ast
 }

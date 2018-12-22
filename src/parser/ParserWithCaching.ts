@@ -3,17 +3,21 @@ import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'
-import {FormulaLexer, parseFromTokens} from './FormulaParser'
+import {buildLexerConfig, FormulaLexer, FormulaParser, ILexerConfig} from './FormulaParser'
 
 export class ParserWithCaching {
   public statsCacheUsed: number = 0
   private cache: Cache = new Cache()
   private lexer: FormulaLexer
+  private lexerConfig: ILexerConfig
+  private formulaParser: FormulaParser
 
   constructor(
     private readonly config: Config,
   ) {
-    this.lexer = new FormulaLexer()
+    this.lexerConfig = buildLexerConfig(config) 
+    this.lexer = new FormulaLexer(this.lexerConfig)
+    this.formulaParser = new FormulaParser(this.lexerConfig)
   }
 
   public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
@@ -35,7 +39,7 @@ export class ParserWithCaching {
     if (cacheResult) {
       ++this.statsCacheUsed
     } else {
-      const ast = parseFromTokens(lexerResult, formulaAddress)
+      const ast = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
       cacheResult = this.cache.set(hash, ast)
     }
     const { ast, relativeDependencies } = cacheResult
