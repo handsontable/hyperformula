@@ -1,6 +1,6 @@
 import {AddressMapping} from '../src/AddressMapping'
 import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
-import {relativeCellAddress, simpleCellAddress} from '../src/Cell'
+import {simpleCellAddress} from '../src/Cell'
 import {IAddressMapping} from '../src/IAddressMapping'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
@@ -8,7 +8,7 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
   it('simple set', () => {
     const mapping = builder(1, 1)
     const vertex = new ValueCellVertex(42)
-    const address = relativeCellAddress(0, 0)
+    const address = simpleCellAddress(0, 0)
 
     mapping.setCell(address, vertex)
 
@@ -19,74 +19,74 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
     const mapping = builder(1, 1)
     const vertex = new ValueCellVertex(42)
 
-    mapping.setCell(relativeCellAddress(0, 0), vertex)
+    mapping.setCell(simpleCellAddress(0, 0), vertex)
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(vertex)
+    expect(mapping.getCell(simpleCellAddress(0, 0))).toBe(vertex)
   })
 
   it("get when there's even no column", () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when there was already something in that column', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(relativeCellAddress(0, 1), new ValueCellVertex(42))
+    mapping.setCell(simpleCellAddress(0, 1), new ValueCellVertex(42))
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when asking for out of the row bound cell', () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(relativeCellAddress(0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it("set when there's already something in that column", () => {
     const mapping = builder(1, 2)
     const vertex0 = new ValueCellVertex(42)
     const vertex1 = new ValueCellVertex(42)
-    mapping.setCell(relativeCellAddress(0, 0), vertex0)
+    mapping.setCell(simpleCellAddress(0, 0), vertex0)
 
-    mapping.setCell(relativeCellAddress(0, 1), vertex1)
+    mapping.setCell(simpleCellAddress(0, 1), vertex1)
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(vertex0)
-    expect(mapping.getCell(relativeCellAddress(0, 1))).toBe(vertex1)
+    expect(mapping.getCell(simpleCellAddress(0, 0))).toBe(vertex0)
+    expect(mapping.getCell(simpleCellAddress(0, 1))).toBe(vertex1)
   })
 
   it('set overrides old value', () => {
     const mapping = builder(1, 1)
     const vertex0 = new ValueCellVertex(42)
     const vertex1 = new ValueCellVertex(42)
-    mapping.setCell(relativeCellAddress(0, 0), vertex0)
+    mapping.setCell(simpleCellAddress(0, 0), vertex0)
 
-    mapping.setCell(relativeCellAddress(0, 0), vertex1)
+    mapping.setCell(simpleCellAddress(0, 0), vertex1)
 
-    expect(mapping.getCell(relativeCellAddress(0, 0))).toBe(vertex1)
+    expect(mapping.getCell(simpleCellAddress(0, 0))).toBe(vertex1)
   })
 
   it("has when there's even no column", () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.has(relativeCellAddress(0, 0))).toBe(false)
+    expect(mapping.has(simpleCellAddress(0, 0))).toBe(false)
   })
 
   it('has when there was already something in that column', () => {
     const mapping = builder(1, 2)
 
-    mapping.setCell(relativeCellAddress(0, 1), new ValueCellVertex(42))
+    mapping.setCell(simpleCellAddress(0, 1), new ValueCellVertex(42))
 
-    expect(mapping.has(relativeCellAddress(0, 0))).toBe(false)
+    expect(mapping.has(simpleCellAddress(0, 0))).toBe(false)
   })
 
   it('has when there is a value', () => {
     const mapping = builder(1, 1)
 
-    mapping.setCell(relativeCellAddress(0, 0), new ValueCellVertex(42))
+    mapping.setCell(simpleCellAddress(0, 0), new ValueCellVertex(42))
 
-    expect(mapping.has(relativeCellAddress(0, 0))).toBe(true)
+    expect(mapping.has(simpleCellAddress(0, 0))).toBe(true)
   })
 }
 
