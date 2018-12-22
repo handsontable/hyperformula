@@ -149,6 +149,15 @@ export class Interpreter {
           return cellError(ErrorType.VALUE)
         }
       }
+      case AstNodeType.POWER_OP: {
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
+          return Math.pow(leftResult, rightResult)
+        } else {
+          return cellError(ErrorType.VALUE)
+        }
+      }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)

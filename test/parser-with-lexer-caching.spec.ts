@@ -14,8 +14,9 @@ import {
   ErrorAst,
   MinusOpAst,
   MinusUnaryOpAst,
-  NumberAst, ParsingErrorType,
-  PlusOpAst,
+  NumberAst,
+  ParsingErrorType, PlusOpAst,
+  PowerOpAst,
   ProcedureAst,
   StringAst,
 } from '../src/parser/Ast'
@@ -64,6 +65,24 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.MINUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
     expect(ast.right.type).toBe(AstNodeType.NUMBER)
+  })
+
+  it('power operator', () => {
+    const parser = new ParserWithCaching(new Config())
+
+    const ast = parser.parse('=2^3', absoluteCellAddress(0, 0)).ast as PowerOpAst
+    expect(ast.type).toBe(AstNodeType.POWER_OP)
+    expect(ast.left.type).toBe(AstNodeType.NUMBER)
+    expect(ast.right.type).toBe(AstNodeType.NUMBER)
+  })
+
+  it('power operator order', () => {
+    const parser = new ParserWithCaching(new Config())
+
+    const ast = parser.parse('=2*2^3', absoluteCellAddress(0, 0)).ast as PowerOpAst
+    expect(ast.type).toBe(AstNodeType.TIMES_OP)
+    expect(ast.left.type).toBe(AstNodeType.NUMBER)
+    expect(ast.right.type).toBe(AstNodeType.POWER_OP)
   })
 
   it('absolute cell reference', () => {

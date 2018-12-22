@@ -20,6 +20,7 @@ import {
   buildNotEqualOpAst,
   buildNumberAst,
   buildPlusOpAst,
+  buildPowerOpAst,
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
@@ -49,6 +50,7 @@ import {
   NumberLiteral,
   OffsetProcedureName,
   PlusOp,
+  PowerOp,
   ProcedureName,
   RangeSeparator,
   RelativeCell,
@@ -67,7 +69,8 @@ import {
  * B -> K < B | K >= B ... | K <br/>
  * K -> E & K | E <br/>
  * E -> M + E | M - E | M <br/>
- * M -> C * M | C / M | C <br/>
+ * M -> W * M | W / M | W <br/>
+ * W -> C * W | C <br/>
  * C -> N | R | O | A | P | num <br/>
  * N -> '(' E ')' <br/>
  * R -> A:OFFSET(..) | A:A <br/>
@@ -168,16 +171,36 @@ export class FormulaParser extends Parser {
    * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
    */
   private multiplicationExpression: AstRule = this.RULE('multiplicationExpression', () => {
-    let lhs: Ast = this.SUBRULE(this.atomicExpression)
+    let lhs: Ast = this.SUBRULE(this.powerExpression)
 
     this.MANY(() => {
       const op = this.CONSUME(MultiplicationOp)
-      const rhs = this.SUBRULE2(this.atomicExpression)
+      const rhs = this.SUBRULE2(this.powerExpression)
 
       if (tokenMatcher(op, TimesOp)) {
         lhs = buildTimesOpAst(lhs, rhs)
       } else if (tokenMatcher(op, DivOp)) {
         lhs = buildDivOpAst(lhs, rhs)
+      } else {
+        throw Error('Operator not supported')
+      }
+    })
+
+    return lhs
+  })
+
+  /**
+   * Rule for power expression
+   */
+  private powerExpression: AstRule = this.RULE('powerExpression', () => {
+    let lhs: Ast = this.SUBRULE(this.atomicExpression)
+
+    this.MANY(() => {
+      const op = this.CONSUME(PowerOp)
+      const rhs = this.SUBRULE2(this.atomicExpression)
+
+      if (tokenMatcher(op, PowerOp)) {
+        lhs = buildPowerOpAst(lhs, rhs)
       } else {
         throw Error('Operator not supported')
       }

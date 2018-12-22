@@ -149,6 +149,24 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
   })
 
+  it('power operator', () => {
+    const engine = HandsOnEngine.buildFromArray([['3', '=2^A1']])
+
+    expect(engine.getCellValue('B1')).toBe(8)
+  })
+
+  it('power operator - VALUE error on 1st operand', () => {
+    const engine = HandsOnEngine.buildFromArray([['www', '=A1^3']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('power operator - VALUE error on 2nd operand', () => {
+    const engine = HandsOnEngine.buildFromArray([['www', '=2^A1']])
+
+    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
   it('procedures - SUM without args', () => {
     const engine = HandsOnEngine.buildFromArray([['=SUM()']])
 

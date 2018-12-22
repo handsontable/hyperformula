@@ -18,6 +18,8 @@ export const MultiplicationOp = createToken({
 export const TimesOp = createToken({name: 'TimesOp', pattern: /\*/, categories: MultiplicationOp})
 export const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: MultiplicationOp})
 
+export const PowerOp = createToken({name: 'PowerOp', pattern: /\^/})
+
 export const BooleanOp = createToken({
   name: 'BooleanOp',
   pattern: Lexer.NA,
@@ -75,6 +77,7 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     MinusOp,
     TimesOp,
     DivOp,
+    PowerOp,
     EqualsOp,
     NotEqualOp,
     GreaterThanOrEqualOp,

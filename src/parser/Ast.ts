@@ -17,6 +17,7 @@ export type Ast =
     | MinusOpAst
     | TimesOpAst
     | DivOpAst
+    | PowerOpAst
     | ProcedureAst
     | ErrorAst
 
@@ -52,6 +53,7 @@ export enum AstNodeType {
   MINUS_OP = 'MINUS_OP',
   TIMES_OP = 'TIMES_OP',
   DIV_OP = 'DIV_OP',
+  POWER_OP = 'POWER_OP',
 
   FUNCTION_CALL = 'FUNCTION_CALL',
 
@@ -219,6 +221,16 @@ export interface DivOpAst extends BinaryOpAst {
 
 export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({
   type: AstNodeType.DIV_OP,
+  left,
+  right,
+})
+
+export interface PowerOpAst extends BinaryOpAst {
+  type: AstNodeType.POWER_OP,
+}
+
+export const buildPowerOpAst = (left: Ast, right: Ast): PowerOpAst => ({
+  type: AstNodeType.POWER_OP,
   left,
   right,
 })
