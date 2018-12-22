@@ -1,6 +1,7 @@
 import { absoluteCellAddress, CellAddress, CellDependency, simpleCellAddress } from '../src/Cell'
 import { computeHash } from '../src/parser/computeHash'
-import { FormulaLexer, buildLexerConfig } from '../src/parser/FormulaParser'
+import { FormulaLexer } from '../src/parser/FormulaParser'
+import { buildLexerConfig } from '../src/parser/LexerConfig'
 import { Config } from '../src/Config'
 
 describe('computeHash', () => {

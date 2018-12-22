@@ -3,7 +3,8 @@ import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {computeHash} from './computeHash'
-import {buildLexerConfig, FormulaLexer, FormulaParser, ILexerConfig} from './FormulaParser'
+import {FormulaLexer, FormulaParser} from './FormulaParser'
+import {buildLexerConfig, ILexerConfig} from './LexerConfig'
 
 export class ParserWithCaching {
   public statsCacheUsed: number = 0
