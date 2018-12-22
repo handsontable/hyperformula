@@ -76,9 +76,6 @@ const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z]+/})
 /* terminals */
 const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
 
-/* separator */
-const ArgSeparator = createToken({name: 'ArgSeparator', pattern: Config.FUNCTION_ARG_SEPARATOR})
-
 /* string literal */
 const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
@@ -90,9 +87,13 @@ const WhiteSpace = createToken({
 })
 
 export interface ILexerConfig {
+  argSeparator: TokenType,
   allTokens: TokenType[],
 }
 export const buildLexerConfig = (config: Config): ILexerConfig => {
+  /* separator */
+  const argSeparator = createToken({name: 'argSeparator', pattern: Config.FUNCTION_ARG_SEPARATOR})
+
   /* order is important, first pattern is used */
   const allTokens = [
     WhiteSpace,
@@ -115,7 +116,7 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     RelativeCell,
     OffsetProcedureName,
     ProcedureName,
-    ArgSeparator,
+    argSeparator,
     NumberLiteral,
     StringLiteral,
     ConcatenateOp,
@@ -125,7 +126,8 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     CellReference,
   ]
   return {
-    allTokens
+    argSeparator,
+    allTokens,
   }
 }
 
@@ -318,7 +320,7 @@ export class FormulaParser extends Parser {
     const args: Ast[] = []
     this.CONSUME(LParen)
     this.MANY_SEP({
-      SEP: ArgSeparator,
+      SEP: this.lexerConfig.argSeparator,
       DEF: () => {
         args.push(this.SUBRULE(this.booleanExpression))
       },
@@ -368,7 +370,7 @@ export class FormulaParser extends Parser {
     this.CONSUME(OffsetProcedureName)
     this.CONSUME(LParen)
     this.MANY_SEP({
-      SEP: ArgSeparator,
+      SEP: this.lexerConfig.argSeparator,
       DEF: () => {
         args.push(this.SUBRULE(this.booleanExpression))
       },
