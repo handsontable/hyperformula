@@ -4,7 +4,7 @@ import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('="a"&"b"', absoluteCellAddress(0, 0)).ast as ConcatenateOpAst
     expect(ast.type).toBe(AstNodeType.CONCATENATE_OP)
@@ -13,7 +13,7 @@ describe('Parser - Concatenate operators', () => {
   })
 
   it('Greater than operator as function parameter', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=CONCATENATE("="&A6,"foo")', absoluteCellAddress(0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)

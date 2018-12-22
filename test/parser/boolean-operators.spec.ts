@@ -11,7 +11,7 @@ import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1=2', absoluteCellAddress(0, 0)).ast as EqualsOpAst
 
@@ -19,7 +19,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Not equal operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1<>2', absoluteCellAddress(0, 0)).ast as NotEqualOpAst
 
@@ -27,7 +27,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1>2', absoluteCellAddress(0, 0)).ast as GreaterThanOpAst
 
@@ -35,7 +35,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1<2', absoluteCellAddress(0, 0)).ast as LessThanOpAst
 
@@ -43,7 +43,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than or equal operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1>=2', absoluteCellAddress(0, 0)).ast as GreaterThanOrEqualOpAst
 
@@ -51,7 +51,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than or equal operator', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1<=2', absoluteCellAddress(0, 0)).ast as LessThanOrEqualOpAst
 
@@ -59,7 +59,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Boolean operator with more complex childs', () => {
-    const parser = new ParserWithCaching('parser')
+    const parser = new ParserWithCaching()
 
     const ast = parser.parse('=1+2=1+2*6', absoluteCellAddress(0, 0)).ast as EqualsOpAst
 
