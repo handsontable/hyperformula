@@ -27,34 +27,34 @@ import {
   ParsingErrorType,
 } from './Ast'
 import {
-  ILexerConfig,
-  buildLexerConfig,
-  AdditionOp,
-  PlusOp,
-  MinusOp,
-  MultiplicationOp,
-  TimesOp,
-  DivOp,
-  BooleanOp,
-  EqualsOp,
-  NotEqualOp,
-  GreaterThanOp,
-  LessThanOp,
-  GreaterThanOrEqualOp,
-  LessThanOrEqualOp,
-  ConcatenateOp,
-  CellReference,
-  RelativeCell,
+  AbsoluteCell,
   AbsoluteColCell,
   AbsoluteRowCell,
-  AbsoluteCell,
-  RangeSeparator,
+  AdditionOp,
+  BooleanOp,
+  buildLexerConfig,
+  CellReference,
+  ConcatenateOp,
+  DivOp,
+  EqualsOp,
+  GreaterThanOp,
+  GreaterThanOrEqualOp,
+  ILexerConfig,
+  LessThanOp,
+  LessThanOrEqualOp,
   LParen,
-  RParen,
-  OffsetProcedureName,
-  ProcedureName,
+  MinusOp,
+  MultiplicationOp,
+  NotEqualOp,
   NumberLiteral,
+  OffsetProcedureName,
+  PlusOp,
+  ProcedureName,
+  RangeSeparator,
+  RelativeCell,
+  RParen,
   StringLiteral,
+  TimesOp,
   WhiteSpace,
 } from './LexerConfig'
 
@@ -389,6 +389,30 @@ export class FormulaParser extends Parser {
   }
 
   /**
+   * Parses tokenized formula and builds abstract syntax tree
+   *
+   * @param lexResult - tokenized formula
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
+    this.input = lexResult.tokens
+
+    const ast = this.formulaWithContext(formulaAddress)
+    const errors = this.errors
+
+    if (errors.length > 0) {
+      return buildErrorAst(errors.map((e) =>
+        ({
+          type: ParsingErrorType.ParserError,
+          message: e.message,
+        }),
+      ))
+    }
+
+    return ast
+  }
+
+  /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
    *
    * @param args - OFFSET function arguments
@@ -506,30 +530,6 @@ export class FormulaParser extends Parser {
       }
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
-  }
-
-  /**
-   * Parses tokenized formula and builds abstract syntax tree
-   *
-   * @param lexResult - tokenized formula
-   * @param formulaAddress - address of the cell in which formula is located
-   */
-  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
-    this.input = lexResult.tokens
-
-    const ast = this.formulaWithContext(formulaAddress)
-    const errors = this.errors
-
-    if (errors.length > 0) {
-      return buildErrorAst(errors.map((e) =>
-        ({
-          type: ParsingErrorType.ParserError,
-          message: e.message,
-        }),
-      ))
-    }
-
-    return ast
   }
 }
 

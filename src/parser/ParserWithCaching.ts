@@ -16,7 +16,7 @@ export class ParserWithCaching {
   constructor(
     private readonly config: Config,
   ) {
-    this.lexerConfig = buildLexerConfig(config) 
+    this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig)
   }

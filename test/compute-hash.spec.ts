@@ -1,8 +1,8 @@
 import { absoluteCellAddress, CellAddress, CellDependency, simpleCellAddress } from '../src/Cell'
+import { Config } from '../src/Config'
 import { computeHash } from '../src/parser/computeHash'
 import { FormulaLexer } from '../src/parser/FormulaParser'
 import { buildLexerConfig } from '../src/parser/LexerConfig'
-import { Config } from '../src/Config'
 
 describe('computeHash', () => {
   const computeFunc = (code: string, address: CellAddress): string => computeHash(new FormulaLexer(buildLexerConfig(new Config())).tokenizeFormula(code).tokens, address)

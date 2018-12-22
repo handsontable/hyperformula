@@ -104,4 +104,3 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     allTokens,
   }
 }
-

@@ -243,7 +243,7 @@ describe('ParserWithCaching', () => {
 
   it('allow to accept different lexer configs', () => {
     const parser1 = new ParserWithCaching(new Config())
-    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ";" }))
+    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }))
 
     const ast1 = parser1.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
     const ast2 = parser2.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
