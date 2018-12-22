@@ -240,4 +240,16 @@ describe('ParserWithCaching', () => {
     expect(ast.reference.col).toBe(3)
     expect(ast.reference.row).toBe(0)
   })
+
+  it('allow to accept different lexer configs', () => {
+    const parser1 = new ParserWithCaching(new Config())
+    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ";" }))
+
+    const ast1 = parser1.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
+    const ast2 = parser2.parse('=SUM(1, 2)', absoluteCellAddress(0, 0)).ast as ProcedureAst
+
+    expect(ast1.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast2.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast1).toEqual(ast2)
+  })
 })
