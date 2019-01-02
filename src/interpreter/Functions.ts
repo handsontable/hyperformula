@@ -1,10 +1,16 @@
+/**
+ * Mapping translating functions from different languages to English.
+ */
 interface IFunctions {
   [language: string]: {
     [functionName: string]: string,
   }
 }
 
+/** @inheritDoc */
 export const Functions: IFunctions = {
+
+  /** English translation */
   EN: {
     SUM: 'SUM',
     SUMIF: 'SUMIF',
