@@ -14,11 +14,29 @@ import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
+/**
+ * Two-dimenstional array representation of sheet
+ */
 export type Sheet = string[][]
 
+/**
+ * Service building the graph and mappings.
+ */
 export class GraphBuilder {
+  /**
+   * Parser to use when reading formulas.
+   */
   private parser: ParserWithCaching
 
+  /**
+   * Configures the building service.
+   *
+   * @param graph - graph instance in which we want to add vertices and edges
+   * @param addressMapping - mapping from addresses to vertices
+   * @param rangeMapping - mapping from ranges to range vertices
+   * @param stats - dependency tracking building performance
+   * @param config - configuration of the sheet
+   */
   constructor(private graph: Graph<Vertex>,
               private addressMapping: IAddressMapping,
               private rangeMapping: RangeMapping,
