@@ -27,6 +27,11 @@ export class GraphBuilder {
     this.parser = new ParserWithCaching(config)
   }
 
+  /**
+   * Builds graph.
+   *
+   * @param sheet - two-dimensional array representation of sheet
+   */
   public buildGraph(sheet: Sheet) {
     const dependencies: Map<SimpleCellAddress, CellDependency[]> = new Map()
 
@@ -90,6 +95,12 @@ export class GraphBuilder {
   }
 }
 
+/**
+ * Generates cell addresses in given range.
+ *
+ * @param rangeStart - top-left corner of range
+ * @param rangeEnd - bottom-right corner of range
+ */
 export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress) {
   let currentRow = rangeStart.row
   while (currentRow <= rangeEnd.row) {
@@ -102,6 +113,13 @@ export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCell
   }
 }
 
+/**
+ * Finds smaller range does have own vertex.
+ *
+ * @param rangeMapping - range mapping dependency
+ * @param rangeStart - top-left corner of range
+ * @param rangeEnd - bottom-right corner of range
+ */
 export const findSmallerRange = (rangeMapping: RangeMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
   if (rangeEnd.row > rangeStart.row) {
     const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
