@@ -30,5 +30,6 @@ export const Functions: IFunctions = {
     SPLIT: 'SPLIT',
     ISBLANK: 'ISBLANK',
     TEXT: 'TEXT',
+    MEDIAN: 'MEDIAN',
   },
 }
