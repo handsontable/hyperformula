@@ -8,6 +8,11 @@ import {CellVertex, EmptyCellVertex} from './Vertex'
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
   */
 export class ArrayAddressMapping implements IAddressMapping {
+  /**
+   * Array in which actual data is stored.
+   *
+   * It is created when building the mapping and the size of it is fixed.
+   */
   private mapping: CellVertex[][]
 
   /**
