@@ -21,11 +21,7 @@ export class ArrayAddressMapping implements IAddressMapping {
     }
   }
 
-  /**
-   * Returns cell content
-   *
-   * @param address - cell address
-    */
+  /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {
     const row = this.mapping[address.row]
     if (!row) {
@@ -34,21 +30,12 @@ export class ArrayAddressMapping implements IAddressMapping {
     return row[address.col] || EmptyCellVertex.getSingletonInstance()
   }
 
-  /**
-   * Set vertex for given address
-   *
-   * @param address - cell address
-   * @param newVertex - vertex to associate with address
-    */
+  /** @inheritDoc */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     this.mapping[address.row][address.col] = newVertex
   }
 
-  /**
-   * Returns whether the address is present or not
-   *
-   * @param address - address
-    */
+  /** @inheritDoc */
   public has(address: SimpleCellAddress): boolean {
     const row = this.mapping[address.row]
     if (!row) {
@@ -57,16 +44,12 @@ export class ArrayAddressMapping implements IAddressMapping {
     return !!row[address.col]
   }
 
-  /**
-   * Returns height of stored sheet
-    */
+  /** @inheritDoc */
   public getHeight(): number {
     return this.height
   }
 
-  /**
-   * Returns width of stored sheet
-    */
+  /** @inheritDoc */
   public getWidth(): number {
     return this.width
   }
