@@ -222,6 +222,14 @@ export class Interpreter {
     return rangeResult
   }
 
+  /**
+   * Finds existing CriterionCache or returns fresh one and fetch list of remaining values.
+   *
+   * @param functionName - function name (e.g. SUMIF)
+   * @param conditionLeftCorner - top-left corner of condition range
+   * @param beginRange - top-left corner of computing range
+   * @param endRange - bottom-right corner of computing range
+   */
   private getCriterionRangeValues(functionName: string, conditionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
     const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
@@ -547,7 +555,7 @@ export class Interpreter {
   }
 
   /**
-   *
+   * Concatenate values of arguments.
    *
    * @param args
    * @param formulaAddress
@@ -601,6 +609,14 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Computes SUMIF function for range arguments.
+   *
+   * @param ast - ast of the SUMIF function call
+   * @param formulaAddress - address of the cell with function call
+   * @param criterionString - raw value of the criterion passed to function call
+   * @param criterion - computed value of the criterion passed to function call
+   */
   private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const functionName = 'SUMIF'
     const conditionRangeArg = ast.args[0] as CellRangeAst
@@ -654,6 +670,13 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Computes SUMIF function for single-cell arguments
+   *
+   * @param ast - ast of the SUMIF function call
+   * @param formulaAddress - address of the cell with function call
+   * @param criterion - computed value of the criterion passed to function call
+   */
   private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
     const conditionReferenceArg = ast.args[0] as CellReferenceAst
     const valuesReferenceArg = ast.args[2] as CellReferenceAst
