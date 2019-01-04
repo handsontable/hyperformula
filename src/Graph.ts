@@ -133,7 +133,7 @@ export class Graph<T> {
   /**
    * Builds a mapping from nodes to the count of their incoming edges.
    */
-  public incomingEdges(): Map<T, number> {
+  private incomingEdges(): Map<T, number> {
     const incomingEdges: Map<T, number> = new Map()
     this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
     this.edges.forEach((adjacentNodes, sourceNode) => {
