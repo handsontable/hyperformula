@@ -1,19 +1,10 @@
 import {Config} from '../src/Config'
-import {Interpreter} from '../src/interpreter/Interpreter'
-import {IAddressMapping} from '../src/IAddressMapping'
-import {RangeMapping} from '../src/RangeMapping'
-import {Graph} from '../src/Graph'
-import {Vertex} from '../src/Vertex'
 import {HandsOnEngine} from '../src'
 import {CellValue, SimpleCellAddress} from '../src/Cell'
-import {Ast, ProcedureAst} from '../src/parser/Ast'
+import {ProcedureAst} from '../src/parser/Ast'
+import {FunctionPlugin, PluginFunctionType} from "../src/interpreter/FunctionPlugin";
 
-class FooPlugin {
-  private readonly interpreter: Interpreter
-  private readonly addressMapping: IAddressMapping
-  private readonly rangeMapping: RangeMapping
-  private readonly graph: Graph<Vertex>
-
+class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'foo': {
       'EN': 'foo',
@@ -21,18 +12,7 @@ class FooPlugin {
     }
   }
 
-  constructor(interpreter: Interpreter) {
-    this.interpreter = interpreter
-    this.addressMapping = interpreter.addressMapping
-    this.rangeMapping = interpreter.rangeMapping
-    this.graph = interpreter.graph
-  }
-
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    return this.interpreter.evaluateAst(ast, formulaAddress)
-  }
-
-  public foo(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public foo: PluginFunctionType = (ast, formulaAdress) => {
     return 42
   }
 }
