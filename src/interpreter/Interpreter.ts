@@ -17,6 +17,8 @@ import {CriterionCache, EmptyCellVertex, Vertex} from '../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
 import {Functions} from './Functions'
 import {SumifModule} from "./Sumif";
+import {add} from "./scalar";
+import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
 
 
 export class Interpreter {
@@ -312,7 +314,7 @@ export class Interpreter {
         }
       }
       case Functions[this.config.language].IF: {
-        const condition = this.booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
+        const condition = booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
         if (condition === true) {
           return this.evaluateAst(ast.args[1], formulaAddress)
         } else if (condition === false) {
@@ -334,7 +336,7 @@ export class Interpreter {
         let index = 0
         while (result === true && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          result = this.booleanRepresentation(argValue)
+          result = booleanRepresentation(argValue)
           ++index
         }
         return result
@@ -348,7 +350,7 @@ export class Interpreter {
         let index = 0
         while (result === false && index < ast.args.length) {
           const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          result = this.booleanRepresentation(argValue)
+          result = booleanRepresentation(argValue)
           ++index
         }
         return result
@@ -409,7 +411,7 @@ export class Interpreter {
         }
 
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        const dateNumber = this.dateNumberRepresentation(arg)
+        const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
 
         if (dateNumber !== null) {
           return dateNumberToMonthNumber(dateNumber)
@@ -423,7 +425,7 @@ export class Interpreter {
         }
 
         const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        const dateNumber = this.dateNumberRepresentation(arg)
+        const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
 
         if (dateNumber !== null) {
           return dateNumberToYearNumber(dateNumber)
@@ -439,7 +441,7 @@ export class Interpreter {
         const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
         const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
 
-        const dateNumber = this.dateNumberRepresentation(dateArg)
+        const dateNumber = dateNumberRepresentation(dateArg, this.config.dateFormat)
 
         if (dateNumber !== null && typeof formatArg === 'string') {
           return dateNumebrToStringFormat(dateNumber, formatArg)
@@ -530,42 +532,6 @@ export class Interpreter {
       }
     }, '')
   }
-
-  /**
-   * Converts cell value to date number representation (days after 12th Dec 1899)
-   *
-   * If value is a number simply returns value
-   * If value is a string, it tries to parse it with known format
-   *
-   * @param arg
-   */
-  private dateNumberRepresentation(arg: CellValue): number | null {
-    if (typeof arg === 'number') {
-      return arg
-    } else if (typeof arg === 'string') {
-      return stringToDateNumber(arg, this.config.dateFormat)
-    } else {
-      return null
-    }
-  }
-
-  /**
-   * Converts cell value to boolean representation
-   *
-   * if value is a boolean simply returns value
-   * if value is a number return true if value is different than 0
-   *
-   * @param arg
-   */
-  private booleanRepresentation(arg: CellValue): CellValue {
-    if (typeof arg === 'number') {
-      return arg !== 0
-    } else if (typeof arg === 'boolean') {
-      return arg
-    } else {
-      return cellError(ErrorType.VALUE)
-    }
-  }
 }
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
@@ -601,19 +567,7 @@ export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable:
   }
 }
 
-export function add(left: CellValue, right: CellValue): CellValue {
-  if (isCellError(left)) {
-    return left
-  }
-  if (isCellError(right)) {
-    return right
-  }
-  if (typeof left === 'number' && typeof right === 'number') {
-    return left + right
-  }
 
-  return left
-}
 
 export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
   let acc: CellValue = 0

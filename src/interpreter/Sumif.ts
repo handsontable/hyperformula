@@ -6,7 +6,8 @@ import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "..
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "./Criterion";
 import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {add, ifFilter, Interpreter, reduceSum} from "./Interpreter";
+import {ifFilter, Interpreter, reduceSum} from "./Interpreter";
+import {add} from "./scalar";
 
 export class SumifModule {
   private readonly interpreter: Interpreter
