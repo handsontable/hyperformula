@@ -38,7 +38,7 @@ class FooPlugin {
 }
 
 describe('Plugins', () => {
-  it.only('Extending with a plugin', () => {
+  it('Extending with a plugin', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=foo()'],
     ], new Config({functionPlugins: [FooPlugin]}))

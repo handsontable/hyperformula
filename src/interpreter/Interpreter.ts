@@ -42,9 +42,8 @@ export class Interpreter {
     for (const pluginClass of this.config.functionPlugins) {
       const pluginInstance = new pluginClass(this)
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        Object.keys(pluginClass.implementedFunctions[pluginFunction][this.config.language]).forEach((functionTranslation) => {
-          this.pluginCache.set(functionTranslation, [pluginInstance, pluginFunction])
-        })
+        const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
+        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
       })
     }
   }
