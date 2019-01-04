@@ -1,7 +1,5 @@
 import {Config} from '../src/Config'
 import {HandsOnEngine} from '../src'
-import {CellValue, SimpleCellAddress} from '../src/Cell'
-import {ProcedureAst} from '../src/parser/Ast'
 import {FunctionPlugin, PluginFunctionType} from "../src/interpreter/FunctionPlugin";
 
 class FooPlugin extends FunctionPlugin {

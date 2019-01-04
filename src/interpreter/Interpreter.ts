@@ -2,14 +2,12 @@ import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, Simple
 import {Config} from '../Config'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber,} from '../Date'
 import {Graph} from '../Graph'
-import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {EmptyCellVertex, Vertex} from '../Vertex'
 import {Functions} from './Functions'
 import {SumifModule} from "./Sumif";
-import {add} from "./scalar";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
 import {TextModule} from "./Text";
 import {NumericAggregationModule} from "./NumericAggregation";
