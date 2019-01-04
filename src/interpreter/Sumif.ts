@@ -6,8 +6,9 @@ import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "..
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "./Criterion";
 import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {ifFilter, Interpreter, reduceSum} from "./Interpreter";
+import {Interpreter, reduceSum} from "./Interpreter";
 import {add} from "./scalar";
+import {split} from "../generatorUtils";
 
 export class SumifModule {
   private readonly interpreter: Interpreter
@@ -203,6 +204,20 @@ export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRa
     result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
   }
   return result
+}
+
+export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
+  const conditionalSplit = split(conditionalIterable)
+  const computableSplit = split(computableIterable)
+  if (conditionalSplit.hasOwnProperty('value') && computableSplit.hasOwnProperty('value')) {
+    const conditionalFirst = conditionalSplit.value as CellValue
+    const computableFirst = computableSplit.value as CellValue
+    if (criterionLambda(conditionalFirst)) {
+      yield computableFirst
+    }
+
+    yield* ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
+  }
 }
 
 const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {

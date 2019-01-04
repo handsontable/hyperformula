@@ -20,12 +20,14 @@ import {SumifModule} from "./Sumif";
 import {add} from "./scalar";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
 import {TextModule} from "./Text";
+import {NumericAggregationModule} from "./NumericAggregation";
 
 
 export class Interpreter {
 
   private readonly sumifModule: SumifModule
   private readonly textModule: TextModule
+  private readonly numericAggregationModule: NumericAggregationModule
 
   constructor(
     public readonly addressMapping: IAddressMapping,
@@ -35,6 +37,7 @@ export class Interpreter {
   ) {
     this.sumifModule = new SumifModule(this)
     this.textModule = new TextModule(this)
+    this.numericAggregationModule = new NumericAggregationModule(this)
   }
 
   /**
@@ -206,59 +209,6 @@ export class Interpreter {
   }
 
   /**
-   * Returns list of values for given range and function name
-   *
-   * If range is dependent on smaller range, list will contain value of smaller range for this function
-   * and values of cells that are not present in smaller range
-   *
-   * @param functionName - function name (e.g. SUM)
-   * @param ast - cell range ast
-   * @param formulaAddress - address of the cell in which formula is located
-   */
-  private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-    const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
-    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
-    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
-    }
-
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-    }
-
-    return rangeResult
-  }
-
-  /**
-   * Performs range operation on given range
-   *
-   * @param ast - cell range ast
-   * @param formulaAddress - address of the cell in which formula is located
-   * @param functionName - function name to use as cache key
-   * @param funcToCalc - range operation
-   */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
-    const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
-    const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
-    const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
-
-    if (!rangeVertex) {
-      throw Error('Range does not exists in graph')
-    }
-
-    let value = rangeVertex.getFunctionValue(functionName)
-    if (!value) {
-      const rangeValues = this.getRangeValues(functionName, ast, formulaAddress)
-      value = funcToCalc(rangeValues)
-      rangeVertex.setFunctionValue(functionName, value)
-    }
-
-    return value
-  }
-
-  /**
    * Calculates value of procedure formula based on procedure name
    *
    * @param ast - procedure abstract syntax tree
@@ -267,20 +217,7 @@ export class Interpreter {
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
       case Functions[this.config.language].SUM: {
-        return ast.args.reduce((currentSum: CellValue, arg) => {
-          let value
-          if (arg.type === AstNodeType.CELL_RANGE) {
-            value = this.evaluateRange(arg, formulaAddress, 'SUM', rangeSum)
-          } else {
-            value = this.evaluateAst(arg, formulaAddress)
-          }
-
-          if (typeof currentSum === 'number' && typeof value === 'number') {
-            return currentSum + value
-          } else {
-            return cellError(ErrorType.VALUE)
-          }
-        }, 0)
+        return this.numericAggregationModule.sum(ast, formulaAddress)
       }
       case Functions[this.config.language].SUMIF: {
         return this.sumifModule.sumif(ast, formulaAddress)
@@ -522,37 +459,8 @@ export class Interpreter {
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
 export function rangeSum(rangeValues: CellValue[]): CellValue {
-  return rangeValues.reduce((acc: CellValue, val: CellValue) => {
-    if (isCellError(acc)) {
-      return acc
-    }
-    if (isCellError(val)) {
-      return val
-    }
-
-    if (typeof acc === 'number' && typeof val === 'number') {
-      return acc + val
-    } else {
-      return acc
-    }
-  })
+  return reduceSum(rangeValues[Symbol.iterator]())
 }
-
-export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
-  const conditionalSplit = split(conditionalIterable)
-  const computableSplit = split(computableIterable)
-  if (conditionalSplit.hasOwnProperty('value') && computableSplit.hasOwnProperty('value')) {
-    const conditionalFirst = conditionalSplit.value as CellValue
-    const computableFirst = computableSplit.value as CellValue
-    if (criterionLambda(conditionalFirst)) {
-      yield computableFirst
-    }
-
-    yield* ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
-  }
-}
-
-
 
 export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
   let acc: CellValue = 0
