@@ -44,13 +44,29 @@ export class HandsOnEngine {
   public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
     return new HandsOnEngine(sheet, config)
   }
+
+  /** Address mapping from addresses to vertices from graph. */
   private addressMapping: IAddressMapping
+
+  /** Range mapping from ranges to vertices representing these ranges. */
   private rangeMapping: RangeMapping = new RangeMapping()
+
+  /** Directed graph of cell dependencies. */
   private graph: Graph<Vertex> = new Graph()
+
+  /** Topologically sorted list of vertices. */
   private sortedVertices: Vertex[] = []
+
+  /** List of vertices which are on some cycle */
   private verticesOnCycle: Vertex[] = []
+
+  /** Formula interpreter */
   private interpreter: Interpreter
+
+  /** Statistics module for benchmarking */
   private stats: Statistics = new Statistics()
+
+  /** Engine configuration */
   private readonly config: Config
 
   constructor(sheet: Sheet, config: Config) {
