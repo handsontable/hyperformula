@@ -14,6 +14,7 @@ import {MedianPlugin} from "./plugin/MedianPlugin";
 import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
 import {TextPlugin} from "./plugin/TextPlugin";
 import {DatePlugin} from "./plugin/DatePlugin";
+import {BooleanPlugin} from "./plugin/BooleanPlugin";
 
 
 export class Interpreter {
@@ -26,7 +27,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -220,20 +221,6 @@ export class Interpreter {
    */
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
-      case Functions[this.config.language].TRUE: {
-        if (ast.args.length > 0) {
-          return cellError(ErrorType.NA)
-        } else {
-          return true
-        }
-      }
-      case Functions[this.config.language].FALSE: {
-        if (ast.args.length > 0) {
-          return cellError(ErrorType.NA)
-        } else {
-          return false
-        }
-      }
       case Functions[this.config.language].ACOS: {
         if (ast.args.length !== 1) {
           return cellError(ErrorType.NA)
@@ -247,48 +234,6 @@ export class Interpreter {
         } else {
           return cellError(ErrorType.NUM)
         }
-      }
-      case Functions[this.config.language].IF: {
-        const condition = booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
-        if (condition === true) {
-          return this.evaluateAst(ast.args[1], formulaAddress)
-        } else if (condition === false) {
-          if (ast.args[2]) {
-            return this.evaluateAst(ast.args[2], formulaAddress)
-          } else {
-            return false
-          }
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
-      }
-      case Functions[this.config.language].AND: {
-        if (ast.args.length < 1) {
-          return cellError(ErrorType.NA)
-        }
-
-        let result: CellValue = true
-        let index = 0
-        while (result === true && index < ast.args.length) {
-          const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          result = booleanRepresentation(argValue)
-          ++index
-        }
-        return result
-      }
-      case Functions[this.config.language].OR: {
-        if (ast.args.length < 1) {
-          return cellError(ErrorType.NA)
-        }
-
-        let result: CellValue = false
-        let index = 0
-        while (result === false && index < ast.args.length) {
-          const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-          result = booleanRepresentation(argValue)
-          ++index
-        }
-        return result
       }
       case Functions[this.config.language].ISERROR: {
         if (ast.args.length != 1) {
