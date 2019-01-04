@@ -1,14 +1,16 @@
+import {cellError, CellValue, ErrorType} from '../Cell'
+import {stringToDateNumber} from '../Date'
+
 /**
  * Converts cell value to date number representation (days after 12th Dec 1899)
  *
  * If value is a number simply returns value
- * If value is a string, it tries to parse it with known format
+ * If value is a string, it tries to parse it with date format
  *
- * @param arg
+ *
+ * @param arg - cell value
+ * @param dateFormat - date format pattern used when argument is a text
  */
-import {cellError, CellValue, ErrorType} from '../Cell'
-import {stringToDateNumber} from '../Date'
-
 export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | null {
   if (typeof arg === 'number') {
     return arg

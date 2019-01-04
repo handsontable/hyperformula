@@ -1,5 +1,5 @@
 import {CellValue, SimpleCellAddress} from './Cell'
-import {Criterion, CriterionLambda} from './interpreter/Criterion'
+import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
 
 /**

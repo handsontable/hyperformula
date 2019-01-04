@@ -1,6 +1,6 @@
 import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber} from '../../Date'
-import {Ast, ProcedureAst} from '../../parser/Ast'
+import {ProcedureAst} from '../../parser/Ast'
 import {dateNumberRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 

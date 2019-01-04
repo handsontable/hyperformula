@@ -1,5 +1,5 @@
 import {SimpleCellAddress} from './Cell'
-import {CellVertex, EmptyCellVertex, RangeVertex} from './Vertex'
+import {RangeVertex} from './Vertex'
 
 /**
  * Mapping from address ranges to range vertices

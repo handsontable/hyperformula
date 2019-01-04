@@ -1,10 +1,5 @@
 import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
-import {Graph} from '../../Graph'
-import {IAddressMapping} from '../../IAddressMapping'
 import {Ast, ProcedureAst} from '../../parser/Ast'
-import {RangeMapping} from '../../RangeMapping'
-import {Vertex} from '../../Vertex'
-import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class TextPlugin extends FunctionPlugin {

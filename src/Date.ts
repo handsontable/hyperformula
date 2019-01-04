@@ -1,6 +1,4 @@
-import moment  from 'moment'
-import { Moment }  from 'moment'
-import {Config} from './Config'
+import moment, {Moment} from 'moment'
 
 const DATE_ZERO = moment({
   year: 1899,

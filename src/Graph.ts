@@ -1,5 +1,3 @@
-import {FormulaCellVertex} from './Vertex'
-
 /**
  * Provides graph structure
  */

@@ -1,7 +1,6 @@
-import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher, TokenType} from 'chevrotain'
+import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
 import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
-import {Config} from '../Config'
 import {
   Ast,
   AstNodeType,
@@ -28,12 +27,8 @@ import {
   ParsingErrorType,
 } from './Ast'
 import {
-  AbsoluteCell,
-  AbsoluteColCell,
-  AbsoluteRowCell,
   AdditionOp,
   BooleanOp,
-  buildLexerConfig,
   CellReference,
   ConcatenateOp,
   DivOp,
@@ -53,11 +48,9 @@ import {
   PowerOp,
   ProcedureName,
   RangeSeparator,
-  RelativeCell,
   RParen,
   StringLiteral,
   TimesOp,
-  WhiteSpace,
 } from './LexerConfig'
 
 /**

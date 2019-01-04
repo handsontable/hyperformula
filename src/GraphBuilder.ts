@@ -1,18 +1,11 @@
-import {
-  absoluteCellAddress,
-  CellAddress,
-  CellDependency,
-  getAbsoluteAddress,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from './Cell'
+import {CellDependency, simpleCellAddress, SimpleCellAddress,} from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 /**
  * Two-dimenstional array representation of sheet
