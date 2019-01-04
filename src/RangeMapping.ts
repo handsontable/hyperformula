@@ -5,6 +5,7 @@ import {RangeVertex} from './Vertex'
  * Mapping from address ranges to range vertices
  */
 export class RangeMapping {
+  /** Map in which actual data is stored. */
   private rangeMapping: Map<string, RangeVertex> = new Map()
 
   /**

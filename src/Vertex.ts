@@ -22,8 +22,13 @@ export abstract class CellVertex extends Vertex {
  * Represents vertex which keeps formula
  */
 export class FormulaCellVertex extends CellVertex {
+  /** Most recently computed value of this formula. */
   private cachedCellValue?: CellValue
+
+  /** Formula in AST format */
   private formula: Ast
+
+  /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress) {
@@ -69,6 +74,7 @@ export class FormulaCellVertex extends CellVertex {
  * Represents vertex which keeps static cell value
  */
 export class ValueCellVertex extends CellVertex {
+  /** Static cell value. */
   private cellValue: CellValue
 
   constructor(cellValue: CellValue) {
@@ -95,7 +101,6 @@ export class ValueCellVertex extends CellVertex {
  * Represents singleton vertex bound to all empty cells
  */
 export class EmptyCellVertex extends CellVertex {
-
   /**
    * Retrieves singleton
    */
@@ -105,6 +110,8 @@ export class EmptyCellVertex extends CellVertex {
     }
     return EmptyCellVertex.instance
   }
+  
+  /** Singleton instance. */
   private static instance: EmptyCellVertex
 
   constructor() {
@@ -128,7 +135,10 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
  * Represents vertex bound to range
  */
 export class RangeVertex extends Vertex {
+  /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
+  
+  /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
@@ -215,6 +225,7 @@ export class RangeVertex extends Vertex {
     return this.end
   }
 
+  /** Computes key for criterion function cache */
   private criterionFunctioncache(functionName: string, leftCorner: SimpleCellAddress) {
     return `${functionName},${leftCorner.col},${leftCorner.row}`
   }
