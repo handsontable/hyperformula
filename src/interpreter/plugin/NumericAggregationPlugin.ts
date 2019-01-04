@@ -11,7 +11,7 @@ import {FunctionPlugin} from "./FunctionPlugin";
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
-export class NumericAggregationModule extends FunctionPlugin {
+export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'sum': {
       'EN': 'SUM',

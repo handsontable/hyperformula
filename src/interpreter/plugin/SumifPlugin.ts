@@ -8,7 +8,7 @@ import {add} from "../scalar";
 import {split} from "../../generatorUtils";
 import {FunctionPlugin} from "./FunctionPlugin";
 
-export class SumifModule extends FunctionPlugin {
+export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'sumif': {
       'EN': 'SUMIF',

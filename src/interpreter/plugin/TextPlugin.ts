@@ -7,7 +7,7 @@ import {Graph} from "../../Graph";
 import {Vertex} from "../../Vertex";
 import {FunctionPlugin} from "./FunctionPlugin";
 
-export class TextModule extends FunctionPlugin {
+export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     'concatenate': {
       'EN': 'CONCATENATE',

@@ -7,11 +7,11 @@ import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {EmptyCellVertex, Vertex} from '../Vertex'
 import {Functions} from './Functions'
-import {SumifModule} from "./plugin/SumifPlugin";
+import {SumifPlugin} from "./plugin/SumifPlugin";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
-import {TextModule} from "./plugin/TextPlugin";
-import {NumericAggregationModule} from "./plugin/NumericAggregationPlugin";
-import {MedianModule} from "./plugin/MedianPlugin";
+import {TextPlugin} from "./plugin/TextPlugin";
+import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
+import {MedianPlugin} from "./plugin/MedianPlugin";
 import {concatenate} from "./text";
 
 
@@ -25,7 +25,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifModule, TextModule, NumericAggregationModule, MedianModule
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin
     ])
 
     this.registerPlugins(this.config.functionPlugins)

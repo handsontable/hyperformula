@@ -3,7 +3,7 @@ import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, Simple
 import {generateCellsFromRangeGenerator} from "../../GraphBuilder";
 import {FunctionPlugin} from "./FunctionPlugin";
 
-export class MedianModule extends FunctionPlugin {
+export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
     'median': {
