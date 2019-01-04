@@ -1,32 +1,31 @@
-import {FunctionPlugin} from "./FunctionPlugin";
-import {cellError, CellValue, ErrorType, SimpleCellAddress} from "../../Cell";
-import {booleanRepresentation} from "../coerce";
-import {ProcedureAst} from "../../parser/Ast";
+import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser/Ast'
+import {booleanRepresentation} from '../coerce'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'true': {
-      'EN': 'TRUE',
-      'PL': 'PRAWDA',
+    true: {
+      EN: 'TRUE',
+      PL: 'PRAWDA',
     },
-    'false': {
-      'EN': 'FALSE',
-      'PL': 'FALSZ',
+    false: {
+      EN: 'FALSE',
+      PL: 'FALSZ',
     },
-    'if': {
-      'EN': 'IF',
-      'PL': 'JEZELI',
+    if: {
+      EN: 'IF',
+      PL: 'JEZELI',
     },
-    'and': {
-      'EN': 'AND',
-      'PL': 'ORAZ',
+    and: {
+      EN: 'AND',
+      PL: 'ORAZ',
     },
-    'or': {
-      'EN': 'OR',
-      'PL': 'LUB',
-    }
+    or: {
+      EN: 'OR',
+      PL: 'LUB',
+    },
   }
-
 
   public true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length > 0) {

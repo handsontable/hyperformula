@@ -1,27 +1,27 @@
-import {FunctionPlugin} from "./FunctionPlugin";
-import {Ast, ProcedureAst} from "../../parser/Ast";
-import {cellError, CellValue, ErrorType, SimpleCellAddress} from "../../Cell";
-import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber} from "../../Date";
-import {dateNumberRepresentation} from "../coerce";
+import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber} from '../../Date'
+import {Ast, ProcedureAst} from '../../parser/Ast'
+import {dateNumberRepresentation} from '../coerce'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'date': {
-      'EN': 'DATE',
-      'PL': 'DATA',
+    date: {
+      EN: 'DATE',
+      PL: 'DATA',
     },
-    'month': {
-      'EN': 'MONTH',
-      'PL': 'MIESIAC',
+    month: {
+      EN: 'MONTH',
+      PL: 'MIESIAC',
     },
-    'year': {
-      'EN': 'YEAR',
-      'PL': 'ROK',
+    year: {
+      EN: 'YEAR',
+      PL: 'ROK',
     },
-    'text': {
-      'EN': 'TEXT',
-      'PL': 'TEKST',
-    }
+    text: {
+      EN: 'TEXT',
+      PL: 'TEKST',
+    },
   }
 
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

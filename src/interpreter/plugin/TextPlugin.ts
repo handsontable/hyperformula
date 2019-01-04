@@ -1,22 +1,22 @@
-import {Ast, ProcedureAst} from "../../parser/Ast";
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from "../../Cell";
-import {Interpreter} from "../Interpreter";
-import {IAddressMapping} from "../../IAddressMapping";
-import {RangeMapping} from "../../RangeMapping";
-import {Graph} from "../../Graph";
-import {Vertex} from "../../Vertex";
-import {FunctionPlugin} from "./FunctionPlugin";
+import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {Graph} from '../../Graph'
+import {IAddressMapping} from '../../IAddressMapping'
+import {Ast, ProcedureAst} from '../../parser/Ast'
+import {RangeMapping} from '../../RangeMapping'
+import {Vertex} from '../../Vertex'
+import {Interpreter} from '../Interpreter'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'concatenate': {
-      'EN': 'CONCATENATE',
-      'PL': 'ZLACZTEKST',
+    concatenate: {
+      EN: 'CONCATENATE',
+      PL: 'ZLACZTEKST',
     },
-    'split': {
-      'EN': 'SPLIT',
-      'PL': 'PODZIELTEKST'
-    }
+    split: {
+      EN: 'SPLIT',
+      PL: 'PODZIELTEKST',
+    },
   }
 
   /**

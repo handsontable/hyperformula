@@ -1,15 +1,15 @@
-import {AstNodeType, ProcedureAst} from "../../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from "../../Cell";
-import {generateCellsFromRangeGenerator} from "../../GraphBuilder";
-import {FunctionPlugin} from "./FunctionPlugin";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
-    'median': {
-      'EN': 'MEDIAN',
-      'PL': 'MEDIANA',
-    }
+    median: {
+      EN: 'MEDIAN',
+      PL: 'MEDIANA',
+    },
   }
 
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

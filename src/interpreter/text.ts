@@ -1,4 +1,4 @@
-import {CellValue, isCellError} from "../Cell";
+import {CellValue, isCellError} from '../Cell'
 
 export function concatenate(args: CellValue[]): CellValue {
   return args.reduce((acc: CellValue, arg: CellValue) => {

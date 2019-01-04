@@ -1,22 +1,22 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../../Cell";
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../../parser/Ast";
-import {Interpreter} from "../Interpreter";
-import {IAddressMapping} from "../../IAddressMapping";
-import {RangeMapping} from "../../RangeMapping";
-import {Graph} from "../../Graph";
-import {Vertex} from "../../Vertex";
-import {findSmallerRange, generateCellsFromRangeGenerator} from "../../GraphBuilder";
-import {add} from "../scalar";
-import {FunctionPlugin} from "./FunctionPlugin";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../../Cell'
+import {Graph} from '../../Graph'
+import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {IAddressMapping} from '../../IAddressMapping'
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
+import {RangeMapping} from '../../RangeMapping'
+import {Vertex} from '../../Vertex'
+import {Interpreter} from '../Interpreter'
+import {add} from '../scalar'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'sum': {
-      'EN': 'SUM',
-      'PL': 'SUMA',
-    }
+    sum: {
+      EN: 'SUM',
+      PL: 'SUMA',
+    },
   }
 
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

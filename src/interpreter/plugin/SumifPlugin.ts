@@ -1,23 +1,23 @@
-import {IAddressMapping} from "../../IAddressMapping";
-import {CriterionCache} from "../../Vertex";
-import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "../../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../../Cell";
-import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "../Criterion";
-import {findSmallerRange, generateCellsFromRangeGenerator} from "../../GraphBuilder";
-import {add} from "../scalar";
-import {split} from "../../generatorUtils";
-import {FunctionPlugin} from "./FunctionPlugin";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../../Cell'
+import {split} from '../../generatorUtils'
+import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {IAddressMapping} from '../../IAddressMapping'
+import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
+import {CriterionCache} from '../../Vertex'
+import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
+import {add} from '../scalar'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'sumif': {
-      'EN': 'SUMIF',
-      'PL': 'SUMAJEZELI',
+    sumif: {
+      EN: 'SUMIF',
+      PL: 'SUMAJEZELI',
     },
-    'countif': {
-      'EN': 'COUNTIF',
-      'PL': 'LICZJEZELI'
-    }
+    countif: {
+      EN: 'COUNTIF',
+      PL: 'LICZJEZELI',
+    },
   }
 
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -189,7 +189,6 @@ export class SumifPlugin extends FunctionPlugin {
   }
 }
 
-
 export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
   const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
   const result: CellValue[] = []
@@ -220,7 +219,6 @@ export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
   }
   return acc
 }
-
 
 const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
   const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)

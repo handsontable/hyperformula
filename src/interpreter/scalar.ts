@@ -1,4 +1,4 @@
-import {CellValue, isCellError} from "../Cell";
+import {CellValue, isCellError} from '../Cell'
 
 export function add(left: CellValue, right: CellValue): CellValue {
   if (isCellError(left)) {

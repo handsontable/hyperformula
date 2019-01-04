@@ -12,7 +12,7 @@ export class Config {
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
   public readonly language: string
-  public readonly functionPlugins: Array<any>
+  public readonly functionPlugins: any[]
 
   constructor({
     addressMappingFillThreshold,
@@ -27,7 +27,7 @@ export class Config {
     dateFormat?: string,
     functionArgSeparator?: string,
     language?: string,
-    functionPlugins?: Array<any>,
+    functionPlugins?: any[],
   } = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.ADDRESS_MAPPING_FILL_THRESHOLD
     this.csvDelimiter = csvDelimiter || Config.CSV_DELIMITER

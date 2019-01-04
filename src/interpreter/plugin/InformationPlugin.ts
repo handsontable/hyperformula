@@ -1,22 +1,22 @@
-import {FunctionPlugin} from "./FunctionPlugin";
-import {AstNodeType, ProcedureAst} from "../../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from "../../Cell";
-import {EmptyCellVertex} from "../../Vertex";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
+import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {EmptyCellVertex} from '../../Vertex'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'iserror': {
-      'EN': 'ISERROR',
-      'PL': 'CZYBLAD',
+    iserror: {
+      EN: 'ISERROR',
+      PL: 'CZYBLAD',
     },
-    'isblank': {
-      'EN': 'ISBLANK',
-      'PL': 'CZYPUSTA',
+    isblank: {
+      EN: 'ISBLANK',
+      PL: 'CZYPUSTA',
     },
-    'columns': {
-      'EN': 'COLUMNS',
-      'PL': 'LICZBAKOLUMN',
-    }
+    columns: {
+      EN: 'COLUMNS',
+      PL: 'LICZBAKOLUMN',
+    },
   }
 
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

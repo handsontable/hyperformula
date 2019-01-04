@@ -1,23 +1,22 @@
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber,} from '../Date'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber} from '../Date'
 import {Graph} from '../Graph'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {EmptyCellVertex, Vertex} from '../Vertex'
+import {booleanRepresentation, dateNumberRepresentation} from './coerce'
 import {Functions} from './Functions'
-import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
-import {concatenate} from "./text";
-import {SumifPlugin} from "./plugin/SumifPlugin";
-import {MedianPlugin} from "./plugin/MedianPlugin";
-import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
-import {TextPlugin} from "./plugin/TextPlugin";
-import {DatePlugin} from "./plugin/DatePlugin";
-import {BooleanPlugin} from "./plugin/BooleanPlugin";
-import {InformationPlugin} from "./plugin/InformationPlugin";
-import {TrigonometryPlugin} from "./plugin/TrigonometryPlugin";
-
+import {BooleanPlugin} from './plugin/BooleanPlugin'
+import {DatePlugin} from './plugin/DatePlugin'
+import {InformationPlugin} from './plugin/InformationPlugin'
+import {MedianPlugin} from './plugin/MedianPlugin'
+import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
+import {SumifPlugin} from './plugin/SumifPlugin'
+import {TextPlugin} from './plugin/TextPlugin'
+import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
+import {concatenate} from './text'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -29,20 +28,10 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
-  }
-
-  private registerPlugins(plugins: Array<any>) {
-    for (const pluginClass of plugins) {
-      const pluginInstance = new pluginClass(this)
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
-        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
-      })
-    }
   }
 
   /**
@@ -218,6 +207,16 @@ export class Interpreter {
       default: {
         throw Error('Not supported Ast node type')
       }
+    }
+  }
+
+  private registerPlugins(plugins: any[]) {
+    for (const pluginClass of plugins) {
+      const pluginInstance = new pluginClass(this)
+      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+        const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
+        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
+      })
     }
   }
 }

@@ -6,8 +6,8 @@
  *
  * @param arg
  */
-import {cellError, CellValue, ErrorType} from "../Cell";
-import {stringToDateNumber} from "../Date";
+import {cellError, CellValue, ErrorType} from '../Cell'
+import {stringToDateNumber} from '../Date'
 
 export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | null {
   if (typeof arg === 'number') {

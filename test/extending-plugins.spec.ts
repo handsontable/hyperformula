@@ -1,13 +1,13 @@
-import {Config} from '../src/Config'
 import {HandsOnEngine} from '../src'
-import {FunctionPlugin, PluginFunctionType} from "../src/interpreter/plugin/FunctionPlugin";
+import {Config} from '../src/Config'
+import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    'foo': {
-      'EN': 'foo',
-      'PL': 'fu',
-    }
+    foo: {
+      EN: 'foo',
+      PL: 'fu',
+    },
   }
 
   public foo: PluginFunctionType = (ast, formulaAdress) => {
