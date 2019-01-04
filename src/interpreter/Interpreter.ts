@@ -15,6 +15,7 @@ import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
 import {TextPlugin} from "./plugin/TextPlugin";
 import {DatePlugin} from "./plugin/DatePlugin";
 import {BooleanPlugin} from "./plugin/BooleanPlugin";
+import {InformationPlugin} from "./plugin/InformationPlugin";
 
 
 export class Interpreter {
@@ -27,7 +28,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -233,38 +234,6 @@ export class Interpreter {
           return Math.acos(arg)
         } else {
           return cellError(ErrorType.NUM)
-        }
-      }
-      case Functions[this.config.language].ISERROR: {
-        if (ast.args.length != 1) {
-          return cellError(ErrorType.NA)
-        } else {
-          const arg = this.evaluateAst(ast.args[0], formulaAddress)
-          return isCellError(arg)
-        }
-      }
-      case Functions[this.config.language].ISBLANK: {
-        if (ast.args.length != 1) {
-          return cellError(ErrorType.NA)
-        }
-        const arg = ast.args[0]
-        if (arg.type === AstNodeType.CELL_REFERENCE) {
-          const address = getAbsoluteAddress(arg.reference, formulaAddress)
-          const vertex = this.addressMapping.getCell(address)
-          return (vertex === EmptyCellVertex.getSingletonInstance())
-        } else {
-          return false
-        }
-      }
-      case Functions[this.config.language].COLUMNS: {
-        if (ast.args.length !== 1) {
-          return cellError(ErrorType.NA)
-        }
-        const rangeAst = ast.args[0]
-        if (rangeAst.type === AstNodeType.CELL_RANGE) {
-          return (rangeAst.end.col - rangeAst.start.col + 1)
-        } else {
-          return cellError(ErrorType.VALUE)
         }
       }
       default: {
