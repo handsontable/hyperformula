@@ -16,6 +16,7 @@ import {TextPlugin} from "./plugin/TextPlugin";
 import {DatePlugin} from "./plugin/DatePlugin";
 import {BooleanPlugin} from "./plugin/BooleanPlugin";
 import {InformationPlugin} from "./plugin/InformationPlugin";
+import {TrigonometryPlugin} from "./plugin/TrigonometryPlugin";
 
 
 export class Interpreter {
@@ -28,7 +29,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -197,7 +198,13 @@ export class Interpreter {
         }
       }
       case AstNodeType.FUNCTION_CALL: {
-        return this.evaluateFunction(ast, formulaAddress)
+        const pluginEntry = this.pluginCache.get(ast.procedureName)
+        if (pluginEntry) {
+          const [pluginInstance, pluginFunction] = pluginEntry
+          return pluginInstance[pluginFunction](ast, formulaAddress)
+        } else {
+          return cellError(ErrorType.NAME)
+        }
       }
       case AstNodeType.CELL_RANGE: {
         return cellError(ErrorType.VALUE)
@@ -210,40 +217,6 @@ export class Interpreter {
       }
       default: {
         throw Error('Not supported Ast node type')
-      }
-    }
-  }
-
-  /**
-   * Calculates value of procedure formula based on procedure name
-   *
-   * @param ast - procedure abstract syntax tree
-   * @param formulaAddress - address of the cell in which formula is located
-   */
-  private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    switch (ast.procedureName) {
-      case Functions[this.config.language].ACOS: {
-        if (ast.args.length !== 1) {
-          return cellError(ErrorType.NA)
-        }
-
-        const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        if (typeof arg !== 'number') {
-          return cellError(ErrorType.VALUE)
-        } else if (-1 <= arg && arg <= 1) {
-          return Math.acos(arg)
-        } else {
-          return cellError(ErrorType.NUM)
-        }
-      }
-      default: {
-        const pluginEntry = this.pluginCache.get(ast.procedureName)
-        if (pluginEntry) {
-          const [pluginInstance, pluginFunction] = pluginEntry
-          return pluginInstance[pluginFunction](ast, formulaAddress)
-        } else {
-          return cellError(ErrorType.NAME)
-        }
       }
     }
   }
