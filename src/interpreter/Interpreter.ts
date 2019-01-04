@@ -19,11 +19,13 @@ import {Functions} from './Functions'
 import {SumifModule} from "./Sumif";
 import {add} from "./scalar";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
+import {TextModule} from "./Text";
 
 
 export class Interpreter {
 
   private readonly sumifModule: SumifModule
+  private readonly textModule: TextModule
 
   constructor(
     public readonly addressMapping: IAddressMapping,
@@ -32,6 +34,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.sumifModule = new SumifModule(this)
+    this.textModule = new TextModule(this)
   }
 
   /**
@@ -52,7 +55,7 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        return this.concatenate([ast.left, ast.right], formulaAddress)
+        return this.textModule.concatenate([ast.left, ast.right], formulaAddress)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -356,7 +359,7 @@ export class Interpreter {
         return result
       }
       case Functions[this.config.language].CONCATENATE: {
-        return this.concatenate(ast.args, formulaAddress)
+        return this.textModule.concatenate(ast.args, formulaAddress)
       }
       case Functions[this.config.language].ISERROR: {
         if (ast.args.length != 1) {
@@ -514,24 +517,6 @@ export class Interpreter {
     }
   }
 
-  /**
-   * Concatenate values of arguments.
-   *
-   * @param args
-   * @param formulaAddress
-   */
-  private concatenate(args: Ast[], formulaAddress: SimpleCellAddress): CellValue {
-    return args.reduce((acc: CellValue, arg: Ast) => {
-      const argResult = this.evaluateAst(arg, formulaAddress)
-      if (isCellError(acc)) {
-        return acc
-      } else if (isCellError(argResult)) {
-        return argResult
-      } else {
-        return (acc as string).concat(argResult.toString())
-      }
-    }, '')
-  }
 }
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
