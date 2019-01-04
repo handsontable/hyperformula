@@ -10,6 +10,9 @@ compile: ## Compile to javascript
 test: ## Run tests
 	@yarn jest
 
+test-ci: ## Separate Test configuration form CI environment
+	@yarn jest --runInBand
+
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/01-simple-big.ts
 	@echo

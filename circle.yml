@@ -13,7 +13,7 @@ jobs:
       #     paths:
       #       - node_modules
       - run: make typecheck
-      - run: make test
+      - run: make test-ci
       - run: make lint
       - run: make benchmark
 
