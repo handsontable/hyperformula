@@ -12,6 +12,7 @@ export class Config {
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
   public readonly language: string
+  public readonly functionPlugins: Array<any>
 
   constructor({
     addressMappingFillThreshold,
@@ -19,17 +20,20 @@ export class Config {
     dateFormat,
     functionArgSeparator,
     language,
+    functionPlugins,
   }: {
     addressMappingFillThreshold?: number,
     csvDelimiter?: string,
     dateFormat?: string,
     functionArgSeparator?: string,
     language?: string,
+    functionPlugins?: Array<any>,
   } = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.ADDRESS_MAPPING_FILL_THRESHOLD
     this.csvDelimiter = csvDelimiter || Config.CSV_DELIMITER
     this.dateFormat = dateFormat || Config.DATE_FORMAT
     this.functionArgSeparator = functionArgSeparator || Config.FUNCTION_ARG_SEPARATOR
     this.language = language || Config.LANGUAGE
+    this.functionPlugins = functionPlugins || []
   }
 }

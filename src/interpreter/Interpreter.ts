@@ -22,6 +22,7 @@ export class Interpreter {
   private readonly textModule: TextModule
   private readonly numericAggregationModule: NumericAggregationModule
   private readonly medianModule: MedianModule
+  private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
     public readonly addressMapping: IAddressMapping,
@@ -33,6 +34,19 @@ export class Interpreter {
     this.textModule = new TextModule(this)
     this.numericAggregationModule = new NumericAggregationModule(this)
     this.medianModule = new MedianModule(this)
+
+    this.registerPlugins()
+  }
+
+  private registerPlugins() {
+    for (const pluginClass of this.config.functionPlugins) {
+      const pluginInstance = new pluginClass(this)
+      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+        Object.keys(pluginClass.implementedFunctions[pluginFunction][this.config.language]).forEach((functionTranslation) => {
+          this.pluginCache.set(functionTranslation, [pluginInstance, pluginFunction])
+        })
+      })
+    }
   }
 
   /**
@@ -390,9 +404,15 @@ export class Interpreter {
       case Functions[this.config.language].MEDIAN: {
         return this.medianModule.median(ast, formulaAddress)
       }
-      default:
-        return cellError(ErrorType.NAME)
+      default: {
+        const pluginEntry = this.pluginCache.get(ast.procedureName)
+        if (pluginEntry) {
+          const [pluginInstance, pluginFunction] = pluginEntry
+          return pluginInstance[pluginFunction](ast, formulaAddress)
+        } else {
+          return cellError(ErrorType.NAME)
+        }
+      }
     }
   }
-
 }
