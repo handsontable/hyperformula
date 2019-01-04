@@ -1,7 +1,7 @@
 import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
 import {Ast, ProcedureAst} from '../../parser/Ast'
+import {concatenate} from '../text'
 import {FunctionPlugin} from './FunctionPlugin'
-import {concatenate} from "../text";
 
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -22,7 +22,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const values = ast.args.map(arg => this.evaluateAst(arg, formulaAddress))
+    const values = ast.args.map((arg) => this.evaluateAst(arg, formulaAddress))
     return concatenate(values)
   }
 

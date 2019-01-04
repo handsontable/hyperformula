@@ -1,4 +1,4 @@
-import {CellDependency, simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {CellDependency, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
