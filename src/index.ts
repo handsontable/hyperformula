@@ -46,13 +46,13 @@ export class HandsOnEngine {
   }
 
   /** Address mapping from addresses to vertices from graph. */
-  private addressMapping: IAddressMapping
+  private readonly addressMapping: IAddressMapping
 
   /** Range mapping from ranges to vertices representing these ranges. */
-  private rangeMapping: RangeMapping = new RangeMapping()
+  private readonly rangeMapping: RangeMapping = new RangeMapping()
 
   /** Directed graph of cell dependencies. */
-  private graph: Graph<Vertex> = new Graph()
+  private readonly graph: Graph<Vertex> = new Graph()
 
   /** Topologically sorted list of vertices. */
   private sortedVertices: Vertex[] = []
@@ -61,10 +61,10 @@ export class HandsOnEngine {
   private verticesOnCycle: Vertex[] = []
 
   /** Formula interpreter */
-  private interpreter: Interpreter
+  private readonly interpreter: Interpreter
 
   /** Statistics module for benchmarking */
-  private stats: Statistics = new Statistics()
+  private readonly stats: Statistics = new Statistics()
 
   /** Engine configuration */
   private readonly config: Config

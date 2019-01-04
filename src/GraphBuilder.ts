@@ -30,10 +30,10 @@ export class GraphBuilder {
    * @param stats - dependency tracking building performance
    * @param config - configuration of the sheet
    */
-  constructor(private graph: Graph<Vertex>,
-              private addressMapping: IAddressMapping,
-              private rangeMapping: RangeMapping,
-              private stats: Statistics,
+  constructor(private readonly graph: Graph<Vertex>,
+              private readonly addressMapping: IAddressMapping,
+              private readonly rangeMapping: RangeMapping,
+              private readonly stats: Statistics,
               private readonly config: Config) {
     this.parser = new ParserWithCaching(config)
   }
