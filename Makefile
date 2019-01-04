@@ -10,7 +10,7 @@ compile: ## Compile to javascript
 test: ## Run tests
 	@yarn jest
 
-test-ci: ## Separate Test configuration form CI environment
+test-ci: ## Separate test configuration for CI environment
 	@yarn jest --maxWorkers=2
 
 benchmark: ## Run benchmarks
