@@ -1,30 +1,22 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../parser/Ast";
-import {Interpreter} from "./Interpreter";
-import {IAddressMapping} from "../IAddressMapping";
-import {RangeMapping} from "../RangeMapping";
-import {Graph} from "../Graph";
-import {Vertex} from "../Vertex";
-import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {add} from "./scalar";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../../Cell";
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../../parser/Ast";
+import {Interpreter} from "../Interpreter";
+import {IAddressMapping} from "../../IAddressMapping";
+import {RangeMapping} from "../../RangeMapping";
+import {Graph} from "../../Graph";
+import {Vertex} from "../../Vertex";
+import {findSmallerRange, generateCellsFromRangeGenerator} from "../../GraphBuilder";
+import {add} from "../scalar";
+import {FunctionPlugin} from "./FunctionPlugin";
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
-export class NumericAggregationModule {
-  private readonly interpreter: Interpreter
-  private readonly addressMapping: IAddressMapping
-  private readonly rangeMapping: RangeMapping
-  private readonly graph: Graph<Vertex>
-
-  constructor(interpreter: Interpreter) {
-    this.interpreter = interpreter
-    this.addressMapping = interpreter.addressMapping
-    this.rangeMapping = interpreter.rangeMapping
-    this.graph = interpreter.graph
-  }
-
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    return this.interpreter.evaluateAst(ast, formulaAddress)
+export class NumericAggregationModule extends FunctionPlugin {
+  public static implementedFunctions = {
+    'sum': {
+      'EN': 'SUM',
+      'PL': 'SUMA',
+    }
   }
 
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

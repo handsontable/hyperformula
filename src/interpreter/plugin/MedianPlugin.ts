@@ -1,27 +1,15 @@
-import {Interpreter} from "./Interpreter";
-import {IAddressMapping} from "../IAddressMapping";
-import {RangeMapping} from "../RangeMapping";
-import {Graph} from "../Graph";
-import {Vertex} from "../Vertex";
-import {Ast, AstNodeType, ProcedureAst} from "../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from "../Cell";
-import {generateCellsFromRangeGenerator} from "../GraphBuilder";
+import {AstNodeType, ProcedureAst} from "../../parser/Ast";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from "../../Cell";
+import {generateCellsFromRangeGenerator} from "../../GraphBuilder";
+import {FunctionPlugin} from "./FunctionPlugin";
 
-export class MedianModule {
-  private readonly interpreter: Interpreter
-  private readonly addressMapping: IAddressMapping
-  private readonly rangeMapping: RangeMapping
-  private readonly graph: Graph<Vertex>
+export class MedianModule extends FunctionPlugin {
 
-  constructor(interpreter: Interpreter) {
-    this.interpreter = interpreter
-    this.addressMapping = interpreter.addressMapping
-    this.rangeMapping = interpreter.rangeMapping
-    this.graph = interpreter.graph
-  }
-
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    return this.interpreter.evaluateAst(ast, formulaAddress)
+  public static implementedFunctions = {
+    'median': {
+      'EN': 'MEDIAN',
+      'PL': 'MEDIANA',
+    }
   }
 
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

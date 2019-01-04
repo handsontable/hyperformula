@@ -1,6 +1,6 @@
 import {Config} from '../src/Config'
 import {HandsOnEngine} from '../src'
-import {FunctionPlugin, PluginFunctionType} from "../src/interpreter/FunctionPlugin";
+import {FunctionPlugin, PluginFunctionType} from "../src/interpreter/plugin/FunctionPlugin";
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {

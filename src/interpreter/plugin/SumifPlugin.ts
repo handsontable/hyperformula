@@ -1,30 +1,23 @@
-import {IAddressMapping} from "../IAddressMapping";
-import {RangeMapping} from "../RangeMapping";
-import {Graph} from "../Graph";
-import {CriterionCache, Vertex} from "../Vertex";
-import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "../parser/Ast";
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
-import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "./Criterion";
-import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {Interpreter} from "./Interpreter";
-import {add} from "./scalar";
-import {split} from "../generatorUtils";
+import {IAddressMapping} from "../../IAddressMapping";
+import {CriterionCache} from "../../Vertex";
+import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "../../parser/Ast";
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../../Cell";
+import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "../Criterion";
+import {findSmallerRange, generateCellsFromRangeGenerator} from "../../GraphBuilder";
+import {add} from "../scalar";
+import {split} from "../../generatorUtils";
+import {FunctionPlugin} from "./FunctionPlugin";
 
-export class SumifModule {
-  private readonly interpreter: Interpreter
-  private readonly addressMapping: IAddressMapping
-  private readonly rangeMapping: RangeMapping
-  private readonly graph: Graph<Vertex>
-
-  constructor(interpreter: Interpreter) {
-    this.interpreter = interpreter
-    this.addressMapping = interpreter.addressMapping
-    this.rangeMapping = interpreter.rangeMapping
-    this.graph = interpreter.graph
-  }
-
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    return this.interpreter.evaluateAst(ast, formulaAddress)
+export class SumifModule extends FunctionPlugin {
+  public static implementedFunctions = {
+    'sumif': {
+      'EN': 'SUMIF',
+      'PL': 'SUMAJEZELI',
+    },
+    'countif': {
+      'EN': 'COUNTIF',
+      'PL': 'LICZJEZELI'
+    }
   }
 
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

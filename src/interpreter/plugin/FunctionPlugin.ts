@@ -1,10 +1,10 @@
-import {Interpreter} from "./Interpreter";
-import {IAddressMapping} from "../IAddressMapping";
-import {RangeMapping} from "../RangeMapping";
-import {Graph} from "../Graph";
-import {Vertex} from "../Vertex";
-import {Ast, ProcedureAst} from "../parser/Ast";
-import {CellValue, SimpleCellAddress} from "../Cell";
+import {Interpreter} from "../Interpreter";
+import {IAddressMapping} from "../../IAddressMapping";
+import {RangeMapping} from "../../RangeMapping";
+import {Graph} from "../../Graph";
+import {Vertex} from "../../Vertex";
+import {Ast, ProcedureAst} from "../../parser/Ast";
+import {CellValue, SimpleCellAddress} from "../../Cell";
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -15,10 +15,10 @@ interface IImplementedFunctions {
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => CellValue
 
 export abstract class FunctionPlugin {
-  private readonly interpreter: Interpreter
-  private readonly addressMapping: IAddressMapping
-  private readonly rangeMapping: RangeMapping
-  private readonly graph: Graph<Vertex>
+  protected readonly interpreter: Interpreter
+  protected readonly addressMapping: IAddressMapping
+  protected readonly rangeMapping: RangeMapping
+  protected readonly graph: Graph<Vertex>
 
   public static implementedFunctions: IImplementedFunctions
 

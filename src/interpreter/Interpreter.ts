@@ -7,19 +7,15 @@ import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {EmptyCellVertex, Vertex} from '../Vertex'
 import {Functions} from './Functions'
-import {SumifModule} from "./Sumif";
+import {SumifModule} from "./plugin/SumifPlugin";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
-import {TextModule} from "./Text";
-import {NumericAggregationModule} from "./NumericAggregation";
-import {MedianModule} from "./Median";
+import {TextModule} from "./plugin/TextPlugin";
+import {NumericAggregationModule} from "./plugin/NumericAggregationPlugin";
+import {MedianModule} from "./plugin/MedianPlugin";
+import {concatenate} from "./text";
 
 
 export class Interpreter {
-
-  private readonly sumifModule: SumifModule
-  private readonly textModule: TextModule
-  private readonly numericAggregationModule: NumericAggregationModule
-  private readonly medianModule: MedianModule
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
@@ -28,16 +24,15 @@ export class Interpreter {
     public readonly graph: Graph<Vertex>,
     public readonly config: Config,
   ) {
-    this.sumifModule = new SumifModule(this)
-    this.textModule = new TextModule(this)
-    this.numericAggregationModule = new NumericAggregationModule(this)
-    this.medianModule = new MedianModule(this)
+    this.registerPlugins([
+      SumifModule, TextModule, NumericAggregationModule, MedianModule
+    ])
 
-    this.registerPlugins()
+    this.registerPlugins(this.config.functionPlugins)
   }
 
-  private registerPlugins() {
-    for (const pluginClass of this.config.functionPlugins) {
+  private registerPlugins(plugins: Array<any>) {
+    for (const pluginClass of plugins) {
       const pluginInstance = new pluginClass(this)
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
         const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
@@ -64,7 +59,9 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        return this.textModule.concatenate([ast.left, ast.right], formulaAddress)
+        const left = this.evaluateAst(ast.left, formulaAddress)
+        const right = this.evaluateAst(ast.right, formulaAddress)
+        return concatenate([left, right])
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -222,15 +219,6 @@ export class Interpreter {
    */
   private evaluateFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.procedureName) {
-      case Functions[this.config.language].SUM: {
-        return this.numericAggregationModule.sum(ast, formulaAddress)
-      }
-      case Functions[this.config.language].SUMIF: {
-        return this.sumifModule.sumif(ast, formulaAddress)
-      }
-      case Functions[this.config.language].COUNTIF: {
-        return this.sumifModule.countif(ast, formulaAddress)
-      }
       case Functions[this.config.language].TRUE: {
         if (ast.args.length > 0) {
           return cellError(ErrorType.NA)
@@ -300,9 +288,6 @@ export class Interpreter {
           ++index
         }
         return result
-      }
-      case Functions[this.config.language].CONCATENATE: {
-        return this.textModule.concatenate(ast.args, formulaAddress)
       }
       case Functions[this.config.language].ISERROR: {
         if (ast.args.length != 1) {
@@ -394,12 +379,6 @@ export class Interpreter {
         } else {
           return cellError(ErrorType.VALUE)
         }
-      }
-      case Functions[this.config.language].SPLIT: {
-        return this.textModule.split(ast.args, formulaAddress)
-      }
-      case Functions[this.config.language].MEDIAN: {
-        return this.medianModule.median(ast, formulaAddress)
       }
       default: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
