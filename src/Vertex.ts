@@ -110,7 +110,7 @@ export class EmptyCellVertex extends CellVertex {
     }
     return EmptyCellVertex.instance
   }
-  
+
   /** Singleton instance. */
   private static instance: EmptyCellVertex
 
@@ -137,7 +137,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 export class RangeVertex extends Vertex {
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
-  
+
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
