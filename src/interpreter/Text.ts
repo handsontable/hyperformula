@@ -1,5 +1,5 @@
 import {Ast} from "../parser/Ast";
-import {CellValue, isCellError, SimpleCellAddress} from "../Cell";
+import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from "../Cell";
 import {Interpreter} from "./Interpreter";
 import {IAddressMapping} from "../IAddressMapping";
 import {RangeMapping} from "../RangeMapping";
@@ -40,5 +40,27 @@ export class TextModule {
         return (acc as string).concat(argResult.toString())
       }
     }, '')
+  }
+
+  public split(args: Ast[], formulaAddress: SimpleCellAddress): CellValue {
+    const stringArg = args[0]
+    const indexArg = args[1]
+
+    const stringToSplit = this.evaluateAst(stringArg, formulaAddress)
+    if (typeof stringToSplit !== 'string') {
+      return cellError(ErrorType.VALUE)
+    }
+    const indexToUse = this.evaluateAst(indexArg, formulaAddress)
+    if (typeof indexToUse !== 'number') {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const splittedString = stringToSplit.split(' ')
+
+    if (indexToUse > splittedString.length || indexToUse < 0) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    return splittedString[indexToUse]
   }
 }

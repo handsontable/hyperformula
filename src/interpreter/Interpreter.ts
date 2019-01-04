@@ -385,25 +385,7 @@ export class Interpreter {
         }
       }
       case Functions[this.config.language].SPLIT: {
-        const stringArg = ast.args[0]
-        const indexArg = ast.args[1]
-
-        const stringToSplit = this.evaluateAst(stringArg, formulaAddress)
-        if (typeof stringToSplit !== 'string') {
-          return cellError(ErrorType.VALUE)
-        }
-        const indexToUse = this.evaluateAst(indexArg, formulaAddress)
-        if (typeof indexToUse !== 'number') {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const splittedString = stringToSplit.split(' ')
-
-        if (indexToUse > splittedString.length || indexToUse < 0) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        return splittedString[indexToUse]
+        return this.textModule.split(ast.args, formulaAddress)
       }
       case Functions[this.config.language].MEDIAN: {
         return this.medianModule.median(ast, formulaAddress)
