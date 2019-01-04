@@ -1,26 +1,19 @@
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
-import {
-  dateNumberToMonthNumber,
-  dateNumberToYearNumber,
-  dateNumebrToStringFormat,
-  stringToDateNumber,
-  toDateNumber,
-} from '../Date'
-import {split} from '../generatorUtils'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber,} from '../Date'
 import {Graph} from '../Graph'
-import {findSmallerRange, generateCellsFromRangeGenerator} from '../GraphBuilder'
+import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
-import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../parser/Ast'
+import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
-import {CriterionCache, EmptyCellVertex, Vertex} from '../Vertex'
-import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from './Criterion'
+import {EmptyCellVertex, Vertex} from '../Vertex'
 import {Functions} from './Functions'
 import {SumifModule} from "./Sumif";
 import {add} from "./scalar";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
 import {TextModule} from "./Text";
 import {NumericAggregationModule} from "./NumericAggregation";
+import {MedianModule} from "./Median";
 
 
 export class Interpreter {
@@ -28,6 +21,7 @@ export class Interpreter {
   private readonly sumifModule: SumifModule
   private readonly textModule: TextModule
   private readonly numericAggregationModule: NumericAggregationModule
+  private readonly medianModule: MedianModule
 
   constructor(
     public readonly addressMapping: IAddressMapping,
@@ -38,6 +32,7 @@ export class Interpreter {
     this.sumifModule = new SumifModule(this)
     this.textModule = new TextModule(this)
     this.numericAggregationModule = new NumericAggregationModule(this)
+    this.medianModule = new MedianModule(this)
   }
 
   /**
@@ -411,61 +406,11 @@ export class Interpreter {
         return splittedString[indexToUse]
       }
       case Functions[this.config.language].MEDIAN: {
-        if (ast.args.length === 0) {
-          return cellError(ErrorType.NA)
-        }
-
-        const values: number[] = []
-        for (const astArg of ast.args) {
-          if (astArg.type === AstNodeType.CELL_RANGE) {
-            const [beginRange, endRange] = [getAbsoluteAddress(astArg.start, formulaAddress), getAbsoluteAddress(astArg.end, formulaAddress)]
-            for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-              const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
-              if (typeof value === 'number') {
-                values.push(value)
-              } else if (isCellError(value)) {
-                return value
-              } else {
-                return cellError(ErrorType.NA)
-              }
-            }
-          } else {
-            const value = this.evaluateAst(astArg, formulaAddress)
-            if (typeof value === 'number') {
-              values.push(value)
-            } else if (isCellError(value)) {
-              return value
-            } else {
-              return cellError(ErrorType.NA)
-            }
-          }
-        }
-
-        values.sort((a, b) => (a - b))
-
-        if (values.length % 2 === 0) {
-          return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
-        } else {
-          return values[Math.floor(values.length / 2)]
-        }
+        return this.medianModule.median(ast, formulaAddress)
       }
       default:
         return cellError(ErrorType.NAME)
     }
   }
 
-}
-
-export type RangeOperation = (rangeValues: CellValue[]) => CellValue
-
-export function rangeSum(rangeValues: CellValue[]): CellValue {
-  return reduceSum(rangeValues[Symbol.iterator]())
-}
-
-export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
-  let acc: CellValue = 0
-  for (const val of iterable) {
-    acc = add(acc, val)
-  }
-  return acc
 }

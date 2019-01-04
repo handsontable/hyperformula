@@ -1,11 +1,14 @@
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from "../parser/Ast";
-import {Interpreter, RangeOperation, rangeSum} from "./Interpreter";
+import {Interpreter} from "./Interpreter";
 import {IAddressMapping} from "../IAddressMapping";
 import {RangeMapping} from "../RangeMapping";
 import {Graph} from "../Graph";
 import {Vertex} from "../Vertex";
 import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
+import {add} from "./scalar";
+
+export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
 export class NumericAggregationModule {
   private readonly interpreter: Interpreter
@@ -28,7 +31,7 @@ export class NumericAggregationModule {
     return ast.args.reduce((currentSum: CellValue, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
-        value = this.evaluateRange(arg, formulaAddress, 'SUM', rangeSum)
+        value = this.evaluateRange(arg, formulaAddress, 'SUM', reduceSum)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
       }
@@ -93,4 +96,12 @@ export class NumericAggregationModule {
 
     return rangeResult
   }
+}
+
+export function reduceSum(rangeValues: CellValue[]): CellValue {
+  let acc: CellValue = 0
+  for (const val of rangeValues) {
+    acc = add(acc, val)
+  }
+  return acc
 }

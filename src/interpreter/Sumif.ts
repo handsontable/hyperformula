@@ -6,7 +6,7 @@ import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "..
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "./Criterion";
 import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {Interpreter, reduceSum} from "./Interpreter";
+import {Interpreter} from "./Interpreter";
 import {add} from "./scalar";
 import {split} from "../generatorUtils";
 
@@ -219,6 +219,15 @@ export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable:
     yield* ifFilter(criterionLambda, conditionalSplit.rest, computableSplit.rest)
   }
 }
+
+export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
+  let acc: CellValue = 0
+  for (const val of iterable) {
+    acc = add(acc, val)
+  }
+  return acc
+}
+
 
 const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
   const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)
