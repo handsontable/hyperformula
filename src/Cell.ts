@@ -1,24 +1,50 @@
+/**
+ * Possible errors returned by our interpreter.
+ */
 export enum ErrorType {
+  /** Division by zero. */
   DIV_BY_ZERO = 'DIV_BY_ZERO',
+
+  /** Unknown function name. */
   NAME = 'NAME',
   VALUE = 'VALUE',
   NUM = 'NUM',
   NA = 'NA',
+
+  /** Cyclic dependency. */
   CYCLE = 'CYCLE',
+
+  /* Wrong address reference. */
   REF = 'REF',
 }
 
+/** Possible kinds of cell references */
 export enum CellReferenceType {
+  /** Cell reference with both row and column relative. */
   CELL_REFERENCE_RELATIVE = 'CELL_REFERENCE',
+
+  /** Cell reference with both row and column absolute. */
   CELL_REFERENCE_ABSOLUTE = 'CELL_REFERENCE_ABSOLUTE',
+
+  /** Cell reference with absolute column and relative row. */
   CELL_REFERENCE_ABSOLUTE_COL = 'CELL_REFERENCE_ABSOLUTE_COL',
+  
+  /** Cell reference with relative column and absolute row. */
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
 export interface CellError {
   type: ErrorType
 }
+
+/**
+ * Builds cell error of given type.
+ *
+ * @param error - type of error
+ */
 export const cellError = (error: ErrorType): CellError => ({type: error})
+
+/** Returns true if value is a cell error. */
 export const isCellError = (value: any): value is CellError => {
   return value.type !== undefined && value.type in ErrorType
 }
