@@ -6,7 +6,7 @@ import {Ast, AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from "..
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from "../Cell";
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from "./Criterion";
 import {findSmallerRange, generateCellsFromRangeGenerator} from "../GraphBuilder";
-import {add, getPlainRangeValues, ifFilter, Interpreter, reduceSum} from "./Interpreter";
+import {add, ifFilter, Interpreter, reduceSum} from "./Interpreter";
 
 export class SumifModule {
   private readonly interpreter: Interpreter
@@ -55,6 +55,33 @@ export class SumifModule {
     } else {
       return cellError(ErrorType.VALUE)
     }
+  }
+
+  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    const conditionRangeArg = ast.args[0]
+    if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const conditionValues = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+    if (typeof criterionString !== 'string') {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const criterion = parseCriterion(criterionString)
+    if (criterion === null) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const criterionLambda = buildCriterionLambda(criterion)
+    let counter = 0
+    for (const e of conditionValues) {
+      if (criterionLambda(e)) {
+        counter++
+      }
+    }
+    return counter
   }
 
   /**
@@ -165,7 +192,16 @@ export class SumifModule {
 
     return [smallerRangeResult || new Map(), rangeResult]
   }
+}
 
+
+export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
+  const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+  const result: CellValue[] = []
+  for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+    result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
+  }
+  return result
 }
 
 const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {

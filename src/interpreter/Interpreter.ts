@@ -253,10 +253,6 @@ export class Interpreter {
     return value
   }
 
-  private getPlainRangeValues(ast: CellRangeAst, formulaAddress: SimpleCellAddress) {
-    return getPlainRangeValues(this.addressMapping, ast, formulaAddress)
-  }
-
   /**
    * Calculates value of procedure formula based on procedure name
    *
@@ -285,30 +281,7 @@ export class Interpreter {
         return this.sumifModule.sumif(ast, formulaAddress)
       }
       case Functions[this.config.language].COUNTIF: {
-        const conditionRangeArg = ast.args[0]
-        if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const conditionValues = this.getPlainRangeValues(conditionRangeArg, formulaAddress)
-        const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
-        if (typeof criterionString !== 'string') {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const criterion = parseCriterion(criterionString)
-        if (criterion === null) {
-          return cellError(ErrorType.VALUE)
-        }
-
-        const criterionLambda = buildCriterionLambda(criterion)
-        let counter = 0
-        for (const e of conditionValues) {
-          if (criterionLambda(e)) {
-            counter++
-          }
-        }
-        return counter
+        return this.sumifModule.countif(ast, formulaAddress)
       }
       case Functions[this.config.language].TRUE: {
         if (ast.args.length > 0) {
@@ -612,15 +585,6 @@ export function rangeSum(rangeValues: CellValue[]): CellValue {
       return acc
     }
   })
-}
-
-export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-  const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-  const result: CellValue[] = []
-  for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-    result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
-  }
-  return result
 }
 
 export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
