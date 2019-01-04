@@ -7,12 +7,13 @@ import {Ast, AstNodeType, ProcedureAst} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {EmptyCellVertex, Vertex} from '../Vertex'
 import {Functions} from './Functions'
-import {SumifPlugin} from "./plugin/SumifPlugin";
 import {booleanRepresentation, dateNumberRepresentation} from "./coerce";
-import {TextPlugin} from "./plugin/TextPlugin";
-import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
-import {MedianPlugin} from "./plugin/MedianPlugin";
 import {concatenate} from "./text";
+import {SumifPlugin} from "./plugin/SumifPlugin";
+import {MedianPlugin} from "./plugin/MedianPlugin";
+import {NumericAggregationPlugin} from "./plugin/NumericAggregationPlugin";
+import {TextPlugin} from "./plugin/TextPlugin";
+import {DatePlugin} from "./plugin/DatePlugin";
 
 
 export class Interpreter {
@@ -25,7 +26,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -317,65 +318,6 @@ export class Interpreter {
         const rangeAst = ast.args[0]
         if (rangeAst.type === AstNodeType.CELL_RANGE) {
           return (rangeAst.end.col - rangeAst.start.col + 1)
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
-      }
-      case Functions[this.config.language].DATE: {
-        if (ast.args.length !== 3) {
-          return cellError(ErrorType.NA)
-        }
-
-        const year = this.evaluateAst(ast.args[0], formulaAddress)
-        const month = this.evaluateAst(ast.args[1], formulaAddress)
-        const day = this.evaluateAst(ast.args[2], formulaAddress)
-
-        if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') {
-          return cellError(ErrorType.VALUE)
-        }
-
-        return toDateNumber(year, month, day)
-      }
-      case Functions[this.config.language].MONTH: {
-        if (ast.args.length !== 1) {
-          return cellError(ErrorType.NA)
-        }
-
-        const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
-
-        if (dateNumber !== null) {
-          return dateNumberToMonthNumber(dateNumber)
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
-      }
-      case Functions[this.config.language].YEAR: {
-        if (ast.args.length !== 1) {
-          return cellError(ErrorType.NA)
-        }
-
-        const arg = this.evaluateAst(ast.args[0], formulaAddress)
-        const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
-
-        if (dateNumber !== null) {
-          return dateNumberToYearNumber(dateNumber)
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
-      }
-      case Functions[this.config.language].TEXT: {
-        if (ast.args.length !== 2) {
-          return cellError(ErrorType.NA)
-        }
-
-        const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
-        const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
-
-        const dateNumber = dateNumberRepresentation(dateArg, this.config.dateFormat)
-
-        if (dateNumber !== null && typeof formatArg === 'string') {
-          return dateNumebrToStringFormat(dateNumber, formatArg)
         } else {
           return cellError(ErrorType.VALUE)
         }
