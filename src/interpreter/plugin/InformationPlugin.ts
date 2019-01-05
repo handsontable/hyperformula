@@ -3,6 +3,9 @@ import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {EmptyCellVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing information functions
+ */
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     iserror: {
@@ -19,6 +22,14 @@ export class InformationPlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to ISERROR(value)
+   *
+   * Checks whether provided value is an error
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length != 1) {
       return cellError(ErrorType.NA)
@@ -28,6 +39,14 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
+  /**
+   * Corresponds to ISBLANK(value)
+   *
+   * Checks whether provided cell reference is empty
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length != 1) {
       return cellError(ErrorType.NA)
@@ -42,6 +61,14 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
+  /**
+   * Corresponds to COLUMNS(range)
+   *
+   * Returns number of columns in provided range of cells
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 1) {
       return cellError(ErrorType.NA)
