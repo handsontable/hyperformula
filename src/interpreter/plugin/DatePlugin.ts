@@ -4,6 +4,9 @@ import {ProcedureAst} from '../../parser/Ast'
 import {dateNumberRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing date-specific functions
+ */
 export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     date: {
@@ -24,6 +27,14 @@ export class DatePlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to DATE(year, month, day)
+   *
+   * Converts a provided year, month and day into date
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 3) {
       return cellError(ErrorType.NA)
@@ -40,6 +51,14 @@ export class DatePlugin extends FunctionPlugin {
     return toDateNumber(year, month, day)
   }
 
+  /**
+   * Corresponds to MONTH(date)
+   *
+   * Returns the month of the year specified by a given date
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 1) {
       return cellError(ErrorType.NA)
@@ -55,6 +74,14 @@ export class DatePlugin extends FunctionPlugin {
     }
   }
 
+  /**
+   * Corresponds to YEAR(date)
+   *
+   * Returns the year specified by a given date
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 1) {
       return cellError(ErrorType.NA)
@@ -70,6 +97,14 @@ export class DatePlugin extends FunctionPlugin {
     }
   }
 
+  /**
+   * Corresponds to TEXT(number, format)
+   *
+   * Tries to convert number to specified date format.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 2) {
       return cellError(ErrorType.NA)

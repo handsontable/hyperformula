@@ -15,8 +15,15 @@ interface IImplementedFunctions {
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => CellValue
 
+/**
+ * Abstract class representing interpreter function plugin.
+ * Plugin may contain multiple functions. Each function should be of type {@link PluginFunctionType} and needs to be
+ * included in {@link implementedFunctions}
+ */
 export abstract class FunctionPlugin {
-
+  /**
+   * Dictionary containing functions implemented by specific plugin, along with function name translations.
+   */
   public static implementedFunctions: IImplementedFunctions
   protected readonly interpreter: Interpreter
   protected readonly addressMapping: IAddressMapping
