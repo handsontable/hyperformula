@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
 import {IAddressMapping} from '../IAddressMapping'
@@ -14,6 +14,7 @@ import {SumifPlugin} from './plugin/SumifPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {concatenate} from './text'
+import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -215,5 +216,34 @@ export class Interpreter {
         this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
       })
     }
+  }
+
+  public computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
+    const values: number[] = []
+    for (const ast of asts) {
+      if (ast.type === AstNodeType.CELL_RANGE) {
+        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+        for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+          const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
+          if (typeof value === 'number') {
+            values.push(value)
+          } else if (isCellError(value)) {
+            return value
+          } else {
+            return cellError(ErrorType.NA)
+          }
+        }
+      } else {
+        const value = this.evaluateAst(ast, formulaAddress)
+        if (typeof value === 'number') {
+          values.push(value)
+        } else if (isCellError(value)) {
+          return value
+        } else {
+          return cellError(ErrorType.NA)
+        }
+      }
+    }
+    return values
   }
 }
