@@ -3,6 +3,9 @@ import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing MEDIAN function
+ */
 export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
@@ -12,6 +15,14 @@ export class MedianPlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to MEDIAN(Number1, Number2, ...).
+   *
+   * Returns a median of given numbers.
+   *
+   * @param ast
+   * @param formulaAddress
+    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length === 0) {
       return cellError(ErrorType.NA)
