@@ -1,11 +1,12 @@
-import {CellValue, SimpleCellAddress} from '../../Cell'
+import {getAbsoluteAddress, cellError, CellError, ErrorType, isCellError, CellValue, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {IAddressMapping} from '../../IAddressMapping'
-import {Ast, ProcedureAst} from '../../parser/Ast'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {Vertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -41,5 +42,34 @@ export abstract class FunctionPlugin {
 
   protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     return this.interpreter.evaluateAst(ast, formulaAddress)
+  }
+
+  protected computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
+    const values: number[] = []
+    for (const ast of asts) {
+      if (ast.type === AstNodeType.CELL_RANGE) {
+        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+        for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+          const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
+          if (typeof value === 'number') {
+            values.push(value)
+          } else if (isCellError(value)) {
+            return value
+          } else {
+            return cellError(ErrorType.NA)
+          }
+        }
+      } else {
+        const value = this.evaluateAst(ast, formulaAddress)
+        if (typeof value === 'number') {
+          values.push(value)
+        } else if (isCellError(value)) {
+          return value
+        } else {
+          return cellError(ErrorType.NA)
+        }
+      }
+    }
+    return values
   }
 }

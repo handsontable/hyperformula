@@ -1,7 +1,6 @@
 import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
-import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
@@ -207,35 +206,6 @@ export class Interpreter {
         throw Error('Not supported Ast node type')
       }
     }
-  }
-
-  public computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
-    const values: number[] = []
-    for (const ast of asts) {
-      if (ast.type === AstNodeType.CELL_RANGE) {
-        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-        for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-          const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
-          if (typeof value === 'number') {
-            values.push(value)
-          } else if (isCellError(value)) {
-            return value
-          } else {
-            return cellError(ErrorType.NA)
-          }
-        }
-      } else {
-        const value = this.evaluateAst(ast, formulaAddress)
-        if (typeof value === 'number') {
-          values.push(value)
-        } else if (isCellError(value)) {
-          return value
-        } else {
-          return cellError(ErrorType.NA)
-        }
-      }
-    }
-    return values
   }
 
   private registerPlugins(plugins: any[]) {

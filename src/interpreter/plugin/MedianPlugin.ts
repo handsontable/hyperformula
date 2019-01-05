@@ -27,7 +27,7 @@ export class MedianPlugin extends FunctionPlugin {
       return cellError(ErrorType.NA)
     }
 
-    const values = this.interpreter.computeNumericListOfValues(ast.args, formulaAddress)
+    const values = this.computeNumericListOfValues(ast.args, formulaAddress)
 
     if (Array.isArray(values)) {
       values.sort((a, b) => (a - b))
