@@ -13,6 +13,7 @@ import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
+import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {concatenate} from './text'
 import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 
@@ -26,7 +27,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin,
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
