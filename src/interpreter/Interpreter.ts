@@ -14,8 +14,8 @@ import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
-import {concatenate} from './text'
 import {addStrict} from './scalar'
+import {concatenate} from './text'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()

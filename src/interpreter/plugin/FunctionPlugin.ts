@@ -1,12 +1,12 @@
-import {getAbsoluteAddress, cellError, CellError, ErrorType, isCellError, CellValue, SimpleCellAddress} from '../../Cell'
+import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {Vertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 
 interface IImplementedFunctions {
   [functionName: string]: {
