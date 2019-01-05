@@ -3,6 +3,9 @@ import {ProcedureAst} from '../../parser/Ast'
 import {booleanRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing boolean functions
+ */
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     true: {
