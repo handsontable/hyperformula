@@ -1,8 +1,11 @@
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
-import {Ast, ProcedureAst} from '../../parser/Ast'
+import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser/Ast'
 import {concatenate} from '../text'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing text-specific functions
+ */
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     concatenate: {
@@ -16,7 +19,9 @@ export class TextPlugin extends FunctionPlugin {
   }
 
   /**
-   * Concatenate values of arguments.
+   * Corresponds to CONCATENATE(value1, [value2, ...])
+   *
+   * Concatenates provided arguments to one string.
    *
    * @param args
    * @param formulaAddress
@@ -26,6 +31,14 @@ export class TextPlugin extends FunctionPlugin {
     return concatenate(values)
   }
 
+  /**
+   * Corresponds to SPLIT(string, index)
+   *
+   * Splits provided string using space separator and returns chunk at position specified by second argument
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const stringArg = ast.args[0]
     const indexArg = ast.args[1]
