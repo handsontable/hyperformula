@@ -15,6 +15,7 @@ import {SumifPlugin} from './plugin/SumifPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {concatenate} from './text'
+import {addStrict} from './scalar'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -131,11 +132,7 @@ export class Interpreter {
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult + rightResult
-        } else {
-          return cellError(ErrorType.VALUE)
-        }
+        return addStrict(leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
