@@ -10,6 +10,14 @@ describe('Function COUNTUNIQUE', () => {
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
   })
 
+  it('errors in arguments are propagated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=COUNTUNIQUE(5/0)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+  })
+
   it('single number', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=COUNTUNIQUE(1)'],
