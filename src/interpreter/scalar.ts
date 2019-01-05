@@ -1,4 +1,4 @@
-import {CellValue, isCellError} from '../Cell'
+import {cellError, ErrorType, CellValue, isCellError} from '../Cell'
 
 export function add(left: CellValue, right: CellValue): CellValue {
   if (isCellError(left)) {
@@ -7,9 +7,15 @@ export function add(left: CellValue, right: CellValue): CellValue {
   if (isCellError(right)) {
     return right
   }
-  if (typeof left === 'number' && typeof right === 'number') {
-    return left + right
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return left + right
+    } else {
+      return left
+    }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return 0
   }
-
-  return left
 }
