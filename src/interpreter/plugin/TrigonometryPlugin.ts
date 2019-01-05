@@ -2,6 +2,9 @@ import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/**
+ * Interpreter plugin containing trigonometric functions
+ */
 export class TrigonometryPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
@@ -11,6 +14,14 @@ export class TrigonometryPlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to COS(value)
+   *
+   * Returns the arc cosine (or inverse cosine) of a number.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 1) {
       return cellError(ErrorType.NA)
