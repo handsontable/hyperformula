@@ -6,7 +6,7 @@ import {CellVertex, EmptyCellVertex} from './Vertex'
  * Mapping from cell addresses to vertices
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
-  */
+ */
 export class ArrayAddressMapping implements IAddressMapping {
   /**
    * Array in which actual data is stored.

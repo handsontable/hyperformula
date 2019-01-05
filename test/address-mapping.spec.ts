@@ -73,6 +73,12 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
     expect(mapping.has(simpleCellAddress(0, 0))).toBe(false)
   })
 
+  it("has when there's even no row", () => {
+    const mapping = builder(1, 1)
+
+    expect(mapping.has(simpleCellAddress(0, 2))).toBe(false)
+  })
+
   it('has when there was already something in that column', () => {
     const mapping = builder(1, 2)
 
