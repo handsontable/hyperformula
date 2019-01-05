@@ -1,11 +1,13 @@
 import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
+import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {Vertex} from '../Vertex'
 import {BooleanPlugin} from './plugin/BooleanPlugin'
+import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {DatePlugin} from './plugin/DatePlugin'
 import {InformationPlugin} from './plugin/InformationPlugin'
 import {MedianPlugin} from './plugin/MedianPlugin'
@@ -13,9 +15,7 @@ import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
-import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {concatenate} from './text'
-import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -209,16 +209,6 @@ export class Interpreter {
     }
   }
 
-  private registerPlugins(plugins: any[]) {
-    for (const pluginClass of plugins) {
-      const pluginInstance = new pluginClass(this)
-      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
-        const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
-        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
-      })
-    }
-  }
-
   public computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
     const values: number[] = []
     for (const ast of asts) {
@@ -246,5 +236,15 @@ export class Interpreter {
       }
     }
     return values
+  }
+
+  private registerPlugins(plugins: any[]) {
+    for (const pluginClass of plugins) {
+      const pluginInstance = new pluginClass(this)
+      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+        const functionName = pluginClass.implementedFunctions[pluginFunction][this.config.language].toUpperCase()
+        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
+      })
+    }
   }
 }

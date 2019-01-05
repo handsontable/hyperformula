@@ -33,7 +33,7 @@ export class CountUniquePlugin extends FunctionPlugin {
       values.sort((a, b) => (a - b))
 
       let uniqueValues = 1
-      let previous = values[0];
+      let previous = values[0]
       for (let i = 1; i < values.length; i++) {
         if (previous !== values[i]) {
           previous = values[i]
@@ -47,4 +47,3 @@ export class CountUniquePlugin extends FunctionPlugin {
     }
   }
 }
-
