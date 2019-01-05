@@ -193,17 +193,17 @@ describe('Interpreter', () => {
   it('procedures - SUM with bad args', () => {
     const engine = HandsOnEngine.buildFromArray([['=SUM(B1)', 'asdf']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(0)
   })
 
   it('ranges - SUM with bool', () => {
     const engine = HandsOnEngine.buildFromArray([['=SUM(1,TRUE())']])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(1)
   })
 
   it('ranges - SUM with string', () => {
     const engine = HandsOnEngine.buildFromArray([['=SUM(1,"foo")']])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(1)
   })
 
   it('ranges - SUM and + of 1 with "foo"', () => {
@@ -411,13 +411,12 @@ describe('Interpreter', () => {
 
   it('function ISERROR should return true for common errors', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(SUM("foo"))', '=ISERROR(TRUE(1))'],
+        ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(true)
     expect(engine.getCellValue('B1')).toEqual(true)
     expect(engine.getCellValue('C1')).toEqual(true)
-    expect(engine.getCellValue('D1')).toEqual(true)
   })
 
   it('function ISERROR should return false for valid formulas', () => {

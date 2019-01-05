@@ -23,11 +23,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         value = this.evaluateAst(arg, formulaAddress)
       }
 
-      if (typeof currentSum === 'number' && typeof value === 'number') {
-        return currentSum + value
-      } else {
-        return cellError(ErrorType.VALUE)
-      }
+      return add(currentSum, value)
     }, 0)
   }
 
