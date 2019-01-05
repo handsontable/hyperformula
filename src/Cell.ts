@@ -120,27 +120,6 @@ export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCell
 }
 
 /**
- * Converts string representation of cell address to simple object representation.
- *
- * @param stringAddress - address to convert in string representation, e.g. 'C64'
- */
-export const simpleCellAddressFromString = (stringAddress: string): SimpleCellAddress => {
-  const result = stringAddress.match(/\$?([A-Z]+)\$?([0-9]+)/)!
-
-  let col
-  if (result[1].length === 1) {
-    col = result[1].charCodeAt(0) - 65
-  } else {
-    col = result[1].split('').reduce((currentColumn, nextLetter) => {
-      return currentColumn * 26 + (nextLetter.charCodeAt(0) - 64)
-    }, 0) - 1
-  }
-
-  const row = Number(result[2] as string) - 1
-  return { col, row }
-}
-
-/**
  * Converts simple object representation of cell address to string representation.
  *
  * @param address - address to convert
