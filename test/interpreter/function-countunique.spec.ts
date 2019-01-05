@@ -2,6 +2,14 @@ import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 
 describe('Function COUNTUNIQUE', () => {
+  it('error when no arguments', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=COUNTUNIQUE()'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+  })
+
   it('single number', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=COUNTUNIQUE(1)'],

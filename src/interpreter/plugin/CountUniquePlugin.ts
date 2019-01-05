@@ -24,8 +24,11 @@ export class CountUniquePlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const values = this.interpreter.computeNumericListOfValues(ast.args, formulaAddress)
+    if (ast.args.length === 0) {
+      return cellError(ErrorType.NA)
+    }
 
+    const values = this.interpreter.computeNumericListOfValues(ast.args, formulaAddress)
     if (Array.isArray(values)) {
       values.sort((a, b) => (a - b))
 
