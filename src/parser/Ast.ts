@@ -1,25 +1,25 @@
 import {CellAddress} from '../Cell'
 
 export type Ast =
-    NumberAst
-    | StringAst
-    | CellReferenceAst
-    | CellRangeAst
-    | ConcatenateOpAst
-    | MinusUnaryOpAst
-    | EqualsOpAst
-    | NotEqualOpAst
-    | GreaterThanOpAst
-    | LessThanOpAst
-    | LessThanOrEqualOpAst
-    | GreaterThanOrEqualOpAst
-    | PlusOpAst
-    | MinusOpAst
-    | TimesOpAst
-    | DivOpAst
-    | PowerOpAst
-    | ProcedureAst
-    | ErrorAst
+  NumberAst
+  | StringAst
+  | CellReferenceAst
+  | CellRangeAst
+  | ConcatenateOpAst
+  | MinusUnaryOpAst
+  | EqualsOpAst
+  | NotEqualOpAst
+  | GreaterThanOpAst
+  | LessThanOpAst
+  | LessThanOrEqualOpAst
+  | GreaterThanOrEqualOpAst
+  | PlusOpAst
+  | MinusOpAst
+  | TimesOpAst
+  | DivOpAst
+  | PowerOpAst
+  | ProcedureAst
+  | ErrorAst
 
 export interface ParsingError {
   type: ParsingErrorType,
