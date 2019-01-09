@@ -21,7 +21,7 @@ export class MedianPlugin extends FunctionPlugin {
    *
    * @param ast
    * @param formulaAddress
-    */
+   */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length === 0) {
       return cellError(ErrorType.NA)

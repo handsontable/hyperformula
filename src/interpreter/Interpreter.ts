@@ -205,6 +205,11 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Registers plugins with functions to use
+   *
+   * @param plugins - list of plugin modules
+   */
   private registerPlugins(plugins: any[]) {
     for (const pluginClass of plugins) {
       const pluginInstance = new pluginClass(this)

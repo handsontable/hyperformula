@@ -7,7 +7,6 @@ import {FunctionPlugin} from './FunctionPlugin'
  * Interpreter plugin containing COUNTUNIQUE function
  */
 export class CountUniquePlugin extends FunctionPlugin {
-
   public static implementedFunctions = {
     countunique: {
       EN: 'COUNTUNIQUE',

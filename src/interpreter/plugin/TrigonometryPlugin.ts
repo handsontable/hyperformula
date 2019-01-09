@@ -15,7 +15,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
   /**
-   * Corresponds to COS(value)
+   * Corresponds to ACOS(value)
    *
    * Returns the arc cosine (or inverse cosine) of a number.
    *

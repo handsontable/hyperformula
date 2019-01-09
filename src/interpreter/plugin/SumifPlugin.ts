@@ -20,6 +20,16 @@ export class SumifPlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to SUMIF(Range, Criterion, SumRange)
+   *
+   * Range is the range to which criterion is to be applied.
+   * Criterion is the criteria used to choose which cells will be included in sum.
+   * SumRange is the range on which adding will be performed.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
     if (typeof criterionString !== 'string') {

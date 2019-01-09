@@ -14,6 +14,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
   }
 
+  /**
+   * Corresponds to SUM(Number1, Number2, ...).
+   *
+   * Returns a sum of given numbers.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return ast.args.reduce((currentSum: CellValue, arg) => {
       let value
