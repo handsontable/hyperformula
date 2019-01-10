@@ -185,6 +185,14 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('C2')).toEqual(10)
   })
 
+  it('procedures - SUM with using previously cached value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['3', '=SUM(A1:A1)'],
+      ['4', '=SUM(A1:A2)'],
+    ])
+    expect(engine.getCellValue('B2')).toEqual(7)
+  })
+
   it('ranges - VALUE error when evaluating without context', () => {
     const engine = HandsOnEngine.buildFromArray([['1'], ['2'], ['=A1:A2']])
     expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
