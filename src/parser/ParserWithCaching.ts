@@ -21,6 +21,12 @@ export class ParserWithCaching {
     this.formulaParser = new FormulaParser(this.lexerConfig)
   }
 
+  /**
+   * Parses a formula.
+   *
+   * @param text - formula to parse
+   * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
+   */
   public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
@@ -54,10 +60,21 @@ export class ParserWithCaching {
   }
 }
 
+/**
+ * Checks whether string looks like formula or not.
+ *
+ * @param text - formula
+ */
 export function isFormula(text: string): Boolean {
   return text.startsWith('=')
 }
 
+/**
+ * Converts dependencies from maybe relative addressing to absolute addressing.
+ *
+ * @param deps - list of addresses in R0C0 format
+ * @param baseAddress - base address with regard to which make a convertion
+ */
 const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
   return deps.map((dep) => {
     if (Array.isArray(dep)) {
