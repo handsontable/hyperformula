@@ -46,6 +46,24 @@ it('function DATE with 3 numerical arguments', () => {
   expect(dateNumberToString(engine.getCellValue('C1') as number, Config.DATE_FORMAT)).toEqual('10/24/1915')
 })
 
+it('function DATE with less than 3 numerical arguments', () => {
+  const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1)']])
+
+  expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+})
+
+it('function DATE with non numerical argument', () => {
+  const engine = HandsOnEngine.buildFromArray([
+    ['=DATE("foo", 1, 1)'],
+    ['=DATE(1900, "foo", 1)'],
+    ['=DATE(1900, 1, "foo")'],
+  ])
+
+  expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
+  expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+})
+
 it('function MONTH with numerical arguments', () => {
   const engine = HandsOnEngine.buildFromArray([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
 
