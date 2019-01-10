@@ -11,7 +11,7 @@ export function split<T>(iterable: IterableIterator<T>): { value?: T, rest: Iter
   }
 }
 
-function first<T>(iterable: IterableIterator<T>): T | undefined {
+export function first<T>(iterable: IterableIterator<T>): T | undefined {
   const iterator: Iterator<T> = iterable[Symbol.iterator]()
   const { done, value } = iterator.next()
 
@@ -21,7 +21,7 @@ function first<T>(iterable: IterableIterator<T>): T | undefined {
   return
 }
 
-function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {
+export function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {
   const asSplit = split(iterable)
 
   if (asSplit.hasOwnProperty('value')) {
