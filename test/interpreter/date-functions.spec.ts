@@ -10,6 +10,30 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual('01/01/1900')
     expect(engine.getCellValue('C1')).toEqual('01/01/1900')
   })
+
+  it('function TEXT with different number of arguments than 2', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TEXT(42)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+  })
+
+  it('function TEXT with non-string date format', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TEXT(2, 42)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
+
+  it('function TEXT with wrong date value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TEXT(TRUE(), "mm/dd/yyyy")'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+  })
 })
 
 it('function DATE with 3 numerical arguments', () => {
