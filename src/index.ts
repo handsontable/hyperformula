@@ -172,11 +172,7 @@ export class HandsOnEngine {
    */
   private recomputeFormulas() {
     this.verticesOnCycle.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(cellError(ErrorType.CYCLE))
-      } else {
-        throw Error('Only formula vertix can be on cycle')
-      }
+      (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {
