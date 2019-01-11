@@ -54,6 +54,9 @@ export class SumifPlugin extends FunctionPlugin {
     const valuesRangeArg = ast.args[2]
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
+      const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
+      const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
+
       const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
       const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
       const valuesWidth = getRangeWidth(valuesRangeArg, formulaAddress)
@@ -63,7 +66,7 @@ export class SumifPlugin extends FunctionPlugin {
         return cellError(ErrorType.VALUE)
       }
 
-      return this.evaluateRangeSumif(conditionRangeArg, valuesRangeArg, formulaAddress, criterionString, criterion)
+      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, formulaAddress, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
@@ -98,7 +101,8 @@ export class SumifPlugin extends FunctionPlugin {
     const criterionLambda = buildCriterionLambda(criterion)
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
-      return this.evaluateRangeCountif(conditionRangeArg, formulaAddress, criterionString, criterion)
+      const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
+      return this.evaluateRangeCountif(simpleConditionRange, formulaAddress, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
       const criterionResult = criterionLambda(valueFromCellReference)
@@ -138,10 +142,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - raw value of the criterion passed to function call
    * @param criterion - computed value of the criterion passed to function call
    */
-  private evaluateRangeSumif(conditionRangeArg: CellRangeAst, valuesRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
-    const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
-
+  private evaluateRangeSumif(simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
@@ -171,8 +172,7 @@ export class SumifPlugin extends FunctionPlugin {
     return resultValue
   }
 
-  private evaluateRangeCountif(conditionRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
+  private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
     if (!conditionRangeVertex) {
       throw Error('Range does not exists in graph')
