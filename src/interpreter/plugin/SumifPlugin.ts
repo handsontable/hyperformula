@@ -192,22 +192,14 @@ export class SumifPlugin extends FunctionPlugin {
       return cache.get(criterionString)![0]
     }
 
-    /* if there was no previous value for this criterion, we need to calculate it from scratch */
-    const criterionLambda = buildCriterionLambda(criterion)
-    const allValues = getPlainRangeValues(this.addressMapping, simpleConditionRange)
+    const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleConditionRange,
+      (filteredValues: IterableIterator<CellValue>) => {
+        return Array.from(filteredValues).length
+      })
+    cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
+    conditionRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
 
-    const filteredValues = ifFilter(criterionLambda, allValues[Symbol.iterator](), allValues[Symbol.iterator]())
-
-    rangeValue = 0
-    for (const e of filteredValues) {
-      if (criterionLambda(e)) {
-        rangeValue++
-      }
-    }
-    cache.set(criterionString, [rangeValue, criterionLambda])
-
-    conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
-    return rangeValue
+    return resultValue
   }
 
   /**
