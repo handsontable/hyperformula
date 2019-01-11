@@ -199,40 +199,39 @@ export class SumifPlugin extends FunctionPlugin {
     let rangeValue = conditionRangeVertex.getCriterionFunctionValue(COUNTIF_CACHE_KEY, criterionString)
     if (rangeValue) {
       return rangeValue
-    } else {
-      const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, conditionRangeStart, conditionRangeEnd)
+    } 
+    const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, conditionRangeStart, conditionRangeEnd)
 
-      /* copy old cache and actualize values */
-      const cache: CriterionCache = new Map()
-      smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-        const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
-        const newCount = (value as number) + Array.from(filteredValues).length
-        cache.set(key, [newCount, criterionLambda])
+    /* copy old cache and actualize values */
+    const cache: CriterionCache = new Map()
+    smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
+      const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
+      const newCount = (value as number) + Array.from(filteredValues).length
+      cache.set(key, [newCount, criterionLambda])
 
-        if (key === criterionString) {
-          rangeValue = newCount
-        }
-      })
-
-      /* if there was no previous value for this criterion, we need to calculate it from scratch */
-      if (!rangeValue) {
-        const criterionLambda = buildCriterionLambda(criterion)
-        const values = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
-
-        const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
-
-        rangeValue = 0
-        for (const e of filteredValues) {
-          if (criterionLambda(e)) {
-            rangeValue++
-          }
-        }
-        cache.set(criterionString, [rangeValue, criterionLambda])
+      if (key === criterionString) {
+        rangeValue = newCount
       }
+    })
 
-      conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
-      return rangeValue
+    /* if there was no previous value for this criterion, we need to calculate it from scratch */
+    if (!rangeValue) {
+      const criterionLambda = buildCriterionLambda(criterion)
+      const values = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+
+      const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
+
+      rangeValue = 0
+      for (const e of filteredValues) {
+        if (criterionLambda(e)) {
+          rangeValue++
+        }
+      }
+      cache.set(criterionString, [rangeValue, criterionLambda])
     }
+
+    conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
+    return rangeValue
   }
 
   /**
