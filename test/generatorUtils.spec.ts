@@ -1,4 +1,4 @@
-import { empty, filterWith, first, split, count } from '../src/generatorUtils'
+import { count, empty, filterWith, first, split } from '../src/generatorUtils'
 
 describe('empty', () => {
   it('works', () => {
