@@ -161,19 +161,14 @@ export class SumifPlugin extends FunctionPlugin {
       return cache.get(criterionString)![0]
     }
 
-    /* if there was no previous value for this criterion, we need to calculate it from scratch */
-    const criterionLambda = buildCriterionLambda(criterion)
-    const allValues = getPlainRangeValues(this.addressMapping, simpleValuesRange)
-    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
-
-    const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
-    const reducedSum = reduceSum(filteredValues)
-    cache.set(criterionString, [reducedSum, criterionLambda])
-
-    rangeValue = reducedSum
+    const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleValuesRange,
+      (filteredValues: IterableIterator<CellValue>) => {
+        return reduceSum(filteredValues)
+      })
+    cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
 
-    return rangeValue
+    return resultValue
   }
 
   private evaluateRangeCountif(conditionRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
@@ -262,6 +257,14 @@ export class SumifPlugin extends FunctionPlugin {
     })
 
     return newCache
+  }
+
+  private computeCriterionValue(criterion: Criterion, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
+    const criterionLambda = buildCriterionLambda(criterion)
+    const allValues = getPlainRangeValues(this.addressMapping, simpleValuesRange)
+    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
+    const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
+    return valueComputingFunction(filteredValues)
   }
 }
 
