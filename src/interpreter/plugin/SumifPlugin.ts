@@ -1,5 +1,5 @@
 import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange, rangeWidth, rangeHeight} from '../../Cell'
-import {split} from '../../generatorUtils'
+import {split, count} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
@@ -180,7 +180,7 @@ export class SumifPlugin extends FunctionPlugin {
 
     const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, simpleConditionRange, simpleConditionRange,
       (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-        return (cacheCurrentValue as number) + Array.from(newFilteredValues).length
+        return (cacheCurrentValue as number) + count(newFilteredValues)
       })
 
     if (cache.has(criterionString)) {
@@ -189,7 +189,7 @@ export class SumifPlugin extends FunctionPlugin {
 
     const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleConditionRange,
       (filteredValues: IterableIterator<CellValue>) => {
-        return Array.from(filteredValues).length
+        return count(filteredValues)
       })
     cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     conditionRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)

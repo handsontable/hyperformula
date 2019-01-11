@@ -1,4 +1,4 @@
-import { empty, filterWith, first, split } from '../src/generatorUtils'
+import { empty, filterWith, first, split, count } from '../src/generatorUtils'
 
 describe('empty', () => {
   it('works', () => {
@@ -78,5 +78,14 @@ describe('filterWith', () => {
 
     expect(Array.from(result1)).toEqual([42])
     expect(Array.from(result2)).toEqual([43])
+  })
+})
+
+describe('count', () => {
+  it('works', () => {
+    expect(count([][Symbol.iterator]())).toBe(0)
+    expect(count([42][Symbol.iterator]())).toBe(1)
+    expect(count([42, 42][Symbol.iterator]())).toBe(2)
+    expect(count([42, 42, 42][Symbol.iterator]())).toBe(3)
   })
 })
