@@ -189,8 +189,6 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private evaluateRangeCountif(conditionRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const functionName = 'COUNTIF'
-
     const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
     const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
     const conditionRangeVertex = this.rangeMapping.getRange(conditionRangeStart, conditionRangeEnd)
