@@ -8,7 +8,7 @@ describe('FormatParser', () => {
     expect(parseResult.tokens.length).toBe(1)
     expect(parseResult.tokens[0]).toEqual({
       type: TokenType.FORMAT,
-      value: 'dd'
+      value: 'dd',
     })
   })
 
@@ -32,12 +32,12 @@ describe('FormatParser', () => {
 
     expect(parseResult.tokens[0]).toEqual({
       type: TokenType.FORMAT,
-      value: 'dd'
+      value: 'dd',
     })
 
     expect(parseResult.tokens[1]).toEqual({
       type: TokenType.FREE_TEXT,
-      value: ' foo'
+      value: ' foo',
     })
   })
 
@@ -58,12 +58,12 @@ describe('FormatParser', () => {
 
     expect(parseResult.tokens[0]).toEqual({
       type: TokenType.FORMAT,
-      value: '#.###'
+      value: '#.###',
     })
 
     expect(parseResult.tokens[1]).toEqual({
       type: TokenType.FREE_TEXT,
-      value: ' #.###'
+      value: ' #.###',
     })
   })
 
