@@ -152,19 +152,11 @@ export class SumifPlugin extends FunctionPlugin {
       return rangeValue
     }
 
-    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(simpleConditionRange), simpleValuesRange.start, simpleValuesRange.end)
+    const cache = this.buildNewCriterionCache(sumifCacheKey(simpleConditionRange), simpleConditionRange, simpleValuesRange,
+      (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+        return add(cacheCurrentValue, reduceSum(newFilteredValues))
+      })
 
-    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
-    const restConditions = conditions.slice(conditions.length - values.length)
-
-    /* copy old cache and actualize values */
-    const cache: CriterionCache = new Map()
-    smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-      const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
-      let reducedSum = reduceSum(filteredValues)
-      reducedSum = add(reducedSum, value)
-      cache.set(key, [reducedSum, criterionLambda])
-    })
     if (cache.has(criterionString)) {
       return cache.get(criterionString)![0]
     }
@@ -172,6 +164,7 @@ export class SumifPlugin extends FunctionPlugin {
     /* if there was no previous value for this criterion, we need to calculate it from scratch */
     const criterionLambda = buildCriterionLambda(criterion)
     const allValues = getPlainRangeValues(this.addressMapping, simpleValuesRange)
+    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
 
     const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
     const reducedSum = reduceSum(filteredValues)
