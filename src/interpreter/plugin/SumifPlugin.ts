@@ -1,4 +1,4 @@
-import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange, rangeWidth, rangeHeight} from '../../Cell'
+import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange, rangeWidth, rangeHeight, buildSimpleCellRange, simpleCellAddress} from '../../Cell'
 import {split, count} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -195,14 +195,15 @@ export class SumifPlugin extends FunctionPlugin {
     return cache.get(criterionString)![0]
   }
 
-  /**
-   * Finds existing CriterionCache or returns fresh one and fetch list of remaining values.
-   *
-   * @param cacheKey - key to retrieve from cache
-   * @param beginRange - top-left corner of computing range
-   * @param endRange - bottom-right corner of computing range
-   */
-  private getCriterionRangeValues(cacheKey: string, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
+  private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
+    return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
+  }
+
+  private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
+    let beginRange = simpleValuesRange.start
+    let endRange = simpleValuesRange.end
+    let beginConditionRange = simpleConditionRange.start
+    let endConditionRange = simpleConditionRange.end
     const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
 
@@ -214,29 +215,19 @@ export class SumifPlugin extends FunctionPlugin {
     if (smallerRangeVertex !== null) {
       beginRange = restRangeStart
       endRange = restRangeEnd
+      beginConditionRange = simpleCellAddress(
+        simpleConditionRange.start.col + (beginRange.col - simpleValuesRange.start.col),
+        simpleConditionRange.start.row + (beginRange.row - simpleValuesRange.start.row))
+      endConditionRange = simpleCellAddress(
+        simpleConditionRange.end.col + (endRange.col - simpleValuesRange.end.col),
+        simpleConditionRange.end.row + (endRange.row - simpleValuesRange.end.row))
     }
 
-    const rangeResult = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
-    }
-
-    return [smallerRangeResult || new Map(), rangeResult]
-  }
-
-  private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
-    return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
-  }
-
-  private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
-    const [smallerCache, values] = this.getCriterionRangeValues(cacheKey, simpleValuesRange.start, simpleValuesRange.end)
-
-    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
-    const restConditions = conditions.slice(conditions.length - values.length)
+    const smallerCache = smallerRangeResult || new Map()
 
     const newCache: CriterionCache = new Map()
     smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-      const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
+      const filteredValues = ifFilter(criterionLambda, getRangeValues(this.addressMapping, buildSimpleCellRange(beginConditionRange, endConditionRange)), getRangeValues(this.addressMapping, buildSimpleCellRange(beginRange, endRange)))
       const newCacheValue = cacheBuilder(key, value, filteredValues)
       newCache.set(key, [newCacheValue, criterionLambda])
     })
@@ -257,14 +248,6 @@ function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCell
   for (const cellFromRange of generateCellsFromRangeGenerator(cellRange.start, cellRange.end)) {
     yield addressMapping.getCell(cellFromRange)!.getCellValue()
   }
-}
-
-export function getPlainRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): CellValue[] {
-  const result: CellValue[] = []
-  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange.start, cellRange.end)) {
-    result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
-  }
-  return result
 }
 
 export function* ifFilter(criterionLambda: CriterionLambda, conditionalIterable: IterableIterator<CellValue>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
