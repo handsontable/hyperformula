@@ -33,7 +33,7 @@ export class HandsOnEngine {
    * @param csv - csv representation of sheet
    */
   public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }))
+    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
   }
 
   /**
