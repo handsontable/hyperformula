@@ -1,8 +1,6 @@
 const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|mmmmm|mmmm|mmm|mm|m|yyyy|yy|HH|hh|ss|AM\/PM)/g
 const numberFormatRegex = /(?<!\\)([#0]+(\.[#0]*)?)/g
 
-const str = 'mmmm-yyyy-dd-as\\ddddr\\d\\mmm%$    HH hh ss AM/PM'
-
 export enum TokenType {
   FORMAT = 'FORMAT',
   FREE_TEXT = 'FREE_TEXT',
