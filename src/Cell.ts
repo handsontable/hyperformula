@@ -136,3 +136,15 @@ export function cellAddressToString(address: SimpleCellAddress): string {
 
   return `${result.toUpperCase()}${address.row + 1}`
 }
+
+export interface CellRange {
+  from: CellAddress,
+  to: CellAddress,
+}
+export const buildCellRange = (from: CellAddress, to: CellAddress): CellRange => ({ from, to })
+
+export interface SimpleCellRange {
+  from: SimpleCellAddress,
+  to: SimpleCellAddress,
+}
+export const buildSimpleCellRange = (from: SimpleCellAddress, to: SimpleCellAddress): SimpleCellRange => ({ from, to })
