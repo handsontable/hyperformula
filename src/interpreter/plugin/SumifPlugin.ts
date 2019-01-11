@@ -162,13 +162,9 @@ export class SumifPlugin extends FunctionPlugin {
       let reducedSum = reduceSum(filteredValues)
       reducedSum = add(reducedSum, value)
       cache.set(key, [reducedSum, criterionLambda])
-
-      if (key === criterionString) {
-        rangeValue = reducedSum
-      }
     })
-    if (rangeValue) {
-      return rangeValue
+    if (cache.has(criterionString)) {
+      return cache.get(criterionString)![0]
     }
 
     /* if there was no previous value for this criterion, we need to calculate it from scratch */
@@ -205,14 +201,10 @@ export class SumifPlugin extends FunctionPlugin {
       const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
       const newCount = (value as number) + Array.from(filteredValues).length
       cache.set(key, [newCount, criterionLambda])
-
-      if (key === criterionString) {
-        rangeValue = newCount
-      }
     })
 
-    if (rangeValue) {
-      return rangeValue
+    if (cache.has(criterionString)) {
+      return cache.get(criterionString)![0]
     }
 
     /* if there was no previous value for this criterion, we need to calculate it from scratch */
