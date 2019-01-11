@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../../Cell'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, cellRangeToSimpleCellRange} from '../../Cell'
 import {split} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -189,9 +189,8 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private evaluateRangeCountif(conditionRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
-    const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
-    const conditionRangeVertex = this.rangeMapping.getRange(conditionRangeStart, conditionRangeEnd)
+    const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg)
+    const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
     if (!conditionRangeVertex) {
       throw Error('Range does not exists in graph')
     }
@@ -200,7 +199,7 @@ export class SumifPlugin extends FunctionPlugin {
     if (rangeValue) {
       return rangeValue
     } 
-    const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, conditionRangeStart, conditionRangeEnd)
+    const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, simpleConditionRange.start, conditionRangeEnd)
 
     /* copy old cache and actualize values */
     const cache: CriterionCache = new Map()
