@@ -138,13 +138,13 @@ export function cellAddressToString(address: SimpleCellAddress): string {
 }
 
 export interface CellRange {
-  from: CellAddress,
-  to: CellAddress,
+  start: CellAddress,
+  end: CellAddress,
 }
-export const buildCellRange = (from: CellAddress, to: CellAddress): CellRange => ({ from, to })
+export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({ start, end })
 
 export interface SimpleCellRange {
-  from: SimpleCellAddress,
-  to: SimpleCellAddress,
+  start: SimpleCellAddress,
+  end: SimpleCellAddress,
 }
-export const buildSimpleCellRange = (from: SimpleCellAddress, to: SimpleCellAddress): SimpleCellRange => ({ from, to })
+export const buildSimpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress): SimpleCellRange => ({ start, end })
