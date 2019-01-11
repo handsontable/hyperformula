@@ -175,11 +175,8 @@ export class RangeVertex extends Vertex {
    */
   public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): CellValue | null {
     const values = this.getCriterionFunctionValues(functionName, leftCorner)
-    if (values) {
-      const value = values.get(criterionString)
-      return value ? value[0] : null
-    }
-    return null
+    const value = values.get(criterionString)
+    return value ? value[0] : null
   }
 
   /**
