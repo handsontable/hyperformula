@@ -96,7 +96,11 @@ export class SumifPlugin extends FunctionPlugin {
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
       const criterionResult = criterionLambda(valueFromCellReference)
-      return criterionResult || cellError(ErrorType.VALUE)
+      if (criterionResult) {
+        return 1
+      } else {
+        return 0
+      }
     } else {
       return cellError(ErrorType.VALUE)
     }

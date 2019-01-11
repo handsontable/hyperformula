@@ -13,7 +13,7 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue('A4')).toEqual(2)
   })
 
-  it('function COUNTIF using cache', () => {
+  it('function COUNTIF using partial cache', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['0'],
       ['1'],
@@ -23,6 +23,27 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue('B3')).toEqual(2)
     expect(engine.getCellValue('B4')).toEqual(3)
+  })
+
+  it('function COUNTIF using full cache', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['0', '=COUNTIF(A1:A3, ">=1")'],
+      ['1', '=COUNTIF(A1:A3, ">=1")'],
+      ['2'],
+    ])
+
+    expect(engine.getCellValue('B1')).toEqual(2)
+    expect(engine.getCellValue('B2')).toEqual(2)
+  })
+
+  it('for only one cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTIF(A1, ">=1")'],
+      ['0', '=COUNTIF(A2, ">=1")'],
+    ])
+
+    expect(engine.getCellValue('B1')).toEqual(1)
+    expect(engine.getCellValue('B2')).toEqual(0)
   })
 
   it('function COUNTIF error when 1st arg is not a range', () => {
