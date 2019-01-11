@@ -75,10 +75,6 @@ export class GraphBuilder {
 
     dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
-        if (!this.addressMapping.has(endCell)) {
-          throw Error(`${endCell} does not exist in graph`)
-        }
-
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
           let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
