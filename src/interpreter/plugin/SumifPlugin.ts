@@ -153,18 +153,17 @@ export class SumifPlugin extends FunctionPlugin {
         return add(cacheCurrentValue, reduceSum(newFilteredValues))
       })
 
-    if (cache.has(criterionString)) {
-      return cache.get(criterionString)![0]
+    if (!cache.has(criterionString)) {
+      const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleValuesRange,
+        (filteredValues: IterableIterator<CellValue>) => {
+          return reduceSum(filteredValues)
+        })
+      cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     }
 
-    const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleValuesRange,
-      (filteredValues: IterableIterator<CellValue>) => {
-        return reduceSum(filteredValues)
-      })
-    cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
 
-    return resultValue
+    return cache.get(criterionString)![0]
   }
 
   private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
@@ -183,18 +182,17 @@ export class SumifPlugin extends FunctionPlugin {
         return (cacheCurrentValue as number) + count(newFilteredValues)
       })
 
-    if (cache.has(criterionString)) {
-      return cache.get(criterionString)![0]
+    if (!cache.has(criterionString)) {
+      const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleConditionRange,
+        (filteredValues: IterableIterator<CellValue>) => {
+          return count(filteredValues)
+        })
+      cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     }
 
-    const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleConditionRange,
-      (filteredValues: IterableIterator<CellValue>) => {
-        return count(filteredValues)
-      })
-    cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     conditionRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
 
-    return resultValue
+    return cache.get(criterionString)![0]
   }
 
   /**
