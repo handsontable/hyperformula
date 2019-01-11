@@ -8,6 +8,13 @@ import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 
+/** Computes key for criterion function cache */
+function sumifCacheKey(leftCorner: SimpleCellAddress) {
+  return `SUMIF,${leftCorner.col},${leftCorner.row}`
+}
+
+const COUNTIF_CACHE_KEY = 'COUNTIF'
+
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumif: {
@@ -130,7 +137,6 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - computed value of the criterion passed to function call
    */
   private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const functionName = 'SUMIF'
     const conditionRangeArg = ast.args[0] as CellRangeAst
     const valuesRangeArg = ast.args[2] as CellRangeAst
 
@@ -143,11 +149,11 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = valuesRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
+    let rangeValue = valuesRangeVertex.getCriterionFunctionValue(sumifCacheKey(conditionRangeStart), criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
-      const [smallerCache, values] = this.getCriterionRangeValues(functionName, conditionRangeStart, valuesRangeStart, valuesRangeEnd)
+      const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), valuesRangeStart, valuesRangeEnd)
 
       const conditions = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
       const restConditions = conditions.slice(conditions.length - values.length)
@@ -177,7 +183,7 @@ export class SumifPlugin extends FunctionPlugin {
         rangeValue = reducedSum
       }
 
-      valuesRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
+      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditionRangeStart), cache)
       return rangeValue
     }
   }
@@ -192,11 +198,11 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = conditionRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
+    let rangeValue = conditionRangeVertex.getCriterionFunctionValue(COUNTIF_CACHE_KEY, criterionString)
     if (rangeValue) {
       return rangeValue
     } else {
-      const [smallerCache, values] = this.getCriterionRangeValues(functionName, conditionRangeStart, conditionRangeStart, conditionRangeEnd)
+      const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, conditionRangeStart, conditionRangeEnd)
 
       /* copy old cache and actualize values */
       const cache: CriterionCache = new Map()
@@ -226,7 +232,7 @@ export class SumifPlugin extends FunctionPlugin {
         cache.set(criterionString, [rangeValue, criterionLambda])
       }
 
-      conditionRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
+      conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
       return rangeValue
     }
   }
@@ -234,18 +240,17 @@ export class SumifPlugin extends FunctionPlugin {
   /**
    * Finds existing CriterionCache or returns fresh one and fetch list of remaining values.
    *
-   * @param functionName - function name (e.g. SUMIF)
-   * @param conditionLeftCorner - top-left corner of condition range
+   * @param cacheKey - key to retrieve from cache
    * @param beginRange - top-left corner of computing range
    * @param endRange - bottom-right corner of computing range
    */
-  private getCriterionRangeValues(functionName: string, conditionLeftCorner: SimpleCellAddress, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
+  private getCriterionRangeValues(cacheKey: string, beginRange: SimpleCellAddress, endRange: SimpleCellAddress): [CriterionCache, CellValue[]] {
     const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
 
     let smallerRangeResult = null
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerRangeResult = smallerRangeVertex.getCriterionFunctionValues(functionName, conditionLeftCorner)
+      smallerRangeResult = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
     }
 
     if (smallerRangeVertex !== null) {
