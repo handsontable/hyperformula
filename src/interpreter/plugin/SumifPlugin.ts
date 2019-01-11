@@ -140,11 +140,10 @@ export class SumifPlugin extends FunctionPlugin {
     const conditionRangeArg = ast.args[0] as CellRangeAst
     const valuesRangeArg = ast.args[2] as CellRangeAst
 
+    const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
     const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
-    const valuesRangeStart = getAbsoluteAddress(valuesRangeArg.start, formulaAddress)
-    const valuesRangeEnd = getAbsoluteAddress(valuesRangeArg.end, formulaAddress)
 
-    const valuesRangeVertex = this.rangeMapping.getRange(valuesRangeStart, valuesRangeEnd)
+    const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
     }
@@ -154,7 +153,7 @@ export class SumifPlugin extends FunctionPlugin {
       return rangeValue
     }
 
-    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), valuesRangeStart, valuesRangeEnd)
+    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), simpleValuesRange.start, simpleValuesRange.end)
 
     const conditions = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
     const restConditions = conditions.slice(conditions.length - values.length)
