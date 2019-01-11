@@ -152,3 +152,11 @@ export const buildSimpleCellRange = (start: SimpleCellAddress, end: SimpleCellAd
 export function cellRangeToSimpleCellRange(cellRange: CellRange, baseAddress: SimpleCellAddress) {
   return buildSimpleCellRange(getAbsoluteAddress(cellRange.start, baseAddress), getAbsoluteAddress(cellRange.end, baseAddress))
 }
+
+export const rangeWidth = (simpleCellRange: SimpleCellRange) => {
+  return simpleCellRange.end.col - simpleCellRange.start.col
+}
+
+export const rangeHeight = (simpleCellRange: SimpleCellRange) => {
+  return simpleCellRange.end.row - simpleCellRange.start.row
+}

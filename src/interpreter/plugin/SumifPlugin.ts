@@ -1,4 +1,4 @@
-import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange} from '../../Cell'
+import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange, rangeWidth, rangeHeight} from '../../Cell'
 import {split} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -57,12 +57,7 @@ export class SumifPlugin extends FunctionPlugin {
       const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
 
-      const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
-      const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
-      const valuesWidth = getRangeWidth(valuesRangeArg, formulaAddress)
-      const valuesHeight = getRangeHeight(valuesRangeArg, formulaAddress)
-
-      if (conditionWidth !== valuesWidth || conditionHeight !== valuesHeight) {
+      if (rangeWidth(simpleConditionRange) !== rangeWidth(simpleValuesRange) || rangeHeight(simpleConditionRange) !== rangeHeight(simpleValuesRange)) {
         return cellError(ErrorType.VALUE)
       }
 
@@ -288,16 +283,4 @@ export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
     acc = add(acc, val)
   }
   return acc
-}
-
-const getRangeWidth = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
-  const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)
-  const absoluteEnd = getAbsoluteAddress(ast.end, baseAddress)
-  return absoluteEnd.col - absoluteStart.col
-}
-
-const getRangeHeight = (ast: CellRangeAst, baseAddress: SimpleCellAddress) => {
-  const absoluteStart = getAbsoluteAddress(ast.start, baseAddress)
-  const absoluteEnd = getAbsoluteAddress(ast.end, baseAddress)
-  return absoluteEnd.row - absoluteStart.row
 }
