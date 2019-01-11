@@ -89,9 +89,6 @@ export class SumifPlugin extends FunctionPlugin {
     const criterionLambda = buildCriterionLambda(criterion)
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
-      const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
-      const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
-
       return this.evaluateRangeCountif(ast, formulaAddress, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
