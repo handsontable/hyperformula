@@ -66,7 +66,7 @@ export class SumifPlugin extends FunctionPlugin {
         return cellError(ErrorType.VALUE)
       }
 
-      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, formulaAddress, criterionString, criterion)
+      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
@@ -102,7 +102,7 @@ export class SumifPlugin extends FunctionPlugin {
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
       const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
-      return this.evaluateRangeCountif(simpleConditionRange, formulaAddress, criterionString, criterion)
+      return this.evaluateRangeCountif(simpleConditionRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
       const criterionResult = criterionLambda(valueFromCellReference)
@@ -142,7 +142,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - raw value of the criterion passed to function call
    * @param criterion - computed value of the criterion passed to function call
    */
-  private evaluateRangeSumif(simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
+  private evaluateRangeSumif(simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
     const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
@@ -172,7 +172,7 @@ export class SumifPlugin extends FunctionPlugin {
     return resultValue
   }
 
-  private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
+  private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
     const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
     if (!conditionRangeVertex) {
       throw Error('Range does not exists in graph')
