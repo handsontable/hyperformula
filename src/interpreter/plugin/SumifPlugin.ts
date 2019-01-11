@@ -214,21 +214,23 @@ export class SumifPlugin extends FunctionPlugin {
       }
     })
 
-    /* if there was no previous value for this criterion, we need to calculate it from scratch */
-    if (!rangeValue) {
-      const criterionLambda = buildCriterionLambda(criterion)
-      const values = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
-
-      const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
-
-      rangeValue = 0
-      for (const e of filteredValues) {
-        if (criterionLambda(e)) {
-          rangeValue++
-        }
-      }
-      cache.set(criterionString, [rangeValue, criterionLambda])
+    if (rangeValue) {
+      return rangeValue
     }
+
+    /* if there was no previous value for this criterion, we need to calculate it from scratch */
+    const criterionLambda = buildCriterionLambda(criterion)
+    const allValues = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+
+    const filteredValues = ifFilter(criterionLambda, allValues[Symbol.iterator](), allValues[Symbol.iterator]())
+
+    rangeValue = 0
+    for (const e of filteredValues) {
+      if (criterionLambda(e)) {
+        rangeValue++
+      }
+    }
+    cache.set(criterionString, [rangeValue, criterionLambda])
 
     conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
     return rangeValue
