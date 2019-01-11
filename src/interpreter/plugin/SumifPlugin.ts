@@ -1,7 +1,8 @@
 import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange, rangeWidth, rangeHeight, buildSimpleCellRange, simpleCellAddress} from '../../Cell'
 import {split, count} from '../../generatorUtils'
-import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
+import {RangeMapping} from '../../RangeMapping'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {CriterionCache, RangeVertex} from '../../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
@@ -14,6 +15,29 @@ function sumifCacheKey(simpleConditionRange: SimpleCellRange): string {
 }
 
 const COUNTIF_CACHE_KEY = 'COUNTIF'
+
+export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: SimpleCellRange, valuesRange: SimpleCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: SimpleCellRange, restValuesRange: SimpleCellRange} => {
+  if (valuesRange.end.row > valuesRange.start.row) {
+    const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.col, valuesRange.end.row - 1)
+    const rowLessVertex = rangeMapping.getRange(valuesRange.start, valuesRangeEndRowLess)
+    if (rowLessVertex) {
+      return {
+        smallerRangeVertex: rowLessVertex,
+        restValuesRange: buildSimpleCellRange(
+          simpleCellAddress(valuesRange.start.col, valuesRange.end.row),
+          valuesRange.end),
+        restConditionRange: buildSimpleCellRange(
+          simpleCellAddress(conditionRange.start.col, conditionRange.end.row),
+          conditionRange.end),
+      }
+    }
+  }
+  return {
+    smallerRangeVertex: null,
+    restValuesRange: valuesRange,
+    restConditionRange: conditionRange,
+  }
+}
 
 type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
 
@@ -200,34 +224,19 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
-    let beginRange = simpleValuesRange.start
-    let endRange = simpleValuesRange.end
-    let beginConditionRange = simpleConditionRange.start
-    let endConditionRange = simpleConditionRange.end
-    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
+    const currentRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+    const {smallerRangeVertex, restConditionRange, restValuesRange} = findSmallerRange(this.rangeMapping, simpleConditionRange, simpleValuesRange)
 
-    let smallerRangeResult = null
+    let smallerCache
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerRangeResult = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
+      smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
+    } else {
+      smallerCache = new Map()
     }
-
-    if (smallerRangeVertex !== null) {
-      beginRange = restRangeStart
-      endRange = restRangeEnd
-      beginConditionRange = simpleCellAddress(
-        simpleConditionRange.start.col + (beginRange.col - simpleValuesRange.start.col),
-        simpleConditionRange.start.row + (beginRange.row - simpleValuesRange.start.row))
-      endConditionRange = simpleCellAddress(
-        simpleConditionRange.end.col + (endRange.col - simpleValuesRange.end.col),
-        simpleConditionRange.end.row + (endRange.row - simpleValuesRange.end.row))
-    }
-
-    const smallerCache = smallerRangeResult || new Map()
 
     const newCache: CriterionCache = new Map()
     smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-      const filteredValues = ifFilter(criterionLambda, getRangeValues(this.addressMapping, buildSimpleCellRange(beginConditionRange, endConditionRange)), getRangeValues(this.addressMapping, buildSimpleCellRange(beginRange, endRange)))
+      const filteredValues = ifFilter(criterionLambda, getRangeValues(this.addressMapping, restConditionRange), getRangeValues(this.addressMapping, restValuesRange))
       const newCacheValue = cacheBuilder(key, value, filteredValues)
       newCache.set(key, [newCacheValue, criterionLambda])
     })
