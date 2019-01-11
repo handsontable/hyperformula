@@ -248,10 +248,16 @@ export class SumifPlugin extends FunctionPlugin {
 
   private computeCriterionValue(criterion: Criterion, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambda = buildCriterionLambda(criterion)
-    const allValues = getPlainRangeValues(this.addressMapping, simpleValuesRange)
-    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
-    const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
+    const values = getRangeValues(this.addressMapping, simpleValuesRange)
+    const conditions = getRangeValues(this.addressMapping, simpleConditionRange)
+    const filteredValues = ifFilter(criterionLambda, conditions, values)
     return valueComputingFunction(filteredValues)
+  }
+}
+
+function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): IterableIterator<CellValue> {
+  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange.start, cellRange.end)) {
+    yield addressMapping.getCell(cellFromRange)!.getCellValue()
   }
 }
 
