@@ -13,6 +13,18 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue('A4')).toEqual(2)
   })
 
+  it('function COUNTIF using cache', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['0'],
+      ['1'],
+      ['2', '=COUNTIF(A1:A3, ">=1")'],
+      ['3', '=COUNTIF(A1:A4, ">=1")'],
+    ])
+
+    expect(engine.getCellValue('B3')).toEqual(2)
+    expect(engine.getCellValue('B4')).toEqual(3)
+  })
+
   it('function COUNTIF error when 1st arg is not a range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=COUNTIF(42, ">0")'],

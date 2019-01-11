@@ -75,11 +75,7 @@ export class SumifPlugin extends FunctionPlugin {
    */
   public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const conditionRangeArg = ast.args[0]
-    if (conditionRangeArg.type !== AstNodeType.CELL_RANGE) {
-      return cellError(ErrorType.VALUE)
-    }
 
-    const conditionValues = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
     const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
     if (typeof criterionString !== 'string') {
       return cellError(ErrorType.VALUE)
@@ -91,13 +87,19 @@ export class SumifPlugin extends FunctionPlugin {
     }
 
     const criterionLambda = buildCriterionLambda(criterion)
-    let counter = 0
-    for (const e of conditionValues) {
-      if (criterionLambda(e)) {
-        counter++
-      }
+
+    if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
+      const conditionWidth = getRangeWidth(conditionRangeArg, formulaAddress)
+      const conditionHeight = getRangeHeight(conditionRangeArg, formulaAddress)
+
+      return this.evaluateRangeCountif(ast, formulaAddress, criterionString, criterion)
+    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
+      const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
+      const criterionResult = criterionLambda(valueFromCellReference)
+      return criterionResult || cellError(ErrorType.VALUE)
+    } else {
+      return cellError(ErrorType.VALUE)
     }
-    return counter
   }
 
   /**
@@ -175,6 +177,56 @@ export class SumifPlugin extends FunctionPlugin {
       }
 
       valuesRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
+      return rangeValue
+    }
+  }
+
+  private evaluateRangeCountif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
+    const functionName = 'COUNTIF'
+    const conditionRangeArg = ast.args[0] as CellRangeAst
+
+    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
+    const conditionRangeEnd = getAbsoluteAddress(conditionRangeArg.end, formulaAddress)
+    const conditionRangeVertex = this.rangeMapping.getRange(conditionRangeStart, conditionRangeEnd)
+    if (!conditionRangeVertex) {
+      throw Error('Range does not exists in graph')
+    }
+
+    let rangeValue = conditionRangeVertex.getCriterionFunctionValue(functionName, conditionRangeStart, criterionString)
+    if (rangeValue) {
+      return rangeValue
+    } else {
+      const [smallerCache, values] = this.getCriterionRangeValues(functionName, conditionRangeStart, conditionRangeStart, conditionRangeEnd)
+
+      /* copy old cache and actualize values */
+      const cache: CriterionCache = new Map()
+      smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
+        const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
+        const newCount = (value as number) + Array.from(filteredValues).length
+        cache.set(key, [newCount, criterionLambda])
+
+        if (key === criterionString) {
+          rangeValue = newCount
+        }
+      })
+
+      /* if there was no previous value for this criterion, we need to calculate it from scratch */
+      if (!rangeValue) {
+        const criterionLambda = buildCriterionLambda(criterion)
+        const values = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+
+        const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
+
+        rangeValue = 0
+        for (const e of filteredValues) {
+          if (criterionLambda(e)) {
+            rangeValue++
+          }
+        }
+        cache.set(criterionString, [rangeValue, criterionLambda])
+      }
+
+      conditionRangeVertex.setCriterionFunctionValues(functionName, conditionRangeStart, cache)
       return rangeValue
     }
   }
