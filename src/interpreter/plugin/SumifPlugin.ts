@@ -147,9 +147,9 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
-    if (rangeValue) {
-      return rangeValue
+    const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
+    if (cachedResult) {
+      return cachedResult
     }
 
     const cache = this.buildNewCriterionCache(sumifCacheKey(simpleConditionRange), simpleConditionRange, simpleValuesRange,
@@ -178,9 +178,9 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
-    if (rangeValue) {
-      return rangeValue
+    const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
+    if (cachedResult) {
+      return cachedResult
     }
 
     const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, simpleConditionRange, simpleConditionRange,
