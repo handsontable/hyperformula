@@ -3,7 +3,7 @@ import {split} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
-import {CriterionCache} from '../../Vertex'
+import {CriterionCache, RangeVertex} from '../../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -149,43 +149,44 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = valuesRangeVertex.getCriterionFunctionValue(sumifCacheKey(conditionRangeStart), criterionString)
+    let rangeValue = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditionRangeStart), criterionString)
     if (rangeValue) {
       return rangeValue
-    } else {
-      const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), valuesRangeStart, valuesRangeEnd)
+    }
 
-      const conditions = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
-      const restConditions = conditions.slice(conditions.length - values.length)
+    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), valuesRangeStart, valuesRangeEnd)
 
-      /* copy old cache and actualize values */
-      const cache: CriterionCache = new Map()
-      smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-        const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
-        let reducedSum = reduceSum(filteredValues)
-        reducedSum = add(reducedSum, value)
-        cache.set(key, [reducedSum, criterionLambda])
+    const conditions = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+    const restConditions = conditions.slice(conditions.length - values.length)
 
-        if (key === criterionString) {
-          rangeValue = reducedSum
-        }
-      })
+    /* copy old cache and actualize values */
+    const cache: CriterionCache = new Map()
+    smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
+      const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
+      let reducedSum = reduceSum(filteredValues)
+      reducedSum = add(reducedSum, value)
+      cache.set(key, [reducedSum, criterionLambda])
 
-      /* if there was no previous value for this criterion, we need to calculate it from scratch */
-      if (!rangeValue) {
-        const criterionLambda = buildCriterionLambda(criterion)
-        const values = getPlainRangeValues(this.addressMapping, valuesRangeArg, formulaAddress)
-
-        const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), values[Symbol.iterator]())
-        const reducedSum = reduceSum(filteredValues)
-        cache.set(criterionString, [reducedSum, criterionLambda])
-
+      if (key === criterionString) {
         rangeValue = reducedSum
       }
-
-      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditionRangeStart), cache)
+    })
+    if (rangeValue) {
       return rangeValue
     }
+
+    /* if there was no previous value for this criterion, we need to calculate it from scratch */
+    const criterionLambda = buildCriterionLambda(criterion)
+    const allValues = getPlainRangeValues(this.addressMapping, valuesRangeArg, formulaAddress)
+
+    const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
+    const reducedSum = reduceSum(filteredValues)
+    cache.set(criterionString, [reducedSum, criterionLambda])
+
+    rangeValue = reducedSum
+    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditionRangeStart), cache)
+
+    return rangeValue
   }
 
   private evaluateRangeCountif(conditionRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
@@ -195,10 +196,11 @@ export class SumifPlugin extends FunctionPlugin {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = conditionRangeVertex.getCriterionFunctionValue(COUNTIF_CACHE_KEY, criterionString)
+    let rangeValue = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
     if (rangeValue) {
       return rangeValue
     }
+
     const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, simpleConditionRange.start, simpleConditionRange.end)
 
     /* copy old cache and actualize values */
@@ -262,6 +264,10 @@ export class SumifPlugin extends FunctionPlugin {
     }
 
     return [smallerRangeResult || new Map(), rangeResult]
+  }
+
+  private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
+    return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 }
 
