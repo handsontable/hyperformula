@@ -31,19 +31,29 @@ interface FormatExpression {
   tokens: FormatToken[]
 }
 
-function formatParse(str: string, regex: RegExp) {
+function matchDateFormat(str: string): RegExpExecArray[] {
   const tokens: RegExpExecArray[] = []
 
   let m
 
   do {
-    m = regex.exec(str)
+    m = dateFormatRegex.exec(str)
     if (m != null) {
       tokens.push(m)
     }
   } while (m)
 
   return tokens
+}
+
+function matchNumberFormat(str: string): RegExpExecArray[] {
+  const numberFormatToken = numberFormatRegex.exec(str)
+
+  if (numberFormatToken !== null) {
+    return [numberFormatToken]
+  } else {
+    return []
+  }
 }
 
 function createTokens(regexTokens: RegExpExecArray[], str: string) {
@@ -73,7 +83,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
 }
 
 export function parse(str: string): FormatExpression {
-  const dateFormatTokens = formatParse(str, dateFormatRegex)
+  const dateFormatTokens = matchDateFormat(str)
 
   if (dateFormatTokens.length > 0) {
     return {
@@ -82,7 +92,7 @@ export function parse(str: string): FormatExpression {
     }
   }
 
-  const numberFormatTokens = formatParse(str, numberFormatRegex)
+  const numberFormatTokens = matchNumberFormat(str)
   if (numberFormatTokens.length > 0) {
     return {
       type: FormatExpressionType.NUMBER,
