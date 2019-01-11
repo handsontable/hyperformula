@@ -73,8 +73,10 @@ describe('Integration', () => {
     ])
 
     engine.setCellContent('A1', '2')
-
     expect(engine.getCellValue('B1')).toBe(2)
+
+    engine.setCellContent('A1', 'foo')
+    expect(engine.getCellValue('B1')).toBe('foo')
   })
 
   it('#loadSheet change cell content which was formula throws error', () => {

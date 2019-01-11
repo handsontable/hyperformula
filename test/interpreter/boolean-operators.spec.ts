@@ -47,13 +47,12 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Equals operator with error', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['=1/0', '=A1=2','=2=A1']
+        ['=1/0', '=A1=2', '=2=A1'],
     ])
 
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
   })
-
 
   it('Not equals operator - numbers', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -87,7 +86,7 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Not equals operator with error', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=1/0', '=A1<>2','=2<>A1']
+      ['=1/0', '=A1<>2', '=2<>A1'],
     ])
 
     expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
