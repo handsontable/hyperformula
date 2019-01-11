@@ -1,4 +1,4 @@
-import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../../Cell'
+import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, SimpleCellRange} from '../../Cell'
 import {split} from '../../generatorUtils'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -9,11 +9,13 @@ import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /** Computes key for criterion function cache */
-function sumifCacheKey(leftCorner: SimpleCellAddress) {
-  return `SUMIF,${leftCorner.col},${leftCorner.row}`
+function sumifCacheKey(simpleConditionRange: SimpleCellRange): string {
+  return `SUMIF,${simpleConditionRange.start.col},${simpleConditionRange.start.row}`
 }
 
 const COUNTIF_CACHE_KEY = 'COUNTIF'
+
+type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -138,21 +140,21 @@ export class SumifPlugin extends FunctionPlugin {
    */
   private evaluateRangeSumif(conditionRangeArg: CellRangeAst, valuesRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
-    const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
+    const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
 
     const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
     }
 
-    let rangeValue = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditionRangeStart), criterionString)
+    let rangeValue = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
     if (rangeValue) {
       return rangeValue
     }
 
-    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(conditionRangeStart), simpleValuesRange.start, simpleValuesRange.end)
+    const [smallerCache, values] = this.getCriterionRangeValues(sumifCacheKey(simpleConditionRange), simpleValuesRange.start, simpleValuesRange.end)
 
-    const conditions = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
     const restConditions = conditions.slice(conditions.length - values.length)
 
     /* copy old cache and actualize values */
@@ -169,14 +171,14 @@ export class SumifPlugin extends FunctionPlugin {
 
     /* if there was no previous value for this criterion, we need to calculate it from scratch */
     const criterionLambda = buildCriterionLambda(criterion)
-    const allValues = getPlainRangeValues(this.addressMapping, valuesRangeArg, formulaAddress)
+    const allValues = getPlainRangeValues(this.addressMapping, simpleValuesRange)
 
     const filteredValues = ifFilter(criterionLambda, conditions[Symbol.iterator](), allValues[Symbol.iterator]())
     const reducedSum = reduceSum(filteredValues)
     cache.set(criterionString, [reducedSum, criterionLambda])
 
     rangeValue = reducedSum
-    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditionRangeStart), cache)
+    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
 
     return rangeValue
   }
@@ -193,15 +195,10 @@ export class SumifPlugin extends FunctionPlugin {
       return rangeValue
     }
 
-    const [smallerCache, values] = this.getCriterionRangeValues(COUNTIF_CACHE_KEY, simpleConditionRange.start, simpleConditionRange.end)
-
-    /* copy old cache and actualize values */
-    const cache: CriterionCache = new Map()
-    smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-      const filteredValues = ifFilter(criterionLambda, values[Symbol.iterator](), values[Symbol.iterator]())
-      const newCount = (value as number) + Array.from(filteredValues).length
-      cache.set(key, [newCount, criterionLambda])
-    })
+    const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, simpleConditionRange, simpleConditionRange,
+      (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+        return (cacheCurrentValue as number) + Array.from(newFilteredValues).length
+      })
 
     if (cache.has(criterionString)) {
       return cache.get(criterionString)![0]
@@ -209,7 +206,7 @@ export class SumifPlugin extends FunctionPlugin {
 
     /* if there was no previous value for this criterion, we need to calculate it from scratch */
     const criterionLambda = buildCriterionLambda(criterion)
-    const allValues = getPlainRangeValues(this.addressMapping, conditionRangeArg, formulaAddress)
+    const allValues = getPlainRangeValues(this.addressMapping, simpleConditionRange)
 
     const filteredValues = ifFilter(criterionLambda, allValues[Symbol.iterator](), allValues[Symbol.iterator]())
 
@@ -257,12 +254,27 @@ export class SumifPlugin extends FunctionPlugin {
   private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
+
+  private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
+    const [smallerCache, values] = this.getCriterionRangeValues(cacheKey, simpleValuesRange.start, simpleValuesRange.end)
+
+    const conditions = getPlainRangeValues(this.addressMapping, simpleConditionRange)
+    const restConditions = conditions.slice(conditions.length - values.length)
+
+    const newCache: CriterionCache = new Map()
+    smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
+      const filteredValues = ifFilter(criterionLambda, restConditions[Symbol.iterator](), values[Symbol.iterator]())
+      const newCacheValue = cacheBuilder(key, value, filteredValues)
+      newCache.set(key, [newCacheValue, criterionLambda])
+    })
+
+    return newCache
+  }
 }
 
-export function getPlainRangeValues(addressMapping: IAddressMapping, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-  const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+export function getPlainRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): CellValue[] {
   const result: CellValue[] = []
-  for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange.start, cellRange.end)) {
     result.push(addressMapping.getCell(cellFromRange)!.getCellValue())
   }
   return result
