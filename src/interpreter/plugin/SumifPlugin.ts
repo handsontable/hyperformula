@@ -61,7 +61,7 @@ export class SumifPlugin extends FunctionPlugin {
         return cellError(ErrorType.VALUE)
       }
 
-      return this.evaluateRangeSumif(ast, formulaAddress, criterionString, criterion)
+      return this.evaluateRangeSumif(conditionRangeArg, valuesRangeArg, formulaAddress, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
@@ -136,10 +136,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - raw value of the criterion passed to function call
    * @param criterion - computed value of the criterion passed to function call
    */
-  private evaluateRangeSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeArg = ast.args[0] as CellRangeAst
-    const valuesRangeArg = ast.args[2] as CellRangeAst
-
+  private evaluateRangeSumif(conditionRangeArg: CellRangeAst, valuesRangeArg: CellRangeAst, formulaAddress: SimpleCellAddress, criterionString: string, criterion: Criterion): CellValue {
     const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
     const conditionRangeStart = getAbsoluteAddress(conditionRangeArg.start, formulaAddress)
 
