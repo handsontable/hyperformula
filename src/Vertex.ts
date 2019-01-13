@@ -167,40 +167,34 @@ export class RangeVertex extends Vertex {
   }
 
   /**
-   * Returns cached value stored for given function name, left corner of condition range and criterion text representation
+   * Returns cached value for given cache key and criterion text representation
    *
-   * @param functionName - name of the function
-   * @param leftCorner - left corner of condition range
+   * @param cacheKey - key to retrieve from the cache
    * @param criterionString - criterion text (ex. '<=5')
    */
-  public getCriterionFunctionValue(functionName: string, leftCorner: SimpleCellAddress, criterionString: string): CellValue | null {
-    const values = this.getCriterionFunctionValues(functionName, leftCorner)
-    if (values) {
-      const value = values.get(criterionString)
-      return value ? value[0] : null
-    }
-    return null
+  public getCriterionFunctionValue(cacheKey: string, criterionString: string): CellValue | null {
+    const values = this.getCriterionFunctionValues(cacheKey)
+    const value = values.get(criterionString)
+    return value ? value[0] : null
   }
 
   /**
    * Returns all cached values stored for given criterion function
    *
-   * @param functionName - name of the function
-   * @param leftCorner - left corner of condition range
+   * @param cacheKey - key to retrieve from the cache
    */
-  public getCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress): Map<string, [CellValue, CriterionLambda]> {
-    return this.criterionFuncitonCache.get(this.criterionFunctioncache(functionName, leftCorner)) || new Map()
+  public getCriterionFunctionValues(cacheKey: string): Map<string, [CellValue, CriterionLambda]> {
+    return this.criterionFuncitonCache.get(cacheKey) || new Map()
   }
 
   /**
    * Stores all values for given criterion function
    *
-   * @param functionName - name of the function
-   * @param leftCorner - left corner of condition range
+   * @param cacheKey - key to store in the cache
    * @param values - map with values
    */
-  public setCriterionFunctionValues(functionName: string, leftCorner: SimpleCellAddress, values: CriterionCache) {
-    this.criterionFuncitonCache.set(this.criterionFunctioncache(functionName, leftCorner), values)
+  public setCriterionFunctionValues(cacheKey: string, values: CriterionCache) {
+    this.criterionFuncitonCache.set(cacheKey, values)
   }
 
   /**
@@ -223,10 +217,5 @@ export class RangeVertex extends Vertex {
    */
   public getEnd(): SimpleCellAddress {
     return this.end
-  }
-
-  /** Computes key for criterion function cache */
-  private criterionFunctioncache(functionName: string, leftCorner: SimpleCellAddress) {
-    return `${functionName},${leftCorner.col},${leftCorner.row}`
   }
 }

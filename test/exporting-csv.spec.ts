@@ -19,4 +19,12 @@ describe('Exporting CSV', () => {
 
     expect(engine.exportAsCsv().trim()).toEqual(str)
   })
+
+  it('exports formatter errors', () => {
+    const str = `=1/0`
+
+    const engine = HandsOnEngine.buildFromCsv(str)
+
+    expect(engine.exportAsCsv().trim()).toEqual('#DIV_BY_ZERO!')
+  })
 })

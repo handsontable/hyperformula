@@ -33,7 +33,7 @@ export class HandsOnEngine {
    * @param csv - csv representation of sheet
    */
   public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }))
+    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
   }
 
   /**
@@ -172,11 +172,7 @@ export class HandsOnEngine {
    */
   private recomputeFormulas() {
     this.verticesOnCycle.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex) {
-        vertex.setCellValue(cellError(ErrorType.CYCLE))
-      } else {
-        throw Error('Only formula vertix can be on cycle')
-      }
+      (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {

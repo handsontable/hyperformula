@@ -62,7 +62,7 @@ export class Interpreter {
         if (isCellError(leftResult)) {
           return leftResult
         }
-        if (isCellError(leftResult)) {
+        if (isCellError(rightResult)) {
           return rightResult
         }
 
@@ -79,7 +79,7 @@ export class Interpreter {
         if (isCellError(leftResult)) {
           return leftResult
         }
-        if (isCellError(leftResult)) {
+        if (isCellError(rightResult)) {
           return rightResult
         }
 

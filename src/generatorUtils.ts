@@ -33,3 +33,11 @@ export function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableItera
     yield * filterWith(fn, asSplit.rest)
   }
 }
+
+export function count<T>(iterable: IterableIterator<T>): number {
+  let counter = 0
+  for (const val of iterable) {
+    counter++
+  }
+  return counter
+}

@@ -136,3 +136,27 @@ export function cellAddressToString(address: SimpleCellAddress): string {
 
   return `${result.toUpperCase()}${address.row + 1}`
 }
+
+export interface CellRange {
+  start: CellAddress,
+  end: CellAddress,
+}
+export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({ start, end })
+
+export interface SimpleCellRange {
+  start: SimpleCellAddress,
+  end: SimpleCellAddress,
+}
+export const buildSimpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress): SimpleCellRange => ({ start, end })
+
+export function cellRangeToSimpleCellRange(cellRange: CellRange, baseAddress: SimpleCellAddress) {
+  return buildSimpleCellRange(getAbsoluteAddress(cellRange.start, baseAddress), getAbsoluteAddress(cellRange.end, baseAddress))
+}
+
+export const rangeWidth = (simpleCellRange: SimpleCellRange) => {
+  return simpleCellRange.end.col - simpleCellRange.start.col
+}
+
+export const rangeHeight = (simpleCellRange: SimpleCellRange) => {
+  return simpleCellRange.end.row - simpleCellRange.start.row
+}
