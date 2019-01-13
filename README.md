@@ -141,8 +141,45 @@ With this approach we do not loose any information, because knowing absolute add
 
 ### Handling ranges
 
+In many applications, one may use formulas that depend on a big range of cells.
+For example, the formula `SUM(A1:A100)+B5` depends on 101 cells and then we need to represent this relationship in the graph of cell dependencies accordingly.
 
-### Cumulative sums
+An interesting challenge arises when the are multiple cells thata depend on big ranges. 
+For example, consider the following use-case:
+
+`B1=SUM(A1:A1)`
+
+`B2=SUM(A1:A2)`
+
+`B3=SUM(A1:A3)`
+
+...
+
+`B100=SUM(A1:A100)`
+
+The problem is that there are `1+2+3+...+100 = 5050` dependencies for such a simple situation. In general, for `n` such rows we will need to add `n*(n+1)/2 ≈ n²` arrows in our graph. Unfortunately, this grows much faster than the size of data and we cannot handle big spreadsheets.
+
+A solution for this problem comes from the observation that we can rewrite the above formulas to equivalent ones, which will be more compact to represent. More precisely, the following formulas compute the same values as the above ones:
+
+`B1=A1`
+
+`B2=B1+A2`
+
+`B3=B2+A3`
+
+...
+
+`B100=B99+A100`
+
+Unfortunatelly the formulas can be much more complicated and we cannot rewrite  them to "the smarter form", but we can handle the similar ranges more efficiently.
+The above simple example shows the main idea behind efficient handling of multiple ranges: we should represent a range as a composition of a small number of smaller ranges. 
+
+Every time we encounter a range, say `B5:D20`, we check if we haven't already considerd the range which is one row shorter, in this example: `B5:D19`. If so, then we represent `B5:D20` as the compostition of range `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
+
+![ast](examples/ranges.png)
+
+Then, a result of any associative operation is a result of operations for these small rows. There are many examples of such associative functions: `SUM`, `MAX`, `COUNT` etc.
+As one range can be used in different formulas, we can reuse its node and not duplicate the work.
 
 ## Dependencies
 
