@@ -1,6 +1,5 @@
 import {FormatExpressionType, parse, TokenType} from "../src/format/FormatParser";
 
-
 describe('FormatParser', () => {
   it('works for single date token', () => {
     const parseResult = parse('dd')

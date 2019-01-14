@@ -1,8 +1,10 @@
 import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, dateNumebrToStringFormat, toDateNumber} from '../../Date'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, toDateNumber} from '../../Date'
 import {ProcedureAst} from '../../parser/Ast'
 import {dateNumberRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
+import {parse} from "../../format/FormatParser";
+import {format} from "../../format/Format";
 
 /**
  * Interpreter plugin containing date-specific functions
@@ -113,12 +115,13 @@ export class DatePlugin extends FunctionPlugin {
     const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
     const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
 
-    const dateNumber = dateNumberRepresentation(dateArg, this.config.dateFormat)
+    const numberRepresentation = dateNumberRepresentation(dateArg, this.config.dateFormat)
 
-    if (dateNumber !== null && typeof formatArg === 'string') {
-      return dateNumebrToStringFormat(dateNumber, formatArg)
-    } else {
+    if (numberRepresentation === null || typeof formatArg !== 'string') {
       return cellError(ErrorType.VALUE)
     }
+
+    const expression = parse(formatArg)
+    return format(expression, numberRepresentation)
   }
 }
