@@ -1,4 +1,4 @@
-const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|mmmmm|mmmm|mmm|mm|m|yyyy|yy|HH|hh|ss|AM\/PM)/g
+const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|hh|ss|AM\/PM)/g
 const numberFormatRegex = /(?<!\\)([#0]+(\.[#0]*)?)/g
 
 export enum TokenType {
@@ -6,7 +6,7 @@ export enum TokenType {
   FREE_TEXT = 'FREE_TEXT',
 }
 
-interface FormatToken {
+export interface FormatToken {
   type: TokenType,
   value: string
 }
@@ -24,7 +24,7 @@ export enum FormatExpressionType {
   STRING = 'STRING',
 }
 
-interface FormatExpression {
+export interface FormatExpression {
   type: FormatExpressionType,
   tokens: FormatToken[]
 }
@@ -106,3 +106,5 @@ export function parse(str: string): FormatExpression {
     }],
   }
 }
+
+
