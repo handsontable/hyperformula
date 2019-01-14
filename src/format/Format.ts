@@ -2,15 +2,7 @@ import {CellValue} from "../Cell";
 import {dateNumberToMoment} from "../Date";
 import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from "./FormatParser";
 
-export function pad(number: number, size: number) {
-  let result = number + "";
-  while (result.length < size) {
-    result = "0" + result
-  }
-  return result
-}
-
-export function formatInterpreter(expression: FormatExpression, value: number): CellValue {
+export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {
     return dateFormatInterpreter(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.NUMBER) {
@@ -20,6 +12,14 @@ export function formatInterpreter(expression: FormatExpression, value: number): 
   }
 
   return ""
+}
+
+export function pad(number: number, size: number) {
+  let result = number + "";
+  while (result.length < size) {
+    result = "0" + result
+  }
+  return result
 }
 
 function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue {
