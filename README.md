@@ -6,25 +6,25 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
 
 You can use HandsOnEngine for processing spreadsheet-like data and formulas in various ways:
 - as a standalone tool
-- as a service via an API, embedded in a bigger system
+- as a service via an API, embedded in a larger system
 - as a spreadsheet, while combined with suitable UI
 
 ## Overview
 
 Processing a spreadsheet consists of three phases:
 
-1. Parsing and construction of ASTs - we need to parse the provided formulas and represent them as so-called Abstract Syntax Tree. For example, AST for 
+1. Parsing and construction of ASTs - we need to parse the provided formulas and represent them as a so-called Abstract Syntax Tree. For example, the AST for 
 `7*3-SIN(A5)` looks as follows:
 
 ![ast](examples/ast.png)
 
-2. Construction of dependency graph - we need to understand the relationship between the cells and find the order of processing them. For example if we have `C1=A1+B1`, then we need to process first `A1` and `B1` and then `C1`. Such an order of processing cells - also known as topological order - exists if and only if there is no cycle in the dependency graph. There can be many such orders, see an example:
+2. Construction of the dependency graph - we need to understand the relationship between the cells and find the order of processing them. For example if we have `C1=A1+B1`, then we need to process first `A1` and `B1` and then `C1`. Such an order of processing cells - also known as topological order - exists if and only if there is no cycle in the dependency graph. There can be many such orders, see an example:
 
 ![topological sort](examples/topsort.png)
 
-3. Evaluation - it is crucial to evaluate all cells efficiently. For simple expressions there is no big room for maneuver, but for instance a plenty of SUMs on big ranges needs more attention.
+3. Evaluation - it is crucial to evaluate all cells efficiently. For simple expressions there is not much room for maneuver, but for instance spreadsheets with plenty of SUMs on large ranges needs more attention.
 
-You can find the more detailed description below.
+A more detailed description is provided below.
 
 ## Examples
 
@@ -32,7 +32,7 @@ You can find the more detailed description below.
 
 ## Installation
 
-Note: make sure, that you use a recent (at least 10.x) version of node js. We observed a significant performance drop even in some 8.x versions.
+Note: make sure to use a recent (at least 10.x) version of node js. We have observed a significant performance drop even in some 8.x versions.
 
 Install yarn:
 
@@ -63,12 +63,12 @@ First, there are various parameters that you might want to edit in the [Config f
 - CSV_DELIMITER - delimiter between entries in CSV file (default: '.')
 - FUNCTION_ARG_SEPARATOR - separator between the arguments of functions (default: ',')
 - LANGUAGE - language, currently only English supported (default: 'EN"')
-- DATE_FORMAT - what date format do you use (default: 'MM/DD/YYYY')
+- DATE_FORMAT - what date format you use (default: 'MM/DD/YYYY')
 
 
 ### handsonengine-convert
 
-This script provides converter from CSV with formulas (exported from other tool) to CSV with values computed by our engine.
+This script provides a converter from a CSV file with formulas (exported from some other tool) to a CSV file with values computed by our engine.
 
 Usage:
 
@@ -81,7 +81,7 @@ The last argument is optional and represent columns to be ignored in final diff.
 
 ### handsonengine-diff
 
-This script provides a diff tool between 3 csv files: formulas csv file, expected values csv file (exported from other tool) and with another CSV computed by our engine.
+This script provides a diff tool between 3 CSV files: a CSV file with formulars, a CSV file with expected values (exported from some other tool), and another CSV file with values computed by our engine.
 
 Usage:
 
@@ -93,12 +93,12 @@ The last argument is optional and represent columns to be ignored in final diff.
 
 ## Errors
 
-Not every cell can be correctly evaluated. In such case, our engine returns one of the following errors:
+Not every cell can be correctly evaluated. If this is the case, our engine returns one of the following errors:
 
 - DIV0 - division by zero
 - CYCLE - the cell belongs to a cyclic dependency
 - REF - reference to a non-existing address (i.e. OFFSET(A1,-1,-1))
-- NAME - unknown function name or parsing lub tokenization error (i.e. =A-100)
+- NAME - unknown function name or parsing / tokenization error (i.e. =A-100)
 - VALUE - wrong type of an arguments (i.e. 5+”aa”)
 - NUM - problem with computing the answer (i.e. ACOS(5)=?) 
 - NA - wrong number of arguments of a function
@@ -107,19 +107,19 @@ Not every cell can be correctly evaluated. In such case, our engine returns one 
 
 ### Parsing - grammar
 
-In the beginning, our engine parses given formulas.
-For this purpose we use [Chevrotain](http://sap.github.io/chevrotain/docs/) parser, which turns out to be more efficient for our purposes than [Jison](https://zaa.ch/jison/).
+Initially, our engine parses the provided formulas.
+For this purpose we use the [Chevrotain](http://sap.github.io/chevrotain/docs/) parser, which turns out to be more efficient for our purposes than [Jison](https://zaa.ch/jison/).
 We describe the language of acceptable formulas with a LL(k) grammar using Chevrotain Domain Specific Language.
 See details of the grammar in [FormulaParser](src/parser/FormulaParser.ts) file.
 
 
 ### Repetitive ASTs
-First optimization that comes to mind is to spot that some cells store exactly the same formulas.
-Then there is no point in constructing and storing two ASTs which will be the same in the end, so we can lookup for the particular formula in the past and reuse the constructed AST.
+A first natural optimization could concern cells in a spreadsheet which store exactly the same formulas.
+For such cells, there is no point in constructing and storing two ASTs which will be the same in the end, so we can lookup the particular formula which has already been parsed and reuse the constructed AST.
 
-However, it is not always the case and usually the formulas will be distinct.
+A scenario with repeating formulas is somewhat idealised; in practice, most formulas will be distinct.
 Fortunately, formulas in spreadsheets usually have a particular structure and do share some patterns.
-Especially, while using bottom right corner drag, neighboring cells are very similar, for example:
+Especially, after filling cells using bottom right corner drag, neighboring cells contain similar formulas, for example:
 
 ```B2=A2-C2+B1```
 
@@ -134,17 +134,17 @@ A very useful approach here is to rewrite a formula using relative addressing of
 #### Relative addressing
 
 Instead of absolute references (like `A1` or `B5`), for every cell we store what is the offset to the referenced formula, for example `B2=B5+C1` can be rewritten to `B2=[B+0][2+3]+[B+1][2-1]` or in short `B2=[0][+3] + [+1][-1]`.
-Then, the above example with `B2,B3` and `B4` can be rewritten as `B2=B3=B4=[-1][0]-[1][0]+[0][-1]` and now the three cells have exactly the same formulas!
+Then, the above example with `B2,B3` and `B4` can be rewritten as `B2=B3=B4=[-1][0]-[1][0]+[0][-1]` and now the three cells have exactly the same formulas.
 
-So using the relative addressing we can unify formulas from many cells and then we do not have to parse them all and can share ASTs between them.
-With this approach we do not loose any information, because knowing absolute address of a cell and its formula with relative addresses we can easily retrieve the absolute addresses in the formula and compute the value of the cell.
+Using relative addressing we can unify formulas from many cells. We then do not have to parse them all and can share ASTs between them.
+With this approach we do not loose any information because, knowing the absolute address of a cell and its formula with relative addresses, we can easily retrieve the absolute addresses in the formula and compute the value of the cell.
 
 ### Handling ranges
 
-In many applications, one may use formulas that depend on a big range of cells.
-For example, the formula `SUM(A1:A100)+B5` depends on 101 cells and then we need to represent this relationship in the graph of cell dependencies accordingly.
+In many applications, one may use formulas that depend on a large range of cells.
+For example, the formula `SUM(A1:A100)+B5` depends on 101 cells and we need to represent this relationship in the graph of cell dependencies accordingly.
 
-An interesting challenge arises when the are multiple cells thata depend on big ranges. 
+An interesting optimization challenge arises when the are multiple cells that depend on large ranges. 
 For example, consider the following use-case:
 
 `B1=SUM(A1:A1)`
@@ -157,9 +157,9 @@ For example, consider the following use-case:
 
 `B100=SUM(A1:A100)`
 
-The problem is that there are `1+2+3+...+100 = 5050` dependencies for such a simple situation. In general, for `n` such rows we will need to add `n*(n+1)/2 ≈ n²` arrows in our graph. Unfortunately, this grows much faster than the size of data and we cannot handle big spreadsheets.
+The problem is that there are `1+2+3+...+100 = 5050` dependencies for such a simple situation. In general, for `n` such rows we would need to add `n*(n+1)/2 ≈ n²` arcs in our graph. This value grows much faster than the size of data, meaning we would not be able to handle large spreadsheets efficiently.
 
-A solution for this problem comes from the observation that we can rewrite the above formulas to equivalent ones, which will be more compact to represent. More precisely, the following formulas compute the same values as the above ones:
+A solution to this problem comes from the observation that we can rewrite the above formulas to equivalent ones, which will be more compact to represent. Specifically, the following formulas would compute the same values as the ones given previously:
 
 `B1=A1`
 
@@ -171,15 +171,14 @@ A solution for this problem comes from the observation that we can rewrite the a
 
 `B100=B99+A100`
 
-Unfortunatelly the formulas can be much more complicated and we cannot rewrite  them to "the smarter form", but we can handle the similar ranges more efficiently.
-The above simple example shows the main idea behind efficient handling of multiple ranges: we should represent a range as a composition of a small number of smaller ranges. 
+Whereas this example is too specialized to provide a useful rule for optimization, it shows the main idea behind efficient handling of multiple ranges: we should represent a range as a composition of a small number of smaller ranges. 
 
-Every time we encounter a range, say `B5:D20`, we check if we haven't already considerd the range which is one row shorter, in this example: `B5:D19`. If so, then we represent `B5:D20` as the compostition of range `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
+In the adopted implementation, every time we encounter a range, say `B5:D20`, we check if we have already considered the range which is one row shorter, in this example: `B5:D19`. If so, then we represent `B5:D20` as the compostition of range `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
 
 ![ast](examples/ranges.png)
 
-Then, a result of any associative operation is a result of operations for these small rows. There are many examples of such associative functions: `SUM`, `MAX`, `COUNT` etc.
-As one range can be used in different formulas, we can reuse its node and not duplicate the work.
+More generally, the result of any associative operation is obtained as the result of operations for these small rows. There are many examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
+As one range can be used in different formulas, we can reuse its node and avoid duplicating the work during computation.
 
 ## Dependencies
 
