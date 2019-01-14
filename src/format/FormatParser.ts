@@ -11,7 +11,7 @@ export interface FormatToken {
   value: string
 }
 
-function formatToken(type: TokenType, value: string): FormatToken {
+export function formatToken(type: TokenType, value: string): FormatToken {
   return {
     type,
     value,
