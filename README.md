@@ -1,6 +1,6 @@
 # HandsOnEngine
 
-HandsOnEngine is a JavaScript engine for efficient processing of formulas in spreadsheets
+HandsOnEngine is a JavaScript engine for efficient processing of formulas in spreadsheets.
 
 ## What to use it for?
 
