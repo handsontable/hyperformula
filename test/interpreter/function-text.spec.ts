@@ -1,7 +1,7 @@
-import {HandsOnEngine} from "../../src";
-import {cellError, ErrorType} from "../../src/Cell";
+import {HandsOnEngine} from '../../src'
+import {cellError, ErrorType} from '../../src/Cell'
 
-describe("Text", () => {
+describe('Text', () => {
   it('works', () => {
     const engine = HandsOnEngine.buildFromArray([['2', '=TEXT(A1, "mm/dd/yyyy")', '=TEXT(A1, "MM/DD/YYYY")']])
 

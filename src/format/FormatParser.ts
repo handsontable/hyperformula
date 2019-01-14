@@ -106,5 +106,3 @@ export function parse(str: string): FormatExpression {
     }],
   }
 }
-
-

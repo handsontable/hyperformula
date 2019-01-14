@@ -1,23 +1,23 @@
-import {CellValue} from "../Cell";
-import {dateNumberToMoment} from "../Date";
-import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from "./FormatParser";
+import {CellValue} from '../Cell'
+import {dateNumberToMoment} from '../Date'
+import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './FormatParser'
 
 export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {
     return dateFormatInterpreter(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.NUMBER) {
-    throw Error("Number formatting not supported yet")
+    throw Error('Number formatting not supported yet')
   } else if (expression.type === FormatExpressionType.STRING) {
     return expression.tokens[0].value
   }
 
-  return ""
+  return ''
 }
 
 export function pad(number: number, size: number) {
-  let result = number + "";
+  let result = number + ''
   while (result.length < size) {
-    result = "0" + result
+    result = '0' + result
   }
   return result
 }
@@ -33,7 +33,6 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
       result += token.value
       continue
     }
-
 
     switch (token.value) {
         /* hours*/
@@ -56,11 +55,11 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
       }
       case 'ddd':
       case 'DDD':
-        result += date.format("ddd")
+        result += date.format('ddd')
         break
       case 'dddd':
       case 'DDDD': {
-        result += date.format("dddd")
+        result += date.format('dddd')
         break
       }
 
@@ -73,30 +72,30 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
           result += pad(date.minute(), token.value.length)
           break
         } else {
-          result += pad(date.month()+1, token.value.length)
+          result += pad(date.month() + 1, token.value.length)
           break
         }
       }
       case 'mmm':
       case 'MMM': {
-        result += date.format("MMM")
+        result += date.format('MMM')
         break
       }
       case 'mmmm':
       case 'MMMM': {
-        result += date.format("MMMM")
+        result += date.format('MMMM')
         break
       }
       case 'mmmmm':
       case 'MMMMM': {
-        result += date.format("MMMM")[0]
+        result += date.format('MMMM')[0]
         break
       }
 
         /* years */
       case 'yy':
       case 'YY': {
-        result += date.format("YY")
+        result += date.format('YY')
         break
       }
       case 'yyyy':
