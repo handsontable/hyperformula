@@ -1,21 +1,24 @@
 import {benchmark, ExpectedValue} from './benchmark'
 
-const rows = 10000
+export function sheet() {
+  const rows = 10000
 
-const sheet = []
-sheet.push(['=1*E$1', '=SUM($A$1:A1)', '=A1', `=SUM(B1:B${rows})`, '5'])
+  const sheet = []
+  sheet.push(['=1*E$1', '=SUM($A$1:A1)', '=A1', `=SUM(B1:B${rows})`, '5'])
 
-let prev = 1
+  let prev = 1
 
-while (prev < rows) {
-  const rowToPush = [
-    `=${prev + 1}*E$1`,
-    `=SUM($A$1:A${prev + 1})`,
-    `=A${prev + 1}+C${prev}`,
-  ]
+  while (prev < rows) {
+    const rowToPush = [
+      `=${prev + 1}*E$1`,
+      `=SUM($A$1:A${prev + 1})`,
+      `=A${prev + 1}+C${prev}`,
+    ]
 
-  sheet.push(rowToPush)
-  ++prev
+    sheet.push(rowToPush)
+    ++prev
+  }
+  return sheet
 }
 
 const expectedValues: ExpectedValue[] = [
@@ -29,4 +32,5 @@ const expectedValues: ExpectedValue[] = [
   { address: 'B1000', value: 2502500 },
   { address: 'C1000', value: 2502500 },
 ]
-benchmark(sheet, expectedValues, { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
+
+benchmark(sheet(), expectedValues, { millisecondsPerThousandRows: 70, numberOfRuns: 3 })

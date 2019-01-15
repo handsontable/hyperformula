@@ -1,22 +1,25 @@
 import {benchmark} from './benchmark'
 
-const rows = 100000
+export function sheet() {
+  const rows = 100000
 
-const sheet = []
-sheet.push(['1', '2', '3', '5', `=SUM(A1:D${rows})`])
+  const sheet = []
+  sheet.push(['1', '2', '3', '5', `=SUM(A1:D${rows})`])
 
-let prev = 1
+  let prev = 1
 
-while (prev < rows) {
-  const rowToPush = [
-    '1',
-    '2',
-    '3',
-    '5',
-  ]
+  while (prev < rows) {
+    const rowToPush = [
+      '1',
+      '2',
+      '3',
+      '5',
+    ]
 
-  sheet.push(rowToPush)
-  ++prev
+    sheet.push(rowToPush)
+    ++prev
+  }
+  return sheet
 }
 
-benchmark(sheet, [], { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
+benchmark(sheet(), [], { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
