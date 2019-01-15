@@ -21,5 +21,3 @@ export function sheet() {
   }
   return sheet
 }
-
-benchmark(sheet(), [], { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
