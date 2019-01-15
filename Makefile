@@ -23,25 +23,25 @@ check: typecheck test
 
 full: check lint-fix
 
-lint: ## show linting errors
+lint: ## Show linting errors
 	@yarn tslint --project tsconfig.json
 
-lint-fix: ## fix linting errors
+lint-fix: ## Fix linting errors
 	@yarn tslint --fix --project tsconfig.json > /dev/null
 
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage
 
-doc:
+doc: ## Generate documentation
 	@yarn typedoc --options .typedoc.js
 
-servedoc:
+servedoc: ## Run server with documentation
 	@yarn http-server doc -p 5005
 
 clean: ## Clean compiled files
 	@rm -rf lib/
 
-help:
+help: ## Show all make commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test coverage benchmark doc servedoc
