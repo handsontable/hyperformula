@@ -49,19 +49,27 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   const parsing = stats.map((s) => s.get(StatType.PARSER)!).sort()
   const topSort = stats.map((s) => s.get(StatType.TOP_SORT)!).sort()
   const buildGraph = stats.map((s) => s.get(StatType.GRAPH_BUILD)!).sort()
+  const averageOverall = average(overall)
+  const stdDevOverall = standardDeviation(overall)
 
   console.warn(`Number of rows: ${rows}`)
   console.warn(`Overall: ${overall.map((v) => (v / 1000))} (in seconds)`)
-  console.warn(`Median overall: ${medianRun / 1000}`)
+  console.warn(`Median: ${medianRun / 1000}`)
+  console.warn(`Average: ${averageOverall / 1000}`)
+  console.warn(`Standard deviation: ${stdDevOverall / 1000}`)
+  console.warn('---')
   console.warn(`Evaluation: ${evaluation.map((v) => (v / 1000))} (in seconds)`)
-  console.warn(`Median evaluation: ${evaluation[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn(`Median: ${evaluation[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn('---')
   console.warn(`Parsing: ${parsing.map((v) => (v / 1000))}`)
-  console.warn(`Median parsing: ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn(`Median: ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn('---')
   console.warn(`TopSort: ${topSort.map((v) => (v / 1000))}`)
-  console.warn(`Median TopSort: ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn(`Median: ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn('---')
   console.warn(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
-  console.warn(`Median BuildGraph: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
-
+  console.warn(`Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.warn('\n')
   if (config.csvDump && engine !== null) {
     const csvString = engine.exportAsCsv()
     fs.writeFileSync('/tmp/dump.csv', csvString)
@@ -95,4 +103,26 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
   }
 
   return valid
+}
+
+function average(values: number[]): number {
+  const sum = values.reduce((sum, value) => {
+    return sum + value
+  }, 0)
+  return sum / values.length
+}
+
+function squareDiffs(values: number[], avg: number): number[] {
+  return values.map((value) => {
+    const diff = value - avg
+    return diff * diff
+  })
+}
+
+function standardDeviation(values: number[]): number {
+  const avg = average(values)
+  const sqrDiffs = squareDiffs(values, avg)
+  const avgSquareDiffs = average(sqrDiffs)
+
+  return Math.sqrt(avgSquareDiffs)
 }
