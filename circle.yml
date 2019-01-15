@@ -15,5 +15,5 @@ jobs:
       - run: make typecheck
       - run: make test-ci
       - run: make lint
-      - run: make benchmark
+      - run: make benchmark-ci
 

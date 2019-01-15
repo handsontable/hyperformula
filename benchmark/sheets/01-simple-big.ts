@@ -1,4 +1,4 @@
-import {benchmark, ExpectedValue} from './benchmark'
+import {benchmark, ExpectedValue} from '../benchmark'
 
 export function sheet() {
   const rows = 100000
@@ -22,12 +22,12 @@ export function sheet() {
   return sheet
 }
 
-const expectedValues: ExpectedValue[] = [
-  {address: 'A10', value: 100},
-  {address: 'B100', value: 200},
-  {address: 'C1000', value: 300},
-  {address: 'D10000', value: 400},
-  {address: 'E100000', value: 500},
-]
-
-benchmark(sheet(), expectedValues, { millisecondsPerThousandRows: 150, numberOfRuns: 3 })
+export function expectedValues(sheet: string[][]): ExpectedValue[] {
+  return [
+    {address: 'A10', value: 100},
+    {address: 'B100', value: 200},
+    {address: 'C1000', value: 300},
+    {address: 'D10000', value: 400},
+    {address: 'E100000', value: 500},
+  ]
+}

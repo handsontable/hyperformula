@@ -13,18 +13,11 @@ test: ## Run tests
 test-ci: ## Separate test configuration for CI environment
 	@yarn jest --maxWorkers=2
 
+benchmark-ci: ## Run CI benchmarks
+	@yarn ts-node benchmark/circle.ts
+
 benchmark: ## Run benchmarks
-	@yarn ts-node benchmark/01-simple-big.ts
-	@echo
-	@yarn ts-node benchmark/03-sheet-a.ts
-	@echo
-	@yarn ts-node benchmark/04-sheet-b.ts
-	@echo
-	@yarn ts-node benchmark/05-sheet-t.ts
-	@echo
-	@yarn ts-node benchmark/06-big-sum.ts
-	@echo
-	@yarn ts-node benchmark/07-sumif.ts
+	@yarn ts-node benchmark/stage-1.ts
 
 check: typecheck test
 
