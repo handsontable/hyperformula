@@ -34,7 +34,6 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-
 function numberFormat(tokens: FormatToken[], value: number): CellValue {
   let result = ''
 

@@ -43,57 +43,57 @@ describe('FormatInterpreter', () => {
     const exp: FormatExpression = {
       type: FormatExpressionType.NUMBER,
       tokens: [
-        formatToken(TokenType.FORMAT, '###')
-      ]
+        formatToken(TokenType.FORMAT, '###'),
+      ],
     }
 
-    expect(format(exp, 1)).toEqual("1")
-    expect(format(exp, 12)).toEqual("12")
-    expect(format(exp, 123)).toEqual("123")
-    expect(format(exp, 123.4)).toEqual("123")
+    expect(format(exp, 1)).toEqual('1')
+    expect(format(exp, 12)).toEqual('12')
+    expect(format(exp, 123)).toEqual('123')
+    expect(format(exp, 123.4)).toEqual('123')
   })
 
   it('works with # number format with decimal separator', () => {
     const exp: FormatExpression = {
       type: FormatExpressionType.NUMBER,
       tokens: [
-          formatToken(TokenType.FORMAT, '#.##')
-      ]
+          formatToken(TokenType.FORMAT, '#.##'),
+      ],
     }
 
-    expect(format(exp, 1)).toEqual("1.")
-    expect(format(exp, 12)).toEqual("12.")
-    expect(format(exp, 12.34)).toEqual("12.34")
-    expect(format(exp, 12.345)).toEqual("12.35")
+    expect(format(exp, 1)).toEqual('1.')
+    expect(format(exp, 12)).toEqual('12.')
+    expect(format(exp, 12.34)).toEqual('12.34')
+    expect(format(exp, 12.345)).toEqual('12.35')
   })
 
   it('works with 0 without decimal separator', () => {
     const exp: FormatExpression = {
       type: FormatExpressionType.NUMBER,
       tokens: [
-        formatToken(TokenType.FORMAT, '000')
-      ]
+        formatToken(TokenType.FORMAT, '000'),
+      ],
     }
 
-    expect(format(exp, 1)).toEqual("001")
-    expect(format(exp, 12)).toEqual("012")
-    expect(format(exp, 123)).toEqual("123")
-    expect(format(exp, 123.4)).toEqual("123")
+    expect(format(exp, 1)).toEqual('001')
+    expect(format(exp, 12)).toEqual('012')
+    expect(format(exp, 123)).toEqual('123')
+    expect(format(exp, 123.4)).toEqual('123')
   })
 
   it('works with 0 number format', () => {
     const exp: FormatExpression = {
       type: FormatExpressionType.NUMBER,
       tokens: [
-        formatToken(TokenType.FORMAT, '00.00')
-      ]
+        formatToken(TokenType.FORMAT, '00.00'),
+      ],
     }
 
-    expect(format(exp, 1)).toEqual("01.00")
-    expect(format(exp, 12)).toEqual("12.00")
-    expect(format(exp, 12.3)).toEqual("12.30")
-    expect(format(exp, 12.34)).toEqual("12.34")
-    expect(format(exp, 12.345)).toEqual("12.35")
+    expect(format(exp, 1)).toEqual('01.00')
+    expect(format(exp, 12)).toEqual('12.00')
+    expect(format(exp, 12.3)).toEqual('12.30')
+    expect(format(exp, 12.34)).toEqual('12.34')
+    expect(format(exp, 12.345)).toEqual('12.35')
   })
 
   it('number formatting with additional chars', () => {
@@ -101,10 +101,10 @@ describe('FormatInterpreter', () => {
       type: FormatExpressionType.NUMBER,
       tokens: [
         formatToken(TokenType.FREE_TEXT, '$'),
-        formatToken(TokenType.FORMAT, '0.00')
-      ]
+        formatToken(TokenType.FORMAT, '0.00'),
+      ],
     }
 
-    expect(format(exp, 1)).toEqual("$1.00")
+    expect(format(exp, 1)).toEqual('$1.00')
   })
 })
