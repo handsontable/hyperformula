@@ -53,29 +53,31 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   const stdDevOverall = standardDeviation(overall)
 
   console.info(`Number of rows: ${rows}`)
+  console.info('---')
   // console.info(`Overall: ${overall.map((v) => (v / 1000))} (in seconds)`)
-  console.info(`Median: ${medianRun / 1000}`)
-  console.info(`Average: ${(averageOverall / 1000).toFixed(3)}`)
+  console.info(`Median            : ${medianRun / 1000}`)
+  console.info(`Average           : ${(averageOverall / 1000).toFixed(3)}`)
   console.info(`Standard deviation: ${(stdDevOverall / 1000).toFixed(3)}`)
   console.info('---')
   // console.info(`Evaluation: ${evaluation.map((v) => (v / 1000))} (in seconds)`)
   console.info(`Evaluation Median: ${evaluation[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`Parsing: ${parsing.map((v) => (v / 1000))}`)
-  console.info(`Parsing Median: ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.info(`Parsing Median   : ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`TopSort: ${topSort.map((v) => (v / 1000))}`)
-  console.info(`TopSort Median: ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.info(`TopSort Median   : ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
-  console.info(`BuildGraph Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}\n`)
-  if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCsv()
-    fs.writeFileSync('/tmp/dump.csv', csvString)
-  }
-
+  console.info(`BuildGraph Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
+  console.info('---')
   console.warn(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
   console.warn(`Median time  : ${resultMillisecondsPerThousandRows.toFixed(3)} ms per 1000 rows`)
   console.warn(`Average time : ${(averageOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
   console.warn(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
+
+  if (config.csvDump && engine !== null) {
+    const csvString = engine.exportAsCsv()
+    fs.writeFileSync('/tmp/dump.csv', csvString)
+  }
   if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
     process.exit(1)
   }
