@@ -12,15 +12,15 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
       - [Config file](###config-file)
       - [handsonengine-convert](###handsonengine-convert)
       - [handsonengine-diff](###handsonengine-diff)
-7. [Source code](###source-code)
-8. [Errors](##errors)
-9. [Detailed description](##detailed-description)
+      - [Source code](###source-code)
+6. [Errors](##errors)
+7. [Detailed description](##detailed-description)
       - [Parsing - grammar](###parsing-grammar)
       - [Repetitive ASTs](###repetitive-asts)
       - [Relative addressing](####relative-addressing)
       - [Handling ranges](###handling-ranges)
-10. [Dependencies](##dependencies)
-11. [License](##license)
+8. [Dependencies](##dependencies)
+9. [License](##license)
 
 
 ## What to use it for
@@ -71,6 +71,8 @@ Run tests to make sure that everything is working properly:
 ```
 make test
 ```
+
+See other useful `make` commands available in [Makefile](Makefile) or listed with `make help` command.
 
 ## Basic usage
 
