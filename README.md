@@ -2,7 +2,28 @@
 
 HandsOnEngine is a JavaScript engine for efficient processing of formulas in spreadsheets.
 
-## What to use it for?
+## Table of Contents
+0. [Table of Contents](##table-of-contents)
+1. [What to use it for?](##what-to-use-it-for)
+2. [Overview](##overview)
+3. [Examples](##examples)
+4. [Installation](##installation)
+5. [Basic usage](##basic-usage)
+      - [Config file](###config-file)
+      - [handsonengine-convert](###handsonengine-convert)
+      - [handsonengine-diff](###handsonengine-diff)
+7. [Source code](###source-code)
+8. [Errors](##errors)
+9. [Detailed description](##detailed-description)
+      - [Parsing - grammar](###parsing-grammar)
+      - [Repetitive ASTs](###repetitive-asts)
+      - [Relative addressing](####relative-addressing)
+      - [Handling ranges](###handling-ranges)
+10. [Dependencies](##dependencies)
+11. [License](##license)
+
+
+## What to use it for
 
 You can use HandsOnEngine for processing spreadsheet-like data and formulas in various ways:
 - as a standalone tool
@@ -204,3 +225,4 @@ Our engine currently depends on the following packages:
 - [Moment](https://momentjs.com/)
 
 ## License
+
