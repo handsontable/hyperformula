@@ -68,7 +68,7 @@ First, there are various parameters that you might want to edit in the [Config f
 
 ### handsonengine-convert
 
-This script provides a converter from a CSV file with formulas (exported from some other tool) to a CSV file with values computed by our engine.
+[This script](bin/handsonengine-diff.ts) provides a converter from a CSV file with formulas (exported from some other tool) to a CSV file with values computed by our engine.
 
 Usage:
 
@@ -76,12 +76,19 @@ Usage:
 yarn ts-node bin/handsonengine-convert formulas.csv ours.csv
 ```
 
-The last argument is optional and represent columns to be ignored in final diff. That argument are zero-based, comma-separated indexes of columns, so for example `0,3,7` tells the script to ignore columns `A`, `D` and `H`.
+You can also call HandsOnEngine class yourself:
+````
+formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
 
+engine = HandsOnEngine.buildFromCsv(formulasCsvString)
+exportedCsvString = engine.exportAsCsv()
+
+fs.writeFileSync(outputCsvPath, exportedCsvString)
+````
 
 ### handsonengine-diff
 
-This script provides a diff tool between 3 CSV files: a CSV file with formulars, a CSV file with expected values (exported from some other tool), and another CSV file with values computed by our engine.
+[This script](bin/handsonengine-diff.ts) provides a diff tool between 3 CSV files: a CSV file with formulars, a CSV file with expected values (exported from some other tool), and another CSV file with values computed by our engine.
 
 Usage:
 
@@ -89,7 +96,15 @@ Usage:
 yarn ts-node bin/handsonengine-diff formulas.csv expected-values.csv ours.csv 0,3,7
 ```
 
-The last argument is optional and represent columns to be ignored in final diff. That argument are zero-based, comma-separated indexes of columns, so for example `0,3,7` tells the script to ignore columns `A`, `D` and `H`.
+The last argument is optional and represents columns to be ignored in final diff. That argument are zero-based, comma-separated indexes of columns, so for example `0,3,7` tells the script to ignore columns `A`, `D` and `H`.
+This feature might be useful to skip the differences that are due to volatile functions (`RAND`,`DATE`) or unimplemented features.
+
+### Source code
+
+The codebase is organised in three main groups as described in the Overview section:
+- [src/parser/](src/parser/) - subroutines for parsing formulas, creating ASTs and hashing them
+- [src/](src/) - classes for representing and handling the sheet and the graph of dependencies
+- [src/interpreter/](src/interpreter/) - plugins for interpreting particular operators and functions that can be used in formulas
 
 ## Errors
 
@@ -121,11 +136,11 @@ A scenario with repeating formulas is somewhat idealised; in practice, most form
 Fortunately, formulas in spreadsheets usually have a particular structure and do share some patterns.
 Especially, after filling cells using bottom right corner drag, neighboring cells contain similar formulas, for example:
 
-```B2=A2-C2+B1```
+`B2=A2-C2+B1`
 
-```B3=A3-C3+B2```
+`B3=A3-C3+B2`
 
-```B4=A4-C4+B3```
+`B4=A4-C4+B3`
 and so on. 
 
 Although the exact ASTs for these formulas are different, we see that they do share a pattern.
