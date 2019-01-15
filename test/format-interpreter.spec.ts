@@ -38,4 +38,61 @@ describe('FormatInterpreter', () => {
 
     expect(() => format(exp, 2)).toThrow(new Error('Mismatched token type'))
   })
+
+  it('works with # without decimal separator', () => {
+    const exp: FormatExpression = {
+      type: FormatExpressionType.NUMBER,
+      tokens: [
+        formatToken(TokenType.FORMAT, '###')
+      ]
+    }
+
+    expect(format(exp, 1)).toEqual("1")
+    expect(format(exp, 12)).toEqual("12")
+    expect(format(exp, 123)).toEqual("123")
+    expect(format(exp, 123.4)).toEqual("123")
+  })
+
+  it('works with # number format with decimal separator', () => {
+    const exp: FormatExpression = {
+      type: FormatExpressionType.NUMBER,
+      tokens: [
+          formatToken(TokenType.FORMAT, '#.##')
+      ]
+    }
+
+    expect(format(exp, 1)).toEqual("1.")
+    expect(format(exp, 12)).toEqual("12.")
+    expect(format(exp, 12.34)).toEqual("12.34")
+    expect(format(exp, 12.345)).toEqual("12.35")
+  })
+
+  it('works with 0 without decimal separator', () => {
+    const exp: FormatExpression = {
+      type: FormatExpressionType.NUMBER,
+      tokens: [
+        formatToken(TokenType.FORMAT, '000')
+      ]
+    }
+
+    expect(format(exp, 1)).toEqual("001")
+    expect(format(exp, 12)).toEqual("012")
+    expect(format(exp, 123)).toEqual("123")
+    expect(format(exp, 123.4)).toEqual("123")
+  })
+
+  it('works with 0 number format', () => {
+    const exp: FormatExpression = {
+      type: FormatExpressionType.NUMBER,
+      tokens: [
+        formatToken(TokenType.FORMAT, '00.00')
+      ]
+    }
+
+    expect(format(exp, 1)).toEqual("01.00")
+    expect(format(exp, 12)).toEqual("12.00")
+    expect(format(exp, 12.3)).toEqual("12.30")
+    expect(format(exp, 12.34)).toEqual("12.34")
+    expect(format(exp, 12.345)).toEqual("12.35")
+  })
 })

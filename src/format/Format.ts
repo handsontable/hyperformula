@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType} from '../Cell'
+import {CellValue} from '../Cell'
 import {dateNumberToMoment} from '../Date'
 import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './FormatParser'
 
@@ -6,7 +6,7 @@ export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {
     return dateFormatInterpreter(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.NUMBER) {
-    throw new Error('Number formatting not supported yet')
+    return numberFormatInterpreter(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.STRING) {
     return expression.tokens[0].value
   }
@@ -14,11 +14,61 @@ export function format(expression: FormatExpression, value: number): CellValue {
   return ''
 }
 
-export function pad(number: number, size: number) {
+export function padLeft(number: number | string, size: number) {
   let result = number + ''
   while (result.length < size) {
     result = '0' + result
   }
+  return result
+}
+
+export function padRight(number: number | string, size: number) {
+  let result = number + ''
+  while (result.length < size) {
+    result = result + '0'
+  }
+  return result
+}
+
+function countChars(text: string, char: string) {
+  return text.split(char).length - 1
+}
+
+
+function numberFormatInterpreter(tokens: FormatToken[], value: number): CellValue {
+  let result = ''
+
+  for (let i = 0; i < tokens.length; ++i) {
+    const token = tokens[i]
+    if (token.type === TokenType.FREE_TEXT) {
+      result += token.value
+      continue
+    }
+
+    const tokenParts = token.value.split('.')
+    const integerFormat = tokenParts[0]
+    const decimalFormat = tokenParts[1] || ''
+    const separator = tokenParts[1] ? '.' : ''
+
+    const valueParts = Number(value.toFixed(decimalFormat.length)).toString().split('.')
+    let integerPart = valueParts[0] || ''
+    let decimalPart = valueParts[1] || ''
+
+    if (integerFormat.length > integerPart.length) {
+      const padSize = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
+      integerPart = padLeft(integerPart, padSize + integerPart.length)
+    }
+
+    if (decimalFormat.length > decimalPart.length) {
+      const padSize = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
+      decimalPart = padRight(decimalPart, padSize + decimalPart.length)
+    } else {
+      decimalPart.substr(0, decimalFormat.length)
+    }
+
+    result += integerPart + separator + decimalPart
+  }
+
   return result
 }
 
@@ -50,7 +100,7 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
       case 'D':
       case 'dd':
       case 'DD': {
-        result += pad(date.date(), token.value.length)
+        result += padLeft(date.date(), token.value.length)
         break
       }
       case 'ddd':
@@ -69,10 +119,10 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
       case 'MM':
       case 'mm': {
         if (minutes) {
-          result += pad(date.minute(), token.value.length)
+          result += padLeft(date.minute(), token.value.length)
           break
         } else {
-          result += pad(date.month() + 1, token.value.length)
+          result += padLeft(date.month() + 1, token.value.length)
           break
         }
       }
