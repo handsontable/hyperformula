@@ -4,9 +4,9 @@ import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './
 
 export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {
-    return dateFormatInterpreter(expression.tokens, value)
+    return dateFormat(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.NUMBER) {
-    return numberFormatInterpreter(expression.tokens, value)
+    return numberFormat(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.STRING) {
     return expression.tokens[0].value
   }
@@ -35,7 +35,7 @@ function countChars(text: string, char: string) {
 }
 
 
-function numberFormatInterpreter(tokens: FormatToken[], value: number): CellValue {
+function numberFormat(tokens: FormatToken[], value: number): CellValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {
@@ -50,6 +50,7 @@ function numberFormatInterpreter(tokens: FormatToken[], value: number): CellValu
     const decimalFormat = tokenParts[1] || ''
     const separator = tokenParts[1] ? '.' : ''
 
+    /* get fixed-point number without trailing zeros */
     const valueParts = Number(value.toFixed(decimalFormat.length)).toString().split('.')
     let integerPart = valueParts[0] || ''
     let decimalPart = valueParts[1] || ''
@@ -72,7 +73,7 @@ function numberFormatInterpreter(tokens: FormatToken[], value: number): CellValu
   return result
 }
 
-function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue {
+function dateFormat(tokens: FormatToken[], value: number): CellValue {
   let result = ''
   const date = dateNumberToMoment(value)
   let minutes: boolean = false
