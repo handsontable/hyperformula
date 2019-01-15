@@ -1,4 +1,4 @@
-import {CellValue} from '../Cell'
+import {cellError, CellValue, ErrorType} from '../Cell'
 import {dateNumberToMoment} from '../Date'
 import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './FormatParser'
 
@@ -6,7 +6,7 @@ export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {
     return dateFormatInterpreter(expression.tokens, value)
   } else if (expression.type === FormatExpressionType.NUMBER) {
-    throw Error('Number formatting not supported yet')
+    throw new Error('Number formatting not supported yet')
   } else if (expression.type === FormatExpressionType.STRING) {
     return expression.tokens[0].value
   }
@@ -103,6 +103,8 @@ function dateFormatInterpreter(tokens: FormatToken[], value: number): CellValue 
         result += date.year()
         break
       }
+      default:
+        throw new Error('Mismatched token type')
     }
   }
 
