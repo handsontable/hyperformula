@@ -226,3 +226,4 @@ Our engine currently depends on the following packages:
 
 ## License
 
+Unlicense: NO LICENSE or permissions given to any third party. Contact contact@navalgo.com or contact@handsontable.com in case of any queries.
