@@ -59,12 +59,8 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
       integerPart = padLeft(integerPart, padSize + integerPart.length)
     }
 
-    if (decimalFormat.length > decimalPart.length) {
-      const padSize = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
-      decimalPart = padRight(decimalPart, padSize + decimalPart.length)
-    } else {
-      decimalPart.substr(0, decimalFormat.length)
-    }
+    const padSize = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
+    decimalPart = padRight(decimalPart, padSize + decimalPart.length)
 
     result += integerPart + separator + decimalPart
   }

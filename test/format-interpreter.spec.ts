@@ -51,6 +51,7 @@ describe('FormatInterpreter', () => {
     expect(format(exp, 12)).toEqual('12')
     expect(format(exp, 123)).toEqual('123')
     expect(format(exp, 123.4)).toEqual('123')
+    expect(format(exp, 1234)).toEqual('1234')
   })
 
   it('works with # number format with decimal separator', () => {
@@ -79,6 +80,7 @@ describe('FormatInterpreter', () => {
     expect(format(exp, 12)).toEqual('012')
     expect(format(exp, 123)).toEqual('123')
     expect(format(exp, 123.4)).toEqual('123')
+    expect(format(exp, 1234)).toEqual('1234')
   })
 
   it('works with 0 number format', () => {
