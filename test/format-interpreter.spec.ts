@@ -95,4 +95,16 @@ describe('FormatInterpreter', () => {
     expect(format(exp, 12.34)).toEqual("12.34")
     expect(format(exp, 12.345)).toEqual("12.35")
   })
+
+  it('number formatting with additional chars', () => {
+    const exp: FormatExpression = {
+      type: FormatExpressionType.NUMBER,
+      tokens: [
+        formatToken(TokenType.FREE_TEXT, '$'),
+        formatToken(TokenType.FORMAT, '0.00')
+      ]
+    }
+
+    expect(format(exp, 1)).toEqual("$1.00")
+  })
 })
