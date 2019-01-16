@@ -19,8 +19,9 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
       - [Repetitive ASTs](#repetitive-asts)
       - [Relative addressing](#relative-addressing)
       - [Handling ranges](#handling-ranges)
-8. [Dependencies](#dependencies)
-9. [License](#license)
+8. [Implementing custom procedures](#implementing-custom-procedures)
+9. [Dependencies](#dependencies)
+10. [License](#license)
 
 
 ## What to use it for
@@ -217,6 +218,63 @@ In the adopted implementation, every time we encounter a range, say `B5:D20`, we
 
 More generally, the result of any associative operation is obtained as the result of operations for these small rows. There are many examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
 As one range can be used in different formulas, we can reuse its node and avoid duplicating the work during computation.
+
+## Implementing custom procedures
+
+HandsOnEngine can be extended by writing plugins which add new procedures to formula interpreter.
+Implementing a plugin means implementing a class deriving from `FunctionPlugin` class.
+
+This class needs to:
+* have `implementedFunctions` mapping, which provides translations and describe which functions from class are computing our new custom procedures.
+* implement functions which are actually computing values of procedures. These functions need to follow signature `public ourCustomFunctionName(ast: ProcedureAst, formulaAddress: SimpleCellAddress)`, where `ast` is AST of the procedure call and `formulaAddress` is absolute cell address of formula in which we are computing value.
+
+As an example, let's assume we want to write a plugin which implements square function (`SQUARE(x)`).
+
+The template of such plugin looks like this:
+```js
+class SquarePlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    // Key of the mapping describes which function will be used to compute it
+    // Value of the mapping is mapping with translations to different languages
+    square: {
+      EN: 'SQUARE',
+      PL: 'KWADRAT',
+    }
+  }
+
+  public square(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
+    // Take ast of first argument from list of arguments
+    const arg = ast.args[0]
+
+    // If there was no argument, return NA error
+    if (!arg) {
+      return cellError(ErrorType.NA)
+    }
+
+    // Compute value of argument
+    const argValue = this.evaluateAst(arg, formulaAddress)
+
+    if (isCellError(argValue)) {
+      // If the value is some error, return that error
+      return argValue
+    } else if (typeof argValue === 'number') {
+      // If it's a number, compute the result
+      return (argValue * argValue)
+    } else {
+      // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
+      return cellError(ErrorType.VALUE)
+    }
+  }
+}
+```
+
+After writing a plugin, all you need is to instantiate an engine with config extended with that plugin:
+
+```
+const config = new Config({ functionPlugins: [SquarePlugin] })
+const engine = HandsOnEngine.buildFromArray(sheet, config)
+```
+
 
 ## Dependencies
 
