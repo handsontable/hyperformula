@@ -1,8 +1,8 @@
 import {HandsOnEngine} from '../src'
+import {cellError, ErrorType, isCellError, SimpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {cellError, isCellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {ProcedureAst} from '../src/parser/Ast'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {ProcedureAst} from '../src/parser/Ast'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -11,7 +11,7 @@ class SquarePlugin extends FunctionPlugin {
     square: {
       EN: 'SQUARE',
       PL: 'KWADRAT',
-    }
+    },
   }
 
   public square(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
@@ -39,8 +39,8 @@ class SquarePlugin extends FunctionPlugin {
   }
 }
 
-describe("Documentation example spec", () => {
-  it("works", () => {
+describe('Documentation example spec', () => {
+  it('works', () => {
     const config = new Config({ functionPlugins: [SquarePlugin] })
     const engine = HandsOnEngine.buildFromArray([
       ['=SQUARE(2)'],
