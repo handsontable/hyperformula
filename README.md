@@ -86,10 +86,9 @@ If you want to compare results of our engine with values computed by another spr
 
 First, there are various parameters that you might want to edit in the [Config file](src/Config.ts):
 
-- CSV_DELIMITER - delimiter between entries in CSV file (default: '.')
-- FUNCTION_ARG_SEPARATOR - separator between the arguments of functions (default: ',')
-- LANGUAGE - language, currently only English supported (default: 'EN"')
-- DATE_FORMAT - what date format you use (default: 'MM/DD/YYYY')
+- CSV_DELIMITER - delimiter between entries in CSV file (default: '.'),
+- FUNCTION_ARG_SEPARATOR - separator between the arguments of functions (default: ','),
+- LANGUAGE - language, currently only English and Polish are supported (default: 'EN'). Other languages can be easily added by inserting translations of function names in corresponding files of [src/interpreter/](src/interpreter/).
 
 
 ### handsonengine-convert
@@ -227,10 +226,10 @@ HandsOnEngine can be extended by writing plugins which add new procedures to for
 Implementing a plugin means implementing a class deriving from `FunctionPlugin` class.
 
 This class needs to:
-* have `implementedFunctions` mapping, which provides translations and describe which functions from class are computing our new custom procedures.
-* implement functions which are actually computing values of procedures. These functions need to follow signature `public ourCustomFunctionName(ast: ProcedureAst, formulaAddress: SimpleCellAddress)`, where `ast` is AST of the procedure call and `formulaAddress` is absolute cell address of formula in which we are computing value.
+* have `implementedFunctions` mapping, which provides translations to all the supported languages and describes which functions from class are computing our new custom procedures.
+* implement functions which are actually computing values of procedures. These functions need to follow signature `public ourCustomFunctionName(ast: ProcedureAst, formulaAddress: SimpleCellAddress)`, where `ast` is the AST of the procedure call and `formulaAddress` is absolute cell address of formula in which we are computing the value.
 
-As an example, let's assume we want to write a plugin which implements square function (`SQUARE(x)`).
+As an example, let's assume we want to write a plugin which implements square function `SQUARE(x)`.
 
 The template of such plugin looks like this:
 ```js
