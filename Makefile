@@ -19,9 +19,9 @@ benchmark-ci: ## Run CI benchmarks
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/stage-1.ts
 
-check: typecheck test
+check: typecheck test ## Check whether code is working correctly (types + specs)
 
-full: check lint-fix
+full: check lint-fix ## Check whether code is ready to commit (types + specs + lint)
 
 lint: ## Show linting errors
 	@yarn tslint --project tsconfig.json
