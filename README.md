@@ -51,6 +51,8 @@ A more detailed description is provided below.
 
 ![example](examples/sample%20sheet.png)
 
+You can find more examples in [examples/](examples/) folder.
+
 ## Installation
 
 Note: make sure to use a recent (at least 10.x) version of node js. We have observed a significant performance drop even in some 8.x versions.
