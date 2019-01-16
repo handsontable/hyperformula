@@ -14,8 +14,16 @@ function sumifCacheKey(simpleConditionRange: SimpleCellRange): string {
   return `SUMIF,${simpleConditionRange.start.col},${simpleConditionRange.start.row}`
 }
 
+/** COUNTIF key for criterion function cache */
 const COUNTIF_CACHE_KEY = 'COUNTIF'
 
+/**
+ * Finds smaller available range when computing criterion functions.
+ *
+ * @param rangeMapping - Range Mapping dependency
+ * @param conditionRange - range for condition on which criterion finds accepted cells
+ * @param valuesRange - range for values on which we run aggregate functions
+ */
 export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: SimpleCellRange, valuesRange: SimpleCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: SimpleCellRange, restValuesRange: SimpleCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.col, valuesRange.end.row - 1)
@@ -156,10 +164,10 @@ export class SumifPlugin extends FunctionPlugin {
   /**
    * Computes SUMIF function for range arguments.
    *
-   * @param ast - ast of the SUMIF function call
-   * @param formulaAddress - address of the cell with function call
-   * @param criterionString - raw value of the criterion passed to function call
-   * @param criterion - computed value of the criterion passed to function call
+   * @param simpleConditionRange - condition range
+   * @param simpleValuesRange - values range
+   * @param criterionString - criterion in raw string format
+   * @param criterion - already parsed criterion structure
    */
   private evaluateRangeSumif(simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
     const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
@@ -190,6 +198,13 @@ export class SumifPlugin extends FunctionPlugin {
     return cache.get(criterionString)![0]
   }
 
+  /**
+   * Computes COUNTIF function for range arguments.
+   *
+   * @param simpleConditionRange - condition range
+   * @param criterionString - criterion in raw string format
+   * @param criterion - already parsed criterion structure
+   */
   private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
     const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
     if (!conditionRangeVertex) {
@@ -219,10 +234,25 @@ export class SumifPlugin extends FunctionPlugin {
     return cache.get(criterionString)![0]
   }
 
+  /**
+   * Finds whether criterion was already computed for given range
+   *
+   * @param simpleConditionRange - condition range
+   * @param criterionString - criterion in raw string format
+   * @param criterion - already parsed criterion structure
+   */
   private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 
+  /**
+   * Builds new criterion cache.
+   *
+   * @param cacheKey - key to use in criterion cache
+   * @param simpleConditionRange - condition range
+   * @param simpleValuesRange - values range
+   * @param cacheBuilder - function used to compute values in new cache
+   */
   private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
     const currentRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     const {smallerRangeVertex, restConditionRange, restValuesRange} = findSmallerRange(this.rangeMapping, simpleConditionRange, simpleValuesRange)
@@ -244,6 +274,14 @@ export class SumifPlugin extends FunctionPlugin {
     return newCache
   }
 
+  /**
+   * Computes value of criterion function if no partial result available.
+   *
+   * @param criterion - criterion structure to compute
+   * @param simpleConditionRange - condition range
+   * @param simpleValuesRange - values range
+   * @param valueComputingFunction - function used to compute final value out of list of filtered cell values
+   */
   private computeCriterionValue(criterion: Criterion, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambda = buildCriterionLambda(criterion)
     const values = getRangeValues(this.addressMapping, simpleValuesRange)
