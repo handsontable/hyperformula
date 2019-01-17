@@ -4,6 +4,7 @@ const chevrotain = require('chevrotain');
 const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
 
 // We need to compute token names, these variables can't be mangled.
+// http://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED
 const reservedTokenNames = buildLexerConfig({ functionArgSeparator: /,/ }).allTokens.map(function (currentToken) {
   return chevrotain.tokenName(currentToken)
 })
