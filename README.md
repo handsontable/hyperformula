@@ -3,7 +3,6 @@
 HandsOnEngine is a JavaScript engine for efficient processing of formulas in spreadsheets.
 
 ## Table of Contents
-0. [Table of Contents](#table-of-contents)
 1. [What to use it for?](#what-to-use-it-for)
 2. [Overview](#overview)
 3. [Examples](#examples)
@@ -287,4 +286,4 @@ Our engine currently depends on the following packages:
 
 ## License
 
-Unlicense: NO LICENSE or permissions given to any third party. Contact contact@navalgo.com or contact@handsontable.com in case of any queries.
+NO LICENSE or permissions given to any third party. Contact contact@navalgo.com or contact@handsontable.com in case of any queries.
