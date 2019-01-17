@@ -16,7 +16,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
       extensions: [ '.tsx', '.ts', '.js' ]
     },
     output: {
-      filename: `${name}.js`,
+      filename: `${name}.bundle.js`,
       library: "HandsOnEngine",
       libraryTarget: "umd",
       path: path.resolve(__dirname, 'lib'),
