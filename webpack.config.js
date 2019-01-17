@@ -18,7 +18,7 @@ module.exports = {
     filename: 'minified-full.js',
     library: "HandsOnEngine",
     libraryTarget: "umd",
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'lib'),
 
     // https://github.com/webpack/webpack/issues/6784
     globalObject: 'typeof self !== \'undefined\' ? self : this',

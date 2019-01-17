@@ -1,4 +1,4 @@
-var HandsOnEngine = require("../dist/minified-full.js").HandsOnEngine
+var HandsOnEngine = require("../lib/minified-full.js").HandsOnEngine
 var assert = require('assert')
 
 var engine = HandsOnEngine.buildFromArray([
