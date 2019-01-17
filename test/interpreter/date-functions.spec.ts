@@ -8,10 +8,10 @@ describe('Interpreter', () => {
     const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
 
     expect(engine.getCellValue('A1')).toEqual(2)
-    expect(dateNumberToString(engine.getCellValue('A1') as number, 'MM/DD/YYYY')).toEqual('01/01/1900')
+    expect(dateNumberToString(engine.getCellValue('A1') as number, Config.DATE_FORMAT)).toEqual('01/01/1900')
     expect(engine.getCellValue('B1')).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue('B1') as number, 'MM/DD/YYYY')).toEqual('01/02/1900')
-    expect(dateNumberToString(engine.getCellValue('C1') as number, 'MM/DD/YYYY')).toEqual('10/24/1915')
+    expect(dateNumberToString(engine.getCellValue('B1') as number, Config.DATE_FORMAT)).toEqual('01/02/1900')
+    expect(dateNumberToString(engine.getCellValue('C1') as number, Config.DATE_FORMAT)).toEqual('10/24/1915')
   })
 
   it('function DATE with less than 3 numerical arguments', () => {

@@ -10,9 +10,9 @@ describe('Date helpers', () => {
   })
 
   it ('#dateNumberToString should return properly formatted  date', () => {
-    expect(dateNumberToString(0, 'MM/DD/YYYY')).toEqual('12/30/1899')
-    expect(dateNumberToString(2, 'MM/DD/YYYY')).toEqual('01/01/1900')
-    expect(dateNumberToString(43465, 'MM/DD/YYYY')).toEqual('12/31/2018')
+    expect(dateNumberToString(0, Config.DATE_FORMAT)).toEqual('12/30/1899')
+    expect(dateNumberToString(2, Config.DATE_FORMAT)).toEqual('01/01/1900')
+    expect(dateNumberToString(43465, Config.DATE_FORMAT)).toEqual('12/31/2018')
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
