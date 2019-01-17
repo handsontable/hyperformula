@@ -1,6 +1,23 @@
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
+const chevrotain = require('chevrotain');
+const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
+
+// We need to compute token names, these variables can't be mangled.
+const reservedTokenNames = buildLexerConfig({ functionArgSeparator: /,/ }).allTokens.map(function (currentToken) {
+  return chevrotain.tokenName(currentToken)
+})
 
 const buildConfiguration = ({ name, mode, excludeDependencies }) => {
+  const optimization = {
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        mangle: {
+          reserved: reservedTokenNames,
+        }
+      }
+    })]
+  }
   const configuration = {
     entry: './src/index.ts',
     module: {
@@ -26,6 +43,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     },
     externals: (excludeDependencies ? ['moment', 'chevrotain', /csv-parse/, /csv-stringify/] : []),
     mode,
+    optimization: (mode === 'production' ? optimization : undefined),
   }
   return configuration
 };

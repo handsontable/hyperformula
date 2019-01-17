@@ -41,7 +41,7 @@ servedoc: ## Run server with documentation
 clean: ## Clean compiled files
 	@rm -rf lib/
 
-bundle:
+bundle: compile
 	@yarn webpack --config webpack.config.js
 
 check-bundle:
