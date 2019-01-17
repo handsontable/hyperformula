@@ -41,6 +41,12 @@ servedoc: ## Run server with documentation
 clean: ## Clean compiled files
 	@rm -rf lib/
 
+bundle:
+	@yarn webpack --config webpack.config.js
+
+check-bundle:
+	@node script/check-minified.js
+
 help: ## Show all make commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
