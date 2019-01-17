@@ -1,4 +1,4 @@
-import {buildSimpleCellRange, cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, rangeHeight, rangeWidth, simpleCellAddress, SimpleCellAddress, SimpleCellRange} from '../../Cell'
+import {simpleCellRange, cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, rangeHeight, rangeWidth, simpleCellAddress, SimpleCellAddress, SimpleCellRange} from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -31,10 +31,10 @@ export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: Sim
     if (rowLessVertex) {
       return {
         smallerRangeVertex: rowLessVertex,
-        restValuesRange: buildSimpleCellRange(
+        restValuesRange: simpleCellRange(
           simpleCellAddress(valuesRange.start.col, valuesRange.end.row),
           valuesRange.end),
-        restConditionRange: buildSimpleCellRange(
+        restConditionRange: simpleCellRange(
           simpleCellAddress(conditionRange.start.col, conditionRange.end.row),
           conditionRange.end),
       }

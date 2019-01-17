@@ -6,6 +6,9 @@ import {computeHash} from './computeHash'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, ILexerConfig} from './LexerConfig'
 
+/**
+ * Parses formula using caching if feasible.
+ */
 export class ParserWithCaching {
   public statsCacheUsed: number = 0
   private cache: Cache = new Cache()
