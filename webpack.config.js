@@ -15,8 +15,13 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ]
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    filename: 'minified-full.js',
+    library: "HandsOnEngine",
+    libraryTarget: "umd",
+    path: path.resolve(__dirname, 'dist'),
+
+    // https://github.com/webpack/webpack/issues/6784
+    globalObject: 'typeof self !== \'undefined\' ? self : this',
   },
   mode: 'development'
 };
