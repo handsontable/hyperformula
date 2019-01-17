@@ -44,6 +44,9 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     externals: (excludeDependencies ? ['moment', 'chevrotain', /csv-parse/, /csv-stringify/] : []),
     mode,
     optimization: (mode === 'production' ? optimization : undefined),
+    performance: {
+      hints: false
+    }
   }
   return configuration
 };
