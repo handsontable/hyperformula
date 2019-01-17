@@ -18,5 +18,5 @@ jobs:
       - run: make benchmark-ci
       - run: make bundle
       - run: make check-bundle
-      - run: ls -sS1 lib/ | grep bundle.js
+      - run: ls -sS1h lib/ | grep bundle.js
 
