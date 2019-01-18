@@ -52,9 +52,9 @@ export class SumprodPlugin extends FunctionPlugin {
       throw new Error('Range does not exists in graph')
     }
 
-    const cache = rangeVertex.getFunctionValue(cacheKey(rightRange))
-    if (cache) {
-      return cache
+    const cachedValue = rangeVertex.getFunctionValue(cacheKey(rightRange))
+    if (cachedValue) {
+      return cachedValue
     }
 
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [leftRange, rightRange])
