@@ -83,7 +83,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     const restRange = simpleCellRange(restRangeStart, restRangeEnd)
     for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
+      rangeResult.push(this.addressMapping.getCell(cellFromRange).getCellValue())
     }
 
     return rangeResult
