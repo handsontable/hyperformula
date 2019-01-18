@@ -12,6 +12,7 @@ import {InformationPlugin} from './plugin/InformationPlugin'
 import {MedianPlugin} from './plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
+import {SumprodPlugin} from './plugin/SumprodPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
@@ -27,7 +28,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin,
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)

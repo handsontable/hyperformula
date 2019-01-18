@@ -6,6 +6,7 @@ import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -85,11 +86,11 @@ export class GraphBuilder {
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, rangeStart, rangeEnd)
+          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(rangeStart, rangeEnd)])
+          const restRange = restRanges[0]
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          const restRange = simpleCellRange(restRangeStart, restRangeEnd)
           for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
@@ -118,31 +119,5 @@ export const generateCellsFromRangeGenerator = function *(simpleCellRange: Simpl
       currentColumn++
     }
     currentRow++
-  }
-}
-
-/**
- * Finds smaller range does have own vertex.
- *
- * @param rangeMapping - range mapping dependency
- * @param rangeStart - top-left corner of range
- * @param rangeEnd - bottom-right corner of range
- */
-export const findSmallerRange = (rangeMapping: RangeMapping, rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress): {smallerRangeVertex: RangeVertex | null, restRangeStart: SimpleCellAddress, restRangeEnd: SimpleCellAddress} => {
-  if (rangeEnd.row > rangeStart.row) {
-    const rangeEndRowLess = simpleCellAddress(rangeEnd.col, rangeEnd.row - 1)
-    const rowLessVertex = rangeMapping.getRange(rangeStart, rangeEndRowLess)
-    if (rowLessVertex) {
-      return {
-        smallerRangeVertex: rowLessVertex,
-        restRangeStart: rangeEnd,
-        restRangeEnd: rangeEnd,
-      }
-    }
-  }
-  return {
-    smallerRangeVertex: null,
-    restRangeStart: rangeStart,
-    restRangeEnd: rangeEnd,
   }
 }

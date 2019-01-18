@@ -1,4 +1,15 @@
-import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, rangeHeight, rangeWidth, simpleCellAddress, SimpleCellAddress, simpleCellRange, SimpleCellRange} from '../../Cell'
+import {
+  cellError,
+  cellRangeToSimpleCellRange,
+  CellValue,
+  ErrorType,
+  rangeHeight,
+  rangeWidth,
+  simpleCellAddress,
+  SimpleCellAddress,
+  simpleCellRange,
+  SimpleCellRange,
+} from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'

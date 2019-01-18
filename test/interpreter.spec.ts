@@ -1,6 +1,5 @@
 import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
-import {dateNumberToString} from '../src/Date'
 
 describe('Interpreter', () => {
   it('relative addressing formula', () => {
