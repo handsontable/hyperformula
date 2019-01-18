@@ -60,11 +60,11 @@ describe('Text', () => {
       '=TEXT(A1, "mmmmm MMMMM")',
     ]])
 
-    expect(engine.getCellValue('B1')).toEqual('8')
-    expect(engine.getCellValue('C1')).toEqual('08')
-    expect(engine.getCellValue('D1')).toEqual('Aug')
-    expect(engine.getCellValue('E1')).toEqual('August')
-    expect(engine.getCellValue('F1')).toEqual('A')
+    expect(engine.getCellValue('B1')).toEqual('8 8')
+    expect(engine.getCellValue('C1')).toEqual('08 08')
+    expect(engine.getCellValue('D1')).toEqual('Aug Aug')
+    expect(engine.getCellValue('E1')).toEqual('August August')
+    expect(engine.getCellValue('F1')).toEqual('A A')
   })
 
   it('year formats', () => {
@@ -75,9 +75,7 @@ describe('Text', () => {
     ]])
 
     expect(engine.getCellValue('B1')).toEqual('18 18')
-    expect(engine.getCellValue('C1')).toEqual('18 18')
-    expect(engine.getCellValue('D1')).toEqual('2018 2018')
-    expect(engine.getCellValue('E1')).toEqual('2018 2018')
+    expect(engine.getCellValue('C1')).toEqual('2018 2018')
   })
 
   it('12 hours', () => {
@@ -114,7 +112,7 @@ describe('Text', () => {
     const engine = HandsOnEngine.buildFromArray([[
       '12.45',
       '=TEXT(A1, "###.###")',
-      '=TEXT(A1, "000.000")'
+      '=TEXT(A1, "000.000")',
     ]])
 
     expect(engine.getCellValue('B1')).toEqual('12.45')

@@ -2,11 +2,11 @@ import {CellDependency, simpleCellAddress, SimpleCellAddress, SimpleCellRange, s
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
+import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 
 /**
  * Two-dimenstional array representation of sheet

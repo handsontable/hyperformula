@@ -5,7 +5,7 @@ import {
   getAbsoluteAddress,
   SimpleCellAddress,
   SimpleCellRange,
-  simpleCellRange
+  simpleCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
