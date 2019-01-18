@@ -113,12 +113,12 @@ describe('Text', () => {
   it('works for number format', () => {
     const engine = HandsOnEngine.buildFromArray([[
       '12.45',
-      '=TEXT(A1, "000.000")',
       '=TEXT(A1, "###.###")',
+      '=TEXT(A1, "000.000")'
     ]])
 
-    expect(engine.getCellValue('B1')).toEqual('012.450')
     expect(engine.getCellValue('B1')).toEqual('12.45')
+    expect(engine.getCellValue('C1')).toEqual('012.450')
   })
 
 })

@@ -30,6 +30,7 @@ export interface FormatExpression {
 }
 
 function matchDateFormat(str: string): RegExpExecArray[] {
+  dateFormatRegex.lastIndex = 0
   const tokens: RegExpExecArray[] = []
 
   let m
@@ -45,6 +46,7 @@ function matchDateFormat(str: string): RegExpExecArray[] {
 }
 
 function matchNumberFormat(str: string): RegExpExecArray[] {
+  numberFormatRegex.lastIndex = 0
   const numberFormatToken = numberFormatRegex.exec(str)
 
   if (numberFormatToken !== null) {
