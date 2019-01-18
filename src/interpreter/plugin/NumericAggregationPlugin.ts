@@ -78,7 +78,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const rangeResult: CellValue[] = []
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(beginRange, endRange)])
     const restRange = restRanges[0]
-    const currentRangeVertex = this.rangeMapping.getRange(restRange.start, restRange.end)!
+    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
