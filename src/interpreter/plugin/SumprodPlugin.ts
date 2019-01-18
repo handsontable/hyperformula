@@ -62,9 +62,8 @@ export class SumprodPlugin extends FunctionPlugin {
       return computedResult
     }
 
-    const result = this.reduceSumprod([leftRange, rightRange].map((range) => this.getCellValuesFromRange(range)))
-    rangeVertex.setFunctionValue(cacheKey(rightRange), result)
-    return result
+    const resultFromAllValues = this.computeResultFromAllValues(rangeVertex, leftRange, rightRange)
+    return resultFromAllValues
   }
 
   private computeResultFromSmallerCache(rangeVertex: RangeVertex, leftRange: SimpleCellRange, rightRange: SimpleCellRange) {
@@ -81,6 +80,12 @@ export class SumprodPlugin extends FunctionPlugin {
       }
     }
     return null
+  }
+
+  private computeResultFromAllValues(rangeVertex: RangeVertex, leftRange: SimpleCellRange, rightRange: SimpleCellRange) {
+    const result = this.reduceSumprod([leftRange, rightRange].map((range) => this.getCellValuesFromRange(range)))
+    rangeVertex.setFunctionValue(cacheKey(rightRange), result)
+    return result
   }
 
   private reduceSumprod(ranges: CellValue[][]): number {
