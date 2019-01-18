@@ -79,8 +79,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * and values of cells that are not present in smaller range
    *
    * @param functionName - function name (e.g. SUM)
-   * @param ast - cell range ast
-   * @param formulaAddress - address of the cell in which formula is located
+   * @param range - cell range
    */
   private getRangeValues(functionName: string, range: SimpleCellRange): CellValue[] {
     const rangeResult: CellValue[] = []
