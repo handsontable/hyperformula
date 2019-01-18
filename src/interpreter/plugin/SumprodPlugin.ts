@@ -32,8 +32,6 @@ export class SumprodPlugin extends FunctionPlugin {
     }
 
     return this.evaluateSumprod(cellRangeToSimpleCellRange(leftRange, formulaAddress), cellRangeToSimpleCellRange(rightRange, formulaAddress))
-
-    return cellError(ErrorType.VALUE)
   }
 
   private evaluateSumprod(leftRange: SimpleCellRange, rightRange: SimpleCellRange): CellValue {
