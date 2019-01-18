@@ -1,5 +1,5 @@
-import {HandsOnEngine} from "../../src";
-import {cellError, ErrorType} from "../../src/Cell"
+import {HandsOnEngine} from '../../src'
+import {cellError, ErrorType} from '../../src/Cell'
 
 describe('Function SUMPROD', () => {
   it('works', () => {
@@ -37,7 +37,7 @@ describe('Function SUMPROD', () => {
 
   it('error when not ranges as arguments', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=SUMPROD(42, 78)']
+      ['=SUMPROD(42, 78)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))

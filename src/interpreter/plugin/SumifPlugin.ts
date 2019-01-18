@@ -8,7 +8,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
   simpleCellRange,
-  SimpleCellRange
+  SimpleCellRange,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -69,7 +69,7 @@ export class SumifPlugin extends FunctionPlugin {
     countif: {
       EN: 'COUNTIF',
       PL: 'LICZJEZELI',
-    }
+    },
   }
 
   /**
@@ -153,7 +153,6 @@ export class SumifPlugin extends FunctionPlugin {
       return cellError(ErrorType.VALUE)
     }
   }
-
 
   /**
    * Computes SUMIF function for single-cell arguments
