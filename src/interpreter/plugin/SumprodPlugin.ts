@@ -62,14 +62,14 @@ export class SumprodPlugin extends FunctionPlugin {
       const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey)
 
       if (typeof smallerValue === "number") {
-        const restValue = this.reduceSumprod(restRanges.map(range => this.getCellValues(range)))
+        const restValue = this.reduceSumprod(restRanges.map(range => this.getCellValuesFromRange(range)))
         const result = smallerValue + restValue
         rangeVertex.setFunctionValue(cacheKey, result)
         return result
       }
     }
 
-    const result = this.reduceSumprod([leftRange, rightRange].map(range => this.getCellValues(range)))
+    const result = this.reduceSumprod([leftRange, rightRange].map(range => this.getCellValuesFromRange(range)))
     rangeVertex.setFunctionValue(cacheKey, result)
     return result
   }
@@ -92,7 +92,7 @@ export class SumprodPlugin extends FunctionPlugin {
     return result
   }
 
-  private getCellValues(range: SimpleCellRange): CellValue[] {
+  private getCellValuesFromRange(range: SimpleCellRange): CellValue[] {
     const result = []
     for (const cellFromRange of generateCellsFromRangeGenerator(range.start, range.end)) {
       result.push(this.addressMapping.getCell(cellFromRange).getCellValue())
