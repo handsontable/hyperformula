@@ -52,7 +52,7 @@ export class SumprodPlugin extends FunctionPlugin {
       throw new Error('Range does not exists in graph')
     }
 
-    const cachedValue = rangeVertex.getFunctionValue(cacheKey(rightRange))
+    const cachedValue = this.findAlreadyCachedValue(rangeVertex, rightRange)
     if (cachedValue) {
       return cachedValue
     }
@@ -62,6 +62,10 @@ export class SumprodPlugin extends FunctionPlugin {
 
     rangeVertex.setFunctionValue(cacheKey(rightRange), result)
     return result
+  }
+
+  private findAlreadyCachedValue(rangeVertex: RangeVertex, rightRange: SimpleCellRange) {
+    return rangeVertex.getFunctionValue(cacheKey(rightRange))
   }
 
   private computeResultFromSmallerCache(rangeVertex: RangeVertex, leftRange: SimpleCellRange, rightRange: SimpleCellRange) {
