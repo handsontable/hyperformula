@@ -1,6 +1,6 @@
 import {CellValue} from '../Cell'
 import {dateNumberToMoment} from '../Date'
-import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './FormatParser'
+import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './parser'
 
 export function format(expression: FormatExpression, value: number): CellValue {
   if (expression.type === FormatExpressionType.DATE) {

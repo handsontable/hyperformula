@@ -1,10 +1,10 @@
 import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {dateNumberToMonthNumber, dateNumberToYearNumber, toDateNumber} from '../../Date'
-import {format} from '../../format/Format'
-import {parse} from '../../format/FormatParser'
 import {ProcedureAst} from '../../parser/Ast'
 import {dateNumberRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
+import {parse} from "../../format/parser";
+import {format} from "../../format/format";
 
 /**
  * Interpreter plugin containing date-specific functions

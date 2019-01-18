@@ -1,5 +1,5 @@
-import {format} from '../src/format/Format'
-import {FormatExpression, FormatExpressionType, formatToken, TokenType} from '../src/format/FormatParser'
+import {format} from '../src/format/format'
+import {FormatExpression, FormatExpressionType, formatToken, TokenType} from '../src/format/parser'
 
 describe('FormatInterpreter', () => {
   it('works for expression without significant tokens', () => {
