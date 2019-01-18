@@ -64,4 +64,16 @@ describe('Function SUMPROD', () => {
 
     expect(engine.getCellValue('A4')).toEqual(10)
   })
+
+  it('error when different size', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '3', '1', '3'],
+      ['2', '4', '2', '4'],
+      ['=SUMPROD(A1:B2,C1:C2)'],
+      ['=SUMPROD(A1:B2,C1:D1)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A4')).toEqual(cellError(ErrorType.VALUE))
+  })
 })

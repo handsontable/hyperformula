@@ -7,7 +7,9 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
   simpleCellRange,
-  SimpleCellRange
+  SimpleCellRange,
+  rangeWidth,
+  rangeHeight,
 } from "../../Cell";
 import {RangeMapping} from "../../RangeMapping";
 import {RangeVertex} from "../../Vertex";
@@ -31,7 +33,14 @@ export class SumprodPlugin extends FunctionPlugin {
       return cellError(ErrorType.VALUE)
     }
 
-    return this.evaluateSumprod(cellRangeToSimpleCellRange(leftRange, formulaAddress), cellRangeToSimpleCellRange(rightRange, formulaAddress))
+    const simpleLeftRange = cellRangeToSimpleCellRange(leftRange, formulaAddress)
+    const simpleRightRange = cellRangeToSimpleCellRange(rightRange, formulaAddress)
+
+    if (rangeWidth(simpleLeftRange) !== rangeWidth(simpleRightRange) || rangeHeight(simpleLeftRange) !== rangeHeight(simpleRightRange)) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    return this.evaluateSumprod(simpleLeftRange, simpleRightRange)
   }
 
   private evaluateSumprod(leftRange: SimpleCellRange, rightRange: SimpleCellRange): CellValue {
@@ -43,7 +52,6 @@ export class SumprodPlugin extends FunctionPlugin {
     const cacheKey = `SUMPROD,${rightRange.start.col},${rightRange.start.row}`
 
     const cache = rangeVertex.getFunctionValue(cacheKey)
-
     if (cache) {
       return cache
     }
