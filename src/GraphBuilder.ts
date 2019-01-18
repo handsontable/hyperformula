@@ -1,4 +1,4 @@
-import {CellDependency, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellDependency, simpleCellAddress, SimpleCellAddress, SimpleCellRange, simpleCellRange} from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
@@ -89,7 +89,8 @@ export class GraphBuilder {
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
+          const restRange = simpleCellRange(restRangeStart, restRangeEnd)
+          for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
 
@@ -108,11 +109,11 @@ export class GraphBuilder {
  * @param rangeStart - top-left corner of range
  * @param rangeEnd - bottom-right corner of range
  */
-export const generateCellsFromRangeGenerator = function *(rangeStart: SimpleCellAddress, rangeEnd: SimpleCellAddress) {
-  let currentRow = rangeStart.row
-  while (currentRow <= rangeEnd.row) {
-    let currentColumn = rangeStart.col
-    while (currentColumn <= rangeEnd.col) {
+export const generateCellsFromRangeGenerator = function *(simpleCellRange: SimpleCellRange) {
+  let currentRow = simpleCellRange.start.row
+  while (currentRow <= simpleCellRange.end.row) {
+    let currentColumn = simpleCellRange.start.col
+    while (currentColumn <= simpleCellRange.end.col) {
       yield simpleCellAddress(currentColumn, currentRow)
       currentColumn++
     }

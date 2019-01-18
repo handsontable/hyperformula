@@ -1,4 +1,4 @@
-import {simpleCellRange, cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, rangeHeight, rangeWidth, simpleCellAddress, SimpleCellAddress, SimpleCellRange} from '../../Cell'
+import {cellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, rangeHeight, rangeWidth, simpleCellAddress, SimpleCellAddress, simpleCellRange, SimpleCellRange} from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
@@ -292,7 +292,7 @@ export class SumifPlugin extends FunctionPlugin {
 }
 
 function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): IterableIterator<CellValue> {
-  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange.start, cellRange.end)) {
+  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange)) {
     yield addressMapping.getCell(cellFromRange)!.getCellValue()
   }
 }

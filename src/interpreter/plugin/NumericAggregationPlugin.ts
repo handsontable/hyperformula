@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress} from '../../Cell'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, simpleCellRange} from '../../Cell'
 import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
@@ -81,7 +81,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
 
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRangeStart, restRangeEnd)) {
+    const restRange = simpleCellRange(restRangeStart, restRangeEnd)
+    for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
       rangeResult.push(this.addressMapping.getCell(cellFromRange)!.getCellValue())
     }
 

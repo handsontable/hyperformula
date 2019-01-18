@@ -1,4 +1,4 @@
-import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
+import {cellError, CellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -48,8 +48,7 @@ export abstract class FunctionPlugin {
     const values: number[] = []
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
-        const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
-        for (const cellFromRange of generateCellsFromRangeGenerator(beginRange, endRange)) {
+        for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
           const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
           if (typeof value === 'number') {
             values.push(value)
