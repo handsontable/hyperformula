@@ -1,4 +1,4 @@
-const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|hh|ss|AM\/PM)/g
+const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|H|hh|h|ss|AM\/PM)/g
 const numberFormatRegex = /(?<!\\)([#0]+(\.[#0]*)?)/g
 
 export enum TokenType {
