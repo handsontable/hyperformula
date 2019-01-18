@@ -71,4 +71,12 @@ export abstract class FunctionPlugin {
     }
     return values
   }
+
+  protected getCellValuesFromRange(range: SimpleCellRange): CellValue[] {
+    const result = []
+    for (const cellFromRange of generateCellsFromRangeGenerator(range.start, range.end)) {
+      result.push(this.addressMapping.getCell(cellFromRange).getCellValue())
+    }
+    return result
+  }
 }

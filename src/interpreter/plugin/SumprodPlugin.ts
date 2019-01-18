@@ -91,14 +91,6 @@ export class SumprodPlugin extends FunctionPlugin {
     }
     return result
   }
-
-  private getCellValuesFromRange(range: SimpleCellRange): CellValue[] {
-    const result = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(range.start, range.end)) {
-      result.push(this.addressMapping.getCell(cellFromRange).getCellValue())
-    }
-    return result
-  }
 }
 
 
