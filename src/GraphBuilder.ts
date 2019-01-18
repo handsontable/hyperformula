@@ -57,7 +57,7 @@ export class GraphBuilder {
         let vertex = null
 
         if (isFormula(cellContent)) {
-          const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+          const parseResult = this.parser.parse(cellContent, cellAddress)
           vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
           dependencies.set(cellAddress, parseResult.dependencies)
           this.graph.addNode(vertex)

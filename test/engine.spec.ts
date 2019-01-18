@@ -126,7 +126,7 @@ describe('Integration', () => {
     expect(engine.getCellValue('A2')).toBe(3)
   })
 
-  it('#buildAddresMapping - when sparse matrix', () => {
+  it.skip('#buildAddresMapping - when sparse matrix', () => {
     const addressMapping = buildAddressMapping([
       ['', '', ''],
       ['', '', '1'],
