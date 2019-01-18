@@ -148,6 +148,12 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
         result += date.year()
         break
       }
+
+      /* AM / PM */
+      case 'AM/PM': {
+        result += date.format('A')
+        break
+      }
       default:
         throw new Error('Mismatched token type')
     }
