@@ -15,8 +15,8 @@ import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
 
-function cacheKey(rightRange: SimpleCellRange): string {
-  return `SUMPROD,${rightRange.start.col},${rightRange.start.row}`
+function cacheKey(ranges: SimpleCellRange[]): string {
+  return `SUMPROD,${ranges[1].start.col},${ranges[1].start.row}`
 }
 
 export class SumprodPlugin extends FunctionPlugin {
@@ -52,23 +52,24 @@ export class SumprodPlugin extends FunctionPlugin {
       throw new Error('Range does not exists in graph')
     }
 
-    const result = this.findAlreadyCachedValue(rangeVertex, rightRange) ||
-      this.computeResultFromSmallerCache(leftRange, rightRange) ||
-      this.computeResultFromAllValues(leftRange, rightRange)
+    const ranges = [leftRange, rightRange]
+    const result = this.findAlreadyCachedValue(rangeVertex, ranges) ||
+      this.computeResultFromSmallerCache(ranges) ||
+      this.computeResultFromAllValues(ranges)
 
-    rangeVertex.setFunctionValue(cacheKey(rightRange), result)
+    rangeVertex.setFunctionValue(cacheKey(ranges), result)
     return result
   }
 
-  private findAlreadyCachedValue(rangeVertex: RangeVertex, rightRange: SimpleCellRange) {
-    return rangeVertex.getFunctionValue(cacheKey(rightRange))
+  private findAlreadyCachedValue(rangeVertex: RangeVertex, ranges: SimpleCellRange[]) {
+    return rangeVertex.getFunctionValue(cacheKey(ranges))
   }
 
-  private computeResultFromSmallerCache(leftRange: SimpleCellRange, rightRange: SimpleCellRange) {
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [leftRange, rightRange])
+  private computeResultFromSmallerCache(ranges: SimpleCellRange[]) {
+    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, ranges)
 
     if (smallerRangeVertex !== null) {
-      const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey(rightRange))
+      const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey(ranges))
 
       if (typeof smallerValue === 'number') {
         const restValue = this.reduceSumprod(restRanges.map((range) => this.getCellValuesFromRange(range)))
@@ -79,8 +80,8 @@ export class SumprodPlugin extends FunctionPlugin {
     return null
   }
 
-  private computeResultFromAllValues(leftRange: SimpleCellRange, rightRange: SimpleCellRange) {
-    return this.reduceSumprod([leftRange, rightRange].map((range) => this.getCellValuesFromRange(range)))
+  private computeResultFromAllValues(ranges: SimpleCellRange[]) {
+    return this.reduceSumprod(ranges.map((range) => this.getCellValuesFromRange(range)))
   }
 
   private reduceSumprod(ranges: CellValue[][]): number {
