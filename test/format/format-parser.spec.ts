@@ -1,4 +1,4 @@
-import {FormatExpressionType, parse, TokenType} from "../src/format/parser";
+import {FormatExpressionType, parse, TokenType} from "../../src/format/parser";
 
 describe('FormatParser', () => {
   it('works for single date token', () => {
