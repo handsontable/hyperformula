@@ -1,4 +1,12 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, simpleCellRange} from '../../Cell'
+import {
+  cellError, cellRangeToSimpleCellRange,
+  CellValue,
+  ErrorType,
+  getAbsoluteAddress,
+  SimpleCellAddress,
+  SimpleCellRange,
+  simpleCellRange
+} from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
@@ -55,7 +63,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
-      const rangeValues = this.getRangeValues(functionName, ast, formulaAddress)
+      const range = cellRangeToSimpleCellRange(ast, formulaAddress)
+      const rangeValues = this.getRangeValues(functionName, range)
       value = funcToCalc(rangeValues)
       rangeVertex.setFunctionValue(functionName, value)
     }
@@ -73,12 +82,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast - cell range ast
    * @param formulaAddress - address of the cell in which formula is located
    */
-  private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
-    const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
+  private getRangeValues(functionName: string, range: SimpleCellRange): CellValue[] {
     const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(beginRange, endRange)])
+    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
     const restRange = restRanges[0]
-    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
+    const currentRangeVertex = this.rangeMapping.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
