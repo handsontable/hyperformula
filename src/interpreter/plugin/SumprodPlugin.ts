@@ -15,6 +15,10 @@ import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
 
+function cacheKey(rightRange: SimpleCellRange): string {
+  return `SUMPROD,${rightRange.start.col},${rightRange.start.row}`
+}
+
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumprod: {
@@ -48,9 +52,7 @@ export class SumprodPlugin extends FunctionPlugin {
       throw new Error('Range does not exists in graph')
     }
 
-    const cacheKey = `SUMPROD,${rightRange.start.col},${rightRange.start.row}`
-
-    const cache = rangeVertex.getFunctionValue(cacheKey)
+    const cache = rangeVertex.getFunctionValue(cacheKey(rightRange))
     if (cache) {
       return cache
     }
@@ -58,18 +60,18 @@ export class SumprodPlugin extends FunctionPlugin {
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [leftRange, rightRange])
 
     if (smallerRangeVertex !== null) {
-      const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey)
+      const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey(rightRange))
 
       if (typeof smallerValue === 'number') {
         const restValue = this.reduceSumprod(restRanges.map((range) => this.getCellValuesFromRange(range)))
         const result = smallerValue + restValue
-        rangeVertex.setFunctionValue(cacheKey, result)
+        rangeVertex.setFunctionValue(cacheKey(rightRange), result)
         return result
       }
     }
 
     const result = this.reduceSumprod([leftRange, rightRange].map((range) => this.getCellValuesFromRange(range)))
-    rangeVertex.setFunctionValue(cacheKey, result)
+    rangeVertex.setFunctionValue(cacheKey(rightRange), result)
     return result
   }
 
