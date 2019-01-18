@@ -103,6 +103,12 @@ export class SumprodPlugin extends FunctionPlugin {
   }
 }
 
+/**
+ * Finds smaller range does have own vertex.
+ *
+ * @param rangeMapping - range mapping dependency
+ * @param ranges - ranges to find smaller range in
+ */
 export const findSmallerRange = (rangeMapping: RangeMapping, ranges: SimpleCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: SimpleCellRange[] } => {
   if (ranges[0].end.row > ranges[0].start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.col, ranges[0].end.row - 1)

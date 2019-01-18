@@ -1,8 +1,9 @@
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, SimpleCellAddress, simpleCellRange} from '../../Cell'
-import {findSmallerRange, generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
+import {findSmallerRange} from './SumprodPlugin'
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
@@ -75,13 +76,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private getRangeValues(functionName: string, ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellValue[] {
     const [beginRange, endRange] = [getAbsoluteAddress(ast.start, formulaAddress), getAbsoluteAddress(ast.end, formulaAddress)]
     const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRangeStart, restRangeEnd} = findSmallerRange(this.rangeMapping, beginRange, endRange)
-    const currentRangeVertex = this.rangeMapping.getRange(beginRange, endRange)!
+    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(beginRange, endRange)])
+    const restRange = restRanges[0]
+    const currentRangeVertex = this.rangeMapping.getRange(restRange.start, restRange.end)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
-
-    const restRange = simpleCellRange(restRangeStart, restRangeEnd)
     for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
       rangeResult.push(this.addressMapping.getCell(cellFromRange).getCellValue())
     }
