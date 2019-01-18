@@ -3,15 +3,14 @@ import {dateNumberToMoment} from '../Date'
 import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './parser'
 
 export function format(expression: FormatExpression, value: number): CellValue {
-  if (expression.type === FormatExpressionType.DATE) {
-    return dateFormat(expression.tokens, value)
-  } else if (expression.type === FormatExpressionType.NUMBER) {
-    return numberFormat(expression.tokens, value)
-  } else if (expression.type === FormatExpressionType.STRING) {
-    return expression.tokens[0].value
+  switch (expression.type) {
+    case FormatExpressionType.DATE:
+      return dateFormat(expression.tokens, value)
+    case FormatExpressionType.NUMBER:
+      return numberFormat(expression.tokens, value)
+    case FormatExpressionType.STRING:
+      return expression.tokens[0].value
   }
-
-  return ''
 }
 
 export function padLeft(number: number | string, size: number) {
