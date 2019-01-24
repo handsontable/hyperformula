@@ -4,12 +4,14 @@ import {expectedValues as expectedValuesMarkov, sheet as sheetMarkovFn} from './
 import {expectedValues as expectedValuesPrefixSum, sheet as sheetPrefixSumFn} from './sheets/04-sheet-prefix-sum'
 import {expectedValues as eT, sheet as T} from './sheets/05-sheet-t'
 import {sheet as Bs} from './sheets/06-big-sum'
+import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-sheet-a'
 
 const simpleBig = Sb()
 const sheetMarkov = sheetMarkovFn()
 const sheetPrefixSum = sheetPrefixSumFn()
 const sheetT = T()
 const bigSum = Bs()
+const sheetA = sheetAFn()
 
 console.info(' === Simple Big === ')
 benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 150, numberOfRuns: 3 })
@@ -21,3 +23,5 @@ console.info('\n === Sheet T === ')
 benchmark(sheetT, eT(sheetT), { millisecondsPerThousandRows: 25, numberOfRuns: 3 })
 console.info('\n === Big sum === ')
 benchmark(bigSum, [], { millisecondsPerThousandRows: 70, numberOfRuns: 3 })
+console.info('\n === Sheet A === ')
+benchmark(sheetA, expectedValuesA(sheetA), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
