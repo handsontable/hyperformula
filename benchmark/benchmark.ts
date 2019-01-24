@@ -69,10 +69,10 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   console.info(`BuildGraph Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
   console.info('---')
-  console.warn(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
-  console.warn(`Median time  : ${resultMillisecondsPerThousandRows.toFixed(3)} ms per 1000 rows`)
-  console.warn(`Average time : ${(averageOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
-  console.warn(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
+  console.info(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
+  console.info(`Median time  : ${resultMillisecondsPerThousandRows.toFixed(3)} ms per 1000 rows`)
+  console.info(`Average time : ${(averageOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
+  console.info(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
 
   if (config.csvDump && engine !== null) {
     const csvString = engine.exportAsCsv()
