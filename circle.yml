@@ -18,4 +18,5 @@ jobs:
       - run: make benchmark-ci
       - run: make bundle
       - run: make check-bundle
+      - run: make verify-production-licenses
 
