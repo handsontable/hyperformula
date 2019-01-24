@@ -11,10 +11,10 @@ export function sheet() {
   while (prev < rows) {
     let rowToPush = [
       `${prev+1}`,
-      `2`,
-      `3`,
-      `=4*12`,
-      `=A${prev}-B${prev}*B${prev}+B${prev}*A${prev}/B${prev}+B${prev}*B${prev}`
+      '3',
+      `=A${prev}*A${prev}`,
+      `=C${prev+1}*A${prev}+B${prev}`,
+      `=C${prev}-D${prev}*D${prev}+D${prev}*C${prev}/7+C${prev}*C${prev}*3+7*2`
     ]
 
     sheet.push(rowToPush)

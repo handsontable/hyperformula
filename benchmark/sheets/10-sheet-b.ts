@@ -12,8 +12,8 @@ export function sheet() {
     const rowToPush = [
       `${prev+1}`,
       '2',
-      '3',
-      '4',
+      '=3*5',
+      `=A${prev}+D${prev}`,
       `=SUM($A$1:A${prev})`,
     ]
 
