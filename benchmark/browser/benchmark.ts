@@ -1,6 +1,6 @@
 import {benchmark} from '../benchmark'
-import {sheet as A} from '../sheets/03-sheet-a'
-import {sheet as B} from '../sheets/04-sheet-b'
+import {sheet as A} from '../sheets/09-sheet-a'
+import {sheet as B} from '../sheets/10-sheet-b'
 import {sheet as T} from '../sheets/05-sheet-t'
 
 let working = false
