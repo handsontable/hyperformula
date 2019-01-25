@@ -24,6 +24,6 @@
     "moment": "^2.22.2"
   },
   "scripts": {
-	  "browser": "tsc && copyfiles benchmark/browser/index.html lib/ && browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js"
+    "browser": "tsc && copyfiles benchmark/browser/index.html lib/ && browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js"
   }
 }
