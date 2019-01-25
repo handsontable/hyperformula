@@ -3,15 +3,14 @@ import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
 
 /**
- * Abstract class for any vertex
- */
-export abstract class Vertex {
-}
-
-/**
  * Represents vertex bound to some particular cell
  */
 export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
+
+/**
+ * Represents any vertex
+ */
+export type Vertex = CellVertex | RangeVertex
 
 /**
  * Represents vertex which keeps formula
@@ -123,7 +122,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 /**
  * Represents vertex bound to range
  */
-export class RangeVertex extends Vertex {
+export class RangeVertex {
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
 
@@ -131,7 +130,6 @@ export class RangeVertex extends Vertex {
   private criterionFuncitonCache: Map<string, CriterionCache>
 
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
-    super()
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }
