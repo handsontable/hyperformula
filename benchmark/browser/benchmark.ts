@@ -9,7 +9,7 @@ interface IExtendedConsole extends Console {
     olog?: any
 }
 
-function runBenchmark(fun: any) {
+function runBenchmark(fun: any, benchmarkName: string) {
     if (working) {
         return
     }
@@ -20,6 +20,7 @@ function runBenchmark(fun: any) {
 
     setTimeout(() => {
         working = true
+        console.info(`=== ${benchmarkName} ===`)
         benchmark(fun(), [], { millisecondsPerThousandRows: 100, numberOfRuns})
         working = false
         toggle()
@@ -65,9 +66,9 @@ function init() {
     const btn_sheetB = document.getElementById('btn_sheetB')!
     const btn_sheetT = document.getElementById('btn_sheetT')!
 
-    btn_sheetA.addEventListener('click', () => runBenchmark(A))
-    btn_sheetB.addEventListener('click', () => runBenchmark(B))
-    btn_sheetT.addEventListener('click', () => runBenchmark(T))
+    btn_sheetA.addEventListener('click', () => runBenchmark(A, "Sheet A"))
+    btn_sheetB.addEventListener('click', () => runBenchmark(B, "Sheet B"))
+    btn_sheetT.addEventListener('click', () => runBenchmark(T, "Sheet T"))
 }
 
 init()
