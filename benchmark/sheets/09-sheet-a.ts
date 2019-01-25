@@ -9,12 +9,12 @@ export function sheet() {
   let prev = 1
 
   while (prev < rows) {
-    let rowToPush = [
-      `${prev+1}`,
+    const rowToPush = [
+      `${prev + 1}`,
       '3',
       `=A${prev}*A${prev}`,
-      `=C${prev+1}*A${prev}+B${prev}`,
-      `=C${prev}-D${prev}*D${prev}+D${prev}*C${prev}/7+C${prev}*C${prev}*3+7*2`
+      `=C${prev + 1}*A${prev}+B${prev}`,
+      `=C${prev}-D${prev}*D${prev}+D${prev}*C${prev}/7+C${prev}*C${prev}*3+7*2`,
     ]
 
     sheet.push(rowToPush)

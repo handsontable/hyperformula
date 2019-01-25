@@ -1,7 +1,7 @@
 import {benchmark} from '../benchmark'
+import {sheet as T} from '../sheets/05-sheet-t'
 import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
-import {sheet as T} from '../sheets/05-sheet-t'
 
 let working = false
 
@@ -66,9 +66,9 @@ function init() {
     const btn_sheetB = document.getElementById('btn_sheetB')!
     const btn_sheetT = document.getElementById('btn_sheetT')!
 
-    btn_sheetA.addEventListener('click', () => runBenchmark(A, "Sheet A"))
-    btn_sheetB.addEventListener('click', () => runBenchmark(B, "Sheet B"))
-    btn_sheetT.addEventListener('click', () => runBenchmark(T, "Sheet T"))
+    btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
+    btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
+    btn_sheetT.addEventListener('click', () => runBenchmark(T, 'Sheet T'))
 }
 
 init()

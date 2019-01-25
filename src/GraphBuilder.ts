@@ -49,9 +49,9 @@ export class GraphBuilder {
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
-    for (let i=0; i<sheet.length; ++i) {
+    for (let i = 0; i < sheet.length; ++i) {
       const row = sheet[i]
-      for (let j=0; j<row.length; ++j) {
+      for (let j = 0; j < row.length; ++j) {
         const cellContent = row[j]
         const cellAddress = simpleCellAddress(j, i)
         let vertex = null

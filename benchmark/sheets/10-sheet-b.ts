@@ -10,7 +10,7 @@ export function sheet() {
 
   while (prev < rows) {
     const rowToPush = [
-      `${prev+1}`,
+      `${prev + 1}`,
       '2',
       '=3*5',
       `=A${prev}+D${prev}`,
@@ -32,4 +32,3 @@ export function expectedValues(sheet: string[][]): ExpectedValue[] {
     {address: 'E5000', value: 12497500},
   ]
 }
-
