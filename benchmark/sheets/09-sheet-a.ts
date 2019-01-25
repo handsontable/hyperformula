@@ -26,10 +26,7 @@ export function sheet() {
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
     { address: 'A10000', value: 10000 },
-    { address: 'B10000', value: 2 },
-    { address: 'C10000', value: 3 },
-    { address: 'D10000', value: 48 },
-    { address: 'E10000', value: 9999 - 2*2 + 2*9999/2 + 2*2 },
+    { address: 'B10000', value: 3 },
+    { address: 'C10000', value: 99980001 },
   ]
 }
-
