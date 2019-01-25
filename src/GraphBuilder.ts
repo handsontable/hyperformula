@@ -49,9 +49,11 @@ export class GraphBuilder {
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
-    sheet.forEach((row, rowIndex) => {
-      row.forEach((cellContent, colIndex) => {
-        const cellAddress = simpleCellAddress(colIndex, rowIndex)
+    for (let i=0; i<sheet.length; ++i) {
+      const row = sheet[i]
+      for (let j=0; j<row.length; ++j) {
+        const cellContent = row[j]
+        const cellAddress = simpleCellAddress(j, i)
         let vertex = null
 
         if (isFormula(cellContent)) {
@@ -71,8 +73,8 @@ export class GraphBuilder {
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
         }
-      })
-    })
+      }
+    }
 
     dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
