@@ -11,17 +11,12 @@ export abstract class Vertex {
 /**
  * Represents vertex bound to some particular cell
  */
-export abstract class CellVertex extends Vertex {
-  /**
-   * Returns cell value stored in vertex
-   */
-  public abstract getCellValue(): CellValue
-}
+export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
 
 /**
  * Represents vertex which keeps formula
  */
-export class FormulaCellVertex extends CellVertex {
+export class FormulaCellVertex {
   /** Most recently computed value of this formula. */
   private cachedCellValue?: CellValue
 
@@ -32,7 +27,6 @@ export class FormulaCellVertex extends CellVertex {
   private cellAddress: SimpleCellAddress
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress) {
-    super()
     this.formula = formula
     this.cellAddress = cellAddress
   }
@@ -73,12 +67,11 @@ export class FormulaCellVertex extends CellVertex {
 /**
  * Represents vertex which keeps static cell value
  */
-export class ValueCellVertex extends CellVertex {
+export class ValueCellVertex {
   /** Static cell value. */
   private cellValue: CellValue
 
   constructor(cellValue: CellValue) {
-    super()
     this.cellValue = cellValue
   }
 
@@ -100,7 +93,7 @@ export class ValueCellVertex extends CellVertex {
 /**
  * Represents singleton vertex bound to all empty cells
  */
-export class EmptyCellVertex extends CellVertex {
+export class EmptyCellVertex {
   /**
    * Retrieves singleton
    */
@@ -113,10 +106,6 @@ export class EmptyCellVertex extends CellVertex {
 
   /** Singleton instance. */
   private static instance: EmptyCellVertex
-
-  constructor() {
-    super()
-  }
 
   /**
    * Retrieves cell value bound to that singleton
