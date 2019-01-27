@@ -62,7 +62,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   // console.info(`Evaluation: ${evaluation.map((v) => (v / 1000))} (in seconds)`)
   console.info(`Evaluation Median: ${evaluation[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`Parsing: ${parsing.map((v) => (v / 1000))}`)
-  console.info(`Parsing Median   : ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  //  console.info(`Parsing Median   : ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`TopSort: ${topSort.map((v) => (v / 1000))}`)
   console.info(`TopSort Median   : ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   // console.info(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
