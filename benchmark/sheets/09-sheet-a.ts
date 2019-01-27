@@ -12,9 +12,9 @@ export function sheet() {
     const rowToPush = [
       `${prev + 1}`,
       '3',
-      `=A${prev}*A${prev}`,
-      `=C${prev + 1}*A${prev}+B${prev}`,
-      `=C${prev}-D${prev}*D${prev}+D${prev}*C${prev}/7+C${prev}*C${prev}*3+7*2`,
+      `=A${prev}*A${prev}+5`,
+      `=C${prev + 1}*B${prev}-C${prev}`,
+      `=A${prev}*A${prev}-10*A${prev}+3*C${prev}+7*2`,
     ]
 
     sheet.push(rowToPush)
@@ -27,6 +27,8 @@ export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
     { address: 'A10000', value: 10000 },
     { address: 'B10000', value: 3 },
-    { address: 'C10000', value: 99980001 },
+    { address: 'C10000', value: 99980006 },
+    { address: 'D10000', value: 199980009 },
+    { address: 'E10000', value: 399760052 },
   ]
 }
