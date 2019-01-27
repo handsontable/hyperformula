@@ -222,10 +222,10 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
  * @param sheet - two-dimmensional array sheet representation
  */
 export function buildAddressMapping(sheet: Sheet, threshold: number): IAddressMapping {
-  // const {height, width, fill} = findBoundaries(sheet)
-  // if (fill > threshold) {
-    return new ArrayAddressMapping(sheet[0].length, sheet.length)
-  // } else {
-    // return new AddressMapping()
-  // }
+  const {height, width, fill} = findBoundaries(sheet)
+  if (fill > threshold) {
+    return new ArrayAddressMapping(width, height)
+  } else {
+    return new AddressMapping()
+  }
 }
