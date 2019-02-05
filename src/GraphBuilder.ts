@@ -76,6 +76,11 @@ export class GraphBuilder {
       }
     }
 
+    this.handleDependencies(dependencies)
+  }
+
+
+  private handleDependencies(dependencies: Map<SimpleCellAddress, CellDependency[]>) {
     dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (Array.isArray(absStartCell)) {
