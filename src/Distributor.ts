@@ -37,11 +37,11 @@ export class Distributor {
       subgraph.edges.set(colorNode.node, this.graph.adjacentNodes(colorNode.node))
     })
 
-    coloredChunks.forEach((chunk, color) => {
-      this.pool.addWorkerTask({
-        data: chunk,
+    this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
+      return {
+        data: coloredChunks.get(workerId),
         callback: this.onWorkerMessage
-      })
+      }
     })
 
     return coloredChunks
