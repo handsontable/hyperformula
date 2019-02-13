@@ -1,6 +1,7 @@
 import {Graph} from "./Graph";
 import {CellVertex, Vertex} from "./Vertex";
 import {AddressMapping} from "./AddressMapping";
+import {SimpleArrayAddressMapping} from "./SimpleArrayAddressMapping";
 import {Pool} from "./worker/Pool";
 
 const NUMBER_OF_WORKERS = 3
@@ -10,7 +11,7 @@ export class Distributor {
 
   constructor(
       private graph: Graph<Vertex>,
-      private addressMapping: AddressMapping,
+      private addressMapping: SimpleArrayAddressMapping,
   ) {
     this.pool = new Pool(NUMBER_OF_WORKERS)
     this.pool.init()
@@ -28,7 +29,7 @@ export class Distributor {
           type: "INIT",
           nodes: [],
           edges: new Map(),
-          addressMapping: this.addressMapping.getMapping()
+          addressMapping: this.addressMapping.mapping
         })
       }
 
@@ -82,8 +83,8 @@ export class Distributor {
       ++ currentNodeIndex
     }
 
-    if (sorted.length !== this.graph.getNodes().size) {
-      const nodesOnCycle = new Set(this.graph.getNodes())
+    if (sorted.length !== this.graph.nodes.size) {
+      const nodesOnCycle = new Set(this.graph.nodes.values())
       for (let i = 0; i < sorted.length; ++i) {
         nodesOnCycle.delete(sorted[i].node)
       }
@@ -161,7 +162,7 @@ export type WorkerInitPayload = {
   type: "INIT",
   nodes: Vertex[],
   edges: Map<Vertex, Set<Vertex>>,
-  addressMapping: Map<number, Map<number, CellVertex>>,
+  addressMapping: Int32Array,
 }
 
 interface ColorNode {

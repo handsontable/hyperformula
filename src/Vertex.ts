@@ -12,6 +12,11 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
  */
 export type Vertex = CellVertex | RangeVertex
 
+let nextVertexId = 1
+export const getNextVertexId = (): number => {
+  return nextVertexId++;
+}
+
 /**
  * Represents vertex which keeps formula
  */
@@ -25,7 +30,7 @@ export class FormulaCellVertex {
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
+  constructor(public vertexId: number, formula: Ast, cellAddress: SimpleCellAddress) {
     this.formula = formula
     this.cellAddress = cellAddress
   }
@@ -70,7 +75,7 @@ export class ValueCellVertex {
   /** Static cell value. */
   private cellValue: CellValue
 
-  constructor(cellValue: CellValue) {
+  constructor(public vertexId: number, cellValue: CellValue) {
     this.cellValue = cellValue
   }
 
@@ -98,13 +103,16 @@ export class EmptyCellVertex {
    */
   public static getSingletonInstance() {
     if (!EmptyCellVertex.instance) {
-      EmptyCellVertex.instance = new EmptyCellVertex()
+      EmptyCellVertex.instance = new EmptyCellVertex(getNextVertexId())
     }
     return EmptyCellVertex.instance
   }
 
   /** Singleton instance. */
   private static instance: EmptyCellVertex
+
+  constructor(public vertexId: number) {
+  }
 
   /**
    * Retrieves cell value bound to that singleton
@@ -129,7 +137,7 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
+  constructor(public vertexId: number, private start: SimpleCellAddress, private end: SimpleCellAddress) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }

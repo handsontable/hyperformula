@@ -1,15 +1,20 @@
 /**
  * Provides graph directed structure
  */
-export class Graph<T> {
+
+interface Identifiable {
+  vertexId: number
+}
+
+export class Graph<T extends Identifiable> {
   /** Set with nodes in graph. */
-  private nodes: Set<T>
+  public nodes: Map<number, T>
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
 
   constructor() {
-    this.nodes = new Set()
+    this.nodes = new Map()
     this.edges = new Map()
   }
 
@@ -19,7 +24,7 @@ export class Graph<T> {
    * @param node - a node to be added
    */
   public addNode(node: T) {
-    this.nodes.add(node)
+    this.nodes.set(node.vertexId, node)
     if (!this.edges.has(node)) {
       this.edges.set(node, new Set())
     }
@@ -34,10 +39,10 @@ export class Graph<T> {
    * @param toNode - node to which edge is incoming
    */
   public addEdge(fromNode: T, toNode: T) {
-    if (!this.nodes.has(fromNode)) {
+    if (!this.nodes.has(fromNode.vertexId)) {
       throw new Error(`Unknown node ${fromNode}`)
     }
-    if (!this.nodes.has(toNode)) {
+    if (!this.nodes.has(toNode.vertexId)) {
       throw new Error(`Unknown node ${toNode}`)
     }
     this.edges.get(fromNode)!.add(toNode)
@@ -58,7 +63,7 @@ export class Graph<T> {
    * @param node - node to check
    */
   public hasNode(node: T): boolean {
-    return this.nodes.has(node)
+    return this.nodes.has(node.vertexId)
   }
 
   /**
@@ -78,7 +83,7 @@ export class Graph<T> {
   }
 
   public getNodes() {
-    return this.nodes
+    return new Set(this.nodes.values())
   }
 
   public getEdges() {
@@ -128,7 +133,7 @@ export class Graph<T> {
     }
 
     if (topologicalOrdering.length !== this.nodes.size) {
-      const nodesOnCycle = new Set(this.nodes)
+      const nodesOnCycle = new Set(this.nodes.values())
       for (let i = 0; i < topologicalOrdering.length; ++i) {
         nodesOnCycle.delete(topologicalOrdering[i])
       }
@@ -143,12 +148,16 @@ export class Graph<T> {
    */
   private incomingEdges(): Map<T, number> {
     const incomingEdges: Map<T, number> = new Map()
-    this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
+    this.nodes.forEach((node, vertexId) => (incomingEdges.set(node, 0)))
     this.edges.forEach((adjacentNodes, sourceNode) => {
       adjacentNodes.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
       })
     })
     return incomingEdges
+  }
+
+  public getNodeById(vertexId: number): T | null {
+    return this.nodes.get(vertexId) || null
   }
 }

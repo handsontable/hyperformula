@@ -6,7 +6,7 @@ import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {getNextVertexId, EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -58,18 +58,18 @@ export class GraphBuilder {
 
         if (isFormula(cellContent)) {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-          vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
+          vertex = new FormulaCellVertex(getNextVertexId(), parseResult.ast, cellAddress)
           dependencies.set(cellAddress, parseResult.dependencies)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
         } else if (cellContent === '') {
           /* we don't care about empty cells here */
         } else if (!isNaN(Number(cellContent))) {
-          vertex = new ValueCellVertex(Number(cellContent))
+          vertex = new ValueCellVertex(getNextVertexId(), Number(cellContent))
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
         } else {
-          vertex = new ValueCellVertex(cellContent)
+          vertex = new ValueCellVertex(getNextVertexId(), cellContent)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
         }
@@ -87,7 +87,7 @@ export class GraphBuilder {
           const [rangeStart, rangeEnd] = absStartCell
           let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
           if (rangeVertex === null) {
-            rangeVertex = new RangeVertex(rangeStart, rangeEnd)
+            rangeVertex = new RangeVertex(getNextVertexId(), rangeStart, rangeEnd)
             this.rangeMapping.setRange(rangeVertex)
           }
 
