@@ -1,23 +1,30 @@
 import {Graph} from "./Graph";
 import {CellVertex, Vertex} from "./Vertex";
 import {AddressMapping} from "./AddressMapping";
+import {Pool} from "./worker/Pool";
 
 const NUMBER_OF_WORKERS = 3
 
 export class Distributor {
+  private pool: Pool
+
   constructor(
       private graph: Graph<Vertex>,
       private addressMapping: AddressMapping,
-  ) {}
+  ) {
+    this.pool = new Pool(NUMBER_OF_WORKERS)
+    this.pool.init()
+  }
+
 
   public distribute(): Map<Color, WorkerInitPayload> {
     let { sorted, cycled } = this.topSort()
 
-    const result: Map<Color, WorkerInitPayload> = new Map()
+    const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
 
     sorted.forEach(colorNode => {
-      if (!result.has(colorNode.color)) {
-        result.set(colorNode.color, {
+      if (!coloredChunks.has(colorNode.color)) {
+        coloredChunks.set(colorNode.color, {
           type: "INIT",
           nodes: [],
           edges: new Map(),
@@ -25,12 +32,25 @@ export class Distributor {
         })
       }
 
-      const subgraph = result.get(colorNode.color)!
+      const subgraph = coloredChunks.get(colorNode.color)!
       subgraph.nodes.push(colorNode.node)
       subgraph.edges.set(colorNode.node, this.graph.adjacentNodes(colorNode.node))
     })
 
-    return result
+    coloredChunks.forEach((chunk, color) => {
+      this.pool.addWorkerTask({
+        data: chunk,
+        callback: this.onWorkerMessage
+      })
+    })
+
+    return coloredChunks
+  }
+
+  private onWorkerMessage(message: any) {
+    switch (message.data.type) {
+      case "INITIALIZED": console.log("worker initialized")
+    }
   }
 
   public topSort(): { sorted: ColorNode[], cycled: Vertex[] } {
