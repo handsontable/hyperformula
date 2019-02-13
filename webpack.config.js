@@ -2,6 +2,7 @@ const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const chevrotain = require('chevrotain');
 const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // We need to compute token names, these variables can't be mangled.
 // http://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED
@@ -23,6 +24,10 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     entry: './src/index.ts',
     module: {
       rules: [
+        {
+          test: /\.worker\.ts$/,
+          use: { loader: 'worker-loader' }
+        },
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
@@ -47,7 +52,10 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     optimization: (mode === 'production' ? optimization : undefined),
     performance: {
       hints: false
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin()
+    ],
   }
   return configuration
 };
@@ -75,7 +83,7 @@ const optimized_without_dependencies = buildConfiguration({
 
 module.exports = [
   unoptimized_full,
-  unoptimized_without_dependencies,
-  optimized_full,
-  optimized_without_dependencies,
+  // unoptimized_without_dependencies,
+  // optimized_full,
+  // optimized_without_dependencies,
 ];
