@@ -21,6 +21,8 @@ import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {Distributor} from "./Distributor";
+import {add} from "./interpreter/scalar";
 
 /**
  * Engine for one sheet

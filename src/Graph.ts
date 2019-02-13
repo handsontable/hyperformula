@@ -77,6 +77,14 @@ export class Graph<T> {
     return result
   }
 
+  public getNodes() {
+    return this.nodes
+  }
+
+  public getEdges() {
+    return this.edges
+  }
+
   /**
    * Checks whether exists edge between nodes
    *

@@ -21,7 +21,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     })]
   }
   const configuration = {
-    entry: './src/index.ts',
+    entry: './src/workers.ts',
     module: {
       rules: [
         {

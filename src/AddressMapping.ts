@@ -57,4 +57,8 @@ export class AddressMapping implements IAddressMapping {
   public getWidth(): number {
     return Math.max(0, Math.max(...Array.from(this.mapping.keys())) + 1)
   }
+
+  public getMapping(): Map<number, Map<number, CellVertex>> {
+    return this.mapping
+  }
 }
