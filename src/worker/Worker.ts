@@ -69,12 +69,18 @@ function init(payload: WorkerInitPayload) {
     graph.addNode(vertex)
   }
 
+  const numberOfEdges = payload.allEdges.length / 2
+  for (let i = 0; i < numberOfEdges; i++) {
+    graph.addEdgeByIds(payload.allEdges[i*2], payload.allEdges[i*2+1])
+  }
+
   addressMapping = new SimpleArrayAddressMapping(
     payload.sheetWidth,
     payload.sheetHeight,
     graph,
     payload.addressMapping,
   )
+
 
   // console.log(addressMapping.getCell({ col: 0, row: 0 })) // getting A1
 

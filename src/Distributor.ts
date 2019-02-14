@@ -23,7 +23,7 @@ export class Distributor {
 
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
 
-    const serializedEdges = this.serializeEdges(this.graph.getEdges())
+    const serializedEdges = this.serializeEdges(this.graph.getEdges(), this.graph.edgesCount())
 
     sorted.forEach(colorNode => {
       if (!coloredChunks.has(colorNode.color)) {
@@ -60,8 +60,8 @@ export class Distributor {
     }
   }
 
-  public serializeEdges(edges: Map<Vertex, Set<Vertex>>): Int32Array {
-    const result = new Int32Array(edges.size * 2)
+  public serializeEdges(edges: Map<Vertex, Set<Vertex>>, edgesCount: number): Int32Array {
+    const result = new Int32Array(edgesCount * 2)
     let i = 0
     edges.forEach((targetNodes, sourceNode) => {
       targetNodes.forEach((targetNode) => {

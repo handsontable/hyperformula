@@ -90,6 +90,12 @@ export class Graph<T extends Identifiable> {
     return this.edges
   }
 
+  public addEdgeByIds(fromId: number, toId: number) {
+    const fromNode = this.nodes.get(fromId)!
+    const toNode = this.nodes.get(toId)!
+    this.addEdge(fromNode, toNode)
+  }
+
   /**
    * Checks whether exists edge between nodes
    *
