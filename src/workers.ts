@@ -20,7 +20,6 @@ function init() {
   const addressMapping = new SimpleArrayAddressMapping(width, height, graph)
   const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
 
-
   graphBuilder.buildGraph(sheet)
 
   const distributor = new Distributor(graph, addressMapping)

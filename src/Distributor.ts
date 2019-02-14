@@ -23,12 +23,16 @@ export class Distributor {
 
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
 
+    const serializedEdges = this.serializeEdges(this.graph.getEdges())
+
     sorted.forEach(colorNode => {
       if (!coloredChunks.has(colorNode.color)) {
         coloredChunks.set(colorNode.color, {
           type: "INIT",
           nodes: [],
           edges: new Map(),
+          allEdges: serializedEdges,
+          allNodes: Array.from(this.graph.nodes.values()), // these unfortunately lack colors
           addressMapping: this.addressMapping.mapping,
           sheetWidth: this.addressMapping.getWidth(),
           sheetHeight: this.addressMapping.getHeight(),
@@ -54,6 +58,19 @@ export class Distributor {
     switch (message.data.type) {
       case "INITIALIZED": console.log("worker initialized")
     }
+  }
+
+  public serializeEdges(edges: Map<Vertex, Set<Vertex>>): Int32Array {
+    const result = new Int32Array(edges.size * 2)
+    let i = 0
+    edges.forEach((targetNodes, sourceNode) => {
+      targetNodes.forEach((targetNode) => {
+        result[i] = sourceNode.vertexId
+        result[i+1] = targetNode.vertexId
+        i += 2
+      })
+    })
+    return result
   }
 
   public topSort(): { sorted: ColorNode[], cycled: Vertex[] } {
@@ -164,6 +181,8 @@ export type WorkerInitPayload = {
   type: "INIT",
   nodes: Vertex[],
   edges: Map<Vertex, Set<Vertex>>,
+  allNodes: Vertex[],
+  allEdges: Int32Array,
   addressMapping: Int32Array,
   sheetWidth: number,
   sheetHeight: number,

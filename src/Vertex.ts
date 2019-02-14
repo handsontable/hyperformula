@@ -30,6 +30,8 @@ export class FormulaCellVertex {
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
+  public kind = "formula"
+
   constructor(public vertexId: number, formula: Ast, cellAddress: SimpleCellAddress) {
     this.formula = formula
     this.cellAddress = cellAddress
@@ -75,6 +77,8 @@ export class ValueCellVertex {
   /** Static cell value. */
   private cellValue: CellValue
 
+  public kind = "value"
+
   constructor(public vertexId: number, cellValue: CellValue) {
     this.cellValue = cellValue
   }
@@ -98,6 +102,8 @@ export class ValueCellVertex {
  * Represents singleton vertex bound to all empty cells
  */
 export class EmptyCellVertex {
+  public kind = "empty"
+
   /**
    * Retrieves singleton
    */
@@ -109,7 +115,7 @@ export class EmptyCellVertex {
   }
 
   /** Singleton instance. */
-  private static instance: EmptyCellVertex
+  public static instance: EmptyCellVertex
 
   constructor(public vertexId: number) {
   }
@@ -133,6 +139,8 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 export class RangeVertex {
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
+
+  public kind = "range"
 
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
