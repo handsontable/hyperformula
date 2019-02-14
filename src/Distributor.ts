@@ -29,7 +29,9 @@ export class Distributor {
           type: "INIT",
           nodes: [],
           edges: new Map(),
-          addressMapping: this.addressMapping.mapping
+          addressMapping: this.addressMapping.mapping,
+          sheetWidth: this.addressMapping.getWidth(),
+          sheetHeight: this.addressMapping.getHeight(),
         })
       }
 
@@ -163,6 +165,8 @@ export type WorkerInitPayload = {
   nodes: Vertex[],
   edges: Map<Vertex, Set<Vertex>>,
   addressMapping: Int32Array,
+  sheetWidth: number,
+  sheetHeight: number,
 }
 
 interface ColorNode {

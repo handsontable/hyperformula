@@ -15,14 +15,14 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
    * It is created when building the mapping and the size of it is fixed.
    */
 
-  public mapping: Int32Array;
-  
+  public mapping: Int32Array
+
   /**
    * @param width - width of the stored sheet
    * @param height - height of the stored sheet
    */
-  constructor(private width: number, private height: number, private graph: Graph<Vertex>) {
-    this.mapping = new Int32Array(width * height)
+  constructor(private width: number, private height: number, private graph: Graph<Vertex>, mapping?: Int32Array) {
+    this.mapping = mapping || new Int32Array(width * height)
   }
 
   /** @inheritDoc */
