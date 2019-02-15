@@ -11,7 +11,7 @@ import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
-import {findSmallerRange} from './SumprodPlugin'
+import {findSmallerRange} from "../../findSmallerRange";
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 

@@ -1,14 +1,21 @@
 import {WorkerInitPayload} from "../Distributor";
 import {SimpleArrayAddressMapping} from "../SimpleArrayAddressMapping"
 import {Graph} from '../Graph'
-import {Vertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex} from '../Vertex'
+import {Vertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex, CellVertex} from '../Vertex'
 import {SimpleCellAddress, CellValue} from '../Cell'
 import {Ast} from '../parser/Ast'
 import {RangeMapping} from "../RangeMapping";
+import {Interpreter} from "../interpreter/Interpreter";
+import {Config} from "../Config";
 
 const ctx: Worker = self as any;
 
-let addressMapping, rangeMapping, graph
+let addressMapping: SimpleArrayAddressMapping,
+    rangeMapping: RangeMapping,
+    graph: Graph<Vertex>,
+    nodes: Vertex[],
+    interpreter: Interpreter,
+    color: number
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
@@ -31,6 +38,8 @@ function init(payload: WorkerInitPayload) {
   // graph reconstruction
   graph = new Graph<Vertex>()
   rangeMapping = new RangeMapping()
+  nodes = payload.nodes
+  color = payload.color
 
   const allNodes: any[] = payload.allNodes
   for (const node of allNodes) {
@@ -38,21 +47,23 @@ function init(payload: WorkerInitPayload) {
     switch (node.kind) {
       case "formula": {
         vertex = new FormulaCellVertex(
-          node.vertexId as number,
-          node.formula as Ast,
-          node.cellAddress as SimpleCellAddress,
+            node.vertexId as number,
+            node.formula as Ast,
+            node.cellAddress as SimpleCellAddress,
+            node.color
         )
         break
       }
       case "value": {
         vertex = new ValueCellVertex(
-          node.vertexId as number,
-          node.cellValue as CellValue,
+            node.vertexId as number,
+            node.cellValue as CellValue,
+            node.color
         )
         break
       }
       case "empty": {
-        vertex = new EmptyCellVertex(node.vertexId)
+        vertex = new EmptyCellVertex(node.vertexId, node.color)
         EmptyCellVertex.instance = vertex
         break
       }
@@ -60,9 +71,10 @@ function init(payload: WorkerInitPayload) {
         // something should be done about restoring caches here
         // not sure whether Map copies correctly, it's just Object here
         vertex = new RangeVertex(
-          node.vertexId as number,
-          node.start as SimpleCellAddress,
-          node.end as SimpleCellAddress,
+            node.vertexId as number,
+            node.start as SimpleCellAddress,
+            node.end as SimpleCellAddress,
+            node.color
         )
         rangeMapping.setRange(vertex)
         break
@@ -75,14 +87,14 @@ function init(payload: WorkerInitPayload) {
 
   const numberOfEdges = payload.allEdges.length / 2
   for (let i = 0; i < numberOfEdges; i++) {
-    graph.addEdgeByIds(payload.allEdges[i*2], payload.allEdges[i*2+1])
+    graph.addEdgeByIds(payload.allEdges[i * 2], payload.allEdges[i * 2 + 1])
   }
 
   addressMapping = new SimpleArrayAddressMapping(
-    payload.sheetWidth,
-    payload.sheetHeight,
-    graph,
-    payload.addressMapping,
+      payload.sheetWidth,
+      payload.sheetHeight,
+      graph,
+      payload.addressMapping,
   )
 
 
@@ -92,9 +104,34 @@ function init(payload: WorkerInitPayload) {
     type: "INITIALIZED"
   }
 
+  start()
+
   ctx.postMessage(response)
 }
 
 function start() {
+  interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
+
+  console.log(color, nodes)
+  nodes.forEach(vertex => {
+    if (vertex instanceof FormulaCellVertex) {
+      const address = vertex.getAddress()
+      const formula = vertex.getFormula()
+      const cellValue = interpreter.evaluateAst(formula, address)
+      vertex.setCellValue(cellValue)
+    } else if (vertex instanceof RangeVertex) {
+      vertex.clear()
+    }
+  })
+
+  console.log(color, graph)
+
+  graph.nodes.forEach(node => {
+    try {
+    console.log(color, (node as CellVertex).getCellValue())
+    } catch (e) {
+      console.log(color, "no value")
+    }
+  })
 
 }

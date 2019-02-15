@@ -36,6 +36,7 @@ export class Distributor {
           addressMapping: this.addressMapping.mapping,
           sheetWidth: this.addressMapping.getWidth(),
           sheetHeight: this.addressMapping.getHeight(),
+          color: node.color
         })
       }
 
@@ -56,7 +57,7 @@ export class Distributor {
 
   private onWorkerMessage(message: any) {
     switch (message.data.type) {
-      case "INITIALIZED": console.log("worker initialized")
+      // case "INITIALIZED": console.log("worker initialized")
     }
   }
 
@@ -178,4 +179,5 @@ export type WorkerInitPayload = {
   addressMapping: Int32Array,
   sheetWidth: number,
   sheetHeight: number,
+  color: number
 }

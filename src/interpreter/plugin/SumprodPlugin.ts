@@ -1,19 +1,17 @@
 import {
-  cellError, cellRangeToSimpleCellRange,
+  cellError,
+  cellRangeToSimpleCellRange,
   CellValue,
   ErrorType,
   rangeHeight,
   rangeWidth,
-  simpleCellAddress,
   SimpleCellAddress,
-  simpleCellRange,
   SimpleCellRange,
 } from '../../Cell'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
-import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
-import {RangeMapping} from '../../RangeMapping'
+import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
+import {findSmallerRange} from "../../findSmallerRange";
 
 function cacheKey(ranges: SimpleCellRange[]): string {
   return `SUMPROD,${ranges[1].start.col},${ranges[1].start.row}`
@@ -100,32 +98,5 @@ export class SumprodPlugin extends FunctionPlugin {
       result += prod
     }
     return result
-  }
-}
-
-/**
- * Finds smaller range does have own vertex.
- *
- * @param rangeMapping - range mapping dependency
- * @param ranges - ranges to find smaller range in
- */
-export const findSmallerRange = (rangeMapping: RangeMapping, ranges: SimpleCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: SimpleCellRange[] } => {
-  if (ranges[0].end.row > ranges[0].start.row) {
-    const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.col, ranges[0].end.row - 1)
-    const rowLessVertex = rangeMapping.getRange(ranges[0].start, valuesRangeEndRowLess)
-    if (rowLessVertex) {
-      const restRanges = ranges.map((range) => {
-        return simpleCellRange(simpleCellAddress(range.start.col, range.end.row), range.end)
-      })
-
-      return {
-        smallerRangeVertex: rowLessVertex,
-        restRanges,
-      }
-    }
-  }
-  return {
-    smallerRangeVertex: null,
-    restRanges: ranges,
   }
 }

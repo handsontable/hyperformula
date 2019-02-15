@@ -1,5 +1,4 @@
 import parse from 'csv-parse/lib/sync'
-import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {
@@ -23,6 +22,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 import {Distributor} from "./Distributor";
 import {add} from "./interpreter/scalar";
+import stringify = require("csv-stringify/lib/sync");
 
 /**
  * Engine for one sheet
