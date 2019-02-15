@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {CellVertex, EmptyCellVertex} from './Vertex'
 
@@ -60,5 +60,9 @@ export class AddressMapping implements IAddressMapping {
 
   public getMapping(): Map<number, Map<number, CellVertex>> {
     return this.mapping
+  }
+  
+  getCellValue(address: SimpleCellAddress): Promise<CellValue> {
+    return Promise.resolve(0);
   }
 }

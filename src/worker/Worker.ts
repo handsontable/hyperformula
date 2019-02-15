@@ -35,6 +35,7 @@ ctx.onmessage = (message) => {
 
 function init(payload: WorkerInitPayload) {
   console.log("payload", payload)
+  console.log("payload", payload)
 
   // graph reconstruction
   graph = new Graph<Vertex>()
@@ -101,9 +102,11 @@ function init(payload: WorkerInitPayload) {
       payload.sheetWidth,
       payload.sheetHeight,
       graph,
+      color,
       payload.addressMapping,
   )
 
+  interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
 
   // console.log(addressMapping.getCell({ col: 0, row: 0 })) // getting A1
 
@@ -116,9 +119,6 @@ function init(payload: WorkerInitPayload) {
 
 function start() {
   bc.postMessage(`message from ${color}`)
-
-
-  interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
 
   const myNodes = nodes.map(node => graph.getNodeById(node))
 

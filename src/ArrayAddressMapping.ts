@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {CellVertex, EmptyCellVertex} from './Vertex'
 
@@ -57,5 +57,10 @@ export class ArrayAddressMapping implements IAddressMapping {
   /** @inheritDoc */
   public getWidth(): number {
     return this.width
+  }
+
+
+  getCellValue(address: SimpleCellAddress): Promise<CellValue> {
+    return Promise.resolve(0);
   }
 }

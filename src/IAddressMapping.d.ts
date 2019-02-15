@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {CellValue, SimpleCellAddress} from './Cell'
 import {CellVertex} from './Vertex'
 
 /**
@@ -36,4 +36,7 @@ export interface IAddressMapping {
    * Returns width of stored sheet
    */
   getWidth(): number,
+
+
+  getCellValue(address: SimpleCellAddress): Promise<CellValue>
 }
