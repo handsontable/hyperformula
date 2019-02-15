@@ -62,9 +62,7 @@ export class Distributor {
     return (message: any) => {
       switch (message.data.type) {
         case "INITIALIZED": {
-          console.log(that)
           this.initialized += 1
-          console.log(that.initialized)
           if (this.initialized == NUMBER_OF_WORKERS) {
             this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
               return {

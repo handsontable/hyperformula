@@ -39,9 +39,11 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
 
         const resolver = this.resolvers.get(addressKey(data.address))
 
-        if (resolver !== null) {
-          resolver(data.value)
+        if (resolver === undefined) {
+          return
         }
+
+        resolver(data.value)
       }
 
       if (message.data.type === "CELL_VALUE_REQUEST") {
@@ -68,6 +70,8 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       address: address,
       value: value
     }
+
+    console.log(this.contextColor, "sending cell value", payload)
 
     this.bc.postMessage(payload)
   }
@@ -112,10 +116,16 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
     const promise: Promise<CellValue> = new Promise(((resolve, reject) => {
       this.resolvers.set(addressKey(address), resolve)
 
-      this.bc.postMessage({
+      const payload: CellValueRequest = {
+        type: "CELL_VALUE_REQUEST",
         color: vertex.color,
         address: address
-      })
+      }
+
+      console.log(this.contextColor, "requesting cell value", payload)
+
+
+      this.bc.postMessage(payload)
     }))
 
     return promise

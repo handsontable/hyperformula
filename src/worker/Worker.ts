@@ -34,8 +34,7 @@ ctx.onmessage = (message) => {
 }
 
 function init(payload: WorkerInitPayload) {
-  console.log("payload", payload)
-  console.log("payload", payload)
+  // console.log("payload", payload)
 
   // graph reconstruction
   graph = new Graph<Vertex>()
@@ -45,7 +44,7 @@ function init(payload: WorkerInitPayload) {
 
   bc = new BroadcastChannel("mybus")
   bc.onmessage = (e) => {
-    console.log(color, "Received message", e)
+    // console.log(color, "Received message", e)
   }
 
 
@@ -108,8 +107,6 @@ function init(payload: WorkerInitPayload) {
 
   interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
 
-  // console.log(addressMapping.getCell({ col: 0, row: 0 })) // getting A1
-
   const response: WorkerInitializedPayload = {
     type: "INITIALIZED"
   }
@@ -122,27 +119,17 @@ async function start() {
 
   const myNodes = nodes.map(node => graph.getNodeById(node))
 
-  console.log(color, nodes)
-
   for (const vertex of myNodes) {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()
       const cellValue = await interpreter.evaluateAst(formula, address)
-      vertex.setCellValue(cellValue)
+
+      addressMapping.setCellValue(address, cellValue)
     } else if (vertex instanceof RangeVertex) {
       vertex.clear()
     }
   }
 
   console.log(color, graph)
-
-  graph.nodes.forEach(node => {
-    try {
-    console.log(color, (node as CellVertex).getCellValue())
-    } catch (e) {
-      console.log(color, "no value")
-    }
-  })
-
 }

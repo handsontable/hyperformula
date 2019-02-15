@@ -45,7 +45,13 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
-        return this.addressMapping.getCellValue(address)
+        const value = await this.addressMapping.getCellValue(address)
+        if (value === 2) {
+          await new Promise(r => setTimeout(r, 2000))
+          return value
+        } else {
+          return value
+        }
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
