@@ -25,23 +25,23 @@ export class Distributor {
 
     const serializedEdges = this.serializeEdges(this.graph.getEdges(), this.graph.edgesCount())
 
-    sorted.forEach(colorNode => {
-      if (!coloredChunks.has(colorNode.color)) {
-        coloredChunks.set(colorNode.color, {
+    sorted.forEach(node => {
+      if (!coloredChunks.has(node.color)) {
+        coloredChunks.set(node.color, {
           type: "INIT",
           nodes: [],
           edges: new Map(),
           allEdges: serializedEdges,
-          allNodes: Array.from(this.graph.nodes.values()), // these unfortunately lack colors
+          allNodes: Array.from(this.graph.nodes.values()),
           addressMapping: this.addressMapping.mapping,
           sheetWidth: this.addressMapping.getWidth(),
           sheetHeight: this.addressMapping.getHeight(),
         })
       }
 
-      const subgraph = coloredChunks.get(colorNode.color)!
-      subgraph.nodes.push(colorNode.node)
-      subgraph.edges.set(colorNode.node, this.graph.adjacentNodes(colorNode.node))
+      const subgraph = coloredChunks.get(node.color)!
+      subgraph.nodes.push(node)
+      subgraph.edges.set(node, this.graph.adjacentNodes(node))
     })
 
     this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
@@ -73,29 +73,27 @@ export class Distributor {
     return result
   }
 
-  public topSort(): { sorted: ColorNode[], cycled: Vertex[] } {
+  public topSort(): { sorted: Vertex[], cycled: Vertex[] } {
     const incomingEdges = this.incomingEdges()
     const dominantColors = this.initDominantColors()
 
     const danglingNodes = this.colorNodes(this.danglingNodes(incomingEdges))
 
     let currentNodeIndex = 0
-    const sorted: ColorNode[] = []
+    const sorted: Vertex[] = []
 
     while (currentNodeIndex < danglingNodes.length) {
       const node = danglingNodes[currentNodeIndex]
 
       sorted.push(node)
 
-      this.graph.getEdges().get(node.node)!.forEach((targetNode) => {
+      this.graph.getEdges().get(node)!.forEach((targetNode) => {
         ++dominantColors.get(targetNode)![node.color]
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
 
         if (incomingEdges.get(targetNode) === 0) {
-          danglingNodes.push({
-            color: this.getDominantColor(dominantColors.get(targetNode)!),
-            node: targetNode
-          })
+          targetNode.color = this.getDominantColor(dominantColors.get(targetNode)!)
+          danglingNodes.push(targetNode)
         }
       })
 
@@ -105,7 +103,7 @@ export class Distributor {
     if (sorted.length !== this.graph.nodes.size) {
       const nodesOnCycle = new Set(this.graph.nodes.values())
       for (let i = 0; i < sorted.length; ++i) {
-        nodesOnCycle.delete(sorted[i].node)
+        nodesOnCycle.delete(sorted[i])
       }
       return {
         sorted: sorted,
@@ -143,16 +141,10 @@ export class Distributor {
     return result
   }
 
-  private colorNodes(nodes: Vertex[]): ColorNode[] {
+  private colorNodes(nodes: Vertex[]): Vertex[] {
     let currentColor = 0
-    const result: ColorNode[] = []
-    nodes.forEach(node => {
-      result.push({
-        color: (++currentColor) % NUMBER_OF_WORKERS,
-        node: node
-      })
-    })
-    return result
+    nodes.forEach(node => node.color = (++currentColor) % NUMBER_OF_WORKERS)
+    return nodes
   }
 
   private initDominantColors(): Map<Vertex, Color[]> {
@@ -186,9 +178,4 @@ export type WorkerInitPayload = {
   addressMapping: Int32Array,
   sheetWidth: number,
   sheetHeight: number,
-}
-
-interface ColorNode {
-  color: Color,
-  node: Vertex
 }

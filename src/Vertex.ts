@@ -32,7 +32,7 @@ export class FormulaCellVertex {
 
   public kind = "formula"
 
-  constructor(public vertexId: number, formula: Ast, cellAddress: SimpleCellAddress) {
+  constructor(public vertexId: number, formula: Ast, cellAddress: SimpleCellAddress, public color = -1) {
     this.formula = formula
     this.cellAddress = cellAddress
   }
@@ -79,7 +79,7 @@ export class ValueCellVertex {
 
   public kind = "value"
 
-  constructor(public vertexId: number, cellValue: CellValue) {
+  constructor(public vertexId: number, cellValue: CellValue, public color = -1) {
     this.cellValue = cellValue
   }
 
@@ -117,7 +117,7 @@ export class EmptyCellVertex {
   /** Singleton instance. */
   public static instance: EmptyCellVertex
 
-  constructor(public vertexId: number) {
+  constructor(public vertexId: number, public color = -1) {
   }
 
   /**
@@ -145,7 +145,7 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(public vertexId: number, private start: SimpleCellAddress, private end: SimpleCellAddress) {
+  constructor(public vertexId: number, private start: SimpleCellAddress, private end: SimpleCellAddress, public color = -1) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }
