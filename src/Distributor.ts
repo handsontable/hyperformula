@@ -41,7 +41,7 @@ export class Distributor {
       }
 
       const subgraph = coloredChunks.get(node.color)!
-      subgraph.nodes.push(node)
+      subgraph.nodes.push(node.vertexId)
       subgraph.edges.set(node, this.graph.adjacentNodes(node))
     })
 
@@ -172,7 +172,7 @@ export type Color = number
 
 export type WorkerInitPayload = {
   type: "INIT",
-  nodes: Vertex[],
+  nodes: number[],
   edges: Map<Vertex, Set<Vertex>>,
   allNodes: Vertex[],
   allEdges: Int32Array,

@@ -13,7 +13,7 @@ const ctx: Worker = self as any;
 let addressMapping: SimpleArrayAddressMapping,
     rangeMapping: RangeMapping,
     graph: Graph<Vertex>,
-    nodes: Vertex[],
+    nodes: number[],
     interpreter: Interpreter,
     color: number
 
@@ -112,8 +112,10 @@ function init(payload: WorkerInitPayload) {
 function start() {
   interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
 
+  const myNodes = nodes.map(node => graph.getNodeById(node))
+
   console.log(color, nodes)
-  nodes.forEach(vertex => {
+  myNodes.forEach(vertex => {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()
