@@ -2,7 +2,7 @@
  * Provides graph directed structure
  */
 
-interface Identifiable {
+export interface Identifiable {
   vertexId: number
 }
 

@@ -4,10 +4,11 @@ import {Graph} from '../Graph'
 import {Vertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex} from '../Vertex'
 import {SimpleCellAddress, CellValue} from '../Cell'
 import {Ast} from '../parser/Ast'
+import {RangeMapping} from "../RangeMapping";
 
 const ctx: Worker = self as any;
 
-let addressMapping, graph
+let addressMapping, rangeMapping, graph
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
@@ -28,7 +29,9 @@ function init(payload: WorkerInitPayload) {
   console.log("payload", payload)
 
   // graph reconstruction
-  graph = new Graph<Vertex>() // not correct graph yet
+  graph = new Graph<Vertex>()
+  rangeMapping = new RangeMapping()
+
   const allNodes: any[] = payload.allNodes
   for (const node of allNodes) {
     let vertex;
@@ -61,6 +64,7 @@ function init(payload: WorkerInitPayload) {
           node.start as SimpleCellAddress,
           node.end as SimpleCellAddress,
         )
+        rangeMapping.setRange(vertex)
         break
       }
       default:
