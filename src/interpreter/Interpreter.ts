@@ -5,16 +5,16 @@ import {IAddressMapping} from '../IAddressMapping'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {Vertex} from '../Vertex'
-import {BooleanPlugin} from './plugin/BooleanPlugin'
-import {CountUniquePlugin} from './plugin/CountUniquePlugin'
-import {DatePlugin} from './plugin/DatePlugin'
-import {InformationPlugin} from './plugin/InformationPlugin'
-import {MedianPlugin} from './plugin/MedianPlugin'
+// import {BooleanPlugin} from './plugin/BooleanPlugin'
+// import {CountUniquePlugin} from './plugin/CountUniquePlugin'
+// import {DatePlugin} from './plugin/DatePlugin'
+// import {InformationPlugin} from './plugin/InformationPlugin'
+// import {MedianPlugin} from './plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
-import {SumifPlugin} from './plugin/SumifPlugin'
-import {SumprodPlugin} from './plugin/SumprodPlugin'
-import {TextPlugin} from './plugin/TextPlugin'
-import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
+// import {SumifPlugin} from './plugin/SumifPlugin'
+// import {SumprodPlugin} from './plugin/SumprodPlugin'
+// import {TextPlugin} from './plugin/TextPlugin'
+// import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
 
@@ -22,13 +22,14 @@ export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
-    public readonly addressMapping: IAddressMapping,
-    public readonly rangeMapping: RangeMapping,
-    public readonly graph: Graph<Vertex>,
-    public readonly config: Config,
+      public readonly addressMapping: IAddressMapping,
+      public readonly rangeMapping: RangeMapping,
+      public readonly graph: Graph<Vertex>,
+      public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin,
+        NumericAggregationPlugin
+      // SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -40,25 +41,24 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  public async evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Promise<CellValue> {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
-        const vertex = this.addressMapping.getCell(address)!
-        return vertex.getCellValue()
+        return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        const left = this.evaluateAst(ast.left, formulaAddress)
-        const right = this.evaluateAst(ast.right, formulaAddress)
+        const left = await this.evaluateAst(ast.left, formulaAddress)
+        const right = await this.evaluateAst(ast.right, formulaAddress)
         return concatenate([left, right])
       }
       case AstNodeType.EQUALS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (isCellError(leftResult)) {
           return leftResult
@@ -74,8 +74,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.NOT_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (isCellError(leftResult)) {
           return leftResult
@@ -91,8 +91,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult > rightResult
@@ -101,8 +101,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult < rightResult
@@ -111,8 +111,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult >= rightResult
@@ -121,8 +121,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult <= rightResult
@@ -131,13 +131,13 @@ export class Interpreter {
         }
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
         return addStrict(leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
@@ -145,8 +145,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
@@ -154,8 +154,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.POWER_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return Math.pow(leftResult, rightResult)
         } else {
@@ -163,8 +163,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
             return cellError(ErrorType.DIV_BY_ZERO)
@@ -175,7 +175,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        const value = this.evaluateAst(ast.value, formulaAddress)
+        const value = await this.evaluateAst(ast.value, formulaAddress)
         if (typeof value === 'number') {
           return -value
         } else {

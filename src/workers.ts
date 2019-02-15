@@ -1,13 +1,11 @@
 import {Graph} from "./Graph";
 import {Vertex} from "./Vertex";
-import {AddressMapping} from "./AddressMapping";
 import {SimpleArrayAddressMapping} from "./SimpleArrayAddressMapping";
-import {GraphBuilder} from "./GraphBuilder";
+import {GraphBuilder, Sheet} from "./GraphBuilder";
 import {RangeMapping} from "./RangeMapping";
 import {Statistics} from "./statistics/Statistics";
 import {Config} from "./Config";
 import {Distributor} from "./Distributor";
-import {findBoundaries} from "./index"
 
 function init() {
   const sheet = [
@@ -25,6 +23,30 @@ function init() {
   const distributor = new Distributor(graph, addressMapping)
   const result = distributor.distribute()
   console.log(result)
+}
+
+export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
+  let maxWidth = 0
+  let cellsCount = 0
+  for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
+    const currentRowWidth = sheet[currentRow].length
+    if (maxWidth === undefined || maxWidth < currentRowWidth) {
+      maxWidth = currentRowWidth
+    }
+    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
+      const currentValue = sheet[currentRow][currentCol]
+      if (currentValue !== '') {
+        cellsCount++
+      }
+    }
+  }
+  const sheetSize = sheet.length * maxWidth
+
+  return {
+    height: sheet.length,
+    width: maxWidth,
+    fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
+  }
 }
 
 init()

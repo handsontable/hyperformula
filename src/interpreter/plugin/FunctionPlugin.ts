@@ -40,7 +40,7 @@ export abstract class FunctionPlugin {
     this.config = interpreter.config
   }
 
-  protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Promise<CellValue> {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 

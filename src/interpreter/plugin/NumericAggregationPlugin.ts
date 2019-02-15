@@ -31,8 +31,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return ast.args.reduce((currentSum: CellValue, arg) => {
+  public async sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Promise<CellValue> {
+    return ast.args.reduce(async (currentSum: Promise<CellValue>, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, 'SUM', reduceSum)
@@ -40,8 +40,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         value = this.evaluateAst(arg, formulaAddress)
       }
 
-      return add(currentSum, value)
-    }, 0)
+      return add(await currentSum, await value)
+    }, Promise.resolve(0))
   }
 
   /**

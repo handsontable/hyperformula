@@ -117,22 +117,23 @@ function init(payload: WorkerInitPayload) {
   ctx.postMessage(response)
 }
 
-function start() {
+async function start() {
   bc.postMessage(`message from ${color}`)
 
   const myNodes = nodes.map(node => graph.getNodeById(node))
 
   console.log(color, nodes)
-  myNodes.forEach(vertex => {
+
+  for (const vertex of myNodes) {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()
-      const cellValue = interpreter.evaluateAst(formula, address)
+      const cellValue = await interpreter.evaluateAst(formula, address)
       vertex.setCellValue(cellValue)
     } else if (vertex instanceof RangeVertex) {
       vertex.clear()
     }
-  })
+  }
 
   console.log(color, graph)
 
