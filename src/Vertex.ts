@@ -68,6 +68,13 @@ export class FormulaCellVertex {
       throw Error('Value of the formula cell is not computed.')
     }
   }
+
+  public cellValueComputed(): boolean {
+    if (this.cachedCellValue != null) {
+      return true
+    }
+    return false
+  }
 }
 
 /**
@@ -88,6 +95,10 @@ export class ValueCellVertex {
    */
   public getCellValue() {
     return this.cellValue
+  }
+
+  public cellValueComputed(): boolean {
+    return true
   }
 
   /**
@@ -125,6 +136,10 @@ export class EmptyCellVertex {
    */
   public getCellValue() {
     return 0
+  }
+
+  public cellValueComputed(): boolean {
+    return true
   }
 }
 

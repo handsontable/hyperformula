@@ -2,6 +2,7 @@ import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {Vertex, CellVertex, EmptyCellVertex} from './Vertex'
 import {Graph} from './Graph'
+import {add} from "./interpreter/scalar";
 
 /**
  * Mapping from cell addresses to vertices
@@ -19,6 +20,8 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
 
   private resolvers = new Map<string, any>()
 
+  private awaitingComputation = new Set<string>()
+
   private bc: BroadcastChannel
 
   /**
@@ -33,9 +36,8 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
     this.bc.onmessage = (message) => {
       if (message.data.type === "CELL_VALUE_RESPONSE") {
         const data = message.data as CellValueResponse
-        const resolverKey = `${data.address.row},${data.address.col}`
 
-        const resolver = this.resolvers.get(resolverKey)
+        const resolver = this.resolvers.get(addressKey(data.address))
 
         if (resolver !== null) {
           resolver(data.value)
@@ -49,15 +51,25 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
           return
         }
 
-        const payload: CellValueResponse = {
-          type: "CELL_VALUE_RESPONSE",
-          address: data.address,
-          value: 0 // we don't know if value for this cell is already computed
+        const vertex = this.getCell(data.address)
+        if (vertex.cellValueComputed()) {
+          this.sendCellValue(data.address, vertex.getCellValue())
+        } else {
+          const key = addressKey(data.address)
+          this.awaitingComputation.add(key)
         }
-
-        this.bc.postMessage(payload)
       }
     }
+  }
+
+  private sendCellValue(address: SimpleCellAddress, value: CellValue) {
+    const payload: CellValueResponse = {
+      type: "CELL_VALUE_RESPONSE",
+      address: address,
+      value: value
+    }
+
+    this.bc.postMessage(payload)
   }
 
   /** @inheritDoc */
@@ -98,7 +110,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
     }
 
     const promise: Promise<CellValue> = new Promise(((resolve, reject) => {
-      this.resolvers.set(`${address.row},${address.col}`, resolve)
+      this.resolvers.set(addressKey(address), resolve)
 
       this.bc.postMessage({
         color: vertex.color,
@@ -106,10 +118,23 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       })
     }))
 
-
     return promise
   }
 
+  public setCellValue(address: SimpleCellAddress, value: CellValue) {
+    const vertex = (this.getCell(address)) as LazyCellVertex
+    const key = addressKey(address)
+    vertex.setCellValue(value)
+
+    if (this.awaitingComputation.has(key)) {
+      this.sendCellValue(address, value)
+      this.awaitingComputation.delete(key)
+    }
+  }
+}
+
+function addressKey(address: SimpleCellAddress): string {
+  return `${address.row},${address.col}`
 }
 
 type CellValueRequest = {
@@ -122,4 +147,8 @@ type CellValueResponse = {
   type: "CELL_VALUE_RESPONSE"
   address: SimpleCellAddress
   value: CellValue
+}
+
+interface LazyCellVertex {
+  setCellValue: (value: CellValue) => void
 }
