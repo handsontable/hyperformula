@@ -15,18 +15,19 @@ let addressMapping: SimpleArrayAddressMapping,
     graph: Graph<Vertex>,
     nodes: number[],
     interpreter: Interpreter,
-    color: number
+    color: number,
+    bc: BroadcastChannel
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
 }
-
 ctx.onmessage = (message) => {
   switch (message.data.type) {
     case "INIT":
       init(message.data)
       break
     case "START":
+      console.log("start!!!")
       start()
       break
   }
@@ -40,6 +41,12 @@ function init(payload: WorkerInitPayload) {
   rangeMapping = new RangeMapping()
   nodes = payload.nodes
   color = payload.color
+
+  bc = new BroadcastChannel("mybus")
+  bc.onmessage = (e) => {
+    console.log(color, "Received message", e)
+  }
+
 
   const allNodes: any[] = payload.allNodes
   for (const node of allNodes) {
@@ -104,12 +111,13 @@ function init(payload: WorkerInitPayload) {
     type: "INITIALIZED"
   }
 
-  start()
-
   ctx.postMessage(response)
 }
 
 function start() {
+  bc.postMessage(`message from ${color}`)
+
+
   interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
 
   const myNodes = nodes.map(node => graph.getNodeById(node))

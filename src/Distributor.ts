@@ -9,12 +9,15 @@ const NUMBER_OF_WORKERS = 3
 export class Distributor {
   private pool: Pool
 
+  private initialized: number
+
   constructor(
       private graph: Graph<Vertex>,
       private addressMapping: SimpleArrayAddressMapping,
   ) {
     this.pool = new Pool(NUMBER_OF_WORKERS)
     this.pool.init()
+    this.initialized = 0
   }
 
 
@@ -48,16 +51,33 @@ export class Distributor {
     this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
       return {
         data: coloredChunks.get(workerId),
-        callback: this.onWorkerMessage
+        callback: this.onWorkerMessage(this),
       }
     })
 
     return coloredChunks
   }
 
-  private onWorkerMessage(message: any) {
-    switch (message.data.type) {
-      // case "INITIALIZED": console.log("worker initialized")
+  private onWorkerMessage(that: Distributor) {
+    return (message: any) => {
+      switch (message.data.type) {
+        case "INITIALIZED": {
+          console.log(that)
+          this.initialized += 1
+          console.log(that.initialized)
+          if (this.initialized == NUMBER_OF_WORKERS) {
+            this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
+              return {
+                data: {
+                  type: "START"
+                },
+                callback: that.onWorkerMessage(that)
+              }
+            })
+          }
+          break
+        }
+      }
     }
   }
 
@@ -179,5 +199,10 @@ export type WorkerInitPayload = {
   addressMapping: Int32Array,
   sheetWidth: number,
   sheetHeight: number,
-  color: number
+  color: number,
 }
+
+export interface WorkerStartPayload {
+  type: "START"
+}
+
