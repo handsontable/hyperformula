@@ -15,7 +15,7 @@ const sheetT = T()
 const bigSum = Bs()
 const sheetA = sheetAFn()
 const sheetB = sheetBFn()
-// const sheetManyMedians = sheetManyMediansFn()
+const sheetManyMedians = sheetManyMediansFn()
 
 console.info(' === Simple Big === ')
 benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 150, numberOfRuns: 3 })

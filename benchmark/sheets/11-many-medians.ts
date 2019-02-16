@@ -1,18 +1,18 @@
 import {benchmark, ExpectedValue} from '../benchmark'
 
 export function sheet() {
-  const rows = 1000
+  const rows = 2000
   const sheet = []
 
   let current = 1
   while (current <= rows) {
     const rowToPush = [
       `${current}`,
-      `=MEDIAN(A${current}:A${rows})`,
+      `=MEDIAN(A1:A${current})`,
       `${current}`,
-      `=MEDIAN(C${current}:C${rows})`,
+      `=MEDIAN(C1:C${current})`,
       `${current}`,
-      `=MEDIAN(E${current}:E${rows})`,
+      `=MEDIAN(E1:E${current})`,
     ]
 
     sheet.push(rowToPush)
@@ -24,8 +24,11 @@ export function sheet() {
 
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
-    // { address: 'A10000', value: 10000 },
-    // { address: 'B10000', value: 3 },
-    // { address: 'C10000', value: 99980001 },
+    { address: 'A1000', value: 1000 },
+    { address: 'B1000', value: 500.5 },
+    { address: 'C1000', value: 1000 },
+    { address: 'D1000', value: 500.5 },
+    { address: 'E1000', value: 1000 },
+    { address: 'F1000', value: 500.5 },
   ]
 }
