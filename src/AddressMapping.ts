@@ -15,6 +15,7 @@ export class AddressMapping implements IAddressMapping {
    * Key of map in second level is row number.
    */
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
+  public contextColor = 0
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {
@@ -63,6 +64,10 @@ export class AddressMapping implements IAddressMapping {
   }
   
   getCellValue(address: SimpleCellAddress): Promise<CellValue> {
+    return Promise.resolve(0);
+  }
+
+  getRemoteCellValueByVertex(address: SimpleCellAddress, vertex: CellVertex): Promise<CellValue> {
     return Promise.resolve(0);
   }
 }

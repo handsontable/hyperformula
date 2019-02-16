@@ -39,4 +39,8 @@ export interface IAddressMapping {
 
 
   getCellValue(address: SimpleCellAddress): Promise<CellValue>
+
+  contextColor: number,
+
+  getRemoteCellValueByVertex(address: SimpleCellAddress, vertex: CellVertex): Promise<CellValue>
 }

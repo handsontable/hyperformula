@@ -20,6 +20,7 @@ import {concatenate} from './text'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
+  public timeSpentOnMedian = 0
 
   constructor(
       public readonly addressMapping: IAddressMapping,
@@ -47,7 +48,7 @@ export class Interpreter {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
         const value = await this.addressMapping.getCellValue(address)
         if (value === 2) {
-          await new Promise(r => setTimeout(r, 2000))
+          // await new Promise(r => setTimeout(r, 2000))
           return value
         } else {
           return value
@@ -192,7 +193,15 @@ export class Interpreter {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
         if (pluginEntry) {
           const [pluginInstance, pluginFunction] = pluginEntry
-          return await pluginInstance[pluginFunction](ast, formulaAddress)
+          if (ast.procedureName === 'MEDIAN') {
+            const startedAt = Date.now()
+            const result = await pluginInstance[pluginFunction](ast, formulaAddress)
+            const finishedAt = Date.now()
+            this.timeSpentOnMedian += (finishedAt - startedAt)
+            return result
+          } else {
+            return await pluginInstance[pluginFunction](ast, formulaAddress)
+          }
         } else {
           return cellError(ErrorType.NAME)
         }

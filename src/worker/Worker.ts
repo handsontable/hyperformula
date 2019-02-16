@@ -5,6 +5,7 @@ import {Vertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex
 import {SimpleCellAddress, CellValue} from '../Cell'
 import {Ast} from '../parser/Ast'
 import {RangeMapping} from "../RangeMapping";
+import {MedianPlugin} from "../interpreter/plugin/MedianPlugin"
 import {Interpreter} from "../interpreter/Interpreter";
 import {Config} from "../Config";
 
@@ -142,20 +143,23 @@ async function start() {
   }
   const finishedAt = Date.now()
   console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
+  // console.warn(`Time spent at Worker ${color} on computing median: ${interpreter.timeSpentOnMedian}`)
+  // console.warn(`Time spent at Worker ${color} on computing numeric list: ${MedianPlugin.timeSpentOnComputingList}`)
+  // console.warn(`Time spent at Worker ${color} on AddressMapping.getCellValue: ${MedianPlugin.timeSpentOnGetCellValue}`)
 
   console.log(color, graph)
   ctx.postMessage({
     type: "FINISHED",
   })
 
-  Promise.all([
-    addressMapping.getCellValue({ col: 0, row: 999 }),
-    addressMapping.getCellValue({ col: 1, row: 999 }),
-    addressMapping.getCellValue({ col: 2, row: 999 }),
-    addressMapping.getCellValue({ col: 3, row: 999 }),
-    addressMapping.getCellValue({ col: 4, row: 999 }),
-    addressMapping.getCellValue({ col: 5, row: 999 }),
-  ]).then((results) => {
-    console.warn(`Results: ${results}`)
-  })
+  // Promise.all([
+  //   addressMapping.getCellValue({ col: 0, row: 999 }),
+  //   addressMapping.getCellValue({ col: 1, row: 999 }),
+  //   addressMapping.getCellValue({ col: 2, row: 999 }),
+  //   addressMapping.getCellValue({ col: 3, row: 999 }),
+  //   addressMapping.getCellValue({ col: 4, row: 999 }),
+  //   addressMapping.getCellValue({ col: 5, row: 999 }),
+  // ]).then((results) => {
+  //   console.warn(`Results: ${results}`)
+  // })
 }

@@ -14,6 +14,7 @@ export class ArrayAddressMapping implements IAddressMapping {
    * It is created when building the mapping and the size of it is fixed.
    */
   private mapping: CellVertex[][]
+  public contextColor = 0
 
   /**
    * @param width - width of the stored sheet
@@ -61,6 +62,10 @@ export class ArrayAddressMapping implements IAddressMapping {
 
 
   getCellValue(address: SimpleCellAddress): Promise<CellValue> {
+    return Promise.resolve(0);
+  }
+
+  getRemoteCellValueByVertex(address: SimpleCellAddress, vertex: CellVertex): Promise<CellValue> {
     return Promise.resolve(0);
   }
 }

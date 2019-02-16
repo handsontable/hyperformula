@@ -28,7 +28,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
    * @param width - width of the stored sheet
    * @param height - height of the stored sheet
    */
-  constructor(private width: number, private height: number, private graph: Graph<Vertex>, private contextColor: number, mapping?: Int32Array) {
+  constructor(private width: number, private height: number, private graph: Graph<Vertex>, public contextColor: number, mapping?: Int32Array) {
     this.mapping = mapping || new Int32Array(width * height)
 
     this.bc = new BroadcastChannel("addressMappingBus")
@@ -113,6 +113,10 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       return Promise.resolve(vertex.getCellValue())
     }
 
+    return this.getRemoteCellValueByVertex(address, vertex)
+  }
+
+  public getRemoteCellValueByVertex(address: SimpleCellAddress, vertex: CellVertex): Promise<CellValue> {
     const promise: Promise<CellValue> = new Promise(((resolve, reject) => {
       this.resolvers.set(addressKey(address), resolve)
 
@@ -123,7 +127,6 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       }
 
       console.log(this.contextColor, "requesting cell value", payload)
-
 
       this.bc.postMessage(payload)
     }))
