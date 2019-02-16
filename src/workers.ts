@@ -22,11 +22,11 @@ async function init() {
   while (current <= rows) {
     const rowToPush = [
       `${current}`,
-      `=MEDIAN(A${current}:A${rows})`,
+      `=MEDIAN(A1:A${current})`,
       `${current}`,
-      `=MEDIAN(C${current}:C${rows})`,
+      `=MEDIAN(C1:C${current})`,
       `${current}`,
-      `=MEDIAN(E${current}:E${rows})`,
+      `=MEDIAN(E1:E${current})`,
     ]
 
     sheet.push(rowToPush)
