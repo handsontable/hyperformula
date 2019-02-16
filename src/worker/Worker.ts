@@ -41,6 +41,7 @@ ctx.onmessage = (message) => {
 function init(payload: WorkerInitPayload) {
   // console.log("payload", payload)
 
+  const startedAt = Date.now()
   // graph reconstruction
   graph = new Graph<Vertex>()
   rangeMapping = new RangeMapping()
@@ -116,6 +117,9 @@ function init(payload: WorkerInitPayload) {
     type: "INITIALIZED"
   }
 
+  const finishedAt = Date.now()
+  console.warn(`Initialization at Worker ${color} finished in ${finishedAt - startedAt}`)
+
   ctx.postMessage(response)
 }
 
@@ -124,6 +128,7 @@ async function start() {
 
   const myNodes = nodes.map(node => graph.getNodeById(node))
 
+  const startedAt = Date.now()
   for (const vertex of myNodes) {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
@@ -135,6 +140,8 @@ async function start() {
       vertex.clear()
     }
   }
+  const finishedAt = Date.now()
+  console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
 
   console.log(color, graph)
   ctx.postMessage({

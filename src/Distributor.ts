@@ -25,6 +25,7 @@ export class Distributor {
 
 
   public distribute() {
+    const startedAt = Date.now()
     let { sorted, cycled } = this.topSort()
 
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
@@ -51,6 +52,8 @@ export class Distributor {
       subgraph.edges.set(node, this.graph.adjacentNodes(node))
     })
 
+    const finishedAt = Date.now()
+    console.warn(`Distribution finished in ${finishedAt - startedAt}`)
     const finishedPromise = new Promise((resolve, reject) => {
       this.finishedPromiseResolver = resolve
       this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
