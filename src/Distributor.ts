@@ -10,6 +10,8 @@ export class Distributor {
   private pool: Pool
 
   private initialized: number
+  private finished: number
+  private finishedPromiseResolver?: any
 
   constructor(
       private graph: Graph<Vertex>,
@@ -18,10 +20,11 @@ export class Distributor {
     this.pool = new Pool(NUMBER_OF_WORKERS)
     this.pool.init()
     this.initialized = 0
+    this.finished = 0
   }
 
 
-  public distribute(): Map<Color, WorkerInitPayload> {
+  public distribute() {
     let { sorted, cycled } = this.topSort()
 
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
@@ -48,14 +51,17 @@ export class Distributor {
       subgraph.edges.set(node, this.graph.adjacentNodes(node))
     })
 
-    this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
-      return {
-        data: coloredChunks.get(workerId),
-        callback: this.onWorkerMessage(this),
-      }
+    const finishedPromise = new Promise((resolve, reject) => {
+      this.finishedPromiseResolver = resolve
+      this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
+        return {
+          data: coloredChunks.get(workerId),
+          callback: this.onWorkerMessage(this),
+        }
+      })
     })
 
-    return coloredChunks
+    return finishedPromise
   }
 
   private onWorkerMessage(that: Distributor) {
@@ -74,6 +80,12 @@ export class Distributor {
             })
           }
           break
+        }
+        case "FINISHED": {
+          this.finished += 1
+          if (this.finished == NUMBER_OF_WORKERS) {
+            this.finishedPromiseResolver()
+          }
         }
       }
     }

@@ -7,25 +7,46 @@ import {Statistics} from "./statistics/Statistics";
 import {Config} from "./Config";
 import {Distributor} from "./Distributor";
 
-function init() {
-  const sheet = [
-    ["1",     "2", "3"],
-    ["=A1", "=B1", "=C1"],
-    ["=A2", "=B2", "=C2"],
-    ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
-    ["=MEDIAN(A1:C1)"],
-  ]
+async function init() {
+  // const sheet = [
+  //   ["1",     "4", "3"],
+  //   ["=A1", "=B1", "=C1"],
+  //   ["=A2", "=B2", "=C2"],
+  //   ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
+  //   ["=MEDIAN(A1:C1)"],
+  // ]
+  const rows = 2000
+  const sheet = []
+
+  let current = 1
+  while (current <= rows) {
+    const rowToPush = [
+      `${current}`,
+      `=MEDIAN(A${current}:A${rows})`,
+      `${current}`,
+      `=MEDIAN(C${current}:C${rows})`,
+      `${current}`,
+      `=MEDIAN(E${current}:E${rows})`,
+    ]
+
+    sheet.push(rowToPush)
+    ++current
+  }
+
+
 
   const graph = new Graph<Vertex>()
   const {width, height} = findBoundaries(sheet)
   const addressMapping = new SimpleArrayAddressMapping(width, height, graph, -1)
   const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
 
+  const startedAt = Date.now()
   graphBuilder.buildGraph(sheet)
 
   const distributor = new Distributor(graph, addressMapping)
-  const result = distributor.distribute()
-  console.log(result)
+  const result = await distributor.distribute()
+  const finishedAt = Date.now()
+  console.log(`Total time: ${finishedAt - startedAt}`)
 }
 
 export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {

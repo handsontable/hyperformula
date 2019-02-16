@@ -21,6 +21,11 @@ let addressMapping: SimpleArrayAddressMapping,
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
 }
+
+export interface WorkerFinishedPayload {
+  type: "FINISHED",
+}
+
 ctx.onmessage = (message) => {
   switch (message.data.type) {
     case "INIT":
@@ -132,4 +137,7 @@ async function start() {
   }
 
   console.log(color, graph)
+  ctx.postMessage({
+    type: "FINISHED",
+  })
 }
