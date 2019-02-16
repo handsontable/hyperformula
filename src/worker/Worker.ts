@@ -126,9 +126,9 @@ function init(payload: WorkerInitPayload) {
 async function start() {
   bc.postMessage(`message from ${color}`)
 
+  const startedAt = Date.now()
   const myNodes = nodes.map(node => graph.getNodeById(node))
 
-  const startedAt = Date.now()
   for (const vertex of myNodes) {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
@@ -146,5 +146,16 @@ async function start() {
   console.log(color, graph)
   ctx.postMessage({
     type: "FINISHED",
+  })
+
+  Promise.all([
+    addressMapping.getCellValue({ col: 0, row: 999 }),
+    addressMapping.getCellValue({ col: 1, row: 999 }),
+    addressMapping.getCellValue({ col: 2, row: 999 }),
+    addressMapping.getCellValue({ col: 3, row: 999 }),
+    addressMapping.getCellValue({ col: 4, row: 999 }),
+    addressMapping.getCellValue({ col: 5, row: 999 }),
+  ]).then((results) => {
+    console.warn(`Results: ${results}`)
   })
 }
