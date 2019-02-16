@@ -12,7 +12,8 @@ function init() {
     ["1",     "2", "3"],
     ["=A1", "=B1", "=C1"],
     ["=A2", "=B2", "=C2"],
-    ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"]
+    ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
+    ["=MEDIAN(A1:C1)"],
   ]
 
   const graph = new Graph<Vertex>()

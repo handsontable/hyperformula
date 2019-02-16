@@ -44,12 +44,12 @@ export abstract class FunctionPlugin {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
-  protected computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
+  protected async computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): Promise<number[] | CellError> {
     const values: number[] = []
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
-          const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
+          const value = await this.addressMapping.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
           } else if (isCellError(value)) {
@@ -59,7 +59,7 @@ export abstract class FunctionPlugin {
           }
         }
       } else {
-        const value = this.evaluateAst(ast, formulaAddress)
+        const value = await this.evaluateAst(ast, formulaAddress)
         if (typeof value === 'number') {
           values.push(value)
         } else if (isCellError(value)) {
@@ -69,7 +69,7 @@ export abstract class FunctionPlugin {
         }
       }
     }
-    return values
+    return Promise.resolve(values)
   }
 
   protected getCellValuesFromRange(range: SimpleCellRange): CellValue[] {

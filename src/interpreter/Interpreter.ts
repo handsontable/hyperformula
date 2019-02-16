@@ -9,7 +9,7 @@ import {Vertex} from '../Vertex'
 // import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 // import {DatePlugin} from './plugin/DatePlugin'
 // import {InformationPlugin} from './plugin/InformationPlugin'
-// import {MedianPlugin} from './plugin/MedianPlugin'
+import {MedianPlugin} from './plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 // import {SumifPlugin} from './plugin/SumifPlugin'
 // import {SumprodPlugin} from './plugin/SumprodPlugin'
@@ -28,7 +28,7 @@ export class Interpreter {
       public readonly config: Config,
   ) {
     this.registerPlugins([
-        NumericAggregationPlugin
+        NumericAggregationPlugin, MedianPlugin,
       // SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin,
     ])
 
@@ -192,7 +192,7 @@ export class Interpreter {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
         if (pluginEntry) {
           const [pluginInstance, pluginFunction] = pluginEntry
-          return pluginInstance[pluginFunction](ast, formulaAddress)
+          return await pluginInstance[pluginFunction](ast, formulaAddress)
         } else {
           return cellError(ErrorType.NAME)
         }
