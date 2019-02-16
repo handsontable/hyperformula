@@ -16,6 +16,7 @@ async function init() {
   //   ["=MEDIAN(A1:C1)"],
   // ]
   const rows = 2000
+  console.warn(`Rows: ${rows}`)
   const sheet = []
 
   let current = 1
