@@ -1,7 +1,7 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const chevrotain = require('chevrotain');
-const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
+const buildLexerConfig = require('./lib/parser/LexerConfig.js').buildLexerConfig;
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // We need to compute token names, these variables can't be mangled.
