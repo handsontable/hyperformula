@@ -54,7 +54,7 @@ export class MedianPlugin extends FunctionPlugin {
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
-          const startedAt = Date.now()
+          // const startedAt = Date.now()
           let value
           const vertex = this.addressMapping.getCell(cellFromRange)
           if (vertex.color === this.addressMapping.contextColor) {
@@ -63,8 +63,8 @@ export class MedianPlugin extends FunctionPlugin {
             value = await this.addressMapping.getRemoteCellValueByVertex(cellFromRange, vertex)
           }
           // const value = await this.addressMapping.getCellValue(cellFromRange)
-          const finishedAt = Date.now()
-          MedianPlugin.timeSpentOnGetCellValue += (finishedAt - startedAt)
+          // const finishedAt = Date.now()
+          // MedianPlugin.timeSpentOnGetCellValue += (finishedAt - startedAt)
           if (typeof value === 'number') {
             values.push(value)
           } else if (isCellError(value)) {
