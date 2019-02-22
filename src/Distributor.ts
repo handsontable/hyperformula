@@ -42,8 +42,11 @@ export class Distributor {
 
     for (let i=0; i<sorted.length; ++i) {
       const colors : Set<number> = new Set()
+      colorMap.get(sorted[i].color)!.push(sorted[i])
       this.graph.getEdges().get(sorted[i])!.forEach(vertex => {
-        colors.add(vertex.color)
+        if (vertex.color != sorted[i].color) {
+          colors.add(vertex.color)
+        }
         let tempMap = edges.get(vertex.color)!
 
         if (!tempMap.has(sorted[i])) {

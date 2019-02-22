@@ -14,7 +14,7 @@ const ctx: Worker = self as any;
 let addressMapping: SimpleArrayAddressMapping,
     rangeMapping: RangeMapping,
     graph: Graph<Vertex>,
-    nodes: any[],
+    nodes: Vertex[],
     interpreter: Interpreter,
     color: number,
     bc: BroadcastChannel
@@ -46,8 +46,9 @@ function init(payload: WorkerInitPayload) {
   // graph reconstruction
   graph = new Graph<Vertex>()
   rangeMapping = new RangeMapping()
-  nodes = payload.nodes
   color = payload.color
+  nodes = []
+  let serializedNodes = payload.nodes as any[]
 
   bc = new BroadcastChannel("mybus")
   bc.onmessage = (e) => {
@@ -55,7 +56,7 @@ function init(payload: WorkerInitPayload) {
   }
 
 
-  for (const node of nodes) {
+  for (const node of serializedNodes) {
     let vertex;
     switch (node.kind) {
       case "formula": {
@@ -96,6 +97,7 @@ function init(payload: WorkerInitPayload) {
         throw new Error()
     }
     graph.addNode(vertex)
+    nodes.push(vertex)
   }
 
   const numberOfEdges = payload.edges.length / 2
