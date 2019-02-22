@@ -4,8 +4,6 @@ import {AddressMapping} from "./AddressMapping";
 import {SimpleArrayAddressMapping} from "./SimpleArrayAddressMapping";
 import {Pool} from "./worker/Pool";
 
-const NUMBER_OF_WORKERS = 3
-
 export class Distributor {
   private pool: Pool
 
@@ -16,8 +14,9 @@ export class Distributor {
   constructor(
       private graph: Graph<Vertex>,
       private addressMapping: SimpleArrayAddressMapping,
+      private numberOfWorkers: number = 3
   ) {
-    this.pool = new Pool(NUMBER_OF_WORKERS)
+    this.pool = new Pool(this.numberOfWorkers)
     this.pool.init()
     this.initialized = 0
     this.finished = 0
@@ -29,13 +28,13 @@ export class Distributor {
     let { sorted, cycled } = this.topSort()
 
     const colorMap : Map<Color, Vertex[]> = new Map()
-    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+    for (let i=0; i<this.numberOfWorkers; ++i) {
       colorMap.set(i, [])
     }
 
     const edges : Map<Color, Map<Vertex, Set<Vertex>>> = new Map()
     const edgesCount : Map<Color, number> = new Map()
-    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+    for (let i=0; i<this.numberOfWorkers; ++i) {
       edges.set(i, new Map())
       edgesCount.set(i, 0)
     }
@@ -61,7 +60,7 @@ export class Distributor {
 
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
 
-    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+    for (let i=0; i<this.numberOfWorkers; ++i) {
       coloredChunks.set(i, {
         type: "INIT",
         nodes: colorMap.get(i)!,
@@ -93,7 +92,7 @@ export class Distributor {
       switch (message.data.type) {
         case "INITIALIZED": {
           this.initialized += 1
-          if (this.initialized == NUMBER_OF_WORKERS) {
+          if (this.initialized == this.numberOfWorkers) {
             this.pool.addWorkerTaskForAllWorkers((workerId: number) => {
               return {
                 data: {
@@ -107,7 +106,7 @@ export class Distributor {
         }
         case "FINISHED": {
           this.finished += 1
-          if (this.finished == NUMBER_OF_WORKERS) {
+          if (this.finished == this.numberOfWorkers) {
             this.finishedPromiseResolver()
           }
         }
@@ -198,14 +197,14 @@ export class Distributor {
 
   private colorNodes(nodes: Vertex[]): Vertex[] {
     let currentColor = 0
-    nodes.forEach(node => node.color = (++currentColor) % NUMBER_OF_WORKERS)
+    nodes.forEach(node => node.color = (++currentColor) % this.numberOfWorkers)
     return nodes
   }
 
   private initDominantColors(): Map<Vertex, Color[]> {
     const result = new Map()
     this.graph.getNodes().forEach((node) => {
-      result.set(node, new Int32Array(NUMBER_OF_WORKERS))
+      result.set(node, new Int32Array(this.numberOfWorkers))
     })
     return result
   }

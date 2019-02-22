@@ -21,7 +21,8 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     })]
   }
   const configuration = {
-    entry: './src/workers.ts',
+    // entry: './src/workers.ts',
+    entry: './benchmark/webworkers/benchmark.ts',
     module: {
       rules: [
         {
@@ -52,10 +53,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
     optimization: (mode === 'production' ? optimization : undefined),
     performance: {
       hints: false
-    },
-    plugins: [
-      new HtmlWebpackPlugin()
-    ],
+    }
   }
   return configuration
 };

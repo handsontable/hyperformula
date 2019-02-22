@@ -1,5 +1,3 @@
-import {benchmark, ExpectedValue} from '../benchmark'
-
 export function sheet() {
   const rows = 5000
 
@@ -23,7 +21,7 @@ export function sheet() {
   return sheet
 }
 
-export function expectedValues(sheet: string[][]): ExpectedValue[] {
+export function expectedValues(sheet: string[][]) {
   return [
     {address: 'A5000', value: 5000},
     {address: 'B5000', value: 2},

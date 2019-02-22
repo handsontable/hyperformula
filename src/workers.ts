@@ -69,6 +69,7 @@ async function init() {
 
 
 
+
   const graph = new Graph<Vertex>()
   const {width, height} = findBoundaries(sheet)
   const addressMapping = new SimpleArrayAddressMapping(width, height, graph, -1)
