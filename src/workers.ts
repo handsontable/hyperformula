@@ -15,24 +15,57 @@ async function init() {
   //   ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
   //   ["=MEDIAN(A1:C1)"],
   // ]
-   const rows = 2000
-   console.warn(`Rows: ${rows}`)
-   const sheet = []
+   // const rows = 2000
+   // console.warn(`Rows: ${rows}`)
+   // const sheet = []
   
-   let current = 1
-   while (current <= rows) {
-     const rowToPush = [
-       `${current}`,
-       `=MEDIAN(A1:A${current})`,
-       `${current}`,
-       `=MEDIAN(C1:C${current})`,
-       // `${current}`,
-       // `=MEDIAN(E1:E${current})`,
-     ]
+   // let current = 1
+   // while (current <= rows) {
+   //   const rowToPush = [
+   //     `${current}`,
+   //     `=MEDIAN(A1:A${current})`,
+   //     `${current}`,
+   //     `=MEDIAN(C1:C${current})`,
+   //     `${current}`,
+   //     `=MEDIAN(E1:E${current})`,
+   //   ]
   
-     sheet.push(rowToPush)
-     ++current
-   }
+   //   sheet.push(rowToPush)
+   //   ++current
+   // }
+  const rows = 2000
+  console.warn(`Rows: ${rows}`)
+  const sheet = []
+  let dependent = 0
+
+  let current = 1
+  while (current <= rows) {
+    let rowToPush
+    if (current % 1 === 0) {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, C${current})`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, E${current})`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, A${current})`,
+      ]
+      dependent++
+    } else {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, A1)`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, C1)`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, E1)`,
+      ]
+    }
+
+    sheet.push(rowToPush)
+    ++current
+  }
+  console.warn(`Dependent rows: ${dependent}`)
 
 
 
