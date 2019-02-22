@@ -14,7 +14,7 @@ const ctx: Worker = self as any;
 let addressMapping: SimpleArrayAddressMapping,
     rangeMapping: RangeMapping,
     graph: Graph<Vertex>,
-    nodes: number[],
+    nodes: any[],
     interpreter: Interpreter,
     color: number,
     bc: BroadcastChannel
@@ -55,8 +55,7 @@ function init(payload: WorkerInitPayload) {
   }
 
 
-  const allNodes: any[] = payload.allNodes
-  for (const node of allNodes) {
+  for (const node of nodes) {
     let vertex;
     switch (node.kind) {
       case "formula": {
@@ -99,9 +98,9 @@ function init(payload: WorkerInitPayload) {
     graph.addNode(vertex)
   }
 
-  const numberOfEdges = payload.allEdges.length / 2
+  const numberOfEdges = payload.edges.length / 2
   for (let i = 0; i < numberOfEdges; i++) {
-    graph.addEdgeByIds(payload.allEdges[i * 2], payload.allEdges[i * 2 + 1])
+    graph.addEdgeByIds(payload.edges[i * 2], payload.edges[i * 2 + 1])
   }
 
   addressMapping = new SimpleArrayAddressMapping(
@@ -128,9 +127,11 @@ async function start() {
   bc.postMessage(`message from ${color}`)
 
   const startedAt = Date.now()
-  const myNodes = nodes.map(node => graph.getNodeById(node))
 
-  for (const vertex of myNodes) {
+  for (const vertex of nodes) {
+    if (vertex.color != color) {
+      continue
+    }
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()

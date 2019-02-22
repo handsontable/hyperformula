@@ -28,29 +28,47 @@ export class Distributor {
     const startedAt = Date.now()
     let { sorted, cycled } = this.topSort()
 
+    const colorMap : Map<Color, Vertex[]> = new Map()
+    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+      colorMap.set(i, [])
+    }
+
+    const edges : Map<Color, Map<Vertex, Set<Vertex>>> = new Map()
+    const edgesCount : Map<Color, number> = new Map()
+    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+      edges.set(i, new Map())
+      edgesCount.set(i, 0)
+    }
+
+    for (let i=0; i<sorted.length; ++i) {
+      const colors : Set<number> = new Set()
+      this.graph.getEdges().get(sorted[i])!.forEach(vertex => {
+        colors.add(vertex.color)
+        let tempMap = edges.get(vertex.color)!
+
+        if (!tempMap.has(sorted[i])) {
+          tempMap.set(sorted[i], new Set())
+        }
+
+        tempMap.get(sorted[i])!.add(vertex)
+        edgesCount.set(vertex.color, edgesCount.get(vertex.color)!+1)
+      })
+      colors.forEach(color => colorMap.get(color)!.push(sorted[i]))
+    }
+
     const coloredChunks: Map<Color, WorkerInitPayload> = new Map()
 
-    const serializedEdges = this.serializeEdges(this.graph.getEdges(), this.graph.edgesCount())
-
-    sorted.forEach(node => {
-      if (!coloredChunks.has(node.color)) {
-        coloredChunks.set(node.color, {
-          type: "INIT",
-          nodes: [],
-          edges: new Map(),
-          allEdges: serializedEdges,
-          allNodes: Array.from(this.graph.nodes.values()),
-          addressMapping: this.addressMapping.mapping,
-          sheetWidth: this.addressMapping.getWidth(),
-          sheetHeight: this.addressMapping.getHeight(),
-          color: node.color
-        })
-      }
-
-      const subgraph = coloredChunks.get(node.color)!
-      subgraph.nodes.push(node.vertexId)
-      subgraph.edges.set(node, this.graph.adjacentNodes(node))
-    })
+    for (let i=0; i<NUMBER_OF_WORKERS; ++i) {
+      coloredChunks.set(i, {
+        type: "INIT",
+        nodes: colorMap.get(i)!,
+        edges: this.serializeEdges(edges.get(i)!, edgesCount.get(i)!),
+        addressMapping: this.addressMapping.mapping,
+        sheetWidth: this.addressMapping.getWidth(),
+        sheetHeight: this.addressMapping.getHeight(),
+        color: i
+      })
+    }
 
     const finishedAt = Date.now()
     console.warn(`Distribution finished in ${finishedAt - startedAt}`)
@@ -205,10 +223,8 @@ export type Color = number
 
 export type WorkerInitPayload = {
   type: "INIT",
-  nodes: number[],
-  edges: Map<Vertex, Set<Vertex>>,
-  allNodes: Vertex[],
-  allEdges: Int32Array,
+  nodes: Vertex[],
+  edges: Int32Array,
   addressMapping: Int32Array,
   sheetWidth: number,
   sheetHeight: number,

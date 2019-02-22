@@ -8,31 +8,31 @@ import {Config} from "./Config";
 import {Distributor} from "./Distributor";
 
 async function init() {
-  // const sheet = [
-  //   ["1",     "4", "3"],
-  //   ["=A1", "=B1", "=C1"],
-  //   ["=A2", "=B2", "=C2"],
-  //   ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
-  //   ["=MEDIAN(A1:C1)"],
-  // ]
-  const rows = 2000
-  console.warn(`Rows: ${rows}`)
-  const sheet = []
-
-  let current = 1
-  while (current <= rows) {
-    const rowToPush = [
-      `${current}`,
-      `=MEDIAN(A1:A${current})`,
-      `${current}`,
-      `=MEDIAN(C1:C${current})`,
-      `${current}`,
-      `=MEDIAN(E1:E${current})`,
-    ]
-
-    sheet.push(rowToPush)
-    ++current
-  }
+  const sheet = [
+    ["1",     "4", "3"],
+    ["=A1", "=B1", "=C1"],
+    ["=A2", "=B2", "=C2"],
+    ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
+    ["=MEDIAN(A1:C1)"],
+  ]
+  // const rows = 2000
+  // console.warn(`Rows: ${rows}`)
+  // const sheet = []
+  //
+  // let current = 1
+  // while (current <= rows) {
+  //   const rowToPush = [
+  //     `${current}`,
+  //     `=MEDIAN(A1:A${current})`,
+  //     `${current}`,
+  //     `=MEDIAN(C1:C${current})`,
+  //     `${current}`,
+  //     `=MEDIAN(E1:E${current})`,
+  //   ]
+  //
+  //   sheet.push(rowToPush)
+  //   ++current
+  // }
 
 
 
