@@ -49,11 +49,14 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       if (message.data.type === "CELL_VALUE_REQUEST") {
         const data = message.data as CellValueRequest
 
-        if (data.color !== contextColor) {
-          return
-        }
+        // if (data.color !== contextColor) {
+        //   return
+        // }
 
         const vertex = this.getCell(data.address)
+        if (!vertex || vertex.color != this.contextColor) {
+          return
+        }
         if (vertex.cellValueComputed()) {
           this.sendCellValue(data.address, vertex.getCellValue())
         } else {
@@ -71,7 +74,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       value: value
     }
 
-    console.log(this.contextColor, "sending cell value", payload)
+    // console.log(this.contextColor, "sending cell value", payload)
 
     this.bc.postMessage(payload)
   }
@@ -113,20 +116,19 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       return Promise.resolve(vertex.getCellValue())
     }
 
-    return this.getRemoteCellValueByVertex(address, vertex)
+    return this.getRemoteCellValueByVertex(address)
   }
 
-  public getRemoteCellValueByVertex(address: SimpleCellAddress, vertex: CellVertex): Promise<CellValue> {
+  public getRemoteCellValueByVertex(address: SimpleCellAddress): Promise<CellValue> {
     const promise: Promise<CellValue> = new Promise(((resolve, reject) => {
       this.resolvers.set(addressKey(address), resolve)
 
       const payload: CellValueRequest = {
         type: "CELL_VALUE_REQUEST",
-        color: vertex.color,
         address: address
       }
 
-      console.log(this.contextColor, "requesting cell value", payload)
+      // console.log(this.contextColor, "requesting cell value", payload)
 
       this.bc.postMessage(payload)
     }))
@@ -152,7 +154,6 @@ function addressKey(address: SimpleCellAddress): string {
 
 type CellValueRequest = {
   type: "CELL_VALUE_REQUEST"
-  color: number
   address: SimpleCellAddress
 }
 

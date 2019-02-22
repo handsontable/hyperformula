@@ -15,7 +15,7 @@ async function init() {
   //   ["=SUM(A1,A2,A3)+B4", "=B3+C4", "=C3"],
   //   ["=MEDIAN(A1:C1)"],
   // ]
-   const rows = 8000
+   const rows = 2000
    console.warn(`Rows: ${rows}`)
    const sheet = []
   
@@ -26,8 +26,8 @@ async function init() {
        `=MEDIAN(A1:A${current})`,
        `${current}`,
        `=MEDIAN(C1:C${current})`,
-       `${current}`,
-       `=MEDIAN(E1:E${current})`,
+       // `${current}`,
+       // `=MEDIAN(E1:E${current})`,
      ]
   
      sheet.push(rowToPush)

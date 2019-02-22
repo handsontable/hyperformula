@@ -40,7 +40,7 @@ ctx.onmessage = (message) => {
 }
 
 function init(payload: WorkerInitPayload) {
-  // console.log("payload", payload)
+  console.log("payload", payload)
 
   const startedAt = Date.now()
   // graph reconstruction

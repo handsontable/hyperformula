@@ -57,10 +57,10 @@ export class MedianPlugin extends FunctionPlugin {
           // const startedAt = Date.now()
           let value
           const vertex = this.addressMapping.getCell(cellFromRange)
-          if (vertex.color === this.addressMapping.contextColor) {
+          if (vertex && vertex.color === this.addressMapping.contextColor) {
             value = vertex.getCellValue()
           } else {
-            value = await this.addressMapping.getRemoteCellValueByVertex(cellFromRange, vertex)
+            value = await this.addressMapping.getRemoteCellValueByVertex(cellFromRange)
           }
           // const value = await this.addressMapping.getCellValue(cellFromRange)
           // const finishedAt = Date.now()
