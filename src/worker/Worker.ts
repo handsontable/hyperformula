@@ -20,7 +20,8 @@ let addressMapping: SimpleArrayAddressMapping,
     nodes: Vertex[],
     interpreter: Interpreter,
     color: number,
-    bc: BroadcastChannel
+    bc: BroadcastChannel,
+    numberOfWorkers: number
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
@@ -51,6 +52,7 @@ function init(payload: WorkerInitPayload) {
   rangeMapping = new RangeMapping()
   color = payload.color
   nodes = []
+  numberOfWorkers = payload.numberOfWorkers
   let serializedNodes = payload.nodes as any[]
 
   bc = new BroadcastChannel("mybus")
@@ -164,50 +166,55 @@ async function start() {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()
-      let relativeDependencies: RelativeDependency[] = []
-      collectDependencies(formula, relativeDependencies)
-      const dependencies = absolutizeDependencies(relativeDependencies, address)
-      const dependenciesPromises = []
-      for (let i = 0; i < dependencies.length; i++) {
-        if (Array.isArray(dependencies[i])) {
-          const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
-          const depRange = simpleCellRange(depDummyRange[0], depDummyRange[1])
-          const rangeKey = addressMapping.rangeKey(depRange)
-          if (addressMapping.remoteRangePromiseCache.has(rangeKey)) {
-            dependenciesPromises.push(addressMapping.remoteRangePromiseCache.get(rangeKey))
-          } else {
-            const promisesForRange = []
-            const { smallerRangePromise, restRanges } = findSmallerCacheRange(addressMapping, [depRange])
-            if (smallerRangePromise) {
-              promisesForRange.push(smallerRangePromise)
-            }
-            for (const cellFromRange of generateCellsFromRangeGenerator(restRanges[0])) {
-              const vertexId = addressMapping.getVertexId(cellFromRange)
-              if (addressMapping.remoteCache.has(vertexId)) {
-                continue
-              } else if (addressMapping.remotePromiseCache.has(vertexId)) {
-                promisesForRange.push(addressMapping.remotePromiseCache.get(vertexId))
-              } else {
-                promisesForRange.push(addressMapping.getRemoteCellValueByVertex(cellFromRange))
+      let cellValue
+      if (numberOfWorkers > 1) {
+        let relativeDependencies: RelativeDependency[] = []
+        collectDependencies(formula, relativeDependencies)
+        const dependencies = absolutizeDependencies(relativeDependencies, address)
+        const dependenciesPromises = []
+        for (let i = 0; i < dependencies.length; i++) {
+          if (Array.isArray(dependencies[i])) {
+            const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
+            const depRange = simpleCellRange(depDummyRange[0], depDummyRange[1])
+            const rangeKey = addressMapping.rangeKey(depRange)
+            if (addressMapping.remoteRangePromiseCache.has(rangeKey)) {
+              dependenciesPromises.push(addressMapping.remoteRangePromiseCache.get(rangeKey))
+            } else {
+              const promisesForRange = []
+              const { smallerRangePromise, restRanges } = findSmallerCacheRange(addressMapping, [depRange])
+              if (smallerRangePromise) {
+                promisesForRange.push(smallerRangePromise)
               }
+              for (const cellFromRange of generateCellsFromRangeGenerator(restRanges[0])) {
+                const vertexId = addressMapping.getVertexId(cellFromRange)
+                if (addressMapping.remoteCache.has(vertexId)) {
+                  continue
+                } else if (addressMapping.remotePromiseCache.has(vertexId)) {
+                  promisesForRange.push(addressMapping.remotePromiseCache.get(vertexId))
+                } else {
+                  promisesForRange.push(addressMapping.getRemoteCellValueByVertex(cellFromRange))
+                }
+              }
+              const rangePromise = Promise.all(promisesForRange)
+              addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
+              dependenciesPromises.push(rangePromise)
             }
-            const rangePromise = Promise.all(promisesForRange)
-            addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
-            dependenciesPromises.push(rangePromise)
-          }
-        } else {
-          const dep = dependencies[i] as SimpleCellAddress
-          const vertexId = addressMapping.getVertexId(dep)
-          if (addressMapping.remoteCache.has(vertexId)) {
-            continue
-          } else if (addressMapping.remotePromiseCache.has(vertexId)) {
-            dependenciesPromises.push(addressMapping.remotePromiseCache.get(vertexId))
           } else {
-            dependenciesPromises.push(addressMapping.getRemoteCellValueByVertex(dep))
+            const dep = dependencies[i] as SimpleCellAddress
+            const vertexId = addressMapping.getVertexId(dep)
+            if (addressMapping.remoteCache.has(vertexId)) {
+              continue
+            } else if (addressMapping.remotePromiseCache.has(vertexId)) {
+              dependenciesPromises.push(addressMapping.remotePromiseCache.get(vertexId))
+            } else {
+              dependenciesPromises.push(addressMapping.getRemoteCellValueByVertex(dep))
+            }
           }
         }
+        cellValue = interpreter.evaluateAst(formula, address)
+      } else {
+        cellValue = interpreter.evaluateAst(formula, address)
       }
-      const cellValue = await interpreter.evaluateAst(formula, address)
 
       addressMapping.setCellValue(address, cellValue)
     } else if (vertex instanceof RangeVertex) {

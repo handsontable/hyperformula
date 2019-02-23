@@ -106,7 +106,8 @@ function runBenchmark(fun: any, benchmarkName: string) {
   setTimeout(async () => {
     working = true
     console.info(`=== ${benchmarkName} ===`)
-    await benchmark2(fun())
+    await benchmark(fun(), numberOfWorkers)
+    // await benchmark2(fun())
     working = false
     toggle()
   }, 500)

@@ -68,6 +68,7 @@ export class Distributor {
         addressMapping: this.addressMapping.mapping,
         sheetWidth: this.addressMapping.getWidth(),
         sheetHeight: this.addressMapping.getHeight(),
+        numberOfWorkers: this.numberOfWorkers,
         color: i
       })
     }
@@ -231,6 +232,7 @@ export type WorkerInitPayload = {
   sheetWidth: number,
   sheetHeight: number,
   color: number,
+  numberOfWorkers: number,
 }
 
 export interface WorkerStartPayload {
