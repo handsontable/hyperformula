@@ -26,13 +26,13 @@ export class MedianPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public async median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Promise<CellValue> {
+  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length === 0) {
       return cellError(ErrorType.NA)
     }
 
     const startedAt = Date.now()
-    const values = await this.computeNumericListOfValues(ast.args, formulaAddress)
+    const values = this.computeNumericListOfValues(ast.args, formulaAddress)
     const finishedAt = Date.now()
     MedianPlugin.timeSpentOnComputingList += (finishedAt - startedAt)
 
@@ -49,20 +49,20 @@ export class MedianPlugin extends FunctionPlugin {
     }
   }
 
-  public async computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): Promise<number[] | CellError> {
+  public computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
     const values: number[] = []
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
           // const startedAt = Date.now()
-          let value
-          const vertex = this.addressMapping.getCell(cellFromRange)
-          if (vertex && vertex.color === this.addressMapping.contextColor) {
-            value = vertex.getCellValue()
-          } else {
-            value = await this.addressMapping.getRemoteCellValueByVertex(cellFromRange)
-          }
-          // const value = await this.addressMapping.getCellValue(cellFromRange)
+          // let value 
+          // const vertex = this.addressMapping.getCell(cellFromRange)
+          // if (vertex && vertex.color === this.addressMapping.contextColor) {
+          //   value = vertex.getCellValue()
+          // } else {
+          //   value = await this.addressMapping.getRemoteCellValueByVertex(cellFromRange)
+          // }
+          const value = this.addressMapping.getCellValue(cellFromRange)
           // const finishedAt = Date.now()
           // MedianPlugin.timeSpentOnGetCellValue += (finishedAt - startedAt)
           if (typeof value === 'number') {
@@ -74,7 +74,7 @@ export class MedianPlugin extends FunctionPlugin {
           }
         }
       } else {
-        const value = await this.evaluateAst(ast, formulaAddress)
+        const value = this.evaluateAst(ast, formulaAddress)
         if (typeof value === 'number') {
           values.push(value)
         } else if (isCellError(value)) {
@@ -84,6 +84,6 @@ export class MedianPlugin extends FunctionPlugin {
         }
       }
     }
-    return Promise.resolve(values)
+    return values
   }
 }

@@ -42,11 +42,11 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public async evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Promise<CellValue> {
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
-        const value = await this.addressMapping.getCellValue(address)
+        const value = this.addressMapping.getCellValue(address)
         if (value === 2) {
           // await new Promise(r => setTimeout(r, 2000))
           return value
@@ -59,13 +59,13 @@ export class Interpreter {
         return ast.value
       }
       case AstNodeType.CONCATENATE_OP: {
-        const left = await this.evaluateAst(ast.left, formulaAddress)
-        const right = await this.evaluateAst(ast.right, formulaAddress)
+        const left = this.evaluateAst(ast.left, formulaAddress)
+        const right = this.evaluateAst(ast.right, formulaAddress)
         return concatenate([left, right])
       }
       case AstNodeType.EQUALS_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (isCellError(leftResult)) {
           return leftResult
@@ -81,8 +81,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.NOT_EQUAL_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (isCellError(leftResult)) {
           return leftResult
@@ -98,8 +98,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult > rightResult
@@ -108,8 +108,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult < rightResult
@@ -118,8 +118,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult >= rightResult
@@ -128,8 +128,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult <= rightResult
@@ -138,13 +138,13 @@ export class Interpreter {
         }
       }
       case AstNodeType.PLUS_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         return addStrict(leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
@@ -152,8 +152,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.TIMES_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
@@ -161,8 +161,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.POWER_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return Math.pow(leftResult, rightResult)
         } else {
@@ -170,8 +170,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.DIV_OP: {
-        const leftResult = await this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = await this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
             return cellError(ErrorType.DIV_BY_ZERO)
@@ -182,7 +182,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        const value = await this.evaluateAst(ast.value, formulaAddress)
+        const value = this.evaluateAst(ast.value, formulaAddress)
         if (typeof value === 'number') {
           return -value
         } else {
@@ -195,12 +195,12 @@ export class Interpreter {
           const [pluginInstance, pluginFunction] = pluginEntry
           if (ast.procedureName === 'MEDIAN') {
             const startedAt = Date.now()
-            const result = await pluginInstance[pluginFunction](ast, formulaAddress)
+            const result = pluginInstance[pluginFunction](ast, formulaAddress)
             const finishedAt = Date.now()
             this.timeSpentOnMedian += (finishedAt - startedAt)
             return result
           } else {
-            return await pluginInstance[pluginFunction](ast, formulaAddress)
+            return pluginInstance[pluginFunction](ast, formulaAddress)
           }
         } else {
           return cellError(ErrorType.NAME)

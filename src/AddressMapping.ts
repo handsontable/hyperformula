@@ -63,8 +63,8 @@ export class AddressMapping implements IAddressMapping {
     return this.mapping
   }
   
-  getCellValue(address: SimpleCellAddress): Promise<CellValue> {
-    return Promise.resolve(0);
+  getCellValue(address: SimpleCellAddress): CellValue {
+    return 0;
   }
 
   getRemoteCellValueByVertex(address: SimpleCellAddress): Promise<CellValue> {

@@ -61,8 +61,8 @@ export class ArrayAddressMapping implements IAddressMapping {
   }
 
 
-  getCellValue(address: SimpleCellAddress): Promise<CellValue> {
-    return Promise.resolve(0);
+  getCellValue(address: SimpleCellAddress): CellValue {
+    return 0;
   }
 
   getRemoteCellValueByVertex(address: SimpleCellAddress): Promise<CellValue> {

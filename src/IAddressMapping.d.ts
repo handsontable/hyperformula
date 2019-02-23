@@ -38,7 +38,7 @@ export interface IAddressMapping {
   getWidth(): number,
 
 
-  getCellValue(address: SimpleCellAddress): Promise<CellValue>
+  getCellValue(address: SimpleCellAddress): CellValue,
 
   contextColor: number,
 
