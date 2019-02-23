@@ -78,7 +78,7 @@ export function isFormula(text: string): Boolean {
  * @param deps - list of addresses in R0C0 format
  * @param baseAddress - base address with regard to which make a convertion
  */
-const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
+export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
   return deps.map((dep) => {
     if (Array.isArray(dep)) {
       return [getAbsoluteAddress(dep[0], baseAddress), getAbsoluteAddress(dep[1], baseAddress)] as CellDependency

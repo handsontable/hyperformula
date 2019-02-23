@@ -25,7 +25,7 @@ export class Cache {
   }
 }
 
-const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) => {
+export const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:

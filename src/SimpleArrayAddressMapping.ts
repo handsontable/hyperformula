@@ -1,4 +1,4 @@
-import {CellValue, SimpleCellAddress} from './Cell'
+import {CellValue, SimpleCellAddress, SimpleCellRange} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {Vertex, CellVertex, EmptyCellVertex} from './Vertex'
 import {Graph} from './Graph'
@@ -22,6 +22,11 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
 
   private awaitingComputation = new Set<string>()
 
+  public remoteCache = new Map<number, CellValue>()
+
+  public remotePromiseCache = new Map<number, Promise<CellValue>>()
+  public remoteRangePromiseCache = new Map<string, Promise<any>>()
+
   private bc: BroadcastChannel
 
   /**
@@ -42,6 +47,8 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
         if (resolver === undefined) {
           return
         }
+        const vertexId = this.getVertexId(data.address)
+        this.remoteCache.set(vertexId, data.value)
 
         resolver(data.value)
       }
@@ -88,6 +95,10 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
     return this.graph.getNodeById(vertexId) as CellVertex
   }
 
+  public getVertexId(address: SimpleCellAddress): number {
+    return this.mapping[address.row * this.width + address.col]
+  }
+
   /** @inheritDoc */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     this.mapping[address.row * this.width + address.col] = newVertex.vertexId
@@ -132,6 +143,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
 
       this.bc.postMessage(payload)
     }))
+    this.remotePromiseCache.set(this.getVertexId(address), promise)
 
     return promise
   }
@@ -145,6 +157,10 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       this.sendCellValue(address, value)
       this.awaitingComputation.delete(key)
     }
+  }
+
+  public rangeKey(range: SimpleCellRange): string {
+    return `${range.start.col},${range.start.row},${range.end.col},${range.end.row}`
   }
 }
 
