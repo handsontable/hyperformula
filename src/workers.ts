@@ -41,7 +41,7 @@ async function init() {
   let current = 1
   while (current <= rows) {
     let rowToPush
-    if (current % 20 === 0) {
+    if (current % 10 === 0) {
       rowToPush = [
         `${current}`,
         `=MEDIAN(A1, A1:A${current}, C${current})`,

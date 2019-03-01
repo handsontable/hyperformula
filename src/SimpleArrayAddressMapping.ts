@@ -132,6 +132,16 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
     }
   }
 
+  public getCellValueIfHere(address: SimpleCellAddress): CellValue | null {
+    const vertex = this.getCell(address)
+
+    if (vertex && vertex.color === this.contextColor) {
+      return vertex.getCellValue()
+    } else {
+      return null
+    }
+  }
+
   public getRemoteCellValueByVertex(address: SimpleCellAddress): Promise<CellValue> {
     const promise = new Promise<CellValue>((resolve, reject) => {
       this.resolvers.set(addressKey(address), resolve)

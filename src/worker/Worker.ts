@@ -39,6 +39,9 @@ let addressMapping: SimpleArrayAddressMapping,
     numberOfWorkers: number
 
 let blockedNodesPromises = new Map<number, Promise<any>>()
+let blockedNodesResolvers = new Map<number, any>()
+let blockedCount = 0
+const resolvedNodes: number[] = []
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
@@ -181,9 +184,6 @@ async function start() {
   let waitingForDependencies = 0.0
   let dependencyProcessing = 0.0
 
-  let blockedCount = 0
-  const resolvedNodes: number[] = []
-
   for (let j = 0; j < nodes.length; j++) {
     const vertex = nodes[j]
 
@@ -199,6 +199,8 @@ async function start() {
     if (!(vertex instanceof FormulaCellVertex)) {
       continue;
     }
+
+    processBlockedNodes()
 
     const address = vertex.getAddress()
     const formula = vertex.getFormula()
@@ -252,31 +254,34 @@ async function start() {
 
       if (dependenciesPromises.length > 0) {
         blockedCount++
-        const dependenciesPromise = Promise.all(dependenciesPromises)
-        blockedNodesPromises.set(vertex.vertexId, dependenciesPromise)
-        dependenciesPromise.then(() => {
-          resolvedNodes.push(j);
-          blockedCount--
+        const nodePromise = new Promise((resolve, reject) => {
+          blockedNodesResolvers.set(vertex.vertexId, resolve)
         })
+        Promise.all(dependenciesPromises).then(() => {
+          resolvedNodes.push(j);
+          blockedCount--;
+        })
+        blockedNodesPromises.set(vertex.vertexId, nodePromise)
         continue
-      } 
+      }
+
       // const startedAt = Date.now()
       // await Promise.all(dependenciesPromises)
       // const finishedAt = Date.now()
       // waitingForDependencies += (finishedAt - startedAt)
 
-      let cellValue = interpreter.evaluateAst(formula, address)
-      addressMapping.setCellValue(address, cellValue)
+      // let cellValue = interpreter.evaluateAst(formula, address)
+      // addressMapping.setCellValue(address, cellValue)
     }
 
-    while (blockedCount > 0 || resolvedNodes.length > 0) {
-      while (resolvedNodes.length > 0) {
-        const node = nodes[resolvedNodes.shift()!]
-        let cellValue = interpreter.evaluateAst(formula, address)
-        addressMapping.setCellValue(address, cellValue)
-      }
-      await sleep(1)
-    }
+    let cellValue = interpreter.evaluateAst(formula, address)
+    addressMapping.setCellValue(address, cellValue)
+  }
+
+  console.warn(color, `Blocked: ${blockedCount}, resolvedNodes: ${resolvedNodes}`)
+  while (blockedCount > 0 || resolvedNodes.length > 0) {
+    processBlockedNodes()
+    await sleep(1)
   }
 
   const finishedAt = Date.now()
@@ -284,11 +289,29 @@ async function start() {
   // console.warn(`waiting for deps at ${color}:   ${waitingForDependencies}`)
   // console.warn(`processing dependencies at ${color}:   ${dependencyProcessing}`)
 
+  console.warn(color, addressMapping.getCellValueIfHere({ col: 1, row: 999 }))
+  console.warn(color, addressMapping.getCellValueIfHere({ col: 3, row: 999 }))
+  console.warn(color, addressMapping.getCellValueIfHere({ col: 5, row: 999 }))
   console.log(color, graph)
   ctx.postMessage({
     type: "FINISHED",
   })
 }
+
+function processBlockedNodes() {
+  while (resolvedNodes.length > 0) {
+    const vertex = nodes[resolvedNodes.shift()!] as FormulaCellVertex
+
+    const address = vertex.getAddress()
+    const formula = vertex.getFormula()
+
+    let cellValue = interpreter.evaluateAst(formula, address)
+    addressMapping.setCellValue(address, cellValue)
+    const resolver = blockedNodesResolvers.get(vertex.vertexId)
+    resolver()
+  }
+}
+
 function getDependencyPromise(address: SimpleCellAddress, addressMapping: SimpleArrayAddressMapping): Promise<CellValue> | null {
   const vertexId = addressMapping.getVertexId(address)
 
