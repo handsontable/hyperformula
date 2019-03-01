@@ -21,6 +21,7 @@ import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {absolutizeDependencies} from '../parser/ParserWithCaching'
 import {collectDependencies, RelativeDependency} from '../parser/Cache'
 import {IAddressMapping} from "../IAddressMapping";
+import {add} from "../interpreter/scalar";
 
 const ctx: Worker = self as any;
 
@@ -173,93 +174,88 @@ async function start() {
     if (vertex.color != color) {
       continue
     }
-    if (vertex instanceof FormulaCellVertex) {
-      const address = vertex.getAddress()
-      const formula = vertex.getFormula()
-      let cellValue
-      if (numberOfWorkers > 1) {
-        let relativeDependencies: RelativeDependency[] = []
-        collectDependencies(formula, relativeDependencies)
-        const dependencies = absolutizeDependencies(relativeDependencies, address)
-        const dependenciesPromises = []
-        for (let i = 0; i < dependencies.length; i++) {
-          if (Array.isArray(dependencies[i])) {
-            const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
-            const depRange = simpleCellRange(depDummyRange[0], depDummyRange[1])
-            const rangeKey = addressMapping.rangeKey(depRange)
-            if (addressMapping.remoteRangePromiseCache.has(rangeKey)) {
-              dependenciesPromises.push(addressMapping.remoteRangePromiseCache.get(rangeKey))
-            } else {
-              const promisesForRange = []
-              const { smallerRangePromise, restRanges } = findSmallerCacheRange(addressMapping, [depRange])
-              if (smallerRangePromise) {
-                promisesForRange.push(smallerRangePromise)
-              }
-              for (const cellFromRange of generateCellsFromRangeGenerator(restRanges[0])) {
-                const vertexId = addressMapping.getVertexId(cellFromRange)
-                if (addressMapping.remoteCache.has(vertexId)) {
-                  continue
-                } else if (addressMapping.remotePromiseCache.has(vertexId)) {
-                  promisesForRange.push(addressMapping.remotePromiseCache.get(vertexId))
-                } else {
-                  promisesForRange.push(addressMapping.getRemoteCellValueByVertex(cellFromRange))
-                }
-              }
-              const rangePromise = Promise.all(promisesForRange)
-              addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
-              dependenciesPromises.push(rangePromise)
-            }
+
+    if (vertex instanceof RangeVertex) {
+      vertex.clear()
+      continue
+    }
+
+    if (!(vertex instanceof FormulaCellVertex)) {
+      continue;
+    }
+
+    const address = vertex.getAddress()
+    const formula = vertex.getFormula()
+
+    if (numberOfWorkers > 1) {
+      let relativeDependencies: RelativeDependency[] = []
+      collectDependencies(formula, relativeDependencies)
+      const dependencies = absolutizeDependencies(relativeDependencies, address)
+      const dependenciesPromises = []
+
+      for (let i = 0; i < dependencies.length; i++) {
+        if (Array.isArray(dependencies[i])) {
+          const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
+          const depRange = simpleCellRange(depDummyRange[0], depDummyRange[1])
+          const rangeKey = addressMapping.rangeKey(depRange)
+
+          if (addressMapping.remoteRangePromiseCache.has(rangeKey)) {
+            dependenciesPromises.push(addressMapping.remoteRangePromiseCache.get(rangeKey))
           } else {
-            const dep = dependencies[i] as SimpleCellAddress
-            const vertexId = addressMapping.getVertexId(dep)
-            if (addressMapping.remoteCache.has(vertexId)) {
-              continue
-            } else if (addressMapping.remotePromiseCache.has(vertexId)) {
-              dependenciesPromises.push(addressMapping.remotePromiseCache.get(vertexId))
-            } else {
-              dependenciesPromises.push(addressMapping.getRemoteCellValueByVertex(dep))
+            const promisesForRange = []
+            const {smallerRangePromise, restRanges} = findSmallerCacheRange(addressMapping, [depRange])
+
+            if (smallerRangePromise) {
+              promisesForRange.push(smallerRangePromise)
             }
+
+            for (const cellFromRange of generateCellsFromRangeGenerator(restRanges[0])) {
+              const promise = getDependencyPromise(cellFromRange, addressMapping)
+              if (promise !== null) {
+                promisesForRange.push(promise)
+              }
+            }
+
+            const rangePromise = Promise.all(promisesForRange)
+            addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
+            dependenciesPromises.push(rangePromise)
+          }
+        } else {
+          const promise = getDependencyPromise(dependencies[i] as SimpleCellAddress, addressMapping)
+          if (promise !== null) {
+            dependenciesPromises.push(promise)
           }
         }
-        cellValue = interpreter.evaluateAst(formula, address)
-      } else {
-        cellValue = interpreter.evaluateAst(formula, address)
+
+        await Promise.all(dependenciesPromises)
       }
 
+      let cellValue = interpreter.evaluateAst(formula, address)
       addressMapping.setCellValue(address, cellValue)
-    } else if (vertex instanceof RangeVertex) {
-      vertex.clear()
     }
   }
 
   const finishedAt = Date.now()
   console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
 
-  printSample("C10000", addressMapping)
-  // console.warn(`Time spent at Worker ${color} on computing median: ${interpreter.timeSpentOnMedian}`)
-  // console.warn(`Time spent at Worker ${color} on computing numeric list: ${MedianPlugin.timeSpentOnComputingList}`)
-  // console.warn(`Time spent at Worker ${color} on AddressMapping.getCellValue: ${MedianPlugin.timeSpentOnGetCellValue}`)
-
   console.log(color, graph)
   ctx.postMessage({
     type: "FINISHED",
   })
-
-  // Promise.all([
-  //   addressMapping.getCellValue({ col: 0, row: 999 }),
-  //   addressMapping.getCellValue({ col: 1, row: 999 }),
-  //   addressMapping.getCellValue({ col: 2, row: 999 }),
-  //   addressMapping.getCellValue({ col: 3, row: 999 }),
-  //   addressMapping.getCellValue({ col: 4, row: 999 }),
-  //   addressMapping.getCellValue({ col: 5, row: 999 }),
-  // ]).then((results) => {
-  //   console.warn(`Results: ${results}`)
-  // })
 }
+function getDependencyPromise(address: SimpleCellAddress, addressMapping: SimpleArrayAddressMapping): Promise<CellValue> | null {
+  const vertexId = addressMapping.getVertexId(address)
 
-function printSample(addressStr: string, addressMapping: IAddressMapping) {
-  const address = cellAddressFromString(addressStr, absoluteCellAddress(0, 0))
-  const vertex = addressMapping.getCell(address)!
-  const value = vertex.getCellValue()
-  console.log(`Value in ${addressStr}:`, value)
+  const vertex = graph.getNodeById(vertexId)
+  if (vertex !== null && vertex.color === color) {
+    return null;
+  }
+
+  if (addressMapping.remoteCache.has(vertexId)) {
+    return null
+  } else if (addressMapping.remotePromiseCache.has(vertexId)) {
+    return addressMapping.remotePromiseCache.get(vertexId) || null
+  } else {
+    return addressMapping.getRemoteCellValueByVertex(address)
+  }
 }

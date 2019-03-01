@@ -42,6 +42,8 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
       if (message.data.type === "CELL_VALUE_RESPONSE") {
         const data = message.data as CellValueResponse
 
+        // console.log(contextColor, "value response", data.address)
+
         const resolver = this.resolvers.get(addressKey(data.address))
 
         if (resolver === undefined) {
@@ -131,18 +133,16 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
   }
 
   public getRemoteCellValueByVertex(address: SimpleCellAddress): Promise<CellValue> {
-    const promise: Promise<CellValue> = new Promise(((resolve, reject) => {
+    const promise = new Promise<CellValue>((resolve, reject) => {
       this.resolvers.set(addressKey(address), resolve)
 
       const payload: CellValueRequest = {
         type: "CELL_VALUE_REQUEST",
         address: address
       }
-
-      // console.log(this.contextColor, "requesting cell value", payload)
-
+      // console.log(this.contextColor, "requesting value", address)
       this.bc.postMessage(payload)
-    }))
+    })
     this.remotePromiseCache.set(this.getVertexId(address), promise)
 
     return promise
