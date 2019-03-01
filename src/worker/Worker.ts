@@ -205,6 +205,7 @@ async function start() {
     const address = vertex.getAddress()
     const formula = vertex.getFormula()
 
+    // const dependencyProcessingStartedAt = Date.now()
     if (numberOfWorkers > 1) {
       // const startedAt = Date.now()
       let relativeDependencies: RelativeDependency[] = []
@@ -214,7 +215,6 @@ async function start() {
       // const finishedAt = Date.now()
       // collectingDependencies += (finishedAt - startedAt)
 
-      // const dependencyProcessingStartedAt = Date.now()
       for (let i = 0; i < dependencies.length; i++) {
         if (Array.isArray(dependencies[i])) {
           const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
@@ -254,8 +254,6 @@ async function start() {
           }
         }
       }
-      // const dependencyProcessingFinishedAt = Date.now()
-      // dependencyProcessing += (dependencyProcessingFinishedAt - dependencyProcessingStartedAt)
 
       if (dependenciesPromises.length > 0) {
         blockedCount++
@@ -278,25 +276,30 @@ async function start() {
       // let cellValue = interpreter.evaluateAst(formula, address)
       // addressMapping.setCellValue(address, cellValue)
     }
+    // const dependencyProcessingFinishedAt = Date.now()
+    // dependencyProcessing += (dependencyProcessingFinishedAt - dependencyProcessingStartedAt)
 
     let cellValue = interpreter.evaluateAst(formula, address)
     addressMapping.setCellValue(address, cellValue)
   }
 
-  console.warn(color, `Blocked: ${blockedCount}, resolvedNodes: ${resolvedNodes}`)
+  console.warn(color, `Blocked: ${blockedCount}, resolvedNodes: ${resolvedNodes.length}`)
+  const processingBlockedStartedAt = Date.now()
   while (blockedCount > 0 || resolvedNodes.length > 0) {
     processBlockedNodes()
     await sleep(1)
   }
+  const processingBlockedFinishedAt = Date.now()
 
   const finishedAt = Date.now()
   console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
   // console.warn(`waiting for deps at ${color}:   ${waitingForDependencies}`)
   // console.warn(`processing dependencies at ${color}:   ${dependencyProcessing}`)
+  console.warn(`processing blocked at ${color}:   ${processingBlockedFinishedAt - processingBlockedStartedAt}`)
 
-  console.warn(color, addressMapping.getCellValueIfHere({ col: 1, row: 999 }))
-  console.warn(color, addressMapping.getCellValueIfHere({ col: 3, row: 999 }))
-  console.warn(color, addressMapping.getCellValueIfHere({ col: 5, row: 999 }))
+  // console.warn(color, addressMapping.getCellValueIfHere({ col: 1, row: 999 }))
+  // console.warn(color, addressMapping.getCellValueIfHere({ col: 3, row: 999 }))
+  // console.warn(color, addressMapping.getCellValueIfHere({ col: 5, row: 999 }))
   console.log(color, graph)
   ctx.postMessage({
     type: "FINISHED",
