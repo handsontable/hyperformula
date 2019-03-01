@@ -151,7 +151,7 @@ function init(payload: WorkerInitPayload) {
   ctx.postMessage(response)
 }
 
-const findSmallerCacheRange = (addressMapping: SimpleArrayAddressMapping, ranges: SimpleCellRange[]): { smallerRangePromise: Promise<any> | null, restRanges: SimpleCellRange[] } => {
+const findSmallerCacheRange = (addressMapping: SimpleArrayAddressMapping, ranges: SimpleCellRange[]): { smallerRangePromise: Promise<any> | boolean | null, restRanges: SimpleCellRange[] } => {
   if (ranges[0].end.row > ranges[0].start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.col, ranges[0].end.row - 1)
     // const rowLessVertex = rangeMapping.getRange(ranges[0].start, valuesRangeEndRowLess)
@@ -221,13 +221,14 @@ async function start() {
           const depRange = simpleCellRange(depDummyRange[0], depDummyRange[1])
           const rangeKey = addressMapping.rangeKey(depRange)
 
-          if (addressMapping.remoteRangePromiseCache.has(rangeKey)) {
+          const remoteRangePromise = addressMapping.remoteRangePromiseCache.has(rangeKey)
+          if (remoteRangePromise && remoteRangePromise !== true) {
             dependenciesPromises.push(addressMapping.remoteRangePromiseCache.get(rangeKey))
           } else {
             const promisesForRange = []
             const {smallerRangePromise, restRanges} = findSmallerCacheRange(addressMapping, [depRange])
 
-            if (smallerRangePromise) {
+            if (smallerRangePromise && smallerRangePromise !== true) {
               promisesForRange.push(smallerRangePromise)
             }
 
@@ -238,9 +239,13 @@ async function start() {
               }
             }
 
-            const rangePromise = Promise.all(promisesForRange)
-            addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
-            dependenciesPromises.push(rangePromise)
+            if (promisesForRange.length > 0) { 
+              const rangePromise = Promise.all(promisesForRange)
+              addressMapping.remoteRangePromiseCache.set(rangeKey, rangePromise)
+              dependenciesPromises.push(rangePromise)
+            } else {
+              addressMapping.remoteRangePromiseCache.set(rangeKey, true)
+            }
           }
         } else {
           const promise = getDependencyPromise(dependencies[i] as SimpleCellAddress, addressMapping)

@@ -25,7 +25,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
   public remoteCache = new Map<number, CellValue>()
 
   public remotePromiseCache = new Map<number, Promise<CellValue>>()
-  public remoteRangePromiseCache = new Map<string, Promise<any>>()
+  public remoteRangePromiseCache = new Map<string, Promise<any> | boolean>()
 
   private bc: BroadcastChannel
 
