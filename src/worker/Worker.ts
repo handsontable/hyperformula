@@ -25,6 +25,10 @@ import {add} from "../interpreter/scalar";
 
 const ctx: Worker = self as any;
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 let addressMapping: SimpleArrayAddressMapping,
     rangeMapping: RangeMapping,
     graph: Graph<Vertex>,
@@ -33,6 +37,8 @@ let addressMapping: SimpleArrayAddressMapping,
     color: number,
     bc: BroadcastChannel,
     numberOfWorkers: number
+
+let blockedNodesPromises = new Map<number, Promise<any>>()
 
 export interface WorkerInitializedPayload {
   type: "INITIALIZED"
@@ -175,7 +181,12 @@ async function start() {
   let waitingForDependencies = 0.0
   let dependencyProcessing = 0.0
 
-  for (const vertex of nodes) {
+  let blockedCount = 0
+  const resolvedNodes: number[] = []
+
+  for (let j = 0; j < nodes.length; j++) {
+    const vertex = nodes[j]
+
     if (vertex.color != color) {
       continue
     }
@@ -239,13 +250,32 @@ async function start() {
       // const dependencyProcessingFinishedAt = Date.now()
       // dependencyProcessing += (dependencyProcessingFinishedAt - dependencyProcessingStartedAt)
 
+      if (dependenciesPromises.length > 0) {
+        blockedCount++
+        const dependenciesPromise = Promise.all(dependenciesPromises)
+        blockedNodesPromises.set(vertex.vertexId, dependenciesPromise)
+        dependenciesPromise.then(() => {
+          resolvedNodes.push(j);
+          blockedCount--
+        })
+        continue
+      } 
       // const startedAt = Date.now()
-      await Promise.all(dependenciesPromises)
+      // await Promise.all(dependenciesPromises)
       // const finishedAt = Date.now()
       // waitingForDependencies += (finishedAt - startedAt)
 
       let cellValue = interpreter.evaluateAst(formula, address)
       addressMapping.setCellValue(address, cellValue)
+    }
+
+    while (blockedCount > 0 || resolvedNodes.length > 0) {
+      while (resolvedNodes.length > 0) {
+        const node = nodes[resolvedNodes.shift()!]
+        let cellValue = interpreter.evaluateAst(formula, address)
+        addressMapping.setCellValue(address, cellValue)
+      }
+      await sleep(1)
     }
   }
 
@@ -264,7 +294,7 @@ function getDependencyPromise(address: SimpleCellAddress, addressMapping: Simple
 
   const vertex = graph.getNodeById(vertexId)
   if (vertex !== null && vertex.color === color) {
-    return null;
+    return blockedNodesPromises.get(vertexId) || null
   }
 
   if (addressMapping.remoteCache.has(vertexId)) {
