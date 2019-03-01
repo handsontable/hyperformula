@@ -123,12 +123,16 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    const vertex = this.getCell(address)
+    const vertexId = this.mapping[address.row * this.width + address.col]
+    if (vertexId === 0) {
+      return EmptyCellVertex.getSingletonInstance().getCellValue()
+    }
+    const vertex = this.graph.getNodeById(vertexId) as CellVertex
 
-    if (vertex.color === this.contextColor) {
+    if (vertex && vertex.color === this.contextColor) {
       return vertex.getCellValue()
     } else {
-      return this.remoteCache.get(vertex.vertexId)!
+      return this.remoteCache.get(vertexId)!
     }
   }
 

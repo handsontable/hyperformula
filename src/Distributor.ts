@@ -27,7 +27,7 @@ export class Distributor {
     const startedAt = Date.now()
     let { sorted, cycled, longestPathSize } = this.topSort()
 
-    console.log(longestPathSize)
+    console.log(`Longest path: ${longestPathSize}`)
 
     const colorMap : Map<Color, Vertex[]> = new Map()
     for (let i=0; i<this.numberOfWorkers; ++i) {

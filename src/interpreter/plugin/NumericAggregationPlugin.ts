@@ -31,8 +31,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public async sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Promise<CellValue> {
-    return ast.args.reduce(async (currentSum: Promise<CellValue>, arg) => {
+  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return ast.args.reduce((currentSum: CellValue, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, 'SUM', reduceSum)
@@ -40,8 +40,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         value = this.evaluateAst(arg, formulaAddress)
       }
 
-      return add(await currentSum, await value)
-    }, Promise.resolve(0))
+      return add(currentSum, value)
+    }, 0)
   }
 
   /**
@@ -87,10 +87,21 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const restRange = restRanges[0]
     const currentRangeVertex = this.rangeMapping.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
-    }
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange).getCellValue())
+      const cachedValue = smallerRangeVertex.getFunctionValue(functionName)
+      if (cachedValue) {
+        rangeResult.push(cachedValue)
+        for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+          rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
+        }
+      } else {
+        for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
+          rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
+        }
+      }
+    } else {
+      for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+        rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
+      }
     }
 
     return rangeResult
