@@ -2,7 +2,7 @@ import {benchmark, ExpectedValue} from '../benchmark'
 
 export function sheet() {
   const rows = 2000
-  const divider = 3000
+  const divider = 10
 
   let dependent = 0
   const sheet = []
@@ -39,10 +39,10 @@ export function sheet() {
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
     { address: 'A1000', value: 1000 },
-    { address: 'B1000', value: 499.5 },
+    { address: 'B1000', value: 500.5 },
     { address: 'C1000', value: 1000 },
-    { address: 'D1000', value: 499.5 },
+    { address: 'D1000', value: 500.5 },
     { address: 'E1000', value: 1000 },
-    { address: 'F1000', value: 499.5 },
+    { address: 'F1000', value: 500.5 },
   ]
 }

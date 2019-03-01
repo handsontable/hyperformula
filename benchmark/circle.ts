@@ -32,4 +32,4 @@ benchmark(sheetA, expectedValuesA(sheetA), { millisecondsPerThousandRows: 60, nu
 console.info('\n === Sheet B === ')
 benchmark(sheetB, expectedValuesB(sheetB), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
 // console.info('\n === Sheet Many Medians === ')
-// benchmark(sheetManyMedians, expectedValuesManyMedians(sheetManyMedians), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
+// benchmark(sheetManyMedians, expectedValuesManyMedians(sheetManyMedians), { millisecondsPerThousandRows: 6000, numberOfRuns: 3 })
