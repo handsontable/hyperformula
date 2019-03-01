@@ -6,11 +6,12 @@ import {Graph} from "../../src/Graph";
 import {FormulaCellVertex, RangeVertex, Vertex} from "../../src/Vertex";
 import {SimpleArrayAddressMapping} from "../../src/SimpleArrayAddressMapping";
 import {RangeMapping} from "../../src/RangeMapping";
-import {Statistics} from "../../src/statistics/Statistics";
+import {Statistics, StatType} from "../../src/statistics/Statistics";
 import {Config} from "../../src/Config";
 import {Distributor} from "../../src/Distributor";
 import {Interpreter} from "../../src/interpreter/Interpreter";
 import {absoluteCellAddress, cellAddressFromString} from "../../src/Cell";
+import {IAddressMapping} from "../../src/IAddressMapping";
 
 let working = false
 
@@ -19,6 +20,7 @@ interface IExtendedConsole extends Console {
 }
 
 async function benchmark(sheet: Sheet, numberOfWorkers: number) {
+  console.log("running benchmark on workers")
   const graph = new Graph<Vertex>()
   const {width, height} = findBoundaries(sheet)
   const addressMapping = new SimpleArrayAddressMapping(width, height, graph, -1)
@@ -34,40 +36,50 @@ async function benchmark(sheet: Sheet, numberOfWorkers: number) {
   console.log(`Total time: ${finishedAt - startedAt}`)
 }
 
-async function benchmark2(sheet: Sheet) {
+async function benchmarkSync(sheet: Sheet) {
+  console.log("running benchmark in main thread")
   const graph = new Graph<Vertex>()
+  const statistics = new Statistics()
   const {width, height} = findBoundaries(sheet)
   const rangeMapping = new RangeMapping()
   const addressMapping = new SimpleArrayAddressMapping(width, height, graph, -1)
   const interpreter = new Interpreter(addressMapping, rangeMapping, graph, new Config())
   const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
 
+  const overallStart = Date.now()
+
   graphBuilder.buildGraph(sheet)
 
-  let { sorted, cycled } = graph.topologicalSort()
+  let { sorted, cycled } = statistics.measure(StatType.TOP_SORT, () => {
+    return graph.topologicalSort();
+  })
 
-  const startedAt = Date.now()
-
+  const evalStart = Date.now()
   for (const vertex of sorted) {
     if (vertex instanceof FormulaCellVertex) {
       const address = vertex.getAddress()
       const formula = vertex.getFormula()
-      const cellValue = await interpreter.evaluateAst(formula, address)
+      const cellValue = interpreter.evaluateAst(formula, address)
 
       addressMapping.setCellValue(address, cellValue)
     } else if (vertex instanceof RangeVertex) {
       vertex.clear()
     }
   }
+  const evalEnd = Date.now()
 
-  const address = cellAddressFromString("C10000", absoluteCellAddress(0, 0))
+  const overallEnd = Date.now()
+
+  console.log(`Total time: ${overallEnd - overallStart}` )
+  console.log(`Eval time : ${evalEnd - evalStart}` )
+  printSample("C10000", addressMapping)
+}
+
+function printSample(addressStr: string, addressMapping: IAddressMapping) {
+  const address = cellAddressFromString(addressStr, absoluteCellAddress(0, 0))
   const vertex = addressMapping.getCell(address)!
   const value = vertex.getCellValue()
-
-  const finishedAt = Date.now()
-
-  console.log(`Total time: ${finishedAt - startedAt}`)
-  console.log(value)
+  console.log(`Value in ${addressStr}:`, value)
 }
 
 function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
@@ -100,14 +112,18 @@ function runBenchmark(fun: any, benchmarkName: string) {
   }
 
   const numberOfWorkers = parseInt((document.getElementById('numberOfWorkers')! as HTMLInputElement).value, 10)
+  const sync = (document.getElementById('sync')! as HTMLInputElement).checked
   clear()
   toggle()
 
   setTimeout(async () => {
     working = true
     console.info(`=== ${benchmarkName} ===`)
-    await benchmark(fun(), numberOfWorkers)
-    // await benchmark2(fun())
+    if (sync) {
+      await benchmarkSync(fun())
+    } else {
+      await benchmark(fun(), numberOfWorkers)
+    }
     working = false
     toggle()
   }, 500)

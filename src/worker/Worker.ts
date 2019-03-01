@@ -2,7 +2,16 @@ import {WorkerInitPayload} from "../Distributor";
 import {SimpleArrayAddressMapping} from "../SimpleArrayAddressMapping"
 import {Graph} from '../Graph'
 import {Vertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex, CellVertex} from '../Vertex'
-import {SimpleCellAddress, simpleCellAddress, CellValue, buildCellRange, simpleCellRange, CellDependency, SimpleCellRange} from '../Cell'
+import {
+  SimpleCellAddress,
+  simpleCellAddress,
+  CellValue,
+  buildCellRange,
+  simpleCellRange,
+  CellDependency,
+  SimpleCellRange,
+  cellAddressFromString, absoluteCellAddress
+} from '../Cell'
 import {Ast} from '../parser/Ast'
 import {RangeMapping} from "../RangeMapping";
 import {MedianPlugin} from "../interpreter/plugin/MedianPlugin"
@@ -11,6 +20,7 @@ import {Config} from "../Config";
 import {generateCellsFromRangeGenerator} from '../GraphBuilder'
 import {absolutizeDependencies} from '../parser/ParserWithCaching'
 import {collectDependencies, RelativeDependency} from '../parser/Cache'
+import {IAddressMapping} from "../IAddressMapping";
 
 const ctx: Worker = self as any;
 
@@ -221,8 +231,11 @@ async function start() {
       vertex.clear()
     }
   }
+
   const finishedAt = Date.now()
   console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
+
+  printSample("C10000", addressMapping)
   // console.warn(`Time spent at Worker ${color} on computing median: ${interpreter.timeSpentOnMedian}`)
   // console.warn(`Time spent at Worker ${color} on computing numeric list: ${MedianPlugin.timeSpentOnComputingList}`)
   // console.warn(`Time spent at Worker ${color} on AddressMapping.getCellValue: ${MedianPlugin.timeSpentOnGetCellValue}`)
@@ -242,4 +255,11 @@ async function start() {
   // ]).then((results) => {
   //   console.warn(`Results: ${results}`)
   // })
+}
+
+function printSample(addressStr: string, addressMapping: IAddressMapping) {
+  const address = cellAddressFromString(addressStr, absoluteCellAddress(0, 0))
+  const vertex = addressMapping.getCell(address)!
+  const value = vertex.getCellValue()
+  console.log(`Value in ${addressStr}:`, value)
 }

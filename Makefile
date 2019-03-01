@@ -48,9 +48,8 @@ check-bundle:
 	@node script/check-minified.js
 	@ls -sS1h lib/ | grep bundle.js
 
-browser: compile
-	@cp benchmark/browser/index.html lib/benchmark/browser/
-	@browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js
+browser: bundle
+	@cp benchmark/webworkers/index.html lib/
 
 verify-production-licenses:
 	@yarn license-checker --production --onlyAllow="MIT; Apache-2.0; BSD-3-Clause"
