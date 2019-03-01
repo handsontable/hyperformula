@@ -64,6 +64,7 @@ function init(payload: WorkerInitPayload) {
   color = payload.color
   nodes = []
   numberOfWorkers = payload.numberOfWorkers
+  let serializedEdges = payload.edges
   let serializedNodes = payload.nodes as any[]
 
   bc = new BroadcastChannel("mybus")
@@ -116,9 +117,9 @@ function init(payload: WorkerInitPayload) {
     nodes.push(vertex)
   }
 
-  const numberOfEdges = payload.edges.length / 2
+  const numberOfEdges = serializedEdges.length / 2
   for (let i = 0; i < numberOfEdges; i++) {
-    graph.addEdgeByIds(payload.edges[i * 2], payload.edges[i * 2 + 1])
+    graph.addEdgeByIds(serializedEdges[i * 2], serializedEdges[i * 2 + 1])
   }
 
   addressMapping = new SimpleArrayAddressMapping(
