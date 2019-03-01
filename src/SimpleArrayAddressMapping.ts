@@ -27,7 +27,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
   public remotePromiseCache = new Map<number, Promise<CellValue>>()
   public remoteRangePromiseCache = new Map<string, Promise<any> | boolean>()
 
-  private bc: BroadcastChannel
+  private bc?: BroadcastChannel
 
   /**
    * @param width - width of the stored sheet
@@ -36,41 +36,43 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
   constructor(private width: number, private height: number, private graph: Graph<Vertex>, public contextColor: number, mapping?: Int32Array) {
     this.mapping = mapping || new Int32Array(width * height)
 
-    this.bc = new BroadcastChannel("addressMappingBus")
+    if (contextColor >= 0) {
+      this.bc = new BroadcastChannel("addressMappingBus")
 
-    this.bc.onmessage = (message) => {
-      if (message.data.type === "CELL_VALUE_RESPONSE") {
-        const data = message.data as CellValueResponse
+      this.bc.onmessage = (message) => {
+        if (message.data.type === "CELL_VALUE_RESPONSE") {
+          const data = message.data as CellValueResponse
 
-        // console.log(contextColor, "value response", data.address)
+          // console.log(contextColor, "value response", data.address)
 
-        const resolver = this.resolvers.get(addressKey(data.address))
+          const resolver = this.resolvers.get(addressKey(data.address))
 
-        if (resolver === undefined) {
-          return
+          if (resolver === undefined) {
+            return
+          }
+          const vertexId = this.getVertexId(data.address)
+          this.remoteCache.set(vertexId, data.value)
+
+          resolver(data.value)
         }
-        const vertexId = this.getVertexId(data.address)
-        this.remoteCache.set(vertexId, data.value)
 
-        resolver(data.value)
-      }
+        if (message.data.type === "CELL_VALUE_REQUEST") {
+          const data = message.data as CellValueRequest
 
-      if (message.data.type === "CELL_VALUE_REQUEST") {
-        const data = message.data as CellValueRequest
+          // if (data.color !== contextColor) {
+          //   return
+          // }
 
-        // if (data.color !== contextColor) {
-        //   return
-        // }
-
-        const vertex = this.getCell(data.address)
-        if (!vertex || vertex.color != this.contextColor) {
-          return
-        }
-        if (vertex.cellValueComputed()) {
-          this.sendCellValue(data.address, vertex.getCellValue())
-        } else {
-          const key = addressKey(data.address)
-          this.awaitingComputation.add(key)
+          const vertex = this.getCell(data.address)
+          if (!vertex || vertex.color != this.contextColor) {
+            return
+          }
+          if (vertex.cellValueComputed()) {
+            this.sendCellValue(data.address, vertex.getCellValue())
+          } else {
+            const key = addressKey(data.address)
+            this.awaitingComputation.add(key)
+          }
         }
       }
     }
@@ -85,7 +87,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
 
     // console.log(this.contextColor, "sending cell value", payload)
 
-    this.bc.postMessage(payload)
+    this.bc!.postMessage(payload)
   }
 
   /** @inheritDoc */
@@ -155,7 +157,7 @@ export class SimpleArrayAddressMapping implements IAddressMapping {
         address: address
       }
       // console.log(this.contextColor, "requesting value", address)
-      this.bc.postMessage(payload)
+      this.bc!.postMessage(payload)
     })
     this.remotePromiseCache.set(this.getVertexId(address), promise)
 
