@@ -170,6 +170,10 @@ async function start() {
 
   const startedAt = Date.now()
 
+  let collectingDependencies = 0.0
+  let waitingForDependencies = 0.0
+  let dependencyProcessing = 0.0
+
   for (const vertex of nodes) {
     if (vertex.color != color) {
       continue
@@ -188,11 +192,15 @@ async function start() {
     const formula = vertex.getFormula()
 
     if (numberOfWorkers > 1) {
+      // const startedAt = Date.now()
       let relativeDependencies: RelativeDependency[] = []
       collectDependencies(formula, relativeDependencies)
       const dependencies = absolutizeDependencies(relativeDependencies, address)
       const dependenciesPromises = []
+      // const finishedAt = Date.now()
+      // collectingDependencies += (finishedAt - startedAt)
 
+      // const dependencyProcessingStartedAt = Date.now()
       for (let i = 0; i < dependencies.length; i++) {
         if (Array.isArray(dependencies[i])) {
           const depDummyRange = dependencies[i] as [SimpleCellAddress, SimpleCellAddress]
@@ -226,9 +234,14 @@ async function start() {
             dependenciesPromises.push(promise)
           }
         }
-
-        await Promise.all(dependenciesPromises)
       }
+      // const dependencyProcessingFinishedAt = Date.now()
+      // dependencyProcessing += (dependencyProcessingFinishedAt - dependencyProcessingStartedAt)
+
+      // const startedAt = Date.now()
+      await Promise.all(dependenciesPromises)
+      // const finishedAt = Date.now()
+      // waitingForDependencies += (finishedAt - startedAt)
 
       let cellValue = interpreter.evaluateAst(formula, address)
       addressMapping.setCellValue(address, cellValue)
@@ -237,6 +250,8 @@ async function start() {
 
   const finishedAt = Date.now()
   console.warn(`Computing at Worker ${color} finished in ${finishedAt - startedAt}`)
+  // console.warn(`waiting for deps at ${color}:   ${waitingForDependencies}`)
+  // console.warn(`processing dependencies at ${color}:   ${dependencyProcessing}`)
 
   console.log(color, graph)
   ctx.postMessage({
