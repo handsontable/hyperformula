@@ -25,7 +25,9 @@ export class Distributor {
 
   public distribute() {
     const startedAt = Date.now()
-    let { sorted, cycled } = this.topSort()
+    let { sorted, cycled, longestPathSize } = this.topSort()
+
+    console.log(longestPathSize)
 
     const colorMap : Map<Color, Vertex[]> = new Map()
     for (let i=0; i<this.numberOfWorkers; ++i) {
@@ -128,9 +130,10 @@ export class Distributor {
     return result
   }
 
-  public topSort(): { sorted: Vertex[], cycled: Vertex[] } {
+  public topSort(): { sorted: Vertex[], cycled: Vertex[], longestPathSize: number } {
     const incomingEdges = this.incomingEdges()
     const dominantColors = this.initDominantColors()
+    const distances = new Int32Array(this.graph.nodes.size)
 
     const danglingNodes = this.colorNodes(this.danglingNodes(incomingEdges))
 
@@ -143,6 +146,8 @@ export class Distributor {
       sorted.push(node)
 
       this.graph.getEdges().get(node)!.forEach((targetNode) => {
+        distances[targetNode.vertexId] = Math.max(distances[targetNode.vertexId], distances[node.vertexId] + 1)
+
         ++dominantColors.get(targetNode)![node.color]
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
 
@@ -155,6 +160,8 @@ export class Distributor {
       ++ currentNodeIndex
     }
 
+    const longestPathSize = Math.max(...distances) + 1
+
     if (sorted.length !== this.graph.nodes.size) {
       const nodesOnCycle = new Set(this.graph.nodes.values())
       for (let i = 0; i < sorted.length; ++i) {
@@ -162,13 +169,15 @@ export class Distributor {
       }
       return {
         sorted: sorted,
-        cycled: Array.from(nodesOnCycle)
+        cycled: Array.from(nodesOnCycle),
+        longestPathSize: longestPathSize
       }
     }
 
     return {
       sorted: sorted,
-      cycled: []
+      cycled: [],
+      longestPathSize: longestPathSize
     }
   }
 
