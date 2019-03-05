@@ -186,7 +186,10 @@ trait IGraph {
     // fn get_node_reference(&self, vertex_id: &i32) -> &GraphNode;
     fn add_node(&mut self, boxed_node: Box<IVertex>) -> ();
     fn add_edge(&mut self, from_node: &mut GraphNode, to_node: Rc<RefCell<GraphNode>>) -> ();
+    fn add_edge_by_ids(&mut self, from_node_id: &i32, to_node_id: &i32) -> ();
+    fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool;
 }
+
 impl IGraph for Graph {
     fn build() -> Graph {
         Graph {
@@ -213,6 +216,24 @@ impl IGraph for Graph {
     fn add_edge(&mut self, from_node: &mut GraphNode, to_node: Rc<RefCell<GraphNode>>) -> () {
         from_node.edges.push(to_node.clone());
     }
+
+    fn add_edge_by_ids(&mut self, from_node_id: &i32, to_node_id: &i32) -> () {
+        let mut from_node = self.nodes.get(from_node_id).unwrap().borrow_mut();
+        let to_node = self.nodes.get(to_node_id).unwrap();
+        from_node.edges.push(to_node.clone())
+    }
+
+    fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool {
+        let looking_for_vertex_id = self.nodes.get(to_node_id).unwrap().borrow().datum.get_vertex_id();
+        let target_nodes = &self.nodes.get(from_node_id).unwrap().borrow().edges;
+        // return true
+        for target_node in target_nodes {
+            if target_node.borrow().datum.get_vertex_id() == looking_for_vertex_id {
+                return true
+            }
+        };
+        false
+    }
 }
 
 
@@ -231,5 +252,21 @@ mod tests {
         graph.add_node(node2);
         let graph_node1 = &graph.nodes.get(&1).unwrap().borrow();
         assert_eq!(graph_node1.datum.get_vertex_id(), 1)
+    }
+
+    #[test]
+    fn it_works2() {
+        let mut graph = Graph::build();
+        let node1 = Box::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) });
+        let node2 = Box::new(ValueCellVertex { color: 0, vertex_id: 2, cell_value: CellValue::Number(13) });
+        let node3 = Box::new(ValueCellVertex { color: 0, vertex_id: 3, cell_value: CellValue::Number(13) });
+        graph.add_node(node1);
+        graph.add_node(node2);
+        graph.add_node(node3);
+        graph.add_edge_by_ids(&1, &2);
+        assert_eq!(graph.edge_exists(&1, &2), true);
+        assert_eq!(graph.edge_exists(&1, &3), false);
+        // let graph_node1 = &graph.nodes.get(&1).unwrap().borrow();
+        // assert_eq!(graph_node1.datum.get_vertex_id(), 1)
     }
 }
