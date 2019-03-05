@@ -65,6 +65,8 @@ enum Ast {
 struct RangeVertex {
     color: i8,
     vertex_id: i32,
+    start: SimpleCellAddress,
+    end: SimpleCellAddress,
 }
 
 struct ValueCellVertex {
@@ -81,12 +83,27 @@ struct FormulaCellVertex {
     address: SimpleCellAddress,
 }
 
+struct EmptyCellVertex {
+    vertex_id: i32,
+    color: i8,
+}
+
 trait IVertex {
     fn get_color(&self) -> i8;
     fn get_vertex_id(&self) -> i32;
 }
 
 impl IVertex for ValueCellVertex {
+    fn get_color(&self) -> i8 {
+        self.color
+    }
+
+    fn get_vertex_id(&self) -> i32 {
+        self.vertex_id
+    }
+}
+
+impl IVertex for EmptyCellVertex {
     fn get_color(&self) -> i8 {
         self.color
     }
@@ -119,6 +136,18 @@ impl IVertex for RangeVertex {
 trait ICellVertex : IVertex {
     fn get_cell_value(&self) -> CellValue;
     fn set_cell_value(&mut self, new_cell_value: CellValue) -> ();
+}
+
+impl ICellVertex for EmptyCellVertex {
+    fn get_cell_value(&self) -> CellValue {
+        // that struct should OWN that cell value, so it can borrow it?
+        CellValue::Number(0)
+    }
+
+    // a cheat.
+    fn set_cell_value(&mut self, _new_cell_value: CellValue) -> () {
+        ()
+    }
 }
 
 impl ICellVertex for ValueCellVertex {
