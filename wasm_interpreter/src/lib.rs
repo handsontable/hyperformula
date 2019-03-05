@@ -20,7 +20,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::vec::Vec;
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 enum CellValue {
     Number(i32),
     Text(String),
@@ -226,7 +226,6 @@ impl IGraph for Graph {
     fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool {
         let looking_for_vertex_id = self.nodes.get(to_node_id).unwrap().borrow().datum.get_vertex_id();
         let target_nodes = &self.nodes.get(from_node_id).unwrap().borrow().edges;
-        // return true
         for target_node in target_nodes {
             if target_node.borrow().datum.get_vertex_id() == looking_for_vertex_id {
                 return true
@@ -235,6 +234,43 @@ impl IGraph for Graph {
         false
     }
 }
+
+struct ArrayAddressMapping<'a> {
+    mapping: Vec<Option<Box<ICellVertex>>>,
+    default_empty: &'a EmptyCellVertex,
+    remote_cache: HashMap<i32, CellValue>,
+}
+
+trait IAddressMapping {
+    fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue;
+    // setCellValue
+    // getCellValue
+}
+
+impl<'a> IAddressMapping for ArrayAddressMapping<'a> {
+    fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue {
+        let position = address.col * address.row;
+        match &self.mapping[position as usize] {
+            None => self.default_empty.get_cell_value(),
+            Some(x) => x.get_cell_value(),
+        }
+    }
+}
+
+fn build_array_address_mapping<'a>(width: i32, height: i32, default_empty: &'a EmptyCellVertex) -> ArrayAddressMapping<'a> {
+    let elements = width * height;
+    // highly unoptimized!
+    let mut mapping = Vec::new();
+    for _ in 1..elements {
+        mapping.push(None)
+    }
+    ArrayAddressMapping {
+        mapping: mapping,
+        remote_cache: HashMap::new(),
+        default_empty: default_empty,
+    }
+}
+
 
 
 // tests part
@@ -268,5 +304,13 @@ mod tests {
         assert_eq!(graph.edge_exists(&1, &3), false);
         // let graph_node1 = &graph.nodes.get(&1).unwrap().borrow();
         // assert_eq!(graph_node1.datum.get_vertex_id(), 1)
+    }
+
+    #[test]
+    fn it_works3() {
+        let empty = EmptyCellVertex { color: 0, vertex_id: 0 };
+        let address_mapping = build_array_address_mapping(4, 4, &empty);
+        let some_address = SimpleCellAddress { col: 0, row: 0 };
+        assert_eq!(address_mapping.get_cell_value(&some_address), CellValue::Number(0));
     }
 }
