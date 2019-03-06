@@ -173,19 +173,18 @@ impl ICellVertex for FormulaCellVertex {
 
 
 struct GraphNode {
-    datum: Box<IVertex>,
+    datum: Rc<RefCell<IVertex>>,
     edges: Vec<Rc<RefCell<GraphNode>>>,
 }
 
 struct Graph {
-    nodes: HashMap<i32, Rc<RefCell<GraphNode>>>,
+    nodes: HashMap<i32, Rc<RefCell<GraphNode>>>, // Maybe Box here would be enough?
 }
 
 trait IGraph {
     fn build() -> Graph;
     // fn get_node_reference(&self, vertex_id: &i32) -> &GraphNode;
-    fn add_node(&mut self, boxed_node: Box<IVertex>) -> ();
-    fn add_edge(&mut self, from_node: &mut GraphNode, to_node: Rc<RefCell<GraphNode>>) -> ();
+    fn add_node(&mut self, boxed_node: Rc<RefCell<IVertex>>) -> ();
     fn add_edge_by_ids(&mut self, from_node_id: &i32, to_node_id: &i32) -> ();
     fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool;
 }
@@ -197,12 +196,12 @@ impl IGraph for Graph {
         }
     }
 
-    fn add_node(&mut self, boxed_node: Box<IVertex>) -> () {
+    fn add_node(&mut self, boxed_node: Rc<RefCell<IVertex>>) -> () {
         self.nodes.insert(
-            boxed_node.get_vertex_id(),
+            boxed_node.borrow().get_vertex_id(),
             Rc::new(RefCell::new(
                 GraphNode {
-                    datum: boxed_node,
+                    datum: boxed_node.clone(),
                     edges: Vec::new()
                 }
             ))
@@ -213,10 +212,6 @@ impl IGraph for Graph {
     //     self.nodes.get(vertex_id).unwrap().clone()
     // }
 
-    fn add_edge(&mut self, from_node: &mut GraphNode, to_node: Rc<RefCell<GraphNode>>) -> () {
-        from_node.edges.push(to_node.clone());
-    }
-
     fn add_edge_by_ids(&mut self, from_node_id: &i32, to_node_id: &i32) -> () {
         let mut from_node = self.nodes.get(from_node_id).unwrap().borrow_mut();
         let to_node = self.nodes.get(to_node_id).unwrap();
@@ -224,10 +219,10 @@ impl IGraph for Graph {
     }
 
     fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool {
-        let looking_for_vertex_id = self.nodes.get(to_node_id).unwrap().borrow().datum.get_vertex_id();
+        let looking_for_vertex_id = self.nodes.get(to_node_id).unwrap().borrow().datum.borrow().get_vertex_id();
         let target_nodes = &self.nodes.get(from_node_id).unwrap().borrow().edges;
         for target_node in target_nodes {
-            if target_node.borrow().datum.get_vertex_id() == looking_for_vertex_id {
+            if target_node.borrow().datum.borrow().get_vertex_id() == looking_for_vertex_id {
                 return true
             }
         };
@@ -235,39 +230,42 @@ impl IGraph for Graph {
     }
 }
 
-struct ArrayAddressMapping<'a> {
-    mapping: Vec<Option<Box<ICellVertex>>>,
-    default_empty: &'a EmptyCellVertex,
+struct ArrayAddressMapping {
+    mapping: Vec<Rc<RefCell<ICellVertex>>>,
+    default_empty: Rc<RefCell<ICellVertex>>,
     remote_cache: HashMap<i32, CellValue>,
 }
 
 trait IAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue;
-    // setCellValue
-    // getCellValue
+    fn set_cell_value(&mut self, address: &SimpleCellAddress, new_value: CellValue) -> ();
+    fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> ();
 }
 
-impl<'a> IAddressMapping for ArrayAddressMapping<'a> {
+impl IAddressMapping for ArrayAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue {
         let position = address.col * address.row;
-        match &self.mapping[position as usize] {
-            None => self.default_empty.get_cell_value(),
-            Some(x) => x.get_cell_value(),
-        }
+        self.mapping[position as usize].borrow().get_cell_value()
+    }
+
+    fn set_cell_value(&mut self, address: &SimpleCellAddress, new_value: CellValue) -> () {
+        let position = address.col * address.row;
+        self.mapping[position as usize].borrow_mut().set_cell_value(new_value);
+    }
+
+    fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> () {
+        let position = address.col * address.row;
+        self.mapping[position as usize] = cell.clone()
     }
 }
 
-fn build_array_address_mapping<'a>(width: i32, height: i32, default_empty: &'a EmptyCellVertex) -> ArrayAddressMapping<'a> {
+fn build_array_address_mapping(width: i32, height: i32, default_empty: Rc<RefCell<ICellVertex>>) -> ArrayAddressMapping {
     let elements = width * height;
-    // highly unoptimized!
-    let mut mapping = Vec::new();
-    for _ in 1..elements {
-        mapping.push(None)
-    }
+    let mapping = vec![default_empty.clone(); elements as usize];
     ArrayAddressMapping {
         mapping: mapping,
         remote_cache: HashMap::new(),
-        default_empty: default_empty,
+        default_empty: default_empty.clone(),
     }
 }
 
@@ -282,35 +280,44 @@ mod tests {
     fn it_works() {
         assert_eq!(2 + 2, 4);
         let mut graph = Graph::build();
-        let node1 = Box::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) });
-        let node2 = Box::new(ValueCellVertex { color: 0, vertex_id: 2, cell_value: CellValue::Number(13) });
+        let node1 = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) }));
+        let node2 = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 2, cell_value: CellValue::Number(13) }));
         graph.add_node(node1);
         graph.add_node(node2);
-        let graph_node1 = &graph.nodes.get(&1).unwrap().borrow();
-        assert_eq!(graph_node1.datum.get_vertex_id(), 1)
+        let graph_node1id = graph.nodes.get(&1).unwrap().borrow().datum.borrow().get_vertex_id();
+        assert_eq!(graph_node1id, 1)
     }
 
     #[test]
     fn it_works2() {
         let mut graph = Graph::build();
-        let node1 = Box::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) });
-        let node2 = Box::new(ValueCellVertex { color: 0, vertex_id: 2, cell_value: CellValue::Number(13) });
-        let node3 = Box::new(ValueCellVertex { color: 0, vertex_id: 3, cell_value: CellValue::Number(13) });
+        let node1 = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) }));
+        let node2 = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 2, cell_value: CellValue::Number(13) }));
+        let node3 = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 3, cell_value: CellValue::Number(13) }));
         graph.add_node(node1);
         graph.add_node(node2);
         graph.add_node(node3);
         graph.add_edge_by_ids(&1, &2);
         assert_eq!(graph.edge_exists(&1, &2), true);
         assert_eq!(graph.edge_exists(&1, &3), false);
-        // let graph_node1 = &graph.nodes.get(&1).unwrap().borrow();
-        // assert_eq!(graph_node1.datum.get_vertex_id(), 1)
     }
 
     #[test]
     fn it_works3() {
-        let empty = EmptyCellVertex { color: 0, vertex_id: 0 };
-        let address_mapping = build_array_address_mapping(4, 4, &empty);
+        let mut graph = Graph::build();
+        let empty = Rc::new(RefCell::new(EmptyCellVertex { color: 0, vertex_id: 0 }));
+        graph.add_node(empty.clone());
+        let mut address_mapping = build_array_address_mapping(4, 4, empty.clone());
         let some_address = SimpleCellAddress { col: 0, row: 0 };
         assert_eq!(address_mapping.get_cell_value(&some_address), CellValue::Number(0));
+
+        let other_address = SimpleCellAddress { col: 1, row: 0 };
+        let other_node = Rc::new(RefCell::new(ValueCellVertex { color: 0, vertex_id: 1, cell_value: CellValue::Number(42) }));
+        graph.add_node(other_node.clone());
+        address_mapping.set_cell(&other_address, other_node.clone());
+        assert_eq!(address_mapping.get_cell_value(&other_address), CellValue::Number(42));
+
+        address_mapping.set_cell_value(&other_address, CellValue::Number(13));
+        assert_eq!(address_mapping.get_cell_value(&other_address), CellValue::Number(13));
     }
 }
