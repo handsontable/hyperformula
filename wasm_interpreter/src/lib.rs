@@ -233,7 +233,6 @@ impl IGraph for Graph {
 struct ArrayAddressMapping {
     mapping: Vec<Rc<RefCell<ICellVertex>>>,
     default_empty: Rc<RefCell<ICellVertex>>,
-    remote_cache: HashMap<i32, CellValue>,
 }
 
 trait IAddressMapping {
@@ -255,7 +254,7 @@ impl IAddressMapping for ArrayAddressMapping {
 
     fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> () {
         let position = address.col * address.row;
-        self.mapping[position as usize] = cell.clone()
+        self.mapping[position as usize] = cell.clone();
     }
 }
 
@@ -264,8 +263,35 @@ fn build_array_address_mapping(width: i32, height: i32, default_empty: Rc<RefCel
     let mapping = vec![default_empty.clone(); elements as usize];
     ArrayAddressMapping {
         mapping: mapping,
-        remote_cache: HashMap::new(),
         default_empty: default_empty.clone(),
+    }
+}
+
+struct RangeMapping {
+    mapping: HashMap<String, Rc<RefCell<RangeVertex>>>
+}
+
+fn buildRangeMapping() -> RangeMapping {
+    RangeMapping {
+        mapping: HashMap::new()
+    }
+}
+
+trait IRangeMapping {
+    fn get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Rc<RefCell<RangeVertex>>;
+    fn set_range(&mut self, node: Rc<RefCell<RangeVertex>>) -> ();
+}
+
+impl IRangeMapping for RangeMapping {
+    fn get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Rc<RefCell<RangeVertex>> {
+        let key = format!("{},{},{},{}", start.col, start.row, end.col, end.row);
+        self.mapping.get(&key).unwrap().clone()
+    }
+    fn set_range(&mut self, node: Rc<RefCell<RangeVertex>>) -> () {
+        let start = &node.borrow().start;
+        let end = &node.borrow().end;
+        let key = format!("{},{},{},{}", start.col, start.row, end.col, end.row);
+        self.mapping.insert(key, node.clone());
     }
 }
 
@@ -319,5 +345,18 @@ mod tests {
 
         address_mapping.set_cell_value(&other_address, CellValue::Number(13));
         assert_eq!(address_mapping.get_cell_value(&other_address), CellValue::Number(13));
+    }
+
+    #[test]
+    fn range_mapping() {
+        let mut range_mapping = buildRangeMapping();
+        let node = Rc::new(RefCell::new(RangeVertex {
+            color: 0,
+            vertex_id: 42,
+            start: SimpleCellAddress { col: 0, row: 0 },
+            end: SimpleCellAddress { col: 0, row: 1 },
+        }));
+        range_mapping.set_range(node);
+        assert_eq!(range_mapping.get_range(&SimpleCellAddress { col: 0, row: 0 }, &SimpleCellAddress { col: 0, row: 1 }).borrow().get_vertex_id(), 42)
     }
 }
