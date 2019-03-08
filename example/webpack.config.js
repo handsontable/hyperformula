@@ -15,6 +15,9 @@ module.exports = {
       withTypeScript: true // this is new
     }),
   ],
+  optimization: {
+    minimizer: []
+  },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".wasm"]
   },
