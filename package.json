@@ -1,4 +1,7 @@
 {
+  "name": "handsonengine",
+  "version": "0.0.1",
+  "module": "lib/src/index.js",
   "devDependencies": {
     "@microsoft/tsdoc": "^0.12.4",
     "@types/csv-parse": "^1.1.11",
