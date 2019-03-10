@@ -107,9 +107,9 @@ export class HandsOnEngine {
   }
 
   /**
-   * Creates CSV string out of sheet content
-   */
-  public exportAsCsv(): string {
+   * Returns array with values of all cells
+   * */
+  public getValues() {
     const sheetHeight = this.addressMapping.getHeight()
     const sheetWidth = this.addressMapping.getWidth()
 
@@ -135,7 +135,14 @@ export class HandsOnEngine {
       }
     }
 
-    return stringify(arr, { delimiter: ','})
+    return arr
+  }
+
+  /**
+   * Creates CSV string out of sheet content
+   */
+  public exportAsCsv(): string {
+    return stringify(this.getValues(), { delimiter: ','})
   }
 
   /**
