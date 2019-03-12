@@ -16,6 +16,30 @@ extern "C" {
 
     #[wasm_bindgen(method, getter)]
     fn row(this: &ExportedSimpleCellAddress) -> i32;
+
+    pub type ExportedAst;
+    #[wasm_bindgen(method, getter)]
+    fn kind(this: &ExportedAst) -> String;
+    #[wasm_bindgen(method, getter)]
+    fn start(this: &ExportedAst) -> ExportedCellAddress;
+    #[wasm_bindgen(method, getter)]
+    fn end(this: &ExportedAst) -> ExportedCellAddress;
+    #[wasm_bindgen(method, getter)]
+    fn procedureName(this: &ExportedAst) -> String;
+    #[wasm_bindgen(method, getter)]
+    fn args(this: &ExportedAst) -> Array;
+
+    pub type ExportedCellAddress;
+    #[wasm_bindgen(method, getter)]
+    fn col(this: &ExportedCellAddress) -> i32;
+    #[wasm_bindgen(method, getter)]
+    fn row(this: &ExportedCellAddress) -> i32;
+    #[wasm_bindgen(method, getter)]
+    fn kind(this: &ExportedCellAddress) -> String;
+
+    pub type Array;
+    #[wasm_bindgen(method, js_name = forEach)]
+    pub fn for_each(this: &Array, callback: &mut FnMut(ExportedAst, u32, Array));
 }
 
 #[wasm_bindgen]
@@ -36,7 +60,7 @@ pub enum CellValue {
     // Error()
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum CellReferenceType {
     Relative,
     Absolute,
@@ -44,19 +68,20 @@ enum CellReferenceType {
     AbsoluteRow,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct CellAddress {
     col: i32,
     row: i32,
     kind: CellReferenceType,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct SimpleCellAddress {
     col: i32,
     row: i32,
 }
 
+#[derive(Clone, Debug)]
 enum Ast {
     NumberAst {
         value: i32,
@@ -67,7 +92,53 @@ enum Ast {
     },
     ProcedureAst {
         procedure_name: String,
-        args: Box<[Ast]>,
+        args: Vec<Ast>,
+    }
+}
+
+fn reference_type_by_js_string(kind: String) -> CellReferenceType {
+    match kind.as_ref() {
+        "CELL_REFERENCE" => CellReferenceType::Relative,
+        "CELL_REFERENCE_ABSOLUTE" => CellReferenceType::Absolute,
+        "CELL_REFERENCE_ABSOLUTE_COL" => CellReferenceType::AbsoluteCol,
+        "CELL_REFERENCE_ABSOLUTE_ROW" => CellReferenceType::AbsoluteRow,
+        _ => panic!("Unknown JS Cell Reference type"),
+    }
+}
+
+fn convert_ast(js_ast: ExportedAst) -> Ast {
+    log(&format!("Got js ast: {}", js_ast.kind()));
+    if js_ast.kind() == "CELL_RANGE" {
+        log(&format!("Yep, cell range"));
+        log(&format!("reference type {}", js_ast.start().kind()));
+        // log(&format!("start reference type js ast: {:?}", reference_type_by_js_string(js_ast.start().kind())));
+        Ast::CellRangeAst {
+            start: CellAddress {
+                kind: reference_type_by_js_string(js_ast.start().kind()),
+                col: js_ast.start().col(),
+                row: js_ast.start().row(),
+            },
+            end: CellAddress {
+                kind: reference_type_by_js_string(js_ast.start().kind()),
+                col: js_ast.end().col(),
+                row: js_ast.end().row(),
+            },
+        }
+    } else if js_ast.kind() == "FUNCTION_CALL" {
+        let mut parsed_args = Vec::new();
+        // pub fn for_each(this: &Array, callback: &mut FnMut(JsValue, u32, Array));
+        let mut callback = |js_arg_ast: ExportedAst, _js_index: u32, _js_arr: Array| -> () {
+            parsed_args.push(convert_ast(js_arg_ast))
+        };
+        js_ast.args().for_each(&mut callback);
+        log(&format!("Args: {:?}", parsed_args));
+        Ast::ProcedureAst {
+            procedure_name: js_ast.procedureName(),
+            args: parsed_args,
+            // args: js_ast.args
+        }
+    } else {
+        panic!("Unknown ast");
     }
 }
 
@@ -344,7 +415,19 @@ impl InterpretingBundle {
         self.address_mapping.set_cell(&address, vertex.clone());
     }
 
-    // pub fn build_formula_node_into_graph(&mut self, address: SimpleCellAddress, ast: JavascriptAst) {
+    pub fn build_formula_node_into_graph(&mut self, js_address: ExportedSimpleCellAddress, js_ast: ExportedAst) -> () {
+        let address = SimpleCellAddress { col: js_address.col(), row: js_address.row() };
+        let next_vertex_id = self.vertex_counter;
+        self.vertex_counter += 1;
+        let vertex = Rc::new(RefCell::new(FormulaCellVertex {
+            color: 0,
+            vertex_id: next_vertex_id,
+            cached_cell_value: None,
+            address: address.clone(),
+            formula: convert_ast(js_ast),
+        }));
+        self.graph.add_node(vertex.clone());
+        self.address_mapping.set_cell(&address, vertex.clone());
     //     let next_vertex_id = self.vertex_counter++
     //     let vertex = Rc::new(RefCell::new(FormulaCellVertex {
     //         color: 0,
@@ -362,7 +445,7 @@ impl InterpretingBundle {
     //     //     dependencies.set(cellAddress, parseResult.dependencies)
     //     //     this.graph.addNode(vertex)
     //     //     this.addressMapping.setCell(cellAddress, vertex)
-    // }
+    }
 }
 
 #[wasm_bindgen]

@@ -64,7 +64,7 @@ export class GraphBuilder {
           dependencies.set(cellAddress, parseResult.dependencies)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
-          // this.bundle.buildIntoGraph(cellAddress, parseResult.ast)
+          // this.bundle.build_formula_node_into_graph(cellAddress, parseResult.ast)
         } else if (cellContent === '') {
           /* we don't care about empty cells here */
         } else if (!isNaN(Number(cellContent))) {

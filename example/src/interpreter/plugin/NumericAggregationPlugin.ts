@@ -34,7 +34,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return ast.args.reduce((currentSum: CellValue, arg) => {
       let value
-      if (arg.type === AstNodeType.CELL_RANGE) {
+      if (arg.kind === AstNodeType.CELL_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, 'SUM', reduceSum)
       } else {
         value = this.evaluateAst(arg, formulaAddress)

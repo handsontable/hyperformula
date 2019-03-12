@@ -55,7 +55,7 @@ export class ParserWithCaching {
     const { ast, relativeDependencies } = cacheResult
     const dependencies = absolutizeDependencies(relativeDependencies, formulaAddress)
 
-    if (ast.type === AstNodeType.ERROR) {
+    if (ast.kind === AstNodeType.ERROR) {
       return { ast, dependencies: [] }
     } else {
       return { ast, dependencies }

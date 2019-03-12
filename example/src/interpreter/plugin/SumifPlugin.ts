@@ -96,7 +96,7 @@ export class SumifPlugin extends FunctionPlugin {
     const conditionRangeArg = ast.args[0]
     const valuesRangeArg = ast.args[2]
 
-    if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
+    if (conditionRangeArg.kind === AstNodeType.CELL_RANGE && valuesRangeArg.kind === AstNodeType.CELL_RANGE) {
       const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
 
@@ -105,7 +105,7 @@ export class SumifPlugin extends FunctionPlugin {
       }
 
       return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
-    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
+    } else if (conditionRangeArg.kind === AstNodeType.CELL_REFERENCE && valuesRangeArg.kind === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
       return cellError(ErrorType.VALUE)
@@ -138,10 +138,10 @@ export class SumifPlugin extends FunctionPlugin {
 
     const criterionLambda = buildCriterionLambda(criterion)
 
-    if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
+    if (conditionRangeArg.kind === AstNodeType.CELL_RANGE) {
       const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
       return this.evaluateRangeCountif(simpleConditionRange, criterionString, criterion)
-    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
+    } else if (conditionRangeArg.kind === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
       const criterionResult = criterionLambda(valueFromCellReference)
       if (criterionResult) {

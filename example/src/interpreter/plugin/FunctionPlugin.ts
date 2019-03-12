@@ -47,7 +47,7 @@ export abstract class FunctionPlugin {
   protected computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
     const values: number[] = []
     for (const ast of asts) {
-      if (ast.type === AstNodeType.CELL_RANGE) {
+      if (ast.kind === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
           const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
           if (typeof value === 'number') {

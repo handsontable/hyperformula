@@ -400,9 +400,9 @@ export class FormulaParser extends Parser {
     })
 
     if (end !== undefined) {
-      if (offsetProcedure.type === AstNodeType.CELL_REFERENCE && end.type === AstNodeType.CELL_REFERENCE) {
+      if (offsetProcedure.kind === AstNodeType.CELL_REFERENCE && end.kind === AstNodeType.CELL_REFERENCE) {
         return buildCellRangeAst(offsetProcedure.reference, end!.reference)
-      } else if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
+      } else if (offsetProcedure.kind === AstNodeType.CELL_RANGE) {
         return buildErrorAst([
           {
             type: ParsingErrorType.RangeOffsetNotAllowed,
@@ -440,7 +440,7 @@ export class FormulaParser extends Parser {
     this.CONSUME2(RangeSeparator)
     const end = this.SUBRULE(this.endOfRangeExpression)
 
-    if (end.type !== AstNodeType.CELL_REFERENCE) {
+    if (end.kind !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([
         {
           type: ParsingErrorType.RangeOffsetNotAllowed,
@@ -465,7 +465,7 @@ export class FormulaParser extends Parser {
       {
         ALT: () => {
           const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
-          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+          if (offsetProcedure.kind === AstNodeType.CELL_REFERENCE) {
             return buildCellReferenceAst(offsetProcedure.reference)
           } else {
             return buildErrorAst([
@@ -545,7 +545,7 @@ export class FormulaParser extends Parser {
    */
   private handleOffsetHeuristic(args: Ast[]): Ast {
     const cellArg = args[0]
-    if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
+    if (cellArg.kind !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([{
         type: ParsingErrorType.StaticOffsetError,
         message: 'First argument to OFFSET is not a reference',
@@ -553,9 +553,9 @@ export class FormulaParser extends Parser {
     }
     const rowsArg = args[1]
     let rowShift
-    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
+    if (rowsArg.kind === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
       rowShift = rowsArg.value
-    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
+    } else if (rowsArg.kind === AstNodeType.MINUS_UNARY_OP && rowsArg.value.kind === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
       rowShift = -rowsArg.value.value
     } else {
       return buildErrorAst([{
@@ -565,9 +565,9 @@ export class FormulaParser extends Parser {
     }
     const columnsArg = args[2]
     let colShift
-    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
+    if (columnsArg.kind === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
       colShift = columnsArg.value
-    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
+    } else if (columnsArg.kind === AstNodeType.MINUS_UNARY_OP && columnsArg.value.kind === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
       colShift = -columnsArg.value.value
     } else {
       return buildErrorAst([{
@@ -579,7 +579,7 @@ export class FormulaParser extends Parser {
     let height
     if (heightArg === undefined) {
       height = 1
-    } else if (heightArg.type === AstNodeType.NUMBER) {
+    } else if (heightArg.kind === AstNodeType.NUMBER) {
       height = heightArg.value
       if (height < 1) {
         return buildErrorAst([{
@@ -602,7 +602,7 @@ export class FormulaParser extends Parser {
     let width
     if (widthArg === undefined) {
       width = 1
-    } else if (widthArg.type === AstNodeType.NUMBER) {
+    } else if (widthArg.kind === AstNodeType.NUMBER) {
       width = widthArg.value
       if (width < 1) {
         return buildErrorAst([{

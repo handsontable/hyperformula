@@ -32,7 +32,7 @@ export class SumprodPlugin extends FunctionPlugin {
     const leftRange = ast.args[0]
     const rightRange = ast.args[1]
 
-    if (leftRange.type !== AstNodeType.CELL_RANGE || rightRange.type !== AstNodeType.CELL_RANGE) {
+    if (leftRange.kind !== AstNodeType.CELL_RANGE || rightRange.kind !== AstNodeType.CELL_RANGE) {
       return cellError(ErrorType.VALUE)
     }
 

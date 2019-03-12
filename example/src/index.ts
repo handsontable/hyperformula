@@ -14,21 +14,27 @@ function sheet() {
     if (current % divider === 0) {
       rowToPush = [
         `${current}`,
-        `=MEDIAN(A1, A1:A${current}, C${current})`,
+        // `=MEDIAN(A1, A1:A${current}, C${current})`,
+        `=MEDIAN(A1:A${current})`,
         `${current}`,
-        `=MEDIAN(C1, C1:C${current}, E${current})`,
+        // `=MEDIAN(C1, C1:C${current}, E${current})`,
+        `=MEDIAN(C1:C${current})`,
         `${current}`,
-        `=MEDIAN(E1, E1:E${current}, A${current})`,
+        // `=MEDIAN(E1, E1:E${current}, A${current})`,
+        `=MEDIAN(E1:E${current})`,
       ]
       dependent++
     } else {
       rowToPush = [
         `${current}`,
-        `=MEDIAN(A1, A1:A${current}, A1)`,
+        // `=MEDIAN(A1, A1:A${current}, A1)`,
+        `=MEDIAN(A1:A${current})`,
         `${current}`,
-        `=MEDIAN(C1, C1:C${current}, C1)`,
+        // `=MEDIAN(C1, C1:C${current}, C1)`,
+        `=MEDIAN(C1:C${current})`,
         `${current}`,
-        `=MEDIAN(E1, E1:E${current}, E1)`,
+        // `=MEDIAN(E1, E1:E${current}, E1)`,
+        `=MEDIAN(E1:E${current})`,
       ]
     }
     sheet.push(rowToPush)

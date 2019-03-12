@@ -41,7 +41,7 @@ export class Interpreter {
    * @param formulaAddress - address of the cell in which formula is located
    */
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    switch (ast.type) {
+    switch (ast.kind) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
         const vertex = this.addressMapping.getCell(address)!

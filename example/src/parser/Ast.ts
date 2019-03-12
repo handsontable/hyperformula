@@ -65,37 +65,37 @@ export enum AstNodeType {
 }
 
 export interface NumberAst {
-  type: AstNodeType.NUMBER,
+  kind: AstNodeType.NUMBER,
   value: number,
 }
 
-export const buildNumberAst = (value: number): NumberAst => ({type: AstNodeType.NUMBER, value})
+export const buildNumberAst = (value: number): NumberAst => ({kind: AstNodeType.NUMBER, value})
 
 export interface StringAst {
-  type: AstNodeType.STRING,
+  kind: AstNodeType.STRING,
   value: string,
 }
 
-export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.STRING, value})
+export const buildStringAst = (value: string): StringAst => ({kind: AstNodeType.STRING, value})
 
 export interface CellReferenceAst {
-  type: AstNodeType.CELL_REFERENCE,
+  kind: AstNodeType.CELL_REFERENCE,
   reference: CellAddress
 }
 
 export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
-  type: AstNodeType.CELL_REFERENCE,
+  kind: AstNodeType.CELL_REFERENCE,
   reference,
 })
 
 export interface CellRangeAst {
-  type: AstNodeType.CELL_RANGE,
+  kind: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({
-  type: AstNodeType.CELL_RANGE,
+  kind: AstNodeType.CELL_RANGE,
   start,
   end,
 })
@@ -106,150 +106,150 @@ export interface BinaryOpAst {
 }
 
 export interface ConcatenateOpAst extends BinaryOpAst {
-  type: AstNodeType.CONCATENATE_OP
+  kind: AstNodeType.CONCATENATE_OP
 }
 
 export const buildConcatenateOpAst = (left: Ast, right: Ast): ConcatenateOpAst => ({
-  type: AstNodeType.CONCATENATE_OP,
+  kind: AstNodeType.CONCATENATE_OP,
   left,
   right,
 })
 
 export interface EqualsOpAst extends BinaryOpAst {
-  type: AstNodeType.EQUALS_OP
+  kind: AstNodeType.EQUALS_OP
 }
 
 export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
-  type: AstNodeType.EQUALS_OP,
+  kind: AstNodeType.EQUALS_OP,
   left,
   right,
 })
 
 export interface NotEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.NOT_EQUAL_OP
+  kind: AstNodeType.NOT_EQUAL_OP
 }
 
 export const buildNotEqualOpAst = (left: Ast, right: Ast): NotEqualOpAst => ({
-  type: AstNodeType.NOT_EQUAL_OP,
+  kind: AstNodeType.NOT_EQUAL_OP,
   left,
   right,
 })
 
 export interface GreaterThanOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OP
+  kind: AstNodeType.GREATER_THAN_OP
 }
 
 export const buildGreaterThanOpAst = (left: Ast, right: Ast): GreaterThanOpAst => ({
-  type: AstNodeType.GREATER_THAN_OP,
+  kind: AstNodeType.GREATER_THAN_OP,
   left,
   right,
 })
 
 export interface LessThanOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OP
+  kind: AstNodeType.LESS_THAN_OP
 }
 
 export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
-  type: AstNodeType.LESS_THAN_OP,
+  kind: AstNodeType.LESS_THAN_OP,
   left,
   right,
 })
 
 export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP
+  kind: AstNodeType.GREATER_THAN_OR_EQUAL_OP
 }
 
 export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast): GreaterThanOrEqualOpAst => ({
-  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
+  kind: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
   left,
   right,
 })
 
 export interface LessThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OR_EQUAL_OP
+  kind: AstNodeType.LESS_THAN_OR_EQUAL_OP
 }
 
 export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast): LessThanOrEqualOpAst => ({
-  type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
+  kind: AstNodeType.LESS_THAN_OR_EQUAL_OP,
   left,
   right,
 })
 
 export interface PlusOpAst extends BinaryOpAst {
-  type: AstNodeType.PLUS_OP,
+  kind: AstNodeType.PLUS_OP,
 }
 
 export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({
-  type: AstNodeType.PLUS_OP,
+  kind: AstNodeType.PLUS_OP,
   left,
   right,
 })
 
 export interface MinusOpAst extends BinaryOpAst {
-  type: AstNodeType.MINUS_OP,
+  kind: AstNodeType.MINUS_OP,
 }
 
 export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({
-  type: AstNodeType.MINUS_OP,
+  kind: AstNodeType.MINUS_OP,
   left,
   right,
 })
 
 export interface MinusUnaryOpAst {
-  type: AstNodeType.MINUS_UNARY_OP,
+  kind: AstNodeType.MINUS_UNARY_OP,
   value: Ast,
 }
 
 export const buildMinusUnaryOpAst = (value: Ast): MinusUnaryOpAst => ({
-  type: AstNodeType.MINUS_UNARY_OP,
+  kind: AstNodeType.MINUS_UNARY_OP,
   value,
 })
 
 export interface TimesOpAst extends BinaryOpAst {
-  type: AstNodeType.TIMES_OP,
+  kind: AstNodeType.TIMES_OP,
 }
 
 export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({
-  type: AstNodeType.TIMES_OP,
+  kind: AstNodeType.TIMES_OP,
   left,
   right,
 })
 
 export interface DivOpAst extends BinaryOpAst {
-  type: AstNodeType.DIV_OP,
+  kind: AstNodeType.DIV_OP,
 }
 
 export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({
-  type: AstNodeType.DIV_OP,
+  kind: AstNodeType.DIV_OP,
   left,
   right,
 })
 
 export interface PowerOpAst extends BinaryOpAst {
-  type: AstNodeType.POWER_OP,
+  kind: AstNodeType.POWER_OP,
 }
 
 export const buildPowerOpAst = (left: Ast, right: Ast): PowerOpAst => ({
-  type: AstNodeType.POWER_OP,
+  kind: AstNodeType.POWER_OP,
   left,
   right,
 })
 
 export interface ProcedureAst {
-  type: AstNodeType.FUNCTION_CALL,
+  kind: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[]
 }
 
 export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
-  type: AstNodeType.FUNCTION_CALL,
+  kind: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
 })
 
 export interface ErrorAst {
-  type: AstNodeType.ERROR,
+  kind: AstNodeType.ERROR,
   args: ParsingError[]
 }
 
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
+export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({kind: AstNodeType.ERROR, args})

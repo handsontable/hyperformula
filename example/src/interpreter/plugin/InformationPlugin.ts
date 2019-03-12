@@ -52,7 +52,7 @@ export class InformationPlugin extends FunctionPlugin {
       return cellError(ErrorType.NA)
     }
     const arg = ast.args[0]
-    if (arg.type === AstNodeType.CELL_REFERENCE) {
+    if (arg.kind === AstNodeType.CELL_REFERENCE) {
       const address = getAbsoluteAddress(arg.reference, formulaAddress)
       const vertex = this.addressMapping.getCell(address)
       return (vertex === EmptyCellVertex.getSingletonInstance())
@@ -74,7 +74,7 @@ export class InformationPlugin extends FunctionPlugin {
       return cellError(ErrorType.NA)
     }
     const rangeAst = ast.args[0]
-    if (rangeAst.type === AstNodeType.CELL_RANGE) {
+    if (rangeAst.kind === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.col - rangeAst.start.col + 1)
     } else {
       return cellError(ErrorType.VALUE)
