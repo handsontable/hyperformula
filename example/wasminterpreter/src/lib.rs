@@ -295,6 +295,24 @@ impl IRangeMapping for RangeMapping {
     }
 }
 
+#[wasm_bindgen]
+pub struct InterpretingBundle {
+    range_mapping: RangeMapping,
+    address_mapping: ArrayAddressMapping,
+    default_empty: Rc<RefCell<EmptyCellVertex>>,
+}
+
+#[wasm_bindgen]
+pub fn build_interpreting_bundle(height: i32, width: i32) -> InterpretingBundle {
+    log("Building interpreting bundle");
+    let default_empty = Rc::new(RefCell::new(EmptyCellVertex { color: 0, vertex_id: 0 }));
+    InterpretingBundle {
+        range_mapping: buildRangeMapping(),
+        address_mapping: build_array_address_mapping(width, height, default_empty.clone()),
+        default_empty: default_empty,
+    }
+}
+
 
 
 // tests part

@@ -1,15 +1,56 @@
 import { ParserWithCaching } from "./parser/ParserWithCaching"
 import { Config } from "./Config"
+import { HandsOnEngine } from "./HandsOnEngine"
 
-import("../wasminterpreter/pkg/interpreter").then(module => {
-  console.warn(module)
-  module.greet("John")
+function sheet() {
+  const rows = 2000
+  const divider = 10
+
+  let dependent = 0
+  const sheet = []
+  let current = 1
+  while (current <= rows) {
+    let rowToPush
+    if (current % divider === 0) {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, C${current})`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, E${current})`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, A${current})`,
+      ]
+      dependent++
+    } else {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, A1)`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, C1)`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, E1)`,
+      ]
+    }
+    sheet.push(rowToPush)
+    ++current
+  }
+
+  return sheet
+}
+
+import("../wasminterpreter/pkg/interpreter").then(wasminterpreter => {
+  console.warn(wasminterpreter)
+  wasminterpreter.greet("John")
   const config = new Config();
   const parser = new ParserWithCaching(config)
   const formula = "=42"
   const { ast, dependencies } = parser.parse(formula, { col: 0, row: 0 })
+  // const engine = new HandsOnEngine()
   console.warn(formula)
   console.warn(ast)
+  const sheetMedian = sheet()
+  const engine = HandsOnEngine.buildFromArray(wasminterpreter, sheetMedian)
+  console.warn(engine.getCellValue('B1'))
   // won't typecheck if yourlib does not expose the run function
   // module.run();
 });
