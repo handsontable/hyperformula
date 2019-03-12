@@ -328,6 +328,22 @@ impl InterpretingBundle {
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
+
+    pub fn build_string_value_node_into_graph(&mut self, js_address: ExportedSimpleCellAddress, value: String) -> () {
+        log(&format!("Got string value: {}", &value));
+        let address = SimpleCellAddress { col: js_address.col(), row: js_address.row() };
+        let cell_value = CellValue::Text(value);
+        let next_vertex_id = self.vertex_counter;
+        self.vertex_counter += 1;
+        let vertex = Rc::new(RefCell::new(ValueCellVertex {
+            color: 0,
+            vertex_id: next_vertex_id,
+            cell_value: cell_value,
+        }));
+        self.graph.add_node(vertex.clone());
+        self.address_mapping.set_cell(&address, vertex.clone());
+    }
+
     // pub fn build_formula_node_into_graph(&mut self, address: SimpleCellAddress, ast: JavascriptAst) {
     //     let next_vertex_id = self.vertex_counter++
     //     let vertex = Rc::new(RefCell::new(FormulaCellVertex {

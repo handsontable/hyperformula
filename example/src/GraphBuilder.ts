@@ -76,6 +76,7 @@ export class GraphBuilder {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
+          this.bundle.build_string_value_node_into_graph(cellAddress, cellContent)
         }
       }
     }

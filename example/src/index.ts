@@ -34,6 +34,7 @@ function sheet() {
     sheet.push(rowToPush)
     ++current
   }
+  sheet.push(["Some random string"])
 
   return sheet
 }
