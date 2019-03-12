@@ -34,7 +34,7 @@ extern "C" {
     fn col(this: &ExportedCellAddress) -> i32;
     #[wasm_bindgen(method, getter)]
     fn row(this: &ExportedCellAddress) -> i32;
-    #[wasm_bindgen(method, getter)]
+    #[wasm_bindgen(method, getter, js_name = type)]
     fn kind(this: &ExportedCellAddress) -> String;
 
     pub type Array;
@@ -107,10 +107,10 @@ fn reference_type_by_js_string(kind: String) -> CellReferenceType {
 }
 
 fn convert_ast(js_ast: ExportedAst) -> Ast {
-    log(&format!("Got js ast: {}", js_ast.kind()));
+    // log(&format!("Got js ast: {}", js_ast.kind()));
     if js_ast.kind() == "CELL_RANGE" {
-        log(&format!("Yep, cell range"));
-        log(&format!("reference type {}", js_ast.start().kind()));
+        // log(&format!("Yep, cell range"));
+        // log(&format!("reference type {}", js_ast.start().kind()));
         // log(&format!("start reference type js ast: {:?}", reference_type_by_js_string(js_ast.start().kind())));
         Ast::CellRangeAst {
             start: CellAddress {
@@ -131,7 +131,7 @@ fn convert_ast(js_ast: ExportedAst) -> Ast {
             parsed_args.push(convert_ast(js_arg_ast))
         };
         js_ast.args().for_each(&mut callback);
-        log(&format!("Args: {:?}", parsed_args));
+        // log(&format!("Args: {:?}", parsed_args));
         Ast::ProcedureAst {
             procedure_name: js_ast.procedureName(),
             args: parsed_args,
