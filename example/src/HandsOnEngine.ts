@@ -21,6 +21,7 @@ import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {InterpretingBundle} from "../wasminterpreter/pkg/interpreter";
 
 /**
  * Engine for one sheet
@@ -41,7 +42,7 @@ export class HandsOnEngine {
    *
    * @param sheet - two-dimmensional array representation of sheet
    */
-  public static buildFromArray(wasminterpreter: any, sheet: Sheet, config: Config = new Config()): HandsOnEngine {
+  public static buildFromArray(wasminterpreter: typeof import("../wasminterpreter/pkg/interpreter"), sheet: Sheet, config: Config = new Config()): HandsOnEngine {
     return new HandsOnEngine(wasminterpreter, sheet, config)
   }
 
@@ -69,9 +70,10 @@ export class HandsOnEngine {
   /** Engine configuration */
   private readonly config: Config
 
-  private wasminterpreter: any
+  private wasminterpreter: typeof import("../wasminterpreter/pkg/interpreter")
+  private bundle: InterpretingBundle
 
-  constructor(wasminterpreter: any, sheet: Sheet, config: Config) {
+  constructor(wasminterpreter: typeof import("../wasminterpreter/pkg/interpreter"), sheet: Sheet, config: Config) {
     this.config = config
     this.wasminterpreter = wasminterpreter
 
@@ -81,9 +83,9 @@ export class HandsOnEngine {
     // this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
     const {height, width, fill} = findBoundaries(sheet)
     this.addressMapping = new ArrayAddressMapping(width, height)
-    const bundle = this.wasminterpreter.build_interpreting_bundle(height, width)
+    this.bundle = this.wasminterpreter.build_interpreting_bundle(height, width)
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
+    const graphBuilder = new GraphBuilder(this.bundle, this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {

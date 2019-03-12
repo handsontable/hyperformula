@@ -7,6 +7,15 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+
+    pub type ExportedSimpleCellAddress;
+
+    // #[wasm_bindgen(structural, method)]
+    #[wasm_bindgen(method, getter)]
+    fn col(this: &ExportedSimpleCellAddress) -> i32;
+
+    #[wasm_bindgen(method, getter)]
+    fn row(this: &ExportedSimpleCellAddress) -> i32;
 }
 
 #[wasm_bindgen]
@@ -21,7 +30,7 @@ use std::rc::Rc;
 use std::vec::Vec;
 
 #[derive(Clone, Debug, PartialEq)]
-enum CellValue {
+pub enum CellValue {
     Number(i32),
     Text(String),
     // Error()
@@ -78,7 +87,7 @@ struct ValueCellVertex {
 struct FormulaCellVertex {
     color: i8,
     vertex_id: i32,
-    cached_cell_value: CellValue,
+    cached_cell_value: Option<CellValue>,
     formula: Ast,
     address: SimpleCellAddress,
 }
@@ -163,11 +172,11 @@ impl ICellVertex for ValueCellVertex {
 
 impl ICellVertex for FormulaCellVertex {
     fn get_cell_value(&self) -> CellValue {
-        self.cached_cell_value.clone()
+        self.cached_cell_value.clone().unwrap()
     }
 
     fn set_cell_value(&mut self, new_cell_value: CellValue) -> () {
-        self.cached_cell_value = new_cell_value
+        self.cached_cell_value = Some(new_cell_value)
     }
 }
 
@@ -297,19 +306,61 @@ impl IRangeMapping for RangeMapping {
 
 #[wasm_bindgen]
 pub struct InterpretingBundle {
+    graph: Graph,
     range_mapping: RangeMapping,
     address_mapping: ArrayAddressMapping,
     default_empty: Rc<RefCell<EmptyCellVertex>>,
+    vertex_counter: i32,
+}
+
+#[wasm_bindgen]
+impl InterpretingBundle {
+    pub fn build_number_value_node_into_graph(&mut self, js_address: ExportedSimpleCellAddress, value: i32) -> () {
+        let address = SimpleCellAddress { col: js_address.col(), row: js_address.row() };
+        let cell_value = CellValue::Number(value);
+        let next_vertex_id = self.vertex_counter;
+        self.vertex_counter += 1;
+        let vertex = Rc::new(RefCell::new(ValueCellVertex {
+            color: 0,
+            vertex_id: next_vertex_id,
+            cell_value: cell_value,
+        }));
+        self.graph.add_node(vertex.clone());
+        self.address_mapping.set_cell(&address, vertex.clone());
+    }
+    // pub fn build_formula_node_into_graph(&mut self, address: SimpleCellAddress, ast: JavascriptAst) {
+    //     let next_vertex_id = self.vertex_counter++
+    //     let vertex = Rc::new(RefCell::new(FormulaCellVertex {
+    //         color: 0,
+    //         vertex_id: next_vertex_id,
+    //         cached_cell_value: None,
+    //         formula: 
+    //     }))
+
+    //         color: i8,
+    //         vertex_id: i32,
+    //         cached_cell_value: CellValue,
+    //         formula: Ast,
+    //         address: SimpleCellAddress,
+    //     // vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
+    //     //     dependencies.set(cellAddress, parseResult.dependencies)
+    //     //     this.graph.addNode(vertex)
+    //     //     this.addressMapping.setCell(cellAddress, vertex)
+    // }
 }
 
 #[wasm_bindgen]
 pub fn build_interpreting_bundle(height: i32, width: i32) -> InterpretingBundle {
     log("Building interpreting bundle");
     let default_empty = Rc::new(RefCell::new(EmptyCellVertex { color: 0, vertex_id: 0 }));
+    let mut graph = Graph::build();
+    graph.add_node(default_empty.clone());
     InterpretingBundle {
+        graph: graph,
         range_mapping: buildRangeMapping(),
         address_mapping: build_array_address_mapping(width, height, default_empty.clone()),
         default_empty: default_empty,
+        vertex_counter: 1,
     }
 }
 

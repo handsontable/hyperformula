@@ -7,6 +7,7 @@ import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {InterpretingBundle} from "../wasminterpreter/pkg/interpreter";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -31,7 +32,8 @@ export class GraphBuilder {
    * @param stats - dependency tracking building performance
    * @param config - configuration of the sheet
    */
-  constructor(private readonly graph: Graph<Vertex>,
+  constructor(public bundle: InterpretingBundle,
+    private readonly graph: Graph<Vertex>,
               private readonly addressMapping: IAddressMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
@@ -62,12 +64,14 @@ export class GraphBuilder {
           dependencies.set(cellAddress, parseResult.dependencies)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
+          // this.bundle.buildIntoGraph(cellAddress, parseResult.ast)
         } else if (cellContent === '') {
           /* we don't care about empty cells here */
         } else if (!isNaN(Number(cellContent))) {
           vertex = new ValueCellVertex(Number(cellContent))
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
+          this.bundle.build_number_value_node_into_graph(cellAddress, Number(cellContent))
         } else {
           vertex = new ValueCellVertex(cellContent)
           this.graph.addNode(vertex)
