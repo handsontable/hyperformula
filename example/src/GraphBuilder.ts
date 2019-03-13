@@ -89,6 +89,7 @@ export class GraphBuilder {
     dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (Array.isArray(absStartCell)) {
+          this.bundle.handle_range_dependency(absStartCell[0], absStartCell[1], endCell)
           const [rangeStart, rangeEnd] = absStartCell
           let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
           if (rangeVertex === null) {

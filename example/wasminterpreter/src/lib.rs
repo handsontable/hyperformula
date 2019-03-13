@@ -365,14 +365,24 @@ fn buildRangeMapping() -> RangeMapping {
 
 trait IRangeMapping {
     fn get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Rc<RefCell<RangeVertex>>;
+    fn maybe_get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Option<Rc<RefCell<RangeVertex>>>;
     fn set_range(&mut self, node: Rc<RefCell<RangeVertex>>) -> ();
 }
 
 impl IRangeMapping for RangeMapping {
+    fn maybe_get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Option<Rc<RefCell<RangeVertex>>> {
+        let key = format!("{},{},{},{}", start.col, start.row, end.col, end.row);
+        match self.mapping.get(&key) {
+            Some(vertex) => Some(vertex.clone()),
+            None => None
+        }
+    }
+
     fn get_range(&self, start: &SimpleCellAddress, end: &SimpleCellAddress) -> Rc<RefCell<RangeVertex>> {
         let key = format!("{},{},{},{}", start.col, start.row, end.col, end.row);
         self.mapping.get(&key).unwrap().clone()
     }
+
     fn set_range(&mut self, node: Rc<RefCell<RangeVertex>>) -> () {
         let start = &node.borrow().start;
         let end = &node.borrow().end;
@@ -442,6 +452,59 @@ impl InterpretingBundle {
         let from_vertex = self.address_mapping.get_cell(&from_address);
         let to_vertex = self.address_mapping.get_cell(&to_address);
         self.graph.add_edge_by_ids(&from_vertex.borrow().get_vertex_id(), &to_vertex.borrow().get_vertex_id());
+    }
+
+    pub fn handle_range_dependency(&mut self, from_start_js_address: ExportedSimpleCellAddress, from_end_js_address: ExportedSimpleCellAddress, to_js_address: ExportedSimpleCellAddress) -> () {
+        let from_start_address = SimpleCellAddress { col: from_start_js_address.col(), row: from_start_js_address.row() };
+        let from_end_address = SimpleCellAddress { col: from_end_js_address.col(), row: from_end_js_address.row() };
+        let to_address = SimpleCellAddress { col: to_js_address.col(), row: to_js_address.row() };
+        let to_vertex = self.address_mapping.get_cell(&to_address);
+        let range_vertex = match self.range_mapping.maybe_get_range(&from_start_address, &from_end_address) {
+            Some(vertex) => vertex,
+            None => {
+                let vertex = Rc::new(RefCell::new(RangeVertex {
+                    color: 0,
+                    vertex_id: self.vertex_counter,
+                    start: from_start_address.clone(),
+                    end: from_end_address.clone(),
+                }));
+                self.vertex_counter += 1;
+                self.range_mapping.set_range(vertex.clone());
+                vertex
+            }
+        };
+        self.graph.add_node(range_vertex.clone());
+        let (maybe_smaller_range_vertex, rest_range_start, rest_range_end) = self.find_smaller_range(from_start_address, from_end_address);
+
+        if let Some(smaller_range_vertex) = maybe_smaller_range_vertex {
+            self.graph.add_edge_by_ids(&smaller_range_vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id());
+        };
+
+        {
+            let mut current_row = rest_range_start.row;
+            while current_row <= rest_range_end.row {
+                let mut current_column = rest_range_start.col;
+                while current_column <= rest_range_end.col {
+                    let address = SimpleCellAddress { col: current_column, row: current_row };
+                    let vertex = self.address_mapping.get_cell(&address);
+                    self.graph.add_edge_by_ids(&vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id());
+                    current_column += 1;
+                }
+                current_row += 1;
+            }
+        }
+
+        self.graph.add_edge_by_ids(&range_vertex.borrow().get_vertex_id(), &to_vertex.borrow().get_vertex_id());
+    }
+
+    fn find_smaller_range(&self, start_address: SimpleCellAddress, end_address: SimpleCellAddress) -> (Option<Rc<RefCell<RangeVertex>>>, SimpleCellAddress, SimpleCellAddress) {
+        if end_address.row > start_address.row {
+            let end_address_row_less = SimpleCellAddress { col: end_address.col, row: end_address.row - 1 };
+            if let Some(vertex) = self.range_mapping.maybe_get_range(&start_address, &end_address_row_less) {
+                return (Some(vertex), SimpleCellAddress { col: start_address.col, row: end_address.row }, end_address)
+            }
+        };
+        (None, start_address, end_address)
     }
 }
 
