@@ -319,6 +319,7 @@ trait IAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue;
     fn set_cell_value(&mut self, address: &SimpleCellAddress, new_value: CellValue) -> ();
     fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> ();
+    fn get_cell(&self, address: &SimpleCellAddress) -> Rc<RefCell<ICellVertex>>;
 }
 
 impl IAddressMapping for ArrayAddressMapping {
@@ -335,6 +336,11 @@ impl IAddressMapping for ArrayAddressMapping {
     fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> () {
         let position = address.col * address.row;
         self.mapping[position as usize] = cell.clone();
+    }
+
+    fn get_cell(&self, address: &SimpleCellAddress) -> Rc<RefCell<ICellVertex>> {
+        let position = address.col * address.row;
+        self.mapping[position as usize].clone()
     }
 }
 
@@ -428,23 +434,14 @@ impl InterpretingBundle {
         }));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
-    //     let next_vertex_id = self.vertex_counter++
-    //     let vertex = Rc::new(RefCell::new(FormulaCellVertex {
-    //         color: 0,
-    //         vertex_id: next_vertex_id,
-    //         cached_cell_value: None,
-    //         formula: 
-    //     }))
+    }
 
-    //         color: i8,
-    //         vertex_id: i32,
-    //         cached_cell_value: CellValue,
-    //         formula: Ast,
-    //         address: SimpleCellAddress,
-    //     // vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
-    //     //     dependencies.set(cellAddress, parseResult.dependencies)
-    //     //     this.graph.addNode(vertex)
-    //     //     this.addressMapping.setCell(cellAddress, vertex)
+    pub fn handle_regular_dependency(&mut self, from_js_address: ExportedSimpleCellAddress, to_js_address: ExportedSimpleCellAddress) -> () {
+        let from_address = SimpleCellAddress { col: from_js_address.col(), row: from_js_address.row() };
+        let to_address = SimpleCellAddress { col: to_js_address.col(), row: to_js_address.row() };
+        let from_vertex = self.address_mapping.get_cell(&from_address);
+        let to_vertex = self.address_mapping.get_cell(&to_address);
+        self.graph.add_edge_by_ids(&from_vertex.borrow().get_vertex_id(), &to_vertex.borrow().get_vertex_id());
     }
 }
 

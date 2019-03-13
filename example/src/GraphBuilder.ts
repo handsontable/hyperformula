@@ -109,6 +109,7 @@ export class GraphBuilder {
 
           this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
         } else {
+          this.bundle.handle_regular_dependency(absStartCell, endCell)
           this.graph.addEdge(this.addressMapping.getCell(absStartCell), this.addressMapping.getCell(endCell)!)
         }
       })
