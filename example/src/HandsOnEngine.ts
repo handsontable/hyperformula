@@ -94,6 +94,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TOP_SORT, () => {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
+      this.bundle.compute_topological_sorting();
     })
 
     this.stats.measure(StatType.EVALUATION, () => {

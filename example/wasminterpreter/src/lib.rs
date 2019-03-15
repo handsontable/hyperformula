@@ -267,6 +267,7 @@ trait IGraph {
     fn add_node(&mut self, boxed_node: Rc<RefCell<IVertex>>) -> ();
     fn add_edge_by_ids(&mut self, from_node_id: &i32, to_node_id: &i32) -> ();
     fn edge_exists(&self, from_node_id: &i32, to_node_id: &i32) -> bool;
+    fn topological_sort(&self) -> Vec<i32>;
 }
 
 impl IGraph for Graph {
@@ -307,6 +308,44 @@ impl IGraph for Graph {
             }
         };
         false
+    }
+
+    fn topological_sort(&self) -> Vec<i32> {
+        let mut incoming_edges: HashMap<i32, i32> = HashMap::new();
+        for (vertex_id, source_node) in &self.nodes {
+            for target_node in &source_node.clone().borrow().edges {
+                let target_node_id = target_node.clone().borrow().datum.clone().borrow().get_vertex_id();
+                incoming_edges.insert(target_node_id, incoming_edges.get(&target_node_id).unwrap_or(&0) + 1);
+            }
+        }
+
+        let mut nodes_with_no_incoming_edge = Vec::new();
+        for (&vertex_id, &incoming_count) in &incoming_edges {
+            if incoming_count == 0 {
+                nodes_with_no_incoming_edge.push(vertex_id);
+            }
+        };
+        
+        let mut topological_ordering = Vec::new();
+        let mut current_node_index = 0;
+        while current_node_index < nodes_with_no_incoming_edge.len() {
+            let vertex_id = nodes_with_no_incoming_edge[current_node_index];
+        // for &mut vertex_id in &mut nodes_with_no_incoming_edge {
+            topological_ordering.push(vertex_id);
+            for target_node in &self.nodes.get(&vertex_id).unwrap().clone().borrow().edges {
+                let target_node_id = target_node.clone().borrow().datum.clone().borrow().get_vertex_id();
+                let new_count = incoming_edges.get(&target_node_id).unwrap() - 1;
+                incoming_edges.insert(target_node_id, new_count);
+                if new_count == 0 {
+                    nodes_with_no_incoming_edge.push(vertex_id);
+                }
+            }
+        }
+
+        topological_ordering
+        // while current_node_index < nodes_with_no_incoming_edge.len() {
+        //     topological_ordering
+        // }
     }
 }
 
@@ -398,6 +437,7 @@ pub struct InterpretingBundle {
     address_mapping: ArrayAddressMapping,
     default_empty: Rc<RefCell<EmptyCellVertex>>,
     vertex_counter: i32,
+    topological_sorting: Option<Vec<i32>>,
 }
 
 #[wasm_bindgen]
@@ -506,6 +546,11 @@ impl InterpretingBundle {
         };
         (None, start_address, end_address)
     }
+
+    pub fn compute_topological_sorting(&mut self) -> () {
+        let topological_ordering = self.graph.topological_sort();
+        self.topological_sorting = Some(topological_ordering);
+    }
 }
 
 #[wasm_bindgen]
@@ -520,6 +565,7 @@ pub fn build_interpreting_bundle(height: i32, width: i32) -> InterpretingBundle 
         address_mapping: build_array_address_mapping(width, height, default_empty.clone()),
         default_empty: default_empty,
         vertex_counter: 1,
+        topological_sorting: None,
     }
 }
 
