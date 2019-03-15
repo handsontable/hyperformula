@@ -3,9 +3,10 @@ import { Config } from "./Config"
 import { HandsOnEngine } from "./HandsOnEngine"
 
 function sheet() {
-  const rows = 2000
+  const rows = 10000
   const divider = 10
 
+  console.warn(`Rows: ${rows}`)
   let dependent = 0
   const sheet = []
   let current = 1
