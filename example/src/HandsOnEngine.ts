@@ -99,6 +99,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.EVALUATION, () => {
       this.recomputeFormulas()
+      this.bundle.compute_formulas();
     })
 
     this.stats.end(StatType.OVERALL)

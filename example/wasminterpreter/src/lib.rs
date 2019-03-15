@@ -142,6 +142,7 @@ fn convert_ast(js_ast: ExportedAst) -> Ast {
     }
 }
 
+#[derive(Debug)]
 struct RangeVertex {
     color: i8,
     vertex_id: i32,
@@ -149,12 +150,14 @@ struct RangeVertex {
     end: SimpleCellAddress,
 }
 
+#[derive(Debug)]
 struct ValueCellVertex {
     color: i8,
     vertex_id: i32,
     cell_value: CellValue,
 }
 
+#[derive(Debug)]
 struct FormulaCellVertex {
     color: i8,
     vertex_id: i32,
@@ -163,6 +166,7 @@ struct FormulaCellVertex {
     address: SimpleCellAddress,
 }
 
+#[derive(Debug)]
 struct EmptyCellVertex {
     vertex_id: i32,
     color: i8,
@@ -171,6 +175,13 @@ struct EmptyCellVertex {
 trait IVertex {
     fn get_color(&self) -> i8;
     fn get_vertex_id(&self) -> i32;
+    fn set_cell_value(&mut self, new_value: CellValue) -> () {
+        ()
+    }
+
+    fn get_formula(&self) -> Option<(&Ast, &SimpleCellAddress)> {
+        None
+    }
 }
 
 impl IVertex for ValueCellVertex {
@@ -201,6 +212,14 @@ impl IVertex for FormulaCellVertex {
     fn get_vertex_id(&self) -> i32 {
         self.vertex_id
     }
+
+    fn get_formula(&self) -> Option<(&Ast, &SimpleCellAddress)> {
+        Some((&self.formula, &self.address))
+    }
+
+    fn set_cell_value(&mut self, new_value: CellValue) -> () {
+        self.cached_cell_value = Some(new_value);
+    }
 }
 
 impl IVertex for RangeVertex {
@@ -215,18 +234,12 @@ impl IVertex for RangeVertex {
 
 trait ICellVertex : IVertex {
     fn get_cell_value(&self) -> CellValue;
-    fn set_cell_value(&mut self, new_cell_value: CellValue) -> ();
 }
 
 impl ICellVertex for EmptyCellVertex {
     fn get_cell_value(&self) -> CellValue {
         // that struct should OWN that cell value, so it can borrow it?
         CellValue::Number(0)
-    }
-
-    // a cheat.
-    fn set_cell_value(&mut self, _new_cell_value: CellValue) -> () {
-        ()
     }
 }
 
@@ -235,19 +248,11 @@ impl ICellVertex for ValueCellVertex {
         // that struct should OWN that cell value, so it can borrow it?
         self.cell_value.clone()
     }
-
-    fn set_cell_value(&mut self, new_cell_value: CellValue) -> () {
-        self.cell_value = new_cell_value
-    }
 }
 
 impl ICellVertex for FormulaCellVertex {
     fn get_cell_value(&self) -> CellValue {
         self.cached_cell_value.clone().unwrap()
-    }
-
-    fn set_cell_value(&mut self, new_cell_value: CellValue) -> () {
-        self.cached_cell_value = Some(new_cell_value)
     }
 }
 
@@ -312,19 +317,30 @@ impl IGraph for Graph {
 
     fn topological_sort(&self) -> Vec<i32> {
         let mut incoming_edges: HashMap<i32, i32> = HashMap::new();
-        for (vertex_id, source_node) in &self.nodes {
+        for (_vertex_id, source_node) in &self.nodes {
+            let source_node_id = source_node.clone().borrow().datum.clone().borrow().get_vertex_id();
+            incoming_edges.insert(source_node_id, 0);
+        }
+        for (_vertex_id, source_node) in &self.nodes {
+            // log(&format!("A node with", vertex_id, incoming_count));
+            let source_node_id = source_node.clone().borrow().datum.clone().borrow().get_vertex_id();
             for target_node in &source_node.clone().borrow().edges {
                 let target_node_id = target_node.clone().borrow().datum.clone().borrow().get_vertex_id();
-                incoming_edges.insert(target_node_id, incoming_edges.get(&target_node_id).unwrap_or(&0) + 1);
+                log(&format!("An edge betwen {} and {}", source_node_id, target_node_id));
+                incoming_edges.insert(target_node_id, incoming_edges.get(&target_node_id).unwrap() + 1);
             }
         }
 
         let mut nodes_with_no_incoming_edge = Vec::new();
         for (&vertex_id, &incoming_count) in &incoming_edges {
+            log(&format!("Element {} in incoming edges with count {}", vertex_id, incoming_count));
             if incoming_count == 0 {
                 nodes_with_no_incoming_edge.push(vertex_id);
+                // log(&format!("Adding {} to nodes with no inc edge", vertex_id));
             }
         };
+
+        // log(&format!("Size of initial topsort {}", nodes_with_no_incoming_edge.len()));
         
         let mut topological_ordering = Vec::new();
         let mut current_node_index = 0;
@@ -332,14 +348,17 @@ impl IGraph for Graph {
             let vertex_id = nodes_with_no_incoming_edge[current_node_index];
         // for &mut vertex_id in &mut nodes_with_no_incoming_edge {
             topological_ordering.push(vertex_id);
+            // log(&format!("Adding {} to topological ordering", vertex_id));
             for target_node in &self.nodes.get(&vertex_id).unwrap().clone().borrow().edges {
                 let target_node_id = target_node.clone().borrow().datum.clone().borrow().get_vertex_id();
                 let new_count = incoming_edges.get(&target_node_id).unwrap() - 1;
                 incoming_edges.insert(target_node_id, new_count);
                 if new_count == 0 {
-                    nodes_with_no_incoming_edge.push(vertex_id);
+                    nodes_with_no_incoming_edge.push(target_node_id);
+                    // log(&format!("Adding {} to nodes with no inc edge", target_node_id));
                 }
             }
+            current_node_index += 1;
         }
 
         topological_ordering
@@ -350,6 +369,7 @@ impl IGraph for Graph {
 }
 
 struct ArrayAddressMapping {
+    width: i32,
     mapping: Vec<Rc<RefCell<ICellVertex>>>,
     default_empty: Rc<RefCell<ICellVertex>>,
 }
@@ -363,22 +383,22 @@ trait IAddressMapping {
 
 impl IAddressMapping for ArrayAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue {
-        let position = address.col * address.row;
+        let position = address.row * self.width + address.col;
         self.mapping[position as usize].borrow().get_cell_value()
     }
 
     fn set_cell_value(&mut self, address: &SimpleCellAddress, new_value: CellValue) -> () {
-        let position = address.col * address.row;
+        let position = address.row * self.width + address.col;
         self.mapping[position as usize].borrow_mut().set_cell_value(new_value);
     }
 
     fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> () {
-        let position = address.col * address.row;
+        let position = address.row * self.width + address.col;
         self.mapping[position as usize] = cell.clone();
     }
 
     fn get_cell(&self, address: &SimpleCellAddress) -> Rc<RefCell<ICellVertex>> {
-        let position = address.col * address.row;
+        let position = address.row * self.width + address.col;
         self.mapping[position as usize].clone()
     }
 }
@@ -387,6 +407,7 @@ fn build_array_address_mapping(width: i32, height: i32, default_empty: Rc<RefCel
     let elements = width * height;
     let mapping = vec![default_empty.clone(); elements as usize];
     ArrayAddressMapping {
+        width: width,
         mapping: mapping,
         default_empty: default_empty.clone(),
     }
@@ -452,6 +473,7 @@ impl InterpretingBundle {
             vertex_id: next_vertex_id,
             cell_value: cell_value,
         }));
+        log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -467,6 +489,7 @@ impl InterpretingBundle {
             vertex_id: next_vertex_id,
             cell_value: cell_value,
         }));
+        log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -482,6 +505,7 @@ impl InterpretingBundle {
             address: address.clone(),
             formula: convert_ast(js_ast),
         }));
+        log(&format!("Added formula vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -508,6 +532,7 @@ impl InterpretingBundle {
                     start: from_start_address.clone(),
                     end: from_end_address.clone(),
                 }));
+                log(&format!("Added range vertex {:?}", vertex.clone()));
                 self.vertex_counter += 1;
                 self.range_mapping.set_range(vertex.clone());
                 vertex
@@ -521,12 +546,15 @@ impl InterpretingBundle {
         };
 
         {
+            log(&format!("Rest range: from {:?} to {:?}", rest_range_start, rest_range_end));
             let mut current_row = rest_range_start.row;
             while current_row <= rest_range_end.row {
                 let mut current_column = rest_range_start.col;
                 while current_column <= rest_range_end.col {
                     let address = SimpleCellAddress { col: current_column, row: current_row };
+                    log(&format!("Address which we want to connect {:?}", address));
                     let vertex = self.address_mapping.get_cell(&address);
+                    log(&format!("Adding edge when iterating on rest ({}, {})", &vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id()));
                     self.graph.add_edge_by_ids(&vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id());
                     current_column += 1;
                 }
@@ -549,7 +577,37 @@ impl InterpretingBundle {
 
     pub fn compute_topological_sorting(&mut self) -> () {
         let topological_ordering = self.graph.topological_sort();
+        log(&format!("Size of topological ordering {}", topological_ordering.len()));
         self.topological_sorting = Some(topological_ordering);
+    }
+
+    fn evaluate_ast(&self, formula: &Ast, address: &SimpleCellAddress) -> CellValue {
+        CellValue::Number(42)
+    }
+
+    pub fn compute_formulas(&mut self) -> () {
+        match &self.topological_sorting {
+            None => (),
+            Some(topological_order) => {
+                for vertex_id in topological_order {
+                    log(&format!("Computing {}", vertex_id));
+                    let vertex = self.graph.nodes.get(&vertex_id).unwrap().clone().borrow().datum.clone();
+                    let mut maybe_value = None;
+                    {
+                        if let Some((formula, address)) = vertex.borrow_mut().get_formula() {
+                            maybe_value = Some(CellValue::Number(42));
+                        };
+                    };
+                    match maybe_value {
+                        None => (),
+                        Some(new_value) => {
+                            vertex.borrow_mut().set_cell_value(new_value);
+                        },
+                    }
+                };
+            },
+        };
+        log(&format!("Computed everything"));
     }
 }
 
