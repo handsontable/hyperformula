@@ -59,6 +59,7 @@ import("../wasminterpreter/pkg/interpreter").then(wasminterpreter => {
   // const sheetMedian = [
   //   ['43', '42', '41', '=MEDIAN(A1:C1)'],
   // ];
+  HandsOnEngine.useWasm = true;
   const engine = HandsOnEngine.buildFromArray(wasminterpreter, sheetMedian)
   console.warn(engine.getCellValue('D1'))
   console.warn(engine.stats.snapshot());

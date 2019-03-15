@@ -32,12 +32,14 @@ export class GraphBuilder {
    * @param stats - dependency tracking building performance
    * @param config - configuration of the sheet
    */
-  constructor(public bundle: InterpretingBundle,
+  constructor(
     private readonly graph: Graph<Vertex>,
               private readonly addressMapping: IAddressMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
-              private readonly config: Config) {
+    private readonly config: Config,
+    public bundle?: InterpretingBundle,
+  ) {
     this.parser = new ParserWithCaching(config)
   }
 
@@ -60,23 +62,32 @@ export class GraphBuilder {
 
         if (isFormula(cellContent)) {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-          vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
-          dependencies.set(cellAddress, parseResult.dependencies)
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
-          this.bundle.build_formula_node_into_graph(cellAddress, parseResult.ast)
+          if (this.bundle) {
+            this.bundle.build_formula_node_into_graph(cellAddress, parseResult.ast)
+          } else {
+            vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
+            dependencies.set(cellAddress, parseResult.dependencies)
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          }
         } else if (cellContent === '') {
           /* we don't care about empty cells here */
         } else if (!isNaN(Number(cellContent))) {
-          vertex = new ValueCellVertex(Number(cellContent))
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
-          this.bundle.build_number_value_node_into_graph(cellAddress, Number(cellContent))
+          if (this.bundle) {
+            this.bundle.build_number_value_node_into_graph(cellAddress, Number(cellContent))
+          } else {
+            vertex = new ValueCellVertex(Number(cellContent))
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          }
         } else {
-          vertex = new ValueCellVertex(cellContent)
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
-          this.bundle.build_string_value_node_into_graph(cellAddress, cellContent)
+          if (this.bundle) {
+            this.bundle.build_string_value_node_into_graph(cellAddress, cellContent)
+          } else {
+            vertex = new ValueCellVertex(cellContent)
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          }
         }
       }
     }
@@ -89,29 +100,35 @@ export class GraphBuilder {
     dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (Array.isArray(absStartCell)) {
-          this.bundle.handle_range_dependency(absStartCell[0], absStartCell[1], endCell)
-          const [rangeStart, rangeEnd] = absStartCell
-          let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
-          if (rangeVertex === null) {
-            rangeVertex = new RangeVertex(rangeStart, rangeEnd)
-            this.rangeMapping.setRange(rangeVertex)
-          }
+          if (this.bundle) {
+            this.bundle.handle_range_dependency(absStartCell[0], absStartCell[1], endCell)
+          } else {
+            const [rangeStart, rangeEnd] = absStartCell
+            let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
+            if (rangeVertex === null) {
+              rangeVertex = new RangeVertex(rangeStart, rangeEnd)
+              this.rangeMapping.setRange(rangeVertex)
+            }
 
-          this.graph.addNode(rangeVertex)
+            this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(rangeStart, rangeEnd)])
-          const restRange = restRanges[0]
-          if (smallerRangeVertex) {
-            this.graph.addEdge(smallerRangeVertex, rangeVertex)
-          }
-          for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
-            this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
-          }
+            const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(rangeStart, rangeEnd)])
+            const restRange = restRanges[0]
+            if (smallerRangeVertex) {
+              this.graph.addEdge(smallerRangeVertex, rangeVertex)
+            }
+            for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+              this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
+            }
 
-          this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
+            this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
+          }
         } else {
-          this.bundle.handle_regular_dependency(absStartCell, endCell)
-          this.graph.addEdge(this.addressMapping.getCell(absStartCell), this.addressMapping.getCell(endCell)!)
+          if (this.bundle) {
+            this.bundle.handle_regular_dependency(absStartCell, endCell)
+          } else {
+            this.graph.addEdge(this.addressMapping.getCell(absStartCell), this.addressMapping.getCell(endCell)!)
+          }
         }
       })
     })

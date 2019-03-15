@@ -27,6 +27,7 @@ import {InterpretingBundle} from "../wasminterpreter/pkg/interpreter";
  * Engine for one sheet
  */
 export class HandsOnEngine {
+  public static useWasm = false;
 
   /**
    * Builds engine for sheet from CSV string representation
@@ -71,7 +72,7 @@ export class HandsOnEngine {
   private readonly config: Config
 
   private wasminterpreter: typeof import("../wasminterpreter/pkg/interpreter")
-  private bundle: InterpretingBundle
+  private bundle?: InterpretingBundle;
 
   constructor(wasminterpreter: typeof import("../wasminterpreter/pkg/interpreter"), sheet: Sheet, config: Config) {
     this.config = config
@@ -83,9 +84,11 @@ export class HandsOnEngine {
     // this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
     const {height, width, fill} = findBoundaries(sheet)
     this.addressMapping = new ArrayAddressMapping(width, height)
-    this.bundle = this.wasminterpreter.build_interpreting_bundle(height, width)
+    if (HandsOnEngine.useWasm) {
+      this.bundle = this.wasminterpreter.build_interpreting_bundle(height, width)
+    }
 
-    const graphBuilder = new GraphBuilder(this.bundle, this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.bundle)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
@@ -93,13 +96,19 @@ export class HandsOnEngine {
     })
 
     this.stats.measure(StatType.TOP_SORT, () => {
-      ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
-      this.bundle.compute_topological_sorting();
+      if (this.bundle) {
+        this.bundle.compute_topological_sorting();
+      } else {
+        ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
+      }
     })
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas()
-      this.bundle.compute_formulas();
+      if (this.bundle) {
+        this.bundle.compute_formulas();
+      } else {
+        this.recomputeFormulas()
+      }
     })
 
     this.stats.end(StatType.OVERALL)
