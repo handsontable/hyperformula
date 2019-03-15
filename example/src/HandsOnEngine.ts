@@ -65,7 +65,7 @@ export class HandsOnEngine {
   private readonly interpreter: Interpreter
 
   /** Statistics module for benchmarking */
-  private readonly stats: Statistics = new Statistics()
+  public readonly stats: Statistics = new Statistics()
 
   /** Engine configuration */
   private readonly config: Config

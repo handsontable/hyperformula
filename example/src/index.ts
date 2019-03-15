@@ -61,6 +61,7 @@ import("../wasminterpreter/pkg/interpreter").then(wasminterpreter => {
   // ];
   const engine = HandsOnEngine.buildFromArray(wasminterpreter, sheetMedian)
   console.warn(engine.getCellValue('D1'))
+  console.warn(engine.stats.snapshot());
   // won't typecheck if yourlib does not expose the run function
   // module.run();
 });
