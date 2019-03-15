@@ -56,8 +56,11 @@ import("../wasminterpreter/pkg/interpreter").then(wasminterpreter => {
   console.warn(formula)
   console.warn(ast)
   const sheetMedian = sheet()
+  // const sheetMedian = [
+  //   ['43', '42', '41', '=MEDIAN(A1:C1)'],
+  // ];
   const engine = HandsOnEngine.buildFromArray(wasminterpreter, sheetMedian)
-  console.warn(engine.getCellValue('B1'))
+  console.warn(engine.getCellValue('D1'))
   // won't typecheck if yourlib does not expose the run function
   // module.run();
 });

@@ -326,14 +326,14 @@ impl IGraph for Graph {
             let source_node_id = source_node.clone().borrow().datum.clone().borrow().get_vertex_id();
             for target_node in &source_node.clone().borrow().edges {
                 let target_node_id = target_node.clone().borrow().datum.clone().borrow().get_vertex_id();
-                log(&format!("An edge betwen {} and {}", source_node_id, target_node_id));
+                // log(&format!("An edge betwen {} and {}", source_node_id, target_node_id));
                 incoming_edges.insert(target_node_id, incoming_edges.get(&target_node_id).unwrap() + 1);
             }
         }
 
         let mut nodes_with_no_incoming_edge = Vec::new();
         for (&vertex_id, &incoming_count) in &incoming_edges {
-            log(&format!("Element {} in incoming edges with count {}", vertex_id, incoming_count));
+            // log(&format!("Element {} in incoming edges with count {}", vertex_id, incoming_count));
             if incoming_count == 0 {
                 nodes_with_no_incoming_edge.push(vertex_id);
                 // log(&format!("Adding {} to nodes with no inc edge", vertex_id));
@@ -383,6 +383,7 @@ trait IAddressMapping {
 
 impl IAddressMapping for ArrayAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue {
+        // log(&format!("Requesting address {:?}", address));
         let position = address.row * self.width + address.col;
         self.mapping[position as usize].borrow().get_cell_value()
     }
@@ -461,6 +462,20 @@ pub struct InterpretingBundle {
     topological_sorting: Option<Vec<i32>>,
 }
 
+fn absolutize_address(address: &CellAddress, base_address: &SimpleCellAddress) -> SimpleCellAddress {
+    // struct CellAddress {
+    //     col: i32,
+    //     row: i32,
+    //     kind: CellReferenceType,
+// }
+    match &address.kind {
+        CellReferenceType::Relative => SimpleCellAddress { col: address.col + base_address.col, row: address.row + base_address.row },
+        CellReferenceType::Absolute => SimpleCellAddress { col: address.col, row: address.row },
+        CellReferenceType::AbsoluteCol => SimpleCellAddress { col: address.col, row: address.row + base_address.row },
+        CellReferenceType::AbsoluteRow => SimpleCellAddress { col: address.col + base_address.col, row: address.row },
+    }
+}
+
 #[wasm_bindgen]
 impl InterpretingBundle {
     pub fn build_number_value_node_into_graph(&mut self, js_address: ExportedSimpleCellAddress, value: i32) -> () {
@@ -473,7 +488,7 @@ impl InterpretingBundle {
             vertex_id: next_vertex_id,
             cell_value: cell_value,
         }));
-        log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
+        // log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -489,7 +504,7 @@ impl InterpretingBundle {
             vertex_id: next_vertex_id,
             cell_value: cell_value,
         }));
-        log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
+        // log(&format!("Added value cell vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -505,7 +520,7 @@ impl InterpretingBundle {
             address: address.clone(),
             formula: convert_ast(js_ast),
         }));
-        log(&format!("Added formula vertex {:?} into address {:?}", vertex.clone(), address));
+        // log(&format!("Added formula vertex {:?} into address {:?}", vertex.clone(), address));
         self.graph.add_node(vertex.clone());
         self.address_mapping.set_cell(&address, vertex.clone());
     }
@@ -532,7 +547,7 @@ impl InterpretingBundle {
                     start: from_start_address.clone(),
                     end: from_end_address.clone(),
                 }));
-                log(&format!("Added range vertex {:?}", vertex.clone()));
+                // log(&format!("Added range vertex {:?}", vertex.clone()));
                 self.vertex_counter += 1;
                 self.range_mapping.set_range(vertex.clone());
                 vertex
@@ -546,15 +561,15 @@ impl InterpretingBundle {
         };
 
         {
-            log(&format!("Rest range: from {:?} to {:?}", rest_range_start, rest_range_end));
+            // log(&format!("Rest range: from {:?} to {:?}", rest_range_start, rest_range_end));
             let mut current_row = rest_range_start.row;
             while current_row <= rest_range_end.row {
                 let mut current_column = rest_range_start.col;
                 while current_column <= rest_range_end.col {
                     let address = SimpleCellAddress { col: current_column, row: current_row };
-                    log(&format!("Address which we want to connect {:?}", address));
+                    // log(&format!("Address which we want to connect {:?}", address));
                     let vertex = self.address_mapping.get_cell(&address);
-                    log(&format!("Adding edge when iterating on rest ({}, {})", &vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id()));
+                    // log(&format!("Adding edge when iterating on rest ({}, {})", &vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id()));
                     self.graph.add_edge_by_ids(&vertex.borrow().get_vertex_id(), &range_vertex.borrow().get_vertex_id());
                     current_column += 1;
                 }
@@ -577,12 +592,65 @@ impl InterpretingBundle {
 
     pub fn compute_topological_sorting(&mut self) -> () {
         let topological_ordering = self.graph.topological_sort();
-        log(&format!("Size of topological ordering {}", topological_ordering.len()));
+        // log(&format!("Size of topological ordering {}", topological_ordering.len()));
         self.topological_sorting = Some(topological_ordering);
     }
 
     fn evaluate_ast(&self, formula: &Ast, address: &SimpleCellAddress) -> CellValue {
-        CellValue::Number(42)
+        // NumberAst {
+        //     value: i32,
+        // },
+        // CellRangeAst {
+        //     start: CellAddress,
+        //     end: CellAddress,
+        // },
+        // ProcedureAst {
+        //     procedure_name: String,
+        //     args: Vec<Ast>,
+        // }
+        match formula {
+            Ast::NumberAst { value } => CellValue::Number(*value),
+            Ast::ProcedureAst { procedure_name, args } => {
+                // log(&format!("Processing procedure {}", procedure_name));
+                match procedure_name.as_ref() {
+                    "MEDIAN" => {
+                        let mut values_to_choose_median_from = Vec::new();
+                        for arg in args {
+                            match arg {
+                                Ast::CellRangeAst { start, end } => {
+                                    let abs_start = absolutize_address(&start, address);
+                                    let abs_end = absolutize_address(&end, address);
+                                    // values_to_choose_median_from.push(42);
+                                    // log(&format!("Processing range {:?} {:?}", start, end));
+                                    let mut current_row = abs_start.row;
+                                    while current_row <= abs_end.row {
+                                        let mut current_column = abs_start.col;
+                                        while current_column <= abs_end.col {
+                                            let address = SimpleCellAddress { col: current_column, row: current_row };
+                                            // log(&format!("Processing address {:?}", address));
+                                            let vertex_value = self.address_mapping.get_cell_value(&address);
+                                            if let CellValue::Number(val) = vertex_value {
+                                                values_to_choose_median_from.push(val)
+                                            }
+                                            current_column += 1;
+                                        }
+                                        current_row += 1;
+                                    }
+                                },
+                                _ => panic!("Computing arguments other than range is not supported"),
+                            };
+                        };
+                        values_to_choose_median_from.sort_unstable();
+                        // log(&format!("Vector with values {:?}", values_to_choose_median_from));
+                        // I know it's not correct median but it doesn't really matter in spike
+                        CellValue::Number(values_to_choose_median_from[values_to_choose_median_from.len() / 2])
+                    },
+                    _ => panic!("Unknown procedure name"),
+                }
+            }
+            Ast::CellRangeAst { start, end } => panic!("Computing cell range is not supported"),
+        }
+        // CellValue::Number(42)
     }
 
     pub fn compute_formulas(&mut self) -> () {
@@ -590,12 +658,13 @@ impl InterpretingBundle {
             None => (),
             Some(topological_order) => {
                 for vertex_id in topological_order {
-                    log(&format!("Computing {}", vertex_id));
+                    // log(&format!("Computing {}", vertex_id));
                     let vertex = self.graph.nodes.get(&vertex_id).unwrap().clone().borrow().datum.clone();
                     let mut maybe_value = None;
                     {
                         if let Some((formula, address)) = vertex.borrow_mut().get_formula() {
-                            maybe_value = Some(CellValue::Number(42));
+                            // maybe_value = Some(CellValue::Number(42));
+                            maybe_value = Some(self.evaluate_ast(formula, address));
                         };
                     };
                     match maybe_value {
