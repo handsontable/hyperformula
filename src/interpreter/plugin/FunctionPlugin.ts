@@ -7,7 +7,6 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {Vertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
-import {MatrixMapping} from "../../MatrixMapping";
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -30,7 +29,6 @@ export abstract class FunctionPlugin {
   protected readonly interpreter: Interpreter
   protected readonly addressMapping: IAddressMapping
   protected readonly rangeMapping: RangeMapping
-  protected readonly matrixMapping: MatrixMapping
   protected readonly graph: Graph<Vertex>
   protected readonly config: Config
 
@@ -38,7 +36,6 @@ export abstract class FunctionPlugin {
     this.interpreter = interpreter
     this.addressMapping = interpreter.addressMapping
     this.rangeMapping = interpreter.rangeMapping
-    this.matrixMapping = interpreter.matrixMapping
     this.graph = interpreter.graph
     this.config = interpreter.config
   }

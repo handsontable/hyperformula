@@ -22,7 +22,6 @@ import {
   Vertex
 } from './Vertex'
 import {CellRangeAst, ProcedureAst} from "./parser/Ast";
-import {MatrixMapping} from "./MatrixMapping";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -49,7 +48,6 @@ export class GraphBuilder {
    */
   constructor(private readonly graph: Graph<Vertex>,
               private readonly addressMapping: IAddressMapping,
-              private readonly matrixMapping: MatrixMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
               private readonly config: Config) {

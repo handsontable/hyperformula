@@ -17,7 +17,6 @@ import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {MatrixMapping} from "../MatrixMapping";
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -25,7 +24,6 @@ export class Interpreter {
   constructor(
     public readonly addressMapping: IAddressMapping,
     public readonly rangeMapping: RangeMapping,
-    public readonly matrixMapping: MatrixMapping,
     public readonly graph: Graph<Vertex>,
     public readonly config: Config,
   ) {

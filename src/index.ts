@@ -21,7 +21,6 @@ import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import {MatrixMapping} from "./MatrixMapping";
 
 /**
  * Engine for one sheet
@@ -52,8 +51,6 @@ export class HandsOnEngine {
   /** Range mapping from ranges to vertices representing these ranges. */
   private readonly rangeMapping: RangeMapping = new RangeMapping()
 
-  private readonly matrixMapping: MatrixMapping = new MatrixMapping()
-
   /** Directed graph of cell dependencies. */
   private readonly graph: Graph<Vertex> = new Graph()
 
@@ -80,8 +77,8 @@ export class HandsOnEngine {
 
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.matrixMapping, this.rangeMapping, this.stats, this.config)
-    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.matrixMapping, this.graph, this.config)
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
+    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       graphBuilder.buildGraph(sheet)

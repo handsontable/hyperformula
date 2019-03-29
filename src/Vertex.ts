@@ -1,9 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
-import {IAddressMapping} from "./IAddressMapping";
-import {add} from "./interpreter/scalar";
-import {MatrixMapping} from "./MatrixMapping";
 
 /**
  * Represents vertex bound to some particular cell
@@ -31,7 +28,7 @@ export class MatrixCellVertex {
 export class Matrix {
   private formula: Ast
   private cellAddress: SimpleCellAddress
-  private matrix?: number[][]
+  private matrix: number[][]
   private width: number
   private height: number
 
@@ -40,6 +37,7 @@ export class Matrix {
     this.cellAddress = cellAddress
     this.width = width
     this.height = height
+    this.matrix = []
   }
 
   public setMatrix(matrix: number[][]) {
