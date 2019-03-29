@@ -376,6 +376,7 @@ struct ArrayAddressMapping {
 
 trait IAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue;
+    fn get_cell_value2(&self, col: i32, row: i32) -> CellValue;
     fn set_cell_value(&mut self, address: &SimpleCellAddress, new_value: CellValue) -> ();
     fn set_cell(&mut self, address: &SimpleCellAddress, cell: Rc<RefCell<ICellVertex>>) -> ();
     fn get_cell(&self, address: &SimpleCellAddress) -> Rc<RefCell<ICellVertex>>;
@@ -385,6 +386,12 @@ impl IAddressMapping for ArrayAddressMapping {
     fn get_cell_value(&self, address: &SimpleCellAddress) -> CellValue {
         // log(&format!("Requesting address {:?}", address));
         let position = address.row * self.width + address.col;
+        self.mapping[position as usize].borrow().get_cell_value()
+    }
+
+    fn get_cell_value2(&self, col: i32, row: i32) -> CellValue {
+        // log(&format!("Requesting address {:?}", address));
+        let position = row * self.width + col;
         self.mapping[position as usize].borrow().get_cell_value()
     }
 
@@ -626,9 +633,9 @@ impl InterpretingBundle {
                                     while current_row <= abs_end.row {
                                         let mut current_column = abs_start.col;
                                         while current_column <= abs_end.col {
-                                            let address = SimpleCellAddress { col: current_column, row: current_row };
+                                            // let address = SimpleCellAddress { col: current_column, row: current_row };
                                             // log(&format!("Processing address {:?}", address));
-                                            let vertex_value = self.address_mapping.get_cell_value(&address);
+                                            let vertex_value = self.address_mapping.get_cell_value2(current_column, current_row);
                                             if let CellValue::Number(val) = vertex_value {
                                                 values_to_choose_median_from.push(val)
                                             }
@@ -645,6 +652,37 @@ impl InterpretingBundle {
                         // I know it's not correct median but it doesn't really matter in spike
                         CellValue::Number(values_to_choose_median_from[values_to_choose_median_from.len() / 2])
                     },
+                    "SUM" => {
+                        let mut final_result = 0;
+                        for arg in args {
+                            match arg {
+                                Ast::CellRangeAst { start, end } => {
+                                    let abs_start = absolutize_address(&start, address);
+                                    let abs_end = absolutize_address(&end, address);
+                                    // values_to_choose_median_from.push(42);
+                                    // log(&format!("Processing range {:?} {:?}", start, end));
+                                    let mut current_row = abs_start.row;
+                                    while current_row <= abs_end.row {
+                                        let mut current_column = abs_start.col;
+                                        while current_column <= abs_end.col {
+                                            // let address = SimpleCellAddress { col: current_column, row: current_row };
+                                            // log(&format!("Processing address {:?}", address));
+                                            let vertex_value = self.address_mapping.get_cell_value2(current_column, current_row);
+                                            if let CellValue::Number(val) = vertex_value {
+                                                final_result += val;
+                                            }
+                                            current_column += 1;
+                                        }
+                                        current_row += 1;
+                                    }
+                                    // log(&format!("After processing range"));
+                                },
+                                _ => panic!("Computing arguments other than range is not supported"),
+                            };
+                        };
+                        // log(&format!("After processing funccall {:?}", final_result));
+                        CellValue::Number(final_result)
+                    }
                     _ => panic!("Unknown procedure name"),
                 }
             }
@@ -663,7 +701,6 @@ impl InterpretingBundle {
                     let mut maybe_value = None;
                     {
                         if let Some((formula, address)) = vertex.borrow_mut().get_formula() {
-                            // maybe_value = Some(CellValue::Number(42));
                             maybe_value = Some(self.evaluate_ast(formula, address));
                         };
                     };
@@ -676,7 +713,7 @@ impl InterpretingBundle {
                 };
             },
         };
-        log(&format!("Computed everything"));
+        log(&format!("Computed everything {:?}", self.));
     }
 }
 
