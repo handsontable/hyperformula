@@ -3,6 +3,8 @@ name = "interpreter"
 version = "0.1.0"
 authors = ["Rafał Łasocha <me@swistak35.com>"]
 edition = "2018"
+lto = true
+opt-level = 3
 
 [lib]
 crate-type = ["cdylib"]

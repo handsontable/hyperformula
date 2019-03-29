@@ -713,7 +713,7 @@ impl InterpretingBundle {
                 };
             },
         };
-        log(&format!("Computed everything {:?}", self.));
+        log(&format!("Computed everything"));
     }
 }
 
