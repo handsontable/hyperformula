@@ -29,8 +29,8 @@ export class Matrix {
   private formula: Ast
   private cellAddress: SimpleCellAddress
   private matrix: number[][]
-  private width: number
-  private height: number
+  public readonly width: number
+  public readonly height: number
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
     this.formula = formula
