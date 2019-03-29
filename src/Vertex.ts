@@ -8,32 +8,25 @@ import {MatrixMapping} from "./MatrixMapping";
 /**
  * Represents vertex bound to some particular cell
  */
-export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | MatrixCellVertex
+export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | Matrix | MatrixCellVertex
 
 /**
  * Represents any vertex
  */
 export type Vertex = CellVertex | RangeVertex
 
+
 export class MatrixCellVertex {
-  constructor(private formula: Ast,
-              private matrixAddress: SimpleCellAddress,
-              private matrix: Matrix,
-              private col: number,
-              private row: number) {}
+  constructor(
+      public matrix: Matrix,
+      private address: SimpleCellAddress
+  ) {}
 
-  public getFormula(): Ast {
-    return this.formula
-  }
-
-  public getAddress(): SimpleCellAddress {
-    return this.matrixAddress
-  }
-
-  public getCellValue(): CellValue {
-    return this.matrix.getCellValue(this.col, this.row)
+  public getCellValue(): number {
+    return this.matrix.getMatrixCellValue(this.address)
   }
 }
+
 
 export class Matrix {
   private formula: Ast
@@ -53,14 +46,30 @@ export class Matrix {
     this.matrix = matrix
   }
 
-  public getCellValue(col: number, row: number): CellValue {
-    if (!this.matrix) {
-      throw Error("Matrix not initialized")
-    }
-    if (col < 0 || row < 0 || col > this.width || row > this.height) {
+  public getCellValue() {
+    return this.matrix
+  }
+
+  public getMatrixCellVertex(address: SimpleCellAddress) {
+    const col = address.col - this.cellAddress.col
+    const row = address.row - this.cellAddress.row
+
+    if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
       throw Error("Matrix index out of bound")
     }
-    return this.matrix[row][col]
+
+    return new MatrixCellVertex(this, address)
+  }
+
+  public getMatrixCellValue(address: SimpleCellAddress): number {
+    const col = address.col - this.cellAddress.col
+    const row = address.row - this.cellAddress.row
+
+    if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
+      throw Error("Matrix index out of bound")
+    }
+
+    return this.matrix![row][col]!
   }
 }
 
@@ -100,7 +109,7 @@ export class FormulaCellVertex {
    * Sets computed cell value stored in this vertex
    */
   public setCellValue(cellValue: CellValue) {
-     this.cachedCellValue = cellValue
+    this.cachedCellValue = cellValue
   }
 
   /**
@@ -167,8 +176,8 @@ export class EmptyCellVertex {
 }
 
 /**
-* Represents cache structure for one criterion
-*/
+ * Represents cache structure for one criterion
+ */
 export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 
 /**

@@ -22,7 +22,13 @@ export class AddressMapping implements IAddressMapping {
     if (!colMapping) {
       return EmptyCellVertex.getSingletonInstance()
     }
-    return colMapping.get(address.row) || EmptyCellVertex.getSingletonInstance()
+    const vertex = colMapping.get(address.row) || EmptyCellVertex.getSingletonInstance()
+
+    if (vertex instanceof Matrix) {
+      return vertex.getMatrixCellVertex(address)
+    } else {
+      return vertex
+    }
   }
 
   /** @inheritDoc */

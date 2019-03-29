@@ -16,8 +16,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
-  Matrix,
-  MatrixCellVertex,
+  Matrix, MatrixCellVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex
@@ -106,14 +105,14 @@ export class GraphBuilder {
 
     let matrix = new Matrix(ast, formulaAddress, width, height)
 
-    this.matrixMapping.setMatrix(formulaAddress, matrix)
+    this.graph.addNode(matrix)
+    this.addressMapping.setCell(formulaAddress, matrix)
+    // this.matrixMapping.setMatrix(formulaAddress, matrix)
 
     for (let i=0; i<width; ++i) {
       for (let j=0; j<height; ++j) {
         let address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
-        let vertex = new MatrixCellVertex(ast, formulaAddress, matrix, j, i)
-        this.graph.addNode(vertex)
-        this.addressMapping.setCell(address, vertex)
+        this.addressMapping.setCell(address, matrix)
       }
     }
   }
@@ -152,13 +151,21 @@ export class GraphBuilder {
           for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
-
-          this.graph.addEdge(rangeVertex, this.addressMapping.getCell(endCell)!)
+          this.addEdge(rangeVertex, endCell)
         } else {
-          this.graph.addEdge(this.addressMapping.getCell(absStartCell), this.addressMapping.getCell(endCell)!)
+          this.addEdge(this.addressMapping.getCell(absStartCell), endCell)
         }
       })
     })
+  }
+
+  private addEdge(start: Vertex, endCell: SimpleCellAddress) {
+    const endOfEdge = this.addressMapping.getCell(endCell)!
+    if (endOfEdge instanceof MatrixCellVertex) {
+      this.graph.addEdge(start, endOfEdge.matrix)
+    } else {
+      this.graph.addEdge(start, endOfEdge)
+    }
   }
 }
 
