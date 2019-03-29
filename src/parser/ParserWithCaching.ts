@@ -72,6 +72,10 @@ export function isFormula(text: string): Boolean {
   return text.startsWith('=')
 }
 
+export function isMatrix(text: string): Boolean {
+  return text.toLowerCase().startsWith('=mmult')
+}
+
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.
  *

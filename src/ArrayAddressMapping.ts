@@ -1,6 +1,6 @@
 import {SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
-import {CellVertex, EmptyCellVertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, Matrix} from './Vertex'
 
 /**
  * Mapping from cell addresses to vertices

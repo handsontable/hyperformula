@@ -1,12 +1,29 @@
-import {CellDependency, simpleCellAddress, SimpleCellAddress, SimpleCellRange, simpleCellRange} from './Cell'
+import {
+  CellDependency,
+  cellRangeToSimpleCellRange,
+  simpleCellAddress,
+  SimpleCellAddress,
+  SimpleCellRange,
+  simpleCellRange
+} from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
-import {isFormula, ParserWithCaching} from './parser/ParserWithCaching'
+import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {
+  EmptyCellVertex,
+  FormulaCellVertex,
+  Matrix,
+  MatrixCellVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex
+} from './Vertex'
+import {CellRangeAst, ProcedureAst} from "./parser/Ast";
+import {MatrixMapping} from "./MatrixMapping";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -33,6 +50,7 @@ export class GraphBuilder {
    */
   constructor(private readonly graph: Graph<Vertex>,
               private readonly addressMapping: IAddressMapping,
+              private readonly matrixMapping: MatrixMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
               private readonly config: Config) {
@@ -56,7 +74,11 @@ export class GraphBuilder {
         const cellAddress = simpleCellAddress(j, i)
         let vertex = null
 
-        if (isFormula(cellContent)) {
+        if (isMatrix(cellContent)) {
+          const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+          dependencies.set(cellAddress, parseResult.dependencies)
+          this.handleMatrix(parseResult.ast as ProcedureAst, cellAddress)
+        } else if (isFormula(cellContent)) {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
           dependencies.set(cellAddress, parseResult.dependencies)
@@ -77,6 +99,35 @@ export class GraphBuilder {
     }
 
     this.handleDependencies(dependencies)
+  }
+
+  private handleMatrix(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
+    let [width, height] = this.sizeOfMatrix(ast, formulaAddress)
+
+    let matrix = new Matrix(ast, formulaAddress, width, height)
+
+    this.matrixMapping.setMatrix(formulaAddress, matrix)
+
+    for (let i=0; i<width; ++i) {
+      for (let j=0; j<height; ++j) {
+        let address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
+        let vertex = new MatrixCellVertex(ast, formulaAddress, matrix, j, i)
+        this.graph.addNode(vertex)
+        this.addressMapping.setCell(address, vertex)
+      }
+    }
+  }
+
+  private sizeOfMatrix(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] {
+    /* TODO how to do it and when */
+    if (ast.procedureName.toLowerCase() !== 'mmult') {
+      throw Error("Unhandled matrix expression")
+    }
+
+    let left = cellRangeToSimpleCellRange(ast.args[0] as CellRangeAst, formulaAddress)
+    let right = cellRangeToSimpleCellRange(ast.args[1] as CellRangeAst, formulaAddress)
+
+    return [left.end.row - left.start.row + 1, right.end.col - right.start.col + 1]
   }
 
 

@@ -1,51 +1,65 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
+import {IAddressMapping} from "./IAddressMapping";
+import {add} from "./interpreter/scalar";
+import {MatrixMapping} from "./MatrixMapping";
 
 /**
  * Represents vertex bound to some particular cell
  */
-export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
+export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | MatrixCellVertex
 
 /**
  * Represents any vertex
  */
-export type Vertex = CellVertex | RangeVertex | MatrixVertex
+export type Vertex = CellVertex | RangeVertex
 
-export class MatrixVertex {
-  private formula: Ast
-  private matrix: number[][]
-  private readonly width: number
-  private readonly height: number
-  private readonly cellAddresss: SimpleCellAddress
-
-  constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
-    this.matrix = []
-    this.width = width
-    this.height = height
-    this.cellAddresss = cellAddress
-  }
+export class MatrixCellVertex {
+  constructor(private formula: Ast,
+              private matrixAddress: SimpleCellAddress,
+              private matrix: Matrix,
+              private col: number,
+              private row: number) {}
 
   public getFormula(): Ast {
     return this.formula
   }
 
   public getAddress(): SimpleCellAddress {
-    return this.cellAddresss
+    return this.matrixAddress
+  }
+
+  public getCellValue(): CellValue {
+    return this.matrix.getCellValue(this.col, this.row)
+  }
+}
+
+export class Matrix {
+  private formula: Ast
+  private cellAddress: SimpleCellAddress
+  private matrix?: number[][]
+  private width: number
+  private height: number
+
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
+    this.formula = formula
+    this.cellAddress = cellAddress
+    this.width = width
+    this.height = height
   }
 
   public setMatrix(matrix: number[][]) {
     this.matrix = matrix
   }
 
-  public getCellValue(address: SimpleCellAddress): number {
-    const col = address.col - this.cellAddresss.col
-    const row = address.row - this.cellAddresss.row
-
+  public getCellValue(col: number, row: number): CellValue {
+    if (!this.matrix) {
+      throw Error("Matrix not initialized")
+    }
     if (col < 0 || row < 0 || col > this.width || row > this.height) {
       throw Error("Matrix index out of bound")
     }
-
     return this.matrix[row][col]
   }
 }
