@@ -4,7 +4,7 @@ import {CellValue, SimpleCellAddress} from "../../Cell";
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    countunique: {
+    mmult: {
       EN: 'MMULT',
       PL: 'MACIERZ.ILOCZYN',
     },

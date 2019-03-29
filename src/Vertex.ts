@@ -40,8 +40,8 @@ export class Matrix {
     this.matrix = []
   }
 
-  public setMatrix(matrix: number[][]) {
-    this.matrix = matrix
+  public setCellValue(matrix: CellValue) {
+    this.matrix = matrix as number[][]
   }
 
   public getCellValue() {
@@ -68,6 +68,14 @@ export class Matrix {
     }
 
     return this.matrix![row][col]!
+  }
+
+  public getAddress() {
+    return this.cellAddress
+  }
+
+  public getFormula() {
+    return this.formula
   }
 }
 

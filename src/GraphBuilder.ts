@@ -105,7 +105,6 @@ export class GraphBuilder {
 
     this.graph.addNode(matrix)
     this.addressMapping.setCell(formulaAddress, matrix)
-    // this.matrixMapping.setMatrix(formulaAddress, matrix)
 
     for (let i=0; i<width; ++i) {
       for (let j=0; j<height; ++j) {
