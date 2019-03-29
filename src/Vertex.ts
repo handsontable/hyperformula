@@ -10,7 +10,45 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
 /**
  * Represents any vertex
  */
-export type Vertex = CellVertex | RangeVertex
+export type Vertex = CellVertex | RangeVertex | MatrixVertex
+
+export class MatrixVertex {
+  private formula: Ast
+  private matrix: number[][]
+  private readonly width: number
+  private readonly height: number
+  private readonly cellAddresss: SimpleCellAddress
+
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
+    this.matrix = []
+    this.width = width
+    this.height = height
+    this.cellAddresss = cellAddress
+  }
+
+  public getFormula(): Ast {
+    return this.formula
+  }
+
+  public getAddress(): SimpleCellAddress {
+    return this.cellAddresss
+  }
+
+  public setMatrix(matrix: number[][]) {
+    this.matrix = matrix
+  }
+
+  public getCellValue(address: SimpleCellAddress): number {
+    const col = address.col - this.cellAddresss.col
+    const row = address.row - this.cellAddresss.row
+
+    if (col < 0 || row < 0 || col > this.width || row > this.height) {
+      throw Error("Matrix index out of bound")
+    }
+
+    return this.matrix[row][col]
+  }
+}
 
 /**
  * Represents vertex which keeps formula
