@@ -117,14 +117,13 @@ export class HandsOnEngine {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
-        const cell = this.addressMapping.getCell(simpleCellAddress(j, i))
-
-        if (cell == null || cell === EmptyCellVertex.getSingletonInstance()) {
+        const address = simpleCellAddress(j, i)
+        if (this.addressMapping.isEmpty(address)) {
           arr[i][j] = ''
           continue
         }
 
-        const cellValue = cell.getCellValue()
+        const cellValue = this.addressMapping.getCellValue(address)
 
         if (isCellError(cellValue)) {
           arr[i][j] = `#${(cellValue as CellError).type}!`

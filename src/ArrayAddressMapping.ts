@@ -68,4 +68,8 @@ export class ArrayAddressMapping implements IAddressMapping {
   public getWidth(): number {
     return this.width
   }
+
+  public isEmpty(address: SimpleCellAddress): boolean {
+    return (this.getCell(address) instanceof EmptyCellVertex);
+  }
 }

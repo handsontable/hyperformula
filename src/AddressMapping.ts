@@ -67,4 +67,8 @@ export class AddressMapping implements IAddressMapping {
   public getWidth(): number {
     return Math.max(0, Math.max(...Array.from(this.mapping.keys())) + 1)
   }
+
+  public isEmpty(address: SimpleCellAddress): boolean {
+    return (this.getCell(address) instanceof EmptyCellVertex);
+  }
 }

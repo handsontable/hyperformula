@@ -12,8 +12,9 @@ export interface IAddressMapping {
     */
   getCell(address: SimpleCellAddress): CellVertex,
 
-  
   getCellValue(address: SimpleCellAddress): CellValue,
+
+  isEmpty(address: SimpleCellAddress): CellValue,
 
   /**
    * Set vertex for given address

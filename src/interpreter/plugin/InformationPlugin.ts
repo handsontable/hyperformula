@@ -54,8 +54,7 @@ export class InformationPlugin extends FunctionPlugin {
     const arg = ast.args[0]
     if (arg.type === AstNodeType.CELL_REFERENCE) {
       const address = getAbsoluteAddress(arg.reference, formulaAddress)
-      const vertex = this.addressMapping.getCell(address)
-      return (vertex === EmptyCellVertex.getSingletonInstance())
+      return this.addressMapping.isEmpty(address)
     } else {
       return false
     }
