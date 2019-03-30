@@ -1,7 +1,10 @@
 import {HandsOnEngine} from "../src";
+import {Config} from "../src/Config";
+import {MatrixPlugin} from "../src/interpreter/plugin/MatrixPlugin";
 
 describe('Matrix', () => {
   it('matrix', () => {
+    const config = new Config({ functionPlugins: [MatrixPlugin] })
     const engine = HandsOnEngine.buildFromArray([
         ['1','2'],
         ['3','4'],
@@ -9,7 +12,7 @@ describe('Matrix', () => {
         ['1','2','3'],
         ['4','5','6'],
         ['=mmult(A1:B3,A4:C5)']
-    ])
+    ], config)
 
     expect(engine.getCellValue("A6")).toBe(9)
     expect(engine.getCellValue("B6")).toBe(12)
