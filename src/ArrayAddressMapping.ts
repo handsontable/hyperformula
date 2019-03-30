@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress, CellValue} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {CellVertex, EmptyCellVertex, Matrix} from './Vertex'
 
@@ -33,6 +33,16 @@ export class ArrayAddressMapping implements IAddressMapping {
       return EmptyCellVertex.getSingletonInstance()
     }
     return row[address.col] || EmptyCellVertex.getSingletonInstance()
+  }
+
+  public getCellValue(address: SimpleCellAddress): CellValue {
+    const vertex = this.getCell(address);
+
+    if (vertex instanceof Matrix) {
+      return vertex.getMatrixCellValue(address)
+    } else {
+      return vertex.getCellValue()
+    }
   }
 
   /** @inheritDoc */

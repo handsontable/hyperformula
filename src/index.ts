@@ -102,8 +102,7 @@ export class HandsOnEngine {
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping.getCell(address)!
-    return vertex.getCellValue()
+    return this.addressMapping.getCellValue(address)
   }
 
   /**

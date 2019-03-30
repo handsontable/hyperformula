@@ -44,8 +44,7 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
-        const vertex = this.addressMapping.getCell(address)!
-        return vertex.getCellValue()
+        return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {

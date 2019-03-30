@@ -304,7 +304,7 @@ export class SumifPlugin extends FunctionPlugin {
 
 function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): IterableIterator<CellValue> {
   for (const cellFromRange of generateCellsFromRangeGenerator(cellRange)) {
-    yield addressMapping.getCell(cellFromRange)!.getCellValue()
+    yield addressMapping.getCellValue(cellFromRange)
   }
 }
 

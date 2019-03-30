@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress, CellValue} from './Cell'
 import {CellVertex, Matrix} from './Vertex'
 
 /**
@@ -11,6 +11,9 @@ export interface IAddressMapping {
    * @param address - cell address
     */
   getCell(address: SimpleCellAddress): CellVertex,
+
+  
+  getCellValue(address: SimpleCellAddress): CellValue,
 
   /**
    * Set vertex for given address
