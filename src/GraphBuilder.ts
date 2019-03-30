@@ -60,7 +60,7 @@ export class GraphBuilder {
    * @param sheet - two-dimensional array representation of sheet
    */
   public buildGraph(sheet: Sheet) {
-    const dependencies: Map<SimpleCellAddress, CellDependency[]> = new Map()
+    const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
@@ -73,12 +73,14 @@ export class GraphBuilder {
 
         if (isMatrix(cellContent)) {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-          dependencies.set(cellAddress, parseResult.dependencies)
-          this.handleMatrix(parseResult.ast as ProcedureAst, cellAddress)
+          vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+          dependencies.set(vertex, parseResult.dependencies)
+          this.graph.addNode(vertex)
+          this.handleMatrix(vertex, cellAddress)
         } else if (isFormula(cellContent)) {
           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
           vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
-          dependencies.set(cellAddress, parseResult.dependencies)
+          dependencies.set(vertex, parseResult.dependencies)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(cellAddress, vertex)
         } else if (cellContent === '') {
@@ -98,16 +100,17 @@ export class GraphBuilder {
     this.handleDependencies(dependencies)
   }
 
-  private handleMatrix(ast: ProcedureAst, formulaAddress: SimpleCellAddress) {
-    let [width, height] = this.sizeOfMatrix(ast, formulaAddress)
+  private buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix {
+    const [width, height] = this.sizeOfMatrix(ast, formulaAddress)
 
-    let matrix = new Matrix(ast, formulaAddress, width, height)
+    return new Matrix(ast, formulaAddress, width, height)
+  }
 
-    this.graph.addNode(matrix)
+  private handleMatrix(matrix: Matrix, formulaAddress: SimpleCellAddress) {
     this.addressMapping.setCell(formulaAddress, matrix)
 
-    for (let i=0; i<width; ++i) {
-      for (let j=0; j<height; ++j) {
+    for (let i=0; i<matrix.width; ++i) {
+      for (let j=0; j<matrix.height; ++j) {
         let address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
         this.addressMapping.setCell(address, matrix)
       }
@@ -127,8 +130,8 @@ export class GraphBuilder {
   }
 
 
-  private handleDependencies(dependencies: Map<SimpleCellAddress, CellDependency[]>) {
-    dependencies.forEach((cellDependencies: CellDependency[], endCell: SimpleCellAddress) => {
+  private handleDependencies(dependencies: Map<Vertex, CellDependency[]>) {
+    dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
@@ -148,21 +151,13 @@ export class GraphBuilder {
           for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
-          this.addEdge(rangeVertex, endCell)
+          this.graph.addEdge(rangeVertex, endVertex)
         } else {
-          this.addEdge(this.addressMapping.getCell(absStartCell), endCell)
+          // Still small bug: first node can be a MatrixCellVertex, it should be Matrix here
+          this.graph.addEdge(this.addressMapping.getCell(absStartCell), endVertex)
         }
       })
     })
-  }
-
-  private addEdge(start: Vertex, endCell: SimpleCellAddress) {
-    const endOfEdge = this.addressMapping.getCell(endCell)!
-    if (endOfEdge instanceof MatrixCellVertex) {
-      this.graph.addEdge(start, endOfEdge.matrix)
-    } else {
-      this.graph.addEdge(start, endOfEdge)
-    }
   }
 }
 
