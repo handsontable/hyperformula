@@ -10,7 +10,7 @@ import {
   SimpleCellRange
 } from "../../Cell";
 import {generateCellsFromRangeGenerator} from "../../GraphBuilder";
-import {MatrixCellVertex} from "../../Vertex";
+import {Matrix} from "../../Vertex";
 import {Interpreter} from "../Interpreter";
 import {GPU} from "gpu.js";
 
@@ -44,10 +44,10 @@ export class MatrixPlugin extends FunctionPlugin {
     const leftMatrix = this.matrixFromRange(cellRangeToSimpleCellRange(leftRange, formulaAddress))
     const rightMatrix = this.matrixFromRange(cellRangeToSimpleCellRange(rightRange, formulaAddress))
 
-    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixCellVertex
+    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
 
-    const width = vertex.matrix.width
-    const height = vertex.matrix.height
+    const width = vertex.width
+    const height = vertex.height
 
     const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0;
