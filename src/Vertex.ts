@@ -3,7 +3,7 @@ import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
 
 /**
- * Represents vertex bound to some particular cell
+ * Represents vertex which keeps values of one or more cells
  */
 export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | Matrix
 
