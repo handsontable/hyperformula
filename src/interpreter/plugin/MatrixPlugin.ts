@@ -68,7 +68,7 @@ export class MatrixPlugin extends FunctionPlugin {
     let i=0
     let row = []
     for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
-      row.push(this.addressMapping.getCell(cellFromRange).getCellValue() as number)
+      row.push(this.addressMapping.getCellValue(cellFromRange) as number)
       ++i
 
       if (i % width === 0) {
