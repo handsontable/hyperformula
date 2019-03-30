@@ -52,7 +52,7 @@ export class MatrixPlugin extends FunctionPlugin {
     const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0;
       for (let i=0; i<width; ++i) {
-        sum += a[this.thread.y][i] * b[i][this.thread.x];
+        sum += a[this.thread.y as number][i] * b[i][this.thread.x as number];
       }
       return sum
     }).setOutput([width, height]);
