@@ -1,5 +1,4 @@
-import {FunctionPlugin} from './FunctionPlugin'
-import {AstNodeType, ProcedureAst} from "../../parser/Ast";
+import {GPU} from 'gpu.js'
 import {
   cellError,
   CellRange,
@@ -7,12 +6,13 @@ import {
   CellValue,
   ErrorType,
   SimpleCellAddress,
-  SimpleCellRange
-} from "../../Cell";
-import {generateCellsFromRangeGenerator} from "../../GraphBuilder";
-import {Matrix} from "../../Vertex";
-import {Interpreter} from "../Interpreter";
-import {GPU} from "gpu.js";
+  SimpleCellRange,
+} from '../../Cell'
+import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {Matrix} from '../../Vertex'
+import {Interpreter} from '../Interpreter'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -50,12 +50,12 @@ export class MatrixPlugin extends FunctionPlugin {
     const height = vertex.height
 
     const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
-      let sum = 0;
-      for (let i=0; i<width; ++i) {
-        sum += a[this.thread.y as number][i] * b[i][this.thread.x as number];
+      let sum = 0
+      for (let i = 0; i < width; ++i) {
+        sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setOutput([width, height]);
+    }).setOutput([width, height])
 
     const output = kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
     return output
@@ -65,14 +65,14 @@ export class MatrixPlugin extends FunctionPlugin {
     const width = range.end.col - range.start.col + 1
     const result = []
 
-    let i=0
+    let i = 0
     let row = []
     for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
       row.push(this.addressMapping.getCellValue(cellFromRange) as number)
       ++i
 
       if (i % width === 0) {
-        i=0
+        i = 0
         result.push([...row])
         row = []
       }

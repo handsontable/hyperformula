@@ -4,12 +4,13 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
   SimpleCellRange,
-  simpleCellRange
+  simpleCellRange,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
+import {CellRangeAst, ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -19,9 +20,8 @@ import {
   Matrix,
   RangeVertex,
   ValueCellVertex,
-  Vertex
+  Vertex,
 } from './Vertex'
-import {CellRangeAst, ProcedureAst} from "./parser/Ast";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -109,9 +109,9 @@ export class GraphBuilder {
   private handleMatrix(matrix: Matrix, formulaAddress: SimpleCellAddress) {
     this.addressMapping.setCell(formulaAddress, matrix)
 
-    for (let i=0; i<matrix.width; ++i) {
-      for (let j=0; j<matrix.height; ++j) {
-        let address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
+    for (let i = 0; i < matrix.width; ++i) {
+      for (let j = 0; j < matrix.height; ++j) {
+        const address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
         this.addressMapping.setCell(address, matrix)
       }
     }
@@ -120,15 +120,14 @@ export class GraphBuilder {
   private sizeOfMatrix(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] {
     /* TODO how to do it and when */
     if (ast.procedureName.toLowerCase() !== 'mmult') {
-      throw Error("Unhandled matrix expression")
+      throw Error('Unhandled matrix expression')
     }
 
-    let left = cellRangeToSimpleCellRange(ast.args[0] as CellRangeAst, formulaAddress)
-    let right = cellRangeToSimpleCellRange(ast.args[1] as CellRangeAst, formulaAddress)
+    const left = cellRangeToSimpleCellRange(ast.args[0] as CellRangeAst, formulaAddress)
+    const right = cellRangeToSimpleCellRange(ast.args[1] as CellRangeAst, formulaAddress)
 
     return [left.end.row - left.start.row + 1, right.end.col - right.start.col + 1]
   }
-
 
   private handleDependencies(dependencies: Map<Vertex, CellDependency[]>) {
     dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {

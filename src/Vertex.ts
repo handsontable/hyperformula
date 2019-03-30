@@ -13,11 +13,11 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex |
 export type Vertex = CellVertex | RangeVertex
 
 export class Matrix {
+  public readonly width: number
+  public readonly height: number
   private formula: Ast
   private cellAddress: SimpleCellAddress
   private matrix: number[][]
-  public readonly width: number
-  public readonly height: number
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
     this.formula = formula
@@ -40,7 +40,7 @@ export class Matrix {
     const row = address.row - this.cellAddress.row
 
     if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
-      throw Error("Matrix index out of bound")
+      throw Error('Matrix index out of bound')
     }
 
     return this.matrix![row][col]!
