@@ -5,25 +5,12 @@ import {Ast} from './parser/Ast'
 /**
  * Represents vertex bound to some particular cell
  */
-export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | Matrix | MatrixCellVertex
+export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | Matrix
 
 /**
  * Represents any vertex
  */
 export type Vertex = CellVertex | RangeVertex
-
-
-export class MatrixCellVertex {
-  constructor(
-      public matrix: Matrix,
-      private address: SimpleCellAddress
-  ) {}
-
-  public getCellValue(): number {
-    return this.matrix.getMatrixCellValue(this.address)
-  }
-}
-
 
 export class Matrix {
   private formula: Ast
@@ -46,17 +33,6 @@ export class Matrix {
 
   public getCellValue() {
     return this.matrix
-  }
-
-  public getMatrixCellVertex(address: SimpleCellAddress) {
-    const col = address.col - this.cellAddress.col
-    const row = address.row - this.cellAddress.row
-
-    if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
-      throw Error("Matrix index out of bound")
-    }
-
-    return new MatrixCellVertex(this, address)
   }
 
   public getMatrixCellValue(address: SimpleCellAddress): number {

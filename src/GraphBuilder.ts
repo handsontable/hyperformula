@@ -16,7 +16,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
-  Matrix, MatrixCellVertex,
+  Matrix,
   RangeVertex,
   ValueCellVertex,
   Vertex
@@ -153,7 +153,6 @@ export class GraphBuilder {
           }
           this.graph.addEdge(rangeVertex, endVertex)
         } else {
-          // Still small bug: first node can be a MatrixCellVertex, it should be Matrix here
           this.graph.addEdge(this.addressMapping.getCell(absStartCell), endVertex)
         }
       })
