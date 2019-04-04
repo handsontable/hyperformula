@@ -2,6 +2,8 @@ import {HandsOnEngine} from '../src'
 import {Config} from '../src/Config'
 import {MatrixPlugin} from '../src/interpreter/plugin/MatrixPlugin'
 import './testConfig.ts'
+import {cellError, ErrorType} from "../src/Cell";
+import {EmptyCellVertex} from "../src/Vertex";
 
 describe('Matrix', () => {
   it('matrix', () => {
@@ -24,5 +26,21 @@ describe('Matrix', () => {
     expect(engine.getCellValue('A8')).toBeCloseTo(29)
     expect(engine.getCellValue('B8')).toBeCloseTo(40)
     expect(engine.getCellValue('C8')).toBeCloseTo(51)
+  })
+
+  it('matrix wrong size', () => {
+    const config = new Config({ functionPlugins: [MatrixPlugin] })
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['7', '8', '9'],
+      ['=mmult(A1:B3,A4:C6)'],
+    ], config)
+
+    expect(engine.getCellValue('A7')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B7')).toEqual(0)
   })
 })
