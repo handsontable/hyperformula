@@ -1,11 +1,37 @@
+import {GPUMode, GPUInternalMode} from 'gpu.js';
+
+type PossibleGPUMode = GPUMode | GPUInternalMode | undefined
+
+interface ConfigParams {
+  addressMappingFillThreshold?: number,
+  csvDelimiter?: string,
+  dateFormat?: string,
+  functionArgSeparator?: string,
+  language?: string,
+  functionPlugins?: any[],
+  gpuMode?: PossibleGPUMode,
+}
+
+export interface DefaultConfigParams {
+  addressMappingFillThreshold: number,
+  csvDelimiter: string,
+  dateFormat: string,
+  functionArgSeparator: string,
+  language: string,
+  functionPlugins: any[],
+  gpuMode: PossibleGPUMode,
+}
+
 export class Config {
-  public static readonly CSV_DELIMITER = ','
-  public static readonly FUNCTION_ARG_SEPARATOR = ','
-
-  public static readonly ADDRESS_MAPPING_FILL_THRESHOLD = 1
-
-  public static readonly LANGUAGE = 'EN'
-  public static readonly DATE_FORMAT = 'MM/DD/YYYY'
+  public static defaultConfig: DefaultConfigParams = {
+    addressMappingFillThreshold: 1,
+    csvDelimiter: ',',
+    dateFormat: 'MM/DD/YYYY',
+    functionArgSeparator: ',',
+    language: 'EN',
+    functionPlugins: [],
+    gpuMode: undefined,
+  }
 
   public readonly addressMappingFillThreshold: number
   public readonly csvDelimiter: string
@@ -13,6 +39,7 @@ export class Config {
   public readonly functionArgSeparator: string
   public readonly language: string
   public readonly functionPlugins: any[]
+  public readonly gpuMode: PossibleGPUMode
 
   constructor({
     addressMappingFillThreshold,
@@ -21,19 +48,14 @@ export class Config {
     functionArgSeparator,
     language,
     functionPlugins,
-  }: {
-    addressMappingFillThreshold?: number,
-    csvDelimiter?: string,
-    dateFormat?: string,
-    functionArgSeparator?: string,
-    language?: string,
-    functionPlugins?: any[],
-  } = {}) {
-    this.addressMappingFillThreshold = addressMappingFillThreshold || Config.ADDRESS_MAPPING_FILL_THRESHOLD
-    this.csvDelimiter = csvDelimiter || Config.CSV_DELIMITER
-    this.dateFormat = dateFormat || Config.DATE_FORMAT
-    this.functionArgSeparator = functionArgSeparator || Config.FUNCTION_ARG_SEPARATOR
-    this.language = language || Config.LANGUAGE
-    this.functionPlugins = functionPlugins || []
+    gpuMode
+  }: ConfigParams = {}) {
+    this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
+    this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
+    this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
+    this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
+    this.language = language || Config.defaultConfig.language
+    this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
+    this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
   }
 }

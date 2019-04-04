@@ -1,4 +1,5 @@
 import {HandsOnEngine} from '../src'
+import "./testConfig.ts"
 
 describe('Exporting CSV', () => {
   it('works', () => {

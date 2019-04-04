@@ -1,6 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {Config} from '../src/Config'
 import {MatrixPlugin} from '../src/interpreter/plugin/MatrixPlugin'
+import "./testConfig.ts"
 
 describe('Matrix', () => {
   it('matrix', () => {

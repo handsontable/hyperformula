@@ -1,5 +1,6 @@
 import {cellError, ErrorType} from '../../src/Cell'
 import {add, addStrict} from '../../src/interpreter/scalar'
+import '../testConfig';
 
 describe('add', () => {
   it('adds', () => {
