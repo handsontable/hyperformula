@@ -23,7 +23,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export {
-  Config
+  Config,
 }
 
 /**

@@ -1,7 +1,7 @@
-import {Ast, AstNodeType} from "./parser/Ast";
-import {cellRangeToSimpleCellRange, SimpleCellAddress} from "./Cell";
+import {cellRangeToSimpleCellRange, SimpleCellAddress} from './Cell'
+import {Ast, AstNodeType} from './parser/Ast'
 
-export type MatrixSize = { width: number, height: number }
+export interface MatrixSize { width: number, height: number }
 export type MatrixSizeCheck = MatrixSize | false
 
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
@@ -21,7 +21,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 
         return {
           width: right.width,
-          height: left.height
+          height: left.height,
         }
       }
       default: {
@@ -32,10 +32,9 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     const range = cellRangeToSimpleCellRange(ast, formulaAddress)
     return {
       width: range.end.col - range.start.col + 1,
-      height: range.end.row - range.start.row + 1
+      height: range.end.row - range.start.row + 1,
     }
   } else {
     return false
   }
 }
-

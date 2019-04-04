@@ -1,9 +1,9 @@
+import {absoluteCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
+import {checkMatrixSize, MatrixSize} from '../src/Matrix'
+import {EqualsOpAst} from '../src/parser/Ast'
+import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import './testConfig.ts'
-import {ParserWithCaching} from "../src/parser/ParserWithCaching";
-import {absoluteCellAddress, simpleCellAddress} from "../src/Cell";
-import {EqualsOpAst} from "../src/parser/Ast";
-import {checkMatrixSize, MatrixSize} from "../src/Matrix";
 
 describe('Matrix size check tests', () => {
   it('check', () => {

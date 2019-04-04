@@ -1,9 +1,9 @@
 import {HandsOnEngine} from '../src'
+import {cellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {MatrixPlugin} from '../src/interpreter/plugin/MatrixPlugin'
+import {EmptyCellVertex} from '../src/Vertex'
 import './testConfig.ts'
-import {cellError, ErrorType} from "../src/Cell";
-import {EmptyCellVertex} from "../src/Vertex";
 
 describe('Matrix', () => {
   it('matrix', () => {

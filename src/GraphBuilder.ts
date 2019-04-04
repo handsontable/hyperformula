@@ -11,12 +11,12 @@ import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
+import {checkMatrixSize} from './Matrix'
 import {ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex,} from './Vertex'
-import {checkMatrixSize} from "./Matrix";
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -156,7 +156,7 @@ export class GraphBuilder {
  * @param rangeStart - top-left corner of range
  * @param rangeEnd - bottom-right corner of range
  */
-export const generateCellsFromRangeGenerator = function* (simpleCellRange: SimpleCellRange) {
+export const generateCellsFromRangeGenerator = function*(simpleCellRange: SimpleCellRange) {
   let currentRow = simpleCellRange.start.row
   while (currentRow <= simpleCellRange.end.row) {
     let currentColumn = simpleCellRange.start.col
