@@ -20,7 +20,7 @@ const defaultConfig = {
 export interface ExpectedValue { address: string, value: CellValue}
 
 export function benchmarkCSV(csvString: string, config: Config) {
-  benchmark(parse(csvString, {  delimiter: EngineConfig.CSV_DELIMITER }), [], config)
+  benchmark(parse(csvString, {  delimiter: EngineConfig.defaultConfig.csvDelimiter }), [], config)
 }
 
 export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
