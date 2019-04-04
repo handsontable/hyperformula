@@ -22,6 +22,10 @@ import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
+export {
+  Config
+}
+
 /**
  * Engine for one sheet
  */
