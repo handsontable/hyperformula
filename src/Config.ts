@@ -1,6 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 
-type PossibleGPUMode = GPUMode | GPUInternalMode | undefined
+type PossibleGPUMode = GPUMode | GPUInternalMode
 
 interface ConfigParams {
   addressMappingFillThreshold?: number,
@@ -30,7 +30,7 @@ export class Config {
     functionArgSeparator: ',',
     language: 'EN',
     functionPlugins: [],
-    gpuMode: undefined,
+    gpuMode: 'gpu',
   }
 
   public readonly addressMappingFillThreshold: number
