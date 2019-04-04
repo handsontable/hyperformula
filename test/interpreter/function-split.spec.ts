@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
-import '../testConfig';
+import '../testConfig'
 
 describe('Interpreter', () => {
   it('function SPLIT happy path', () => {

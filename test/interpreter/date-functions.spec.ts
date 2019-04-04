@@ -2,7 +2,7 @@ import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {dateNumberToString} from '../../src/Date'
-import '../testConfig';
+import '../testConfig'
 
 describe('Interpreter', () => {
   it('function DATE with 3 numerical arguments', () => {

@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
-import "./testConfig.ts"
+import './testConfig.ts'
 
 describe('Loading CSV', () => {
   it('with only strings', () => {

@@ -1,4 +1,4 @@
-import {GPUMode, GPUInternalMode} from 'gpu.js';
+import {GPUInternalMode, GPUMode} from 'gpu.js'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode | undefined
 
@@ -48,7 +48,7 @@ export class Config {
     functionArgSeparator,
     language,
     functionPlugins,
-    gpuMode
+    gpuMode,
   }: ConfigParams = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter

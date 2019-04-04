@@ -9,6 +9,7 @@ import {BooleanPlugin} from './plugin/BooleanPlugin'
 import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {DatePlugin} from './plugin/DatePlugin'
 import {InformationPlugin} from './plugin/InformationPlugin'
+import {MatrixPlugin} from './plugin/MatrixPlugin'
 import {MedianPlugin} from './plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
@@ -17,7 +18,6 @@ import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {MatrixPlugin} from './plugin/MatrixPlugin'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()

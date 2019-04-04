@@ -3,7 +3,7 @@ import {cellError, ErrorType, isCellError, SimpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser/Ast'
-import "./testConfig.ts"
+import './testConfig.ts'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
