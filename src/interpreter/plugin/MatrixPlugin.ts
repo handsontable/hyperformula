@@ -64,8 +64,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return sum
     }).setOutput([vertex.width, vertex.height])
 
-    const output = kernel(leftMatrix as number[][], rightMatrix as number[][], (leftMatrix as number[][])[0].length) as number[][]
-    return output
+    return kernel(leftMatrix as number[][], rightMatrix as number[][], (leftMatrix as number[][])[0].length) as number[][]
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
@@ -83,9 +82,7 @@ export class MatrixPlugin extends FunctionPlugin {
         return a[this.thread.x as number][this.thread.y as number]
       }).setOutput([vertex.width, vertex.height])
 
-      const output = kernel(value) as number[][]
-      console.log(output)
-      return output
+      return kernel(value) as number[][]
     }
   }
 
