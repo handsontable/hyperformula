@@ -18,7 +18,7 @@ export function first<T>(iterable: IterableIterator<T>): T | undefined {
   if (!done) {
     return value
   }
-  return
+  return undefined
 }
 
 export function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {

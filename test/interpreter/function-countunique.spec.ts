@@ -1,5 +1,6 @@
 import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
+import '../testConfig'
 
 describe('Function COUNTUNIQUE', () => {
   it('error when no arguments', () => {

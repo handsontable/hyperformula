@@ -10,6 +10,6 @@ describe('Config', () => {
   it('has some defaults', () => {
     const config = new Config()
 
-    expect(config.language).toBe(Config.LANGUAGE)
+    expect(config.language).toBe(Config.defaultConfig.language)
   })
 })

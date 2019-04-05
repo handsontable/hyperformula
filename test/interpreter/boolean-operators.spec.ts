@@ -1,5 +1,6 @@
 import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
+import '../testConfig'
 
 describe('Interpreter - Boolean operators', () => {
   it('Equals operator - numbers', () => {

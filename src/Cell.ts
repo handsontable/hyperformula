@@ -49,7 +49,7 @@ export const isCellError = (value: any): value is CellError => {
   return value.type !== undefined && value.type in ErrorType
 }
 
-export type CellValue = boolean | string | number | CellError
+export type CellValue = boolean | string | number | number[][] | CellError
 
 export interface CellAddress {
   col: number,

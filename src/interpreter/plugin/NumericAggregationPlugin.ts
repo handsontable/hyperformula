@@ -90,7 +90,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
     for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
-      rangeResult.push(this.addressMapping.getCell(cellFromRange).getCellValue())
+      rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
     }
 
     return rangeResult

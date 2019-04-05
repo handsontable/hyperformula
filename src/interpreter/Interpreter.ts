@@ -9,6 +9,7 @@ import {BooleanPlugin} from './plugin/BooleanPlugin'
 import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {DatePlugin} from './plugin/DatePlugin'
 import {InformationPlugin} from './plugin/InformationPlugin'
+import {MatrixPlugin} from './plugin/MatrixPlugin'
 import {MedianPlugin} from './plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
 import {SumifPlugin} from './plugin/SumifPlugin'
@@ -28,7 +29,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin,
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -44,8 +45,7 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = getAbsoluteAddress(ast.reference, formulaAddress)
-        const vertex = this.addressMapping.getCell(address)!
-        return vertex.getCellValue()
+        return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {

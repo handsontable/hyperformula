@@ -1,6 +1,6 @@
-import {SimpleCellAddress} from './Cell'
+import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
-import {CellVertex, EmptyCellVertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, Matrix} from './Vertex'
 
 /**
  * Mapping from cell addresses to vertices
@@ -35,6 +35,16 @@ export class ArrayAddressMapping implements IAddressMapping {
     return row[address.col] || EmptyCellVertex.getSingletonInstance()
   }
 
+  public getCellValue(address: SimpleCellAddress): CellValue {
+    const vertex = this.getCell(address)
+
+    if (vertex instanceof Matrix) {
+      return vertex.getMatrixCellValue(address)
+    } else {
+      return vertex.getCellValue()
+    }
+  }
+
   /** @inheritDoc */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     this.mapping[address.row][address.col] = newVertex
@@ -57,5 +67,9 @@ export class ArrayAddressMapping implements IAddressMapping {
   /** @inheritDoc */
   public getWidth(): number {
     return this.width
+  }
+
+  public isEmpty(address: SimpleCellAddress): boolean {
+    return (this.getCell(address) instanceof EmptyCellVertex)
   }
 }

@@ -20,7 +20,11 @@ import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+
+export {
+  Config,
+}
 
 /**
  * Engine for one sheet
@@ -102,8 +106,7 @@ export class HandsOnEngine {
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
-    const vertex = this.addressMapping.getCell(address)!
-    return vertex.getCellValue()
+    return this.addressMapping.getCellValue(address)
   }
 
   /**
@@ -118,14 +121,13 @@ export class HandsOnEngine {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
-        const cell = this.addressMapping.getCell(simpleCellAddress(j, i))
-
-        if (cell == null || cell === EmptyCellVertex.getSingletonInstance()) {
+        const address = simpleCellAddress(j, i)
+        if (this.addressMapping.isEmpty(address)) {
           arr[i][j] = ''
           continue
         }
 
-        const cellValue = cell.getCellValue()
+        const cellValue = this.addressMapping.getCellValue(address)
 
         if (isCellError(cellValue)) {
           arr[i][j] = `#${(cellValue as CellError).type}!`
@@ -182,7 +184,7 @@ export class HandsOnEngine {
       (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex) {
+      if (vertex instanceof FormulaCellVertex || vertex instanceof Matrix) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()
         const cellValue = this.interpreter.evaluateAst(formula, address)

@@ -1,5 +1,5 @@
-import {SimpleCellAddress} from './Cell'
-import {CellVertex} from './Vertex'
+import {SimpleCellAddress, CellValue} from './Cell'
+import {CellVertex, Matrix} from './Vertex'
 
 /**
  * Interface for mapping from addresses to vertices.
@@ -11,6 +11,10 @@ export interface IAddressMapping {
    * @param address - cell address
     */
   getCell(address: SimpleCellAddress): CellVertex,
+
+  getCellValue(address: SimpleCellAddress): CellValue,
+
+  isEmpty(address: SimpleCellAddress): CellValue,
 
   /**
    * Set vertex for given address
@@ -35,5 +39,5 @@ export interface IAddressMapping {
   /**
    * Returns width of stored sheet
    */
-  getWidth(): number,
+  getWidth(): number
 }

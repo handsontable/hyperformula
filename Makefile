@@ -53,7 +53,7 @@ browser: compile
 	@browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js
 
 verify-production-licenses:
-	@yarn license-checker --production --onlyAllow="MIT; Apache-2.0; BSD-3-Clause"
+	@yarn license-checker --production --excludePackages="handsonengine@0.0.1" --onlyAllow="MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense"
 
 help: ## Show all make commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -49,7 +49,7 @@ export abstract class FunctionPlugin {
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of generateCellsFromRangeGenerator(cellRangeToSimpleCellRange(ast, formulaAddress))) {
-          const value = this.addressMapping.getCell(cellFromRange)!.getCellValue()
+          const value = this.addressMapping.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
           } else if (isCellError(value)) {
@@ -75,7 +75,7 @@ export abstract class FunctionPlugin {
   protected getCellValuesFromRange(range: SimpleCellRange): CellValue[] {
     const result = []
     for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
-      result.push(this.addressMapping.getCell(cellFromRange).getCellValue())
+      result.push(this.addressMapping.getCellValue(cellFromRange))
     }
     return result
   }

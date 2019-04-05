@@ -3,14 +3,57 @@ import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
 
 /**
- * Represents vertex bound to some particular cell
+ * Represents vertex which keeps values of one or more cells
  */
-export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex
+export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | Matrix
 
 /**
  * Represents any vertex
  */
 export type Vertex = CellVertex | RangeVertex
+
+export class Matrix {
+  public readonly width: number
+  public readonly height: number
+  private formula: Ast
+  private cellAddress: SimpleCellAddress
+  private matrix: number[][]
+
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
+    this.formula = formula
+    this.cellAddress = cellAddress
+    this.width = width
+    this.height = height
+    this.matrix = []
+  }
+
+  public setCellValue(matrix: CellValue) {
+    this.matrix = matrix as number[][]
+  }
+
+  public getCellValue() {
+    return this.matrix
+  }
+
+  public getMatrixCellValue(address: SimpleCellAddress): number {
+    const col = address.col - this.cellAddress.col
+    const row = address.row - this.cellAddress.row
+
+    if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
+      throw Error('Matrix index out of bound')
+    }
+
+    return this.matrix[row][col]
+  }
+
+  public getAddress() {
+    return this.cellAddress
+  }
+
+  public getFormula() {
+    return this.formula
+  }
+}
 
 /**
  * Represents vertex which keeps formula
@@ -48,7 +91,7 @@ export class FormulaCellVertex {
    * Sets computed cell value stored in this vertex
    */
   public setCellValue(cellValue: CellValue) {
-     this.cachedCellValue = cellValue
+    this.cachedCellValue = cellValue
   }
 
   /**
@@ -115,8 +158,8 @@ export class EmptyCellVertex {
 }
 
 /**
-* Represents cache structure for one criterion
-*/
+ * Represents cache structure for one criterion
+ */
 export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
 
 /**
