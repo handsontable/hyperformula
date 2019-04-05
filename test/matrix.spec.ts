@@ -2,11 +2,10 @@ import {HandsOnEngine} from '../src'
 import {cellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {MatrixPlugin} from '../src/interpreter/plugin/MatrixPlugin'
-import {EmptyCellVertex} from '../src/Vertex'
 import './testConfig.ts'
 
 describe('Matrix', () => {
-  it('matrix', () => {
+  it('matrix multiplication', () => {
     const config = new Config({ functionPlugins: [MatrixPlugin] })
     const engine = HandsOnEngine.buildFromArray([
         ['1', '2'],
@@ -28,7 +27,7 @@ describe('Matrix', () => {
     expect(engine.getCellValue('C8')).toBeCloseTo(51)
   })
 
-  it('matrix wrong size', () => {
+  it('matrix multiplication wrong size', () => {
     const config = new Config({ functionPlugins: [MatrixPlugin] })
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
@@ -42,5 +41,22 @@ describe('Matrix', () => {
 
     expect(engine.getCellValue('A7')).toEqual(cellError(ErrorType.VALUE))
     expect(engine.getCellValue('B7')).toEqual(0)
+  })
+
+  it ("matrix transpose", () => {
+    const config = new Config({ functionPlugins: [MatrixPlugin] })
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=transpose(A1:B3)'],
+    ], config)
+
+    expect(engine.getCellValue('A4')).toBeCloseTo(1)
+    expect(engine.getCellValue('B4')).toBeCloseTo(3)
+    expect(engine.getCellValue('C4')).toBeCloseTo(5)
+    expect(engine.getCellValue('A5')).toBeCloseTo(2)
+    expect(engine.getCellValue('B5')).toBeCloseTo(4)
+    expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
 })
