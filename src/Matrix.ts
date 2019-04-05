@@ -24,6 +24,18 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           height: left.height,
         }
       }
+      case 'transpose': {
+        if (ast.args.length !== 1) {
+          return false
+        }
+
+        const size = checkMatrixSize(ast.args[0], formulaAddress)
+
+        return !size ? false : {
+          width: size.height,
+          height: size.width
+        }
+      }
       default: {
         return false
       }
@@ -38,3 +50,4 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     return false
   }
 }
+
