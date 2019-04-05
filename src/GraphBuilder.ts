@@ -103,7 +103,19 @@ export class GraphBuilder {
       }
     }
 
+    this.detectMatrices()
     this.handleDependencies(dependencies)
+  }
+
+  private detectMatrices() {
+    const cacheMapping = this.parser.getMapping()
+
+    cacheMapping.forEach((value: SimpleCellAddress[], key: string) => {
+      let isMatrix = checkIfMatrix(value)
+      if (isMatrix) {
+        console.log(`Cells with hash ${key} makes matrix with size of ${value.length}`)
+      }
+    })
   }
 
   private buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellVertex {
@@ -162,12 +174,37 @@ export class GraphBuilder {
 }
 
 /**
+ * Checks if list of addresses form a rectangle
+ * */
+export function checkIfMatrix(addresses: SimpleCellAddress[]): boolean {
+  // addresses sorted in parsing order, we are assuming that
+  // topleft is always first
+  // bottomright is always last
+  const first = addresses[0]
+  const last = addresses[addresses.length - 1]
+  const possibleMatrixSize = (last.col - first.col + 1) * (last.row - first.row + 1)
+
+  if (addresses.length !== possibleMatrixSize) {
+    return false
+  }
+
+  for (let i=0; i<addresses.length; ++i) {
+    const address = addresses[i]
+    if (address.col > last.col || address.col < first.col) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
  * Generates cell addresses in given range.
  *
  * @param rangeStart - top-left corner of range
  * @param rangeEnd - bottom-right corner of range
  */
-export const generateCellsFromRangeGenerator = function*(simpleCellRange: SimpleCellRange) {
+export const generateCellsFromRangeGenerator = function* (simpleCellRange: SimpleCellRange) {
   let currentRow = simpleCellRange.start.row
   while (currentRow <= simpleCellRange.end.row) {
     let currentColumn = simpleCellRange.start.col
