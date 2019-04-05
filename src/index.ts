@@ -26,6 +26,11 @@ export {
   Config,
 }
 
+
+interface Sheets {
+  [sheetName: string]: Sheet
+}
+
 /**
  * Engine for one sheet
  */
@@ -46,7 +51,11 @@ export class HandsOnEngine {
    * @param sheet - two-dimmensional array representation of sheet
    */
   public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
-    return new HandsOnEngine(sheet, config)
+    return new HandsOnEngine({ "Sheet1": sheet }, config)
+  }
+
+  public static buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
+    return new HandsOnEngine(sheets, config)
   }
 
   /** Address mapping from addresses to vertices from graph. */
@@ -73,11 +82,13 @@ export class HandsOnEngine {
   /** Engine configuration */
   private readonly config: Config
 
-  constructor(sheet: Sheet, config: Config) {
+  constructor(sheets: Sheets, config: Config) {
     this.config = config
 
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
+
+    const sheet = sheets["Sheet1"] as Sheet
 
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
