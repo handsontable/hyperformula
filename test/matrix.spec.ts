@@ -40,7 +40,7 @@ describe('Matrix', () => {
     expect(engine.getCellValue('B7')).toEqual(0)
   })
 
-  it ("matrix transpose", () => {
+  it ('matrix transpose', () => {
     const config = new Config({ functionPlugins: [MatrixPlugin] })
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],

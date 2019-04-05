@@ -33,7 +33,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 
         return !size ? false : {
           width: size.height,
-          height: size.width
+          height: size.width,
         }
       }
       default: {
@@ -50,4 +50,3 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     return false
   }
 }
-

@@ -43,7 +43,7 @@ export class Matrix {
       throw Error('Matrix index out of bound')
     }
 
-    return this.matrix![row][col]!
+    return this.matrix[row][col]
   }
 
   public getAddress() {

@@ -1,15 +1,16 @@
 import {GPU} from 'gpu.js'
 import {
+  CellError,
   cellError,
-  CellRange,
   cellRangeToSimpleCellRange,
   CellValue,
   ErrorType,
+  isCellError,
   SimpleCellAddress,
   SimpleCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
-import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {Matrix} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -20,34 +21,40 @@ export class MatrixPlugin extends FunctionPlugin {
       EN: 'MMULT',
       PL: 'MACIERZ.ILOCZYN',
     },
+    transpose: {
+      EN: 'TRANSPOSE',
+      PL: 'TRANSPONUJ',
+    },
   }
 
   private gpu: GPU
 
   constructor(protected readonly interpreter: Interpreter) {
     super(interpreter)
-    this.gpu = new GPU({ mode: interpreter.config.gpuMode })
+    this.gpu = new GPU({mode: interpreter.config.gpuMode})
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 2) {
       return cellError(ErrorType.NA)
     }
+    const left = ast.args[0]
+    const right = ast.args[1]
 
-    const leftRange = ast.args[0]
-    const rightRange = ast.args[1]
-
-    if (leftRange.type !== AstNodeType.CELL_RANGE || rightRange.type !== AstNodeType.CELL_RANGE) {
+    if (left.type !== AstNodeType.CELL_RANGE || right.type !== AstNodeType.CELL_RANGE) {
       return cellError(ErrorType.VALUE)
     }
+    const leftMatrix = this.evaluateAst(left, formulaAddress)
+    const rightMatrix = this.evaluateAst(right, formulaAddress)
 
-    const leftMatrix = this.matrixFromRange(cellRangeToSimpleCellRange(leftRange, formulaAddress))
-    const rightMatrix = this.matrixFromRange(cellRangeToSimpleCellRange(rightRange, formulaAddress))
+    if (isCellError(left)) {
+      return left
+    }
+    if (isCellError(right)) {
+      return right
+    }
 
     const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
-
-    const width = vertex.width
-    const height = vertex.height
 
     const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
@@ -55,21 +62,67 @@ export class MatrixPlugin extends FunctionPlugin {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setOutput([width, height])
+    }).setOutput([vertex.width, vertex.height])
 
-    const output = kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
+    const output = kernel(leftMatrix as number[][], rightMatrix as number[][], (leftMatrix as number[][])[0].length) as number[][]
     return output
   }
 
-  private matrixFromRange(range: SimpleCellRange): number[][] {
+  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
+    if (ast.args.length !== 1) {
+      return cellError(ErrorType.NA)
+    }
+
+    const value = this.evaluateAst(ast.args[0], formulaAddress)
+    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
+
+    if (isCellError(value)) {
+      return value
+    } else {
+      const kernel = this.gpu.createKernel(function(a: number[][]) {
+        return a[this.thread.x as number][this.thread.y as number]
+      }).setOutput([vertex.width, vertex.height])
+
+      const output = kernel(value) as number[][]
+      console.log(output)
+      return output
+    }
+  }
+
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): number[][] | CellError {
+    if (ast.type === AstNodeType.CELL_RANGE) {
+      return this.matrixFromRange(cellRangeToSimpleCellRange(ast, formulaAddress))
+    }
+    const value = super.evaluateAst(ast, formulaAddress)
+
+    if (typeof value === 'number') {
+      return [[value]]
+    }
+    if (this.isMatrix(value)) {
+      return value as number[][]
+    }
+
+    return cellError(ErrorType.VALUE)
+  }
+
+  private isMatrix(value: CellValue) {
+    return Array.isArray(value) && Array.isArray(value[0]) // value.every(item => Array.isArray(item));
+  }
+
+  private matrixFromRange(range: SimpleCellRange): number[][] | CellError {
     const width = range.end.col - range.start.col + 1
     const result = []
 
     let i = 0
     let row = []
     for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
-      row.push(this.addressMapping.getCellValue(cellFromRange) as number)
-      ++i
+      const value = this.addressMapping.getCellValue(cellFromRange)
+      if (typeof value === 'number') {
+        row.push(value)
+        ++i
+      } else {
+        return cellError(ErrorType.VALUE)
+      }
 
       if (i % width === 0) {
         i = 0
