@@ -47,11 +47,11 @@ export class MatrixPlugin extends FunctionPlugin {
     const leftMatrix = this.evaluateAst(left, formulaAddress)
     const rightMatrix = this.evaluateAst(right, formulaAddress)
 
-    if (isCellError(left)) {
-      return left
+    if (isCellError(leftMatrix)) {
+      return leftMatrix
     }
-    if (isCellError(right)) {
-      return right
+    if (isCellError(rightMatrix)) {
+      return rightMatrix
     }
 
     const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
@@ -64,7 +64,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return sum
     }).setOutput([vertex.width, vertex.height])
 
-    return kernel(leftMatrix as number[][], rightMatrix as number[][], (leftMatrix as number[][])[0].length) as number[][]
+    return kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
