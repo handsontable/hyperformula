@@ -114,7 +114,7 @@ export class GraphBuilder {
 
     for (let i = 0; i < vertex.width; ++i) {
       for (let j = 0; j < vertex.height; ++j) {
-        const address = simpleCellAddress(formulaAddress.col + j, formulaAddress.row + i)
+        const address = simpleCellAddress(formulaAddress.col + i, formulaAddress.row + j)
         this.addressMapping.setCell(address, vertex)
       }
     }
