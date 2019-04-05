@@ -15,6 +15,64 @@ import {IAddressMapping} from "../../src/IAddressMapping";
 
 let working = false
 
+
+function sheetMedianFn() {
+  const rows = 6000
+  console.warn(`Rows: ${rows}`)
+  const sheet = []
+  let dependent = 0
+
+  let current = 1
+  while (current <= rows) {
+    let rowToPush
+    if (current % 2000 === 0) {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, C${current})`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, E${current})`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, A${current})`,
+      ]
+      dependent++
+    } else {
+      rowToPush = [
+        `${current}`,
+        `=MEDIAN(A1, A1:A${current}, A1)`,
+        `${current}`,
+        `=MEDIAN(C1, C1:C${current}, C1)`,
+        `${current}`,
+        `=MEDIAN(E1, E1:E${current}, E1)`,
+      ]
+    }
+
+    sheet.push(rowToPush)
+    ++current
+  }
+
+  return sheet
+}
+
+function sheetStirling() {
+  const diag = 400
+  const rows = diag * diag
+  console.warn(`Rows: ${rows}`)
+  const sheet = []
+
+  let current = 1
+  while (current <= rows) {
+    let rowToPush = [
+      `=STIRLING(${Math.floor(current / diag)}, ${current % diag})`,
+    ]
+
+    sheet.push(rowToPush)
+    ++current
+  }
+
+  return sheet
+}
+
+
 interface IExtendedConsole extends Console {
   olog?: any
 }
@@ -72,7 +130,7 @@ async function benchmarkSync(sheet: Sheet) {
 
   console.log(`Total time: ${overallEnd - overallStart}` )
   console.log(`Eval time : ${evalEnd - evalStart}` )
-  printSample("C10000", addressMapping)
+  printSample("C1000", addressMapping)
 }
 
 function printSample(addressStr: string, addressMapping: IAddressMapping) {
@@ -168,10 +226,14 @@ function init() {
   const btn_sheetA = document.getElementById('btn_sheetA')!
   const btn_sheetB = document.getElementById('btn_sheetB')!
   const btn_sheetT = document.getElementById('btn_sheetT')!
+  const btn_sheetMedian = document.getElementById('btn_sheetMedian')!
+  const btn_sheetStirling = document.getElementById('btn_sheetStirling')!
 
   btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
   btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
   btn_sheetT.addEventListener('click', () => runBenchmark(T, 'Sheet T'))
+  btn_sheetMedian.addEventListener('click', () => runBenchmark(sheetMedianFn, 'Sheet Median'))
+  btn_sheetStirling.addEventListener('click', () => runBenchmark(sheetStirling, 'Sheet Stirling'))
 }
 
 init()

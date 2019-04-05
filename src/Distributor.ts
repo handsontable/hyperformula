@@ -160,7 +160,11 @@ export class Distributor {
       ++ currentNodeIndex
     }
 
-    const longestPathSize = Math.max(...distances) + 1
+    let longestPathSize = distances[0]
+    for (let currentPath of distances) {
+      longestPathSize = Math.max(longestPathSize, currentPath)
+    }
+    longestPathSize += 1
 
     if (sorted.length !== this.graph.nodes.size) {
       const nodesOnCycle = new Set(this.graph.nodes.values())

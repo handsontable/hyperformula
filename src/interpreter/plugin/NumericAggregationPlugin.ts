@@ -12,6 +12,7 @@ import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from "../../findSmallerRange";
+import mathjs from "mathjs";
 
 export type RangeOperation = (rangeValues: CellValue[]) => CellValue
 
@@ -20,6 +21,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     sum: {
       EN: 'SUM',
       PL: 'SUMA',
+    },
+    stirling: {
+      EN: 'STIRLING',
+      PL: 'STIRLING',
     },
   }
 
@@ -42,6 +47,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
       return add(currentSum, value)
     }, 0)
+  }
+
+  public stirling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    const arg1 = this.evaluateAst(ast.args[0], formulaAddress) as number
+    const arg2 = this.evaluateAst(ast.args[1], formulaAddress) as number
+    if (arg2 > arg1) {
+      return cellError(ErrorType.VALUE)
+    }
+    return mathjs.stirlingS2(arg1, arg2).toFixed()
   }
 
   /**
