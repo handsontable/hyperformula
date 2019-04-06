@@ -1,11 +1,16 @@
 import { absoluteCellAddress, CellAddress, CellDependency, simpleCellAddress } from '../src/Cell'
 import { Config } from '../src/Config'
-import { computeHash } from '../src/parser/computeHash'
+import { ParserWithCaching } from '../src/parser/ParserWithCaching'
 import { FormulaLexer } from '../src/parser/FormulaParser'
 import { buildLexerConfig } from '../src/parser/LexerConfig'
 
 describe('computeHash', () => {
-  const computeFunc = (code: string, address: CellAddress): string => computeHash(new FormulaLexer(buildLexerConfig(new Config())).tokenizeFormula(code).tokens, address)
+  const computeFunc = (code: string, address: CellAddress): string => {
+    const config = new Config()
+    const parser = new ParserWithCaching(config)
+    const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
+    return parser.computeHash(tokens, address)
+  }
 
   it('simple case', () => {
     const code = '=42'

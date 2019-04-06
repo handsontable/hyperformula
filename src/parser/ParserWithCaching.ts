@@ -1,10 +1,10 @@
-import {CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {CellAddress, cellAddressFromString, CellReferenceType, CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
-import {computeHash} from './computeHash'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, ILexerConfig} from './LexerConfig'
+import {buildLexerConfig, ILexerConfig, CellReference} from './LexerConfig'
+import {IToken, tokenMatcher} from 'chevrotain'
 
 /**
  * Parses formula using caching if feasible.
@@ -43,7 +43,7 @@ export class ParserWithCaching {
       return { ast, dependencies: [] }
     }
 
-    const hash = computeHash(lexerResult.tokens, formulaAddress)
+    const hash = this.computeHash(lexerResult.tokens, formulaAddress)
 
     let cacheResult = this.cache.get(hash)
     if (cacheResult) {
@@ -60,6 +60,23 @@ export class ParserWithCaching {
     } else {
       return { ast, dependencies }
     }
+  }
+
+  public computeHash(tokens: IToken[], baseAddress: SimpleCellAddress): string {
+    let hash = ''
+    let idx = 0
+    while (idx < tokens.length) {
+      const token = tokens[idx]
+      if (tokenMatcher(token, CellReference)) {
+        const cellAddress = cellAddressFromString(token.image, baseAddress)
+        hash = hash.concat(cellHashFromToken(cellAddress))
+        idx++
+      } else {
+        hash = hash.concat(token.image)
+        idx++
+      }
+    }
+    return hash
   }
 }
 
@@ -90,4 +107,21 @@ const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleC
       return getAbsoluteAddress(dep, baseAddress)
     }
   })
+}
+
+const cellHashFromToken = (cellAddress: CellAddress): string => {
+  switch (cellAddress.type) {
+    case CellReferenceType.CELL_REFERENCE_RELATIVE: {
+      return `#${cellAddress.row}R${cellAddress.col}`
+    }
+    case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
+      return `#${cellAddress.row}A${cellAddress.col}`
+    }
+    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
+      return `#${cellAddress.row}AC${cellAddress.col}`
+    }
+    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
+      return `#${cellAddress.row}AR${cellAddress.col}`
+    }
+  }
 }
