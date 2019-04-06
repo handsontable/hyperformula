@@ -82,11 +82,19 @@ export class HandsOnEngine {
   /** Engine configuration */
   private readonly config: Config
 
+  private readonly sheetMapping: Map<string, number> = new Map()
+
   constructor(sheets: Sheets, config: Config) {
     this.config = config
 
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
+
+    let i = 0
+    for (let sheetName in sheets) {
+      this.sheetMapping.set(sheetName, i)
+      i++
+    }
 
     const sheet = sheets["Sheet1"] as Sheet
 
