@@ -1,10 +1,11 @@
-import {CellAddress, cellAddressFromString, CellReferenceType, CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {absoluteColCellAddress, absoluteRowCellAddress, absoluteCellAddress, relativeCellAddress, CellAddress, CellReferenceType, CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, ILexerConfig, CellReference} from './LexerConfig'
 import {IToken, tokenMatcher} from 'chevrotain'
+import {SheetMapping} from '../SheetMapping'
 
 /**
  * Parses formula using caching if feasible.
@@ -15,6 +16,7 @@ export class ParserWithCaching {
   private lexer: FormulaLexer
   private lexerConfig: ILexerConfig
   private formulaParser: FormulaParser
+  private sheetMapping: SheetMapping
 
   constructor(
     private readonly config: Config,
@@ -22,6 +24,7 @@ export class ParserWithCaching {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig)
+    this.sheetMapping = new SheetMapping()
   }
 
   /**
@@ -68,7 +71,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(token.image, baseAddress)
+        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
         hash = hash.concat(cellHashFromToken(cellAddress))
         idx++
       } else {
@@ -123,5 +126,35 @@ const cellHashFromToken = (cellAddress: CellAddress): string => {
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
       return `#${cellAddress.row}AR${cellAddress.col}`
     }
+  }
+}
+
+/**
+ * Computes R0C0 representation of cell address based on it's string representation and base address.
+ *
+ * @param stringAddress - string representation of cell address, e.g. 'C64'
+ * @param baseAddress - base address for R0C0 conversion
+ */
+export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
+  const result = stringAddress.match(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/)!;
+
+  let col
+  if (result[2].length === 1) {
+    col = result[2].toUpperCase().charCodeAt(0) - 65
+  } else {
+    col = result[2].split('').reduce((currentColumn, nextLetter) => {
+      return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
+    }, 0) - 1
+  }
+
+  const row = Number(result[4] as string) - 1
+  if (result[1] === '$' && result[3] === '$') {
+    return absoluteCellAddress(col, row)
+  } else if (result[1] === '$') {
+    return absoluteColCellAddress(col, row - baseAddress.row)
+  } else if (result[3] === '$') {
+    return absoluteRowCellAddress(col - baseAddress.col, row)
+  } else {
+    return relativeCellAddress(col - baseAddress.col, row - baseAddress.row)
   }
 }
