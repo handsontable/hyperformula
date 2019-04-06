@@ -11,7 +11,7 @@ import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
-import {checkMatrixSize} from './Matrix'
+import {checkIfMatrix, checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
@@ -103,17 +103,31 @@ export class GraphBuilder {
       }
     }
 
-    this.detectMatrices()
+    this.detectMatrices(dependencies)
     this.handleDependencies(dependencies)
   }
 
-  private detectMatrices() {
+  private detectMatrices(dependencies: Map<Vertex, CellDependency[]>) {
     const cacheMapping = this.parser.getMapping()
 
-    cacheMapping.forEach((value: SimpleCellAddress[], key: string) => {
-      let isMatrix = checkIfMatrix(value)
-      if (isMatrix) {
-        console.log(`Cells with hash ${key} makes matrix with size of ${value.length}`)
+    cacheMapping.forEach((addresses: SimpleCellAddress[], key: string) => {
+      const leftCorner = this.addressMapping.getCell(addresses[0])
+
+      const size = checkIfMatrix(addresses)
+      if (size && leftCorner instanceof FormulaCellVertex) {
+          const matrixVertex = new Matrix(leftCorner.getFormula() as ProcedureAst, leftCorner.getAddress(), size.width, size.height)
+          const matrixDependencies = dependencies.get(leftCorner)!
+
+          addresses.forEach((address) => {
+            const vertex = this.addressMapping.getCell(address)
+            const deps = dependencies.get(vertex)!
+            matrixDependencies.push(...deps)
+            this.addressMapping.setCell(address, matrixVertex)
+            dependencies.delete(vertex)
+            this.graph.removeNode(vertex)
+          })
+
+          this.graph.addNode(matrixVertex)
       }
     })
   }
@@ -171,31 +185,6 @@ export class GraphBuilder {
       })
     })
   }
-}
-
-/**
- * Checks if list of addresses form a rectangle
- * */
-export function checkIfMatrix(addresses: SimpleCellAddress[]): boolean {
-  // addresses sorted in parsing order, we are assuming that
-  // topleft is always first
-  // bottomright is always last
-  const first = addresses[0]
-  const last = addresses[addresses.length - 1]
-  const possibleMatrixSize = (last.col - first.col + 1) * (last.row - first.row + 1)
-
-  if (addresses.length !== possibleMatrixSize) {
-    return false
-  }
-
-  for (let i=0; i<addresses.length; ++i) {
-    const address = addresses[i]
-    if (address.col > last.col || address.col < first.col) {
-      return false
-    }
-  }
-
-  return true
 }
 
 /**

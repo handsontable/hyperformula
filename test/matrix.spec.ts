@@ -56,13 +56,4 @@ describe('Matrix', () => {
     expect(engine.getCellValue('B5')).toBeCloseTo(4)
     expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
-
-  it ('detects perfect matrix', () => {
-    const config = new Config({ functionPlugins: [MatrixPlugin] })
-    const engine = HandsOnEngine.buildFromArray([
-      ['=D1+1', '=E1+1'],
-      ['=D2+1', '=E2+1'],
-      ['=D3+1', '=E3+1'],
-    ], config)
-  })
 })
