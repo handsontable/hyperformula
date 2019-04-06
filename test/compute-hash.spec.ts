@@ -1,8 +1,8 @@
 import { absoluteCellAddress, CellAddress, CellDependency, simpleCellAddress } from '../src/Cell'
 import { Config } from '../src/Config'
-import { ParserWithCaching } from '../src/parser/ParserWithCaching'
 import { FormulaLexer } from '../src/parser/FormulaParser'
 import { buildLexerConfig } from '../src/parser/LexerConfig'
+import { ParserWithCaching } from '../src/parser/ParserWithCaching'
 
 describe('computeHash', () => {
   const computeFunc = (code: string, address: CellAddress): string => {

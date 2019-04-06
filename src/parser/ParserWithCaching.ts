@@ -1,11 +1,11 @@
-import {absoluteColCellAddress, absoluteRowCellAddress, absoluteCellAddress, relativeCellAddress, CellAddress, CellReferenceType, CellDependency, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {IToken, tokenMatcher} from 'chevrotain'
+import {absoluteCellAddress, absoluteColCellAddress, absoluteRowCellAddress, CellAddress, CellDependency, CellReferenceType, getAbsoluteAddress, relativeCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {SheetMapping} from '../SheetMapping'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, ILexerConfig, CellReference} from './LexerConfig'
-import {IToken, tokenMatcher} from 'chevrotain'
-import {SheetMapping} from '../SheetMapping'
+import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
 
 /**
  * Parses formula using caching if feasible.
@@ -136,7 +136,7 @@ const cellHashFromToken = (cellAddress: CellAddress): string => {
  * @param baseAddress - base address for R0C0 conversion
  */
 export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
-  const result = stringAddress.match(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/)!;
+  const result = stringAddress.match(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/)!
 
   let col
   if (result[2].length === 1) {

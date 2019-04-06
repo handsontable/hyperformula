@@ -2,7 +2,6 @@ import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {ArrayAddressMapping} from './ArrayAddressMapping'
-import {SheetMapping} from './SheetMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString,
@@ -20,13 +19,13 @@ import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
+import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export {
   Config,
 }
-
 
 interface Sheets {
   [sheetName: string]: Sheet
@@ -52,7 +51,7 @@ export class HandsOnEngine {
    * @param sheet - two-dimmensional array representation of sheet
    */
   public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
-    return new HandsOnEngine({ "Sheet1": sheet }, config)
+    return new HandsOnEngine({ Sheet1: sheet }, config)
   }
 
   public static buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
@@ -91,11 +90,11 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    for (let sheetName in sheets) {
+    for (const sheetName in sheets) {
       this.sheetMapping.addSheet(sheetName)
     }
 
-    const sheet = sheets["Sheet1"] as Sheet
+    const sheet = sheets.Sheet1 as Sheet
 
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 

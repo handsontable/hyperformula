@@ -536,10 +536,9 @@ describe('Interpreter', () => {
       expect(engine.getCellValue('C2')).toEqual(9)
   })
 
-
   it('initializing engine with multiple sheets', () => {
     const engine = HandsOnEngine.buildFromSheets({
-      "Sheet1": [
+      Sheet1: [
         ['0', '1'],
         ['2', '3'],
       ],
