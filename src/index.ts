@@ -2,6 +2,7 @@ import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {ArrayAddressMapping} from './ArrayAddressMapping'
+import {SheetMapping} from './SheetMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString,
@@ -82,7 +83,7 @@ export class HandsOnEngine {
   /** Engine configuration */
   private readonly config: Config
 
-  private readonly sheetMapping: Map<string, number> = new Map()
+  private readonly sheetMapping = new SheetMapping()
 
   constructor(sheets: Sheets, config: Config) {
     this.config = config
@@ -90,10 +91,8 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
-    let i = 0
     for (let sheetName in sheets) {
-      this.sheetMapping.set(sheetName, i)
-      i++
+      this.sheetMapping.addSheet(sheetName)
     }
 
     const sheet = sheets["Sheet1"] as Sheet
