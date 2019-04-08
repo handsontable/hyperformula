@@ -14,7 +14,7 @@ export class RangeMapping {
    * @param vertex - vertex to save
    */
   public setRange(vertex: RangeVertex) {
-    const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
+    const key = `${vertex.getStart().sheet},${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
     this.rangeMapping.set(key, vertex)
   }
 
@@ -25,7 +25,7 @@ export class RangeMapping {
    * @param end - bottom-right corner of the range
    */
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
-    const key = `${start.col},${start.row},${end.col},${end.row}`
+    const key = `${start.sheet},${start.col},${start.row},${end.col},${end.row}`
     return this.rangeMapping.get(key) || null
   }
 }

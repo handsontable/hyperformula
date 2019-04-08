@@ -175,6 +175,9 @@ export class RangeVertex {
   constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
+    if (start.sheet !== end.sheet) {
+      throw new Error('start range in different sheet than end range')
+    }
   }
 
   /**

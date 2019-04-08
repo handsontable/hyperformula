@@ -82,7 +82,7 @@ for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
 
 differences.forEach((e: [number, number, string, string, string]) => {
   const [currentRowIdx, currentColumnIdx, expectedValue, actualValue, formulaString] = e
-  console.log(`In cell ${cellAddressToString(simpleCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
+  console.log(`In cell ${cellAddressToString(simpleCellAddress(0, currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
 })
 
 if (differences.length > 0) {

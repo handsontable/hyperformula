@@ -15,6 +15,7 @@ import {checkMatrixSize} from './Matrix'
 import {ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
+import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
@@ -22,6 +23,10 @@ import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, Val
  * Two-dimenstional array representation of sheet
  */
 export type Sheet = string[][]
+
+export interface Sheets {
+  [sheetName: string]: Sheet
+}
 
 /**
  * Service building the graph and mappings.
@@ -45,8 +50,9 @@ export class GraphBuilder {
               private readonly addressMapping: IAddressMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
-              private readonly config: Config) {
-    this.parser = new ParserWithCaching(config)
+              private readonly config: Config,
+              private readonly sheetMapping: SheetMapping) {
+    this.parser = new ParserWithCaching(config, this.sheetMapping)
   }
 
   /**
@@ -54,40 +60,45 @@ export class GraphBuilder {
    *
    * @param sheet - two-dimensional array representation of sheet
    */
-  public buildGraph(sheet: Sheet) {
+  public buildGraph(sheets: Sheets) {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
-    for (let i = 0; i < sheet.length; ++i) {
-      const row = sheet[i]
-      for (let j = 0; j < row.length; ++j) {
-        const cellContent = row[j]
-        const cellAddress = simpleCellAddress(j, i)
-        let vertex = null
+    for (const sheetName in sheets) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      const sheet = sheets[sheetName] as Sheet
 
-        if (isMatrix(cellContent)) {
-          const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-          vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
-          dependencies.set(vertex, parseResult.dependencies)
-          this.graph.addNode(vertex)
-          this.handleMatrix(vertex, cellAddress)
-        } else if (isFormula(cellContent)) {
-          const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-          vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
-          dependencies.set(vertex, parseResult.dependencies)
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
-        } else if (cellContent === '') {
-          /* we don't care about empty cells here */
-        } else if (!isNaN(Number(cellContent))) {
-          vertex = new ValueCellVertex(Number(cellContent))
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
-        } else {
-          vertex = new ValueCellVertex(cellContent)
-          this.graph.addNode(vertex)
-          this.addressMapping.setCell(cellAddress, vertex)
+      for (let i = 0; i < sheet.length; ++i) {
+        const row = sheet[i]
+        for (let j = 0; j < row.length; ++j) {
+          const cellContent = row[j]
+          const cellAddress = simpleCellAddress(sheetId, j, i)
+          let vertex = null
+
+          if (isMatrix(cellContent)) {
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+            vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+            dependencies.set(vertex, parseResult.dependencies)
+            this.graph.addNode(vertex)
+            this.handleMatrix(vertex, cellAddress)
+          } else if (isFormula(cellContent)) {
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+            vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
+            dependencies.set(vertex, parseResult.dependencies)
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          } else if (cellContent === '') {
+            /* we don't care about empty cells here */
+          } else if (!isNaN(Number(cellContent))) {
+            vertex = new ValueCellVertex(Number(cellContent))
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          } else {
+            vertex = new ValueCellVertex(cellContent)
+            this.graph.addNode(vertex)
+            this.addressMapping.setCell(cellAddress, vertex)
+          }
         }
       }
     }
@@ -114,7 +125,7 @@ export class GraphBuilder {
 
     for (let i = 0; i < vertex.width; ++i) {
       for (let j = 0; j < vertex.height; ++j) {
-        const address = simpleCellAddress(formulaAddress.col + i, formulaAddress.row + j)
+        const address = simpleCellAddress(formulaAddress.sheet, formulaAddress.col + i, formulaAddress.row + j)
         this.addressMapping.setCell(address, vertex)
       }
     }
@@ -161,7 +172,7 @@ export const generateCellsFromRangeGenerator = function*(simpleCellRange: Simple
   while (currentRow <= simpleCellRange.end.row) {
     let currentColumn = simpleCellRange.start.col
     while (currentColumn <= simpleCellRange.end.col) {
-      yield simpleCellAddress(currentColumn, currentRow)
+      yield simpleCellAddress(simpleCellRange.start.sheet, currentColumn, currentRow)
       currentColumn++
     }
     currentRow++

@@ -14,7 +14,7 @@ import {
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
-import {GraphBuilder, Sheet} from './GraphBuilder'
+import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
@@ -25,10 +25,6 @@ import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex
 
 export {
   Config,
-}
-
-interface Sheets {
-  [sheetName: string]: Sheet
 }
 
 /**
@@ -95,14 +91,13 @@ export class HandsOnEngine {
     }
 
     const sheet = sheets.Sheet1 as Sheet
-
     this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config)
+    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
-      graphBuilder.buildGraph(sheet)
+      graphBuilder.buildGraph(sheets)
     })
 
     this.stats.measure(StatType.TOP_SORT, () => {
@@ -122,14 +117,14 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    */
   public getCellValue(stringAddress: string): CellValue {
-    const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
+    const address = cellAddressFromString(this.sheetMapping, stringAddress, absoluteCellAddress(0, 0, 0))
     return this.addressMapping.getCellValue(address)
   }
 
   /**
    * Returns array with values of all cells
    * */
-  public getValues() {
+  public getValues(sheet: number) {
     const sheetHeight = this.addressMapping.getHeight()
     const sheetWidth = this.addressMapping.getWidth()
 
@@ -138,7 +133,7 @@ export class HandsOnEngine {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
-        const address = simpleCellAddress(j, i)
+        const address = simpleCellAddress(sheet, j, i)
         if (this.addressMapping.isEmpty(address)) {
           arr[i][j] = ''
           continue
@@ -161,7 +156,7 @@ export class HandsOnEngine {
    * Creates CSV string out of sheet content
    */
   public exportAsCsv(): string {
-    return stringify(this.getValues(), { delimiter: ','})
+    return stringify(this.getValues(0), { delimiter: ','})
   }
 
   /**
@@ -178,7 +173,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(stringAddress: string, newCellContent: string) {
-    const address = cellAddressFromString(stringAddress, absoluteCellAddress(0, 0))
+    const address = cellAddressFromString(this.sheetMapping, stringAddress, absoluteCellAddress(0, 0, 0))
     const vertex = this.addressMapping.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
