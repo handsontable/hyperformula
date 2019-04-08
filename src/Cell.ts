@@ -54,20 +54,22 @@ export type CellValue = boolean | string | number | number[][] | CellError
 export interface CellAddress {
   col: number,
   row: number,
+  sheet: number,
   type: CellReferenceType
 }
 
-export const relativeCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_RELATIVE })
-export const absoluteCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE })
-export const absoluteColCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
-export const absoluteRowCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
+export const relativeCellAddress = (col: number, row: number, sheet?: number): CellAddress => ({ col, row, sheet: sheet || 0, type: CellReferenceType.CELL_REFERENCE_RELATIVE })
+export const absoluteCellAddress = (col: number, row: number, sheet?: number): CellAddress => ({ col, row, sheet: sheet || 0, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE })
+export const absoluteColCellAddress = (col: number, row: number, sheet?: number): CellAddress => ({ col, row, sheet: sheet || 0, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
+export const absoluteRowCellAddress = (col: number, row: number, sheet?: number): CellAddress => ({ col, row, sheet: sheet || 0, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
 
 export interface SimpleCellAddress {
   col: number,
   row: number,
+  sheet: number,
 }
 
-export const simpleCellAddress = (col: number, row: number): SimpleCellAddress => ({ col, row })
+export const simpleCellAddress = (col: number, row: number, sheet?: number): SimpleCellAddress => ({ col, row, sheet: sheet || 0 })
 
 export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
 

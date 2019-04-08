@@ -516,6 +516,7 @@ export class FormulaParser extends Parser {
       type: cellArg.reference.type,
       row: cellArg.reference.row + rowShift,
       col: cellArg.reference.col + colShift,
+      sheet: 0,
     }
 
     let absoluteCol = topLeftCorner.col
@@ -541,6 +542,7 @@ export class FormulaParser extends Parser {
     } else {
       const bottomRightCorner = {
         type: topLeftCorner.type,
+        sheet: 0,
         row: topLeftCorner.row + height - 1,
         col: topLeftCorner.col + width - 1,
       }
