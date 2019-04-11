@@ -374,7 +374,7 @@ export class FormulaParser extends Parser {
   })
 
   /**
-   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1)
+   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42.A$17)
    */
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference)
