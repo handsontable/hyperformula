@@ -7,31 +7,31 @@ const generateCellsFromRange = (range: SimpleCellRange): SimpleCellAddress[] => 
 
 describe('generateCellsFromRange', () => {
   it('one element', () => {
-    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0), simpleCellAddress(0, 0)))).toEqual([
-      simpleCellAddress(0, 0),
+    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0)))).toEqual([
+      simpleCellAddress(0, 0, 0),
     ])
   })
 
   it('simple row', () => {
-    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0), simpleCellAddress(1, 0)))).toEqual([
-      simpleCellAddress(0, 0),
-      simpleCellAddress(1, 0),
+    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)))).toEqual([
+      simpleCellAddress(0, 0, 0),
+      simpleCellAddress(0, 1, 0),
     ])
   })
 
   it('simple column', () => {
-    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0), simpleCellAddress(0, 1)))).toEqual([
-      simpleCellAddress(0, 0),
-      simpleCellAddress(0, 1),
+    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 1)))).toEqual([
+      simpleCellAddress(0, 0, 0),
+      simpleCellAddress(0, 0, 1),
     ])
   })
 
   it('simple square', () => {
-    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0), simpleCellAddress(1, 1)))).toEqual([
-      simpleCellAddress(0, 0),
-      simpleCellAddress(1, 0),
-      simpleCellAddress(0, 1),
-      simpleCellAddress(1, 1),
+    expect(generateCellsFromRange(simpleCellRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 1)))).toEqual([
+      simpleCellAddress(0, 0, 0),
+      simpleCellAddress(0, 1, 0),
+      simpleCellAddress(0, 0, 1),
+      simpleCellAddress(0, 1, 1),
     ])
   })
 })

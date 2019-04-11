@@ -37,16 +37,16 @@ const COUNTIF_CACHE_KEY = 'COUNTIF'
  */
 export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: SimpleCellRange, valuesRange: SimpleCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: SimpleCellRange, restValuesRange: SimpleCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
-    const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.col, valuesRange.end.row - 1)
+    const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = rangeMapping.getRange(valuesRange.start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       return {
         smallerRangeVertex: rowLessVertex,
         restValuesRange: simpleCellRange(
-          simpleCellAddress(valuesRange.start.col, valuesRange.end.row),
+          simpleCellAddress(valuesRange.start.sheet, valuesRange.start.col, valuesRange.end.row),
           valuesRange.end),
         restConditionRange: simpleCellRange(
-          simpleCellAddress(conditionRange.start.col, conditionRange.end.row),
+          simpleCellAddress(conditionRange.start.sheet, conditionRange.start.col, conditionRange.end.row),
           conditionRange.end),
       }
     }

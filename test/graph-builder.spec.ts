@@ -4,6 +4,7 @@ import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
 import {RangeMapping} from '../src/RangeMapping'
+import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
 import {CellVertex, EmptyCellVertex, ValueCellVertex, Vertex} from '../src/Vertex'
 
@@ -11,11 +12,13 @@ describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([['42']])
+    graphBuilder.buildGraph({ Sheet1: [['42']]})
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
     expect(node.getCellValue()).toBe(42)
   })
@@ -23,11 +26,13 @@ describe('GraphBuilder', () => {
   it('build sheet with simple string cell', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([['foo']])
+    graphBuilder.buildGraph({ Sheet1: [['foo']]})
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
     expect(node.getCellValue()).toBe('foo')
   })
@@ -35,24 +40,28 @@ describe('GraphBuilder', () => {
   it('building for cell with empty string should give empty vertex', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([['']])
+    graphBuilder.buildGraph({ Sheet1: [['']]})
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0))!
+    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('#buildGraph', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([
+    graphBuilder.buildGraph({ Sheet1: [
       ['1', 'A5', '2'],
       ['foo', 'bar', 'A2'],
-    ])
+    ]})
 
     expect(graph.nodesCount()).toBe(
       6 + // for the cells above
@@ -63,42 +72,46 @@ describe('GraphBuilder', () => {
   it('#buildGraph works with ranges', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([
+    graphBuilder.buildGraph({ Sheet1: [
       ['1', '2', '0'],
       ['3', '4', '=A1:B2'],
-    ])
+    ]})
 
     expect(graph.nodesCount()).toBe(
       6 + // for cells above
       1 + // for range vertex
       1, // for EmptyCellVertex
     )
-    const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0))!)!
-    const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1))!)!
-    const nodesB1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(1, 0))!)!
-    const nodesB2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(1, 1))!)!
+    const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0, 0))!)!
+    const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0, 1))!)!
+    const nodesB1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1, 0))!)!
+    const nodesB2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1, 1))!)!
     expect(nodesA1).toEqual(nodesA2)
     expect(nodesA2).toEqual(nodesB1)
     expect(nodesB1).toEqual(nodesB2)
     expect(nodesB1.size).toEqual(1)
     const rangeVertex = Array.from(nodesB2)[0]!
-    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(simpleCellAddress(2, 1))!]))
+    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(simpleCellAddress(0, 2, 1))!]))
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([
+    graphBuilder.buildGraph({ Sheet1: [
         ['1', '2', '0'],
         ['3', '4', '=A1:B2'],
         ['5', '6', '=A1:B2'],
-    ])
+    ]})
 
     expect(graph.nodesCount()).toBe(
       9 + // for cells above
@@ -110,13 +123,15 @@ describe('GraphBuilder', () => {
   it('build with range one row smaller', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([
+    graphBuilder.buildGraph({ Sheet1: [
       ['1', '0'],
       ['3', '=A1:A2'],
       ['5', '=A1:A3'],
-    ])
+    ]})
 
     expect(graph.edgesCount()).toBe(
       2 + // from cells to range(A1:A2)
@@ -128,9 +143,11 @@ describe('GraphBuilder', () => {
   it('#buildGraph should work even if range dependencies are empty', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
-    graphBuilder.buildGraph([['1', '2', '=SUM(A1:B2)']])
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    graphBuilder.buildGraph({ Sheet1: [['1', '2', '=SUM(A1:B2)']]})
 
     expect(graph.nodesCount()).toBe(
       3 + // for cells above
@@ -147,13 +164,15 @@ describe('GraphBuilder', () => {
   it("optimization doesn't work if smaller range is after bigger", () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config())
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph([
+    graphBuilder.buildGraph({ Sheet1: [
       ['1', '0'],
       ['3', '=A1:A3'],
       ['5', '=A1:A2'],
-    ])
+    ]})
 
     expect(graph.edgesCount()).toBe(
       3 + // from 3 cells to range(A1:A2)

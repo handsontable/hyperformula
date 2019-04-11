@@ -2,7 +2,7 @@ import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
 import {findBoundaries} from '../src'
-import {cellAddressToString, simpleCellAddress} from '../src/Cell'
+import {sheetCellAddress, sheetCellAddressToString} from '../src/Cell'
 
 // Config
 const CSV_DELIMITER = ','
@@ -82,7 +82,7 @@ for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
 
 differences.forEach((e: [number, number, string, string, string]) => {
   const [currentRowIdx, currentColumnIdx, expectedValue, actualValue, formulaString] = e
-  console.log(`In cell ${cellAddressToString(simpleCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
+  console.log(`In cell ${sheetCellAddressToString(sheetCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
 })
 
 if (differences.length > 0) {

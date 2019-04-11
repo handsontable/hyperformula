@@ -4,13 +4,13 @@ import {CriterionCache, RangeVertex} from '../src/Vertex'
 
 describe('RangeVertex with cache', () => {
   it('cache for criterion fuctions empty', () => {
-    const rangeVertex = new RangeVertex(simpleCellAddress(1, 1), simpleCellAddress(1, 10))
+    const rangeVertex = new RangeVertex(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 1, 10))
 
     expect(rangeVertex.getCriterionFunctionValues('SUMIF,1,1').size).toBe(0)
   })
 
   it('cache for functions with criterion basic usage', () => {
-    const rangeVertex = new RangeVertex(simpleCellAddress(1, 1), simpleCellAddress(1, 10))
+    const rangeVertex = new RangeVertex(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 1, 10))
 
     const criterionString1 = '>=0'
     const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!)

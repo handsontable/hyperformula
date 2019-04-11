@@ -1,3 +1,5 @@
+import {SheetMapping} from './SheetMapping'
+
 /**
  * Possible errors returned by our interpreter.
  */
@@ -54,20 +56,27 @@ export type CellValue = boolean | string | number | number[][] | CellError
 export interface CellAddress {
   col: number,
   row: number,
+  sheet: number,
   type: CellReferenceType
 }
 
-export const relativeCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_RELATIVE })
-export const absoluteCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE })
-export const absoluteColCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
-export const absoluteRowCellAddress = (col: number, row: number): CellAddress => ({ col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
+export const relativeCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_RELATIVE })
+export const absoluteCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE })
+export const absoluteColCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
+export const absoluteRowCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
 
 export interface SimpleCellAddress {
   col: number,
   row: number,
+  sheet: number,
 }
+export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({ sheet, col, row })
 
-export const simpleCellAddress = (col: number, row: number): SimpleCellAddress => ({ col, row })
+export interface SheetCellAddress {
+  col: number,
+  row: number,
+}
+export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({ col, row })
 
 export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
 
@@ -77,27 +86,28 @@ export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellA
  * @param stringAddress - string representation of cell address, e.g. 'C64'
  * @param baseAddress - base address for R0C0 conversion
  */
-export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
-  const result = stringAddress.match(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/)!
+export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
+  const result = stringAddress.match(/^(\$([A-Za-z0-9]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 
   let col
-  if (result[2].length === 1) {
-    col = result[2].toUpperCase().charCodeAt(0) - 65
+  if (result[4].length === 1) {
+    col = result[4].toUpperCase().charCodeAt(0) - 65
   } else {
-    col = result[2].split('').reduce((currentColumn, nextLetter) => {
+    col = result[4].split('').reduce((currentColumn, nextLetter) => {
       return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
     }, 0) - 1
   }
 
-  const row = Number(result[4] as string) - 1
-  if (result[1] === '$' && result[3] === '$') {
-    return absoluteCellAddress(col, row)
-  } else if (result[1] === '$') {
-    return absoluteColCellAddress(col, row - baseAddress.row)
+  const sheet = result[2] ? sheetMapping.fetch(result[2]) : baseAddress.sheet
+  const row = Number(result[6] as string) - 1
+  if (result[3] === '$' && result[5] === '$') {
+    return absoluteCellAddress(sheet, col, row)
   } else if (result[3] === '$') {
-    return absoluteRowCellAddress(col - baseAddress.col, row)
+    return absoluteColCellAddress(sheet, col, row - baseAddress.row)
+  } else if (result[5] === '$') {
+    return absoluteRowCellAddress(sheet, col - baseAddress.col, row)
   } else {
-    return relativeCellAddress(col - baseAddress.col, row - baseAddress.row)
+    return relativeCellAddress(sheet, col - baseAddress.col, row - baseAddress.row)
   }
 }
 
@@ -111,11 +121,11 @@ export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCell
   if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
     return address
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-    return simpleCellAddress(baseAddress.col + address.col, address.row)
+    return simpleCellAddress(address.sheet, baseAddress.col + address.col, address.row)
   } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-    return simpleCellAddress(address.col, baseAddress.row + address.row)
+    return simpleCellAddress(address.sheet, address.col, baseAddress.row + address.row)
   } else {
-    return simpleCellAddress(baseAddress.col + address.col, baseAddress.row + address.row)
+    return simpleCellAddress(address.sheet, baseAddress.col + address.col, baseAddress.row + address.row)
   }
 }
 
@@ -125,7 +135,7 @@ export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCell
  * @param address - address to convert
  * @returns string representation, e.g. 'C64'
  */
-export function cellAddressToString(address: SimpleCellAddress): string {
+export function sheetCellAddressToString(address: SheetCellAddress): string {
   let result = ''
   let column = address.col
 

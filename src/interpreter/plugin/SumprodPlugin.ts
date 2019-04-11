@@ -111,11 +111,11 @@ export class SumprodPlugin extends FunctionPlugin {
  */
 export const findSmallerRange = (rangeMapping: RangeMapping, ranges: SimpleCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: SimpleCellRange[] } => {
   if (ranges[0].end.row > ranges[0].start.row) {
-    const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.col, ranges[0].end.row - 1)
+    const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.sheet, ranges[0].end.col, ranges[0].end.row - 1)
     const rowLessVertex = rangeMapping.getRange(ranges[0].start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       const restRanges = ranges.map((range) => {
-        return simpleCellRange(simpleCellAddress(range.start.col, range.end.row), range.end)
+        return simpleCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
       })
 
       return {

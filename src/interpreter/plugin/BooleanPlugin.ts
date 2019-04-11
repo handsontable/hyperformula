@@ -8,15 +8,15 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    true: {
+    literal_true: {
       EN: 'TRUE',
       PL: 'PRAWDA',
     },
-    false: {
+    literal_false: {
       EN: 'FALSE',
       PL: 'FALSZ',
     },
-    if: {
+    conditional_if: {
       EN: 'IF',
       PL: 'JEZELI',
     },
@@ -38,7 +38,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length > 0) {
       return cellError(ErrorType.NA)
     } else {
@@ -54,7 +54,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length > 0) {
       return cellError(ErrorType.NA)
     } else {
@@ -70,7 +70,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const condition = booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
     if (condition === true) {
       return this.evaluateAst(ast.args[1], formulaAddress)

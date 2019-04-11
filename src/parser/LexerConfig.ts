@@ -39,6 +39,10 @@ export const RelativeCell = createToken({name: 'RelativeCell', pattern: /[A-Za-z
 export const AbsoluteColCell = createToken({name: 'AbsoluteColCell', pattern: /\$[A-Za-z]+[0-9]+/, categories: CellReference})
 export const AbsoluteRowCell = createToken({name: 'AbsoluteRowCell', pattern: /[A-Za-z]+\$[0-9]+/, categories: CellReference})
 export const AbsoluteCell = createToken({name: 'AbsoluteCell', pattern: /\$[A-Za-z]+\$[0-9]+/, categories: CellReference})
+export const SheetRelativeCell = createToken({name: 'SheetRelativeCell', pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+[0-9]+/, categories: CellReference})
+export const SheetAbsoluteColCell = createToken({name: 'SheetAbsoluteColCell', pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+[0-9]+/, categories: CellReference})
+export const SheetAbsoluteRowCell = createToken({name: 'SheetAbsoluteRowCell', pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+\$[0-9]+/, categories: CellReference})
+export const SheetAbsoluteCell = createToken({name: 'SheetAbsoluteCell', pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+\$[0-9]+/, categories: CellReference})
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
 /* parenthesis */
@@ -87,6 +91,10 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     LParen,
     RParen,
     RangeSeparator,
+    SheetAbsoluteCell,
+    SheetAbsoluteColCell,
+    SheetAbsoluteRowCell,
+    SheetRelativeCell,
     AbsoluteCell,
     AbsoluteColCell,
     AbsoluteRowCell,

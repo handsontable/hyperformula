@@ -11,4 +11,12 @@ export class SheetMapping {
     this.mapping.set(sheetName, this.lastSheetId)
     return this.lastSheetId
   }
+
+  public fetch(sheetName: string): number {
+    const sheetId = this.mapping.get(sheetName)
+    if (sheetId === undefined) {
+      throw new Error(`Sheet ${sheetName} doesnt exist`)
+    }
+    return sheetId
+  }
 }

@@ -1,6 +1,7 @@
 import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
 import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
+import {SheetMapping} from '../SheetMapping'
 import {
   Ast,
   AstNodeType,
@@ -87,6 +88,8 @@ export class FormulaParser extends Parser {
    * Address of the cell in which formula is located
    */
   private formulaAddress?: SimpleCellAddress
+
+  private sheetMapping?: SheetMapping
 
   /**
    * Cache for positiveAtomicExpression alternatives
@@ -371,11 +374,11 @@ export class FormulaParser extends Parser {
   })
 
   /**
-   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1)
+   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42.A$17)
    */
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference)
-    return buildCellReferenceAst(cellAddressFromString(cell.image, this.formulaAddress!))
+    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!))
   })
 
   /**
@@ -388,9 +391,10 @@ export class FormulaParser extends Parser {
     return expression
   })
 
-  constructor(lexerConfig: ILexerConfig) {
+  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMapping) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
+    this.sheetMapping = sheetMapping
     this.performSelfAnalysis()
   }
 
@@ -516,6 +520,7 @@ export class FormulaParser extends Parser {
       type: cellArg.reference.type,
       row: cellArg.reference.row + rowShift,
       col: cellArg.reference.col + colShift,
+      sheet: this.formulaAddress!.sheet,
     }
 
     let absoluteCol = topLeftCorner.col
@@ -541,6 +546,7 @@ export class FormulaParser extends Parser {
     } else {
       const bottomRightCorner = {
         type: topLeftCorner.type,
+        sheet: this.formulaAddress!.sheet,
         row: topLeftCorner.row + height - 1,
         col: topLeftCorner.col + width - 1,
       }
