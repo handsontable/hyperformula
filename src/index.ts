@@ -155,8 +155,9 @@ export class HandsOnEngine {
   /**
    * Creates CSV string out of sheet content
    */
-  public exportAsCsv(): string {
-    return stringify(this.getValues(0), { delimiter: ','})
+  public exportAsCsv(sheetName: string): string {
+    const sheet = this.sheetMapping.fetch(sheetName)
+    return stringify(this.getValues(sheet), { delimiter: ','})
   }
 
   /**

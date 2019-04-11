@@ -10,7 +10,7 @@ describe('Exporting CSV', () => {
 
     const engine = HandsOnEngine.buildFromCsv(str)
 
-    expect(engine.exportAsCsv().trim()).toEqual(str)
+    expect(engine.exportAsCsv("Sheet1").trim()).toEqual(str)
   })
 
   it('exports empty cells as empty strings', () => {
@@ -18,7 +18,7 @@ describe('Exporting CSV', () => {
 
     const engine = HandsOnEngine.buildFromCsv(str)
 
-    expect(engine.exportAsCsv().trim()).toEqual(str)
+    expect(engine.exportAsCsv("Sheet1").trim()).toEqual(str)
   })
 
   it('exports formatter errors', () => {
@@ -26,6 +26,6 @@ describe('Exporting CSV', () => {
 
     const engine = HandsOnEngine.buildFromCsv(str)
 
-    expect(engine.exportAsCsv().trim()).toEqual('#DIV_BY_ZERO!')
+    expect(engine.exportAsCsv("Sheet1").trim()).toEqual('#DIV_BY_ZERO!')
   })
 })

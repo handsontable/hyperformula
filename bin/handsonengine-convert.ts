@@ -17,6 +17,6 @@ if (!fs.existsSync(formulasCsvPath)) {
 
 const formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
 const engine = HandsOnEngine.buildFromCsv(formulasCsvString)
-const exportedCsvString = engine.exportAsCsv()
+const exportedCsvString = engine.exportAsCsv("Sheet1")
 
 fs.writeFileSync(outputCsvPath, exportedCsvString)

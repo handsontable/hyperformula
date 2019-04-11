@@ -75,7 +75,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   console.info(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
 
   if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCsv()
+    const csvString = engine.exportAsCsv("Sheet1")
     fs.writeFileSync('/tmp/dump.csv', csvString)
   }
   if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
