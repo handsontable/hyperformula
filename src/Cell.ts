@@ -154,10 +154,10 @@ export interface CellRange {
 export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({ start, end })
 
 export interface SimpleCellRange {
-  start: SimpleCellAddress,
-  end: SimpleCellAddress,
+  start: SheetCellAddress,
+  end: SheetCellAddress,
 }
-export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress): SimpleCellRange => ({ start, end })
+export const simpleCellRange = (start: SheetCellAddress, end: SheetCellAddress): SimpleCellRange => ({ start, end })
 
 export function cellRangeToSimpleCellRange(cellRange: CellRange, baseAddress: SimpleCellAddress) {
   return simpleCellRange(getAbsoluteAddress(cellRange.start, baseAddress), getAbsoluteAddress(cellRange.end, baseAddress))

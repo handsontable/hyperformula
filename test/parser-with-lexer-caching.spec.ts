@@ -263,8 +263,8 @@ describe('ParserWithCaching', () => {
 
   it('cell reference with sheet name', () => {
     const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet("Sheet1")
-    sheetMapping.addSheet("Sheet2")
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=$Sheet2.D1', absoluteCellAddress(0, 0, 0)).ast as CellReferenceAst
@@ -273,7 +273,6 @@ describe('ParserWithCaching', () => {
     expect(ast.reference.col).toBe(3)
     expect(ast.reference.row).toBe(0)
   })
-
 
   it('allow to accept different lexer configs', () => {
     const parser1 = new ParserWithCaching(new Config(), new SheetMapping())

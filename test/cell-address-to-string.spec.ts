@@ -1,4 +1,4 @@
-import {sheetCellAddressToString, sheetCellAddress} from '../src/Cell'
+import {sheetCellAddress, sheetCellAddressToString} from '../src/Cell'
 
 describe('sheetCellAddressToString', () => {
   it('is zero based', () => {
