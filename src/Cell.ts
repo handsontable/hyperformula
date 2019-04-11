@@ -70,8 +70,13 @@ export interface SimpleCellAddress {
   row: number,
   sheet: number,
 }
-
 export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({ sheet, col, row })
+
+export interface SheetCellAddress {
+  col: number,
+  row: number,
+}
+export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({ col, row })
 
 export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
 
@@ -130,7 +135,7 @@ export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCell
  * @param address - address to convert
  * @returns string representation, e.g. 'C64'
  */
-export function cellAddressToString(address: SimpleCellAddress): string {
+export function sheetCellAddressToString(address: SheetCellAddress): string {
   let result = ''
   let column = address.col
 
