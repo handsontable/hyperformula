@@ -6,8 +6,8 @@ export type MatrixSizeCheck = MatrixSize | false
 
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
-    switch (ast.procedureName.toLowerCase()) {
-      case 'mmult': {
+    switch (ast.procedureName) {
+      case 'MMULT': {
         if (ast.args.length !== 2) {
           return false
         }
@@ -24,7 +24,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           height: left.height,
         }
       }
-      case 'transpose': {
+      case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
           return false
         }
