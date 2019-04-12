@@ -25,6 +25,11 @@ export class Graph<T> {
     }
   }
 
+  public removeNode(node: T) {
+    this.nodes.delete(node)
+    this.edges.delete(node)
+  }
+
   /**
    * Adds edge between nodes.
    *

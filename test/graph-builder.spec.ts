@@ -3,10 +3,11 @@ import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
+import {add} from '../src/interpreter/scalar'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
-import {CellVertex, EmptyCellVertex, ValueCellVertex, Vertex} from '../src/Vertex'
+import {CellVertex, EmptyCellVertex, Matrix, ValueCellVertex, Vertex} from '../src/Vertex'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -179,5 +180,47 @@ describe('GraphBuilder', () => {
       2 + // from 2 cells to range(A1:A2)
       2, // from range vertexes to formulas
     )
+  })
+
+  it('matrix no overlap', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: [
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['1', '2'],
+      ['3', '4'],
+      ['=sumprod($A1:$B1,transpose(A$4:A$5))', '=sumprod($A1:$B1,transpose(B$4:B$5))'],
+      ['=sumprod($A2:$B2,transpose(A$4:A$5))', '=sumprod($A2:$B2,transpose(B$4:B$5))'],
+      ['=sumprod($A3:$B3,transpose(A$4:A$5))', '=sumprod($A3:$B3,transpose(B$4:B$5))'],
+    ]})
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
+  })
+
+  it('overalp', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: [
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['1', '2'],
+      ['3', '4'],
+      ['=sumprod($A4:$B4,transpose(A$4:A$5))', '=sumprod($A4:$B4,transpose(B$4:B$5))'],
+      ['=sumprod($A5:$B5,transpose(A$4:A$5))', '=sumprod($A5:$B5,transpose(B$4:B$5))'],
+      ['=sumprod($A6:$B6,transpose(A$4:A$5))', '=sumprod($A6:$B6,transpose(B$4:B$5))'],
+    ]})
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(Matrix)
   })
 })

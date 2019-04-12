@@ -127,7 +127,6 @@ export class MatrixPlugin extends FunctionPlugin {
         row = []
       }
     }
-
     return result
   }
 }

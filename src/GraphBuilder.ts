@@ -1,7 +1,7 @@
 import {
   CellDependency,
-  cellError,
-  ErrorType,
+  cellError, CellRange, cellRangeToSimpleCellRange,
+  ErrorType, getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
   SimpleCellRange,
@@ -11,8 +11,8 @@ import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
-import {checkMatrixSize} from './Matrix'
-import {ProcedureAst} from './parser/Ast'
+import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
+import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -103,7 +103,110 @@ export class GraphBuilder {
       }
     }
 
+    this.detectMatrices(dependencies)
     this.handleDependencies(dependencies)
+  }
+
+  private detectMatrices(dependencies: Map<Vertex, CellDependency[]>) {
+    const cacheMapping = this.parser.getMapping()
+
+    cacheMapping.forEach((addresses: SimpleCellAddress[], key: string) => {
+      const leftCorner = this.addressMapping.getCell(addresses[0])
+
+      const size = checkIfMatrix(addresses)
+      if (size && leftCorner instanceof FormulaCellVertex && this.ifMatrixCompatibile(leftCorner, size)) {
+          const matrixVertex = new Matrix(leftCorner.getFormula() as ProcedureAst, leftCorner.getAddress(), size.width, size.height)
+          const matrixDependencies = dependencies.get(leftCorner)!
+
+          addresses.forEach((address) => {
+            const vertex = this.addressMapping.getCell(address)
+            const deps = dependencies.get(vertex)!
+            matrixDependencies.push(...deps)
+            this.addressMapping.setCell(address, matrixVertex)
+            dependencies.delete(vertex)
+            this.graph.removeNode(vertex)
+          })
+
+          this.graph.addNode(matrixVertex)
+      }
+    })
+  }
+
+  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, size: MatrixSize): boolean {
+    const formula = leftCorner.getFormula()
+    if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPROD') {
+      const args = formula.args
+
+      if (args.length !== 2) {
+        return false
+      }
+
+      const leftArg = args[0]
+      const rightArg = args[1]
+      // =sumprod(A:B;transpose(X:Y))
+      if (leftArg.type === AstNodeType.CELL_RANGE && rightArg.type === AstNodeType.FUNCTION_CALL && rightArg.procedureName === 'TRANSPOSE') {
+        const currentMatrix = simpleCellRange(leftCorner.getAddress(), simpleCellAddress(leftCorner.getAddress().sheet, leftCorner.getAddress().col + size.width - 1, leftCorner.getAddress().row + size.height - 1))
+        const transposeArg = rightArg.args[0] as CellRangeAst
+
+        const leftArgRange = cellRangeToSimpleCellRange(leftArg, leftCorner.getAddress())
+        const rightArgRange = cellRangeToSimpleCellRange(transposeArg, leftCorner.getAddress())
+
+        const leftRangeSize = this.rangeSize(leftArgRange)
+        const rightRangeSize = this.rangeSize(rightArgRange)
+
+        let leftMatrix, rightMatrix
+
+        if (leftRangeSize.height === 1 && rightRangeSize.width === 1 && leftRangeSize.width === rightRangeSize.height) {
+          leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + size.height - 1))
+          rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
+        } else if (leftRangeSize.width === 1 && rightRangeSize.height === 1 && leftRangeSize.height === rightRangeSize.width) {
+          leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col + size.width - 1, leftArgRange.end.row))
+          rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col, rightArgRange.end.row + size.height - 1))
+        } else {
+          return false
+        }
+
+        return !this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)
+      }
+    }
+
+    return false
+  }
+
+  private overlap(left: SimpleCellRange, right: SimpleCellRange) {
+    /* todo check if same sheet */
+    if (left.end.row < right.start.row || left.start.row > right.end.row) {
+      return false
+    }
+    if (left.end.col < right.start.col || left.start.col > right.end.col) {
+      return false
+    }
+    return true
+  }
+
+  private rangeSize(range: SimpleCellRange): MatrixSize {
+    return {
+      width: range.end.col - range.start.col + 1,
+      height: range.end.row - range.start.row + 1,
+    }
+  }
+
+  private vectorToLeftCorner(ast: Ast, leftCorner: SimpleCellAddress): SimpleCellAddress | false {
+    switch (ast.type) {
+      case AstNodeType.CELL_RANGE: {
+        return getAbsoluteAddress(ast.start, leftCorner)
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        if (ast.procedureName !== 'TRANSPOSE') {
+          return false
+        }
+
+        return this.vectorToLeftCorner(ast.args[0], leftCorner)
+      }
+      default:
+        return false
+
+    }
   }
 
   private buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellVertex {
