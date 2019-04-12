@@ -1,19 +1,19 @@
 import {
+  absoluteCellAddress,
   CellDependency,
-  cellError,
-  CellRange, cellRangeToSimpleCellRange, CellReferenceType,
-  ErrorType, getAbsoluteAddress,
+  cellError, CellRange, cellRangeToSimpleCellRange,
+  CellReferenceType, ErrorType,
+  getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
   SimpleCellRange,
   simpleCellRange,
-  absoluteCellAddress,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
-import {buildCellRangeAst, Ast, AstNodeType, CellRangeAst, ProcedureAst, buildProcedureAst} from './parser/Ast'
+import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -38,7 +38,7 @@ export class GraphBuilderMatrixHeuristic {
       if (size && leftCorner instanceof FormulaCellVertex) {
         const output = this.ifMatrixCompatibile(leftCorner, size)
         if (output) {
-          const { leftMatrix, rightMatrix } = output;
+          const { leftMatrix, rightMatrix } = output
           const newAst = this.buildMultAst(leftMatrix, rightMatrix)
           const matrixVertex = new Matrix(newAst, leftCorner.getAddress(), size.width, size.height)
           const matrixDependencies = this.dependencies.get(leftCorner)!
@@ -127,7 +127,7 @@ export class GraphBuilderMatrixHeuristic {
   }
 
   private buildMultAst(leftMatrix: SimpleCellRange, rightMatrix: SimpleCellRange): ProcedureAst {
-    return buildProcedureAst("MMULT", [
+    return buildProcedureAst('MMULT', [
       buildCellRangeAst(
         absoluteCellAddress(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
         absoluteCellAddress(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),

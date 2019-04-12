@@ -84,8 +84,8 @@ export class MatrixPlugin extends FunctionPlugin {
     const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
 
     const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
-      let leftCornerX = this.thread.x as number * windowSize
-      let leftCornerY = this.thread.y as number * windowSize
+      const leftCornerX = this.thread.x as number * windowSize
+      const leftCornerY = this.thread.y as number * windowSize
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {
         for (let j = 0; j < windowSize; j++) {

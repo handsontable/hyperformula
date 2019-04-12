@@ -4,11 +4,11 @@ import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
 import {add} from '../src/interpreter/scalar'
+import {buildCellRangeAst, buildProcedureAst} from '../src/parser/Ast'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
 import {CellVertex, EmptyCellVertex, Matrix, ValueCellVertex, Vertex} from '../src/Vertex'
-import {buildProcedureAst, buildCellRangeAst} from "../src/parser/Ast"
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -203,7 +203,7 @@ describe('GraphBuilder', () => {
 
     const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
     expect(vertex).toBeInstanceOf(Matrix)
-    expect((vertex as Matrix).getFormula()).toEqual(buildProcedureAst("MMULT", [
+    expect((vertex as Matrix).getFormula()).toEqual(buildProcedureAst('MMULT', [
       buildCellRangeAst(absoluteCellAddress(0, 0, 0), absoluteCellAddress(0, 1, 2)),
       buildCellRangeAst(absoluteCellAddress(0, 0, 3), absoluteCellAddress(0, 1, 4)),
     ]))
