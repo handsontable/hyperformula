@@ -237,9 +237,9 @@ describe('GraphBuilder', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=sumprod(transpose($A1:$B1),A$4:A$5)', '=sumprod(transpose($A1:$B1),B$4:B$5)',],
-      ['=sumprod(transpose($A2:$B2),A$4:A$5)', '=sumprod(transpose($A2:$B2),B$4:B$5)',],
-      ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)',],
+      ['=sumprod(transpose($A1:$B1),A$4:A$5)', '=sumprod(transpose($A1:$B1),B$4:B$5)'],
+      ['=sumprod(transpose($A2:$B2),A$4:A$5)', '=sumprod(transpose($A2:$B2),B$4:B$5)'],
+      ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)'],
     ]})
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
