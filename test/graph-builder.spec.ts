@@ -1,5 +1,5 @@
 import {AddressMapping} from '../src/AddressMapping'
-import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
+import {absoluteCellAddress, CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
@@ -8,6 +8,7 @@ import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
 import {CellVertex, EmptyCellVertex, Matrix, ValueCellVertex, Vertex} from '../src/Vertex'
+import {buildProcedureAst, buildCellRangeAst} from "../src/parser/Ast"
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -200,7 +201,12 @@ describe('GraphBuilder', () => {
       ['=sumprod($A3:$B3,transpose(A$4:A$5))', '=sumprod($A3:$B3,transpose(B$4:B$5))'],
     ]})
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
+    const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
+    expect(vertex).toBeInstanceOf(Matrix)
+    expect((vertex as Matrix).getFormula()).toEqual(buildProcedureAst("MMULT", [
+      buildCellRangeAst(absoluteCellAddress(0, 0, 0), absoluteCellAddress(0, 1, 2)),
+      buildCellRangeAst(absoluteCellAddress(0, 0, 3), absoluteCellAddress(0, 1, 4)),
+    ]))
   })
 
   it('overlap', () => {

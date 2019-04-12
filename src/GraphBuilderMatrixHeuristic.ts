@@ -7,12 +7,13 @@ import {
   SimpleCellAddress,
   SimpleCellRange,
   simpleCellRange,
+  absoluteCellAddress,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {IAddressMapping} from './IAddressMapping'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
-import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from './parser/Ast'
+import {buildCellRangeAst, Ast, AstNodeType, CellRangeAst, ProcedureAst, buildProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -34,25 +35,30 @@ export class GraphBuilderMatrixHeuristic {
       const leftCorner = this.addressMapping.getCell(addresses[0])
 
       const size = checkIfMatrix(addresses)
-      if (size && leftCorner instanceof FormulaCellVertex && this.ifMatrixCompatibile(leftCorner, size)) {
-        const matrixVertex = new Matrix(leftCorner.getFormula() as ProcedureAst, leftCorner.getAddress(), size.width, size.height)
-        const matrixDependencies = this.dependencies.get(leftCorner)!
+      if (size && leftCorner instanceof FormulaCellVertex) {
+        const output = this.ifMatrixCompatibile(leftCorner, size)
+        if (output) {
+          const { leftMatrix, rightMatrix } = output;
+          const newAst = this.buildMultAst(leftMatrix, rightMatrix)
+          const matrixVertex = new Matrix(newAst, leftCorner.getAddress(), size.width, size.height)
+          const matrixDependencies = this.dependencies.get(leftCorner)!
 
-        addresses.forEach((address) => {
-          const vertex = this.addressMapping.getCell(address)
-          const deps = this.dependencies.get(vertex)!
-          matrixDependencies.push(...deps)
-          this.addressMapping.setCell(address, matrixVertex)
-          this.dependencies.delete(vertex)
-          this.graph.removeNode(vertex)
-        })
+          addresses.forEach((address) => {
+            const vertex = this.addressMapping.getCell(address)
+            const deps = this.dependencies.get(vertex)!
+            matrixDependencies.push(...deps)
+            this.addressMapping.setCell(address, matrixVertex)
+            this.dependencies.delete(vertex)
+            this.graph.removeNode(vertex)
+          })
 
-        this.graph.addNode(matrixVertex)
+          this.graph.addNode(matrixVertex)
+        }
       }
     })
   }
 
-  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, size: MatrixSize): boolean {
+  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, size: MatrixSize): ({ leftMatrix: SimpleCellRange, rightMatrix: SimpleCellRange }) | false {
     const formula = leftCorner.getFormula()
 
     if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPROD') {
@@ -91,7 +97,9 @@ export class GraphBuilderMatrixHeuristic {
         const rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
         const currentMatrix = simpleCellRange(leftCorner.getAddress(), simpleCellAddress(leftCorner.getAddress().sheet, leftCorner.getAddress().col + size.width - 1, leftCorner.getAddress().row + size.height - 1))
 
-        return !this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)
+        if (!this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)) {
+          return { leftMatrix, rightMatrix }
+        }
       }
     }
 
@@ -116,5 +124,18 @@ export class GraphBuilderMatrixHeuristic {
       width: range.end.col - range.start.col + 1,
       height: range.end.row - range.start.row + 1,
     }
+  }
+
+  private buildMultAst(leftMatrix: SimpleCellRange, rightMatrix: SimpleCellRange): ProcedureAst {
+    return buildProcedureAst("MMULT", [
+      buildCellRangeAst(
+        absoluteCellAddress(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
+        absoluteCellAddress(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
+      ),
+      buildCellRangeAst(
+        absoluteCellAddress(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
+        absoluteCellAddress(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
+      ),
+    ])
   }
 }
