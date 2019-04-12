@@ -188,7 +188,9 @@ export class GraphBuilder {
   }
 
   private overlap(left: SimpleCellRange, right: SimpleCellRange) {
-    /* todo check if same sheet */
+    if (left.start.sheet != right.start.sheet){
+      return true
+    }
     if (left.end.row < right.start.row || left.start.row > right.end.row) {
       return false
     }
