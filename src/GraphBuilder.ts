@@ -141,33 +141,41 @@ export class GraphBuilder {
         return false
       }
 
-      const leftArg = args[0]
-      const rightArg = args[1]
-      // =sumprod(A:B;transpose(X:Y))
-      if (leftArg.type === AstNodeType.CELL_RANGE && rightArg.type === AstNodeType.FUNCTION_CALL && rightArg.procedureName === 'TRANSPOSE') {
-        const currentMatrix = simpleCellRange(leftCorner.getAddress(), simpleCellAddress(leftCorner.getAddress().sheet, leftCorner.getAddress().col + size.width - 1, leftCorner.getAddress().row + size.height - 1))
-        const transposeArg = rightArg.args[0] as CellRangeAst
-
-        const leftArgRange = cellRangeToSimpleCellRange(leftArg, leftCorner.getAddress())
-        const rightArgRange = cellRangeToSimpleCellRange(transposeArg, leftCorner.getAddress())
-
-        const leftRangeSize = this.rangeSize(leftArgRange)
-        const rightRangeSize = this.rangeSize(rightArgRange)
-
-        let leftMatrix, rightMatrix
-
-        if (leftRangeSize.height === 1 && rightRangeSize.width === 1 && leftRangeSize.width === rightRangeSize.height) {
-          leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + size.height - 1))
-          rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
-        } else if (leftRangeSize.width === 1 && rightRangeSize.height === 1 && leftRangeSize.height === rightRangeSize.width) {
-          leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col + size.width - 1, leftArgRange.end.row))
-          rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col, rightArgRange.end.row + size.height - 1))
-        } else {
-          return false
-        }
-
-        return !this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)
+      const rawLeftArg = args[0]
+      const rawRightArg = args[1]
+      let leftArg, rightArg
+      if (rawLeftArg.type === AstNodeType.CELL_RANGE && rawRightArg.type === AstNodeType.FUNCTION_CALL && rawRightArg.procedureName === 'TRANSPOSE') {
+        leftArg = rawLeftArg
+        rightArg = rawRightArg
+      } else if (rawRightArg.type === AstNodeType.CELL_RANGE && rawLeftArg.type === AstNodeType.FUNCTION_CALL && rawLeftArg.procedureName === 'TRANSPOSE') {
+        leftArg = rawRightArg
+        rightArg = rawLeftArg
+      } else {
+        return false
       }
+
+      const currentMatrix = simpleCellRange(leftCorner.getAddress(), simpleCellAddress(leftCorner.getAddress().sheet, leftCorner.getAddress().col + size.width - 1, leftCorner.getAddress().row + size.height - 1))
+      const transposeArg = rightArg.args[0] as CellRangeAst
+
+      const leftArgRange = cellRangeToSimpleCellRange(leftArg, leftCorner.getAddress())
+      const rightArgRange = cellRangeToSimpleCellRange(transposeArg, leftCorner.getAddress())
+
+      const leftRangeSize = this.rangeSize(leftArgRange)
+      const rightRangeSize = this.rangeSize(rightArgRange)
+
+      let leftMatrix, rightMatrix
+
+      if (leftRangeSize.height === 1 && rightRangeSize.width === 1 && leftRangeSize.width === rightRangeSize.height) {
+        leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + size.height - 1))
+        rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
+      } else if (leftRangeSize.width === 1 && rightRangeSize.height === 1 && leftRangeSize.height === rightRangeSize.width) {
+        leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col + size.width - 1, leftArgRange.end.row))
+        rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col, rightArgRange.end.row + size.height - 1))
+      } else {
+        return false
+      }
+
+      return !this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)
     }
 
     return false

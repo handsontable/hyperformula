@@ -203,7 +203,7 @@ describe('GraphBuilder', () => {
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
   })
 
-  it('overalp', () => {
+  it('overlap', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
     const sheetMapping = new SheetMapping()
@@ -222,5 +222,26 @@ describe('GraphBuilder', () => {
     ]})
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(Matrix)
+  })
+
+  it('matrix no overlap 2', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping()
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: [
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['1', '2'],
+      ['3', '4'],
+      ['=sumprod(transpose($A1:$B1),A$4:A$5)', '=sumprod(transpose($A1:$B1),B$4:B$5)',],
+      ['=sumprod(transpose($A2:$B2),A$4:A$5)', '=sumprod(transpose($A2:$B2),B$4:B$5)',],
+      ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)',],
+    ]})
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
   })
 })
