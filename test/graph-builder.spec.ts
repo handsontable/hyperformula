@@ -3,11 +3,11 @@ import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
+import {add} from '../src/interpreter/scalar'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
 import {CellVertex, EmptyCellVertex, Matrix, ValueCellVertex, Vertex} from '../src/Vertex'
-import {add} from "../src/interpreter/scalar";
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -182,7 +182,7 @@ describe('GraphBuilder', () => {
     )
   })
 
-  it("matrix no overlap", () => {
+  it('matrix no overlap', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
     const sheetMapping = new SheetMapping()
@@ -203,7 +203,7 @@ describe('GraphBuilder', () => {
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
   })
 
-  it("overalp", () => {
+  it('overalp', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping()
     const sheetMapping = new SheetMapping()

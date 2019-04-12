@@ -66,7 +66,7 @@ export function checkIfMatrix(addresses: SimpleCellAddress[]): MatrixSizeCheck {
     return false
   }
 
-  for (let i=0; i<addresses.length; ++i) {
+  for (let i = 0; i < addresses.length; ++i) {
     const address = addresses[i]
     if (address.col > last.col || address.col < first.col) {
       return false
