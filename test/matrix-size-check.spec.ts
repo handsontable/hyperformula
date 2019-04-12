@@ -40,4 +40,13 @@ describe('Matrix size check tests', () => {
     const size = checkMatrixSize(ast, simpleCellAddress(0, 0, 0))
     expect(size).toBe(false)
   })
+
+  it('check maxpool', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const ast = parser.parse('=maxpool(A1:I9,3)', absoluteCellAddress(0, 0, 0)).ast
+
+    const {width, height} = checkMatrixSize(ast, simpleCellAddress(0, 0, 0)) as MatrixSize
+    expect(width).toBe(3)
+    expect(height).toBe(3)
+  })
 })

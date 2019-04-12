@@ -24,6 +24,23 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           height: left.height,
         }
       }
+      case 'MAXPOOL': {
+        if (ast.args.length !== 2) {
+          return false
+        }
+
+        const left = checkMatrixSize(ast.args[0], formulaAddress)
+        const right = ast.args[1]
+
+        if (!left || right.type !== AstNodeType.NUMBER) {
+          return false
+        }
+
+        return {
+          width: left.width / right.value,
+          height: left.height / right.value,
+        }
+      }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {
           return false

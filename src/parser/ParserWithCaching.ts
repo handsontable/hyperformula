@@ -109,7 +109,7 @@ export function isFormula(text: string): Boolean {
 }
 
 export function isMatrix(text: string): Boolean {
-  return text.toLowerCase().startsWith('=mmult') || text.toLowerCase().startsWith('=transpose')
+  return text.toLowerCase().startsWith('=mmult') || text.toLowerCase().startsWith('=transpose') || text.toLowerCase().startsWith('=maxpool')
 }
 
 /**

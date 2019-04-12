@@ -77,4 +77,17 @@ describe('Matrix', () => {
     expect(engine.getCellValue('A8')).toBeCloseTo(23)
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
   })
+
+  it('matrix maxpool', () => {
+    const config = new Config({ functionPlugins: [MatrixPlugin] })
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3', '4', '5', '6'],
+      ['11', '12', '13', '14', '15', '16'],
+      ['21', '22', '23', '24', '25', '26'],
+      ['=maxpool(A1:F3,3)'],
+    ], config)
+
+    expect(engine.getCellValue('A4')).toBeCloseTo(23)
+    expect(engine.getCellValue('B4')).toBeCloseTo(26)
+  })
 })

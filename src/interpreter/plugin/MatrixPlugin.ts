@@ -25,6 +25,10 @@ export class MatrixPlugin extends FunctionPlugin {
       EN: 'TRANSPOSE',
       PL: 'TRANSPONUJ',
     },
+    maxpool: {
+      EN: 'MAXPOOL',
+      PL: 'MAKS.Z.PULI',
+    },
   }
 
   private gpu: GPU
@@ -65,6 +69,36 @@ export class MatrixPlugin extends FunctionPlugin {
     }).setOutput([vertex.width, vertex.height])
 
     return kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
+  }
+
+  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 2) {
+      return cellError(ErrorType.NA)
+    }
+    const rangeMatrix = this.evaluateAst(ast.args[0], formulaAddress)
+    const windowSize = 3
+
+    if (isCellError(rangeMatrix)) {
+      return rangeMatrix
+    }
+    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
+
+    const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
+      let leftCornerX = this.thread.x as number * windowSize
+      let leftCornerY = this.thread.y as number * windowSize
+      let currentMax = a[leftCornerY][leftCornerX]
+      for (let i = 0; i < windowSize; i++) {
+        for (let j = 0; j < windowSize; j++) {
+          currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+        }
+      }
+      return currentMax
+    }).setOutput([
+      rangeMatrix[0].length / windowSize,
+      rangeMatrix.length / windowSize,
+    ])
+
+    return kernel(rangeMatrix, windowSize) as number[][]
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
