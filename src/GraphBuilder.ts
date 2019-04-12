@@ -1,5 +1,6 @@
 import {
   CellDependency,
+  CellReferenceType,
   cellError, CellRange, cellRangeToSimpleCellRange,
   ErrorType, getAbsoluteAddress,
   simpleCellAddress,
@@ -145,8 +146,13 @@ export class GraphBuilder {
       const rawRightArg = args[1]
       let leftArg, rightArg
       if (rawLeftArg.type === AstNodeType.CELL_RANGE && rawRightArg.type === AstNodeType.FUNCTION_CALL && rawRightArg.procedureName === 'TRANSPOSE') {
-        leftArg = rawLeftArg
-        rightArg = rawRightArg
+        const rightInsideArg = rawRightArg.args[0] as CellRangeAst
+        if (rawLeftArg.start.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL && rawLeftArg.end.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL && rightInsideArg.start.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW && rightInsideArg.end.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+          leftArg = rawLeftArg
+          rightArg = rawRightArg
+        } else {
+          return false
+        }
       } else if (rawRightArg.type === AstNodeType.CELL_RANGE && rawLeftArg.type === AstNodeType.FUNCTION_CALL && rawLeftArg.procedureName === 'TRANSPOSE') {
         leftArg = rawRightArg
         rightArg = rawLeftArg
