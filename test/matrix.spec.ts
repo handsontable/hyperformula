@@ -9,6 +9,19 @@ describe('Matrix', () => {
     expect(matrix.raw()).toEqual([[1,2,3],[4,5,6],[7,8,9]])
   })
 
+  it('Matrix align with window - no padding', () => {
+    const matrix = new Matrix({ width: 3, height: 3})
+    matrix.fill([[1,2,3],[1,2,3],[1,2,3]])
+
+    const aligned = matrix.alignWithWindow(3)
+
+    expect(aligned.raw()).toEqual([
+      [1,2,3],
+      [1,2,3],
+      [1,2,3],
+    ])
+  })
+
   it('Matrix align with window', () => {
     const matrix = new Matrix({ width: 5, height: 5})
     matrix.fill([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]])
