@@ -1,4 +1,5 @@
 import {SheetMapping} from './SheetMapping'
+import {MatrixSize} from "./Matrix";
 
 /**
  * Possible errors returned by our interpreter.

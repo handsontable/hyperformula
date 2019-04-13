@@ -95,3 +95,57 @@ export function checkIfMatrix(addresses: SimpleCellAddress[]): MatrixSizeCheck {
     height: last.row - first.row + 1,
   }
 }
+
+
+export class Matrix {
+  private matrix: number[][]
+  private size: MatrixSize
+
+  constructor(size: MatrixSize) {
+    this.matrix = []
+    this.size = size
+    for (let y = 0; y < size.height; y++) {
+      let row: number[]  = new Array<number>();
+      row.fill(0)
+      this.matrix.push(row)
+    }
+  }
+
+  public fill(input: number[][]) {
+    for (let y = 0; y < input.length && y < this.size.height; ++y) {
+      for (let x = 0; x < input[y].length && x < this.size.width; ++x) {
+        this.matrix[y][x] = input[y][x]
+      }
+    }
+  }
+
+  public alignWithWindow(windowSize: number): Matrix {
+    const additionalHeight = windowSize > this.size.height ? windowSize - this.size.height : this.size.height % windowSize
+    const additionalWidth = windowSize > this.size.width ? windowSize - this.size.width : this.size.width % windowSize
+    const newWidth = this.size.width + additionalWidth
+    const newHeight = this.size.height + additionalHeight
+
+    let result: number[][] = []
+    for (let y = 0; y < this.size.height; ++y) {
+      const row = [...this.matrix[y]]
+      for (let x = 0; x < additionalWidth; ++x) {
+        row.push(0)
+      }
+      result.push(row)
+    }
+
+    for (let y = 0; y < additionalHeight; ++y) {
+      let zeros = Array(newWidth)
+      zeros.fill(0)
+      result.push(zeros)
+    }
+
+    const matrix = new Matrix({ width: newWidth, height: newHeight})
+    matrix.fill(result)
+    return matrix
+  }
+
+  public raw(): number[][] {
+    return this.matrix
+  }
+}

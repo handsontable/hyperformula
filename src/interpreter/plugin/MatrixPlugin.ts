@@ -71,7 +71,7 @@ export class MatrixPlugin extends FunctionPlugin {
     return kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
     if (ast.args.length !== 2) {
       return cellError(ErrorType.NA)
     }
