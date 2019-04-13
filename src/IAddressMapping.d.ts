@@ -1,5 +1,5 @@
 import {SimpleCellAddress, CellValue} from './Cell'
-import {CellVertex, Matrix} from './Vertex'
+import {CellVertex, MatrixVertex} from './Vertex'
 
 /**
  * Interface for mapping from addresses to vertices.

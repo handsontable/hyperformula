@@ -8,7 +8,7 @@ import {buildCellRangeAst, buildProcedureAst} from '../src/parser/Ast'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
-import {CellVertex, EmptyCellVertex, Matrix, ValueCellVertex, Vertex} from '../src/Vertex'
+import {CellVertex, EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/Vertex'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -202,8 +202,8 @@ describe('GraphBuilder', () => {
     ]})
 
     const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
-    expect(vertex).toBeInstanceOf(Matrix)
-    expect((vertex as Matrix).getFormula()).toEqual(buildProcedureAst('MMULT', [
+    expect(vertex).toBeInstanceOf(MatrixVertex)
+    expect((vertex as MatrixVertex).getFormula()).toEqual(buildProcedureAst('MMULT', [
       buildCellRangeAst(absoluteCellAddress(0, 0, 0), absoluteCellAddress(0, 1, 2)),
       buildCellRangeAst(absoluteCellAddress(0, 0, 3), absoluteCellAddress(0, 1, 4)),
     ]))
@@ -227,7 +227,7 @@ describe('GraphBuilder', () => {
       ['=sumprod($A6:$B6,transpose(A$4:A$5))', '=sumprod($A6:$B6,transpose(B$4:B$5))'],
     ]})
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(Matrix)
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(MatrixVertex)
   })
 
   it('matrix no overlap 2', () => {
@@ -248,6 +248,6 @@ describe('GraphBuilder', () => {
       ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)'],
     ]})
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(Matrix)
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
   })
 })

@@ -19,7 +19,7 @@ import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -118,13 +118,13 @@ export class GraphBuilder {
       return new ValueCellVertex(cellError(ErrorType.VALUE))
     }
 
-    return new Matrix(ast, formulaAddress, size.width, size.height)
+    return new MatrixVertex(ast, formulaAddress, size.width, size.height)
   }
 
   private handleMatrix(vertex: CellVertex, formulaAddress: SimpleCellAddress) {
     this.addressMapping.setCell(formulaAddress, vertex)
 
-    if (!(vertex instanceof Matrix)) {
+    if (!(vertex instanceof MatrixVertex)) {
       return
     }
 

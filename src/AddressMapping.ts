@@ -1,6 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
-import {CellVertex, EmptyCellVertex, Matrix, Vertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
 /**
  * Mapping from cell addresses to vertices
@@ -28,7 +28,7 @@ export class AddressMapping implements IAddressMapping {
   public getCellValue(address: SimpleCellAddress): CellValue {
     const vertex = this.getCell(address)
 
-    if (vertex instanceof Matrix) {
+    if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
     } else {
       return vertex.getCellValue()

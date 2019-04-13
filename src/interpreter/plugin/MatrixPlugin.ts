@@ -11,7 +11,7 @@ import {
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {Matrix} from '../../Vertex'
+import {MatrixVertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -58,7 +58,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rightMatrix
     }
 
-    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
+    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
@@ -75,13 +75,19 @@ export class MatrixPlugin extends FunctionPlugin {
     if (ast.args.length !== 2) {
       return cellError(ErrorType.NA)
     }
-    const rangeMatrix = this.evaluateAst(ast.args[0], formulaAddress)
-    const windowSize = 3
+    const [rangeArg, sizeArg] = ast.args
+    if (sizeArg.type !== AstNodeType.NUMBER) {
+      return cellError(ErrorType.VALUE)
+    }
+
+    const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    const windowSize = sizeArg.value
 
     if (isCellError(rangeMatrix)) {
       return rangeMatrix
     }
-    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
+
+    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
       const leftCornerX = this.thread.x as number * windowSize
@@ -107,7 +113,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }
 
     const value = this.evaluateAst(ast.args[0], formulaAddress)
-    const vertex = this.addressMapping.getCell(formulaAddress) as Matrix
+    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     if (isCellError(value)) {
       return value

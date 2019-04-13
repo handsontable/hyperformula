@@ -2,9 +2,9 @@ import {HandsOnEngine} from '../../src'
 import {cellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
-import '../testConfig.js'
+import '../testConfig.ts'
 
-describe('Matrix', () => {
+describe('Matrix plugin', () => {
   it('matrix multiplication', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = HandsOnEngine.buildFromArray([
@@ -76,19 +76,6 @@ describe('Matrix', () => {
     expect(engine.getCellValue('B7')).toBeCloseTo(22)
     expect(engine.getCellValue('A8')).toBeCloseTo(23)
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
-  })
-
-  it('matrix maxpool', () => {
-    const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '3', '4', '5', '6'],
-      ['11', '12', '13', '14', '15', '16'],
-      ['21', '22', '23', '24', '25', '26'],
-      ['=maxpool(A1:F3,3)'],
-    ], config)
-
-    expect(engine.getCellValue('A4')).toBeCloseTo(23)
-    expect(engine.getCellValue('B4')).toBeCloseTo(26)
   })
 
   it('matrix maxpool', () => {

@@ -17,7 +17,7 @@ import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, Pr
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export class GraphBuilderMatrixHeuristic {
   constructor(
@@ -40,7 +40,7 @@ export class GraphBuilderMatrixHeuristic {
         if (output) {
           const { leftMatrix, rightMatrix } = output
           const newAst = this.buildMultAst(leftMatrix, rightMatrix)
-          const matrixVertex = new Matrix(newAst, leftCorner.getAddress(), size.width, size.height)
+          const matrixVertex = new MatrixVertex(newAst, leftCorner.getAddress(), size.width, size.height)
           const matrixDependencies = this.dependencies.get(leftCorner)!
 
           addresses.forEach((address) => {

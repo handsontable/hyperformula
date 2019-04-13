@@ -21,7 +21,7 @@ import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, Matrix, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export {
   Config,
@@ -197,7 +197,7 @@ export class HandsOnEngine {
       (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || vertex instanceof Matrix) {
+      if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula()
         const cellValue = this.interpreter.evaluateAst(formula, address)
