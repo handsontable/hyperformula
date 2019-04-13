@@ -1,6 +1,7 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Ast} from './parser/Ast'
+import {Matrix} from "./Matrix";
 
 /**
  * Represents vertex which keeps values of one or more cells
@@ -17,18 +18,18 @@ export class MatrixVertex {
   public readonly height: number
   private formula: Ast
   private cellAddress: SimpleCellAddress
-  private matrix: number[][]
+  private matrix: Matrix
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
     this.formula = formula
     this.cellAddress = cellAddress
     this.width = width
     this.height = height
-    this.matrix = []
+    this.matrix = new Matrix([])
   }
 
   public setCellValue(matrix: CellValue) {
-    this.matrix = matrix as number[][]
+    this.matrix = matrix as Matrix
   }
 
   public getCellValue() {
@@ -39,11 +40,7 @@ export class MatrixVertex {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
-    if (col < 0 || row < 0 || col > this.width - 1 || row > this.height - 1) {
-      throw Error('Matrix index out of bound')
-    }
-
-    return this.matrix[row][col]
+    return this.matrix.get(col, row)
   }
 
   public getAddress() {

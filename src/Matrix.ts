@@ -147,6 +147,21 @@ export class Matrix {
     return new Matrix(result)
   }
 
+  public get(col: number, row: number): number {
+    if (col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1) {
+      throw Error("Matrix index out of bound")
+    }
+    return this.matrix[row][col]
+  }
+
+  public width(): number {
+    return this.size.width
+  }
+
+  public height(): number {
+    return this.size.height
+  }
+
   public raw(): number[][] {
     return this.matrix
   }

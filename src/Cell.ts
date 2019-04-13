@@ -1,5 +1,5 @@
 import {SheetMapping} from './SheetMapping'
-import {MatrixSize} from "./Matrix";
+import {Matrix, MatrixSize} from "./Matrix";
 
 /**
  * Possible errors returned by our interpreter.
@@ -52,7 +52,7 @@ export const isCellError = (value: any): value is CellError => {
   return value.type !== undefined && value.type in ErrorType
 }
 
-export type CellValue = boolean | string | number | number[][] | CellError
+export type CellValue = boolean | string | number | Matrix | CellError
 
 export interface CellAddress {
   col: number,

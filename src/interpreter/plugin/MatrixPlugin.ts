@@ -14,6 +14,7 @@ import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
+import {Matrix} from "../../Matrix";
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -68,10 +69,10 @@ export class MatrixPlugin extends FunctionPlugin {
       return sum
     }).setOutput([vertex.width, vertex.height])
 
-    return kernel(leftMatrix, rightMatrix, leftMatrix[0].length) as number[][]
+    return new Matrix(kernel(leftMatrix.raw(), rightMatrix.raw(), leftMatrix.width()) as number[][])
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
+  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.args.length !== 2) {
       return cellError(ErrorType.NA)
     }
@@ -87,6 +88,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rangeMatrix
     }
 
+    const inputMatrix = rangeMatrix.alignWithWindow(windowSize)
     const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
@@ -100,14 +102,14 @@ export class MatrixPlugin extends FunctionPlugin {
       }
       return currentMax
     }).setOutput([
-      rangeMatrix[0].length / windowSize,
-      rangeMatrix.length / windowSize,
+      inputMatrix.width() / windowSize,
+      rangeMatrix.height() / windowSize,
     ])
 
-    return kernel(rangeMatrix, windowSize) as number[][]
+    return new Matrix(kernel(inputMatrix.raw(), windowSize) as number[][])
   }
 
-  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): number[][] | CellError {
+  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.args.length !== 1) {
       return cellError(ErrorType.NA)
     }
@@ -122,31 +124,26 @@ export class MatrixPlugin extends FunctionPlugin {
         return a[this.thread.x as number][this.thread.y as number]
       }).setOutput([vertex.width, vertex.height])
 
-      return kernel(value) as number[][]
+      return new Matrix(kernel(value.raw()) as number[][])
     }
   }
 
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): number[][] | CellError {
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.type === AstNodeType.CELL_RANGE) {
       return this.matrixFromRange(cellRangeToSimpleCellRange(ast, formulaAddress))
     }
     const value = super.evaluateAst(ast, formulaAddress)
 
     if (typeof value === 'number') {
-      return [[value]]
-    }
-    if (this.isMatrix(value)) {
-      return value as number[][]
+      return new Matrix([[value]])
+    } else if (value instanceof Matrix){
+      return value
     }
 
     return cellError(ErrorType.VALUE)
   }
 
-  private isMatrix(value: CellValue) {
-    return Array.isArray(value) && Array.isArray(value[0]) // value.every(item => Array.isArray(item));
-  }
-
-  private matrixFromRange(range: SimpleCellRange): number[][] | CellError {
+  private matrixFromRange(range: SimpleCellRange): Matrix | CellError {
     const width = range.end.col - range.start.col + 1
     const result = []
 
@@ -167,6 +164,6 @@ export class MatrixPlugin extends FunctionPlugin {
         row = []
       }
     }
-    return result
+    return new Matrix(result)
   }
 }
