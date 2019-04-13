@@ -103,7 +103,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return currentMax
     }).setOutput([
       inputMatrix.width() / windowSize,
-      rangeMatrix.height() / windowSize,
+      inputMatrix.height() / windowSize,
     ])
 
     return new Matrix(kernel(inputMatrix.raw(), windowSize) as number[][])
