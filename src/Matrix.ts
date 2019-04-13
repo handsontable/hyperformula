@@ -107,20 +107,7 @@ export class Matrix {
       height: matrix.length,
       width: matrix.length > 0 ? matrix[0].length : 0
     }
-    for (let y = 0; y < this.size.height; y++) {
-      let row: number[]  = new Array<number>();
-      row.fill(0)
-      this.matrix.push(row)
-    }
-    this.fill(matrix)
-  }
-
-  public fill(input: number[][]) {
-    for (let y = 0; y < input.length && y < this.size.height; ++y) {
-      for (let x = 0; x < input[y].length && x < this.size.width; ++x) {
-        this.matrix[y][x] = input[y][x]
-      }
-    }
+    this.matrix = matrix
   }
 
   public alignWithWindow(windowSize: number): Matrix {
