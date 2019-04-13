@@ -101,14 +101,18 @@ export class Matrix {
   private matrix: number[][]
   private size: MatrixSize
 
-  constructor(size: MatrixSize) {
+  constructor(matrix: number[][]) {
     this.matrix = []
-    this.size = size
-    for (let y = 0; y < size.height; y++) {
+    this.size = {
+      height: matrix.length,
+      width: matrix.length > 0 ? matrix[0].length : 0
+    }
+    for (let y = 0; y < this.size.height; y++) {
       let row: number[]  = new Array<number>();
       row.fill(0)
       this.matrix.push(row)
     }
+    this.fill(matrix)
   }
 
   public fill(input: number[][]) {
@@ -140,9 +144,7 @@ export class Matrix {
       result.push(zeros)
     }
 
-    const matrix = new Matrix({ width: newWidth, height: newHeight})
-    matrix.fill(result)
-    return matrix
+    return new Matrix(result)
   }
 
   public raw(): number[][] {

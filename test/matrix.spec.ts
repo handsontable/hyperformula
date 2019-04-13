@@ -3,16 +3,12 @@ import {Matrix} from "../src/Matrix";
 
 describe('Matrix', () => {
   it ('fill', () => {
-    const matrix  = new Matrix({ width: 3, height: 3})
-    matrix.fill([[1,2,3],[4,5,6],[7,8,9]])
-
+    const matrix  = new Matrix([[1,2,3],[4,5,6],[7,8,9]])
     expect(matrix.raw()).toEqual([[1,2,3],[4,5,6],[7,8,9]])
   })
 
   it('Matrix align with window - no padding', () => {
-    const matrix = new Matrix({ width: 3, height: 3})
-    matrix.fill([[1,2,3],[1,2,3],[1,2,3]])
-
+    const matrix = new Matrix([[1,2,3],[1,2,3],[1,2,3]])
     const aligned = matrix.alignWithWindow(3)
 
     expect(aligned.raw()).toEqual([
@@ -23,9 +19,7 @@ describe('Matrix', () => {
   })
 
   it('Matrix align with window', () => {
-    const matrix = new Matrix({ width: 5, height: 5})
-    matrix.fill([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]])
-
+    const matrix = new Matrix([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]])
     const aligned = matrix.alignWithWindow(2)
 
     expect(aligned.raw()).toEqual([
@@ -39,9 +33,7 @@ describe('Matrix', () => {
   })
 
   it('Matrix align with bigger window', () => {
-    const matrix = new Matrix({ width: 5, height: 5})
-    matrix.fill([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]])
-
+    const matrix = new Matrix([[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5],[1,2,3,4,5]])
     const aligned = matrix.alignWithWindow(6)
 
     expect(aligned.raw()).toEqual([
