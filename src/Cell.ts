@@ -176,9 +176,22 @@ export class AbsoluteCellRange {
   constructor(
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress
-  ) { }
+  ) {
+  }
+
+  public static fromSimpleCellRange(x: SimpleCellRange): AbsoluteCellRange {
+    return new AbsoluteCellRange(x.start, x.end)
+  }
 
   public toSimpleCellRange(): SimpleCellRange {
     return { start: this.start, end: this.end }
+  }
+
+  public width() {
+    return this.end.col - this.start.col + 1;
+  }
+
+  public height() {
+    return this.end.row - this.start.row + 1;
   }
 }

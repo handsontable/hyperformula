@@ -8,6 +8,7 @@ import {
   isCellError,
   SimpleCellAddress,
   SimpleCellRange,
+  AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {Matrix} from '../../Matrix'
@@ -130,7 +131,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.type === AstNodeType.CELL_RANGE) {
-      return this.matrixFromRange(cellRangeToSimpleCellRange(ast, formulaAddress))
+      return this.matrixFromRange(AbsoluteCellRange.fromSimpleCellRange(cellRangeToSimpleCellRange(ast, formulaAddress)))
     }
     const value = super.evaluateAst(ast, formulaAddress)
 
@@ -143,13 +144,12 @@ export class MatrixPlugin extends FunctionPlugin {
     return cellError(ErrorType.VALUE)
   }
 
-  private matrixFromRange(range: SimpleCellRange): Matrix | CellError {
-    const width = range.end.col - range.start.col + 1
+  private matrixFromRange(range: AbsoluteCellRange): Matrix | CellError {
     const result = []
 
     let i = 0
     let row = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
+    for (const cellFromRange of generateCellsFromRangeGenerator(range.toSimpleCellRange())) {
       const value = this.addressMapping.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
@@ -158,7 +158,7 @@ export class MatrixPlugin extends FunctionPlugin {
         return cellError(ErrorType.VALUE)
       }
 
-      if (i % width === 0) {
+      if (i % range.width() === 0) {
         i = 0
         result.push([...row])
         row = []
