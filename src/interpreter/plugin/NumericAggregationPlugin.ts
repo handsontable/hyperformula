@@ -1,10 +1,10 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   cellError,
   CellValue,
   ErrorType,
   getAbsoluteAddress,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'

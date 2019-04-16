@@ -1,4 +1,5 @@
-import {SimpleCellAddress, AbsoluteCellRange} from './Cell'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser/Ast'
 
 export interface MatrixSize { width: number, height: number }

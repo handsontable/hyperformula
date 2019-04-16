@@ -1,4 +1,5 @@
 import {GPU} from 'gpu.js'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   CellError,
   cellError,
@@ -6,7 +7,6 @@ import {
   ErrorType,
   isCellError,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {Matrix} from '../../Matrix'

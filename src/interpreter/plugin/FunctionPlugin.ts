@@ -1,4 +1,5 @@
-import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress, AbsoluteCellRange} from '../../Cell'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'

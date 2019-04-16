@@ -1,3 +1,4 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {
   absoluteCellAddress,
   CellDependency,
@@ -6,7 +7,6 @@ import {
   getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'

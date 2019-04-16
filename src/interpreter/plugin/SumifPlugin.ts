@@ -1,10 +1,10 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   cellError,
   CellValue,
   ErrorType,
   simpleCellAddress,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'

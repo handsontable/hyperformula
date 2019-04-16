@@ -1,10 +1,10 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   cellError,
   CellValue,
   ErrorType,
   simpleCellAddress,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'

@@ -1,3 +1,4 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {
   CellDependency,
   cellError,
@@ -5,7 +6,6 @@ import {
   ErrorType, getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  AbsoluteCellRange,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
