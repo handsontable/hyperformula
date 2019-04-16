@@ -1,17 +1,12 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
   cellError,
-  cellRangeToSimpleCellRange,
   CellValue,
   ErrorType,
-  rangeHeight,
-  rangeWidth,
   simpleCellAddress,
   SimpleCellAddress,
-  simpleCellRange,
-  SimpleCellRange,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
@@ -21,7 +16,7 @@ import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /** Computes key for criterion function cache */
-function sumifCacheKey(simpleConditionRange: SimpleCellRange): string {
+function sumifCacheKey(simpleConditionRange: AbsoluteCellRange): string {
   return `SUMIF,${simpleConditionRange.start.col},${simpleConditionRange.start.row}`
 }
 
@@ -35,19 +30,15 @@ const COUNTIF_CACHE_KEY = 'COUNTIF'
  * @param conditionRange - range for condition on which criterion finds accepted cells
  * @param valuesRange - range for values on which we run aggregate functions
  */
-export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: SimpleCellRange, valuesRange: SimpleCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: SimpleCellRange, restValuesRange: SimpleCellRange} => {
+export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: AbsoluteCellRange, valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: AbsoluteCellRange, restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = rangeMapping.getRange(valuesRange.start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       return {
         smallerRangeVertex: rowLessVertex,
-        restValuesRange: simpleCellRange(
-          simpleCellAddress(valuesRange.start.sheet, valuesRange.start.col, valuesRange.end.row),
-          valuesRange.end),
-        restConditionRange: simpleCellRange(
-          simpleCellAddress(conditionRange.start.sheet, conditionRange.start.col, conditionRange.end.row),
-          conditionRange.end),
+        restValuesRange: valuesRange.withStart(simpleCellAddress(valuesRange.start.sheet, valuesRange.start.col, valuesRange.end.row)),
+        restConditionRange: conditionRange.withStart(simpleCellAddress(conditionRange.start.sheet, conditionRange.start.col, conditionRange.end.row)),
       }
     }
   }
@@ -97,10 +88,10 @@ export class SumifPlugin extends FunctionPlugin {
     const valuesRangeArg = ast.args[2]
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
-      const simpleValuesRange = cellRangeToSimpleCellRange(valuesRangeArg, formulaAddress)
-      const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
+      const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
+      const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
 
-      if (rangeWidth(simpleConditionRange) !== rangeWidth(simpleValuesRange) || rangeHeight(simpleConditionRange) !== rangeHeight(simpleValuesRange)) {
+      if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
         return cellError(ErrorType.VALUE)
       }
 
@@ -139,7 +130,7 @@ export class SumifPlugin extends FunctionPlugin {
     const criterionLambda = buildCriterionLambda(criterion)
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
-      const simpleConditionRange = cellRangeToSimpleCellRange(conditionRangeArg, formulaAddress)
+      const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
       return this.evaluateRangeCountif(simpleConditionRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
@@ -180,7 +171,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeSumif(simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
+  private evaluateRangeSumif(simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
     const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
     if (!valuesRangeVertex) {
       throw Error('Range does not exists in graph')
@@ -216,7 +207,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeCountif(simpleConditionRange: SimpleCellRange, criterionString: string, criterion: Criterion): CellValue {
+  private evaluateRangeCountif(simpleConditionRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
     const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
     if (!conditionRangeVertex) {
       throw Error('Range does not exists in graph')
@@ -264,7 +255,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param simpleValuesRange - values range
    * @param cacheBuilder - function used to compute values in new cache
    */
-  private buildNewCriterionCache(cacheKey: string, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
+  private buildNewCriterionCache(cacheKey: string, simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
     const currentRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     const {smallerRangeVertex, restConditionRange, restValuesRange} = findSmallerRange(this.rangeMapping, simpleConditionRange, simpleValuesRange)
 
@@ -293,7 +284,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param simpleValuesRange - values range
    * @param valueComputingFunction - function used to compute final value out of list of filtered cell values
    */
-  private computeCriterionValue(criterion: Criterion, simpleConditionRange: SimpleCellRange, simpleValuesRange: SimpleCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
+  private computeCriterionValue(criterion: Criterion, simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambda = buildCriterionLambda(criterion)
     const values = getRangeValues(this.addressMapping, simpleValuesRange)
     const conditions = getRangeValues(this.addressMapping, simpleConditionRange)
@@ -302,8 +293,8 @@ export class SumifPlugin extends FunctionPlugin {
   }
 }
 
-function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): IterableIterator<CellValue> {
-  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange)) {
+function * getRangeValues(addressMapping: IAddressMapping, cellRange: AbsoluteCellRange): IterableIterator<CellValue> {
+  for (const cellFromRange of cellRange.generateCellsFromRangeGenerator()) {
     yield addressMapping.getCellValue(cellFromRange)
   }
 }

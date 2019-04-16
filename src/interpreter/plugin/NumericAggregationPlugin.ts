@@ -1,13 +1,11 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
-  cellError, cellRangeToSimpleCellRange,
+  cellError,
   CellValue,
   ErrorType,
   getAbsoluteAddress,
   SimpleCellAddress,
-  SimpleCellRange,
-  simpleCellRange,
 } from '../../Cell'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -63,7 +61,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
-      const range = cellRangeToSimpleCellRange(ast, formulaAddress)
+      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
       const rangeValues = this.getRangeValues(functionName, range)
       value = funcToCalc(rangeValues)
       rangeVertex.setFunctionValue(functionName, value)
@@ -81,7 +79,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
    */
-  private getRangeValues(functionName: string, range: SimpleCellRange): CellValue[] {
+  private getRangeValues(functionName: string, range: AbsoluteCellRange): CellValue[] {
     const rangeResult: CellValue[] = []
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
     const restRange = restRanges[0]
@@ -89,7 +87,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+    for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
       rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
     }
 

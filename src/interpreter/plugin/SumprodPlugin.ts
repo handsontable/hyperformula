@@ -1,21 +1,17 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {
-  cellError, cellRangeToSimpleCellRange,
+  cellError,
   CellValue,
   ErrorType,
-  rangeHeight,
-  rangeWidth,
   simpleCellAddress,
   SimpleCellAddress,
-  simpleCellRange,
-  SimpleCellRange,
 } from '../../Cell'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
 
-function cacheKey(ranges: SimpleCellRange[]): string {
+function cacheKey(ranges: AbsoluteCellRange[]): string {
   return `SUMPROD,${ranges[1].start.col},${ranges[1].start.row}`
 }
 
@@ -36,17 +32,17 @@ export class SumprodPlugin extends FunctionPlugin {
       return cellError(ErrorType.VALUE)
     }
 
-    const simpleLeftRange = cellRangeToSimpleCellRange(leftRange, formulaAddress)
-    const simpleRightRange = cellRangeToSimpleCellRange(rightRange, formulaAddress)
+    const simpleLeftRange = AbsoluteCellRange.fromCellRange(leftRange, formulaAddress)
+    const simpleRightRange = AbsoluteCellRange.fromCellRange(rightRange, formulaAddress)
 
-    if (rangeWidth(simpleLeftRange) !== rangeWidth(simpleRightRange) || rangeHeight(simpleLeftRange) !== rangeHeight(simpleRightRange)) {
+    if (!simpleLeftRange.sameDimensionsAs(simpleRightRange)) {
       return cellError(ErrorType.VALUE)
     }
 
     return this.evaluateSumprod(simpleLeftRange, simpleRightRange)
   }
 
-  private evaluateSumprod(leftRange: SimpleCellRange, rightRange: SimpleCellRange): CellValue {
+  private evaluateSumprod(leftRange: AbsoluteCellRange, rightRange: AbsoluteCellRange): CellValue {
     const rangeVertex = this.rangeMapping.getRange(leftRange.start, leftRange.end)
     if (!rangeVertex) {
       throw new Error('Range does not exists in graph')
@@ -61,11 +57,11 @@ export class SumprodPlugin extends FunctionPlugin {
     return result
   }
 
-  private findAlreadyCachedValue(rangeVertex: RangeVertex, ranges: SimpleCellRange[]) {
+  private findAlreadyCachedValue(rangeVertex: RangeVertex, ranges: AbsoluteCellRange[]) {
     return rangeVertex.getFunctionValue(cacheKey(ranges))
   }
 
-  private computeResultFromSmallerCache(ranges: SimpleCellRange[]) {
+  private computeResultFromSmallerCache(ranges: AbsoluteCellRange[]) {
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, ranges)
 
     if (smallerRangeVertex !== null) {
@@ -80,7 +76,7 @@ export class SumprodPlugin extends FunctionPlugin {
     return null
   }
 
-  private computeResultFromAllValues(ranges: SimpleCellRange[]) {
+  private computeResultFromAllValues(ranges: AbsoluteCellRange[]) {
     return this.reduceSumprod(ranges.map((range) => this.getCellValuesFromRange(range)))
   }
 
@@ -109,13 +105,13 @@ export class SumprodPlugin extends FunctionPlugin {
  * @param rangeMapping - range mapping dependency
  * @param ranges - ranges to find smaller range in
  */
-export const findSmallerRange = (rangeMapping: RangeMapping, ranges: SimpleCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: SimpleCellRange[] } => {
-  if (ranges[0].end.row > ranges[0].start.row) {
+export const findSmallerRange = (rangeMapping: RangeMapping, ranges: AbsoluteCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: AbsoluteCellRange[] } => {
+  if (ranges[0].height() > 1) {
     const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.sheet, ranges[0].end.col, ranges[0].end.row - 1)
     const rowLessVertex = rangeMapping.getRange(ranges[0].start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       const restRanges = ranges.map((range) => {
-        return simpleCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
+        return new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
       })
 
       return {

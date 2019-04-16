@@ -1,12 +1,11 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {
   CellDependency,
   cellError,
-  CellRange, cellRangeToSimpleCellRange, CellReferenceType,
+  CellRange, CellReferenceType,
   ErrorType, getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  SimpleCellRange,
-  simpleCellRange,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
@@ -149,12 +148,12 @@ export class GraphBuilder {
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(rangeStart, rangeEnd)])
+          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [new AbsoluteCellRange(rangeStart, rangeEnd)])
           const restRange = restRanges[0]
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
           this.graph.addEdge(rangeVertex, endVertex)
@@ -163,23 +162,5 @@ export class GraphBuilder {
         }
       })
     })
-  }
-}
-
-/**
- * Generates cell addresses in given range.
- *
- * @param rangeStart - top-left corner of range
- * @param rangeEnd - bottom-right corner of range
- */
-export const generateCellsFromRangeGenerator = function*(simpleCellRange: SimpleCellRange) {
-  let currentRow = simpleCellRange.start.row
-  while (currentRow <= simpleCellRange.end.row) {
-    let currentColumn = simpleCellRange.start.col
-    while (currentColumn <= simpleCellRange.end.col) {
-      yield simpleCellAddress(simpleCellRange.start.sheet, currentColumn, currentRow)
-      currentColumn++
-    }
-    currentRow++
   }
 }

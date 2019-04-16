@@ -1,13 +1,12 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {
   absoluteCellAddress,
   CellDependency,
-  cellError, CellRange, cellRangeToSimpleCellRange,
+  cellError, CellRange,
   CellReferenceType, ErrorType,
   getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  SimpleCellRange,
-  simpleCellRange,
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
@@ -58,7 +57,7 @@ export class GraphBuilderMatrixHeuristic {
     })
   }
 
-  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, size: MatrixSize): ({ leftMatrix: SimpleCellRange, rightMatrix: SimpleCellRange }) | false {
+  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, size: MatrixSize): ({ leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange }) | false {
     const formula = leftCorner.getFormula()
 
     if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPROD') {
@@ -86,18 +85,15 @@ export class GraphBuilderMatrixHeuristic {
         return false
       }
 
-      const leftArgRange = cellRangeToSimpleCellRange(leftRange, leftCorner.getAddress())
-      const rightArgRange = cellRangeToSimpleCellRange(rightRange, leftCorner.getAddress())
+      const leftArgRange = AbsoluteCellRange.fromCellRange(leftRange, leftCorner.getAddress())
+      const rightArgRange = AbsoluteCellRange.fromCellRange(rightRange, leftCorner.getAddress())
 
-      const leftRangeSize = this.rangeSize(leftArgRange)
-      const rightRangeSize = this.rangeSize(rightArgRange)
+      if (leftArgRange.height() === 1 && rightArgRange.width() === 1 && leftArgRange.width() === rightArgRange.height()) {
+        const leftMatrix = leftArgRange.withEnd(simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + size.height - 1))
+        const rightMatrix = rightArgRange.withEnd(simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
+        const currentMatrix = AbsoluteCellRange.spanFrom(leftCorner.getAddress(), size.width, size.height)
 
-      if (leftRangeSize.height === 1 && rightRangeSize.width === 1 && leftRangeSize.width === rightRangeSize.height) {
-        const leftMatrix = simpleCellRange(leftArgRange.start, simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + size.height - 1))
-        const rightMatrix = simpleCellRange(rightArgRange.start, simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + size.width - 1, rightArgRange.end.row))
-        const currentMatrix = simpleCellRange(leftCorner.getAddress(), simpleCellAddress(leftCorner.getAddress().sheet, leftCorner.getAddress().col + size.width - 1, leftCorner.getAddress().row + size.height - 1))
-
-        if (!this.overlap(leftMatrix, currentMatrix) && !this.overlap(rightMatrix, currentMatrix)) {
+        if (!leftMatrix.doesOverlap(currentMatrix) && !rightMatrix.doesOverlap(currentMatrix)) {
           return { leftMatrix, rightMatrix }
         }
       }
@@ -106,27 +102,7 @@ export class GraphBuilderMatrixHeuristic {
     return false
   }
 
-  private overlap(left: SimpleCellRange, right: SimpleCellRange) {
-    if (left.start.sheet != right.start.sheet) {
-      return true
-    }
-    if (left.end.row < right.start.row || left.start.row > right.end.row) {
-      return false
-    }
-    if (left.end.col < right.start.col || left.start.col > right.end.col) {
-      return false
-    }
-    return true
-  }
-
-  private rangeSize(range: SimpleCellRange): MatrixSize {
-    return {
-      width: range.end.col - range.start.col + 1,
-      height: range.end.row - range.start.row + 1,
-    }
-  }
-
-  private buildMultAst(leftMatrix: SimpleCellRange, rightMatrix: SimpleCellRange): ProcedureAst {
+  private buildMultAst(leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange): ProcedureAst {
     return buildProcedureAst('MMULT', [
       buildCellRangeAst(
         absoluteCellAddress(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
