@@ -1,4 +1,4 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {
   cellError,
   CellValue,
@@ -51,6 +51,16 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param funcToCalc - range operation
    */
   private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
+    let range
+    try {
+      range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+    } catch (err) {
+      if (err.message === DIFFERENT_SHEETS_ERROR) {
+        return cellError(ErrorType.VALUE)
+      } else {
+        throw err
+      }
+    }
     const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
     const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
     const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
@@ -61,7 +71,6 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
-      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
       const rangeValues = this.getRangeValues(functionName, range)
       value = funcToCalc(rangeValues)
       rangeVertex.setFunctionValue(functionName, value)

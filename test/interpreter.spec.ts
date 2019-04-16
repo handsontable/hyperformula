@@ -549,7 +549,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('$Sheet2.A1')).toEqual(6)
   })
 
-  xit('using bad range reference', () => {
+  it('using bad range reference', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['0', '1'],
