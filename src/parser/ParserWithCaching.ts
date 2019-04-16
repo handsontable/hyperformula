@@ -131,16 +131,16 @@ const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleC
 const cellHashFromToken = (cellAddress: CellAddress): string => {
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
-      return `#${cellAddress.row}R${cellAddress.col}`
+      return `#${cellAddress.sheet}#${cellAddress.row}R${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
-      return `#${cellAddress.row}A${cellAddress.col}`
+      return `#${cellAddress.sheet}#${cellAddress.row}A${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
-      return `#${cellAddress.row}AC${cellAddress.col}`
+      return `#${cellAddress.sheet}#${cellAddress.row}AC${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
-      return `#${cellAddress.row}AR${cellAddress.col}`
+      return `#${cellAddress.sheet}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
 }
