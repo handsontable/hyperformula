@@ -34,10 +34,10 @@ export interface IAddressMapping {
   /**
    * Returns height of stored sheet
    */
-  getHeight(): number,
+  getHeight(sheetId: number): number,
 
   /**
    * Returns width of stored sheet
    */
-  getWidth(): number
+  getWidth(sheetId: number): number
 }

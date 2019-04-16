@@ -60,12 +60,12 @@ export class ArrayAddressMapping implements IAddressMapping {
   }
 
   /** @inheritDoc */
-  public getHeight(): number {
+  public getHeight(sheetId: number): number {
     return this.height
   }
 
   /** @inheritDoc */
-  public getWidth(): number {
+  public getWidth(sheetId: number): number {
     return this.width
   }
 

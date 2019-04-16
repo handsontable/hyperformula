@@ -14,11 +14,15 @@ export class AddressMapping implements IAddressMapping {
    * Key of map in first level is column number.
    * Key of map in second level is row number.
    */
-  private mapping: Map<number, Map<number, CellVertex>> = new Map()
+  private mapping: Map<number, Map<number, Map<number, CellVertex>>> = new Map()
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {
-    const colMapping = this.mapping.get(address.col)
+    const sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      return EmptyCellVertex.getSingletonInstance()
+    }
+    const colMapping = sheetMapping.get(address.col)
     if (!colMapping) {
       return EmptyCellVertex.getSingletonInstance()
     }
@@ -37,17 +41,26 @@ export class AddressMapping implements IAddressMapping {
 
   /** @inheritDoc */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
-    let colMapping = this.mapping.get(address.col)
+    let sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      sheetMapping = new Map()
+      this.mapping.set(address.sheet, sheetMapping)
+    }
+    let colMapping = sheetMapping.get(address.col)
     if (!colMapping) {
       colMapping = new Map()
-      this.mapping.set(address.col, colMapping)
+      sheetMapping.set(address.col, colMapping)
     }
     colMapping.set(address.row, newVertex)
   }
 
   /** @inheritDoc */
   public has(address: SimpleCellAddress): boolean {
-    const colMapping = this.mapping.get(address.col)
+    const sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      return false
+    }
+    const colMapping = sheetMapping.get(address.col)
     if (!colMapping) {
       return false
     }
@@ -55,17 +68,17 @@ export class AddressMapping implements IAddressMapping {
   }
 
   /** @inheritDoc */
-  public getHeight(): number {
+  public getHeight(sheetId: number): number {
     let currentMax = 0
-    this.mapping.forEach((colMapping) => {
+    this.mapping.get(sheetId)!.forEach((colMapping) => {
       currentMax = Math.max(currentMax, Math.max(...Array.from(colMapping.keys())) + 1)
     })
     return currentMax
   }
 
   /** @inheritDoc */
-  public getWidth(): number {
-    return Math.max(0, Math.max(...Array.from(this.mapping.keys())) + 1)
+  public getWidth(sheetId: number): number {
+    return Math.max(0, Math.max(...Array.from(this.mapping.get(sheetId)!.keys())) + 1)
   }
 
   public isEmpty(address: SimpleCellAddress): boolean {

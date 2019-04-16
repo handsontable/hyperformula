@@ -542,6 +542,10 @@ describe('Interpreter', () => {
         ['0', '1'],
         ['2', '3'],
       ],
+      Sheet2: [
+        ['=SUM($Sheet1.A1:$Sheet1.B2)']
+      ]
     })
+    expect(engine.getCellValue('$Sheet2.A1')).toEqual(6)
   })
 })

@@ -125,8 +125,8 @@ export class HandsOnEngine {
    * Returns array with values of all cells
    * */
   public getValues(sheet: number) {
-    const sheetHeight = this.addressMapping.getHeight()
-    const sheetWidth = this.addressMapping.getWidth()
+    const sheetHeight = this.addressMapping.getHeight(sheet)
+    const sheetWidth = this.addressMapping.getWidth(sheet)
 
     const arr: Sheet = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {

@@ -104,8 +104,8 @@ describe('AddressMapping', () => {
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 
-    expect(mapping.getHeight()).toEqual(16)
-    expect(mapping.getWidth()).toEqual(4)
+    expect(mapping.getHeight(0)).toEqual(16)
+    expect(mapping.getWidth(0)).toEqual(4)
   })
 })
 
@@ -115,7 +115,7 @@ describe('ArrayAddressMapping', () => {
   it('returns maximum row/col for simplest case', () => {
     const mapping = new ArrayAddressMapping(1, 2)
 
-    expect(mapping.getHeight()).toEqual(2)
-    expect(mapping.getWidth()).toEqual(1)
+    expect(mapping.getHeight(0)).toEqual(2)
+    expect(mapping.getWidth(0)).toEqual(1)
   })
 })
