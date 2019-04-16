@@ -5,8 +5,8 @@ import {
   cellError,
   ErrorType,
   relativeCellAddress,
-} from '../src/Cell'
-import {Config} from '../src/Config'
+} from '../..//src/Cell'
+import {Config} from '../../src/Config'
 import {
   AstNodeType,
   CellRangeAst,
@@ -19,9 +19,9 @@ import {
   PowerOpAst,
   ProcedureAst,
   StringAst,
-} from '../src/parser/Ast'
-import {ParserWithCaching} from '../src/parser/ParserWithCaching'
-import {SheetMapping} from '../src/SheetMapping'
+} from '../../src/parser/Ast'
+import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
+import {SheetMapping} from '../../src/SheetMapping'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
