@@ -1,4 +1,4 @@
-import {simpleCellAddress, CellRange, getAbsoluteAddress, SimpleCellAddress} from './Cell'
+import {CellRange, getAbsoluteAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 
 export class AbsoluteCellRange {
 
