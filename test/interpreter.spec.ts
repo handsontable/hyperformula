@@ -549,17 +549,17 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('$Sheet2.A1')).toEqual(6)
   })
 
-  it('using bad range reference', () => {
+  xit('using bad range reference', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['0', '1'],
         ['2', '3'],
       ],
       Sheet2: [
-        ['=SUM($Sheet1.A1:$Sheet2:A2)'],
+        ['=SUM($Sheet1.A1:$Sheet2.A2)'],
         [''],
       ]
     })
-    // expect(engine.getCellValue('$Sheet2.A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('$Sheet2.A1')).toEqual(cellError(ErrorType.VALUE))
   })
 })
