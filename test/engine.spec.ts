@@ -128,19 +128,19 @@ describe('Integration', () => {
   })
 
   it('#buildAddresMapping - when sparse matrix', () => {
-    const addressMapping = buildAddressMapping([
+    const addressMapping = buildAddressMapping({ Sheet1: [
       ['', '', ''],
       ['', '', '1'],
-    ], 0.8)
+    ]}, 0.8)
 
     expect(addressMapping).toBeInstanceOf(AddressMapping)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
-    const addressMapping = buildAddressMapping([
+    const addressMapping = buildAddressMapping({ Sheet1: [
       ['1', '1'],
       ['1', '1'],
-    ], 0.8)
+    ]}, 0.8)
 
     expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
   })

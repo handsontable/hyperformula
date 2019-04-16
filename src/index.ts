@@ -90,8 +90,7 @@ export class HandsOnEngine {
       this.sheetMapping.addSheet(sheetName)
     }
 
-    const sheet = sheets.Sheet1 as Sheet
-    this.addressMapping = buildAddressMapping(sheet, config.addressMappingFillThreshold)
+    this.addressMapping = buildAddressMapping(sheets, config.addressMappingFillThreshold)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
@@ -243,7 +242,11 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
  *
  * @param sheet - two-dimmensional array sheet representation
  */
-export function buildAddressMapping(sheet: Sheet, threshold: number): IAddressMapping {
+export function buildAddressMapping(sheets: Sheets, threshold: number): IAddressMapping {
+  if (Object.keys(sheets).length > 1) {
+    return new AddressMapping()
+  }
+  const sheet = sheets.Sheet1
   const {height, width, fill} = findBoundaries(sheet)
   if (fill > threshold) {
     return new ArrayAddressMapping(width, height)
