@@ -1,12 +1,11 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellAddress, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {generateCellsFromRangeGenerator} from '../src/GraphBuilder'
-
-const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {
-  return Array.from(generateCellsFromRangeGenerator(range))
-}
 
 describe('generateCellsFromRange', () => {
+  const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {
+    return Array.from(range.generateCellsFromRangeGenerator())
+  }
+
   it('one element', () => {
     expect(generateCellsFromRange(new AbsoluteCellRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0)))).toEqual([
       simpleCellAddress(0, 0, 0),

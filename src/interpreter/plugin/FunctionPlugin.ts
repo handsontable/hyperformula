@@ -2,7 +2,6 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {IAddressMapping} from '../../IAddressMapping'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
@@ -49,7 +48,7 @@ export abstract class FunctionPlugin {
     const values: number[] = []
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
-        for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromCellRange(ast, formulaAddress))) {
+        for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).generateCellsFromRangeGenerator()) {
           const value = this.addressMapping.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
@@ -75,7 +74,7 @@ export abstract class FunctionPlugin {
 
   protected getCellValuesFromRange(range: AbsoluteCellRange): CellValue[] {
     const result = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
+    for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
       result.push(this.addressMapping.getCellValue(cellFromRange))
     }
     return result

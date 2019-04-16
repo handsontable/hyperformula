@@ -1,4 +1,4 @@
-import {CellRange, getAbsoluteAddress, SimpleCellAddress} from './Cell'
+import {simpleCellAddress, CellRange, getAbsoluteAddress, SimpleCellAddress} from './Cell'
 
 export class AbsoluteCellRange {
 
@@ -45,5 +45,23 @@ export class AbsoluteCellRange {
 
   public sameDimensionsAs(other: AbsoluteCellRange) {
     return this.width() === other.width() && this.height() === other.height()
+  }
+
+  /**
+   * Generates cell addresses in given range.
+   *
+   * @param rangeStart - top-left corner of range
+   * @param rangeEnd - bottom-right corner of range
+   */
+  public *generateCellsFromRangeGenerator() {
+    let currentRow = this.start.row
+    while (currentRow <= this.end.row) {
+      let currentColumn = this.start.col
+      while (currentColumn <= this.end.col) {
+        yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+        currentColumn++
+      }
+      currentRow++
+    }
   }
 }

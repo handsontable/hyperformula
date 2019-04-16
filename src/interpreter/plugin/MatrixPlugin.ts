@@ -8,7 +8,6 @@ import {
   isCellError,
   SimpleCellAddress,
 } from '../../Cell'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
@@ -147,7 +146,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     let i = 0
     let row = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
+    for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
       const value = this.addressMapping.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)

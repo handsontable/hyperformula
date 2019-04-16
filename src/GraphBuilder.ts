@@ -153,7 +153,7 @@ export class GraphBuilder {
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
           this.graph.addEdge(rangeVertex, endVertex)
@@ -162,23 +162,5 @@ export class GraphBuilder {
         }
       })
     })
-  }
-}
-
-/**
- * Generates cell addresses in given range.
- *
- * @param rangeStart - top-left corner of range
- * @param rangeEnd - bottom-right corner of range
- */
-export const generateCellsFromRangeGenerator = function*(absoluteCellRange: AbsoluteCellRange) {
-  let currentRow = absoluteCellRange.start.row
-  while (currentRow <= absoluteCellRange.end.row) {
-    let currentColumn = absoluteCellRange.start.col
-    while (currentColumn <= absoluteCellRange.end.col) {
-      yield simpleCellAddress(absoluteCellRange.start.sheet, currentColumn, currentRow)
-      currentColumn++
-    }
-    currentRow++
   }
 }
