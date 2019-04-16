@@ -36,7 +36,9 @@ const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) =>
       return
     }
     case AstNodeType.CELL_RANGE: {
-      dependenciesSet.push([ast.start, ast.end])
+      if (ast.start.sheet === ast.end.sheet) {
+        dependenciesSet.push([ast.start, ast.end])
+      }
       return
     }
     case AstNodeType.MINUS_UNARY_OP: {
