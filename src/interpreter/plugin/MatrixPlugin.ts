@@ -2,12 +2,10 @@ import {GPU} from 'gpu.js'
 import {
   CellError,
   cellError,
-  cellRangeToSimpleCellRange,
   CellValue,
   ErrorType,
   isCellError,
   SimpleCellAddress,
-  SimpleCellRange,
   AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -131,7 +129,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.type === AstNodeType.CELL_RANGE) {
-      return this.matrixFromRange(AbsoluteCellRange.fromSimpleCellRange(cellRangeToSimpleCellRange(ast, formulaAddress)))
+      return this.matrixFromRange(AbsoluteCellRange.fromCellRange(ast, formulaAddress))
     }
     const value = super.evaluateAst(ast, formulaAddress)
 

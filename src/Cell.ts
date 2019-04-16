@@ -179,6 +179,13 @@ export class AbsoluteCellRange {
   ) {
   }
 
+  public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+    return new AbsoluteCellRange(
+      getAbsoluteAddress(x.start, baseAddress),
+      getAbsoluteAddress(x.end, baseAddress),
+    )
+  }
+
   public static fromSimpleCellRange(x: SimpleCellRange): AbsoluteCellRange {
     return new AbsoluteCellRange(x.start, x.end)
   }
