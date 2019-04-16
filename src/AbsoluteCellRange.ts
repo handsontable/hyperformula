@@ -1,5 +1,7 @@
 import {CellRange, getAbsoluteAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 
+export const DIFFERENT_SHEETS_ERROR = "AbsoluteCellRange: Start and end are in different sheets"
+
 export class AbsoluteCellRange {
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
@@ -20,6 +22,9 @@ export class AbsoluteCellRange {
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,
   ) {
+    if (start.sheet !== end.sheet) {
+      throw new Error(DIFFERENT_SHEETS_ERROR)
+    }
   }
 
   public width() {

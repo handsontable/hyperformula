@@ -1,6 +1,7 @@
 import {simpleCellAddress} from '../src/Cell'
 import {RangeMapping} from '../src/RangeMapping'
 import {RangeVertex} from '../src/Vertex'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 
 describe('RangeMapping', () => {
   it('range mapping when there is none', () => {
@@ -15,7 +16,7 @@ describe('RangeMapping', () => {
     const mapping = new RangeMapping()
     const start = simpleCellAddress(0, 0, 0)
     const end = simpleCellAddress(0, 20, 50)
-    const vertex = new RangeVertex(start, end)
+    const vertex = new RangeVertex(new AbsoluteCellRange(start, end))
 
     mapping.setRange(vertex)
 

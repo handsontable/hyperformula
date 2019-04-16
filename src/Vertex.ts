@@ -2,6 +2,7 @@ import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Matrix} from './Matrix'
 import {Ast} from './parser/Ast'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 /**
  * Represents vertex which keeps values of one or more cells
@@ -169,12 +170,17 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(private start: SimpleCellAddress, private end: SimpleCellAddress) {
+  constructor(private range: AbsoluteCellRange) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
-    if (start.sheet !== end.sheet) {
-      throw new Error('start range in different sheet than end range')
-    }
+  }
+
+  public get start() {
+    return this.range.start
+  }
+
+  public get end() {
+    return this.range.end
   }
 
   /**

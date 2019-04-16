@@ -140,15 +140,16 @@ export class GraphBuilder {
       cellDependencies.forEach((absStartCell: CellDependency) => {
         if (Array.isArray(absStartCell)) {
           const [rangeStart, rangeEnd] = absStartCell
+          const range = new AbsoluteCellRange(rangeStart, rangeEnd)
           let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
           if (rangeVertex === null) {
-            rangeVertex = new RangeVertex(rangeStart, rangeEnd)
+            rangeVertex = new RangeVertex(range)
             this.rangeMapping.setRange(rangeVertex)
           }
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [new AbsoluteCellRange(rangeStart, rangeEnd)])
+          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
           const restRange = restRanges[0]
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
