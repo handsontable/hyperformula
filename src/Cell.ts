@@ -171,3 +171,14 @@ export const rangeWidth = (simpleCellRange: SimpleCellRange) => {
 export const rangeHeight = (simpleCellRange: SimpleCellRange) => {
   return simpleCellRange.end.row - simpleCellRange.start.row
 }
+
+export class AbsoluteCellRange {
+  constructor(
+    public readonly start: SimpleCellAddress,
+    public readonly end: SimpleCellAddress
+  ) { }
+
+  public toSimpleCellRange(): SimpleCellRange {
+    return { start: this.start, end: this.end }
+  }
+}
