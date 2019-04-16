@@ -9,6 +9,7 @@ import {
   SimpleCellAddress,
   simpleCellRange,
   SimpleCellRange,
+  AbsoluteCellRange,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -303,7 +304,7 @@ export class SumifPlugin extends FunctionPlugin {
 }
 
 function * getRangeValues(addressMapping: IAddressMapping, cellRange: SimpleCellRange): IterableIterator<CellValue> {
-  for (const cellFromRange of generateCellsFromRangeGenerator(cellRange)) {
+  for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(cellRange))) {
     yield addressMapping.getCellValue(cellFromRange)
   }
 }

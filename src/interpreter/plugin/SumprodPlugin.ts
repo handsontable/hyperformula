@@ -9,7 +9,6 @@ import {
   simpleCellRange,
   SimpleCellRange,
 } from '../../Cell'
-import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'

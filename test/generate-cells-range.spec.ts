@@ -1,8 +1,8 @@
-import {CellAddress, simpleCellAddress, SimpleCellAddress, simpleCellRange, SimpleCellRange} from '../src/Cell'
+import {AbsoluteCellRange, CellAddress, simpleCellAddress, SimpleCellAddress, simpleCellRange, SimpleCellRange} from '../src/Cell'
 import {generateCellsFromRangeGenerator} from '../src/GraphBuilder'
 
 const generateCellsFromRange = (range: SimpleCellRange): SimpleCellAddress[] => {
-  return Array.from(generateCellsFromRangeGenerator(range))
+  return Array.from(generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(range)))
 }
 
 describe('generateCellsFromRange', () => {

@@ -147,7 +147,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     let i = 0
     let row = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(range.toSimpleCellRange())) {
+    for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
       const value = this.addressMapping.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)

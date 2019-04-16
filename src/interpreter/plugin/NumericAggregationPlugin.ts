@@ -6,6 +6,7 @@ import {
   SimpleCellAddress,
   SimpleCellRange,
   simpleCellRange,
+  AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
@@ -89,7 +90,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
-    for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
+    for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(restRange))) {
       rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
     }
 
