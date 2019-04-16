@@ -1,11 +1,9 @@
 import {
-  cellError, cellRangeToSimpleCellRange,
+  cellError,
   CellValue,
   ErrorType,
   getAbsoluteAddress,
   SimpleCellAddress,
-  SimpleCellRange,
-  simpleCellRange,
   AbsoluteCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -64,7 +62,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
-      const range = cellRangeToSimpleCellRange(ast, formulaAddress)
+      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
       const rangeValues = this.getRangeValues(functionName, range)
       value = funcToCalc(rangeValues)
       rangeVertex.setFunctionValue(functionName, value)
@@ -82,15 +80,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
    */
-  private getRangeValues(functionName: string, range: SimpleCellRange): CellValue[] {
+  private getRangeValues(functionName: string, range: AbsoluteCellRange): CellValue[] {
     const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [AbsoluteCellRange.fromSimpleCellRange(range)])
+    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
     const restRange = restRanges[0]
     const currentRangeVertex = this.rangeMapping.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
-    for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(restRange))) {
+    for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
       rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
     }
 

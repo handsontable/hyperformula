@@ -1,4 +1,4 @@
-import {AbsoluteCellRange, cellError, CellError, cellRangeToSimpleCellRange, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress, SimpleCellRange} from '../../Cell'
+import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress, AbsoluteCellRange} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
@@ -72,9 +72,9 @@ export abstract class FunctionPlugin {
     return values
   }
 
-  protected getCellValuesFromRange(range: SimpleCellRange): CellValue[] {
+  protected getCellValuesFromRange(range: AbsoluteCellRange): CellValue[] {
     const result = []
-    for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(range))) {
+    for (const cellFromRange of generateCellsFromRangeGenerator(range)) {
       result.push(this.addressMapping.getCellValue(cellFromRange))
     }
     return result
