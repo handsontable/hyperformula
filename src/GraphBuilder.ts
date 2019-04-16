@@ -149,7 +149,7 @@ export class GraphBuilder {
 
           this.graph.addNode(rangeVertex)
 
-          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [simpleCellRange(rangeStart, rangeEnd)])
+          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [new AbsoluteCellRange(rangeStart, rangeEnd)])
           const restRange = restRanges[0]
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
