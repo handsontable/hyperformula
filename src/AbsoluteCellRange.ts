@@ -8,6 +8,14 @@ export class AbsoluteCellRange {
       getAbsoluteAddress(x.end, baseAddress),
     )
   }
+
+  public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
+    return new AbsoluteCellRange(
+      topLeftCorner,
+      simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
+    )
+  }
+
   constructor(
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,
