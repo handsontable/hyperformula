@@ -201,4 +201,21 @@ export class AbsoluteCellRange {
   public height() {
     return this.end.row - this.start.row + 1;
   }
+
+  public doesOverlap(other: AbsoluteCellRange) {
+    if (this.start.sheet != other.start.sheet) {
+      return true
+    }
+    if (this.end.row < other.start.row || this.start.row > other.end.row) {
+      return false
+    }
+    if (this.end.col < other.start.col || this.start.col > other.end.col) {
+      return false
+    }
+    return true
+  }
+
+  public withEnd(newEnd: SimpleCellAddress) {
+    return new AbsoluteCellRange(this.start, newEnd)
+  }
 }
