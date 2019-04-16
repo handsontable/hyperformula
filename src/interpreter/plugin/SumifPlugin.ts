@@ -2,8 +2,6 @@ import {
   cellError,
   CellValue,
   ErrorType,
-  rangeHeight,
-  rangeWidth,
   simpleCellAddress,
   SimpleCellAddress,
   AbsoluteCellRange,

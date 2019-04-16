@@ -5,7 +5,6 @@ import {
   ErrorType, getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
-  simpleCellRange,
   AbsoluteCellRange,
 } from './Cell'
 import {Config} from './Config'
@@ -154,7 +153,7 @@ export class GraphBuilder {
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          for (const cellFromRange of generateCellsFromRangeGenerator(AbsoluteCellRange.fromSimpleCellRange(restRange))) {
+          for (const cellFromRange of generateCellsFromRangeGenerator(restRange)) {
             this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
           }
           this.graph.addEdge(rangeVertex, endVertex)

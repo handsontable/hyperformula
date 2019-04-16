@@ -2,8 +2,6 @@ import {
   cellError,
   CellValue,
   ErrorType,
-  rangeHeight,
-  rangeWidth,
   simpleCellAddress,
   SimpleCellAddress,
   AbsoluteCellRange,
@@ -37,7 +35,7 @@ export class SumprodPlugin extends FunctionPlugin {
     const simpleLeftRange = AbsoluteCellRange.fromCellRange(leftRange, formulaAddress)
     const simpleRightRange = AbsoluteCellRange.fromCellRange(rightRange, formulaAddress)
 
-    if (rangeWidth(simpleLeftRange) !== rangeWidth(simpleRightRange) || rangeHeight(simpleLeftRange) !== rangeHeight(simpleRightRange)) {
+    if (!simpleLeftRange.sameDimensionsAs(simpleRightRange)) {
       return cellError(ErrorType.VALUE)
     }
 
