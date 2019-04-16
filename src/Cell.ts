@@ -215,7 +215,15 @@ export class AbsoluteCellRange {
     return true
   }
 
+  public withStart(newStart: SimpleCellAddress) {
+    return new AbsoluteCellRange(newStart, this.end)
+  }
+
   public withEnd(newEnd: SimpleCellAddress) {
     return new AbsoluteCellRange(this.start, newEnd)
+  }
+
+  public sameDimensionsAs(other: AbsoluteCellRange) {
+    return this.width() === other.width() && this.height() === other.height();
   }
 }
