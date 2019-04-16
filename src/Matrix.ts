@@ -96,7 +96,6 @@ export function checkIfMatrix(addresses: SimpleCellAddress[]): MatrixSizeCheck {
   }
 }
 
-
 export class Matrix {
   private matrix: number[][]
   private size: MatrixSize
@@ -105,7 +104,7 @@ export class Matrix {
     this.matrix = []
     this.size = {
       height: matrix.length,
-      width: matrix.length > 0 ? matrix[0].length : 0
+      width: matrix.length > 0 ? matrix[0].length : 0,
     }
     this.matrix = matrix
   }
@@ -116,7 +115,7 @@ export class Matrix {
     const newWidth = this.size.width + additionalWidth
     const newHeight = this.size.height + additionalHeight
 
-    let result: number[][] = []
+    const result: number[][] = []
     for (let y = 0; y < this.size.height; ++y) {
       const row = [...this.matrix[y]]
       for (let x = 0; x < additionalWidth; ++x) {
@@ -126,7 +125,7 @@ export class Matrix {
     }
 
     for (let y = 0; y < additionalHeight; ++y) {
-      let zeros = Array(newWidth)
+      const zeros = Array(newWidth)
       zeros.fill(0)
       result.push(zeros)
     }
@@ -136,7 +135,7 @@ export class Matrix {
 
   public get(col: number, row: number): number {
     if (col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1) {
-      throw Error("Matrix index out of bound")
+      throw Error('Matrix index out of bound')
     }
     return this.matrix[row][col]
   }

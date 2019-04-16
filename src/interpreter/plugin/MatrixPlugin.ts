@@ -10,11 +10,11 @@ import {
   SimpleCellRange,
 } from '../../Cell'
 import {generateCellsFromRangeGenerator} from '../../GraphBuilder'
+import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
-import {Matrix} from "../../Matrix";
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -136,7 +136,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (typeof value === 'number') {
       return new Matrix([[value]])
-    } else if (value instanceof Matrix){
+    } else if (value instanceof Matrix) {
       return value
     }
 

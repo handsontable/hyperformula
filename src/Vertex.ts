@@ -1,7 +1,7 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
+import {Matrix} from './Matrix'
 import {Ast} from './parser/Ast'
-import {Matrix} from "./Matrix";
 
 /**
  * Represents vertex which keeps values of one or more cells

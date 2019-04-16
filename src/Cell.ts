@@ -1,5 +1,5 @@
+import {Matrix, MatrixSize} from './Matrix'
 import {SheetMapping} from './SheetMapping'
-import {Matrix, MatrixSize} from "./Matrix";
 
 /**
  * Possible errors returned by our interpreter.
