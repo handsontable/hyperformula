@@ -1,7 +1,7 @@
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress,} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
-import {add, max} from '../scalar'
+import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 
@@ -16,6 +16,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     max: {
       EN: 'MAX',
       PL: 'MAKS'
+    },
+    min: {
+      EN: 'MIN',
+      PL: 'MIN'
     }
   }
 
@@ -44,6 +48,27 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return cellError(ErrorType.NA)
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max)
+
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      return 0
+    }
+
+    return value
+  }
+
+  /**
+   * Corresponds to MIN(Number1, Number2, ...).
+   *
+   * Returns a min of given numbers.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return cellError(ErrorType.NA)
+    }
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min)
 
     if (typeof value === 'number' && !Number.isFinite(value)) {
       return 0
