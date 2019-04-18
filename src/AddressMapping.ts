@@ -5,11 +5,48 @@ import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
 /**
+ * Interface for mapping from sheet addresses to vertices.
+ */
+interface IAddressMappingStrategy {
+  /**
+   * Returns cell content
+   *
+   * @param address - cell address
+   */
+  getCell(address: SheetCellAddress): CellVertex,
+
+  /**
+   * Set vertex for given address
+   *
+   * @param address - cell address
+   * @param newVertex - vertex to associate with address
+   */
+  setCell(address: SheetCellAddress, newVertex: CellVertex): void,
+
+  /**
+   * Returns whether the address is present or not
+   *
+   * @param address - address
+   */
+  has(address: SheetCellAddress): boolean,
+
+  /**
+   * Returns height of stored sheet
+   */
+  getHeight(): number,
+
+  /**
+   * Returns width of stored sheet
+   */
+  getWidth(): number
+}
+
+/**
  * Mapping from cell addresses to vertices
  *
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
-class SparseStrategy {
+class SparseStrategy implements IAddressMappingStrategy {
   /**
    * Map of Maps in which actual data is stored.
    *
@@ -62,6 +99,64 @@ class SparseStrategy {
 }
 
 /**
+ * Mapping from cell addresses to vertices
+ *
+ * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
+ */
+class DenseStrategy implements IAddressMappingStrategy {
+  /**
+   * Array in which actual data is stored.
+   *
+   * It is created when building the mapping and the size of it is fixed.
+   */
+  private mapping: CellVertex[][]
+
+  /**
+   * @param width - width of the stored sheet
+   * @param height - height of the stored sheet
+   */
+  constructor(private width: number, private height: number) {
+    this.mapping = new Array(height)
+    for (let i = 0; i < height; i++) {
+      this.mapping[i] = new Array(width)
+    }
+  }
+
+  /** @inheritDoc */
+  public getCell(address: SheetCellAddress): CellVertex {
+    const row = this.mapping[address.row]
+    if (!row) {
+      return EmptyCellVertex.getSingletonInstance()
+    }
+    return row[address.col] || EmptyCellVertex.getSingletonInstance()
+  }
+
+  /** @inheritDoc */
+  public setCell(address: SheetCellAddress, newVertex: CellVertex) {
+    this.mapping[address.row][address.col] = newVertex
+  }
+
+  /** @inheritDoc */
+  public has(address: SheetCellAddress): boolean {
+    const row = this.mapping[address.row]
+    if (!row) {
+      return false
+    }
+    return !!row[address.col]
+  }
+
+  /** @inheritDoc */
+  public getHeight(): number {
+    return this.height
+  }
+
+  /** @inheritDoc */
+  public getWidth(): number {
+    return this.width
+  }
+}
+
+/**
  * Returns actual width, height and fill ratio of a sheet
  *
  * @param sheet - two-dimmensional array sheet representation
@@ -91,7 +186,6 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
 }
 
 export class AddressMapping implements IAddressMapping {
-
   /**
    * Creates right address mapping implementation based on fill ratio of a sheet
    *
