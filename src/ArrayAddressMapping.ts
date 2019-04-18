@@ -1,6 +1,7 @@
 import {CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
 import {CellVertex, EmptyCellVertex, MatrixVertex} from './Vertex'
+import {Sheet} from './GraphBuilder'
 
 /**
  * Mapping from cell addresses to vertices
@@ -25,6 +26,8 @@ export class ArrayAddressMapping implements IAddressMapping {
       this.mapping[i] = new Array(width)
     }
   }
+
+  addSheet(sheetId: number, sheet: Sheet) { }
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {

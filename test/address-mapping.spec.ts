@@ -1,4 +1,4 @@
-import {AddressMapping} from '../src/AddressMapping'
+import {AddressMapping, SparseStrategy, DenseStrategy} from '../src/AddressMapping'
 import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 import {simpleCellAddress} from '../src/Cell'
 import {IAddressMapping} from '../src/IAddressMapping'
@@ -97,10 +97,15 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
 }
 
 describe('AddressMapping', () => {
-  sharedExamples((maxCol, maxRow) => new AddressMapping())
+  sharedExamples((maxCol, maxRow) => {
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, [], 'sparse')
+    return mapping
+  })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping()
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, [], 'sparse')
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 
@@ -122,20 +127,22 @@ describe('ArrayAddressMapping', () => {
 
 describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
-    const addressMapping = AddressMapping.build({ Sheet1: [
+    const addressMapping = AddressMapping.build(0.8)
+    addressMapping.addSheet(0, [
       ['', '', ''],
       ['', '', '1'],
-    ]}, 0.8)
+    ])
 
-    expect(addressMapping).toBeInstanceOf(AddressMapping)
+    expect(addressMapping.strategyFor(0)).toBeInstanceOf(SparseStrategy)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
-    const addressMapping = AddressMapping.build({ Sheet1: [
+    const addressMapping = AddressMapping.build(0.8)
+    addressMapping.addSheet(0, [
       ['1', '1'],
       ['1', '1'],
-    ]}, 0.8)
+    ])
 
-    expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
+    expect(addressMapping.strategyFor(0)).toBeInstanceOf(DenseStrategy)
   })
 })

@@ -1,5 +1,6 @@
 import {SimpleCellAddress, CellValue} from './Cell'
 import {CellVertex, MatrixVertex} from './Vertex'
+import {Sheet} from './GraphBuilder'
 
 /**
  * Interface for mapping from addresses to vertices.
@@ -39,5 +40,7 @@ export interface IAddressMapping {
   /**
    * Returns width of stored sheet
    */
-  getWidth(sheetId: number): number
+  getWidth(sheetId: number): number,
+
+  addSheet(sheetId: number, sheet: Sheet): void,
 }

@@ -99,11 +99,11 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
+    this.addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
     for (const sheetName in sheets) {
-      this.sheetMapping.addSheet(sheetName)
+      const sheetId = this.sheetMapping.addSheet(sheetName)
+      this.addressMapping.addSheet(sheetId, sheets[sheetName])
     }
-
-    this.addressMapping = AddressMapping.build(sheets, config.addressMappingFillThreshold)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)

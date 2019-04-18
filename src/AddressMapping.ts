@@ -46,7 +46,7 @@ interface IAddressMappingStrategy {
  *
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
-class SparseStrategy implements IAddressMappingStrategy {
+export class SparseStrategy implements IAddressMappingStrategy {
   /**
    * Map of Maps in which actual data is stored.
    *
@@ -103,7 +103,7 @@ class SparseStrategy implements IAddressMappingStrategy {
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
  */
-class DenseStrategy implements IAddressMappingStrategy {
+export class DenseStrategy implements IAddressMappingStrategy {
   /**
    * Array in which actual data is stored.
    *
@@ -191,20 +191,15 @@ export class AddressMapping implements IAddressMapping {
    *
    * @param sheet - two-dimmensional array sheet representation
    */
-  public static build(sheets: Sheets, threshold: number): IAddressMapping {
-    if (Object.keys(sheets).length > 1) {
-      return new AddressMapping()
-    }
-    const sheet = sheets.Sheet1
-    const {height, width, fill} = findBoundaries(sheet)
-    if (fill > threshold) {
-      return new ArrayAddressMapping(width, height)
-    } else {
-      return new AddressMapping()
-    }
+  public static build(threshold: number): AddressMapping {
+    return new AddressMapping(threshold)
   }
 
-  private mapping: Map<number, SparseStrategy> = new Map()
+  private mapping: Map<number, IAddressMappingStrategy> = new Map()
+
+  constructor(
+    private readonly threshold: number
+  ) { }
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {
@@ -213,6 +208,32 @@ export class AddressMapping implements IAddressMapping {
       return EmptyCellVertex.getSingletonInstance()
     }
     return sheetMapping.getCell(address)
+  }
+
+  public strategyFor(sheetId: number): IAddressMappingStrategy | undefined {
+    return this.mapping.get(sheetId)
+  }
+
+  public addSheet(sheetId: number, sheet: Sheet, strategy: String = 'auto') {
+    if (this.mapping.has(sheetId)) {
+      throw Error("Sheet already added")
+    }
+
+    if (strategy === 'auto') {
+      const {height, width, fill} = findBoundaries(sheet)
+      if (fill > this.threshold) {
+        this.mapping.set(sheetId, new DenseStrategy(width, height))
+      } else {
+        this.mapping.set(sheetId, new SparseStrategy())
+      }
+    } else if (strategy === 'dense') {
+      const {height, width, fill} = findBoundaries(sheet)
+      this.mapping.set(sheetId, new DenseStrategy(width, height))
+    } else if (strategy === 'sparse') {
+      this.mapping.set(sheetId, new SparseStrategy())
+    } else {
+      throw Error('Unknown strategy')
+    }
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {

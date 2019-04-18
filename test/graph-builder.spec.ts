@@ -13,7 +13,7 @@ import {CellVertex, EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -27,7 +27,7 @@ describe('GraphBuilder', () => {
 
   it('build sheet with simple string cell', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -41,7 +41,7 @@ describe('GraphBuilder', () => {
 
   it('building for cell with empty string should give empty vertex', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -54,7 +54,7 @@ describe('GraphBuilder', () => {
 
   it('#buildGraph', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
@@ -73,7 +73,7 @@ describe('GraphBuilder', () => {
 
   it('#buildGraph works with ranges', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
@@ -103,7 +103,7 @@ describe('GraphBuilder', () => {
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
@@ -124,7 +124,7 @@ describe('GraphBuilder', () => {
 
   it('build with range one row smaller', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -144,7 +144,7 @@ describe('GraphBuilder', () => {
 
   it('#buildGraph should work even if range dependencies are empty', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
@@ -165,7 +165,7 @@ describe('GraphBuilder', () => {
 
   it("optimization doesn't work if smaller range is after bigger", () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -185,7 +185,7 @@ describe('GraphBuilder', () => {
 
   it('matrix no overlap', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -211,7 +211,7 @@ describe('GraphBuilder', () => {
 
   it('overlap', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
@@ -232,7 +232,7 @@ describe('GraphBuilder', () => {
 
   it('matrix no overlap 2', () => {
     const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping()
+    const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
