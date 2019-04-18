@@ -31,6 +31,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return this.reduce(ast, formulaAddress, 0, 'SUM', add)
   }
 
+  /**
+   * Corresponds to MAX(Number1, Number2, ...).
+   *
+   * Returns a max of given numbers.
+   *
+   * @param ast
+   * @param formulaAddress
+   */
   public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
       return cellError(ErrorType.NA)
@@ -44,7 +52,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return value
   }
 
-
+  /**
+   * Reduces procedure arguments with given reducing function
+   *
+   * @param ast - cell range ast
+   * @param formulaAddress - address of the cell in which formula is located
+   * @param initialAccValue - initial accumulator value for reducing function
+   * @param functionName - function name to use as cache key
+   * @param reducingFunction - reducing function
+   * */
   private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation): CellValue {
     return ast.args.reduce((acc: CellValue, arg) => {
       let value
@@ -58,8 +74,15 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }, initialAccValue)
   }
 
-  private reduceRange(rangeValues: CellValue[], initial: CellValue, reducingFunction: BinaryOperation) {
-    let acc = initial
+  /**
+   * Reduces list of cell values with given reducing function
+   *
+   * @param rangeValues - list of values to reduce
+   * @param initialAccValue - initial accumulator value for reducing function
+   * @param reducingFunction - reducing function
+   */
+  private reduceRange(rangeValues: CellValue[], initialAccValue: CellValue, reducingFunction: BinaryOperation) {
+    let acc = initialAccValue
     for (const val of rangeValues) {
       acc = reducingFunction(acc, val)
     }
@@ -71,10 +94,11 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    *
    * @param ast - cell range ast
    * @param formulaAddress - address of the cell in which formula is located
+   * @param initialAccValue - initial accumulator value for reducing function
    * @param functionName - function name to use as cache key
-   * @param funcToCalc - range operation
+   * @param reducingFunction - reducing function
    */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, funcToCalc: BinaryOperation): CellValue {
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation): CellValue {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
@@ -96,7 +120,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, range)
-      value = this.reduceRange(rangeValues, initialAccValue, funcToCalc)
+      value = this.reduceRange(rangeValues, initialAccValue, reducingFunction)
       rangeVertex.setFunctionValue(functionName, value)
     }
 
