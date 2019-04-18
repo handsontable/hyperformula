@@ -1,4 +1,4 @@
-import {buildAddressMapping, HandsOnEngine} from '../src'
+import {HandsOnEngine} from '../src'
 import {AddressMapping} from '../src/AddressMapping'
 import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 import {cellError, ErrorType} from '../src/Cell'
@@ -125,23 +125,5 @@ describe('Integration', () => {
     ])
     expect(engine.getCellValue('A1')).toBe(1)
     expect(engine.getCellValue('A2')).toBe(3)
-  })
-
-  it('#buildAddresMapping - when sparse matrix', () => {
-    const addressMapping = buildAddressMapping({ Sheet1: [
-      ['', '', ''],
-      ['', '', '1'],
-    ]}, 0.8)
-
-    expect(addressMapping).toBeInstanceOf(AddressMapping)
-  })
-
-  it('#buildAddresMapping - when dense matrix', () => {
-    const addressMapping = buildAddressMapping({ Sheet1: [
-      ['1', '1'],
-      ['1', '1'],
-    ]}, 0.8)
-
-    expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
   })
 })

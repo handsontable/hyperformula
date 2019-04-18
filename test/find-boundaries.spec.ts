@@ -1,4 +1,4 @@
-import {findBoundaries} from '../src'
+import {findBoundaries} from '../src/AddressMapping'
 
 describe('findBoundaries', () => {
   it('find correct dimensions', () => {

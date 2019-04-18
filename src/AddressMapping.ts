@@ -1,5 +1,7 @@
 import {SheetCellAddress, CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
+import {ArrayAddressMapping} from './ArrayAddressMapping'
+import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
 /**
@@ -59,7 +61,55 @@ class SparseStrategy {
   }
 }
 
+/**
+ * Returns actual width, height and fill ratio of a sheet
+ *
+ * @param sheet - two-dimmensional array sheet representation
+ */
+export function findBoundaries(sheet: Sheet): ({ width: number, height: number, fill: number }) {
+  let maxWidth = 0
+  let cellsCount = 0
+  for (let currentRow = 0; currentRow < sheet.length; currentRow++) {
+    const currentRowWidth = sheet[currentRow].length
+    if (maxWidth === undefined || maxWidth < currentRowWidth) {
+      maxWidth = currentRowWidth
+    }
+    for (let currentCol = 0; currentCol < currentRowWidth; currentCol++) {
+      const currentValue = sheet[currentRow][currentCol]
+      if (currentValue !== '') {
+        cellsCount++
+      }
+    }
+  }
+  const sheetSize = sheet.length * maxWidth
+
+  return {
+    height: sheet.length,
+    width: maxWidth,
+    fill: sheetSize === 0 ? 0 : cellsCount / sheetSize,
+  }
+}
+
 export class AddressMapping implements IAddressMapping {
+
+  /**
+   * Creates right address mapping implementation based on fill ratio of a sheet
+   *
+   * @param sheet - two-dimmensional array sheet representation
+   */
+  public static build(sheets: Sheets, threshold: number): IAddressMapping {
+    if (Object.keys(sheets).length > 1) {
+      return new AddressMapping()
+    }
+    const sheet = sheets.Sheet1
+    const {height, width, fill} = findBoundaries(sheet)
+    if (fill > threshold) {
+      return new ArrayAddressMapping(width, height)
+    } else {
+      return new AddressMapping()
+    }
+  }
+
   private mapping: Map<number, SparseStrategy> = new Map()
 
   /** @inheritDoc */

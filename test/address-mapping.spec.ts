@@ -119,3 +119,23 @@ describe('ArrayAddressMapping', () => {
     expect(mapping.getWidth(0)).toEqual(1)
   })
 })
+
+describe('AddressMapping', () => {
+  it('#buildAddresMapping - when sparse matrix', () => {
+    const addressMapping = AddressMapping.build({ Sheet1: [
+      ['', '', ''],
+      ['', '', '1'],
+    ]}, 0.8)
+
+    expect(addressMapping).toBeInstanceOf(AddressMapping)
+  })
+
+  it('#buildAddresMapping - when dense matrix', () => {
+    const addressMapping = AddressMapping.build({ Sheet1: [
+      ['1', '1'],
+      ['1', '1'],
+    ]}, 0.8)
+
+    expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
+  })
+})

@@ -1,7 +1,7 @@
 import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
-import {findBoundaries} from '../src'
+import {findBoundaries} from '../src/AddressMapping'
 import {sheetCellAddress, sheetCellAddressToString} from '../src/Cell'
 
 // Config
