@@ -87,7 +87,6 @@ export class MatrixPlugin extends FunctionPlugin {
     }
 
     const inputMatrix = rangeMatrix.alignWithWindow(windowSize)
-    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
       const leftCornerX = this.thread.x as number * windowSize
