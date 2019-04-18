@@ -1,13 +1,7 @@
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {
-  cellError,
-  CellValue,
-  ErrorType,
-  getAbsoluteAddress,
-  SimpleCellAddress,
-} from '../../Cell'
+import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress,} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
-import {add} from '../scalar'
+import {add, max} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 
@@ -19,6 +13,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       EN: 'SUM',
       PL: 'SUMA',
     },
+    max: {
+      EN: 'MAX',
+      PL: 'MAKS'
+    }
   }
 
   /**
@@ -30,24 +28,38 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.reduce(ast, formulaAddress, 'SUM', add)
+    return this.reduce(ast, formulaAddress, 0, 'SUM', add)
   }
 
-  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, functionName: string, reducingFunction: BinaryOperation): CellValue {
-    return ast.args.reduce((currentSum: CellValue, arg) => {
+  public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return cellError(ErrorType.NA)
+    }
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max)
+
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      return 0
+    }
+
+    return value
+  }
+
+
+  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation): CellValue {
+    return ast.args.reduce((acc: CellValue, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
-        value = this.evaluateRange(arg, formulaAddress, functionName, reducingFunction)
+        value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
       }
 
-      return reducingFunction(currentSum, value)
-    }, 0)
+      return reducingFunction(acc, value)
+    }, initialAccValue)
   }
 
-  private reduceRange(rangeValues: CellValue[], reducingFunction: BinaryOperation) {
-    let acc: CellValue = 0
+  private reduceRange(rangeValues: CellValue[], initial: CellValue, reducingFunction: BinaryOperation) {
+    let acc = initial
     for (const val of rangeValues) {
       acc = reducingFunction(acc, val)
     }
@@ -62,7 +74,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param funcToCalc - range operation
    */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: BinaryOperation): CellValue {
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, funcToCalc: BinaryOperation): CellValue {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
@@ -84,7 +96,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, range)
-      value = this.reduceRange(rangeValues, funcToCalc)
+      value = this.reduceRange(rangeValues, initialAccValue, funcToCalc)
       rangeVertex.setFunctionValue(functionName, value)
     }
 

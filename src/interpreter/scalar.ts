@@ -30,6 +30,23 @@ export function add(left: CellValue, right: CellValue): CellValue {
   }
 }
 
+export function max(left: CellValue, right: CellValue): CellValue {
+  if (isCellError(left)) {
+    return left
+  }
+  if (isCellError(right)) {
+    return right
+  }
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return Math.max(left, right)
+    } else {
+      return left
+    }
+  }
+  return right
+}
+
 /**
  * Adds two numbers
  *
