@@ -11,7 +11,7 @@ import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 
-export type RangeOperation = (rangeValues: CellValue[]) => CellValue
+export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -30,16 +30,28 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.reduce(ast, formulaAddress, 'SUM', add)
+  }
+
+  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, functionName: string, reducingFunction: BinaryOperation): CellValue {
     return ast.args.reduce((currentSum: CellValue, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
-        value = this.evaluateRange(arg, formulaAddress, 'SUM', reduceSum)
+        value = this.evaluateRange(arg, formulaAddress, functionName, reducingFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
       }
 
-      return add(currentSum, value)
+      return reducingFunction(currentSum, value)
     }, 0)
+  }
+
+  private reduceRange(rangeValues: CellValue[], reducingFunction: BinaryOperation) {
+    let acc: CellValue = 0
+    for (const val of rangeValues) {
+      acc = reducingFunction(acc, val)
+    }
+    return acc
   }
 
   /**
@@ -50,7 +62,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param funcToCalc - range operation
    */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: RangeOperation): CellValue {
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, functionName: string, funcToCalc: BinaryOperation): CellValue {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
@@ -72,7 +84,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, range)
-      value = funcToCalc(rangeValues)
+      value = this.reduceRange(rangeValues, funcToCalc)
       rangeVertex.setFunctionValue(functionName, value)
     }
 
@@ -102,12 +114,4 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     return rangeResult
   }
-}
-
-export function reduceSum(rangeValues: CellValue[]): CellValue {
-  let acc: CellValue = 0
-  for (const val of rangeValues) {
-    acc = add(acc, val)
-  }
-  return acc
 }
