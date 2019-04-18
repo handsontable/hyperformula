@@ -62,6 +62,36 @@ export function max(left: CellValue, right: CellValue): CellValue {
 
 
 /**
+ * Returns min from two numbers
+ *
+ * Implementation of min function which is used in interpreter.
+ *
+ * Errors are propagated, non-numerical values are neutral.
+ *
+ * @param left - left operand of addition
+ * @param right - right operand of addition
+ */
+export function min(left: CellValue, right: CellValue): CellValue {
+  if (isCellError(left)) {
+    return left
+  }
+  if (isCellError(right)) {
+    return right
+  }
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return Math.min(left, right)
+    } else {
+      return left
+    }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return Number.POSITIVE_INFINITY
+  }
+}
+
+/**
  * Adds two numbers
  *
  * Implementation of adding which is used in interpreter.
