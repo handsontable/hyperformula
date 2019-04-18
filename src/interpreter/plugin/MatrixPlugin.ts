@@ -116,13 +116,13 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (isCellError(value)) {
       return value
-    } else {
-      const kernel = this.gpu.createKernel(function(a: number[][]) {
-        return a[this.thread.x as number][this.thread.y as number]
-      }).setOutput([vertex.width, vertex.height])
-
-      return new Matrix(kernel(value.raw()) as number[][])
     }
+
+    const kernel = this.gpu.createKernel(function(a: number[][]) {
+      return a[this.thread.x as number][this.thread.y as number]
+    }).setOutput([vertex.width, vertex.height])
+
+    return new Matrix(kernel(value.raw()) as number[][])
   }
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
