@@ -30,6 +30,16 @@ export function add(left: CellValue, right: CellValue): CellValue {
   }
 }
 
+/**
+ * Returns max from two numbers
+ *
+ * Implementation of max function which is used in interpreter.
+ *
+ * Errors are propagated, non-numerical values are neutral.
+ *
+ * @param left - left operand of addition
+ * @param right - right operand of addition
+ */
 export function max(left: CellValue, right: CellValue): CellValue {
   if (isCellError(left)) {
     return left
@@ -43,9 +53,13 @@ export function max(left: CellValue, right: CellValue): CellValue {
     } else {
       return left
     }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return Number.NEGATIVE_INFINITY
   }
-  return right
 }
+
 
 /**
  * Adds two numbers
