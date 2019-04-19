@@ -4,6 +4,8 @@ import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
 import {StatType} from '../src/statistics/Statistics'
+import {CsvSheets, Sheets} from "../src/GraphBuilder";
+import {load} from "../bin/handsonengine-multisheet";
 
 export interface Config {
   millisecondsPerThousandRows: number,
@@ -21,6 +23,32 @@ export interface ExpectedValue { address: string, value: CellValue}
 
 export function benchmarkCSV(csvString: string, config: Config) {
   benchmark(parse(csvString, {  delimiter: EngineConfig.defaultConfig.csvDelimiter }), [], config)
+}
+
+export async function benchmarkMultiSheets(inputDir: string, expectedValues: ExpectedValue[], engineConfig: EngineConfig, config: Config = defaultConfig) {
+  config = Object.assign({}, defaultConfig, config)
+
+  const stats = []
+  let currentRun = 0
+
+  const sheets: CsvSheets = await load(inputDir, engineConfig)
+
+  while (currentRun < config.numberOfRuns) {
+    let engine = HandsOnEngine.buildFromMultiSheets(sheets, engineConfig)
+    stats.push(engine.getStats())
+    currentRun++
+
+    // if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
+    //   console.error('Sheet validation error')
+    //   process.exit(1)
+    // }
+
+    if (currentRun === config.numberOfRuns - 1) {
+      console.log(engine.exportAsCsv('resp7'))
+    }
+  }
+
+  printStats(stats, config)
 }
 
 export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
@@ -43,6 +71,15 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
     }
   }
 
+  if (config.csvDump && engine !== null) {
+    const csvString = engine.exportAsCsv('Sheet1')
+    fs.writeFileSync('/tmp/dump.csv', csvString)
+  }
+
+  printStats(stats, config, rows)
+}
+
+function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: number) {
   const overall = stats.map((s) => s.get(StatType.OVERALL)!).sort()
   const evaluation = stats.map((s) => s.get(StatType.EVALUATION)!).sort()
   const medianRun = overall[Math.trunc(config.numberOfRuns / 2)]
@@ -52,34 +89,31 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   const averageOverall = average(overall)
   const stdDevOverall = standardDeviation(overall)
 
-  console.info(`Number of rows: ${rows}`)
-  console.info('---')
-  // console.info(`Overall: ${overall.map((v) => (v / 1000))} (in seconds)`)
+  if (rows) {
+    console.info(`Number of rows: ${rows}`)
+    console.info('---')
+  }
+
   console.info(`Median            : ${medianRun / 1000}`)
   console.info(`Average           : ${(averageOverall / 1000).toFixed(3)}`)
   console.info(`Standard deviation: ${(stdDevOverall / 1000).toFixed(3)}`)
   console.info('---')
-  // console.info(`Evaluation: ${evaluation.map((v) => (v / 1000))} (in seconds)`)
   console.info(`Evaluation Median: ${evaluation[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
-  // console.info(`Parsing: ${parsing.map((v) => (v / 1000))}`)
   console.info(`Parsing Median   : ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
-  // console.info(`TopSort: ${topSort.map((v) => (v / 1000))}`)
   console.info(`TopSort Median   : ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
-  // console.info(`Build Graph: ${buildGraph.map((v) => (v / 1000))}`)
   console.info(`BuildGraph Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
-  const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
-  console.info('---')
-  console.info(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
-  console.info(`Median time  : ${resultMillisecondsPerThousandRows.toFixed(3)} ms per 1000 rows`)
-  console.info(`Average time : ${(averageOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
-  console.info(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
 
-  if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCsv('Sheet1')
-    fs.writeFileSync('/tmp/dump.csv', csvString)
-  }
-  if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
-    process.exit(1)
+  if (rows) {
+    const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
+    console.info('---')
+    console.info(`Expected to work in: ${config.millisecondsPerThousandRows} ms per 1000 rows`)
+    console.info(`Median time  : ${resultMillisecondsPerThousandRows.toFixed(3)} ms per 1000 rows`)
+    console.info(`Average time : ${(averageOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
+    console.info(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
+
+    if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
+      process.exit(1)
+    }
   }
 }
 
