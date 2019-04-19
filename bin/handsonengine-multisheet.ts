@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from "readline";
 import {CsvSheets} from "../src/GraphBuilder";
-import {Config} from "../src";
+import {Config, HandsOnEngine} from "../src";
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -48,4 +48,15 @@ export function load(inputDir: string, config: Config): Promise<CsvSheets> {
       resolve(sheets)
     })
   })
+}
+
+export function save(engine: HandsOnEngine, outputDir: string) {
+  const sheets: CsvSheets = engine.exportMultipleSheets()
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir)
+  }
+  for (let key of Object.keys(sheets)) {
+    const outputPath = path.join(outputDir, key + ".csv")
+    fs.writeFileSync(outputPath, sheets[key])
+  }
 }

@@ -170,6 +170,15 @@ export class HandsOnEngine {
     return stringify(this.getValues(sheet), { delimiter: ','})
   }
 
+  public exportMultipleSheets(): CsvSheets {
+    const sheets: CsvSheets = {}
+    for (let sheetName of this.sheetMapping.names()) {
+      const sheet = this.sheetMapping.fetch(sheetName)
+      sheets[sheetName] = stringify(this.getValues(sheet), { delimiter: ','})
+    }
+    return sheets
+  }
+
   /**
    * Returns snapshot of a computation time statistics
    */

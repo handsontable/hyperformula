@@ -19,4 +19,8 @@ export class SheetMapping {
     }
     return sheetId
   }
+
+  public names(): IterableIterator<string> {
+    return this.mapping.keys()
+  }
 }
