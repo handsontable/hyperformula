@@ -1,9 +1,8 @@
 import {AddressMapping, SparseStrategy, DenseStrategy} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
-import {IAddressMapping} from '../src/IAddressMapping'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
-const sharedExamples = (builder: (width: number, height: number) => IAddressMapping) => {
+const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
     const mapping = builder(1, 1)
     const vertex = new ValueCellVertex(42)

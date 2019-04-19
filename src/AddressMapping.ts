@@ -1,5 +1,4 @@
 import {SheetCellAddress, CellValue, SimpleCellAddress} from './Cell'
-import {IAddressMapping} from './IAddressMapping'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
@@ -184,7 +183,7 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
   }
 }
 
-export class AddressMapping implements IAddressMapping {
+export class AddressMapping {
   /**
    * Creates right address mapping implementation based on fill ratio of a sheet
    *

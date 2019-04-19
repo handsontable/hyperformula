@@ -14,7 +14,6 @@ import {
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
@@ -67,7 +66,7 @@ export class HandsOnEngine {
   }
 
   /** Address mapping from addresses to vertices from graph. */
-  private readonly addressMapping: IAddressMapping
+  private readonly addressMapping: AddressMapping
 
   /** Range mapping from ranges to vertices representing these ranges. */
   private readonly rangeMapping: RangeMapping = new RangeMapping()

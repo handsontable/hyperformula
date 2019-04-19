@@ -10,7 +10,7 @@ import {
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
-import {IAddressMapping} from './IAddressMapping'
+import {AddressMapping} from './AddressMapping'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
 import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'
@@ -21,7 +21,7 @@ import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVerte
 export class GraphBuilderMatrixHeuristic {
   constructor(
       private readonly graph: Graph<Vertex>,
-      private readonly addressMapping: IAddressMapping,
+      private readonly addressMapping: AddressMapping,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
       private readonly parser: ParserWithCaching,
   ) {

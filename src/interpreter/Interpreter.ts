@@ -1,7 +1,7 @@
 import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
-import {IAddressMapping} from '../IAddressMapping'
+import {AddressMapping} from '../AddressMapping'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {Vertex} from '../Vertex'
@@ -24,7 +24,7 @@ export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
-    public readonly addressMapping: IAddressMapping,
+    public readonly addressMapping: AddressMapping,
     public readonly rangeMapping: RangeMapping,
     public readonly graph: Graph<Vertex>,
     public readonly config: Config,
