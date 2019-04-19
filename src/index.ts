@@ -14,7 +14,7 @@ import {
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
@@ -39,6 +39,19 @@ export class HandsOnEngine {
    */
   public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
     return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
+  }
+
+  /**
+   * Builds engine for sheet from CSV string representation
+   *
+   * @param csv - csv representation of sheet
+   */
+  public static buildFromMultiSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
+    const sheets: Sheets = {}
+    for (let key of Object.keys(csvSheets)) {
+      sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
+    }
+    return HandsOnEngine.buildFromSheets(sheets)
   }
 
   /**

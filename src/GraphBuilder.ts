@@ -29,6 +29,10 @@ export interface Sheets {
   [sheetName: string]: Sheet
 }
 
+export interface CsvSheets {
+  [sheetName: string]: string
+}
+
 /**
  * Service building the graph and mappings.
  */
