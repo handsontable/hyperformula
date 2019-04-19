@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {AddressMapping} from '../../AddressMapping'
 import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
-import {IAddressMapping} from '../../IAddressMapping'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {Vertex} from '../../Vertex'
@@ -27,7 +27,7 @@ export abstract class FunctionPlugin {
    */
   public static implementedFunctions: IImplementedFunctions
   protected readonly interpreter: Interpreter
-  protected readonly addressMapping: IAddressMapping
+  protected readonly addressMapping: AddressMapping
   protected readonly rangeMapping: RangeMapping
   protected readonly graph: Graph<Vertex>
   protected readonly config: Config

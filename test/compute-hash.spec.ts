@@ -9,8 +9,8 @@ describe('computeHash', () => {
   const computeFunc = (code: string, address: CellAddress): string => {
     const config = new Config()
     const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet("Sheet1")
-    sheetMapping.addSheet("Sheet2")
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(config, sheetMapping)
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHash(tokens, address)

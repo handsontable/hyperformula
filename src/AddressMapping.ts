@@ -1,6 +1,4 @@
-import {SheetCellAddress, CellValue, SimpleCellAddress} from './Cell'
-import {IAddressMapping} from './IAddressMapping'
-import {ArrayAddressMapping} from './ArrayAddressMapping'
+import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
@@ -46,7 +44,7 @@ interface IAddressMappingStrategy {
  *
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
-class SparseStrategy implements IAddressMappingStrategy {
+export class SparseStrategy implements IAddressMappingStrategy {
   /**
    * Map of Maps in which actual data is stored.
    *
@@ -103,7 +101,7 @@ class SparseStrategy implements IAddressMappingStrategy {
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
  */
-class DenseStrategy implements IAddressMappingStrategy {
+export class DenseStrategy implements IAddressMappingStrategy {
   /**
    * Array in which actual data is stored.
    *
@@ -185,26 +183,21 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
   }
 }
 
-export class AddressMapping implements IAddressMapping {
+export class AddressMapping {
   /**
    * Creates right address mapping implementation based on fill ratio of a sheet
    *
    * @param sheet - two-dimmensional array sheet representation
    */
-  public static build(sheets: Sheets, threshold: number): IAddressMapping {
-    if (Object.keys(sheets).length > 1) {
-      return new AddressMapping()
-    }
-    const sheet = sheets.Sheet1
-    const {height, width, fill} = findBoundaries(sheet)
-    if (fill > threshold) {
-      return new ArrayAddressMapping(width, height)
-    } else {
-      return new AddressMapping()
-    }
+  public static build(threshold: number): AddressMapping {
+    return new AddressMapping(threshold)
   }
 
-  private mapping: Map<number, SparseStrategy> = new Map()
+  private mapping: Map<number, IAddressMappingStrategy> = new Map()
+
+  constructor(
+    private readonly threshold: number,
+  ) { }
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex {
@@ -213,6 +206,34 @@ export class AddressMapping implements IAddressMapping {
       return EmptyCellVertex.getSingletonInstance()
     }
     return sheetMapping.getCell(address)
+  }
+
+  public strategyFor(sheetId: number): IAddressMappingStrategy {
+    const strategy = this.mapping.get(sheetId)
+    if (!strategy) {
+      throw Error('Unknown sheet id')
+    }
+
+    return strategy
+  }
+
+  public addSheet(sheetId: number, strategy: IAddressMappingStrategy) {
+    if (this.mapping.has(sheetId)) {
+      throw Error('Sheet already added')
+    }
+
+    this.mapping.set(sheetId, strategy)
+  }
+
+  public autoAddSheet(sheetId: number, sheet: Sheet) {
+    const {height, width, fill} = findBoundaries(sheet)
+    let strategy
+    if (fill > this.threshold) {
+      strategy = new DenseStrategy(width, height)
+    } else {
+      strategy = new SparseStrategy()
+    }
+    this.addSheet(sheetId, strategy)
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {

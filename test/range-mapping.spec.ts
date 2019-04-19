@@ -1,7 +1,7 @@
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
 import {RangeMapping} from '../src/RangeMapping'
 import {RangeVertex} from '../src/Vertex'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 
 describe('RangeMapping', () => {
   it('range mapping when there is none', () => {

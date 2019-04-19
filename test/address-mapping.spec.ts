@@ -1,10 +1,8 @@
-import {AddressMapping} from '../src/AddressMapping'
-import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
+import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
-import {IAddressMapping} from '../src/IAddressMapping'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 
-const sharedExamples = (builder: (width: number, height: number) => IAddressMapping) => {
+const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
     const mapping = builder(1, 1)
     const vertex = new ValueCellVertex(42)
@@ -96,11 +94,16 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
   })
 }
 
-describe('AddressMapping', () => {
-  sharedExamples((maxCol, maxRow) => new AddressMapping())
+describe('SparseStrategy', () => {
+  sharedExamples((maxCol, maxRow) => {
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, new SparseStrategy())
+    return mapping
+  })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping()
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, new SparseStrategy())
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 
@@ -109,11 +112,16 @@ describe('AddressMapping', () => {
   })
 })
 
-describe('ArrayAddressMapping', () => {
-  sharedExamples((maxCol, maxRow) => new ArrayAddressMapping(maxCol, maxRow))
+describe('DenseStrategy', () => {
+  sharedExamples((maxCol, maxRow) => {
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
+    return mapping
+  })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new ArrayAddressMapping(1, 2)
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, new DenseStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)
     expect(mapping.getWidth(0)).toEqual(1)
@@ -122,20 +130,22 @@ describe('ArrayAddressMapping', () => {
 
 describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
-    const addressMapping = AddressMapping.build({ Sheet1: [
+    const addressMapping = AddressMapping.build(0.8)
+    addressMapping.autoAddSheet(0, [
       ['', '', ''],
       ['', '', '1'],
-    ]}, 0.8)
+    ])
 
-    expect(addressMapping).toBeInstanceOf(AddressMapping)
+    expect(addressMapping.strategyFor(0)).toBeInstanceOf(SparseStrategy)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
-    const addressMapping = AddressMapping.build({ Sheet1: [
+    const addressMapping = AddressMapping.build(0.8)
+    addressMapping.autoAddSheet(0, [
       ['1', '1'],
       ['1', '1'],
-    ]}, 0.8)
+    ])
 
-    expect(addressMapping).toBeInstanceOf(ArrayAddressMapping)
+    expect(addressMapping.strategyFor(0)).toBeInstanceOf(DenseStrategy)
   })
 })

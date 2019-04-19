@@ -1,4 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AddressMapping} from './AddressMapping'
 import {
   CellDependency,
   cellError,
@@ -10,7 +11,6 @@ import {
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
-import {IAddressMapping} from './IAddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from './parser/Ast'
@@ -52,7 +52,7 @@ export class GraphBuilder {
    * @param config - configuration of the sheet
    */
   constructor(private readonly graph: Graph<Vertex>,
-              private readonly addressMapping: IAddressMapping,
+              private readonly addressMapping: AddressMapping,
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
               private readonly config: Config,

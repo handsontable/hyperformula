@@ -1,7 +1,6 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
-import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString,
@@ -15,7 +14,6 @@ import {
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {IAddressMapping} from './IAddressMapping'
 import {Interpreter} from './interpreter/Interpreter'
 import {isFormula} from './parser/ParserWithCaching'
 import {RangeMapping} from './RangeMapping'
@@ -68,7 +66,7 @@ export class HandsOnEngine {
   }
 
   /** Address mapping from addresses to vertices from graph. */
-  private readonly addressMapping: IAddressMapping
+  private readonly addressMapping: AddressMapping
 
   /** Range mapping from ranges to vertices representing these ranges. */
   private readonly rangeMapping: RangeMapping = new RangeMapping()
@@ -99,11 +97,11 @@ export class HandsOnEngine {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
+    this.addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
     for (const sheetName in sheets) {
-      this.sheetMapping.addSheet(sheetName)
+      const sheetId = this.sheetMapping.addSheet(sheetName)
+      this.addressMapping.autoAddSheet(sheetId, sheets[sheetName])
     }
-
-    this.addressMapping = AddressMapping.build(sheets, config.addressMappingFillThreshold)
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
