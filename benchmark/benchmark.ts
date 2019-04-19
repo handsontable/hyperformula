@@ -38,13 +38,9 @@ export async function benchmarkMultiSheets(inputDir: string, expectedValues: Exp
     stats.push(engine.getStats())
     currentRun++
 
-    // if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
-    //   console.error('Sheet validation error')
-    //   process.exit(1)
-    // }
-
-    if (currentRun === config.numberOfRuns - 1) {
-      console.log(engine.exportAsCsv('resp7'))
+    if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
+      console.error('Sheet validation error')
+      process.exit(1)
     }
   }
 
@@ -125,8 +121,8 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
     let  expectedValue = expectedValues[i].value
 
     if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
-      expectedValue = (expectedValues[i].value as number).toPrecision(10)
-      actualValue = actualValue.toPrecision(10)
+      expectedValue = (expectedValues[i].value as number).toPrecision(7)
+      actualValue = actualValue.toPrecision(7)
     }
 
     if (actualValue !== expectedValue) {
