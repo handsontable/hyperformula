@@ -1,4 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AddressMapping} from './AddressMapping'
 import {
   CellDependency,
   cellError,
@@ -10,7 +11,6 @@ import {
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
-import {AddressMapping} from './AddressMapping'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
 import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from './parser/Ast'

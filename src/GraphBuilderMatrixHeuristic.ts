@@ -1,4 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {AddressMapping} from './AddressMapping'
 import {
   absoluteCellAddress,
   CellDependency,
@@ -10,7 +11,6 @@ import {
 } from './Cell'
 import {Config} from './Config'
 import {Graph} from './Graph'
-import {AddressMapping} from './AddressMapping'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
 import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser/Ast'
 import {isFormula, isMatrix, ParserWithCaching} from './parser/ParserWithCaching'

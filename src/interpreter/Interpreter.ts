@@ -1,7 +1,7 @@
+import {AddressMapping} from '../AddressMapping'
 import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
-import {AddressMapping} from '../AddressMapping'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {Vertex} from '../Vertex'

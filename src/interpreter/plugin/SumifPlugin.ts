@@ -1,4 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {AddressMapping} from '../../AddressMapping'
 import {
   cellError,
   CellValue,
@@ -7,7 +8,6 @@ import {
   SimpleCellAddress,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
-import {AddressMapping} from '../../AddressMapping'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {CriterionCache, RangeVertex} from '../../Vertex'

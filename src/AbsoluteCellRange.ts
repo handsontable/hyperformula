@@ -1,6 +1,6 @@
 import {CellRange, getAbsoluteAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 
-export const DIFFERENT_SHEETS_ERROR = "AbsoluteCellRange: Start and end are in different sheets"
+export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
 export class AbsoluteCellRange {
 

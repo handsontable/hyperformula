@@ -1,4 +1,4 @@
-import {AddressMapping, SparseStrategy, DenseStrategy} from '../src/AddressMapping'
+import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
 

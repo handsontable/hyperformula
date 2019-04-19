@@ -1,4 +1,4 @@
-import {SheetCellAddress, CellValue, SimpleCellAddress} from './Cell'
+import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
@@ -196,7 +196,7 @@ export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly threshold: number
+    private readonly threshold: number,
   ) { }
 
   /** @inheritDoc */
@@ -214,7 +214,7 @@ export class AddressMapping {
 
   public addSheet(sheetId: number, sheet: Sheet, strategy?: IAddressMappingStrategy) {
     if (this.mapping.has(sheetId)) {
-      throw Error("Sheet already added")
+      throw Error('Sheet already added')
     }
 
     if (strategy) {
