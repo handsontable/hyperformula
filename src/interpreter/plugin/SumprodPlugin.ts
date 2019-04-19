@@ -18,8 +18,8 @@ function cacheKey(ranges: AbsoluteCellRange[]): string {
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumprod: {
-      EN: 'SUMPROD',
-      PL: 'SUMPROD',
+      EN: 'SUMPRODUCT',
+      PL: 'SUMA.ILOCZYNOW',
     },
   }
 
