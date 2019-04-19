@@ -96,16 +96,16 @@ const sharedExamples = (builder: (width: number, height: number) => IAddressMapp
   })
 }
 
-describe('AddressMapping', () => {
+describe('SparseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], 'sparse')
+    mapping.addSheet(0, [], new SparseStrategy())
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], 'sparse')
+    mapping.addSheet(0, [], new SparseStrategy())
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 
@@ -114,11 +114,16 @@ describe('AddressMapping', () => {
   })
 })
 
-describe('ArrayAddressMapping', () => {
-  sharedExamples((maxCol, maxRow) => new ArrayAddressMapping(maxCol, maxRow))
+describe('DenseStrategy', () => {
+  sharedExamples((maxCol, maxRow) => {
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, [], new DenseStrategy(maxCol, maxRow))
+    return mapping
+  })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new ArrayAddressMapping(1, 2)
+    const mapping = new AddressMapping(1.0)
+    mapping.addSheet(0, [], new DenseStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)
     expect(mapping.getWidth(0)).toEqual(1)

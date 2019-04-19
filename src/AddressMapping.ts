@@ -214,25 +214,20 @@ export class AddressMapping implements IAddressMapping {
     return this.mapping.get(sheetId)
   }
 
-  public addSheet(sheetId: number, sheet: Sheet, strategy: String = 'auto') {
+  public addSheet(sheetId: number, sheet: Sheet, strategy?: IAddressMappingStrategy) {
     if (this.mapping.has(sheetId)) {
       throw Error("Sheet already added")
     }
 
-    if (strategy === 'auto') {
+    if (strategy) {
+      this.mapping.set(sheetId, strategy)
+    } else {
       const {height, width, fill} = findBoundaries(sheet)
       if (fill > this.threshold) {
         this.mapping.set(sheetId, new DenseStrategy(width, height))
       } else {
         this.mapping.set(sheetId, new SparseStrategy())
       }
-    } else if (strategy === 'dense') {
-      const {height, width, fill} = findBoundaries(sheet)
-      this.mapping.set(sheetId, new DenseStrategy(width, height))
-    } else if (strategy === 'sparse') {
-      this.mapping.set(sheetId, new SparseStrategy())
-    } else {
-      throw Error('Unknown strategy')
     }
   }
 
