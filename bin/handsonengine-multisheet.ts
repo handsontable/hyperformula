@@ -52,6 +52,8 @@ function load() {
 
   lineReader.on('close', () => {
     const engine = HandsOnEngine.buildFromMultiSheets(sheets, config)
+    const exportedCsvString = engine.exportAsCsv('resp7')
+    console.log(exportedCsvString)
   })
 }
 
