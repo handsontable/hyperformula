@@ -36,12 +36,12 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('C3')).toEqual(14)
   })
 
-  it('error when not ranges as arguments', () => {
+  it('sumproduct from scalars', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=SUMPRODUCT(42, 78)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(3276)
   })
 
   it('use cached value if the same formula used', () => {

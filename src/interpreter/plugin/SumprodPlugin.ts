@@ -1,11 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  cellError,
-  CellValue,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from '../../Cell'
+import {cellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress,} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'
@@ -25,15 +19,20 @@ export class SumprodPlugin extends FunctionPlugin {
 
   // SUMPORD(A1:A2; B1:B2, C1:C2);
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const leftRange = ast.args[0]
-    const rightRange = ast.args[1]
+    const [left, right] = ast.args
 
-    if (leftRange.type !== AstNodeType.CELL_RANGE || rightRange.type !== AstNodeType.CELL_RANGE) {
-      return cellError(ErrorType.VALUE)
+    if (left.type !== AstNodeType.CELL_RANGE && right.type !== AstNodeType.CELL_RANGE) {
+      const leftArg = this.evaluateAst(left, formulaAddress)
+      const rightArg = this.evaluateAst(right, formulaAddress)
+      if (typeof leftArg === 'number' && typeof rightArg === 'number') {
+        return leftArg * rightArg
+      } else {
+        return cellError(ErrorType.VALUE)
+      }
     }
 
-    const simpleLeftRange = AbsoluteCellRange.fromCellRange(leftRange, formulaAddress)
-    const simpleRightRange = AbsoluteCellRange.fromCellRange(rightRange, formulaAddress)
+    const simpleLeftRange = AbsoluteCellRange.fromCellRange(left as CellRangeAst, formulaAddress)
+    const simpleRightRange = AbsoluteCellRange.fromCellRange(right as CellRangeAst, formulaAddress)
 
     if (!simpleLeftRange.sameDimensionsAs(simpleRightRange)) {
       return cellError(ErrorType.VALUE)
