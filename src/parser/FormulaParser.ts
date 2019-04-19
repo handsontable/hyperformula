@@ -331,7 +331,7 @@ export class FormulaParser extends Parser {
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.SUBRULE(this.cellReference) as CellReferenceAst
     this.CONSUME2(RangeSeparator)
-    const end = this.SUBRULE(this.endOfRangeExpression)
+    const end = this.SUBRULE(this.endOfRangeExpression, { ARGS: [start.reference.sheet]})
 
     if (end.type !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([
@@ -350,10 +350,12 @@ export class FormulaParser extends Parser {
    *
    * End of range may be a cell reference or OFFSET() function call
    */
-  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', () => {
+  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (sheet) => {
     return this.OR([
       {
-        ALT: () => this.SUBRULE(this.cellReference),
+        ALT: () => {
+          return this.SUBRULE(this.cellReference, { ARGS: [sheet] })
+        },
       },
       {
         ALT: () => {
@@ -376,9 +378,9 @@ export class FormulaParser extends Parser {
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42.A$17)
    */
-  private cellReference: AstRule = this.RULE('cellReference', () => {
+  private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
-    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!))
+    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet))
   })
 
   /**

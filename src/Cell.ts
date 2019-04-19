@@ -87,7 +87,7 @@ export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellA
  * @param stringAddress - string representation of cell address, e.g. 'C64'
  * @param baseAddress - base address for R0C0 conversion
  */
-export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress): CellAddress => {
+export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress => {
   const result = stringAddress.match(/^(\$([A-Za-z0-9]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 
   let col
@@ -99,7 +99,15 @@ export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress:
     }, 0) - 1
   }
 
-  const sheet = result[2] ? sheetMapping.fetch(result[2]) : baseAddress.sheet
+  let sheet
+  if (result[2]) {
+    sheet = sheetMapping.fetch(result[2])
+  } else if (overrideSheet !== undefined) {
+    sheet = overrideSheet
+  } else {
+    sheet = baseAddress.sheet
+  }
+
   const row = Number(result[6] as string) - 1
   if (result[3] === '$' && result[5] === '$') {
     return absoluteCellAddress(sheet, col, row)
