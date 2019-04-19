@@ -100,7 +100,7 @@ export class HandsOnEngine {
     this.addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
     for (const sheetName in sheets) {
       const sheetId = this.sheetMapping.addSheet(sheetName)
-      this.addressMapping.addSheet(sheetId, sheets[sheetName])
+      this.addressMapping.autoAddSheet(sheetId, sheets[sheetName])
     }
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)

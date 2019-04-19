@@ -208,25 +208,32 @@ export class AddressMapping {
     return sheetMapping.getCell(address)
   }
 
-  public strategyFor(sheetId: number): IAddressMappingStrategy | undefined {
-    return this.mapping.get(sheetId)
+  public strategyFor(sheetId: number): IAddressMappingStrategy {
+    const strategy = this.mapping.get(sheetId)
+    if (!strategy) {
+      throw Error('Unknown sheet id')
+    }
+
+    return strategy
   }
 
-  public addSheet(sheetId: number, sheet: Sheet, strategy?: IAddressMappingStrategy) {
+  public addSheet(sheetId: number, strategy: IAddressMappingStrategy) {
     if (this.mapping.has(sheetId)) {
       throw Error('Sheet already added')
     }
 
-    if (strategy) {
-      this.mapping.set(sheetId, strategy)
+    this.mapping.set(sheetId, strategy)
+  }
+
+  public autoAddSheet(sheetId: number, sheet: Sheet) {
+    const {height, width, fill} = findBoundaries(sheet)
+    let strategy
+    if (fill > this.threshold) {
+      strategy = new DenseStrategy(width, height)
     } else {
-      const {height, width, fill} = findBoundaries(sheet)
-      if (fill > this.threshold) {
-        this.mapping.set(sheetId, new DenseStrategy(width, height))
-      } else {
-        this.mapping.set(sheetId, new SparseStrategy())
-      }
+      strategy = new SparseStrategy()
     }
+    this.addSheet(sheetId, strategy)
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {

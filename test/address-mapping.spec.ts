@@ -97,13 +97,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 describe('SparseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], new SparseStrategy())
+    mapping.addSheet(0, new SparseStrategy())
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], new SparseStrategy())
+    mapping.addSheet(0, new SparseStrategy())
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 
@@ -115,13 +115,13 @@ describe('SparseStrategy', () => {
 describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], new DenseStrategy(maxCol, maxRow))
+    mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, [], new DenseStrategy(1, 2))
+    mapping.addSheet(0, new DenseStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)
     expect(mapping.getWidth(0)).toEqual(1)
@@ -131,7 +131,7 @@ describe('DenseStrategy', () => {
 describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
     const addressMapping = AddressMapping.build(0.8)
-    addressMapping.addSheet(0, [
+    addressMapping.autoAddSheet(0, [
       ['', '', ''],
       ['', '', '1'],
     ])
@@ -141,7 +141,7 @@ describe('AddressMapping', () => {
 
   it('#buildAddresMapping - when dense matrix', () => {
     const addressMapping = AddressMapping.build(0.8)
-    addressMapping.addSheet(0, [
+    addressMapping.autoAddSheet(0, [
       ['1', '1'],
       ['1', '1'],
     ])
