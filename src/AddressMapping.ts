@@ -1,6 +1,5 @@
 import {SheetCellAddress, CellValue, SimpleCellAddress} from './Cell'
 import {IAddressMapping} from './IAddressMapping'
-import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 

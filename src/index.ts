@@ -1,7 +1,6 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
-import {ArrayAddressMapping} from './ArrayAddressMapping'
 import {
   absoluteCellAddress,
   cellAddressFromString,

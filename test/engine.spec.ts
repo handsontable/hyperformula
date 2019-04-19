@@ -1,6 +1,5 @@
 import {HandsOnEngine} from '../src'
 import {AddressMapping} from '../src/AddressMapping'
-import {ArrayAddressMapping} from '../src/ArrayAddressMapping'
 import {cellError, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 
