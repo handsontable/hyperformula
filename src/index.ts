@@ -49,7 +49,7 @@ export class HandsOnEngine {
     for (let key of Object.keys(csvSheets)) {
       sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
     }
-    return HandsOnEngine.buildFromSheets(sheets)
+    return HandsOnEngine.buildFromSheets(sheets, config)
   }
 
   /**
