@@ -183,6 +183,24 @@ describe('GraphBuilder', () => {
     )
   })
 
+  it('matrix cause next cells to be ignored', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: [
+      ['1', '2', '8'],
+      ['3', '4', '9'],
+      ['{=mmult(A1:B2,C1:C2)}'],
+      ['{=mmult(A1:B2,C1:C2)}'],
+    ]})
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
+  })
+
   it('matrix no overlap', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
