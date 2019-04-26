@@ -13,7 +13,7 @@ describe('Matrix plugin', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=mmult(A1:B3,A4:B5)'],
+      ['{=MMULT(A1:B3,A4:B5)}'],
     ], config)
 
     expect(engine.getCellValue('A6')).toBeCloseTo(7)
@@ -33,7 +33,7 @@ describe('Matrix plugin', () => {
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['7', '8', '9'],
-      ['=mmult(A1:B3,A4:C6)'],
+      ['{=mmult(A1:B3,A4:C6)}'],
     ], config)
 
     expect(engine.getCellValue('A7')).toEqual(cellError(ErrorType.VALUE))
@@ -46,7 +46,7 @@ describe('Matrix plugin', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-      ['=transpose(A1:B3)'],
+      ['{=transpose(A1:B3)}'],
     ], config)
 
     expect(engine.getCellValue('A4')).toBeCloseTo(1)
@@ -84,7 +84,7 @@ describe('Matrix plugin', () => {
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
-      ['=maxpool(A1:F3,3)'],
+      ['{=maxpool(A1:F3,3)}'],
     ], config)
 
     expect(engine.getCellValue('A4')).toBeCloseTo(23)
@@ -97,7 +97,7 @@ describe('Matrix plugin', () => {
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
-      ['=maxpool(A1:F3, 4)'],
+      ['{=maxpool(A1:F3, 4)}'],
     ], config)
 
     expect(engine.getCellValue('A4')).toBeCloseTo(24)

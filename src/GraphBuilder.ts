@@ -82,7 +82,8 @@ export class GraphBuilder {
           let vertex = null
 
           if (isMatrix(cellContent)) {
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+            const matrixFormula = cellContent.substr(1, cellContent.length - 2)
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
             vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
             this.graph.addNode(vertex)
