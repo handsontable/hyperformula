@@ -117,8 +117,8 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
   let valid = true
 
   for (let i = 0; i < expectedValues.length; ++i) {
-    let  actualValue = engine.getCellValue(expectedValues[i].address)
-    let  expectedValue = expectedValues[i].value
+    let actualValue = engine.getCellValue(expectedValues[i].address)
+    let expectedValue = expectedValues[i].value
 
     if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
       expectedValue = (expectedValues[i].value as number).toPrecision(7)
@@ -126,7 +126,7 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
     }
 
     if (actualValue !== expectedValue) {
-      console.error(`expected ${expectedValues[i].value} but got ${actualValue}`)
+      console.error(`expected ${expectedValues[i].value} but got`, actualValue)
       valid = false
       break
     }
