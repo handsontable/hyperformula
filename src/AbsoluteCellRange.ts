@@ -37,7 +37,7 @@ export class AbsoluteCellRange {
 
   public doesOverlap(other: AbsoluteCellRange) {
     if (this.start.sheet != other.start.sheet) {
-      return true
+      return false
     }
     if (this.end.row < other.start.row || this.start.row > other.end.row) {
       return false
