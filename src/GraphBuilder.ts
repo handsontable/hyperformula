@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {
   cellError,
-  CellRange, CellReferenceType,
+  CellRange,
   ErrorType,
   simpleCellAddress,
   SimpleCellAddress,
