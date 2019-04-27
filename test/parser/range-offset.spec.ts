@@ -1,4 +1,4 @@
-import {CellAddress} from '../../src/Cell'
+import {CellAddress} from '../../src/CellAddress'
 import {Config} from '../../src/Config'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParsingErrorType} from '../../src/parser/Ast'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'

@@ -1,4 +1,5 @@
-import {CellAddress, simpleCellAddress} from '../src/Cell'
+import {simpleCellAddress} from '../src/Cell'
+import {CellAddress} from '../src/CellAddress'
 import {Config} from '../src/Config'
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import {SheetMapping} from '../src/SheetMapping'

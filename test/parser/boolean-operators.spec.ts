@@ -1,4 +1,4 @@
-import {CellAddress} from '../../src/Cell'
+import {CellAddress} from '../../src/CellAddress'
 import {Config} from '../../src/Config'
 import {
   AstNodeType,

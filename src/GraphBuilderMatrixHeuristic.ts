@@ -1,12 +1,12 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {
-  CellAddress,
   cellError, CellRange,
-  CellReferenceType, ErrorType,
+  ErrorType,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
+import {CellAddress, CellReferenceType} from './CellAddress';
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'

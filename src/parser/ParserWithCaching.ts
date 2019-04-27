@@ -1,5 +1,6 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, SimpleCellAddress} from '../Cell'
+import {CellAddress, CellReferenceType} from '../CellAddress'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {SheetMapping} from '../SheetMapping'

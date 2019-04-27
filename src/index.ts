@@ -2,7 +2,6 @@ import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {
-  CellAddress,
   cellAddressFromString,
   CellError,
   cellError,
@@ -11,6 +10,7 @@ import {
   isCellError,
   simpleCellAddress,
 } from './Cell'
+import {CellAddress} from './CellAddress'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'

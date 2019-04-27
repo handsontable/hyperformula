@@ -1,4 +1,4 @@
-import {CellAddress} from '../Cell'
+import {CellAddress} from '../CellAddress'
 
 export type Ast =
   NumberAst
