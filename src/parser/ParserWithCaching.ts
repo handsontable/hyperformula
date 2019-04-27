@@ -1,5 +1,5 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {CellAddress, cellAddressFromString, CellReferenceType, getAbsoluteAddress, SimpleCellAddress} from '../Cell'
+import {CellAddress, cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {SheetMapping} from '../SheetMapping'
@@ -123,9 +123,9 @@ export function isMatrix(text: string): Boolean {
 const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
   return deps.map((dep) => {
     if (Array.isArray(dep)) {
-      return new AbsoluteCellRange(getAbsoluteAddress(dep[0], baseAddress), getAbsoluteAddress(dep[1], baseAddress))
+      return new AbsoluteCellRange(dep[0].toSimpleCellAddress(baseAddress), dep[1].toSimpleCellAddress(baseAddress))
     } else {
-      return getAbsoluteAddress(dep, baseAddress)
+      return dep.toSimpleCellAddress(baseAddress)
     }
   })
 }

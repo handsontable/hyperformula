@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {AddressMapping} from '../../AddressMapping'
-import {cellError, CellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
+import {cellError, CellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'

@@ -4,7 +4,6 @@ import {
   CellAddress,
   cellError, CellRange,
   CellReferenceType, ErrorType,
-  getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'

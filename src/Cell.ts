@@ -78,6 +78,23 @@ export class CellAddress {
   public static absoluteRow(sheet: number, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
+
+  /**
+   * Converts R0C0 representation of cell address to simple object representation.
+   *
+   * @param baseAddress - base address for R0C0 shifts
+   */
+  public toSimpleCellAddress(baseAddress: SimpleCellAddress): SimpleCellAddress {
+    if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
+      return simpleCellAddress(this.sheet, this.col, this.row)
+    } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+      return simpleCellAddress(this.sheet, baseAddress.col + this.col, this.row)
+    } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
+      return simpleCellAddress(this.sheet, this.col, baseAddress.row + this.row)
+    } else {
+      return simpleCellAddress(this.sheet, baseAddress.col + this.col, baseAddress.row + this.row)
+    }
+  }
 }
 
 export interface SimpleCellAddress {
@@ -129,24 +146,6 @@ export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress:
     return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
   } else {
     return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
-  }
-}
-
-/**
- * Converts R0C0 representation of cell address to simple object representation.
- *
- * @param address - address in R0C0 representation
- * @param baseAddress - base address for R0C0 shifts
- */
-export const getAbsoluteAddress = (address: CellAddress, baseAddress: SimpleCellAddress): SimpleCellAddress => {
-  if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
-    return address
-  } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-    return simpleCellAddress(address.sheet, baseAddress.col + address.col, address.row)
-  } else if (address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-    return simpleCellAddress(address.sheet, address.col, baseAddress.row + address.row)
-  } else {
-    return simpleCellAddress(address.sheet, baseAddress.col + address.col, baseAddress.row + address.row)
   }
 }
 

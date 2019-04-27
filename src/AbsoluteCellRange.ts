@@ -1,14 +1,11 @@
-import {CellRange, getAbsoluteAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
 export class AbsoluteCellRange {
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    return new AbsoluteCellRange(
-      getAbsoluteAddress(x.start, baseAddress),
-      getAbsoluteAddress(x.end, baseAddress),
-    )
+    return new AbsoluteCellRange(x.start.toSimpleCellAddress(baseAddress), x.end.toSimpleCellAddress(baseAddress))
   }
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {

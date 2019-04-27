@@ -1,6 +1,6 @@
 import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
-import {cellAddressFromString, CellReferenceType, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, CellAddress, CellReferenceType, SimpleCellAddress} from '../Cell'
 import {SheetMapping} from '../SheetMapping'
 import {
   Ast,
@@ -518,12 +518,12 @@ export class FormulaParser extends Parser {
       }])
     }
 
-    const topLeftCorner = {
-      type: cellArg.reference.type,
-      row: cellArg.reference.row + rowShift,
-      col: cellArg.reference.col + colShift,
-      sheet: this.formulaAddress!.sheet,
-    }
+    const topLeftCorner = new CellAddress(
+      this.formulaAddress!.sheet,
+      cellArg.reference.col + colShift,
+      cellArg.reference.row + rowShift,
+      cellArg.reference.type,
+    )
 
     let absoluteCol = topLeftCorner.col
     let absoluteRow = topLeftCorner.row
@@ -546,12 +546,12 @@ export class FormulaParser extends Parser {
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)
     } else {
-      const bottomRightCorner = {
-        type: topLeftCorner.type,
-        sheet: this.formulaAddress!.sheet,
-        row: topLeftCorner.row + height - 1,
-        col: topLeftCorner.col + width - 1,
-      }
+      const bottomRightCorner = new CellAddress(
+        this.formulaAddress!.sheet,
+        topLeftCorner.col + width - 1,
+        topLeftCorner.row + height - 1,
+        topLeftCorner.type,
+      )
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
   }

@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../../Cell'
+import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {EmptyCellVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -53,7 +53,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const arg = ast.args[0]
     if (arg.type === AstNodeType.CELL_REFERENCE) {
-      const address = getAbsoluteAddress(arg.reference, formulaAddress)
+      const address = arg.reference.toSimpleCellAddress(formulaAddress)
       return this.addressMapping.isEmpty(address)
     } else {
       return false

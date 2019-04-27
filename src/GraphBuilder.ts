@@ -3,7 +3,7 @@ import {AddressMapping} from './AddressMapping'
 import {
   cellError,
   CellRange, CellReferenceType,
-  ErrorType, getAbsoluteAddress,
+  ErrorType,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'

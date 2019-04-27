@@ -1,5 +1,5 @@
 import {AddressMapping} from '../AddressMapping'
-import {CellError, cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress} from '../Cell'
+import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
 import {Ast, AstNodeType} from '../parser/Ast'
@@ -45,7 +45,7 @@ export class Interpreter {
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const address = getAbsoluteAddress(ast.reference, formulaAddress)
+        const address = ast.reference.toSimpleCellAddress(formulaAddress)
         return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:

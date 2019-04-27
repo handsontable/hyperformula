@@ -1,5 +1,5 @@
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {cellError, CellValue, ErrorType, getAbsoluteAddress, isCellError, SimpleCellAddress,} from '../../Cell'
+import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress,} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -134,8 +134,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         throw err
       }
     }
-    const rangeStart = getAbsoluteAddress(ast.start, formulaAddress)
-    const rangeEnd = getAbsoluteAddress(ast.end, formulaAddress)
+    const rangeStart = ast.start.toSimpleCellAddress(formulaAddress)
+    const rangeEnd = ast.end.toSimpleCellAddress(formulaAddress)
     const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
 
     if (!rangeVertex) {
