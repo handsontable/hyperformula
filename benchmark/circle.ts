@@ -18,7 +18,7 @@ const sheetB = sheetBFn()
 const sheetManyMedians = sheetManyMediansFn()
 
 console.info(' === Simple Big === ')
-benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 150, numberOfRuns: 3 })
+benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 200, numberOfRuns: 3 })
 console.info('\n === Sheet Markov === ')
 benchmark(sheetMarkov, expectedValuesMarkov(sheetMarkov), { millisecondsPerThousandRows: 65, numberOfRuns: 3 })
 console.info('\n === Sheet Prefix Sum === ')
