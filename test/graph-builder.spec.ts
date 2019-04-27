@@ -1,5 +1,5 @@
 import {AddressMapping} from '../src/AddressMapping'
-import {absoluteCellAddress, CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
+import {CellAddress, CellReferenceType, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
@@ -222,8 +222,8 @@ describe('GraphBuilder', () => {
     const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
     expect(vertex).toBeInstanceOf(MatrixVertex)
     expect((vertex as MatrixVertex).getFormula()).toEqual(buildProcedureAst('MMULT', [
-      buildCellRangeAst(absoluteCellAddress(0, 0, 0), absoluteCellAddress(0, 1, 2)),
-      buildCellRangeAst(absoluteCellAddress(0, 0, 3), absoluteCellAddress(0, 1, 4)),
+      buildCellRangeAst(CellAddress.absolute(0, 0, 0), CellAddress.absolute(0, 1, 2)),
+      buildCellRangeAst(CellAddress.absolute(0, 0, 3), CellAddress.absolute(0, 1, 4)),
     ]))
   })
 

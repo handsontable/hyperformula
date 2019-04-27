@@ -2,7 +2,7 @@ import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {
-  absoluteCellAddress,
+  CellAddress,
   cellAddressFromString,
   CellError,
   cellError,
@@ -127,7 +127,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    */
   public getCellValue(stringAddress: string): CellValue {
-    const address = cellAddressFromString(this.sheetMapping, stringAddress, absoluteCellAddress(0, 0, 0))
+    const address = cellAddressFromString(this.sheetMapping, stringAddress, CellAddress.absolute(0, 0, 0))
     return this.addressMapping.getCellValue(address)
   }
 
@@ -193,7 +193,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(stringAddress: string, newCellContent: string) {
-    const address = cellAddressFromString(this.sheetMapping, stringAddress, absoluteCellAddress(0, 0, 0))
+    const address = cellAddressFromString(this.sheetMapping, stringAddress, CellAddress.absolute(0, 0, 0))
     const vertex = this.addressMapping.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {

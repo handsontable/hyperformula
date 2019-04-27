@@ -1,4 +1,4 @@
-import {absoluteCellAddress} from '../../src/Cell'
+import {CellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
 import {SheetMapping} from '../../src/SheetMapping'
@@ -30,7 +30,7 @@ while (currentRun < numberOfRuns) {
 
   const timestampBefore = Date.now()
   flattenSheet.forEach((formula) => {
-    parser.parse(formula, absoluteCellAddress(0, 0, 0))
+    parser.parse(formula, CellAddress.absolute(0, 0, 0))
   })
   const timestampAfter = Date.now()
 

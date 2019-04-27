@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {
-  absoluteCellAddress,
+  CellAddress,
   cellError, CellRange,
   CellReferenceType, ErrorType,
   getAbsoluteAddress,
@@ -105,12 +105,12 @@ export class GraphBuilderMatrixHeuristic {
   private buildMultAst(leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange): ProcedureAst {
     return buildProcedureAst('MMULT', [
       buildCellRangeAst(
-        absoluteCellAddress(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
-        absoluteCellAddress(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
+        CellAddress.absolute(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
+        CellAddress.absolute(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
       ),
       buildCellRangeAst(
-        absoluteCellAddress(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
-        absoluteCellAddress(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
+        CellAddress.absolute(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
+        CellAddress.absolute(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
       ),
     ])
   }

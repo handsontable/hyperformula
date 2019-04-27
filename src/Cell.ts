@@ -54,17 +54,31 @@ export const isCellError = (value: any): value is CellError => {
 
 export type CellValue = boolean | string | number | Matrix | CellError
 
-export interface CellAddress {
-  col: number,
-  row: number,
-  sheet: number,
-  type: CellReferenceType
-}
+export class CellAddress {
+  constructor(
+    public readonly sheet: number,
+    public readonly col: number,
+    public readonly row: number,
+    public readonly type: CellReferenceType,
+  ) {
+  }
 
-export const relativeCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_RELATIVE })
-export const absoluteCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE })
-export const absoluteColCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL })
-export const absoluteRowCellAddress = (sheet: number, col: number, row: number): CellAddress => ({ sheet, col, row, type: CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW })
+  public static relative(sheet: number, col: number, row: number) {
+    return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
+  }
+
+  public static absolute(sheet: number, col: number, row: number) {
+    return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE)
+  }
+
+  public static absoluteCol(sheet: number, col: number, row: number) {
+    return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
+  }
+
+  public static absoluteRow(sheet: number, col: number, row: number) {
+    return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+  }
+}
 
 export interface SimpleCellAddress {
   col: number,
@@ -108,13 +122,13 @@ export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress:
 
   const row = Number(result[6] as string) - 1
   if (result[3] === '$' && result[5] === '$') {
-    return absoluteCellAddress(sheet, col, row)
+    return CellAddress.absolute(sheet, col, row)
   } else if (result[3] === '$') {
-    return absoluteColCellAddress(sheet, col, row - baseAddress.row)
+    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
   } else if (result[5] === '$') {
-    return absoluteRowCellAddress(sheet, col - baseAddress.col, row)
+    return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
   } else {
-    return relativeCellAddress(sheet, col - baseAddress.col, row - baseAddress.row)
+    return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
   }
 }
 
