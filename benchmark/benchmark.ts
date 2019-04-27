@@ -10,13 +10,15 @@ import {load} from "../bin/handsonengine-multisheet";
 export interface Config {
   millisecondsPerThousandRows: number,
   numberOfRuns: number,
-  csvDump?: boolean
+  csvDump?: boolean,
+  engineConfig?: EngineConfig,
 }
 
 const defaultConfig = {
   millisecondsPerThousandRows: 50,
   numberOfRuns: 3,
   csvDump: false,
+  engineConfig: new EngineConfig(),
 }
 
 export interface ExpectedValue { address: string, value: CellValue}
@@ -57,7 +59,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   let engine: HandsOnEngine | null = null
 
   while (currentRun < config.numberOfRuns) {
-    engine = HandsOnEngine.buildFromArray(sheet)
+    engine = HandsOnEngine.buildFromArray(sheet, config.engineConfig)
     stats.push(engine.getStats())
     currentRun++
 
