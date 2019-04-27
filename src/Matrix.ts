@@ -26,20 +26,38 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
         }
       }
       case 'MAXPOOL': {
-        if (ast.args.length !== 2) {
+        if (ast.args.length < 2) {
           return false
         }
 
-        const left = checkMatrixSize(ast.args[0], formulaAddress)
-        const right = ast.args[1]
+        const matrix = checkMatrixSize(ast.args[0], formulaAddress)
+        const windowArg = ast.args[1]
 
-        if (!left || right.type !== AstNodeType.NUMBER) {
+        if (!matrix || windowArg.type !== AstNodeType.NUMBER) {
+          return false
+        }
+
+        const window = windowArg.value
+        let stride = windowArg.value
+
+        if (ast.args.length === 3) {
+          const strideArg = ast.args[2]
+          if (strideArg.type === AstNodeType.NUMBER) {
+            stride = strideArg.value
+          } else {
+            return false
+          }
+        }
+
+        if (window > matrix.width || window > matrix.height
+            || stride > window
+            || (matrix.width - window) % stride !== 0 || (matrix.height - window) % stride !== 0) {
           return false
         }
 
         return {
-          width: left.width / right.value,
-          height: left.height / right.value,
+          width: 1 + (matrix.width - window) / stride,
+          height: 1 + (matrix.height - window) / stride,
         }
       }
       case 'TRANSPOSE': {

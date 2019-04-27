@@ -91,16 +91,23 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toBeCloseTo(26)
   })
 
-  it('matrix maxpool with padding', () => {
+  it('matrix maxpool, custom stride', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
-      ['{=maxpool(A1:F3, 4)}'],
+      ['28', '29', '30', '31', '32', '33'],
+      ['{=maxpool(A1:F4,3,1)}'],
     ], config)
 
-    expect(engine.getCellValue('A4')).toBeCloseTo(24)
-    expect(engine.getCellValue('B4')).toBeCloseTo(26)
+    expect(engine.getCellValue('A5')).toBeCloseTo(23)
+    expect(engine.getCellValue('A6')).toBeCloseTo(30)
+    expect(engine.getCellValue('B5')).toBeCloseTo(24)
+    expect(engine.getCellValue('B6')).toBeCloseTo(31)
+    expect(engine.getCellValue('C5')).toBeCloseTo(25)
+    expect(engine.getCellValue('C6')).toBeCloseTo(32)
+    expect(engine.getCellValue('D5')).toBeCloseTo(26)
+    expect(engine.getCellValue('D6')).toBeCloseTo(33)
   })
 })

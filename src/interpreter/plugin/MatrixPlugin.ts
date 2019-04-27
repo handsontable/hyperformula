@@ -1,13 +1,6 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  CellError,
-  cellError,
-  CellValue,
-  ErrorType,
-  isCellError,
-  SimpleCellAddress,
-} from '../../Cell'
+import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress,} from '../../Cell'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
@@ -71,26 +64,35 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    if (ast.args.length !== 2) {
+    if (ast.args.length < 2) {
       return cellError(ErrorType.NA)
     }
     const [rangeArg, sizeArg] = ast.args
+
     if (sizeArg.type !== AstNodeType.NUMBER) {
       return cellError(ErrorType.VALUE)
     }
 
     const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
     const windowSize = sizeArg.value
+    let stride = windowSize
+
+    if (ast.args.length === 3) {
+      const strideArg = ast.args[2]
+      if (strideArg.type === AstNodeType.NUMBER) {
+        stride = strideArg.value
+      } else {
+        return cellError(ErrorType.VALUE)
+      }
+    }
 
     if (isCellError(rangeMatrix)) {
       return rangeMatrix
     }
 
-    const inputMatrix = rangeMatrix.alignWithWindow(windowSize)
-
-    const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number) {
-      const leftCornerX = this.thread.x as number * windowSize
-      const leftCornerY = this.thread.y as number * windowSize
+    const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
+      const leftCornerX = this.thread.x as number * stride
+      const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {
         for (let j = 0; j < windowSize; j++) {
@@ -99,11 +101,11 @@ export class MatrixPlugin extends FunctionPlugin {
       }
       return currentMax
     }).setOutput([
-      inputMatrix.width() / windowSize,
-      inputMatrix.height() / windowSize,
+      1 + (rangeMatrix.width() - windowSize) / stride,
+      1 + (rangeMatrix.height() - windowSize) / stride,
     ])
 
-    return new Matrix(kernel(inputMatrix.raw(), windowSize) as number[][])
+    return new Matrix(kernel(rangeMatrix.raw(), windowSize, stride) as number[][])
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
