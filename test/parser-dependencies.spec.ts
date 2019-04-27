@@ -2,6 +2,7 @@ import {absoluteCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ParserWithCaching} from '../src/parser/ParserWithCaching'
 import {SheetMapping} from '../src/SheetMapping'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
@@ -29,7 +30,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.parse('=B2:C4', absoluteCellAddress(0, 0, 0)).dependencies
 
     expect(dependencies).toEqual([
-      [simpleCellAddress(0, 1, 1), simpleCellAddress(0, 2, 3)],
+      new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 2, 3))
     ])
   })
 

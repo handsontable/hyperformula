@@ -79,8 +79,6 @@ export interface SheetCellAddress {
 }
 export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({ col, row })
 
-export type CellDependency = SimpleCellAddress | [SimpleCellAddress, SimpleCellAddress]
-
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
  *

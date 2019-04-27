@@ -2,13 +2,13 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {
   absoluteCellAddress,
-  CellDependency,
   cellError, CellRange,
   CellReferenceType, ErrorType,
   getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
+import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'

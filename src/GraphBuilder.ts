@@ -1,13 +1,13 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {
-  CellDependency,
   cellError,
   CellRange, CellReferenceType,
   ErrorType, getAbsoluteAddress,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
+import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
@@ -146,10 +146,9 @@ export class GraphBuilder {
   private handleDependencies(dependencies: Map<Vertex, CellDependency[]>) {
     dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
       cellDependencies.forEach((absStartCell: CellDependency) => {
-        if (Array.isArray(absStartCell)) {
-          const [rangeStart, rangeEnd] = absStartCell
-          const range = new AbsoluteCellRange(rangeStart, rangeEnd)
-          let rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
+        if (absStartCell instanceof AbsoluteCellRange) {
+          const range = absStartCell
+          let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
           if (rangeVertex === null) {
             rangeVertex = new RangeVertex(range)
             this.rangeMapping.setRange(rangeVertex)
