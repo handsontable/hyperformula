@@ -15,6 +15,10 @@ export class AbsoluteCellRange {
     )
   }
 
+  public static fromCooridinates(sheet: number, x1: number, y1: number, x2: number, y2: number): AbsoluteCellRange {
+    return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
+  }
+
   constructor(
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,

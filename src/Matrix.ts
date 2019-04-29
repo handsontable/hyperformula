@@ -2,8 +2,8 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
-export interface MatrixSize { width: number, height: number }
-export type MatrixSizeCheck = MatrixSize | false
+export interface Size { width: number, height: number }
+export type MatrixSizeCheck = Size | false
 
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
@@ -121,7 +121,7 @@ export function checkIfMatrix(addresses: SimpleCellAddress[]): MatrixSizeCheck {
 
 export class Matrix {
   private matrix: number[][]
-  private size: MatrixSize
+  private size: Size
 
   constructor(matrix: number[][]) {
     this.matrix = []

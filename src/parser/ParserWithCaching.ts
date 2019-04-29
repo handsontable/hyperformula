@@ -37,7 +37,7 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
+  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[], hash: string } {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
@@ -47,7 +47,7 @@ export class ParserWithCaching {
             message: e.message,
           }),
       ))
-      return { ast, dependencies: [] }
+      return { ast, dependencies: [], hash: '' }
     }
 
     const hash = this.computeHash(lexerResult.tokens, formulaAddress)
@@ -64,9 +64,9 @@ export class ParserWithCaching {
     const dependencies = absolutizeDependencies(relativeDependencies, formulaAddress)
 
     if (ast.type === AstNodeType.ERROR) {
-      return { ast, dependencies: [] }
+      return { ast, dependencies: [], hash: hash }
     } else {
-      return { ast, dependencies }
+      return { ast, dependencies, hash: hash }
     }
   }
 

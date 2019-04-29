@@ -1,23 +1,25 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
-import {
-  cellError,
-  CellRange,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from './Cell'
+import {cellError, ErrorType, simpleCellAddress, SimpleCellAddress,} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
-import {checkIfMatrix, checkMatrixSize, MatrixSize, MatrixSizeCheck} from './Matrix'
+import {checkMatrixSize} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {
+  CellVertex,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex
+} from './Vertex'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -66,16 +68,20 @@ export class GraphBuilder {
    */
   public buildGraph(sheets: Sheets) {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
+
     const independentSheets: boolean[] = []
     for (const sheetName in sheets) {
       independentSheets[this.sheetMapping.fetch(sheetName)] = true
     }
+
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies)
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
     for (const sheetName in sheets) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       const sheet = sheets[sheetName] as Sheet
+      matrixHeuristic.addSheet(sheetId, { width: sheet[0].length, height: sheet.length })
 
       for (let i = 0; i < sheet.length; ++i) {
         const row = sheet[i]
@@ -90,6 +96,7 @@ export class GraphBuilder {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
+            matrixHeuristic.add(parseResult.hash, cellAddress)
             vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
             this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
@@ -98,6 +105,7 @@ export class GraphBuilder {
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
             vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
+            matrixHeuristic.add(parseResult.hash, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
             this.graph.addNode(vertex)
             this.addressMapping.setCell(cellAddress, vertex)
@@ -116,8 +124,6 @@ export class GraphBuilder {
       }
     }
 
-    // this.detectMatrices(dependencies)
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.parser)
     matrixHeuristic.run()
     this.handleDependencies(dependencies)
   }
