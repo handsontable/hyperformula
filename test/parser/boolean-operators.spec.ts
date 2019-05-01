@@ -7,8 +7,8 @@ import {
   GreaterThanOrEqualOpAst,
   LessThanOpAst,
   LessThanOrEqualOpAst, NotEqualOpAst,
-} from '../../src/parser/Ast'
-import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
+  ParserWithCaching,
+} from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 
 describe('Parser - Boolean operators', () => {

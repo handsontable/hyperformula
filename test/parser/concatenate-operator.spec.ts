@@ -1,7 +1,6 @@
 import {CellAddress} from '../../src/CellAddress'
 import {Config} from '../../src/Config'
-import {AstNodeType, ConcatenateOpAst, ProcedureAst} from '../../src/parser/Ast'
-import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
+import {AstNodeType, ConcatenateOpAst, ProcedureAst, ParserWithCaching} from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 
 describe('Parser - Concatenate operators', () => {

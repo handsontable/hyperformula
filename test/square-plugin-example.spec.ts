@@ -2,7 +2,7 @@ import {HandsOnEngine} from '../src'
 import {cellError, ErrorType, isCellError, SimpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
-import {ProcedureAst} from '../src/parser/Ast'
+import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'
 
 class SquarePlugin extends FunctionPlugin {

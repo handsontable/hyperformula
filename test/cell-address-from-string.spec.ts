@@ -1,6 +1,6 @@
 import {simpleCellAddress} from '../src/Cell'
 import {CellAddress} from '../src/CellAddress'
-import {cellAddressFromString} from '../src/parser/cellAddressFromString'
+import {cellAddressFromString} from '../src/parser'
 import {SheetMapping} from '../src/SheetMapping'
 
 describe('cellAddressFromString', () => {

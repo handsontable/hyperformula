@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Matrix} from './Matrix'
-import {Ast} from './parser/Ast'
+import {Ast} from './parser'
 
 /**
  * Represents vertex which keeps values of one or more cells

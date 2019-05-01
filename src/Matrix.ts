@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
-import {Ast, AstNodeType} from './parser/Ast'
+import {Ast, AstNodeType} from './parser'
 
 export interface MatrixSize { width: number, height: number }
 export type MatrixSizeCheck = MatrixSize | false

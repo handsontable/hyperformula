@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
 import {CellAddress} from '../src/CellAddress'
 import {Config} from '../src/Config'
-import {ParserWithCaching} from '../src/parser/ParserWithCaching'
+import {ParserWithCaching} from '../src/parser'
 import {SheetMapping} from '../src/SheetMapping'
 
 describe('Parsing collecting dependencies', () => {

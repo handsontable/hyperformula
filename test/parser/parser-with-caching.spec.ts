@@ -16,8 +16,8 @@ import {
   PowerOpAst,
   ProcedureAst,
   StringAst,
-} from '../../src/parser/Ast'
-import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
+  ParserWithCaching,
+} from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 
 describe('ParserWithCaching', () => {
