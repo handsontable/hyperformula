@@ -46,7 +46,7 @@ export class HandsOnEngine {
    */
   public static buildFromMultiSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
     const sheets: Sheets = {}
-    for (let key of Object.keys(csvSheets)) {
+    for (const key of Object.keys(csvSheets)) {
       sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
     }
     return HandsOnEngine.buildFromSheets(sheets, config)
@@ -172,7 +172,7 @@ export class HandsOnEngine {
 
   public exportMultipleSheets(): CsvSheets {
     const sheets: CsvSheets = {}
-    for (let sheetName of this.sheetMapping.names()) {
+    for (const sheetName of this.sheetMapping.names()) {
       const sheet = this.sheetMapping.fetch(sheetName)
       sheets[sheetName] = stringify(this.getValues(sheet), { delimiter: ','})
     }

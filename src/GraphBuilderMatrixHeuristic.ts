@@ -6,7 +6,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {CellAddress, CellReferenceType} from './CellAddress';
+import {CellAddress, CellReferenceType} from './CellAddress'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'

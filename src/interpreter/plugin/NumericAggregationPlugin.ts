@@ -1,5 +1,5 @@
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress,} from '../../Cell'
+import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -15,12 +15,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
     max: {
       EN: 'MAX',
-      PL: 'MAKS'
+      PL: 'MAKS',
     },
     min: {
       EN: 'MIN',
-      PL: 'MIN'
-    }
+      PL: 'MIN',
+    },
   }
 
   /**

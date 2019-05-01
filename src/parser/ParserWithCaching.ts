@@ -113,7 +113,7 @@ export function isFormula(text: string): Boolean {
 }
 
 export function isMatrix(text: string): Boolean {
-  return (text.length > 1) && (text[0] === "{") && (text[text.length - 1] === "}")
+  return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
 /**

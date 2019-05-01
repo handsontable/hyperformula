@@ -1,4 +1,4 @@
-import {simpleCellAddress, SimpleCellAddress} from "./Cell"
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -16,13 +16,6 @@ export enum CellReferenceType {
 }
 
 export class CellAddress {
-  constructor(
-    public readonly sheet: number,
-    public readonly col: number,
-    public readonly row: number,
-    public readonly type: CellReferenceType,
-  ) {
-  }
 
   public static relative(sheet: number, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
@@ -38,6 +31,13 @@ export class CellAddress {
 
   public static absoluteRow(sheet: number, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+  }
+  constructor(
+    public readonly sheet: number,
+    public readonly col: number,
+    public readonly row: number,
+    public readonly type: CellReferenceType,
+  ) {
   }
 
   /**

@@ -8,6 +8,7 @@ import {Vertex} from '../Vertex'
 import {BooleanPlugin} from './plugin/BooleanPlugin'
 import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {DatePlugin} from './plugin/DatePlugin'
+import {ExpPlugin} from './plugin/ExpPlugin'
 import {InformationPlugin} from './plugin/InformationPlugin'
 import {MatrixPlugin} from './plugin/MatrixPlugin'
 import {MedianPlugin} from './plugin/MedianPlugin'
@@ -18,7 +19,6 @@ import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {ExpPlugin} from "./plugin/ExpPlugin";
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -30,7 +30,7 @@ export class Interpreter {
     public readonly config: Config,
   ) {
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)

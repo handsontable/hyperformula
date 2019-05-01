@@ -37,7 +37,7 @@ describe('generateCellsFromRange', () => {
   })
 })
 
-describe("AbsoluteCellRange#sameDimensions", () => {
+describe('AbsoluteCellRange#sameDimensions', () => {
   it('same width and height', () => {
     const range1 = new AbsoluteCellRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 2, 3))
     const range2 = new AbsoluteCellRange(simpleCellAddress(0, 11, 10), simpleCellAddress(0, 12, 13))
@@ -57,8 +57,7 @@ describe("AbsoluteCellRange#sameDimensions", () => {
   })
 })
 
-
-describe("AbsoluteCellRange#doesOverlap", () => {
+describe('AbsoluteCellRange#doesOverlap', () => {
   it('exactly the same', () => {
     const range1 = new AbsoluteCellRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 2, 3))
     const range2 = new AbsoluteCellRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 2, 3))
@@ -96,7 +95,7 @@ describe("AbsoluteCellRange#doesOverlap", () => {
   })
 })
 
-describe("AbsoluteCellRange#width", () => {
+describe('AbsoluteCellRange#width', () => {
   it('a column', () => {
     expect(new AbsoluteCellRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 1, 10)).width()).toBe(1)
   })
@@ -106,7 +105,7 @@ describe("AbsoluteCellRange#width", () => {
   })
 })
 
-describe("AbsoluteCellRange#height", () => {
+describe('AbsoluteCellRange#height', () => {
   it('a row', () => {
     expect(new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 10, 1)).height()).toBe(1)
   })

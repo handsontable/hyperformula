@@ -60,7 +60,6 @@ export function max(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-
 /**
  * Returns min from two numbers
  *

@@ -1,6 +1,6 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress,} from '../../Cell'
+import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'

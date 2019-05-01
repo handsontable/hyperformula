@@ -1,5 +1,5 @@
-import {HandsOnEngine} from "../../src";
-import {cellError, ErrorType} from "../../src/Cell";
+import {HandsOnEngine} from '../../src'
+import {cellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('SUM', () => {
@@ -58,7 +58,6 @@ describe('SUM', () => {
     expect(engine.getCellValue('A4')).toEqual(3)
   })
 })
-
 
 describe('MAX', () => {
   it('MAX with empty args', () => {
@@ -143,4 +142,3 @@ describe('MIN', () => {
     expect(engine.getCellValue('A4')).toEqual(5)
   })
 })
-
