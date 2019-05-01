@@ -1,14 +1,15 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {cellAddressFromString, SimpleCellAddress} from '../Cell'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {SimpleCellAddress} from '../Cell'
 import {CellAddress, CellReferenceType} from '../CellAddress'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {SheetMapping} from '../SheetMapping'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
+import {cellAddressFromString} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 /**
  * Parses formula using caching if feasible.
