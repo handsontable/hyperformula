@@ -1,7 +1,7 @@
 import { simpleCellAddress } from '../src/Cell'
 import { CellAddress } from '../src/CellAddress'
 import { Config } from '../src/Config'
-import { FormulaLexer, buildLexerConfig, ParserWithCaching } from '../src/parser'
+import { buildLexerConfig, FormulaLexer, ParserWithCaching } from '../src/parser'
 import { SheetMapping } from '../src/SheetMapping'
 
 describe('computeHash', () => {

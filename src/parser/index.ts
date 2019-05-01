@@ -1,4 +1,4 @@
-export {cellAddressFromString} from "./cellAddressFromString";
+export {cellAddressFromString} from './cellAddressFromString'
 
 export {
   isFormula,

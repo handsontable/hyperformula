@@ -12,11 +12,11 @@ import {
   MinusOpAst,
   MinusUnaryOpAst,
   NumberAst,
-  ParsingErrorType, PlusOpAst,
+  ParserWithCaching, ParsingErrorType,
+  PlusOpAst,
   PowerOpAst,
   ProcedureAst,
   StringAst,
-  ParserWithCaching,
 } from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 

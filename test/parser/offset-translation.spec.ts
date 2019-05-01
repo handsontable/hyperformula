@@ -5,7 +5,7 @@ import {
   CellRangeAst,
   CellReferenceAst,
   ErrorAst,
-  ParserWithCaching
+  ParserWithCaching,
 } from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 

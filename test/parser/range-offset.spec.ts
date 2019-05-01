@@ -1,6 +1,6 @@
 import {CellAddress} from '../../src/CellAddress'
 import {Config} from '../../src/Config'
-import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParsingErrorType, ParserWithCaching} from '../../src/parser'
+import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
 import {SheetMapping} from '../../src/SheetMapping'
 
 describe('Parser - range offset', () => {
