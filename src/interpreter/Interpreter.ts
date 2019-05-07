@@ -1,5 +1,7 @@
 import {AddressMapping} from '../AddressMapping'
 import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../Cell'
+import {Matrix} from '../Matrix'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
 import {Ast, AstNodeType} from '../parser/Ast'
@@ -134,6 +136,25 @@ export class Interpreter {
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (leftResult instanceof Matrix && ast.right.type === AstNodeType.CELL_RANGE) {
+          const rightRange = AbsoluteCellRange.fromCellRange(ast.right, formulaAddress)
+          const resultMatrix: number[][] = []
+          let currentRow = 0
+          while (currentRow < leftResult.height()) {
+            let row: number[] = []
+            let currentColumn = 0
+            while (currentColumn < leftResult.width()) {
+              row.push(addStrict(
+                leftResult.get(currentColumn, currentRow),
+                this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow))
+              ) as number)
+              currentColumn++
+            }
+            resultMatrix.push(row)
+            currentRow++
+          }
+          return new Matrix(resultMatrix)
+        }
         return addStrict(leftResult, rightResult)
       }
       case AstNodeType.MINUS_OP: {

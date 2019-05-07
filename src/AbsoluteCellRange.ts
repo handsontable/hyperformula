@@ -68,4 +68,11 @@ export class AbsoluteCellRange {
       currentRow++
     }
   }
+
+  public getAddress(col: number, row: number): SimpleCellAddress {
+    if (col < 0 || row < 0 || row > this.height() - 1 || col > this.width() - 1) {
+      throw Error('Index out of bound')
+    }
+    return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
+  }
 }
