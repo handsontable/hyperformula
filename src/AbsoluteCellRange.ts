@@ -32,6 +32,10 @@ export class AbsoluteCellRange {
     return this.end.row - this.start.row + 1
   }
 
+  public get sheet() {
+    return this.start.sheet
+  }
+
   public doesOverlap(other: AbsoluteCellRange) {
     if (this.start.sheet != other.start.sheet) {
       return false

@@ -66,6 +66,10 @@ export class GraphBuilder {
    */
   public buildGraph(sheets: Sheets) {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
+    const independentSheets: boolean[] = []
+    for (const sheetName in sheets) {
+      independentSheets[this.sheetMapping.fetch(sheetName)] = true
+    }
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
@@ -88,6 +92,7 @@ export class GraphBuilder {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
             vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
+            this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
             this.graph.addNode(vertex)
             this.handleMatrix(vertex, cellAddress)
           } else if (isFormula(cellContent)) {
@@ -115,6 +120,15 @@ export class GraphBuilder {
     const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.parser)
     matrixHeuristic.run()
     this.handleDependencies(dependencies)
+  }
+
+  private checkDependencies(sheetId: number, dependencies: CellDependency[], independentSheets: boolean[]) {
+    for (const dependency of dependencies) {
+      if (dependency.sheet !== sheetId) {
+        independentSheets[dependency.sheet] = false
+        independentSheets[sheetId] = false
+      }
+    }
   }
 
   private buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellVertex {
