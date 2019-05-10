@@ -94,7 +94,7 @@ export class AbsoluteCellRange {
     for (const address of this.generateCellsFromRangeGenerator()) {
       const value = addressMapping.getCellValue(address)
       if (typeof value === 'number') {
-        values[address.row][address.col] = value
+        values[address.row - this.start.row][address.col - this.start.col] = value
       } else {
         throw new Error('Range contains not numeric values')
       }
