@@ -17,16 +17,16 @@ class FooPlugin extends FunctionPlugin {
 }
 
 describe('Plugins', () => {
-  it('Extending with a plugin', () => {
-    const engine = HandsOnEngine.buildFromArray([
+  it('Extending with a plugin', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
       ['=foo()'],
     ], new Config({functionPlugins: [FooPlugin]}))
 
     expect(engine.getCellValue('A1')).toBe(42)
   })
 
-  it('using translation', () => {
-    const engine = HandsOnEngine.buildFromArray([
+  it('using translation', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
       ['=fu()'],
     ], new Config({functionPlugins: [FooPlugin], language: 'PL'}))
 

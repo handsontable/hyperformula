@@ -23,8 +23,8 @@ const defaultConfig = {
 
 export interface ExpectedValue { address: string, value: CellValue}
 
-export function benchmarkCSV(csvString: string, config: Config) {
-  benchmark(parse(csvString, {  delimiter: EngineConfig.defaultConfig.csvDelimiter }), [], config)
+export async function benchmarkCSV(csvString: string, config: Config) {
+  await benchmark(parse(csvString, {  delimiter: EngineConfig.defaultConfig.csvDelimiter }), [], config)
 }
 
 export async function benchmarkMultiSheets(inputDir: string, expectedValues: ExpectedValue[], engineConfig: EngineConfig, config: Config = defaultConfig) {
@@ -36,7 +36,7 @@ export async function benchmarkMultiSheets(inputDir: string, expectedValues: Exp
   const sheets: CsvSheets = await load(inputDir, engineConfig)
 
   while (currentRun < config.numberOfRuns) {
-    const engine = HandsOnEngine.buildFromMultiSheets(sheets, engineConfig)
+    const engine = await HandsOnEngine.buildFromMultiSheets(sheets, engineConfig)
     stats.push(engine.getStats())
     currentRun++
 
@@ -49,7 +49,7 @@ export async function benchmarkMultiSheets(inputDir: string, expectedValues: Exp
   printStats(stats, config)
 }
 
-export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
+export async function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
   config = Object.assign({}, defaultConfig, config)
 
   const stats = []
@@ -59,7 +59,7 @@ export function benchmark(sheet: string[][], expectedValues: ExpectedValue[], co
   let engine: HandsOnEngine | null = null
 
   while (currentRun < config.numberOfRuns) {
-    engine = HandsOnEngine.buildFromArray(sheet, config.engineConfig)
+    engine = await HandsOnEngine.buildFromArray(sheet, config.engineConfig)
     stats.push(engine.getStats())
     currentRun++
 

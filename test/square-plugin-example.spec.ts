@@ -41,9 +41,9 @@ class SquarePlugin extends FunctionPlugin {
 }
 
 describe('Documentation example spec', () => {
-  it('works', () => {
+  it('works', async () => {
     const config = new Config({ functionPlugins: [SquarePlugin] })
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],

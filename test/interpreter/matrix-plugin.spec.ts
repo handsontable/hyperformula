@@ -5,9 +5,9 @@ import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
 
 describe('Matrix plugin', () => {
-  it('matrix multiplication', () => {
+  it('matrix multiplication', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -24,9 +24,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
   })
 
-  it('matrix multiplication wrong size', () => {
+  it('matrix multiplication wrong size', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -40,9 +40,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B7')).toEqual(0)
   })
 
-  it('matrix transpose', () => {
+  it('matrix transpose', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -57,9 +57,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
 
-  it('matrix multiplication by sumproduct', () => {
+  it('matrix multiplication by sumproduct', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true })
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -78,9 +78,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
   })
 
-  it('matrix maxpool', () => {
+  it('matrix maxpool', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
@@ -91,9 +91,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toBeCloseTo(26)
   })
 
-  it('matrix maxpool, custom stride', () => {
+  it('matrix maxpool, custom stride', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
@@ -111,9 +111,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('D6')).toBeCloseTo(33)
   })
 
-  it('matrix element-wise addition', () => {
+  it('matrix element-wise addition', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = await HandsOnEngine.buildFromArray([
       ['1', '2', '100', '200'],
       ['3', '4', '300', '400'],
       ['5', '6', '500', '600'],
