@@ -75,6 +75,9 @@ class SingleThreadEvaluator implements Evaluator {
   }
 }
 
+class ParallelEvaluator extends SingleThreadEvaluator {
+}
+
 /**
  * Engine for one sheet
  */
