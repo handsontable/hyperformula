@@ -6,6 +6,7 @@ import {
   CellValue,
   ErrorType,
   simpleCellAddress,
+  SimpleCellAddress,
 } from './Cell'
 import {CellAddress} from './CellAddress'
 import {Config} from './Config'
@@ -256,8 +257,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
-  public setCellContent(stringAddress: string, newCellContent: string) {
-    const address = cellAddressFromString(this.sheetMapping, stringAddress, CellAddress.absolute(0, 0, 0))
+  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {

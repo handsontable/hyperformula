@@ -72,10 +72,10 @@ describe('Integration', () => {
       ['1', '=A1'],
     ])
 
-    engine.setCellContent('A1', '2')
+    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '2')
     expect(engine.getCellValue('B1')).toBe(2)
 
-    engine.setCellContent('A1', 'foo')
+    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, 'foo')
     expect(engine.getCellValue('B1')).toBe('foo')
   })
 
@@ -85,7 +85,7 @@ describe('Integration', () => {
     ])
 
     expect(() => {
-      engine.setCellContent('B1', '2')
+      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '2')
     }).toThrowError(new Error('Changes to cells other than simple values not supported'))
   })
 
@@ -95,7 +95,7 @@ describe('Integration', () => {
     ])
 
     expect(() => {
-      engine.setCellContent('B1', '=A1')
+      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '=A1')
     }).toThrowError(new Error('Changes to cells other than simple values not supported'))
   })
 
@@ -113,7 +113,7 @@ describe('Integration', () => {
     ])
     expect(engine.getCellValue('B3')).toEqual(6)
 
-    engine.setCellContent('A1', '3')
+    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
     expect(engine.getCellValue('B3')).toEqual(8)
   })
 
