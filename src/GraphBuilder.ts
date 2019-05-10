@@ -74,7 +74,7 @@ export class GraphBuilder {
       independentSheets[this.sheetMapping.fetch(sheetName)] = true
     }
 
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies)
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.config)
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 
@@ -145,7 +145,7 @@ export class GraphBuilder {
       return new ValueCellVertex(cellError(ErrorType.VALUE))
     }
 
-    return new MatrixVertex(ast, formulaAddress, size.width, size.height)
+    return new MatrixVertex(formulaAddress, size.width, size.height, ast)
   }
 
   private handleMatrix(vertex: CellVertex, formulaAddress: SimpleCellAddress) {

@@ -4,12 +4,12 @@ import {CellAddress} from '../src/CellAddress'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
-import {add} from '../src/interpreter/scalar'
 import {buildCellRangeAst, buildProcedureAst} from '../src/parser'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
-import {CellVertex, EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/Vertex'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/Vertex'
+import './testConfig.ts'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -189,7 +189,7 @@ describe('GraphBuilder', () => {
     const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: [
       ['1', '2', '8'],
@@ -207,7 +207,7 @@ describe('GraphBuilder', () => {
     const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: [
       ['1', '2'],
@@ -234,7 +234,7 @@ describe('GraphBuilder', () => {
     const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: [
       ['1', '2'],
@@ -255,7 +255,7 @@ describe('GraphBuilder', () => {
     const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: [
       ['1', '2'],
@@ -276,7 +276,7 @@ describe('GraphBuilder', () => {
     const addressMapping = new AddressMapping(0.5)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: [
           ['1', '2'],

@@ -14,7 +14,7 @@ import {Config} from './Config'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {Interpreter} from './interpreter/Interpreter'
-import {cellAddressFromString, isFormula} from './parser'
+import {Ast, cellAddressFromString, isFormula} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -215,9 +215,9 @@ export class HandsOnEngine {
       (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || vertex instanceof MatrixVertex) {
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.getFormula() !== null)) {
         const address = vertex.getAddress()
-        const formula = vertex.getFormula()
+        const formula = vertex.getFormula() as Ast
         const cellValue = this.interpreter.evaluateAst(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {

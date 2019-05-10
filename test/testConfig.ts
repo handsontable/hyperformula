@@ -8,4 +8,5 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   language: 'EN',
   functionPlugins: [],
   gpuMode: 'cpu',
+  matrixDetection: false
 })

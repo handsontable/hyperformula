@@ -10,6 +10,7 @@ interface ConfigParams {
   language?: string,
   functionPlugins?: any[],
   gpuMode?: PossibleGPUMode,
+  matrixDetection?: boolean
 }
 
 export interface DefaultConfigParams {
@@ -20,6 +21,7 @@ export interface DefaultConfigParams {
   language: string,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
+  matrixDetection: boolean
 }
 
 export class Config {
@@ -31,6 +33,7 @@ export class Config {
     language: 'EN',
     functionPlugins: [],
     gpuMode: 'gpu',
+    matrixDetection: true,
   }
 
   public readonly addressMappingFillThreshold: number
@@ -40,6 +43,7 @@ export class Config {
   public readonly language: string
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
+  public readonly matrixDetection: boolean
 
   constructor({
     addressMappingFillThreshold,
@@ -49,6 +53,7 @@ export class Config {
     language,
     functionPlugins,
     gpuMode,
+    matrixDetection
   }: ConfigParams = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
@@ -57,5 +62,6 @@ export class Config {
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
+    this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
   }
 }

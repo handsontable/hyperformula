@@ -8,6 +8,7 @@ import {Matrix, Size} from './Matrix'
 import {AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser'
 import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
 import {buildNumberAst} from "./parser/Ast";
+import {Config} from "./Config";
 
 export class Array2d<T> {
   private readonly _size: Size
@@ -55,7 +56,8 @@ export class GraphBuilderMatrixHeuristic {
   constructor(
       private readonly graph: Graph<Vertex>,
       private readonly addressMapping: AddressMapping,
-      private readonly dependencies: Map<Vertex, CellDependency[]>
+      private readonly dependencies: Map<Vertex, CellDependency[]>,
+      private readonly config: Config
   ) {
   }
 
@@ -73,41 +75,43 @@ export class GraphBuilderMatrixHeuristic {
   }
 
   public run() {
-    const scanResult = this.findMatrices()
+    if (this.config.matrixDetection) {
+      const scanResult = this.findMatrices()
 
-    scanResult.forEach(possibleMatrix => {
-      const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
+      scanResult.forEach(possibleMatrix => {
+        const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
 
-      if (leftCorner instanceof ValueCellVertex) {
-        const matrixVertex = MatrixVertex.valueMatrixVertex(possibleMatrix)
-        matrixVertex.setCellValue(possibleMatrix.toMatrix(this.addressMapping))
-        for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
-          const vertex = this.addressMapping.getCell(address)
-          this.addressMapping.setCell(address, matrixVertex)
-          this.graph.removeNode(vertex)
-        }
-        this.graph.addNode(matrixVertex)
-      } else if (leftCorner instanceof FormulaCellVertex) {
-        const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
-        if (output) {
-          const {leftMatrix, rightMatrix} = output
-          const newAst = this.buildMultAst(leftMatrix, rightMatrix)
-          const matrixVertex = MatrixVertex.formulaMatrixVertex(newAst, possibleMatrix)
-          const matrixDependencies = this.dependencies.get(leftCorner)!
-
+        if (leftCorner instanceof ValueCellVertex) {
+          const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
+          matrixVertex.setCellValue(possibleMatrix.toMatrix(this.addressMapping))
           for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
             const vertex = this.addressMapping.getCell(address)
-            const deps = this.dependencies.get(vertex)!
-            matrixDependencies.push(...deps)
             this.addressMapping.setCell(address, matrixVertex)
-            this.dependencies.delete(vertex)
             this.graph.removeNode(vertex)
           }
-
           this.graph.addNode(matrixVertex)
+        } else if (leftCorner instanceof FormulaCellVertex) {
+          const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
+          if (output) {
+            const {leftMatrix, rightMatrix} = output
+            const newAst = this.buildMultAst(leftMatrix, rightMatrix)
+            const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
+            const matrixDependencies = this.dependencies.get(leftCorner)!
+
+            for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
+              const vertex = this.addressMapping.getCell(address)
+              const deps = this.dependencies.get(vertex)!
+              matrixDependencies.push(...deps)
+              this.addressMapping.setCell(address, matrixVertex)
+              this.dependencies.delete(vertex)
+              this.graph.removeNode(vertex)
+            }
+
+            this.graph.addNode(matrixVertex)
+          }
         }
-      }
-    })
+      })
+    }
 
     this.mapping.clear()
   }
