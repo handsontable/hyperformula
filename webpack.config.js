@@ -9,20 +9,24 @@ const reservedTokenNames = buildLexerConfig({ functionArgSeparator: /,/ }).allTo
   return chevrotain.tokenName(currentToken)
 })
 
-const buildConfiguration = ({ name, mode, excludeDependencies }) => {
-  const optimization = {
-    minimizer: [new TerserPlugin({
-      terserOptions: {
-        mangle: {
-          reserved: reservedTokenNames,
-        }
+const optimization = {
+  minimizer: [new TerserPlugin({
+    terserOptions: {
+      mangle: {
+        reserved: reservedTokenNames,
       }
-    })]
-  }
+    }
+  })]
+}
+
+const buildConfiguration = ({ name, mode, excludeDependencies }) => {
   const configuration = {
-    entry: './src/index.ts',
     module: {
       rules: [
+        {
+          test: /\.worker\.ts$/,
+          use: 'worker-loader'
+        },
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
@@ -34,10 +38,8 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
       extensions: [ '.tsx', '.ts', '.js' ]
     },
     output: {
-      filename: `${name}.bundle.js`,
-      library: "HandsOnEngine",
-      libraryTarget: "umd",
-      path: path.resolve(__dirname, 'lib'),
+      filename: `bundle.js`,
+      path: path.resolve(__dirname, 'dist', name),
 
       // https://github.com/webpack/webpack/issues/6784
       globalObject: 'typeof self !== \'undefined\' ? self : this',
@@ -52,22 +54,40 @@ const buildConfiguration = ({ name, mode, excludeDependencies }) => {
   return configuration
 };
 
-const unoptimized_full = buildConfiguration({
+const libraryBundleConfiguration = (props) => {
+  const config = buildConfiguration(props)
+  config.entry = "./src/index.ts"
+  config.output.library = "HandsOnEngine"
+  config.output.libraryTarget = "umd"
+  return config
+}
+
+const circleBenchmark = () => {
+  const config = buildConfiguration({
+    name: "circle",
+    mode: "development",
+    excludeDependencies: false,
+  })
+  config.entry = "./benchmark/circle.ts"
+  return config
+}
+
+const unoptimized_full = libraryBundleConfiguration({
   name: "unoptimized-full",
   mode: "development",
   excludeDependencies: false,
 });
-const unoptimized_without_dependencies = buildConfiguration({
+const unoptimized_without_dependencies = libraryBundleConfiguration({
   name: "unoptimized-without-dependencies",
   mode: "development",
   excludeDependencies: true,
 })
-const optimized_full = buildConfiguration({
+const optimized_full = libraryBundleConfiguration({
   name: "optimized-full",
   mode: "production",
   excludeDependencies: false,
 })
-const optimized_without_dependencies = buildConfiguration({
+const optimized_without_dependencies = libraryBundleConfiguration({
   name: "optimized-without-dependencies",
   mode: "production",
   excludeDependencies: true,
@@ -78,4 +98,5 @@ module.exports = [
   unoptimized_without_dependencies,
   optimized_full,
   optimized_without_dependencies,
+  circleBenchmark()
 ];

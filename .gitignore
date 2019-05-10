@@ -4,4 +4,4 @@ coverage
 .idea/
 yarn-error.log
 doc/
-
+dist/
