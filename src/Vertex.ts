@@ -4,6 +4,11 @@ import {CriterionLambda} from './interpreter/Criterion'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
 
+let nextVertexId = 1
+const getNextVertexId = (): number => {
+  return nextVertexId++;
+}
+
 /**
  * Represents vertex which keeps values of one or more cells
  */
@@ -15,7 +20,6 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex |
 export type Vertex = CellVertex | RangeVertex
 
 export class MatrixVertex {
-
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
@@ -24,13 +28,15 @@ export class MatrixVertex {
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
   private matrix: Matrix
+  public readonly id: number
 
-  constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
+  constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast, id: number = getNextVertexId()) {
     this.cellAddress = cellAddress
     this.width = width
     this.height = height
     this.formula = formula || null
     this.matrix = new Matrix([])
+    this.id = id
   }
 
   public setCellValue(matrix: CellValue) {
@@ -74,9 +80,12 @@ export class FormulaCellVertex {
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
+  public readonly id: number
+
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, id: number = getNextVertexId()) {
     this.formula = formula
     this.cellAddress = cellAddress
+    this.id = id
   }
 
   /**
@@ -119,8 +128,11 @@ export class ValueCellVertex {
   /** Static cell value. */
   private cellValue: CellValue
 
-  constructor(cellValue: CellValue) {
+  public readonly id: number
+
+  constructor(cellValue: CellValue, id: number = getNextVertexId()) {
     this.cellValue = cellValue
+    this.id = id
   }
 
   /**
@@ -142,6 +154,8 @@ export class ValueCellVertex {
  * Represents singleton vertex bound to all empty cells
  */
 export class EmptyCellVertex {
+  public readonly id: number = 0
+
   /**
    * Retrieves singleton
    */
@@ -178,7 +192,7 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(private range: AbsoluteCellRange) {
+  constructor(private range: AbsoluteCellRange, public readonly id: number = getNextVertexId()) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }
