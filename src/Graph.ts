@@ -3,7 +3,7 @@
  */
 export class Graph<T> {
   /** Set with nodes in graph. */
-  private nodes: Set<T>
+  public readonly nodes: Set<T>
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>

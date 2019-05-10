@@ -66,7 +66,7 @@ export class GraphBuilder {
    *
    * @param sheet - two-dimensional array representation of sheet
    */
-  public buildGraph(sheets: Sheets) {
+  public buildGraph(sheets: Sheets): boolean[] {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
     const independentSheets: boolean[] = []
@@ -131,6 +131,8 @@ export class GraphBuilder {
 
     matrixHeuristic.run()
     this.handleDependencies(dependencies)
+    
+    return independentSheets
   }
 
   private checkDependencies(sheetId: number, dependencies: CellDependency[], independentSheets: boolean[]) {
