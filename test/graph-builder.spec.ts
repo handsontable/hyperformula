@@ -270,4 +270,23 @@ describe('GraphBuilder', () => {
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
   })
+
+  it('matrix with plain numbers', () => {
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: [
+          ['1', '2'],
+          ['3', '4'],
+    ]})
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 0))).toEqual(1)
+    expect(addressMapping.getCellValue(simpleCellAddress(0, 1, 0))).toEqual(2)
+    expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 1))).toEqual(3)
+    expect(addressMapping.getCellValue(simpleCellAddress(0, 1, 1))).toEqual(4)
+  })
 })
