@@ -113,6 +113,7 @@ export class GraphBuilder {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
             vertex = new ValueCellVertex(Number(cellContent))
+            matrixHeuristic.add("#d", cellAddress)
             this.graph.addNode(vertex)
             this.addressMapping.setCell(cellAddress, vertex)
           } else {

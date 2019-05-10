@@ -1,4 +1,6 @@
-import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {AddressMapping} from "./AddressMapping";
+import {Matrix} from "./Matrix";
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
@@ -10,8 +12,8 @@ export class AbsoluteCellRange {
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     return new AbsoluteCellRange(
-      topLeftCorner,
-      simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
+        topLeftCorner,
+        simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
     )
   }
 
@@ -20,8 +22,8 @@ export class AbsoluteCellRange {
   }
 
   constructor(
-    public readonly start: SimpleCellAddress,
-    public readonly end: SimpleCellAddress,
+      public readonly start: SimpleCellAddress,
+      public readonly end: SimpleCellAddress,
   ) {
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
@@ -65,7 +67,7 @@ export class AbsoluteCellRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
-  public *generateCellsFromRangeGenerator() {
+  public* generateCellsFromRangeGenerator() {
     let currentRow = this.start.row
     while (currentRow <= this.end.row) {
       let currentColumn = this.start.col
@@ -82,5 +84,22 @@ export class AbsoluteCellRange {
       throw Error('Index out of bound')
     }
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
+  }
+
+  public toMatrix(addressMapping: AddressMapping): Matrix {
+    const values = new Array(this.height())
+    for (let i=0; i<this.height(); ++i) {
+      values[i] = new Array(this.width())
+    }
+    for (let address of this.generateCellsFromRangeGenerator()) {
+      const value = addressMapping.getCellValue(address)
+      if (typeof value === 'number') {
+        values[address.row][address.col] = value
+      } else {
+        throw new Error("Range contains not numeric values")
+      }
+    }
+
+    return new Matrix(values)
   }
 }

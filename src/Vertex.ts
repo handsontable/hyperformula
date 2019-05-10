@@ -17,16 +17,25 @@ export type Vertex = CellVertex | RangeVertex
 export class MatrixVertex {
   public readonly width: number
   public readonly height: number
-  private formula: Ast
+  private formula?: Ast
   private cellAddress: SimpleCellAddress
   private matrix: Matrix
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress, width: number, height: number) {
-    this.formula = formula
-    this.cellAddress = cellAddress
-    this.width = width
-    this.height = height
+  private constructor(range: AbsoluteCellRange) {
+    this.cellAddress = range.start
+    this.width = range.width()
+    this.height = range.height()
     this.matrix = new Matrix([])
+  }
+
+  public static formulaMatrixVertex(formula: Ast, range: AbsoluteCellRange): MatrixVertex {
+    const vertex = new MatrixVertex(range)
+    vertex.formula = formula
+    return vertex
+  }
+
+  public static valueMatrixVertex(range: AbsoluteCellRange): MatrixVertex {
+    return new MatrixVertex(range)
   }
 
   public setCellValue(matrix: CellValue) {
@@ -44,11 +53,11 @@ export class MatrixVertex {
     return this.matrix.get(col, row)
   }
 
-  public getAddress() {
+  public getAddress(): SimpleCellAddress {
     return this.cellAddress
   }
 
-  public getFormula() {
+  public getFormula(): Ast | undefined {
     return this.formula
   }
 }

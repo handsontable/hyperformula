@@ -4,9 +4,10 @@ import {simpleCellAddress, SimpleCellAddress,} from './Cell'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {CellDependency} from './CellDependency'
 import {Graph} from './Graph'
-import {Size} from './Matrix'
+import {Matrix, Size} from './Matrix'
 import {AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser'
-import {FormulaCellVertex, MatrixVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
+import {buildNumberAst} from "./parser/Ast";
 
 export class Array2d<T> {
   private readonly _size: Size
@@ -76,12 +77,22 @@ export class GraphBuilderMatrixHeuristic {
 
     scanResult.forEach(possibleMatrix => {
       const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
-      if (leftCorner instanceof FormulaCellVertex) {
+
+      if (leftCorner instanceof ValueCellVertex) {
+        const matrixVertex = MatrixVertex.valueMatrixVertex(possibleMatrix)
+        matrixVertex.setCellValue(possibleMatrix.toMatrix(this.addressMapping))
+        for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
+          const vertex = this.addressMapping.getCell(address)
+          this.addressMapping.setCell(address, matrixVertex)
+          this.graph.removeNode(vertex)
+        }
+        this.graph.addNode(matrixVertex)
+      } else if (leftCorner instanceof FormulaCellVertex) {
         const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
         if (output) {
           const {leftMatrix, rightMatrix} = output
           const newAst = this.buildMultAst(leftMatrix, rightMatrix)
-          const matrixVertex = new MatrixVertex(newAst, leftCorner.getAddress(), possibleMatrix.width(), possibleMatrix.height())
+          const matrixVertex = MatrixVertex.formulaMatrixVertex(newAst, possibleMatrix)
           const matrixDependencies = this.dependencies.get(leftCorner)!
 
           for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
