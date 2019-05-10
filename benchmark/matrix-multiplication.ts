@@ -29,8 +29,11 @@ export function expectedValues(sheet: string[][]): ExpectedValue[] {
   ]
 }
 
-const s = sheet()
-console.info('\n === Sheet Matrix Multiplication -- GPU === ')
-benchmark(s, expectedValues(s), { millisecondsPerThousandRows: 8000, numberOfRuns: 3, engineConfig: new EngineConfig({ gpuMode: 'gpu' })  })
-console.info('\n === Sheet Matrix Multiplication -- CPU === ')
-benchmark(s, expectedValues(s), { millisecondsPerThousandRows: 8000, numberOfRuns: 3, engineConfig: new EngineConfig({ gpuMode: 'cpu' }) })
+async function start() {
+  const s = sheet()
+
+  console.info('\n === Sheet Matrix Multiplication -- GPU === ')
+  await benchmark(s, expectedValues(s), { millisecondsPerThousandRows: 8000, numberOfRuns: 3, engineConfig: new EngineConfig({ gpuMode: 'gpu' })  })
+  console.info('\n === Sheet Matrix Multiplication -- CPU === ')
+  await benchmark(s, expectedValues(s), { millisecondsPerThousandRows: 8000, numberOfRuns: 3, engineConfig: new EngineConfig({ gpuMode: 'cpu' }) })
+}
