@@ -34,7 +34,7 @@ You can use HandsOnEngine for processing spreadsheet-like data and formulas in v
 
 Processing a spreadsheet consists of three phases:
 
-1. Parsing and construction of ASTs - we need to parse the provided formulas and represent them as a so-called Abstract Syntax Tree. For example, the AST for 
+1. Parsing and construction of ASTs - we need to parse the provided formulas and represent them as a so-called Abstract Syntax Tree. For example, the AST for
 `7*3-SIN(A5)` looks as follows:
 
 ![ast](examples/ast.png)
@@ -139,7 +139,7 @@ Not every cell can be correctly evaluated. If this is the case, our engine retur
 - REF - reference to a non-existing address (i.e. OFFSET(A1,-1,-1))
 - NAME - unknown function name or parsing / tokenization error (i.e. =A-100)
 - VALUE - wrong type of an arguments (i.e. 5+”aa”)
-- NUM - problem with computing the answer (i.e. ACOS(5)=?) 
+- NUM - problem with computing the answer (i.e. ACOS(5)=?)
 - NA - wrong number of arguments of a function
 
 ## Detailed description
@@ -165,7 +165,7 @@ Especially, after filling cells using bottom right corner drag, neighboring cell
 `B3=A3-C3+B2`
 
 `B4=A4-C4+B3`
-and so on. 
+and so on.
 
 Although the exact ASTs for these formulas are different, we see that they do share a pattern.
 A very useful approach here is to rewrite a formula using relative addressing of cells.
@@ -183,7 +183,7 @@ With this approach we do not loose any information because, knowing the absolute
 In many applications, one may use formulas that depend on a large range of cells.
 For example, the formula `SUM(A1:A100)+B5` depends on 101 cells and we need to represent this relationship in the graph of cell dependencies accordingly.
 
-An interesting optimization challenge arises when the are multiple cells that depend on large ranges. 
+An interesting optimization challenge arises when the are multiple cells that depend on large ranges.
 For example, consider the following use-case:
 
 `B1=SUM(A1:A1)`
@@ -210,7 +210,7 @@ A solution to this problem comes from the observation that we can rewrite the ab
 
 `B100=B99+A100`
 
-Whereas this example is too specialized to provide a useful rule for optimization, it shows the main idea behind efficient handling of multiple ranges: we should represent a range as a composition of a small number of smaller ranges. 
+Whereas this example is too specialized to provide a useful rule for optimization, it shows the main idea behind efficient handling of multiple ranges: we should represent a range as a composition of a small number of smaller ranges.
 
 In the adopted implementation, every time we encounter a range, say `B5:D20`, we check if we have already considered the range which is one row shorter, in this example: `B5:D19`. If so, then we represent `B5:D20` as the compostition of range `B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
 
