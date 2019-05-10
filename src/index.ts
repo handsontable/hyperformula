@@ -215,7 +215,7 @@ export class HandsOnEngine {
       (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.getFormula() !== null)) {
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
         const cellValue = this.interpreter.evaluateAst(formula, address)

@@ -55,6 +55,10 @@ export class MatrixVertex {
   public getFormula(): Ast | null {
     return this.formula
   }
+
+  public isFormula(): boolean {
+    return this.formula !== null
+  }
 }
 
 /**
