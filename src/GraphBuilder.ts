@@ -81,7 +81,11 @@ export class GraphBuilder {
     for (const sheetName in sheets) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       const sheet = sheets[sheetName] as Sheet
-      matrixHeuristic.addSheet(sheetId, { width: sheet[0].length, height: sheet.length })
+
+      matrixHeuristic.addSheet(sheetId, {
+        width: this.addressMapping.getWidth(sheetId),
+        height: this.addressMapping.getHeight(sheetId)
+      })
 
       for (let i = 0; i < sheet.length; ++i) {
         const row = sheet[i]

@@ -25,7 +25,7 @@ describe('Matrix plugin', () => {
   })
 
   it('matrix multiplication wrong size', () => {
-    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],

@@ -95,15 +95,15 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 }
 
 describe('SparseStrategy', () => {
-  sharedExamples((maxCol, maxRow) => {
+  sharedExamples((maxCol: number, maxRow: number) => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, new SparseStrategy())
+    mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(1.0)
-    mapping.addSheet(0, new SparseStrategy())
+    mapping.addSheet(0, new SparseStrategy(4, 16))
 
     mapping.setCell(simpleCellAddress(0, 3, 15), new ValueCellVertex(42))
 

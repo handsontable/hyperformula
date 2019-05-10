@@ -53,6 +53,8 @@ export class SparseStrategy implements IAddressMappingStrategy {
    */
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 
+  constructor(private width: number, private height: number) {}
+
   /** @inheritDoc */
   public getCell(address: SheetCellAddress): CellVertex {
     const colMapping = this.mapping.get(address.col)
@@ -83,16 +85,12 @@ export class SparseStrategy implements IAddressMappingStrategy {
 
   /** @inheritDoc */
   public getHeight(): number {
-    let currentMax = 0
-    this.mapping.forEach((colMapping) => {
-      currentMax = Math.max(currentMax, Math.max(...Array.from(colMapping.keys())) + 1)
-    })
-    return currentMax
+    return this.height
   }
 
   /** @inheritDoc */
   public getWidth(): number {
-    return Math.max(0, Math.max(...Array.from(this.mapping.keys())) + 1)
+    return this.width
   }
 }
 
@@ -231,7 +229,7 @@ export class AddressMapping {
     if (fill > this.threshold) {
       strategy = new DenseStrategy(width, height)
     } else {
-      strategy = new SparseStrategy()
+      strategy = new SparseStrategy(width, height)
     }
     this.addSheet(sheetId, strategy)
   }
@@ -250,8 +248,7 @@ export class AddressMapping {
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     let sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      sheetMapping = new SparseStrategy()
-      this.mapping.set(address.sheet, sheetMapping)
+      throw Error("Sheet not initialized")
     }
     sheetMapping.setCell(address, newVertex)
   }
