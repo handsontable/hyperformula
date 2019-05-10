@@ -24,11 +24,61 @@ export {
   Config,
 }
 
+interface Evaluator {
+  run(): void,
+}
+
+class SingleThreadEvaluator implements Evaluator {
+  /** Topologically sorted list of vertices. */
+  private sortedVertices: Vertex[] = []
+
+  /** List of vertices which are on some cycle */
+  private verticesOnCycle: Vertex[] = []
+
+  private interpreter: Interpreter
+
+  constructor(
+    private readonly addressMapping: AddressMapping,
+    private readonly rangeMapping: RangeMapping,
+    private readonly graph: Graph<Vertex>,
+    private readonly config: Config,
+    private readonly stats: Statistics,
+  ) {
+    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
+  }
+
+  public run() {
+    this.stats.measure(StatType.TOP_SORT, () => {
+      ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
+    })
+
+    this.recomputeFormulas()
+  }
+
+  /**
+   * Recalculates formulas in the topological sort order
+   */
+  private recomputeFormulas() {
+    this.verticesOnCycle.forEach((vertex: Vertex) => {
+      (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
+    })
+    this.sortedVertices.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+        const address = vertex.getAddress()
+        const formula = vertex.getFormula() as Ast
+        const cellValue = this.interpreter.evaluateAst(formula, address)
+        vertex.setCellValue(cellValue)
+      } else if (vertex instanceof RangeVertex) {
+        vertex.clear()
+      }
+    })
+  }
+}
+
 /**
  * Engine for one sheet
  */
 export class HandsOnEngine {
-
   /**
    * Builds engine for sheet from CSV string representation
    *
@@ -73,14 +123,8 @@ export class HandsOnEngine {
   /** Directed graph of cell dependencies. */
   private readonly graph: Graph<Vertex> = new Graph()
 
-  /** Topologically sorted list of vertices. */
-  private sortedVertices: Vertex[] = []
-
-  /** List of vertices which are on some cycle */
-  private verticesOnCycle: Vertex[] = []
-
-  /** Formula interpreter */
-  private readonly interpreter: Interpreter
+  /** Formula evaluator */
+  private readonly evaluator: Evaluator
 
   /** Statistics module for benchmarking */
   private readonly stats: Statistics = new Statistics()
@@ -103,18 +147,14 @@ export class HandsOnEngine {
     }
 
     const graphBuilder = new GraphBuilder(this.graph, this.addressMapping, this.rangeMapping, this.stats, this.config, this.sheetMapping)
-    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       graphBuilder.buildGraph(sheets)
     })
 
-    this.stats.measure(StatType.TOP_SORT, () => {
-      ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
-    })
-
+    this.evaluator = new SingleThreadEvaluator(this.addressMapping, this.rangeMapping, this.graph, this.config, this.stats)
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas()
+      this.evaluator.run()
     })
 
     this.stats.end(StatType.OVERALL)
@@ -204,25 +244,6 @@ export class HandsOnEngine {
       throw Error('Changes to cells other than simple values not supported')
     }
 
-    this.recomputeFormulas()
-  }
-
-  /**
-   * Recalculates formulas in the topological sort order
-   */
-  private recomputeFormulas() {
-    this.verticesOnCycle.forEach((vertex: Vertex) => {
-      (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
-    })
-    this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
-        const cellValue = this.interpreter.evaluateAst(formula, address)
-        vertex.setCellValue(cellValue)
-      } else if (vertex instanceof RangeVertex) {
-        vertex.clear()
-      }
-    })
+    this.evaluator.run()
   }
 }
