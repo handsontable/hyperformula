@@ -53,7 +53,7 @@ export class Config {
     language,
     functionPlugins,
     gpuMode,
-    matrixDetection
+    matrixDetection,
   }: ConfigParams = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter

@@ -64,9 +64,9 @@ export class ParserWithCaching {
     const dependencies = absolutizeDependencies(relativeDependencies, formulaAddress)
 
     if (ast.type === AstNodeType.ERROR) {
-      return { ast, dependencies: [], hash: hash }
+      return { ast, dependencies: [], hash }
     } else {
-      return { ast, dependencies, hash: hash }
+      return { ast, dependencies, hash }
     }
   }
 

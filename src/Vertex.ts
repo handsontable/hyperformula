@@ -15,6 +15,10 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex |
 export type Vertex = CellVertex | RangeVertex
 
 export class MatrixVertex {
+
+  public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
+    return new MatrixVertex(range.start, range.width(), range.height(), formula)
+  }
   public readonly width: number
   public readonly height: number
   private formula: Ast | null
@@ -27,10 +31,6 @@ export class MatrixVertex {
     this.height = height
     this.formula = formula || null
     this.matrix = new Matrix([])
-  }
-
-  public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
-    return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
 
   public setCellValue(matrix: CellValue) {

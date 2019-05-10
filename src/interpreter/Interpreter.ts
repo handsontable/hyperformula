@@ -1,9 +1,9 @@
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {AddressMapping} from '../AddressMapping'
 import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../Cell'
-import {Matrix} from '../Matrix'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
+import {Matrix} from '../Matrix'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {RangeMapping} from '../RangeMapping'
 import {Vertex} from '../Vertex'
@@ -141,12 +141,12 @@ export class Interpreter {
           const resultMatrix: number[][] = []
           let currentRow = 0
           while (currentRow < leftResult.height()) {
-            let row: number[] = []
+            const row: number[] = []
             let currentColumn = 0
             while (currentColumn < leftResult.width()) {
               row.push(addStrict(
                 leftResult.get(currentColumn, currentRow),
-                this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow))
+                this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
               ) as number)
               currentColumn++
             }

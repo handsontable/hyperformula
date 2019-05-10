@@ -228,7 +228,6 @@ describe('GraphBuilder', () => {
     ]))
   })
 
-
   it('overlap', () => {
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)

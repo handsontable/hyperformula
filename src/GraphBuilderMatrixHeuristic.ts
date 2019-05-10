@@ -1,18 +1,28 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
-import {simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {CellDependency} from './CellDependency'
+import {Config} from './Config'
 import {Graph} from './Graph'
-import {Matrix, Size} from './Matrix'
+import {Size} from './Matrix'
 import {AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser'
 import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
-import {buildNumberAst} from "./parser/Ast";
-import {Config} from "./Config";
 
 export class Array2d<T> {
+
+  public static fromArray<T>(input: T[][]): Array2d<T> {
+    const size: Size = {width: input[0].length, height: input.length}
+    const array = new Array2d<T>(size)
+    for (let i = 0; i < size.height; ++i) {
+      for (let j = 0; j < size.width; ++j) {
+        array.set(j, i, input[i][j])
+      }
+    }
+    return array
+  }
   private readonly _size: Size
-  private readonly array: Array<Array<T>>
+  private readonly array: T[][]
 
   constructor(size: Size) {
     this._size = size
@@ -37,37 +47,32 @@ export class Array2d<T> {
   public size() {
     return this._size
   }
-
-  public static fromArray(input: string[][]): Array2d<string> {
-    let size: Size = {width: input[0].length, height: input.length}
-    let array = new Array2d<string>(size)
-    for (let i = 0; i < size.height; ++i) {
-      for (let j = 0; j < size.width; ++j) {
-        if (input[i][j] !== "") {
-          array.set(j, i, input[i][j])
-        }
-      }
-    }
-    return array
-  }
 }
 
 export class GraphBuilderMatrixHeuristic {
+
+  private mapping: Map<number, Array2d<string>> = new Map()
   constructor(
       private readonly graph: Graph<Vertex>,
       private readonly addressMapping: AddressMapping,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
-      private readonly config: Config
+      private readonly config: Config,
   ) {
   }
 
-  private mapping: Map<number, Array2d<string>> = new Map()
-
   public addSheet(id: number, size: Size) {
+    if (!this.config.matrixDetection) {
+      return
+    }
+
     this.mapping.set(id, new Array2d<string>(size))
   }
 
   public add(hash: string, cellAddress: SimpleCellAddress) {
+    if (!this.config.matrixDetection) {
+      return
+    }
+
     if (!this.mapping.has(cellAddress.sheet)) {
       throw Error(`Sheet with id: ${cellAddress.sheet} does not exists`)
     }
@@ -75,49 +80,49 @@ export class GraphBuilderMatrixHeuristic {
   }
 
   public run() {
-    if (this.config.matrixDetection) {
-      const scanResult = this.findMatrices()
-
-      scanResult.forEach(possibleMatrix => {
-        const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
-
-        if (leftCorner instanceof ValueCellVertex) {
-          const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
-          matrixVertex.setCellValue(possibleMatrix.toMatrix(this.addressMapping))
-          for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
-            const vertex = this.addressMapping.getCell(address)
-            this.addressMapping.setCell(address, matrixVertex)
-            this.graph.removeNode(vertex)
-          }
-          this.graph.addNode(matrixVertex)
-        } else if (leftCorner instanceof FormulaCellVertex) {
-          const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
-          if (output) {
-            const {leftMatrix, rightMatrix} = output
-            const newAst = this.buildMultAst(leftMatrix, rightMatrix)
-            const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
-            const matrixDependencies = this.dependencies.get(leftCorner)!
-
-            for (let address of possibleMatrix.generateCellsFromRangeGenerator()) {
-              const vertex = this.addressMapping.getCell(address)
-              const deps = this.dependencies.get(vertex)!
-              matrixDependencies.push(...deps)
-              this.addressMapping.setCell(address, matrixVertex)
-              this.dependencies.delete(vertex)
-              this.graph.removeNode(vertex)
-            }
-
-            this.graph.addNode(matrixVertex)
-          }
-        }
-      })
+    if (!this.config.matrixDetection) {
+      return
     }
 
+    const scanResult = this.findMatrices()
+    scanResult.forEach((possibleMatrix) => {
+      const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
+
+      if (leftCorner instanceof ValueCellVertex) {
+        const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
+        matrixVertex.setCellValue(possibleMatrix.toMatrix(this.addressMapping))
+        for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
+          const vertex = this.addressMapping.getCell(address)
+          this.addressMapping.setCell(address, matrixVertex)
+          this.graph.removeNode(vertex)
+        }
+        this.graph.addNode(matrixVertex)
+      } else if (leftCorner instanceof FormulaCellVertex) {
+        const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
+        if (output) {
+          const {leftMatrix, rightMatrix} = output
+          const newAst = buildMultAst(leftMatrix, rightMatrix)
+          const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
+          const matrixDependencies = this.dependencies.get(leftCorner)!
+
+          for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
+            const vertex = this.addressMapping.getCell(address)
+            const deps = this.dependencies.get(vertex)!
+            matrixDependencies.push(...deps)
+            this.addressMapping.setCell(address, matrixVertex)
+            this.dependencies.delete(vertex)
+            this.graph.removeNode(vertex)
+          }
+
+          this.graph.addNode(matrixVertex)
+        }
+      }
+    })
     this.mapping.clear()
   }
 
-  private findMatrices(): Array<AbsoluteCellRange> {
-    let result: Array<AbsoluteCellRange> = []
+  private findMatrices(): AbsoluteCellRange[] {
+    let result: AbsoluteCellRange[] = []
     this.mapping.forEach((m, sheet) => {
       result = result.concat(findMatrices(sheet, m))
     })
@@ -168,22 +173,22 @@ export class GraphBuilderMatrixHeuristic {
 
     return false
   }
-
-  private buildMultAst(leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange): ProcedureAst {
-    return buildProcedureAst('MMULT', [
-      buildCellRangeAst(
-          CellAddress.absolute(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
-          CellAddress.absolute(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
-      ),
-      buildCellRangeAst(
-          CellAddress.absolute(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
-          CellAddress.absolute(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
-      ),
-    ])
-  }
 }
 
-export function findMatrices(sheet: number, input: Array2d<string>): Array<AbsoluteCellRange> {
+export function buildMultAst(leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange): ProcedureAst {
+  return buildProcedureAst('MMULT', [
+    buildCellRangeAst(
+        CellAddress.absolute(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
+        CellAddress.absolute(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
+    ),
+    buildCellRangeAst(
+        CellAddress.absolute(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
+        CellAddress.absolute(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
+    ),
+  ])
+}
+
+export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCellRange[] {
   const size = input.size()
   const result = new Map<number, AbsoluteCellRange>()
   const colours = new Array2d<number>(size)
@@ -212,28 +217,28 @@ export function findMatrices(sheet: number, input: Array2d<string>): Array<Absol
         result.delete(rightColour!)
       } else if (value !== diag) {
         if (right === value && right === bottom) {
-          //1 1
-          //1 0
+          // 1 1
+          // 1 0
           result.delete(rightColour!)
           result.delete(bottomColour!)
           colours.set(x, y, ++colour)
           result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
         } else if (right !== value && bottom === value) {
-          //1 0
-          //1 0
+          // 1 0
+          // 1 0
           if (result.has(bottomColour)) {
             colours.set(x, y, bottomColour)
-            let range = result.get(bottomColour)!.withStart(simpleCellAddress(sheet, x, y))
+            const range = result.get(bottomColour)!.withStart(simpleCellAddress(sheet, x, y))
             result.set(bottomColour, range)
           } else {
             colours.set(x, y, ++colour)
             result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
           }
         } else if (right === value && bottom !== value) {
-          //1 1
-          //0 0
+          // 1 1
+          // 0 0
           colours.set(x, y, rightColour)
-          let range = result.get(rightColour)!.withStart(simpleCellAddress(sheet, x, y))
+          const range = result.get(rightColour)!.withStart(simpleCellAddress(sheet, x, y))
           result.set(rightColour, range)
         } else {
           colours.set(x, y, ++colour)
@@ -243,7 +248,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): Array<Absol
         // 1 1
         // 1 1
         colours.set(x, y, rightColour)
-        let range = result.get(rightColour)!.withStart(simpleCellAddress(sheet, x, y))
+        const range = result.get(rightColour)!.withStart(simpleCellAddress(sheet, x, y))
         result.set(rightColour, range)
       } else if (value === diag) {
         colours.set(x, y, ++colour)
@@ -252,7 +257,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): Array<Absol
     }
   }
 
-  let scanResult: Array<AbsoluteCellRange> = new Array<AbsoluteCellRange>()
+  const scanResult: AbsoluteCellRange[] = new Array<AbsoluteCellRange>()
   result.forEach((range) => {
     if (range.width() * range.height() > 1) {
       scanResult.push(range)

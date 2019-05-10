@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
-import {cellError, ErrorType, simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {cellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
@@ -18,7 +18,7 @@ import {
   MatrixVertex,
   RangeVertex,
   ValueCellVertex,
-  Vertex
+  Vertex,
 } from './Vertex'
 
 /**
@@ -113,7 +113,7 @@ export class GraphBuilder {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
             vertex = new ValueCellVertex(Number(cellContent))
-            matrixHeuristic.add("#d", cellAddress)
+            matrixHeuristic.add('#', cellAddress)
             this.graph.addNode(vertex)
             this.addressMapping.setCell(cellAddress, vertex)
           } else {

@@ -101,7 +101,7 @@ describe('zip', () => {
   })
 
   it('is only as long as shorter list', () => {
-    const arr1 = [1,2,3,4]
+    const arr1 = [1, 2, 3, 4]
     const arr2 = [42]
 
     const result1 = zip(arr1[Symbol.iterator](), arr2[Symbol.iterator]())

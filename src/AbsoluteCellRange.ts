@@ -1,6 +1,6 @@
+import {AddressMapping} from './AddressMapping'
 import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {AddressMapping} from "./AddressMapping";
-import {Matrix} from "./Matrix";
+import {Matrix} from './Matrix'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
@@ -88,15 +88,15 @@ export class AbsoluteCellRange {
 
   public toMatrix(addressMapping: AddressMapping): Matrix {
     const values = new Array(this.height())
-    for (let i=0; i<this.height(); ++i) {
+    for (let i = 0; i < this.height(); ++i) {
       values[i] = new Array(this.width())
     }
-    for (let address of this.generateCellsFromRangeGenerator()) {
+    for (const address of this.generateCellsFromRangeGenerator()) {
       const value = addressMapping.getCellValue(address)
       if (typeof value === 'number') {
         values[address.row][address.col] = value
       } else {
-        throw new Error("Range contains not numeric values")
+        throw new Error('Range contains not numeric values')
       }
     }
 
