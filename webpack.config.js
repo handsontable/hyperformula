@@ -98,5 +98,5 @@ module.exports = [
   unoptimized_without_dependencies,
   optimized_full,
   optimized_without_dependencies,
-  circleBenchmark()
+  // circleBenchmark()
 ];
