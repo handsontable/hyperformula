@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {dateNumberToString} from '../../src/Date'
 import '../testConfig'
@@ -18,7 +18,7 @@ describe('Interpreter', () => {
   it('function DATE with less than 3 numerical arguments', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=DATE(1900, 1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function DATE with non numerical argument', async () => {
@@ -28,9 +28,9 @@ describe('Interpreter', () => {
       ['=DATE(1900, 1, "foo")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function MONTH with numerical arguments', async () => {
@@ -52,10 +52,10 @@ describe('Interpreter', () => {
   it('function MONTH with wrong arguments', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=MONTH("foo")', '=MONTH("30/12/2018")', '=MONTH(1, 2)', '=MONTH()']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function YEAR with numerical arguments', async () => {
@@ -77,9 +77,9 @@ describe('Interpreter', () => {
   it('function YEAR with wrong arguments', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=YEAR("foo")', '=YEAR("30/12/2018")', '=YEAR(1, 2)', '=YEAR()']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.NA))
   })
 })

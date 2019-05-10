@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {EmptyCellVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -32,10 +32,10 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length != 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     } else {
       const arg = this.evaluateAst(ast.args[0], formulaAddress)
-      return isCellError(arg)
+      return (arg instanceof CellError)
     }
   }
 
@@ -49,7 +49,7 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length != 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const arg = ast.args[0]
     if (arg.type === AstNodeType.CELL_REFERENCE) {
@@ -70,13 +70,13 @@ export class InformationPlugin extends FunctionPlugin {
    */
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.col - rangeAst.start.col + 1)
     } else {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
   }
 }

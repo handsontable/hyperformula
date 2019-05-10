@@ -1,4 +1,4 @@
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import {add, addStrict, max, min} from '../../src/interpreter/scalar'
 import '../testConfig'
 
@@ -8,11 +8,11 @@ describe('add', () => {
   })
 
   it('return error of right operand', () => {
-    expect(add(2, cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(add(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error of left operand if both present', () => {
-    expect(add(cellError(ErrorType.NA), cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.NA))
+    expect(add(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('ignores non-numerics', () => {
@@ -32,11 +32,11 @@ describe('max', () => {
   })
 
   it('return error of right operand', () => {
-    expect(max(2, cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(max(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error of left operand if both present', () => {
-    expect(max(cellError(ErrorType.NA), cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.NA))
+    expect(max(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('ignores non-numerics', () => {
@@ -55,11 +55,11 @@ describe('min', () => {
   })
 
   it('return error of right operand', () => {
-    expect(min(2, cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(min(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error of left operand if both present', () => {
-    expect(min(cellError(ErrorType.NA), cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.NA))
+    expect(min(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('ignores non-numerics', () => {
@@ -78,16 +78,16 @@ describe('addStrict', () => {
   })
 
   it('return error of right operand', () => {
-    expect(addStrict(2, cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(addStrict(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error of left operand if both present', () => {
-    expect(addStrict(cellError(ErrorType.NA), cellError(ErrorType.DIV_BY_ZERO))).toEqual(cellError(ErrorType.NA))
+    expect(addStrict(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('error when non-numerics', () => {
-    expect(addStrict('foo', 5)).toEqual(cellError(ErrorType.VALUE))
-    expect(addStrict(5, 'foo')).toEqual(cellError(ErrorType.VALUE))
-    expect(addStrict('bar', 'foo')).toEqual(cellError(ErrorType.VALUE))
+    expect(addStrict('foo', 5)).toEqual(new CellError(ErrorType.VALUE))
+    expect(addStrict(5, 'foo')).toEqual(new CellError(ErrorType.VALUE))
+    expect(addStrict('bar', 'foo')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

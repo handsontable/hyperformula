@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {AddressMapping} from '../src/AddressMapping'
-import {cellError, ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 
 describe('Integration', () => {
@@ -37,19 +37,19 @@ describe('Integration', () => {
   it('loadSheet with a loop', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=B1', '=C1', '=A1']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.CYCLE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside plus operator', async () => {
     const engine = await HandsOnEngine.buildFromArray([['5', '=A1+B1']])
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside minus operator', async () => {
     const engine = await HandsOnEngine.buildFromArray([['5', '=A1-B1']])
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.CYCLE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.CYCLE))
   })
 
   it('loadSheet with operator precedence', async () => {
@@ -102,7 +102,7 @@ describe('Integration', () => {
   it('#loadSheet - it should build graph without cycle but with formula with error', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('#loadSheet - changing value inside range', async () => {

@@ -1,5 +1,5 @@
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -45,7 +45,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max)
 
@@ -66,7 +66,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min)
 
@@ -129,7 +129,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
     } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       } else {
         throw err
       }

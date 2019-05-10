@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -20,12 +20,12 @@ export class ExpPlugin extends FunctionPlugin {
    */
   public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length != 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     } else {
       const arg = this.evaluateAst(ast.args[0], formulaAddress)
 
       if (typeof arg !== 'number') {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
 
       return Math.exp(arg)

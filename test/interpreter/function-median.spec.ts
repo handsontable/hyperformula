@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function MEDIAN', () => {
@@ -49,7 +49,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('propagates first error from range argument', async () => {
@@ -57,7 +57,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=FOO', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error when an argument is not a number', async () => {
@@ -65,7 +65,7 @@ describe('Function MEDIAN', () => {
       ['foo', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('return error when range argument contains not a number', async () => {
@@ -73,7 +73,7 @@ describe('Function MEDIAN', () => {
       ['5', 'foo', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('return error when no arguments', async () => {
@@ -81,6 +81,6 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 })

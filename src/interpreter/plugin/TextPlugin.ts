@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser/Ast'
 import {concatenate} from '../text'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -45,17 +45,17 @@ export class TextPlugin extends FunctionPlugin {
 
     const stringToSplit = this.evaluateAst(stringArg, formulaAddress)
     if (typeof stringToSplit !== 'string') {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
     const indexToUse = this.evaluateAst(indexArg, formulaAddress)
     if (typeof indexToUse !== 'number') {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const splittedString = stringToSplit.split(' ')
 
     if (indexToUse > splittedString.length || indexToUse < 0) {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     return splittedString[indexToUse]

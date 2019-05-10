@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function SUMPRODUCT', () => {
@@ -74,7 +74,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:B2,C1:D1)'],
     ])
 
-    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A4')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

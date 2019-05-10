@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('SUM', () => {
@@ -44,7 +44,7 @@ describe('SUM', () => {
       ['1', 'foo'],
       ['=A1+B1', '=SUM(A1:B1)'],
     ])
-    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('B2')).toEqual(1)
   })
 
@@ -62,7 +62,7 @@ describe('SUM', () => {
 describe('MAX', () => {
   it('MAX with empty args', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=MAX()']])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('MAX with args', async () => {
@@ -104,7 +104,7 @@ describe('MAX', () => {
 describe('MIN', () => {
   it('MIN with empty args', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=MIN()']])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('MIN with args', async () => {

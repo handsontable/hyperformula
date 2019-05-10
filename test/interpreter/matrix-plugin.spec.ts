@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
@@ -36,7 +36,7 @@ describe('Matrix plugin', () => {
       ['{=mmult(A1:B3,A4:C6)}'],
     ], config)
 
-    expect(engine.getCellValue('A7')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A7')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('B7')).toEqual(0)
   })
 

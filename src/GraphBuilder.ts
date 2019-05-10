@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
-import {cellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
@@ -146,7 +146,7 @@ export class GraphBuilder {
     const size = checkMatrixSize(ast, formulaAddress)
 
     if (!size) {
-      return new ValueCellVertex(cellError(ErrorType.VALUE))
+      return new ValueCellVertex(new CellError(ErrorType.VALUE))
     }
 
     return new MatrixVertex(formulaAddress, size.width, size.height, ast)

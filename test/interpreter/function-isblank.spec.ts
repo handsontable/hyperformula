@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter', () => {
@@ -26,7 +26,7 @@ describe('Interpreter', () => {
     const engine = await HandsOnEngine.buildFromArray([
       ['=ISBLANK(A3, A2)', '=ISBLANK()'],
     ])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
   })
 })

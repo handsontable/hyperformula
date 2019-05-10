@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function COUNTUNIQUE', () => {
@@ -8,7 +8,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('errors in arguments are propagated', async () => {
@@ -16,7 +16,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(5/0)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('single number', async () => {

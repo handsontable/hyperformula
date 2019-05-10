@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {AddressMapping} from '../AddressMapping'
-import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Graph} from '../Graph'
 import {Matrix} from '../Matrix'
@@ -63,10 +63,10 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (isCellError(leftResult)) {
+        if (leftResult instanceof CellError) {
           return leftResult
         }
-        if (isCellError(rightResult)) {
+        if (rightResult instanceof CellError) {
           return rightResult
         }
 
@@ -80,10 +80,10 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (isCellError(leftResult)) {
+        if (leftResult instanceof CellError) {
           return leftResult
         }
-        if (isCellError(rightResult)) {
+        if (rightResult instanceof CellError) {
           return rightResult
         }
 
@@ -100,7 +100,7 @@ export class Interpreter {
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult > rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.LESS_THAN_OP: {
@@ -110,7 +110,7 @@ export class Interpreter {
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult < rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
@@ -120,7 +120,7 @@ export class Interpreter {
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult >= rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
@@ -130,7 +130,7 @@ export class Interpreter {
         if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
           return leftResult <= rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.PLUS_OP: {
@@ -163,7 +163,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult - rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.TIMES_OP: {
@@ -172,7 +172,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult * rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.POWER_OP: {
@@ -181,7 +181,7 @@ export class Interpreter {
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return Math.pow(leftResult, rightResult)
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.DIV_OP: {
@@ -189,11 +189,11 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           if (rightResult == 0) {
-            return cellError(ErrorType.DIV_BY_ZERO)
+            return new CellError(ErrorType.DIV_BY_ZERO)
           }
           return leftResult / rightResult
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -201,7 +201,7 @@ export class Interpreter {
         if (typeof value === 'number') {
           return -value
         } else {
-          return cellError(ErrorType.VALUE)
+          return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.FUNCTION_CALL: {
@@ -210,17 +210,17 @@ export class Interpreter {
           const [pluginInstance, pluginFunction] = pluginEntry
           return pluginInstance[pluginFunction](ast, formulaAddress)
         } else {
-          return cellError(ErrorType.NAME)
+          return new CellError(ErrorType.NAME)
         }
       }
       case AstNodeType.CELL_RANGE: {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
       case AstNodeType.ERROR: {
         if (ast.args[0].type === 'StaticOffsetOutOfRangeError') {
-          return cellError(ErrorType.REF)
+          return new CellError(ErrorType.REF)
         }
-        return cellError(ErrorType.NAME)
+        return new CellError(ErrorType.NAME)
       }
       default: {
         throw Error('Not supported Ast node type')

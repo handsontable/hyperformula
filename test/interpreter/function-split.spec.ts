@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter', () => {
@@ -25,19 +25,19 @@ describe('Interpreter', () => {
   it('function SPLIT when 1st arg not a string', async () => {
     const engine = await HandsOnEngine.buildFromArray([['42', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function SPLIT when 2nd arg not a number', async () => {
     const engine = await HandsOnEngine.buildFromArray([['some words', '=SPLIT(A1, "foo")']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function SPLIT when index arg is not value within bounds', async () => {
     const engine = await HandsOnEngine.buildFromArray([['some words', '=SPLIT(A1, 17)', '=SPLIT(A1, -1)']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

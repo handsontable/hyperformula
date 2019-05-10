@@ -1,5 +1,5 @@
 import {
-  cellError,
+  CellError,
   ErrorType,
 } from '../../src/Cell'
 import {CellAddress} from '../../src/CellAddress'

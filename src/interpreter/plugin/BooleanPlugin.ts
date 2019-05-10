@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser/Ast'
 import {booleanRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -40,7 +40,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length > 0) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     } else {
       return true
     }
@@ -56,7 +56,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length > 0) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     } else {
       return false
     }
@@ -81,7 +81,7 @@ export class BooleanPlugin extends FunctionPlugin {
         return false
       }
     } else {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
   }
 
@@ -95,7 +95,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
 
     let result: CellValue = true
@@ -118,7 +118,7 @@ export class BooleanPlugin extends FunctionPlugin {
    */
   public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
 
     let result: CellValue = false

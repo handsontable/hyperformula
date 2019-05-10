@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {AddressMapping} from '../../AddressMapping'
 import {
-  cellError,
+  CellError,
   CellValue,
   ErrorType,
   simpleCellAddress,
@@ -76,12 +76,12 @@ export class SumifPlugin extends FunctionPlugin {
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
     if (typeof criterionString !== 'string') {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const criterion = parseCriterion(criterionString)
     if (criterion === null) {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const conditionRangeArg = ast.args[0]
@@ -92,14 +92,14 @@ export class SumifPlugin extends FunctionPlugin {
       const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
 
       if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
 
       return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
   }
 
@@ -119,12 +119,12 @@ export class SumifPlugin extends FunctionPlugin {
 
     const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
     if (typeof criterionString !== 'string') {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const criterion = parseCriterion(criterionString)
     if (criterion === null) {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const criterionLambda = buildCriterionLambda(criterion)
@@ -141,7 +141,7 @@ export class SumifPlugin extends FunctionPlugin {
         return 0
       }
     } else {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
   }
 

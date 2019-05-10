@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {cellError, ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import './testConfig'
 
 describe('Interpreter', () => {
@@ -24,7 +24,7 @@ describe('Interpreter', () => {
   it('negative number literal - non numeric value', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=-"foo"']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('string literals', async () => {
@@ -68,13 +68,13 @@ describe('Interpreter', () => {
   it('plus operator - VALUE error on 1st operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=A1+42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('plus operator - VALUE error on 2nd operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=42+A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('minus operator', async () => {
@@ -86,13 +86,13 @@ describe('Interpreter', () => {
   it('minus operator - VALUE error on 1st operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=A1-42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('minus operator - VALUE error on 2nd operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=42-A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('times operator', async () => {
@@ -104,13 +104,13 @@ describe('Interpreter', () => {
   it('times operator - VALUE error on 1st operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=A1*42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('times operator - VALUE error on 2nd operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=42*A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('div operator - int result', async () => {
@@ -134,19 +134,19 @@ describe('Interpreter', () => {
   it('div operator - DIV_ZERO error', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=42 / 0']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('div operator - VALUE error on 1st operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=A1 / 42']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('div operator - VALUE error on 2nd operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=42 / A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('power operator', async () => {
@@ -158,18 +158,18 @@ describe('Interpreter', () => {
   it('power operator - VALUE error on 1st operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=A1^3']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('power operator - VALUE error on 2nd operand', async () => {
     const engine = await HandsOnEngine.buildFromArray([['www', '=2^A1']])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('ranges - VALUE error when evaluating without context', async () => {
     const engine = await HandsOnEngine.buildFromArray([['1'], ['2'], ['=A1:A2']])
-    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('procedures - SUM with bad args', async () => {
@@ -181,17 +181,17 @@ describe('Interpreter', () => {
   it('procedures - not known procedure', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=FOO()']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('errors - parsing errors', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo', '=)(asdf']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NAME))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.NAME))
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.NAME))
-    expect(engine.getCellValue('E1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue('E1')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('function TRUE', async () => {
@@ -203,7 +203,7 @@ describe('Interpreter', () => {
   it('function TRUE is 0-arity', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=TRUE(1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function FALSE', async () => {
@@ -215,7 +215,7 @@ describe('Interpreter', () => {
   it('function FALSE is 0-arity', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=FALSE(1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function ACOS happy path', async () => {
@@ -227,7 +227,7 @@ describe('Interpreter', () => {
   it('function ACOS when value not numeric', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=ACOS("foo")']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function ACOS for 1 (edge)', async () => {
@@ -245,13 +245,13 @@ describe('Interpreter', () => {
   it('function ACOS when value too large', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=ACOS(1.1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NUM))
   })
 
   it('function ACOS when value too small', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=ACOS(-1.1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NUM))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NUM))
   })
 
   it('function ACOS happy path', async () => {
@@ -263,8 +263,8 @@ describe('Interpreter', () => {
   it('function ACOS wrong number of arguments', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=ACOS()', '=ACOS(1,-1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function IF when value is true', async () => {
@@ -282,7 +282,7 @@ describe('Interpreter', () => {
   it('function IF when condition is weird type', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=IF("foo", "yes", "no")']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function IF when condition is number', async () => {
@@ -324,7 +324,7 @@ describe('Interpreter', () => {
   it('function CONCATENATE returns error if one of the arguments is error', async () => {
     const engine = await HandsOnEngine.buildFromArray([['John', '=1/0', '=CONCATENATE(A1, B1)']])
 
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('function ISERROR should return true for common errors', async () => {
@@ -352,8 +352,8 @@ describe('Interpreter', () => {
     const engine = await HandsOnEngine.buildFromArray([
         ['=ISERROR(1, 2)', '=ISERROR()'],
     ])
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function AND usage', async () => {
@@ -363,7 +363,7 @@ describe('Interpreter', () => {
 
     expect(engine.getCellValue('A1')).toBe(true)
     expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function AND with numerical arguments', async () => {
@@ -381,7 +381,7 @@ describe('Interpreter', () => {
       ['=AND()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function OR usage', async () => {
@@ -392,7 +392,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toBe(true)
     expect(engine.getCellValue('B1')).toBe(false)
     expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function OR with numerical arguments', async () => {
@@ -410,7 +410,7 @@ describe('Interpreter', () => {
       ['=OR()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function COLUMNS works', async () => {
@@ -422,14 +422,14 @@ describe('Interpreter', () => {
   it('function COLUMNS returns error when argument of invalid type', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=COLUMNS(A1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function COLUMNS accepts exactly one argument', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=COLUMNS()', '=COLUMNS(A1:B1, A2:B2)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function OFFSET basic use', async () => {
@@ -442,8 +442,8 @@ describe('Interpreter', () => {
   it('function OFFSET out of range', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=OFFSET(A1, -1, 0)', '=OFFSET(A1, 0, -1)']])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.REF))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.REF))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.REF))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.REF))
   })
 
   it('function OFFSET returns bigger range', async () => {
@@ -460,7 +460,7 @@ describe('Interpreter', () => {
         ['=OFFSET(A1, 0, 1,2,1))'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NAME))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('function OFFSET used twice in a range', async () => {
@@ -505,6 +505,6 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue('$Sheet2.A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('$Sheet2.A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

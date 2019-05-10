@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter - concatenate operator', () => {
@@ -40,6 +40,6 @@ describe('Interpreter - concatenate operator', () => {
       ['=1/0', '=A1&TRUE()'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })

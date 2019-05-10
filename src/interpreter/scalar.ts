@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, isCellError} from '../Cell'
+import {CellError, CellValue, ErrorType} from '../Cell'
 
 /**
  * Adds two numbers
@@ -11,10 +11,10 @@ import {cellError, CellValue, ErrorType, isCellError} from '../Cell'
  * @param right - right operand of addition
  */
 export function add(left: CellValue, right: CellValue): CellValue {
-  if (isCellError(left)) {
+  if (left instanceof CellError) {
     return left
   }
-  if (isCellError(right)) {
+  if (right instanceof CellError) {
     return right
   }
   if (typeof left === 'number') {
@@ -41,10 +41,10 @@ export function add(left: CellValue, right: CellValue): CellValue {
  * @param right - right operand of addition
  */
 export function max(left: CellValue, right: CellValue): CellValue {
-  if (isCellError(left)) {
+  if (left instanceof CellError) {
     return left
   }
-  if (isCellError(right)) {
+  if (right instanceof CellError) {
     return right
   }
   if (typeof left === 'number') {
@@ -71,10 +71,10 @@ export function max(left: CellValue, right: CellValue): CellValue {
  * @param right - right operand of addition
  */
 export function min(left: CellValue, right: CellValue): CellValue {
-  if (isCellError(left)) {
+  if (left instanceof CellError) {
     return left
   }
-  if (isCellError(right)) {
+  if (right instanceof CellError) {
     return right
   }
   if (typeof left === 'number') {
@@ -101,16 +101,16 @@ export function min(left: CellValue, right: CellValue): CellValue {
  * @param right - right operand of addition
  */
 export function addStrict(left: CellValue, right: CellValue): CellValue {
-  if (isCellError(left)) {
+  if (left instanceof CellError) {
     return left
   }
-  if (isCellError(right)) {
+  if (right instanceof CellError) {
     return right
   }
 
   if (typeof left === 'number' && typeof right === 'number') {
     return left + right
   } else {
-    return cellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE)
   }
 }

@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType} from '../Cell'
+import {CellError, CellValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
 
 /**
@@ -35,6 +35,6 @@ export function booleanRepresentation(arg: CellValue): CellValue {
   } else if (typeof arg === 'boolean') {
     return arg
   } else {
-    return cellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE)
   }
 }

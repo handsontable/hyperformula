@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter - Boolean operators', () => {
@@ -51,8 +51,8 @@ describe('Interpreter - Boolean operators', () => {
         ['=1/0', '=A1=2', '=2=A1'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('Not equals operator - numbers', async () => {
@@ -90,8 +90,8 @@ describe('Interpreter - Boolean operators', () => {
       ['=1/0', '=A1<>2', '=2<>A1'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('Not Equal operator with different types', async () => {
@@ -121,9 +121,9 @@ describe('Interpreter - Boolean operators', () => {
         ['=1<"foo"', '="foo"<"bar"', '=TRUE()<FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Greater than operator with number arguments', async () => {
@@ -142,9 +142,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=1>"foo"', '="foo">"bar"', '=TRUE()>FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Less than or equal operator with number arguments', async () => {
@@ -164,9 +164,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=1<="foo"', '="foo"<="bar"', '=TRUE()<=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Greater than or equal operator with number arguments', async () => {
@@ -186,8 +186,8 @@ describe('Interpreter - Boolean operators', () => {
       ['=1>="foo"', '="foo">="bar"', '=TRUE()>=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

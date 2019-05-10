@@ -1,4 +1,4 @@
-import {cellError, ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src/Cell'
 import {buildCriterion, CriterionType, parseCriterion} from '../src/interpreter/Criterion'
 
 describe('Criterion', () => {
@@ -55,7 +55,7 @@ describe('Criterion', () => {
   })
 
   it('null when criterion being error', () => {
-    expect(parseCriterion(cellError(ErrorType.VALUE))).toEqual(null)
+    expect(parseCriterion(new CellError(ErrorType.VALUE))).toEqual(null)
   })
 
   it('works with criterion being just value', () => {

@@ -1,6 +1,6 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
@@ -32,21 +32,21 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length !== 2) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const left = ast.args[0]
     const right = ast.args[1]
 
     if (left.type !== AstNodeType.CELL_RANGE || right.type !== AstNodeType.CELL_RANGE) {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
     const leftMatrix = this.evaluateAst(left, formulaAddress)
     const rightMatrix = this.evaluateAst(right, formulaAddress)
 
-    if (isCellError(leftMatrix)) {
+    if (leftMatrix instanceof CellError) {
       return leftMatrix
     }
-    if (isCellError(rightMatrix)) {
+    if (rightMatrix instanceof CellError) {
       return rightMatrix
     }
 
@@ -65,12 +65,12 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.args.length < 2) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
     const [rangeArg, sizeArg] = ast.args
 
     if (sizeArg.type !== AstNodeType.NUMBER) {
-      return cellError(ErrorType.VALUE)
+      return new CellError(ErrorType.VALUE)
     }
 
     const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
@@ -82,11 +82,11 @@ export class MatrixPlugin extends FunctionPlugin {
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
     }
 
-    if (isCellError(rangeMatrix)) {
+    if (rangeMatrix instanceof CellError) {
       return rangeMatrix
     }
 
@@ -110,13 +110,13 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.args.length !== 1) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
 
     const value = this.evaluateAst(ast.args[0], formulaAddress)
     const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
-    if (isCellError(value)) {
+    if (value instanceof CellError) {
       return value
     }
 
@@ -139,7 +139,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return value
     }
 
-    return cellError(ErrorType.VALUE)
+    return new CellError(ErrorType.VALUE)
   }
 
   private matrixFromRange(range: AbsoluteCellRange): Matrix | CellError {
@@ -153,7 +153,7 @@ export class MatrixPlugin extends FunctionPlugin {
         row.push(value)
         ++i
       } else {
-        return cellError(ErrorType.VALUE)
+        return new CellError(ErrorType.VALUE)
       }
 
       if (i % range.width() === 0) {

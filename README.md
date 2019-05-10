@@ -254,7 +254,7 @@ class SquarePlugin extends FunctionPlugin {
     // Compute value of argument
     const argValue = this.evaluateAst(arg, formulaAddress)
 
-    if (isCellError(argValue)) {
+    if (argValue instanceof CellError) {
       // If the value is some error, return that error
       return argValue
     } else if (typeof argValue === 'number') {

@@ -1,4 +1,4 @@
-import {cellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -24,7 +24,7 @@ export class MedianPlugin extends FunctionPlugin {
    */
   public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length === 0) {
-      return cellError(ErrorType.NA)
+      return new CellError(ErrorType.NA)
     }
 
     const values = this.computeNumericListOfValues(ast.args, formulaAddress)

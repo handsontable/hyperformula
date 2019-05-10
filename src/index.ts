@@ -3,10 +3,8 @@ import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {
   CellError,
-  cellError,
   CellValue,
   ErrorType,
-  isCellError,
   simpleCellAddress,
 } from './Cell'
 import {CellAddress} from './CellAddress'
@@ -60,7 +58,7 @@ class SingleThreadEvaluator implements Evaluator {
    */
   private recomputeFormulas() {
     this.verticesOnCycle.forEach((vertex: Vertex) => {
-      (vertex as FormulaCellVertex).setCellValue(cellError(ErrorType.CYCLE))
+      (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
     this.sortedVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
@@ -197,8 +195,8 @@ export class HandsOnEngine {
 
         const cellValue = this.addressMapping!.getCellValue(address)
 
-        if (isCellError(cellValue)) {
-          arr[i][j] = `#${(cellValue as CellError).type}!`
+        if (cellValue instanceof CellError) {
+          arr[i][j] = `#${cellValue.type}!`
         } else {
           arr[i][j] = cellValue.toString()
         }

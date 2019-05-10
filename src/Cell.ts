@@ -21,20 +21,9 @@ export enum ErrorType {
   REF = 'REF',
 }
 
-export interface CellError {
-  type: ErrorType
-}
-
-/**
- * Builds cell error of given type.
- *
- * @param error - type of error
- */
-export const cellError = (error: ErrorType): CellError => ({type: error})
-
-/** Returns true if value is a cell error. */
-export const isCellError = (value: any): value is CellError => {
-  return value.type !== undefined && value.type in ErrorType
+export class CellError {
+  constructor(public readonly type: ErrorType) {
+  }
 }
 
 export type CellValue = boolean | string | number | Matrix | CellError

@@ -1,4 +1,4 @@
-import {CellValue, isCellError} from '../Cell'
+import {CellValue, CellError} from '../Cell'
 
 /**
  * Concatenates two strings
@@ -11,9 +11,9 @@ import {CellValue, isCellError} from '../Cell'
  */
 export function concatenate(args: CellValue[]): CellValue {
   return args.reduce((acc: CellValue, arg: CellValue) => {
-    if (isCellError(acc)) {
+    if (acc instanceof CellError) {
       return acc
-    } else if (isCellError(arg)) {
+    } else if (arg instanceof CellError) {
       return arg
     } else {
       return (acc as string).concat(arg.toString())

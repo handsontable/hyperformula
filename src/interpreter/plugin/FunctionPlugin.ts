@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {AddressMapping} from '../../AddressMapping'
-import {cellError, CellError, CellValue, ErrorType, isCellError, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
@@ -52,20 +52,20 @@ export abstract class FunctionPlugin {
           const value = this.addressMapping.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
-          } else if (isCellError(value)) {
+          } else if (value instanceof CellError) {
             return value
           } else {
-            return cellError(ErrorType.NA)
+            return new CellError(ErrorType.NA)
           }
         }
       } else {
         const value = this.evaluateAst(ast, formulaAddress)
         if (typeof value === 'number') {
           values.push(value)
-        } else if (isCellError(value)) {
+        } else if (value instanceof CellError) {
           return value
         } else {
-          return cellError(ErrorType.NA)
+          return new CellError(ErrorType.NA)
         }
       }
     }

@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function COUNTIF', () => {
@@ -52,7 +52,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(42, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 2nd arg is not a string', async () => {
@@ -60,7 +60,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(C1:C2, 78)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable', async () => {
@@ -68,6 +68,6 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(B1:B2, "%")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

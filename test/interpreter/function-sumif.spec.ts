@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function SUMIF', () => {
@@ -8,7 +8,7 @@ describe('Function SUMIF', () => {
       ['=SUMIF(42, ">0", B1:B2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 2nd arg is not a string', async () => {
@@ -16,7 +16,7 @@ describe('Function SUMIF', () => {
       ['=SUMIF(C1:C2, 78, B1:B2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 3rd arg is not a range or reference', async () => {
@@ -24,7 +24,7 @@ describe('Function SUMIF', () => {
       ['=SUMIF(C1:C2, ">0", 42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable', async () => {
@@ -32,7 +32,7 @@ describe('Function SUMIF', () => {
       ['=SUMIF(B1:B2, "%", C1:C2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments', async () => {
@@ -42,9 +42,9 @@ describe('Function SUMIF', () => {
       ['=SUMIF(B1:D1, ">0", B2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments', async () => {
@@ -54,9 +54,9 @@ describe('Function SUMIF', () => {
       ['=SUMIF(B1:B2, ">0", C1)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(cellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('usage of greater than operator', async () => {

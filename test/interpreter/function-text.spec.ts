@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {cellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Text', () => {
@@ -17,7 +17,7 @@ describe('Text', () => {
       ['=TEXT(42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.NA))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('wrong format argument', async () => {
@@ -25,7 +25,7 @@ describe('Text', () => {
       ['=TEXT(2, 42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('wrong date argument', async () => {
@@ -33,7 +33,7 @@ describe('Text', () => {
       ['=TEXT(TRUE(), "mm/dd/yyyy")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(cellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('day formats', async () => {
