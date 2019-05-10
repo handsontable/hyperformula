@@ -1,4 +1,4 @@
-var HandsOnEngine = require("../lib/optimized-full.bundle.js")
+var HandsOnEngine = require("../dist/optimized-full/bundle.js")
 var Engine = HandsOnEngine.HandsOnEngine
 var Config = HandsOnEngine.Config
 var assert = require('assert')

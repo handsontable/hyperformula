@@ -46,7 +46,6 @@ bundle: compile
 
 check-bundle:
 	@node script/check-minified.js
-	@ls -sS1h lib/ | grep bundle.js
 
 browser: compile
 	@cp benchmark/browser/index.html lib/benchmark/browser/
