@@ -13,13 +13,15 @@ import './testConfig.ts'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
+    const sheet = [['42']]
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [['42']]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
@@ -27,13 +29,15 @@ describe('GraphBuilder', () => {
   })
 
   it('build sheet with simple string cell', () => {
+    const sheet = [['foo']]
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [['foo']]})
+    graphBuilder.buildGraph({ Sheet1: sheet})
 
     const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
@@ -41,30 +45,35 @@ describe('GraphBuilder', () => {
   })
 
   it('building for cell with empty string should give empty vertex', () => {
+    const sheet = [['']]
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [['']]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('#buildGraph', () => {
+    const sheet = [
+      ['1', 'A5', '2'],
+      ['foo', 'bar', 'A2'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-      ['1', 'A5', '2'],
-      ['foo', 'bar', 'A2'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
       6 + // for the cells above
@@ -73,17 +82,20 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph works with ranges', () => {
+    const sheet = [
+      ['1', '2', '0'],
+      ['3', '4', '=A1:B2'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-      ['1', '2', '0'],
-      ['3', '4', '=A1:B2'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
       6 + // for cells above
@@ -103,18 +115,21 @@ describe('GraphBuilder', () => {
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
+    const sheet = [
+      ['1', '2', '0'],
+      ['3', '4', '=A1:B2'],
+      ['5', '6', '=A1:B2'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-        ['1', '2', '0'],
-        ['3', '4', '=A1:B2'],
-        ['5', '6', '=A1:B2'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
       9 + // for cells above
@@ -124,17 +139,20 @@ describe('GraphBuilder', () => {
   })
 
   it('build with range one row smaller', () => {
+    const sheet = [
+      ['1', '0'],
+      ['3', '=A1:A2'],
+      ['5', '=A1:A3'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-      ['1', '0'],
-      ['3', '=A1:A2'],
-      ['5', '=A1:A3'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.edgesCount()).toBe(
       2 + // from cells to range(A1:A2)
@@ -144,13 +162,15 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph should work even if range dependencies are empty', () => {
+    const sheet = [['1', '2', '=SUM(A1:B2)']]
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
 
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
-    graphBuilder.buildGraph({ Sheet1: [['1', '2', '=SUM(A1:B2)']]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
       3 + // for cells above
@@ -165,17 +185,20 @@ describe('GraphBuilder', () => {
   })
 
   it("optimization doesn't work if smaller range is after bigger", () => {
+    const sheet = [
+      ['1', '0'],
+      ['3', '=A1:A3'],
+      ['5', '=A1:A2'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-      ['1', '0'],
-      ['3', '=A1:A3'],
-      ['5', '=A1:A2'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.edgesCount()).toBe(
       3 + // from 3 cells to range(A1:A2)
@@ -185,31 +208,28 @@ describe('GraphBuilder', () => {
   })
 
   it('matrix cause next cells to be ignored', () => {
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
-
-    graphBuilder.buildGraph({ Sheet1: [
+    const sheet = [
       ['1', '2', '8'],
       ['3', '4', '9'],
       ['{=mmult(A1:B2,C1:C2)}'],
       ['{=mmult(A1:B2,C1:C2)}'],
-    ]})
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
   })
 
   it('matrix no overlap', () => {
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
-
-    graphBuilder.buildGraph({ Sheet1: [
+    const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -218,7 +238,16 @@ describe('GraphBuilder', () => {
       ['=sumprod($A1:$B1,transpose(A$4:A$5))', '=sumprod($A1:$B1,transpose(B$4:B$5))'],
       ['=sumprod($A2:$B2,transpose(A$4:A$5))', '=sumprod($A2:$B2,transpose(B$4:B$5))'],
       ['=sumprod($A3:$B3,transpose(A$4:A$5))', '=sumprod($A3:$B3,transpose(B$4:B$5))'],
-    ]})
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
     expect(vertex).toBeInstanceOf(MatrixVertex)
@@ -229,13 +258,7 @@ describe('GraphBuilder', () => {
   })
 
   it('overlap', () => {
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
-
-    graphBuilder.buildGraph({ Sheet1: [
+    const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -244,19 +267,22 @@ describe('GraphBuilder', () => {
       ['=sumprod($A4:$B4,transpose(A$4:A$5))', '=sumprod($A4:$B4,transpose(B$4:B$5))'],
       ['=sumprod($A5:$B5,transpose(A$4:A$5))', '=sumprod($A5:$B5,transpose(B$4:B$5))'],
       ['=sumprod($A6:$B6,transpose(A$4:A$5))', '=sumprod($A6:$B6,transpose(B$4:B$5))'],
-    ]})
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(MatrixVertex)
   })
 
   it('matrix no overlap 2', () => {
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
-
-    graphBuilder.buildGraph({ Sheet1: [
+    const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -265,22 +291,34 @@ describe('GraphBuilder', () => {
       ['=sumprod(transpose($A1:$B1),A$4:A$5)', '=sumprod(transpose($A1:$B1),B$4:B$5)'],
       ['=sumprod(transpose($A2:$B2),A$4:A$5)', '=sumprod(transpose($A2:$B2),B$4:B$5)'],
       ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)'],
-    ]})
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
   })
 
   it('matrix with plain numbers', () => {
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+    ]
+
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
 
-    graphBuilder.buildGraph({ Sheet1: [
-          ['1', '2'],
-          ['3', '4'],
-    ]})
+    graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 0))).toEqual(1)
