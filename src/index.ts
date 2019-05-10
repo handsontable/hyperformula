@@ -76,6 +76,15 @@ class SingleThreadEvaluator implements Evaluator {
 class ParallelEvaluator extends SingleThreadEvaluator {
 }
 
+class EvaluatorPolicy {
+  constructor(private readonly graph: Graph<Vertex>) {
+  }
+
+  public shouldBeParallel(): boolean {
+    return false
+  }
+}
+
 /**
  * Engine for one sheet
  */
@@ -157,7 +166,13 @@ export class HandsOnEngine {
       graphBuilder.buildGraph(sheets)
     })
 
-    this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
+    const evaluatorPolicy = new EvaluatorPolicy(this.graph)
+    if (evaluatorPolicy.shouldBeParallel()) {
+      this.evaluator = new ParallelEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
+    } else {
+      this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
+    }
+
     this.stats.measure(StatType.EVALUATION, () => {
       this.evaluator!.run()
     })
