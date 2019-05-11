@@ -19,6 +19,7 @@ class Main {
     const graph = new Graph<Vertex>()
     const rangeMapping = new RangeMapping()
     const serializedNodes = data.vertices
+    const serializedEdges = data.edges
     const nodes: Vertex[] = []
 
     nodes.push(EmptyCellVertex.getSingletonInstance())
@@ -72,6 +73,11 @@ class Main {
       }
       graph.addNode(vertex)
       nodes.push(vertex)
+    }
+
+    const numberOfEdges = serializedEdges.length / 2
+    for (let i = 0; i < numberOfEdges; i++) {
+      graph.addEdgeByIds(serializedEdges[i * 2], serializedEdges[i * 2 + 1])
     }
     this.onmessage(42)
   }
