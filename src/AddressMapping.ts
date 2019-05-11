@@ -1,6 +1,8 @@
 import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
+import {AbsoluteCellRange} from "./AbsoluteCellRange";	
+import {Matrix} from "./Matrix";
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -217,6 +219,8 @@ export class AddressMapping {
 
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
+  private matrixMapping: Map<string, MatrixVertex> = new Map()
+
   constructor(
     private readonly threshold: number,
   ) { }
@@ -298,6 +302,14 @@ export class AddressMapping {
 
   public isEmpty(address: SimpleCellAddress): boolean {
     return (this.getCell(address) instanceof EmptyCellVertex)
+  }
+
+  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
+    return this.matrixMapping.get(range.toString())
+  }
+
+  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
+    this.matrixMapping.set(range.toString(), vertex)
   }
 
   public getAllVerticesFromSheet(sheetId: number): Array<Vertex> {
