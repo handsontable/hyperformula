@@ -117,12 +117,6 @@ class ParallelEvaluator implements Evaluator {
     }))
 
     await Promise.all(chunksPromises)
-
-    this.stats.measure(StatType.TOP_SORT, () => {
-      ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
-    })
-
-    this.recomputeFormulas()
   }
 
   private handleWorkerMessage(messageData: { address: SimpleCellAddress, result:CellValue }[]) {
@@ -132,25 +126,6 @@ class ParallelEvaluator implements Evaluator {
         vertex.setCellValue(result.result)
       }
     }
-  }
-
-  /**
-   * Recalculates formulas in the topological sort order
-   */
-  private recomputeFormulas() {
-    this.verticesOnCycle.forEach((vertex: Vertex) => {
-      (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
-    })
-    this.sortedVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
-        const cellValue = this.interpreter.evaluateAst(formula, address)
-        vertex.setCellValue(cellValue)
-      } else if (vertex instanceof RangeVertex) {
-        vertex.clear()
-      }
-    })
   }
 
   private prepareChunks() {
