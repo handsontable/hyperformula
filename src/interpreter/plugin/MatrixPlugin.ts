@@ -129,7 +129,12 @@ export class MatrixPlugin extends FunctionPlugin {
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.type === AstNodeType.CELL_RANGE) {
-      return this.matrixFromRange(AbsoluteCellRange.fromCellRange(ast, formulaAddress))
+      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+      const matrixVertex = this.addressMapping.getMatrix(range)
+      if (matrixVertex !== undefined) {
+        return matrixVertex.getCellValue()
+      }
+      return this.matrixFromRange(range)
     }
     const value = super.evaluateAst(ast, formulaAddress)
 

@@ -94,6 +94,7 @@ export class GraphBuilderMatrixHeuristic {
         for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
           const vertex = this.addressMapping.getCell(address)
           this.addressMapping.setCell(address, matrixVertex)
+          this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
           this.graph.removeNode(vertex)
         }
         this.graph.addNode(matrixVertex)
@@ -110,6 +111,7 @@ export class GraphBuilderMatrixHeuristic {
             const deps = this.dependencies.get(vertex)!
             matrixDependencies.push(...deps)
             this.addressMapping.setCell(address, matrixVertex)
+            this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
             this.dependencies.delete(vertex)
             this.graph.removeNode(vertex)
           }

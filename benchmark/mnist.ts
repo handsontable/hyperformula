@@ -20,6 +20,18 @@ async function start() {
     csvDelimiter: ',',
     functionArgSeparator: ',',
     gpuMode: 'gpu',
+    matrixDetection: false
+  }))
+
+  console.info('=== MNIST - GPU matrix detection ===')
+  await benchmarkMultiSheets('../HandsOnEnginePrivate/mnist/sheets', [
+    {address: '$Control2.B5', value: 4},
+    {address: '$Control2.B6', value: 4},
+  ], new Config({
+    csvDelimiter: ',',
+    functionArgSeparator: ',',
+    gpuMode: 'gpu',
+    matrixDetection: true
   }))
 }
 

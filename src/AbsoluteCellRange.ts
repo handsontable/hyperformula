@@ -6,6 +6,10 @@ export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in d
 
 export class AbsoluteCellRange {
 
+  public toString() {
+    return `${this.start.sheet},${this.start.col},${this.start.row},${this.end.col},${this.end.row}`
+  }
+
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(x.start.toSimpleCellAddress(baseAddress), x.end.toSimpleCellAddress(baseAddress))
   }

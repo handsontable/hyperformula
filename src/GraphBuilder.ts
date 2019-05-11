@@ -160,6 +160,9 @@ export class GraphBuilder {
       return
     }
 
+    const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
+    this.addressMapping.setMatrix(range, vertex)
+
     for (let i = 0; i < vertex.width; ++i) {
       for (let j = 0; j < vertex.height; ++j) {
         const address = simpleCellAddress(formulaAddress.sheet, formulaAddress.col + i, formulaAddress.row + j)
