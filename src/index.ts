@@ -18,6 +18,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import {Pool} from './worker/Pool'
 
 export {
   Config,
@@ -95,6 +96,28 @@ class ParallelEvaluator implements Evaluator {
   }
 
   public async run() {
+    const chunks = this.prepareChunks()
+    const chunksPromises: Promise<any>[] = []
+    const chunksPromisesResolvers: (() => void)[] = []
+    for (const chunk of chunks) {
+      const promise = new Promise((resolve) => {
+        chunksPromisesResolvers.push(resolve)
+      })
+      chunksPromises.push(promise)
+    }
+
+    const pool = new Pool(chunks.length)
+    pool.init()
+    pool.addWorkerTaskForAllWorkers((workerId: number) => ({
+      data: { kind: "INIT", ...chunks[workerId] },
+      callback: (message: any) => {
+        this.handleWorkerMessage(message)
+        chunksPromisesResolvers[workerId]()
+      }
+    }))
+
+    await Promise.all(chunksPromises)
+
     this.stats.measure(StatType.TOP_SORT, () => {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
     })
@@ -102,12 +125,14 @@ class ParallelEvaluator implements Evaluator {
     this.recomputeFormulas()
   }
 
+  private handleWorkerMessage(message: any) {
+    // console.log("Received msg in main thread, ", message)
+  }
+
   /**
    * Recalculates formulas in the topological sort order
    */
   private recomputeFormulas() {
-    const chunks = this.prepareChunks()
-
     this.verticesOnCycle.forEach((vertex: Vertex) => {
       (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
@@ -151,7 +176,7 @@ class ParallelEvaluator implements Evaluator {
         dependentVertices.edges.concat(edges)
       }
     }
-    chunks.push(dependentVertices)
+    chunks.unshift(dependentVertices)
     return chunks
   }
 }
