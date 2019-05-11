@@ -25,6 +25,7 @@ export class MatrixVertex {
   }
   public readonly width: number
   public readonly height: number
+  public readonly kind = "matrix"
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
   private matrix: Matrix
@@ -71,6 +72,7 @@ export class MatrixVertex {
  * Represents vertex which keeps formula
  */
 export class FormulaCellVertex {
+  public readonly kind = "formula"
   /** Most recently computed value of this formula. */
   private cachedCellValue?: CellValue
 
@@ -125,6 +127,7 @@ export class FormulaCellVertex {
  * Represents vertex which keeps static cell value
  */
 export class ValueCellVertex {
+  public readonly kind = "value"
   /** Static cell value. */
   private cellValue: CellValue
 
@@ -155,6 +158,7 @@ export class ValueCellVertex {
  */
 export class EmptyCellVertex {
   public readonly id: number = 0
+  public readonly kind = "empty"
 
   /**
    * Retrieves singleton
@@ -186,6 +190,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
  * Represents vertex bound to range
  */
 export class RangeVertex {
+  public readonly kind = "range"
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
 
