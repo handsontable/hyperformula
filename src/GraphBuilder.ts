@@ -100,7 +100,6 @@ export class GraphBuilder {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
-            matrixHeuristic.add(parseResult.hash, cellAddress)
             vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
             this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
