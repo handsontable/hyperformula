@@ -16,8 +16,6 @@ class Main {
   public onmessage: (message: any) => any = () => {}
 
   public postMessage(data: any): void {
-    // console.log("Got message!")
-    // console.log(data)
     const graph = new Graph<Vertex>()
     const rangeMapping = new RangeMapping()
     const serializedNodes = data.vertices
@@ -75,7 +73,6 @@ class Main {
       graph.addNode(vertex)
       nodes.push(vertex)
     }
-    // console.log(this.onmessage)
     this.onmessage(42)
   }
 }

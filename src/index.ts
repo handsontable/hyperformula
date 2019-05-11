@@ -126,7 +126,6 @@ class ParallelEvaluator implements Evaluator {
   }
 
   private handleWorkerMessage(message: any) {
-    // console.log("Received msg in main thread, ", message)
   }
 
   /**
