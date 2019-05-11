@@ -89,6 +89,7 @@ class ParallelEvaluator implements Evaluator {
     private readonly graph: Graph<Vertex>,
     private readonly config: Config,
     private readonly stats: Statistics,
+    private readonly independentSheets: boolean[],
   ) {
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
   }
@@ -105,6 +106,8 @@ class ParallelEvaluator implements Evaluator {
    * Recalculates formulas in the topological sort order
    */
   private recomputeFormulas() {
+    const chunks = this.prepareChunks()
+
     this.verticesOnCycle.forEach((vertex: Vertex) => {
       (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
@@ -120,13 +123,13 @@ class ParallelEvaluator implements Evaluator {
     })
   }
 
-  private prepareChunks(independentSheets: boolean[]) {
+  private prepareChunks() {
     const chunks = []
     const dependentVertices: { vertices: Vertex[], edges: number[] } = {
       vertices: [],
       edges: [],
     }
-    for (let sheetId = 0; sheetId < independentSheets.length; sheetId++) {
+    for (let sheetId = 0; sheetId < this.independentSheets.length; sheetId++) {
       const vertices = this.addressMapping.getAllVerticesFromSheet(sheetId)
       vertices.concat(this.rangeMapping.getAllVertices())
       const edges = []
@@ -136,14 +139,14 @@ class ParallelEvaluator implements Evaluator {
           edges.push(adjacentNode.id)
         }
       }
-      if (independentSheets[sheetId] === true) {
+      if (this.independentSheets[sheetId] === true) {
         const chunk = {
           vertices, 
           edges,
           // mapping,
         }
         chunks.push(chunk)
-      } else if (independentSheets[sheetId] === false) {
+      } else if (this.independentSheets[sheetId] === false) {
         dependentVertices.vertices.concat(vertices)
         dependentVertices.edges.concat(edges)
       }
@@ -250,7 +253,7 @@ export class HandsOnEngine {
 
     const evaluatorPolicy = new EvaluatorPolicy(this.config)
     if (evaluatorPolicy.shouldBeParallel(independentSheets!)) {
-      this.evaluator = new ParallelEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
+      this.evaluator = new ParallelEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats, independentSheets)
     } else {
       this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
     }
