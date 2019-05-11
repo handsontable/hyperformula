@@ -108,7 +108,7 @@ class Main {
       addressMapping.addSheet(sheetId, strategy)
     }
 
-    const config = new Config()
+    const config = new Config({ gpuMode: 'cpu' })
     const stats = new Statistics()
     const interpreter = new Interpreter(addressMapping, rangeMapping, graph, config)
     const { sorted, cycled } = graph.topologicalSort()
