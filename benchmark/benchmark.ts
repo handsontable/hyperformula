@@ -123,8 +123,8 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
     let expectedValue = expectedValues[i].value
 
     if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
-      expectedValue = (expectedValues[i].value as number).toPrecision(7)
-      actualValue = actualValue.toPrecision(7)
+      expectedValue = (expectedValues[i].value as number).toPrecision(6)
+      actualValue = actualValue.toPrecision(6)
     }
 
     if (actualValue !== expectedValue) {
