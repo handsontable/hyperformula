@@ -28,7 +28,7 @@ interface Evaluator {
   run(): void,
 }
 
-export class SingleThreadEvaluator implements Evaluator {
+class SingleThreadEvaluator implements Evaluator {
   /** Topologically sorted list of vertices. */
   private sortedVertices: Vertex[] = []
 

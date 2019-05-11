@@ -1,4 +1,4 @@
-import {SimpleCellAddress, CellValue} from "../Cell"
+import {SimpleCellAddress, CellValue, CellError, ErrorType} from "../Cell"
 import {AbsoluteCellRange} from "../AbsoluteCellRange"
 import {Matrix} from "../Matrix"
 import {Ast} from "../parser/Ast"
@@ -8,7 +8,7 @@ import {Vertex, MatrixVertex, FormulaCellVertex, ValueCellVertex, RangeVertex, E
 import {SerializedMapping, AddressMapping, SparseStrategy, DenseStrategy} from "../AddressMapping"
 import {Config} from "../Config"
 import {Statistics} from "../statistics/Statistics"
-import {SingleThreadEvaluator} from "../index"
+import {Interpreter} from "../interpreter/Interpreter"
 
 class Main {
   // This is only to make typechecking work from Main Thread PoV
@@ -106,11 +106,32 @@ class Main {
 
     const config = new Config()
     const stats = new Statistics()
-    const evaluator = new SingleThreadEvaluator(
-      addressMapping, rangeMapping, graph, config, stats
-    )
-    evaluator.run()
-    this.onmessage(42)
+    const interpreter = new Interpreter(addressMapping, rangeMapping, graph, config)
+    const { sorted, cycled } = graph.topologicalSort()
+    const results: { address: SimpleCellAddress, result: CellValue }[] = []
+
+    cycled.forEach((vertex: Vertex) => {
+      const cellValue = new CellError(ErrorType.CYCLE)
+      results.push({
+        address: (vertex as FormulaCellVertex).getAddress(),
+        result: cellValue
+      });
+      (vertex as FormulaCellVertex).setCellValue(cellValue)
+    })
+    sorted.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+        const address = vertex.getAddress()
+        const formula = vertex.getFormula() as Ast
+        const cellValue = interpreter.evaluateAst(formula, address)
+        results.push({
+          address,
+          result: cellValue,
+        })
+        vertex.setCellValue(cellValue)
+      }
+    })
+
+    this.onmessage(results)
   }
 }
 
