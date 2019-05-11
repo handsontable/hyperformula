@@ -1,8 +1,6 @@
 import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Sheet, Sheets} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {Matrix} from "./Matrix";
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -38,7 +36,9 @@ interface IAddressMappingStrategy {
   /**
    * Returns width of stored sheet
    */
-  getWidth(): number
+  getWidth(): number,
+
+  getAllVertices(): Array<Vertex>,
 }
 
 /**
@@ -93,6 +93,16 @@ export class SparseStrategy implements IAddressMappingStrategy {
   /** @inheritDoc */
   public getWidth(): number {
     return this.width
+  }
+
+  public getAllVertices(): Array<Vertex> {
+    const vertices = new Set<Vertex>()
+    this.mapping.forEach((rowVertices, column) => {
+      rowVertices.forEach((vertex, row) => {
+        vertices.add(vertex)
+      })
+    })
+    return Array.from(vertices)
   }
 }
 
@@ -152,6 +162,18 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public getWidth(): number {
     return this.width
   }
+
+  public getAllVertices(): Array<Vertex> {
+    const vertices = new Set<Vertex>()
+    for (const row of this.mapping) {
+      for (const vertex of row) {
+        if (vertex) {
+          vertices.add(vertex)
+        }
+      }
+    }
+    return Array.from(vertices)
+  }
 }
 
 /**
@@ -194,8 +216,6 @@ export class AddressMapping {
   }
 
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
-
-  private matrixMapping: Map<string, MatrixVertex> = new Map()
 
   constructor(
     private readonly threshold: number,
@@ -280,11 +300,7 @@ export class AddressMapping {
     return (this.getCell(address) instanceof EmptyCellVertex)
   }
 
-  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
-    return this.matrixMapping.get(range.toString())
-  }
-
-  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
-    this.matrixMapping.set(range.toString(), vertex)
+  public getAllVerticesFromSheet(sheetId: number): Array<Vertex> {
+    return this.mapping.get(sheetId)!.getAllVertices()
   }
 }

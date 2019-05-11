@@ -1,6 +1,7 @@
 import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
-import {EmptyCellVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
+import {EmptyCellVertex, RangeVertex, ValueCellVertex, MatrixVertex} from '../src/Vertex'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -91,6 +92,20 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(42))
 
     expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(true)
+  })
+
+  it('can return all vertices', () => {
+    const mapping = builder(2, 2)
+
+    const someMatrixVertex = MatrixVertex.fromRange(AbsoluteCellRange.fromCooridinates(0, 0, 1, 1, 1))
+    mapping.setCell(simpleCellAddress(0, 0, 1), someMatrixVertex)
+    mapping.setCell(simpleCellAddress(0, 1, 1), someMatrixVertex)
+    const someValueVertex = new ValueCellVertex(42)
+    mapping.setCell(simpleCellAddress(0, 1, 0), someValueVertex)
+
+    const allVertices = mapping.getAllVerticesFromSheet(0)
+    expect(allVertices.length).toBe(2)
+    expect(allVertices).toEqual(expect.arrayContaining([someValueVertex, someMatrixVertex]))
   })
 }
 
