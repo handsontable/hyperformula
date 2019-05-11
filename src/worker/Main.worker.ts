@@ -6,6 +6,9 @@ import {Graph} from "../Graph"
 import {RangeMapping} from "../RangeMapping"
 import {Vertex, MatrixVertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex} from "../Vertex"
 import {SerializedMapping, AddressMapping, SparseStrategy, DenseStrategy} from "../AddressMapping"
+import {Config} from "../Config"
+import {Statistics} from "../statistics/Statistics"
+import {SingleThreadEvaluator} from "../index"
 
 class Main {
   // This is only to make typechecking work from Main Thread PoV
@@ -100,6 +103,13 @@ class Main {
       }
       addressMapping.addSheet(sheetId, strategy)
     }
+
+    const config = new Config()
+    const stats = new Statistics()
+    const evaluator = new SingleThreadEvaluator(
+      addressMapping, rangeMapping, graph, config, stats
+    )
+    evaluator.run()
     this.onmessage(42)
   }
 }
