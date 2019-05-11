@@ -464,12 +464,12 @@ describe('Interpreter', () => {
   })
 
   it('function OFFSET used twice in a range', async () => {
-      const engine = await HandsOnEngine.buildFromArray([
-          ['5', '6', '=SUM(OFFSET(A2,-1,0):OFFSET(A2,0,1))'],
-          ['2', '3', '4'],
-      ])
+    const engine = await HandsOnEngine.buildFromArray([
+        ['5', '6', '=SUM(OFFSET(A2,-1,0):OFFSET(A2,0,1))'],
+        ['2', '3', '4'],
+    ])
 
-      expect(engine.getCellValue('C1')).toEqual(16)
+    expect(engine.getCellValue('C1')).toEqual(16)
   })
 
   it('function OFFSET as a reference inside SUM', async () => {
