@@ -120,6 +120,37 @@ class ParallelEvaluator implements Evaluator {
     })
   }
 
+  private prepareChunks(independentSheets: boolean[]) {
+    const chunks = []
+    const dependentVertices: { vertices: Vertex[], edges: number[] } = {
+      vertices: [],
+      edges: [],
+    }
+    for (let sheetId = 0; sheetId < independentSheets.length; sheetId++) {
+      const vertices = this.addressMapping.getAllVerticesFromSheet(sheetId)
+      vertices.concat(this.rangeMapping.getAllVertices())
+      const edges = []
+      for (const node of vertices) {
+        for (const adjacentNode of this.graph.adjacentNodes(node)) {
+          edges.push(node.id)
+          edges.push(adjacentNode.id)
+        }
+      }
+      if (independentSheets[sheetId] === true) {
+        const chunk = {
+          vertices, 
+          edges,
+          // mapping,
+        }
+        chunks.push(chunk)
+      } else if (independentSheets[sheetId] === false) {
+        dependentVertices.vertices.concat(vertices)
+        dependentVertices.edges.concat(edges)
+      }
+    }
+    chunks.push(dependentVertices)
+    return chunks
+  }
 }
 
 class EvaluatorPolicy {
