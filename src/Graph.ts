@@ -1,15 +1,20 @@
 /**
  * Provides graph directed structure
  */
-export class Graph<T> {
+
+export interface Identifiable {
+  id: number
+}
+
+export class Graph<T extends Identifiable> {
   /** Set with nodes in graph. */
-  public readonly nodes: Set<T>
+  public nodes: Map<number, T>
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
 
   constructor() {
-    this.nodes = new Set()
+    this.nodes = new Map()
     this.edges = new Map()
   }
 
@@ -19,14 +24,14 @@ export class Graph<T> {
    * @param node - a node to be added
    */
   public addNode(node: T) {
-    this.nodes.add(node)
+    this.nodes.set(node.id, node)
     if (!this.edges.has(node)) {
       this.edges.set(node, new Set())
     }
   }
 
   public removeNode(node: T) {
-    this.nodes.delete(node)
+    this.nodes.delete(node.id)
     this.edges.delete(node)
   }
 
@@ -39,10 +44,10 @@ export class Graph<T> {
    * @param toNode - node to which edge is incoming
    */
   public addEdge(fromNode: T, toNode: T) {
-    if (!this.nodes.has(fromNode)) {
+    if (!this.nodes.has(fromNode.id)) {
       throw new Error(`Unknown node ${fromNode}`)
     }
-    if (!this.nodes.has(toNode)) {
+    if (!this.nodes.has(toNode.id)) {
       throw new Error(`Unknown node ${toNode}`)
     }
     this.edges.get(fromNode)!.add(toNode)
@@ -63,7 +68,7 @@ export class Graph<T> {
    * @param node - node to check
    */
   public hasNode(node: T): boolean {
-    return this.nodes.has(node)
+    return this.nodes.has(node.id)
   }
 
   /**
@@ -80,6 +85,20 @@ export class Graph<T> {
     let result = 0
     this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
     return result
+  }
+
+  public getNodes() {
+    return new Set(this.nodes.values())
+  }
+
+  public getEdges() {
+    return this.edges
+  }
+
+  public addEdgeByIds(fromId: number, toId: number) {
+    const fromNode = this.nodes.get(fromId)!
+    const toNode = this.nodes.get(toId)!
+    this.addEdge(fromNode, toNode)
   }
 
   /**
@@ -125,7 +144,7 @@ export class Graph<T> {
     }
 
     if (topologicalOrdering.length !== this.nodes.size) {
-      const nodesOnCycle = new Set(this.nodes)
+      const nodesOnCycle = new Set(this.nodes.values())
       for (let i = 0; i < topologicalOrdering.length; ++i) {
         nodesOnCycle.delete(topologicalOrdering[i])
       }
@@ -140,12 +159,16 @@ export class Graph<T> {
    */
   private incomingEdges(): Map<T, number> {
     const incomingEdges: Map<T, number> = new Map()
-    this.nodes.forEach((node) => (incomingEdges.set(node, 0)))
+    this.nodes.forEach((node, id) => (incomingEdges.set(node, 0)))
     this.edges.forEach((adjacentNodes, sourceNode) => {
       adjacentNodes.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
       })
     })
     return incomingEdges
+  }
+
+  public getNodeById(id: number): T | null {
+    return this.nodes.get(id) || null
   }
 }
