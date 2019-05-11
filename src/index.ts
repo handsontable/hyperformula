@@ -111,7 +111,7 @@ class ParallelEvaluator implements Evaluator {
     pool.addWorkerTaskForAllWorkers((workerId: number) => ({
       data: { kind: "INIT", ...chunks[workerId] },
       callback: (message: any) => {
-        this.handleWorkerMessage(message)
+        this.handleWorkerMessage(message.data as { address: SimpleCellAddress, result:CellValue }[])
         chunksPromisesResolvers[workerId]()
       }
     }))
@@ -125,7 +125,13 @@ class ParallelEvaluator implements Evaluator {
     this.recomputeFormulas()
   }
 
-  private handleWorkerMessage(message: any) {
+  private handleWorkerMessage(messageData: { address: SimpleCellAddress, result:CellValue }[]) {
+    for (const result of messageData) {
+      const vertex = this.addressMapping.getCell(result.address)
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+        vertex.setCellValue(result.result)
+      }
+    }
   }
 
   /**

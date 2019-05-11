@@ -17,7 +17,11 @@ class Main {
   public afterInitialization() {
   }
 
-  public onmessage: (message: any) => any = () => {}
+  public onmessage: (message: any) => any = (message) => {}
+  public onmessageWrapper: (messageData: any) => any = (messageData) => ({ data: messageData })
+  public sendMessage(data: any) {
+    this.onmessage(this.onmessageWrapper(data))
+  }
 
   public postMessage(data: any): void {
     const graph = new Graph<Vertex>()
@@ -131,7 +135,7 @@ class Main {
       }
     })
 
-    this.onmessage(results)
+    this.sendMessage(results)
   }
 }
 
@@ -140,6 +144,7 @@ if (typeof self !== 'undefined') {
 
   const main = new Main()
   main.onmessage = ctx.postMessage.bind(ctx)
+  main.onmessageWrapper = (messageData) => messageData
   main.afterInitialization()
 
   ctx.onmessage = (message) => {
