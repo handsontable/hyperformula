@@ -1,6 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {AddressMapping} from '../AddressMapping'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellAddress} from "../CellAddress"
 import {Config} from '../Config'
 import {Graph} from '../Graph'
 import {Matrix} from '../Matrix'
@@ -47,7 +48,8 @@ export class Interpreter {
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const address = ast.reference.toSimpleCellAddress(formulaAddress)
+        const reference = new CellAddress(ast.reference.sheet, ast.reference.col, ast.reference.row, ast.reference.type)
+        const address = reference.toSimpleCellAddress(formulaAddress)
         return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:
