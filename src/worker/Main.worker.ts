@@ -34,14 +34,14 @@ class Main {
           vertex = new FormulaCellVertex(
             node.formula as Ast,
             node.cellAddress as SimpleCellAddress,
-            node.vertexId as number,
+            node.id as number,
           )
           break
         }
         case "value": {
           vertex = new ValueCellVertex(
             node.cellValue as CellValue,
-            node.vertexId as number,
+            node.id as number,
           )
           break
         }
@@ -50,7 +50,7 @@ class Main {
           // not sure whether Map copies correctly, it's just Object here
           vertex = new RangeVertex(
             new AbsoluteCellRange(node.range.start, node.range.end),
-            node.vertexId as number,
+            node.id as number,
           )
           rangeMapping.setRange(vertex)
           break
