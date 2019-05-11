@@ -110,6 +110,7 @@ export class GraphBuilder {
             vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
             matrixHeuristic.add(parseResult.hash, cellAddress)
             dependencies.set(vertex, parseResult.dependencies)
+            this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
             this.graph.addNode(vertex)
             this.addressMapping.setCell(cellAddress, vertex)
           } else if (cellContent === '') {
