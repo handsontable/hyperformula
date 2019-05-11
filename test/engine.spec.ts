@@ -72,10 +72,10 @@ describe('Integration', () => {
       ['1', '=A1'],
     ])
 
-    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '2')
+    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '2')
     expect(engine.getCellValue('B1')).toBe(2)
 
-    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, 'foo')
+    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, 'foo')
     expect(engine.getCellValue('B1')).toBe('foo')
   })
 
@@ -84,9 +84,9 @@ describe('Integration', () => {
       ['1', '=A1'],
     ])
 
-    expect(() => {
-      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '2')
-    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
+    expect(engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '2')).rejects.toEqual(
+      new Error('Changes to cells other than simple values not supported')
+    )
   })
 
   it('#loadSheet change cell content to formula throws error', async () => {
@@ -94,9 +94,9 @@ describe('Integration', () => {
       ['1', '2'],
     ])
 
-    expect(() => {
-      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '=A1')
-    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
+    expect(engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '=A1')).rejects.toEqual(
+      new Error('Changes to cells other than simple values not supported')
+    )
   })
 
   it('#loadSheet - it should build graph without cycle but with formula with error', async () => {
@@ -113,7 +113,7 @@ describe('Integration', () => {
     ])
     expect(engine.getCellValue('B3')).toEqual(6)
 
-    engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
+    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
     expect(engine.getCellValue('B3')).toEqual(8)
   })
 

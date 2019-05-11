@@ -46,7 +46,7 @@ class SingleThreadEvaluator implements Evaluator {
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
   }
 
-  public run() {
+  public async run() {
     this.stats.measure(StatType.TOP_SORT, () => {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
     })
@@ -94,7 +94,7 @@ class ParallelEvaluator implements Evaluator {
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
   }
 
-  public run() {
+  public async run() {
     this.stats.measure(StatType.TOP_SORT, () => {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
     })
@@ -259,9 +259,9 @@ export class HandsOnEngine {
       this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
     }
 
-    this.stats.measure(StatType.EVALUATION, () => {
-      this.evaluator!.run()
-    })
+    this.stats.start(StatType.EVALUATION)
+    await this.evaluator!.run()
+    this.stats.end(StatType.EVALUATION)
 
     this.stats.end(StatType.OVERALL)
   }
@@ -337,7 +337,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
+  public async setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
@@ -349,6 +349,6 @@ export class HandsOnEngine {
       throw Error('Changes to cells other than simple values not supported')
     }
 
-    this.evaluator!.run()
+    await this.evaluator!.run()
   }
 }
