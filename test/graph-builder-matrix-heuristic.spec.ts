@@ -34,7 +34,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
     const matrix = output[0]
 
     expect([matrix.width(), matrix.height()]).toEqual([3, 3])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 0, 0, 2, 2))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 2, 2))
   })
 
   it('find - different formulas', () => {
@@ -51,10 +51,10 @@ describe('GraphBuilderMatrixHeuristic', () => {
 
     let matrix = output[1]
     expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 0, 0, 1, 1))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
     matrix = output[0]
     expect([matrix.width(), matrix.height()]).toEqual([4, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 0, 2, 3, 3))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 2, 3, 3))
   })
 
   it('find - same formula', () => {
@@ -71,13 +71,13 @@ describe('GraphBuilderMatrixHeuristic', () => {
 
     let matrix = output[2]
     expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 0, 0, 1, 1))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
     matrix = output[1]
     expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 4, 0, 5, 1))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 4, 0, 5, 1))
     matrix = output[0]
     expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCooridinates(1, 2, 2, 3, 3))
+    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 2, 2, 3, 3))
   })
 
   it('fail 1', () => {

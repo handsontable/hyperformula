@@ -215,7 +215,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCel
         // 1 2
         // 2 *
         colours.set(x, y, ++colour)
-        result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
+        result.set(colour, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y))
         result.delete(rightColour!)
       } else if (value !== diag) {
         if (right === value && right === bottom) {
@@ -224,7 +224,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCel
           result.delete(rightColour!)
           result.delete(bottomColour!)
           colours.set(x, y, ++colour)
-          result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
+          result.set(colour, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y))
         } else if (right !== value && bottom === value) {
           // 1 0
           // 1 0
@@ -234,7 +234,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCel
             result.set(bottomColour, range)
           } else {
             colours.set(x, y, ++colour)
-            result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
+            result.set(colour, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y))
           }
         } else if (right === value && bottom !== value) {
           // 1 1
@@ -244,7 +244,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCel
           result.set(rightColour, range)
         } else {
           colours.set(x, y, ++colour)
-          result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
+          result.set(colour, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y))
         }
       } else if (value === diag && diagColour === rightColour && diagColour === bottomColour) {
         // 1 1
@@ -254,7 +254,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): AbsoluteCel
         result.set(rightColour, range)
       } else if (value === diag) {
         colours.set(x, y, ++colour)
-        result.set(colour, AbsoluteCellRange.fromCooridinates(sheet, x, y, x, y))
+        result.set(colour, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y))
       }
     }
   }

@@ -97,7 +97,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('can return all vertices', () => {
     const mapping = builder(2, 2)
 
-    const someMatrixVertex = MatrixVertex.fromRange(AbsoluteCellRange.fromCooridinates(0, 0, 1, 1, 1))
+    const someMatrixVertex = MatrixVertex.fromRange(AbsoluteCellRange.fromCoordinates(0, 0, 1, 1, 1))
     mapping.setCell(simpleCellAddress(0, 0, 1), someMatrixVertex)
     mapping.setCell(simpleCellAddress(0, 1, 1), someMatrixVertex)
     const someValueVertex = new ValueCellVertex(42)
