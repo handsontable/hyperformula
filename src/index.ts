@@ -155,8 +155,7 @@ class ParallelEvaluator implements Evaluator {
       edges: [],
     }
     for (let sheetId = 0; sheetId < this.independentSheets.length; sheetId++) {
-      const vertices = this.addressMapping.getAllVerticesFromSheet(sheetId)
-      vertices.concat(this.rangeMapping.getAllVertices())
+      let vertices = this.addressMapping.getAllVerticesFromSheet(sheetId).concat(this.rangeMapping.getAllVertices())
       const edges = []
       for (const node of vertices) {
         for (const adjacentNode of this.graph.adjacentNodes(node)) {
