@@ -168,7 +168,10 @@ export class Graph<T extends Identifiable> {
     return incomingEdges
   }
 
-  public getNodeById(id: number): T | null {
-    return this.nodes.get(id) || null
+  public getNodeById(id: number) {
+    const node = this.nodes.get(id)
+    if (!node)
+      throw new Error(`Missing node with id ${id}`)
+    return node
   }
 }

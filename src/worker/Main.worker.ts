@@ -5,6 +5,7 @@ import {Ast} from "../parser/Ast"
 import {Graph} from "../Graph"
 import {RangeMapping} from "../RangeMapping"
 import {Vertex, MatrixVertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex} from "../Vertex"
+import {SerializedMapping, AddressMapping, SparseStrategy, DenseStrategy} from "../AddressMapping"
 
 class Main {
   // This is only to make typechecking work from Main Thread PoV
@@ -17,6 +18,7 @@ class Main {
 
   public postMessage(data: any): void {
     const graph = new Graph<Vertex>()
+    const addressMapping = AddressMapping.build(1.0)
     const rangeMapping = new RangeMapping()
     const serializedNodes = data.vertices
     const serializedEdges = data.edges
@@ -78,6 +80,25 @@ class Main {
     const numberOfEdges = serializedEdges.length / 2
     for (let i = 0; i < numberOfEdges; i++) {
       graph.addEdgeByIds(serializedEdges[i * 2], serializedEdges[i * 2 + 1])
+    }
+
+    for (const serializedMappingData of data.mappings) {
+      const { sheetId, serializedMapping } = serializedMappingData as { sheetId: number, serializedMapping: SerializedMapping }
+      let strategy
+      switch (serializedMapping.kind) {
+        case "sparse": {
+          strategy = SparseStrategy.fromSerialized(serializedMapping, graph)
+          break
+        }
+        case "dense": {
+          strategy = DenseStrategy.fromSerialized(serializedMapping, graph)
+          break
+        }
+        default: {
+          throw new Error("Unknown strategy")
+        }
+      }
+      addressMapping.addSheet(sheetId, strategy)
     }
     this.onmessage(42)
   }

@@ -1,6 +1,6 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
-import {AddressMapping} from './AddressMapping'
+import {AddressMapping, SerializedMapping} from './AddressMapping'
 import {
   CellError,
   CellValue,
@@ -149,13 +149,15 @@ class ParallelEvaluator implements Evaluator {
 
   private prepareChunks() {
     const chunks = []
-    const dependentVertices: { vertices: Vertex[], edges: number[] } = {
+    const dependentVertices: { vertices: Vertex[], edges: number[], mappings: { sheetId: number, serializedMapping: SerializedMapping }[] } = {
       vertices: [],
       edges: [],
+      mappings: [],
     }
     for (let sheetId = 0; sheetId < this.independentSheets.length; sheetId++) {
       let vertices = this.addressMapping.getAllVerticesFromSheet(sheetId).concat(this.rangeMapping.getAllVertices())
       const edges = []
+      const serializedMapping = this.addressMapping.getSerializedMapping(sheetId)
       for (const node of vertices) {
         for (const adjacentNode of this.graph.adjacentNodes(node)) {
           edges.push(node.id)
@@ -166,15 +168,18 @@ class ParallelEvaluator implements Evaluator {
         const chunk = {
           vertices, 
           edges,
-          // mapping,
+          mappings: [{ sheetId, serializedMapping }],
         }
         chunks.push(chunk)
       } else if (this.independentSheets[sheetId] === false) {
-        dependentVertices.vertices.concat(vertices)
-        dependentVertices.edges.concat(edges)
+        dependentVertices.vertices = dependentVertices.vertices.concat(vertices)
+        dependentVertices.edges = dependentVertices.edges.concat(edges)
+        dependentVertices.mappings.push({ sheetId, serializedMapping })
       }
     }
-    chunks.unshift(dependentVertices)
+    if (dependentVertices.mappings.length > 0) {
+      chunks.unshift(dependentVertices)
+    }
     return chunks
   }
 }
