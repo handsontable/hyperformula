@@ -161,6 +161,7 @@ class EvaluatorPolicy {
   }
 
   public shouldBeParallel(independentSheets: boolean[]): boolean {
+    return false
     for (const sheetIndependence of independentSheets) {
       if (sheetIndependence)
         return true
