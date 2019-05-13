@@ -197,7 +197,7 @@ export class HandsOnEngine {
    *
    * @param csv - csv representation of sheet
    */
-  public static async buildFromMultiSheets(csvSheets: CsvSheets, config: Config = new Config()): Promise<HandsOnEngine> {
+  public static async buildFromCsvSheets(csvSheets: CsvSheets, config: Config = new Config()): Promise<HandsOnEngine> {
     const sheets: Sheets = {}
     for (const key of Object.keys(csvSheets)) {
       sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })

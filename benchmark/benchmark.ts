@@ -1,10 +1,7 @@
-import parse from 'csv-parse/lib/sync'
-import * as fs from 'fs'
-import {load} from '../bin/handsonengine-multisheet'
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
-import {CsvSheets, Sheets} from '../src/GraphBuilder'
+import {Sheet, Sheets} from '../src/GraphBuilder'
 import {StatType} from '../src/statistics/Statistics'
 
 export interface Config {
@@ -14,67 +11,46 @@ export interface Config {
   engineConfig?: EngineConfig,
 }
 
-const defaultConfig = {
+export const defaultConfig = {
   millisecondsPerThousandRows: 50,
-  numberOfRuns: 3,
+  numberOfRuns: 1,
   csvDump: false,
   engineConfig: new EngineConfig(),
 }
 
-export interface ExpectedValue { address: string, value: CellValue}
-
-export async function benchmarkCSV(csvString: string, config: Config) {
-  await benchmark(parse(csvString, {  delimiter: EngineConfig.defaultConfig.csvDelimiter }), [], config)
+export interface ExpectedValue {
+  address: string,
+  value: CellValue
 }
 
-export async function benchmarkMultiSheets(inputDir: string, expectedValues: ExpectedValue[], engineConfig: EngineConfig, config: Config = defaultConfig) {
+export async function benchmark(sheet: Sheet, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
+  return benchmarkSheets({Sheet1: sheet}, expectedValues, config)
+}
+
+export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
   config = Object.assign({}, defaultConfig, config)
 
-  const stats = []
+  const stats: Array<Map<StatType, number>> = []
+  const rows = Object.keys(sheets)
+      .map(key => sheets[key].length)
+      .reduce((sum: number, length: number) => sum + length)
+
   let currentRun = 0
+  let engine: HandsOnEngine
 
-  const sheets: CsvSheets = await load(inputDir, engineConfig)
-
-  while (currentRun < config.numberOfRuns) {
-    const engine = await HandsOnEngine.buildFromMultiSheets(sheets, engineConfig)
+  do {
+    engine = await HandsOnEngine.buildFromSheets(sheets, config.engineConfig)
     stats.push(engine.getStats())
     currentRun++
 
-    if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
+    if (currentRun === config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
       console.error('Sheet validation error')
       process.exit(1)
     }
-  }
-
-  printStats(stats, config)
-}
-
-export async function benchmark(sheet: string[][], expectedValues: ExpectedValue[], config: Config = defaultConfig) {
-  config = Object.assign({}, defaultConfig, config)
-
-  const stats = []
-  const rows = sheet.length
-
-  let currentRun = 0
-  let engine: HandsOnEngine | null = null
-
-  while (currentRun < config.numberOfRuns) {
-    engine = await HandsOnEngine.buildFromArray(sheet, config.engineConfig)
-    stats.push(engine.getStats())
-    currentRun++
-
-    if (currentRun == config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
-      console.error('Sheet validation error')
-      process.exit(1)
-    }
-  }
-
-  if (config.csvDump && engine !== null) {
-    const csvString = engine.exportAsCsv('Sheet1')
-    fs.writeFileSync('/tmp/dump.csv', csvString)
-  }
+  } while (currentRun < config.numberOfRuns)
 
   printStats(stats, config, rows)
+  return Promise.resolve(engine)
 }
 
 function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: number) {
@@ -110,6 +86,7 @@ function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: 
     console.info(`Std deviation: ${(stdDevOverall / (rows / 1000)).toFixed(3)} ms per 1000 rows`)
 
     if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
+      console.error('Expected time exceeded')
       process.exit(1)
     }
   }

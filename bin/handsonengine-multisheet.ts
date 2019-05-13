@@ -2,7 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
 import {Config, HandsOnEngine} from '../src'
-import {CsvSheets} from '../src/GraphBuilder'
+import {CsvSheets, Sheets} from '../src/GraphBuilder'
+import parse from 'csv-parse/lib/sync'
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -24,7 +25,7 @@ export function validateArguments(inputDir: string) {
   }
 }
 
-export function load(inputDir: string, config: Config): Promise<CsvSheets> {
+export function load(inputDir: string, config: Config): Promise<Sheets> {
   validateArguments(inputDir)
 
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -35,19 +36,28 @@ export function load(inputDir: string, config: Config): Promise<CsvSheets> {
     crlfDelay: Infinity,
   })
 
-  const sheets: CsvSheets = {}
+  const csvSheets: CsvSheets = {}
 
   lineReader.on('line', (line) => {
     const csv = fs.readFileSync(path.join(sheetsDir, line), { encoding: 'utf8' })
     const sheetName = line.split('.')[0]
-    sheets[sheetName] = csv
+    csvSheets[sheetName] = csv
   })
 
-  return new Promise<CsvSheets>((resolve) => {
+  return new Promise<Sheets>((resolve) => {
     lineReader.on('close', () => {
+      const sheets = parseCsvSheets(csvSheets, config)
       resolve(sheets)
     })
   })
+}
+
+export function parseCsvSheets(csvSheets: CsvSheets, config: Config): Sheets {
+  const sheets: Sheets = {}
+  for (const key of Object.keys(csvSheets)) {
+    sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
+  }
+  return sheets
 }
 
 export function save(engine: HandsOnEngine, outputDir: string) {
