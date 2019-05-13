@@ -46,11 +46,23 @@ export function sheets() {
 
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
-    { address: 'A1000', value: 1000 },
-    { address: 'B1000', value: 500.5 },
-    { address: 'C1000', value: 1000 },
-    { address: 'D1000', value: 500.5 },
-    { address: 'E1000', value: 1000 },
-    { address: 'F1000', value: 500.5 },
+    { address: '$Sheet1.A1000', value: 1000 },
+    { address: '$Sheet1.B1000', value: 500.5 },
+    { address: '$Sheet1.C1000', value: 1000 },
+    { address: '$Sheet1.D1000', value: 500.5 },
+    { address: '$Sheet1.E1000', value: 1000 },
+    { address: '$Sheet1.F1000', value: 500.5 },
+    { address: '$Sheet2.A1000', value: 1000 },
+    { address: '$Sheet2.B1000', value: 500.5 },
+    { address: '$Sheet2.C1000', value: 1000 },
+    { address: '$Sheet2.D1000', value: 500.5 },
+    { address: '$Sheet2.E1000', value: 1000 },
+    { address: '$Sheet2.F1000', value: 500.5 },
+    { address: '$Sheet3.A1000', value: 1000 },
+    { address: '$Sheet3.B1000', value: 500.5 },
+    { address: '$Sheet3.C1000', value: 1000 },
+    { address: '$Sheet3.D1000', value: 500.5 },
+    { address: '$Sheet3.E1000', value: 1000 },
+    { address: '$Sheet3.F1000', value: 500.5 },
   ]
 }
