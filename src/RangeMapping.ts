@@ -29,7 +29,13 @@ export class RangeMapping {
     return this.rangeMapping.get(key) || null
   }
 
-  public getAllVertices(): Array<RangeVertex> {
-    return Array.from(this.rangeMapping.values())
+  public getAllVerticesFromSheet(sheetId: number): Array<RangeVertex> {
+    const result = new Array()
+    for (const rangeVertex of this.rangeMapping.values()) {
+      if (rangeVertex.start.sheet === sheetId) {
+        result.push(rangeVertex)
+      }
+    }
+    return result
   }
 }
