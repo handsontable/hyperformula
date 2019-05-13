@@ -36,6 +36,14 @@ export function sheet() {
   return sheet
 }
 
+export function sheets() {
+  return {
+    Sheet1: sheet(),
+    Sheet2: sheet(),
+    Sheet3: sheet(),
+  }
+}
+
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
     { address: 'A1000', value: 1000 },
