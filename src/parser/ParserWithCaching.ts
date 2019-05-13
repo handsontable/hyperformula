@@ -20,7 +20,6 @@ export class ParserWithCaching {
   private lexer: FormulaLexer
   private lexerConfig: ILexerConfig
   private formulaParser: FormulaParser
-  private cacheMapping: Map<string, SimpleCellAddress[]> = new Map()
 
   constructor(
     private readonly config: Config,
@@ -51,7 +50,6 @@ export class ParserWithCaching {
     }
 
     const hash = this.computeHash(lexerResult.tokens, formulaAddress)
-    this.setMapping(hash, formulaAddress)
 
     let cacheResult = this.cache.get(hash)
     if (cacheResult) {
@@ -89,17 +87,6 @@ export class ParserWithCaching {
 
   public getCache(): Cache {
     return this.cache
-  }
-
-  public setMapping(hash: string, address: SimpleCellAddress) {
-    if (!this.cacheMapping.has(hash)) {
-      this.cacheMapping.set(hash, [])
-    }
-    this.cacheMapping.get(hash)!.push(address)
-  }
-
-  public getMapping(): Map<string, SimpleCellAddress[]> {
-    return this.cacheMapping
   }
 }
 
