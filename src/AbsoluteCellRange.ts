@@ -1,5 +1,6 @@
 import {AddressMapping} from './AddressMapping'
 import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellAddress} from "./CellAddress"
 import {Matrix} from './Matrix'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
@@ -11,7 +12,10 @@ export class AbsoluteCellRange {
   }
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    return new AbsoluteCellRange(x.start.toSimpleCellAddress(baseAddress), x.end.toSimpleCellAddress(baseAddress))
+    return new AbsoluteCellRange(
+      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress)
+    )
   }
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
