@@ -2,18 +2,7 @@ import {GPUInternalMode, GPUMode} from 'gpu.js'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
-interface ConfigParams {
-  addressMappingFillThreshold?: number,
-  csvDelimiter?: string,
-  dateFormat?: string,
-  functionArgSeparator?: string,
-  language?: string,
-  functionPlugins?: any[],
-  gpuMode?: PossibleGPUMode,
-  matrixDetection?: boolean
-}
-
-export interface DefaultConfigParams {
+export interface ConfigParams {
   addressMappingFillThreshold: number,
   csvDelimiter: string,
   dateFormat: string,
@@ -25,7 +14,7 @@ export interface DefaultConfigParams {
 }
 
 export class Config {
-  public static defaultConfig: DefaultConfigParams = {
+  public static defaultConfig: ConfigParams = {
     addressMappingFillThreshold: 1,
     csvDelimiter: ',',
     dateFormat: 'MM/DD/YYYY',
@@ -54,7 +43,7 @@ export class Config {
     functionPlugins,
     gpuMode,
     matrixDetection,
-  }: ConfigParams = {}) {
+  }: Partial<ConfigParams> = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
