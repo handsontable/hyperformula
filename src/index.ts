@@ -21,23 +21,10 @@ import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCell
 import {Evaluator} from './Evaluator'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParallelEvaluator} from './ParallelEvaluator'
+import {EvaluatorPolicy} from './EvaluatorPolicy'
 
 export {
   Config,
-}
-
-class EvaluatorPolicy {
-  constructor(private readonly config: Config) {
-  }
-
-  public shouldBeParallel(independentSheets: boolean[]): boolean {
-    return false
-    for (const sheetIndependence of independentSheets) {
-      if (sheetIndependence)
-        return true
-    }
-    return false
-  }
 }
 
 /**
