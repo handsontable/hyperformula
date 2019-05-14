@@ -96,7 +96,9 @@ class ParallelEvaluator implements Evaluator {
   }
 
   public async run() {
+    this.stats.start(StatType.SERIALIZATION)
     const chunks = this.prepareChunks()
+    this.stats.end(StatType.SERIALIZATION)
     const chunksPromises: Promise<any>[] = []
     const chunksPromisesResolvers: (() => void)[] = []
     for (const chunk of chunks) {
@@ -117,6 +119,8 @@ class ParallelEvaluator implements Evaluator {
     }))
 
     await Promise.all(chunksPromises)
+
+    // console.warn(this.stats.snapshot())
   }
 
   private handleWorkerMessage(messageData: { address: SimpleCellAddress, result:CellValue }[]) {
@@ -138,13 +142,13 @@ class ParallelEvaluator implements Evaluator {
     for (let sheetId = 0; sheetId < this.independentSheets.length; sheetId++) {
       let vertices = this.addressMapping.getAllVerticesFromSheet(sheetId).concat(this.rangeMapping.getAllVerticesFromSheet(sheetId))
       const edges = []
-      const serializedMapping = this.addressMapping.getSerializedMapping(sheetId)
       for (const node of vertices) {
         for (const adjacentNode of this.graph.adjacentNodes(node)) {
           edges.push(node.id)
           edges.push(adjacentNode.id)
         }
       }
+      const serializedMapping = this.addressMapping.getSerializedMapping(sheetId)
       if (this.independentSheets[sheetId] === true) {
         const chunk = {
           vertices, 

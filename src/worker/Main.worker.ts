@@ -7,7 +7,7 @@ import {RangeMapping} from "../RangeMapping"
 import {Vertex, MatrixVertex, FormulaCellVertex, ValueCellVertex, RangeVertex, EmptyCellVertex} from "../Vertex"
 import {SerializedMapping, AddressMapping, SparseStrategy, DenseStrategy} from "../AddressMapping"
 import {Config} from "../Config"
-import {Statistics} from "../statistics/Statistics"
+import {Statistics, StatType} from "../statistics/Statistics"
 import {Interpreter} from "../interpreter/Interpreter"
 
 class Main {
@@ -24,6 +24,8 @@ class Main {
   }
 
   public postMessage(data: any): void {
+    const stats = new Statistics()
+    stats.start(StatType.DESERIALIZATION)
     const graph = new Graph<Vertex>()
     const addressMapping = AddressMapping.build(1.0)
     const rangeMapping = new RangeMapping()
@@ -107,13 +109,16 @@ class Main {
       }
       addressMapping.addSheet(sheetId, strategy)
     }
+    stats.end(StatType.DESERIALIZATION)
 
     const config = new Config({ gpuMode: 'cpu' })
-    const stats = new Statistics()
     const interpreter = new Interpreter(addressMapping, rangeMapping, graph, config)
+    stats.start(StatType.TOP_SORT)
     const { sorted, cycled } = graph.topologicalSort()
+    stats.end(StatType.TOP_SORT)
     const results: { address: SimpleCellAddress, result: CellValue }[] = []
 
+    stats.start(StatType.EVALUATION)
     cycled.forEach((vertex: Vertex) => {
       const cellValue = new CellError(ErrorType.CYCLE)
       results.push({
@@ -134,6 +139,9 @@ class Main {
         vertex.setCellValue(cellValue)
       }
     })
+    stats.end(StatType.EVALUATION)
+
+    // console.warn(stats.snapshot())
 
     this.sendMessage(results)
   }
