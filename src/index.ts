@@ -19,13 +19,10 @@ import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 import {Pool} from './worker/Pool'
+import {Evaluator} from './Evaluator'
 
 export {
   Config,
-}
-
-interface Evaluator {
-  run(): void,
 }
 
 class SingleThreadEvaluator implements Evaluator {
