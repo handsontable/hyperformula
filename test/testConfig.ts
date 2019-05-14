@@ -9,4 +9,5 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   functionPlugins: [],
   gpuMode: 'cpu',
   matrixDetection: false,
+  evaluatorMode: 'single-thread',
 })

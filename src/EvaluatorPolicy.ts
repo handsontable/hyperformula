@@ -5,7 +5,20 @@ export class EvaluatorPolicy {
   }
 
   public shouldBeParallel(independentSheets: boolean[]): boolean {
-    return false
+    switch (this.config.evaluator) {
+      case 'parallel':
+        return true
+      case 'single-thread':
+        return false
+      case 'auto':
+        return this.choose(independentSheets)
+    }
+  }
+
+  private choose(independentSheets: boolean[]): boolean {
+    if (independentSheets.length <= 1) {
+      return false
+    }
     for (const sheetIndependence of independentSheets) {
       if (sheetIndependence)
         return true
