@@ -29,7 +29,7 @@ export class RangeMapping {
     return this.rangeMapping.get(key) || null
   }
 
-  public getAllVerticesFromSheet(sheetId: number): Array<RangeVertex> {
+  public getAllVerticesFromSheet(sheetId: number): RangeVertex[] {
     const result = new Array()
     for (const rangeVertex of this.rangeMapping.values()) {
       if (rangeVertex.start.sheet === sheetId) {

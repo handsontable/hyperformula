@@ -1,5 +1,5 @@
+import {Config} from '../../src'
 import {benchmark} from './benchmark'
-import {Config} from "../../src";
 
 async function start() {
   console.info('=== MNIST - CPU ===')
@@ -20,7 +20,7 @@ async function start() {
     csvDelimiter: ',',
     functionArgSeparator: ',',
     gpuMode: 'gpu',
-    matrixDetection: false
+    matrixDetection: false,
   }), { millisecondsPerThousandRows: 1000, numberOfRuns: 3})
 
   console.info('=== MNIST - GPU matrix detection ===')
@@ -31,7 +31,7 @@ async function start() {
     csvDelimiter: ',',
     functionArgSeparator: ',',
     gpuMode: 'gpu',
-    matrixDetection: true
+    matrixDetection: true,
   }), { millisecondsPerThousandRows: 1000, numberOfRuns: 3})
 }
 

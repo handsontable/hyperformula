@@ -154,6 +154,14 @@ export class Graph<T extends Identifiable> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
+  public getNodeById(id: number) {
+    const node = this.nodes.get(id)
+    if (!node) {
+      throw new Error(`Missing node with id ${id}`)
+    }
+    return node
+  }
+
   /**
    * Builds a mapping from nodes to the count of their incoming edges.
    */
@@ -166,12 +174,5 @@ export class Graph<T extends Identifiable> {
       })
     })
     return incomingEdges
-  }
-
-  public getNodeById(id: number) {
-    const node = this.nodes.get(id)
-    if (!node)
-      throw new Error(`Missing node with id ${id}`)
-    return node
   }
 }

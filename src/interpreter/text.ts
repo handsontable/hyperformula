@@ -1,4 +1,4 @@
-import {CellValue, CellError} from '../Cell'
+import {CellError, CellValue} from '../Cell'
 
 /**
  * Concatenates two strings

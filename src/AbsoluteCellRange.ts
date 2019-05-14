@@ -1,20 +1,20 @@
 import {AddressMapping} from './AddressMapping'
 import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellAddress} from "./CellAddress"
+import {CellAddress} from './CellAddress'
 import {Matrix} from './Matrix'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
 export class AbsoluteCellRange {
 
-  public toString() {
-    return `${this.start.sheet},${this.start.col},${this.start.row},${this.end.col},${this.end.row}`
+  public get sheet() {
+    return this.start.sheet
   }
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
       new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress)
+      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
     )
   }
 
@@ -38,16 +38,16 @@ export class AbsoluteCellRange {
     }
   }
 
+  public toString() {
+    return `${this.start.sheet},${this.start.col},${this.start.row},${this.end.col},${this.end.row}`
+  }
+
   public width() {
     return this.end.col - this.start.col + 1
   }
 
   public height() {
     return this.end.row - this.start.row + 1
-  }
-
-  public get sheet() {
-    return this.start.sheet
   }
 
   public doesOverlap(other: AbsoluteCellRange) {

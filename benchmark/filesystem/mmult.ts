@@ -7,7 +7,7 @@ async function start() {
     csvDelimiter: ';',
     functionArgSeparator: ',',
     gpuMode: 'gpu',
-    matrixDetection: false
+    matrixDetection: false,
   }), { millisecondsPerThousandRows: 8000, numberOfRuns: 3})
 
   console.info('\n === MMULT - GPU with matrix detection === ')
@@ -15,7 +15,7 @@ async function start() {
     csvDelimiter: ';',
     functionArgSeparator: ',',
     gpuMode: 'gpu',
-    matrixDetection: true
+    matrixDetection: true,
   }), { millisecondsPerThousandRows: 8000, numberOfRuns: 3})
 
   console.info('\n === MMULT - CPU without matrix detection === ')
@@ -23,7 +23,7 @@ async function start() {
     csvDelimiter: ';',
     functionArgSeparator: ',',
     gpuMode: 'cpu',
-    matrixDetection: false
+    matrixDetection: false,
   }), { millisecondsPerThousandRows: 8000, numberOfRuns: 3})
 
   console.info('\n === MMULT - CPU with matrix detection === ')
@@ -31,7 +31,7 @@ async function start() {
     csvDelimiter: ';',
     functionArgSeparator: ',',
     gpuMode: 'cpu',
-    matrixDetection: true
+    matrixDetection: true,
   }), { millisecondsPerThousandRows: 8000, numberOfRuns: 3})
 }
 

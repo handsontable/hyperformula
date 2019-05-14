@@ -84,7 +84,7 @@ export class GraphBuilder {
 
       matrixHeuristic.addSheet(sheetId, {
         width: this.addressMapping.getWidth(sheetId),
-        height: this.addressMapping.getHeight(sheetId)
+        height: this.addressMapping.getHeight(sheetId),
       })
 
       for (let i = 0; i < sheet.length; ++i) {
@@ -131,7 +131,7 @@ export class GraphBuilder {
 
     matrixHeuristic.run()
     this.handleDependencies(dependencies)
-    
+
     return independentSheets
   }
 

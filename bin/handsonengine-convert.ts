@@ -2,7 +2,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import {HandsOnEngine} from '../src'
 
-
 async function start() {
   if (process.argv.length < 4) {
     console.log('Usage:\nyarn ts-node bin/handsonengine-convert formulas.csv output.csv')

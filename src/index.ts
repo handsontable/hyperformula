@@ -10,18 +10,18 @@ import {
 } from './Cell'
 import {CellAddress} from './CellAddress'
 import {Config} from './Config'
+import {Evaluator} from './Evaluator'
+import {EvaluatorPolicy} from './EvaluatorPolicy'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {Interpreter} from './interpreter/Interpreter'
+import {ParallelEvaluator} from './ParallelEvaluator'
 import {Ast, cellAddressFromString, isFormula} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import {Evaluator} from './Evaluator'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
-import {ParallelEvaluator} from './ParallelEvaluator'
-import {EvaluatorPolicy} from './EvaluatorPolicy'
 
 export {
   Config,
@@ -88,7 +88,7 @@ export class HandsOnEngine {
   private readonly sheetMapping = new SheetMapping()
 
   constructor(
-    private readonly config: Config
+    private readonly config: Config,
   ) {
   }
 

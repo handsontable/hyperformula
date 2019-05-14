@@ -6,7 +6,7 @@ import {expectedValues as eT, sheet as T} from './sheets/05-sheet-t'
 import {sheet as Bs} from './sheets/06-big-sum'
 import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-sheet-a'
 import {expectedValues as expectedValuesB, sheet as sheetBFn} from './sheets/10-sheet-b'
-import {sheets as sheetsManyMediansFn, expectedValues as expectedValuesManyMedians} from './sheets/11-many-medians'
+import {expectedValues as expectedValuesManyMedians, sheets as sheetsManyMediansFn} from './sheets/11-many-medians'
 
 async function start() {
   const simpleBig = Sb()

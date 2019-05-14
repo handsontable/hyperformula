@@ -20,8 +20,9 @@ export class EvaluatorPolicy {
       return false
     }
     for (const sheetIndependence of independentSheets) {
-      if (sheetIndependence)
+      if (sheetIndependence) {
         return true
+      }
     }
     return false
   }

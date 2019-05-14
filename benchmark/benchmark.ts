@@ -32,7 +32,7 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
 
   const stats: Array<Map<StatType, number>> = []
   const rows = Object.keys(sheets)
-      .map(key => sheets[key].length)
+      .map((key) => sheets[key].length)
       .reduce((sum: number, length: number) => sum + length)
 
   let currentRun = 0

@@ -85,7 +85,7 @@ describe('Integration', () => {
     ])
 
     expect(engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '2')).rejects.toEqual(
-      new Error('Changes to cells other than simple values not supported')
+      new Error('Changes to cells other than simple values not supported'),
     )
   })
 
@@ -95,7 +95,7 @@ describe('Integration', () => {
     ])
 
     expect(engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '=A1')).rejects.toEqual(
-      new Error('Changes to cells other than simple values not supported')
+      new Error('Changes to cells other than simple values not supported'),
     )
   })
 

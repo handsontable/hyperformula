@@ -1,9 +1,9 @@
+import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
 import {Config, HandsOnEngine} from '../src'
 import {CsvSheets, Sheets} from '../src/GraphBuilder'
-import parse from 'csv-parse/lib/sync'
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)

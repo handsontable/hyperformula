@@ -6,7 +6,7 @@ import {Ast} from './parser'
 
 let nextVertexId = 1
 const getNextVertexId = (): number => {
-  return nextVertexId++;
+  return nextVertexId++
 }
 
 /**
@@ -25,11 +25,11 @@ export class MatrixVertex {
   }
   public readonly width: number
   public readonly height: number
-  public readonly kind = "matrix"
+  public readonly kind = 'matrix'
+  public readonly id: number
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
   private matrix: Matrix
-  public readonly id: number
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast, id: number = getNextVertexId()) {
     this.cellAddress = cellAddress
@@ -72,7 +72,9 @@ export class MatrixVertex {
  * Represents vertex which keeps formula
  */
 export class FormulaCellVertex {
-  public readonly kind = "formula"
+  public readonly kind = 'formula'
+
+  public readonly id: number
   /** Most recently computed value of this formula. */
   private cachedCellValue?: CellValue
 
@@ -81,8 +83,6 @@ export class FormulaCellVertex {
 
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
-
-  public readonly id: number
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, id: number = getNextVertexId()) {
     this.formula = formula
@@ -127,11 +127,11 @@ export class FormulaCellVertex {
  * Represents vertex which keeps static cell value
  */
 export class ValueCellVertex {
-  public readonly kind = "value"
-  /** Static cell value. */
-  private cellValue: CellValue
+  public readonly kind = 'value'
 
   public readonly id: number
+  /** Static cell value. */
+  private cellValue: CellValue
 
   constructor(cellValue: CellValue, id: number = getNextVertexId()) {
     this.cellValue = cellValue
@@ -157,8 +157,6 @@ export class ValueCellVertex {
  * Represents singleton vertex bound to all empty cells
  */
 export class EmptyCellVertex {
-  public readonly id: number = 0
-  public readonly kind = "empty"
 
   /**
    * Retrieves singleton
@@ -172,6 +170,8 @@ export class EmptyCellVertex {
 
   /** Singleton instance. */
   private static instance: EmptyCellVertex
+  public readonly id: number = 0
+  public readonly kind = 'empty'
 
   /**
    * Retrieves cell value bound to that singleton
@@ -190,7 +190,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
  * Represents vertex bound to range
  */
 export class RangeVertex {
-  public readonly kind = "range"
+  public readonly kind = 'range'
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, CellValue>
 

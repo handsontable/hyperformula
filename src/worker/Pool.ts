@@ -1,12 +1,12 @@
-import Main from "./Main.worker";
-import {Vertex} from "../Vertex"
+import {Vertex} from '../Vertex'
+import Main from './Main.worker'
 
 export class Pool {
   private workers: Main[] = []
-  private size: number;
+  private size: number
 
   constructor(size: number) {
-    this.size = size;
+    this.size = size
   }
 
   public addWorkerTaskForAllWorkers(workerTaskFunction: ((workerId: number) => WorkerTask)) {
@@ -18,7 +18,7 @@ export class Pool {
   }
 
   public init() {
-    for (var i = 0 ; i < this.size ; i++) {
+    for (let i = 0 ; i < this.size ; i++) {
       const worker = new Main()
       worker.id = i
       this.workers.push(worker)
@@ -28,8 +28,8 @@ export class Pool {
 
 export interface WorkerTask {
   data: {
-    kind: "INIT",
-    vertices: Array<Vertex>,
+    kind: 'INIT',
+    vertices: Vertex[],
     edges: number[],
   },
   callback: any,

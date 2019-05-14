@@ -9,8 +9,7 @@ function gen(arr: number[][]): any[][] {
     row.forEach((elem) => {
       if (elem !== 0) {
         newrow.push(`=${elem}`)
-      }
-      else {
+      } else {
         newrow.push(null)
       }
     })

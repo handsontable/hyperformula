@@ -1,10 +1,4 @@
-import {Ast} from './parser'
-import {Config} from './Config'
 import {AddressMapping, SerializedMapping} from './AddressMapping'
-import {RangeMapping} from './RangeMapping'
-import {Graph} from './Graph'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
-import {Evaluator} from './Evaluator'
 import {
   CellError,
   CellValue,
@@ -12,8 +6,14 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Config} from './Config'
+import {Evaluator} from './Evaluator'
+import {Graph} from './Graph'
 import {Interpreter} from './interpreter/Interpreter'
+import {Ast} from './parser'
+import {RangeMapping} from './RangeMapping'
+import {Statistics, StatType} from './statistics/Statistics'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
 import {Pool} from './worker/Pool'
 
 export class ParallelEvaluator implements Evaluator {
@@ -40,8 +40,8 @@ export class ParallelEvaluator implements Evaluator {
     this.stats.start(StatType.SERIALIZATION)
     const chunks = this.prepareChunks()
     this.stats.end(StatType.SERIALIZATION)
-    const chunksPromises: Promise<any>[] = []
-    const chunksPromisesResolvers: (() => void)[] = []
+    const chunksPromises: Array<Promise<any>> = []
+    const chunksPromisesResolvers: Array<() => void> = []
     for (const chunk of chunks) {
       const promise = new Promise((resolve) => {
         chunksPromisesResolvers.push(resolve)
@@ -52,11 +52,11 @@ export class ParallelEvaluator implements Evaluator {
     const pool = new Pool(chunks.length)
     pool.init()
     pool.addWorkerTaskForAllWorkers((workerId: number) => ({
-      data: { kind: "INIT", ...chunks[workerId] },
+      data: { kind: 'INIT', ...chunks[workerId] },
       callback: (message: any) => {
-        this.handleWorkerMessage(message.data as { address: SimpleCellAddress, result:CellValue }[])
+        this.handleWorkerMessage(message.data as Array<{ address: SimpleCellAddress, result: CellValue }>)
         chunksPromisesResolvers[workerId]()
-      }
+      },
     }))
 
     await Promise.all(chunksPromises)
@@ -64,7 +64,7 @@ export class ParallelEvaluator implements Evaluator {
     // console.warn(this.stats.snapshot())
   }
 
-  private handleWorkerMessage(messageData: { address: SimpleCellAddress, result:CellValue }[]) {
+  private handleWorkerMessage(messageData: Array<{ address: SimpleCellAddress, result: CellValue }>) {
     for (const result of messageData) {
       const vertex = this.addressMapping.getCell(result.address)
       if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
@@ -75,13 +75,13 @@ export class ParallelEvaluator implements Evaluator {
 
   private prepareChunks() {
     const chunks = []
-    const dependentVertices: { vertices: Vertex[], edges: number[], mappings: { sheetId: number, serializedMapping: SerializedMapping }[] } = {
+    const dependentVertices: { vertices: Vertex[], edges: number[], mappings: Array<{ sheetId: number, serializedMapping: SerializedMapping }> } = {
       vertices: [],
       edges: [],
       mappings: [],
     }
     for (let sheetId = 0; sheetId < this.independentSheets.length; sheetId++) {
-      let vertices = this.addressMapping.getAllVerticesFromSheet(sheetId).concat(this.rangeMapping.getAllVerticesFromSheet(sheetId))
+      const vertices = this.addressMapping.getAllVerticesFromSheet(sheetId).concat(this.rangeMapping.getAllVerticesFromSheet(sheetId))
       const edges = []
       for (const node of vertices) {
         for (const adjacentNode of this.graph.adjacentNodes(node)) {
@@ -92,7 +92,7 @@ export class ParallelEvaluator implements Evaluator {
       const serializedMapping = this.addressMapping.getSerializedMapping(sheetId)
       if (this.independentSheets[sheetId] === true) {
         const chunk = {
-          vertices, 
+          vertices,
           edges,
           mappings: [{ sheetId, serializedMapping }],
         }
