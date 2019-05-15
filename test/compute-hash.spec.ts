@@ -1,4 +1,4 @@
-import { simpleCellAddress } from '../src/Cell'
+
 import { CellAddress } from '../src/CellAddress'
 import { Config } from '../src/Config'
 import { buildLexerConfig, FormulaLexer, ParserWithCaching } from '../src/parser'

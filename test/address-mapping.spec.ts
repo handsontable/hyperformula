@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
-import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from '../src/Vertex'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/Vertex'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {

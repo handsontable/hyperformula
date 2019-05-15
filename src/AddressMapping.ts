@@ -1,8 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Graph} from './Graph'
-import {Sheet, Sheets} from './GraphBuilder'
-import {Matrix} from './Matrix'
+import {Sheet} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
 export type SerializedMapping = DenseSerializedMapping | SparseSerializedMapping

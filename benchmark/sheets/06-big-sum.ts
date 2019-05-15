@@ -1,4 +1,4 @@
-import {benchmark} from '../benchmark'
+
 
 export function sheet() {
   const rows = 100000

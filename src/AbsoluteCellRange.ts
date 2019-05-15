@@ -1,5 +1,5 @@
 import {AddressMapping} from './AddressMapping'
-import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress} from './CellAddress'
 import {Matrix} from './Matrix'
 

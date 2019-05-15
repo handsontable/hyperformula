@@ -1,5 +1,4 @@
 import {HandsOnEngine} from '../src'
-import {AddressMapping} from '../src/AddressMapping'
 import {CellError, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 

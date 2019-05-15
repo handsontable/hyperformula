@@ -1,6 +1,5 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {Array2d, findMatrices, GraphBuilderMatrixHeuristic} from '../src/GraphBuilderMatrixHeuristic'
-import {Size} from '../src/Matrix'
+import {Array2d, findMatrices} from '../src/GraphBuilderMatrixHeuristic'
 
 function gen(arr: number[][]): any[][] {
   const result: any[][] = []

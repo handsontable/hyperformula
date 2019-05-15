@@ -1,10 +1,7 @@
-import {AddressMapping, SerializedMapping} from './AddressMapping'
+import {AddressMapping} from './AddressMapping'
 import {
   CellError,
-  CellValue,
   ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress,
 } from './Cell'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
@@ -13,7 +10,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './Vertex'
+import { FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './Vertex'
 
 export class SingleThreadEvaluator implements Evaluator {
   /** Topologically sorted list of vertices. */

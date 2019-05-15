@@ -1,5 +1,4 @@
 import {HandsOnEngine} from '../src'
-import {CellError, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 
 describe('Loading CSV', () => {

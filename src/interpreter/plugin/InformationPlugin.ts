@@ -1,6 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {EmptyCellVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**

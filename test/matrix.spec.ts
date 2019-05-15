@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../src'
+
 import {Matrix} from '../src/Matrix'
 
 describe('Matrix', () => {

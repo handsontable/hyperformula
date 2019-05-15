@@ -1,4 +1,4 @@
-import {Config, ConfigParams} from '../src/Config'
+import {Config} from '../src/Config'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   addressMappingFillThreshold: 1,

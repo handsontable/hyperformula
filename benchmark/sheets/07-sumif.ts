@@ -1,4 +1,4 @@
-import {benchmark, ExpectedValue} from '../benchmark'
+import { ExpectedValue} from '../benchmark'
 
 export function sheet() {
   const rows = 30000

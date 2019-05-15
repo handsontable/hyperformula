@@ -8,7 +8,7 @@ import {
   SimpleCellAddress,
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
-import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
+import {AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {CriterionCache, RangeVertex} from '../../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
