@@ -12,7 +12,7 @@ export class SheetMapping {
     return this.lastSheetId
   }
 
-  public fetch(sheetName: string): number {
+  public fetch = (sheetName: string): number => {
     const sheetId = this.mapping.get(sheetName)
     if (sheetId === undefined) {
       throw new Error(`Sheet ${sheetName} doesnt exist`)

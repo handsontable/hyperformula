@@ -2,13 +2,15 @@ import {SimpleCellAddress} from '../Cell'
 import {CellAddress} from '../CellAddress'
 import {SheetMapping} from '../SheetMapping'
 
+export type SheetMappingFn = (sheetName: string) => number
+
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
  *
  * @param stringAddress - string representation of cell address, e.g. 'C64'
  * @param baseAddress - base address for R0C0 conversion
  */
-export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress => {
+export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress => {
   const result = stringAddress.match(/^(\$([A-Za-z0-9]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 
   let col
@@ -22,7 +24,7 @@ export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress:
 
   let sheet
   if (result[2]) {
-    sheet = sheetMapping.fetch(result[2])
+    sheet = sheetMapping(result[2])
   } else if (overrideSheet !== undefined) {
     sheet = overrideSheet
   } else {

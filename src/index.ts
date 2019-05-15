@@ -127,7 +127,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    */
   public getCellValue(stringAddress: string): CellValue {
-    const address = cellAddressFromString(this.sheetMapping, stringAddress, CellAddress.absolute(0, 0, 0))
+    const address = cellAddressFromString(this.sheetMapping.fetch, stringAddress, CellAddress.absolute(0, 0, 0))
     return this.addressMapping!.getCellValue(address)
   }
 

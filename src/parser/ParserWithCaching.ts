@@ -74,7 +74,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
+        const cellAddress = cellAddressFromString(this.sheetMapping.fetch, token.image, baseAddress)
         hash = hash.concat(cellHashFromToken(cellAddress))
         idx++
       } else {
