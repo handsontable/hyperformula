@@ -1,6 +1,5 @@
 import {SimpleCellAddress} from '../Cell'
 import {CellAddress} from '../CellAddress'
-import {SheetMapping} from '../SheetMapping'
 
 export type SheetMappingFn = (sheetName: string) => number
 

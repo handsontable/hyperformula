@@ -58,7 +58,7 @@ export class GraphBuilder {
               private readonly stats: Statistics,
               private readonly config: Config,
               private readonly sheetMapping: SheetMapping) {
-    this.parser = new ParserWithCaching(config, this.sheetMapping)
+    this.parser = new ParserWithCaching(config, this.sheetMapping.fetch)
   }
 
   /**

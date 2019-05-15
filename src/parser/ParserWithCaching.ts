@@ -4,10 +4,9 @@ import {SimpleCellAddress} from '../Cell'
 import {CellAddress, CellReferenceType} from '../CellAddress'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
-import {SheetMapping} from '../SheetMapping'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {Cache, RelativeDependency} from './Cache'
-import {cellAddressFromString} from './cellAddressFromString'
+import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
 
@@ -23,7 +22,7 @@ export class ParserWithCaching {
 
   constructor(
     private readonly config: Config,
-    private readonly sheetMapping: SheetMapping,
+    private readonly sheetMapping: SheetMappingFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
@@ -74,7 +73,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(this.sheetMapping.fetch, token.image, baseAddress)
+        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
         hash = hash.concat(cellHashFromToken(cellAddress))
         idx++
       } else {

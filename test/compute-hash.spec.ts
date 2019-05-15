@@ -10,7 +10,7 @@ describe('computeHash', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(config, sheetMapping)
+    const parser = new ParserWithCaching(config, sheetMapping.fetch)
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHash(tokens, address)
   }

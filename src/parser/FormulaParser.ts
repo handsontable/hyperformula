@@ -2,7 +2,6 @@ import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} fro
 
 import {SimpleCellAddress} from '../Cell'
 import {CellAddress, CellReferenceType} from '../CellAddress'
-import {SheetMapping} from '../SheetMapping'
 import {
   Ast,
   AstNodeType,
@@ -28,7 +27,7 @@ import {
   CellReferenceAst,
   ParsingErrorType,
 } from './Ast'
-import {cellAddressFromString} from './cellAddressFromString'
+import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {
   AdditionOp,
   BooleanOp,
@@ -91,7 +90,7 @@ export class FormulaParser extends Parser {
    */
   private formulaAddress?: SimpleCellAddress
 
-  private sheetMapping?: SheetMapping
+  private readonly sheetMapping: SheetMappingFn
 
   /**
    * Cache for positiveAtomicExpression alternatives
@@ -382,7 +381,7 @@ export class FormulaParser extends Parser {
    */
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
-    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!.fetch, cell.image, this.formulaAddress!, sheet))
+    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet))
   })
 
   /**
@@ -395,7 +394,7 @@ export class FormulaParser extends Parser {
     return expression
   })
 
-  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMapping) {
+  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping

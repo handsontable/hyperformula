@@ -26,7 +26,7 @@ const flattenSheet: string[] = ([] as string[]).concat([], ...sheet) // flatten
 const runsData = []
 let currentRun = 0
 while (currentRun < numberOfRuns) {
-  const parser = new ParserWithCaching(new Config(), new SheetMapping())
+  const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
   const timestampBefore = Date.now()
   flattenSheet.forEach((formula) => {

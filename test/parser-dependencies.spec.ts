@@ -7,7 +7,7 @@ import {SheetMapping} from '../src/SheetMapping'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=B2', CellAddress.absolute(0, 1, 1)).dependencies
 
@@ -17,7 +17,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('works with absolute dependencies', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=$B$2', CellAddress.absolute(0, 1, 1)).dependencies
 
@@ -26,7 +26,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('works for CELL_RANGE', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=B2:C4', CellAddress.absolute(0, 0, 0)).dependencies
 
@@ -36,7 +36,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside unary minus', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=-B2', CellAddress.absolute(0, 0, 0)).dependencies
 
@@ -46,7 +46,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside plus operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=B2+C3', CellAddress.absolute(0, 0, 0)).dependencies
 
@@ -57,7 +57,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside function call arguments', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=SUM(B2, C3)', CellAddress.absolute(0, 0, 0)).dependencies
 
@@ -68,7 +68,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('OFFSET call is correctly found as dependency', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=OFFSET(D4, 0, 0)', CellAddress.absolute(0, 1, 1)).dependencies
     expect(dependencies).toEqual([
@@ -77,7 +77,7 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('COLUMNS arguments are not dependencies', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping())
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
     const dependencies = parser.parse('=COLUMNS(A1:B3)', CellAddress.absolute(0, 1, 1)).dependencies
     expect(dependencies).toEqual([])
