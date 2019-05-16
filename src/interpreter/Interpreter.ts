@@ -26,6 +26,7 @@ import {GPU} from 'gpu.js'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
+  public readonly gpu: GPU
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -33,6 +34,7 @@ export class Interpreter {
     public readonly graph: Graph<Vertex>,
     public readonly config: Config,
   ) {
+    this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
     this.registerPlugins([
       SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin,
     ])
@@ -161,8 +163,7 @@ export class Interpreter {
             return new Matrix(resultMatrix)
           } else {
             const matrixValue = matrixVertex.getCellValue()
-            const gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
-            const kernel = gpu.createKernel(function(a: number[][], b: number[][]) {
+            const kernel = this.gpu.createKernel(function(a: number[][], b: number[][]) {
               return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
             }).setOutput([matrixVertex.width, matrixVertex.height])
 

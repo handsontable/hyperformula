@@ -23,11 +23,8 @@ export class MatrixPlugin extends FunctionPlugin {
     },
   }
 
-  private gpu: GPU
-
   constructor(protected readonly interpreter: Interpreter) {
     super(interpreter)
-    this.gpu = new GPU({mode: interpreter.config.gpuMode, format: 'Float'})
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -52,7 +49,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
-    const kernel = this.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
+    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
       for (let i = 0; i < width; ++i) {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
@@ -90,7 +87,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rangeMatrix
     }
 
-    const kernel = this.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
+    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
       const leftCornerX = this.thread.x as number * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
@@ -120,7 +117,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return value
     }
 
-    const kernel = this.gpu.createKernel(function(a: number[][]) {
+    const kernel = this.interpreter.gpu.createKernel(function(a: number[][]) {
       return a[this.thread.x as number][this.thread.y as number]
     }).setOutput([vertex.width, vertex.height])
 
