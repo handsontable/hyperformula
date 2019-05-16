@@ -19,7 +19,13 @@ export function sheet(): string[][] {
     }
     sheet.push(rowToPush)
   }
-  sheet.push([`{=MMULT(A1:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize - 1 })}, ${sheetCellAddressToString({ row: 0, col: matrixSize })}:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize * 2 - 1 })})}`])
+  for (let i = 0; i < matrixSize; i++) {
+    const rowToPush: string[] = []
+    for (let j = 0; j < matrixSize; j++) {
+      rowToPush.push(`{=MMULT(A1:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize - 1 })}, ${sheetCellAddressToString({ row: 0, col: matrixSize })}:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize * 2 - 1 })})}`)
+    }
+    sheet.push(rowToPush)
+  }
 
   return sheet
 }
@@ -37,3 +43,5 @@ async function start() {
   console.info('\n === Sheet Matrix Multiplication -- CPU === ')
   await benchmark(s, expectedValues(s), { millisecondsPerThousandRows: 8000, numberOfRuns: 3, engineConfig: new EngineConfig({ gpuMode: 'cpu' }) })
 }
+
+start()
