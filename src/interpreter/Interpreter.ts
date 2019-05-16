@@ -140,22 +140,44 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof Matrix && ast.right.type === AstNodeType.CELL_RANGE) {
           const rightRange = AbsoluteCellRange.fromCellRange(ast.right, formulaAddress)
-          const resultMatrix: number[][] = []
-          let currentRow = 0
-          while (currentRow < leftResult.height()) {
-            const row: number[] = []
-            let currentColumn = 0
-            while (currentColumn < leftResult.width()) {
-              row.push(addStrict(
-                leftResult.get(currentColumn, currentRow),
-                this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
-              ) as number)
-              currentColumn++
+          const matrixVertex = this.addressMapping.getMatrix(rightRange)
+          if (matrixVertex === undefined) {
+            const resultMatrix: number[][] = []
+            let currentRow = 0
+            while (currentRow < leftResult.height()) {
+              const row: number[] = []
+              let currentColumn = 0
+              while (currentColumn < leftResult.width()) {
+                row.push(addStrict(
+                  leftResult.get(currentColumn, currentRow),
+                  this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
+                ) as number)
+                currentColumn++
+              }
+              resultMatrix.push(row)
+              currentRow++
             }
-            resultMatrix.push(row)
-            currentRow++
+            return new Matrix(resultMatrix)
+          } else {
+            console.warn("using remembered matrix")
+            const matrixValue = matrixVertex.getCellValue()
+            const resultMatrix: number[][] = []
+            let currentRow = 0
+            while (currentRow < leftResult.height()) {
+              const row: number[] = []
+              let currentColumn = 0
+              while (currentColumn < leftResult.width()) {
+                row.push(addStrict(
+                  leftResult.get(currentColumn, currentRow),
+                  matrixValue.get(currentColumn, currentRow)
+                ) as number)
+                currentColumn++
+              }
+              resultMatrix.push(row)
+              currentRow++
+            }
+            return new Matrix(resultMatrix)
           }
-          return new Matrix(resultMatrix)
         }
         return addStrict(leftResult, rightResult)
       }
