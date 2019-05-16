@@ -22,6 +22,7 @@ import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
+import {GPU} from 'gpu.js'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -159,24 +160,13 @@ export class Interpreter {
             }
             return new Matrix(resultMatrix)
           } else {
-            console.warn("using remembered matrix")
             const matrixValue = matrixVertex.getCellValue()
-            const resultMatrix: number[][] = []
-            let currentRow = 0
-            while (currentRow < leftResult.height()) {
-              const row: number[] = []
-              let currentColumn = 0
-              while (currentColumn < leftResult.width()) {
-                row.push(addStrict(
-                  leftResult.get(currentColumn, currentRow),
-                  matrixValue.get(currentColumn, currentRow)
-                ) as number)
-                currentColumn++
-              }
-              resultMatrix.push(row)
-              currentRow++
-            }
-            return new Matrix(resultMatrix)
+            const gpu = new GPU({mode: this.config.gpuMode})
+            const kernel = gpu.createKernel(function(a: number[][], b: number[][]) {
+              return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
+            }).setOutput([matrixVertex.width, matrixVertex.height])
+
+            return new Matrix(kernel(leftResult.raw(), matrixValue.raw()) as number[][])
           }
         }
         return addStrict(leftResult, rightResult)
