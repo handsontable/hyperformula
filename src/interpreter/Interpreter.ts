@@ -161,7 +161,7 @@ export class Interpreter {
             return new Matrix(resultMatrix)
           } else {
             const matrixValue = matrixVertex.getCellValue()
-            const gpu = new GPU({mode: this.config.gpuMode})
+            const gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
             const kernel = gpu.createKernel(function(a: number[][], b: number[][]) {
               return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
             }).setOutput([matrixVertex.width, matrixVertex.height])

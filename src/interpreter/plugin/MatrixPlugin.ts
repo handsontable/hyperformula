@@ -27,7 +27,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
   constructor(protected readonly interpreter: Interpreter) {
     super(interpreter)
-    this.gpu = new GPU({mode: interpreter.config.gpuMode})
+    this.gpu = new GPU({mode: interpreter.config.gpuMode, format: 'Float'})
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
