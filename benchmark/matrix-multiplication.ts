@@ -14,7 +14,11 @@ export function sheet(): string[][] {
   const current = 1
   for (let i = 0; i < matrixSize; i++) {
     const rowToPush: string[] = []
-    for (let j = 0; j < (matrixSize * 2); j++) {
+    for (let j = 0; j < matrixSize; j++) {
+      rowToPush.push(randomNumber(1, 1000).toString())
+    }
+    rowToPush.push("")
+    for (let j = 0; j < matrixSize; j++) {
       rowToPush.push(randomNumber(1, 1000).toString())
     }
     sheet.push(rowToPush)
@@ -22,7 +26,7 @@ export function sheet(): string[][] {
   for (let i = 0; i < matrixSize; i++) {
     const rowToPush: string[] = []
     for (let j = 0; j < matrixSize; j++) {
-      rowToPush.push(`{=MMULT(A1:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize - 1 })}, ${sheetCellAddressToString({ row: 0, col: matrixSize })}:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize * 2 - 1 })})}`)
+      rowToPush.push(`{=MMULT(A1:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize - 1 })}, ${sheetCellAddressToString({ row: 0, col: matrixSize + 1 })}:${sheetCellAddressToString({ row: matrixSize - 1, col: matrixSize * 2 })})}`)
     }
     sheet.push(rowToPush)
   }
