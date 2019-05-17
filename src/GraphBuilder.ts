@@ -171,14 +171,14 @@ export class GraphBuilder {
     for (let i=notMatrices.length-1; i>=0; --i) {
       const elem = notMatrices[i]
       if (elem.hash === '#') {
-        for (let address of elem.range.generateCellsFromRangeGenerator()) {
+        for (let address of elem.cells) {
           const value = sheets[this.sheetMapping.name(address.sheet)][address.row][address.col]
           const vertex = new ValueCellVertex(Number(value))
           this.graph.addNode(vertex)
           this.addressMapping.setCell(address, vertex)
         }
       } else {
-        for (let address of elem.range.generateCellsFromRangeGenerator()) {
+        for (let address of elem.cells) {
           const cacheElem = this.parser.getCache().get(elem.hash)
           if (!cacheElem) {
             throw Error("Something went wrong")

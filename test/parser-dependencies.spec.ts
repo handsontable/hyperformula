@@ -5,7 +5,7 @@ import {Config} from '../src/Config'
 import {ParserWithCaching} from '../src/parser'
 import {SheetMapping} from '../src/SheetMapping'
 
-describe('Parsing collecting dependencies', () => {
+describe.skip('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
