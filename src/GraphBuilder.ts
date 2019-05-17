@@ -129,7 +129,9 @@ export class GraphBuilder {
       }
     }
 
+    this.stats.start(StatType.MATRIX_DETECTION)
     matrixHeuristic.run()
+    this.stats.end(StatType.MATRIX_DETECTION)
     this.handleDependencies(dependencies)
 
     return independentSheets

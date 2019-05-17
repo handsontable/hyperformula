@@ -60,6 +60,7 @@ function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: 
   const parsing = stats.map((s) => s.get(StatType.PARSER)!).sort()
   const topSort = stats.map((s) => s.get(StatType.TOP_SORT)!).sort()
   const buildGraph = stats.map((s) => s.get(StatType.GRAPH_BUILD)!).sort()
+  const matrixDetection = stats.map((s) => s.get(StatType.MATRIX_DETECTION)!).sort()
   const averageOverall = average(overall)
   const stdDevOverall = standardDeviation(overall)
 
@@ -76,6 +77,7 @@ function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: 
   console.info(`Parsing Median   : ${parsing[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   console.info(`TopSort Median   : ${topSort[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
   console.info(`BuildGraph Median: ${buildGraph[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
+  console.info(`Matrix detection: ${matrixDetection[Math.trunc(config.numberOfRuns / 2)] / 1000}`)
 
   if (rows) {
     const resultMillisecondsPerThousandRows = medianRun / (rows / 1000)
