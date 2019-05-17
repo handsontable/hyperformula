@@ -238,7 +238,9 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
         // 2 *
         colours.set(x, y, ++colour)
         result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true))
-        result.delete(rightColour!)
+        if (result.has(rightColour)) {
+          result.get(rightColour)!.isMatrix = false
+        }
       } else if (value !== diag) {
         if (right === value && right === bottom) {
           // 1 1
