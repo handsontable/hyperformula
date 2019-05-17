@@ -190,8 +190,14 @@ export class GraphBuilder {
           if (smallerRangeVertex) {
             this.graph.addEdge(smallerRangeVertex, rangeVertex)
           }
-          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
+
+          const matrix = this.addressMapping.getMatrix(restRange)
+          if (matrix !== undefined) {
+            this.graph.addEdge(matrix, rangeVertex!)
+          } else {
+            for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
+              this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
+            }
           }
           this.graph.addEdge(rangeVertex, endVertex)
         } else {
