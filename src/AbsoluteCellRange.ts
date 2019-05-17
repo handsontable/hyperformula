@@ -2,6 +2,8 @@ import {AddressMapping} from './AddressMapping'
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress} from './CellAddress'
 import {Matrix} from './Matrix'
+import {SheetMapping} from "./SheetMapping";
+import {Sheets} from "./GraphBuilder";
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
@@ -13,8 +15,8 @@ export class AbsoluteCellRange {
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
-      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+        new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
+        new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
     )
   }
 
@@ -103,6 +105,25 @@ export class AbsoluteCellRange {
       const value = addressMapping.getCellValue(address)
       if (typeof value === 'number') {
         values[address.row - this.start.row][address.col - this.start.col] = value
+      } else {
+        throw new Error('Range contains not numeric values')
+      }
+    }
+
+    return new Matrix(values)
+  }
+
+  public matrixFromPlainValues(sheets: Sheets, sheetMapping: SheetMapping) {
+    const values = new Array(this.height())
+    const sheet = sheets[sheetMapping.name(this.start.sheet)]
+    for (let i = 0; i < this.height(); ++i) {
+      values[i] = new Array(this.width())
+    }
+
+    for (const address of this.generateCellsFromRangeGenerator()) {
+      const value = sheet[address.row][address.col]
+      if (!isNaN(Number(value))) {
+        values[address.row - this.start.row][address.col - this.start.col] = Number(value)
       } else {
         throw new Error('Range contains not numeric values')
       }

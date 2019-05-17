@@ -116,10 +116,7 @@ export class GraphBuilder {
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
-            vertex = new ValueCellVertex(Number(cellContent))
             matrixHeuristic.add('#', cellAddress)
-            this.graph.addNode(vertex)
-            this.addressMapping.setCell(cellAddress, vertex)
           } else {
             vertex = new ValueCellVertex(cellContent)
             this.graph.addNode(vertex)
@@ -130,7 +127,9 @@ export class GraphBuilder {
     }
 
     this.stats.start(StatType.MATRIX_DETECTION)
-    matrixHeuristic.run()
+
+    matrixHeuristic.run(sheets, this.sheetMapping)
+
     this.stats.end(StatType.MATRIX_DETECTION)
     this.handleDependencies(dependencies)
 

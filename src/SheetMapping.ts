@@ -1,5 +1,6 @@
 export class SheetMapping {
   private readonly mapping: Map<string, number> = new Map()
+  private readonly reversedMapping: Map<number, string> = new Map()
   private lastSheetId = -1
 
   public addSheet(sheetName: string): number {
@@ -8,6 +9,7 @@ export class SheetMapping {
     }
 
     this.lastSheetId++
+    this.reversedMapping.set(this.lastSheetId, sheetName)
     this.mapping.set(sheetName, this.lastSheetId)
     return this.lastSheetId
   }
@@ -18,6 +20,14 @@ export class SheetMapping {
       throw new Error(`Sheet ${sheetName} doesnt exist`)
     }
     return sheetId
+  }
+
+  public name = (sheetId: number): string => {
+    const name = this.reversedMapping.get(sheetId)
+    if (name === undefined) {
+      throw new Error(`Sheet ${name} doesnt exist`)
+    }
+    return name
   }
 
   public names(): IterableIterator<string> {
