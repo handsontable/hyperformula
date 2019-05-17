@@ -6,7 +6,7 @@ import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'
 import {Size} from './Matrix'
-import {AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, isMatrix, ProcedureAst} from './parser'
+import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, isMatrix, ProcedureAst} from './parser'
 import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
 import {Sheets} from "./GraphBuilder";
 import {SheetMapping} from "./SheetMapping";
@@ -117,29 +117,26 @@ export class GraphBuilderMatrixHeuristic {
         }
         this.graph.addNode(matrixVertex)
       } else {
+        const formula = parserCache.get(elem.hash)!.ast
         const leftCorner = this.addressMapping.getCell(possibleMatrix.start)
-        if (leftCorner instanceof FormulaCellVertex) {
-          const output = this.ifMatrixCompatibile(leftCorner, possibleMatrix.width(), possibleMatrix.height())
-          if (output) {
-            const {leftMatrix, rightMatrix} = output
-            const newAst = buildMultAst(leftMatrix, rightMatrix)
-            const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
-            const matrixDependencies = []
+        const output = this.ifMatrixCompatibile(elem.range.start, formula, possibleMatrix.width(), possibleMatrix.height())
+        if (output) {
+          const {leftMatrix, rightMatrix} = output
+          const newAst = buildMultAst(leftMatrix, rightMatrix)
+          const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
+          const matrixDependencies = []
 
-            for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
-              const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
-              matrixDependencies.push(...deps)
-              this.addressMapping.setCell(address, matrixVertex)
-              this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
-            }
-
-            this.dependencies.set(leftCorner, matrixDependencies)
-            this.graph.addNode(matrixVertex)
-          } else {
-            notMatrices.push(elem)
+          for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
+            const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
+            matrixDependencies.push(...deps)
+            this.addressMapping.setCell(address, matrixVertex)
+            this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
           }
+
+          this.dependencies.set(leftCorner, matrixDependencies)
+          this.graph.addNode(matrixVertex)
         } else {
-          throw Error("Unsupported case.")
+          notMatrices.push(elem)
         }
       }
     })
@@ -156,9 +153,7 @@ export class GraphBuilderMatrixHeuristic {
     return result
   }
 
-  private ifMatrixCompatibile(leftCorner: FormulaCellVertex, width: number, height: number): ({ leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange }) | false {
-    const formula = leftCorner.getFormula()
-
+  private ifMatrixCompatibile(address: SimpleCellAddress, formula: Ast, width: number, height: number): ({ leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange }) | false {
     if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPROD') {
       if (formula.args.length !== 2) {
         return false
@@ -184,13 +179,13 @@ export class GraphBuilderMatrixHeuristic {
         return false
       }
 
-      const leftArgRange = AbsoluteCellRange.fromCellRange(leftRange, leftCorner.getAddress())
-      const rightArgRange = AbsoluteCellRange.fromCellRange(rightRange, leftCorner.getAddress())
+      const leftArgRange = AbsoluteCellRange.fromCellRange(leftRange, address)
+      const rightArgRange = AbsoluteCellRange.fromCellRange(rightRange, address)
 
       if (leftArgRange.height() === 1 && rightArgRange.width() === 1 && leftArgRange.width() === rightArgRange.height()) {
         const leftMatrix = leftArgRange.withEnd(simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + height - 1))
         const rightMatrix = rightArgRange.withEnd(simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + width - 1, rightArgRange.end.row))
-        const currentMatrix = AbsoluteCellRange.spanFrom(leftCorner.getAddress(), width, height)
+        const currentMatrix = AbsoluteCellRange.spanFrom(address, width, height)
 
         if (!leftMatrix.doesOverlap(currentMatrix) && !rightMatrix.doesOverlap(currentMatrix)) {
           return {leftMatrix, rightMatrix}
