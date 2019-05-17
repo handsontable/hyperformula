@@ -35,7 +35,7 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[], hash: string } {
+  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, hash: string } {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
@@ -45,7 +45,7 @@ export class ParserWithCaching {
             message: e.message,
           }),
       ))
-      return { ast, dependencies: [], hash: '' }
+      return { ast, hash: '' }
     }
 
     const hash = this.computeHash(lexerResult.tokens, formulaAddress)
@@ -57,13 +57,12 @@ export class ParserWithCaching {
       const ast = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
       cacheResult = this.cache.set(hash, ast)
     }
-    const { ast, relativeDependencies } = cacheResult
-    const dependencies = absolutizeDependencies(relativeDependencies, formulaAddress)
+    const { ast } = cacheResult
 
     if (ast.type === AstNodeType.ERROR) {
-      return { ast, dependencies: [], hash }
+      return { ast, hash }
     } else {
-      return { ast, dependencies, hash }
+      return { ast, hash }
     }
   }
 
@@ -108,7 +107,7 @@ export function isMatrix(text: string): Boolean {
  * @param deps - list of addresses in R0C0 format
  * @param baseAddress - base address with regard to which make a convertion
  */
-const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
+export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: SimpleCellAddress): CellDependency[] => {
   return deps.map((dep) => {
     if (Array.isArray(dep)) {
       return new AbsoluteCellRange(dep[0].toSimpleCellAddress(baseAddress), dep[1].toSimpleCellAddress(baseAddress))

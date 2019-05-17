@@ -20,6 +20,8 @@ import {
   ValueCellVertex,
   Vertex,
 } from './Vertex'
+import {MatrixHeuristic} from "./MatrixHeuristic";
+import {absolutizeDependencies} from "./parser/ParserWithCaching";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -66,12 +68,55 @@ export class GraphBuilder {
    *
    * @param sheet - two-dimensional array representation of sheet
    */
+  // public buildGraph(sheets: Sheets): boolean[] {
+  //   const dependencies: Map<Vertex, CellDependency[]> = new Map()
+  //
+  //   const independentSheets: boolean[] = []
+  //   for (const sheetName in sheets) {
+  //     independentSheets[this.sheetMapping.fetch(sheetName)] = true
+  //   }
+  //
+  //   const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.config)
+  //   this.graph.addNode(EmptyCellVertex.getSingletonInstance())
+  //
+  //   for (const sheetName in sheets) {
+  //     const sheetId = this.sheetMapping.fetch(sheetName)
+  //     const sheet = sheets[sheetName] as Sheet
+  //     const heurisitc = new MatrixHeuristic(sheetId, this.graph, dependencies, this.addressMapping.getWidth(sheetId), this.addressMapping.getHeight(sheetId))
+  //
+  //
+  //     for (let i = 0; i < sheet.length; ++i) {
+  //       const row = sheet[i]
+  //       for (let j = 0; j < row.length; ++j) {
+  //         const cellContent = row[j]
+  //         const cellAddress = simpleCellAddress(sheetId, j, i)
+  //         let vertex = null
+  //         if (isMatrix(cellContent)) {
+  //           if (this.addressMapping.has(cellAddress)) {
+  //             continue
+  //           }
+  //           const matrixFormula = cellContent.substr(1, cellContent.length - 2)
+  //           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
+  //           vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+  //           dependencies.set(vertex, parseResult.dependencies)
+  //           this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
+  //           this.graph.addNode(vertex)
+  //           this.handleMatrix(vertex, cellAddress)
+  //         } else if (isFormula(cellContent)) {
+  //           const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
+  //           heurisitc.add(parseResult.hash, cellAddress)
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+
   public buildGraph(sheets: Sheets): boolean[] {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
     const independentSheets: boolean[] = []
     for (const sheetName in sheets) {
-      independentSheets[this.sheetMapping.fetch(sheetName)] = true
+      independentSheets[this.sheetMapping.fetch(sheetName)] = false
     }
 
     const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.config)
@@ -92,7 +137,6 @@ export class GraphBuilder {
         for (let j = 0; j < row.length; ++j) {
           const cellContent = row[j]
           const cellAddress = simpleCellAddress(sheetId, j, i)
-          let vertex = null
 
           if (isMatrix(cellContent)) {
             if (this.addressMapping.has(cellAddress)) {
@@ -100,25 +144,20 @@ export class GraphBuilder {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
-            vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
-            dependencies.set(vertex, parseResult.dependencies)
-            this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
+            const vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+            const deps = absolutizeDependencies(this.parser.getCache().get(parseResult.hash)!.relativeDependencies, simpleCellAddress(sheetId, i, j))
+            dependencies.set(vertex, deps)
             this.graph.addNode(vertex)
             this.handleMatrix(vertex, cellAddress)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
-            vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
             matrixHeuristic.add(parseResult.hash, cellAddress)
-            dependencies.set(vertex, parseResult.dependencies)
-            this.checkDependencies(sheetId, parseResult.dependencies, independentSheets)
-            this.graph.addNode(vertex)
-            this.addressMapping.setCell(cellAddress, vertex)
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
             matrixHeuristic.add('#', cellAddress)
           } else {
-            vertex = new ValueCellVertex(cellContent)
+            const vertex = new ValueCellVertex(cellContent)
             this.graph.addNode(vertex)
             this.addressMapping.setCell(cellAddress, vertex)
           }
@@ -128,19 +167,47 @@ export class GraphBuilder {
 
     this.stats.start(StatType.MATRIX_DETECTION)
 
-    matrixHeuristic.run(sheets, this.sheetMapping)
+    const notMatrices = matrixHeuristic.run(sheets, this.sheetMapping, this.parser.getCache())
+    for (let i=notMatrices.length-1; i>=0; --i) {
+      const elem = notMatrices[i]
+      if (elem.hash === '#') {
+        for (let address of elem.range.generateCellsFromRangeGenerator()) {
+          const value = sheets[this.sheetMapping.name(address.sheet)][address.row][address.col]
+          const vertex = new ValueCellVertex(Number(value))
+          this.graph.addNode(vertex)
+          this.addressMapping.setCell(address, vertex)
+        }
+      } else {
+        for (let address of elem.range.generateCellsFromRangeGenerator()) {
+          const cacheElem = this.parser.getCache().get(elem.hash)
+          if (!cacheElem) {
+            throw Error("Something went wrong")
+          }
+          const vertex = new FormulaCellVertex(cacheElem.ast, address)
+          const deps = absolutizeDependencies(cacheElem.relativeDependencies, address)
+          this.graph.addNode(vertex)
+          this.addressMapping.setCell(address, vertex)
+          dependencies.set(vertex, deps)
+        }
+      }
+    }
 
     this.stats.end(StatType.MATRIX_DETECTION)
-    this.handleDependencies(dependencies)
 
+    /* check dependencies */
+
+
+    this.handleDependencies(dependencies)
     return independentSheets
   }
 
-  private checkDependencies(sheetId: number, dependencies: CellDependency[], independentSheets: boolean[]) {
-    for (const dependency of dependencies) {
-      if (dependency.sheet !== sheetId) {
-        independentSheets[dependency.sheet] = false
-        independentSheets[sheetId] = false
+  private checkDependencies(dependencies: CellDependency[], independentSheets: boolean[]) {
+    for (let sheetId of this.sheetMapping.sheetIds()) {
+      for (const dependency of dependencies) {
+        if (dependency.sheet !== sheetId) {
+          independentSheets[dependency.sheet] = false
+          independentSheets[sheetId] = false
+        }
       }
     }
   }
