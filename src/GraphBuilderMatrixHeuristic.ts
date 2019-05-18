@@ -218,7 +218,6 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
 
   for (let y = size.height - 1; y >= 0; --y) {
     for (let x = size.width - 1; x >= 0; --x) {
-      console.log(result.get(1))
       const value = input.get(x, y)
 
       const [right, rightColour] = [input.get(x + 1, y)!, colours.get(x + 1, y)!]
