@@ -86,6 +86,17 @@ export class ParserWithCaching {
   public getCache(): Cache {
     return this.cache
   }
+
+  public getAbsolutizedParserResult(hash: string, baseAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
+    if (!this.cache.get(hash)) {
+      throw Error(`Hash ${hash} not present in cache`)
+    }
+    const cacheElem = this.cache.get(hash)!
+    return {
+      ast: cacheElem.ast,
+      dependencies: absolutizeDependencies(cacheElem.relativeDependencies, baseAddress)
+    }
+  }
 }
 
 /**

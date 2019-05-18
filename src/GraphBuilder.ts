@@ -145,8 +145,8 @@ export class GraphBuilder {
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
             const vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
-            const deps = absolutizeDependencies(this.parser.getCache().get(parseResult.hash)!.relativeDependencies, simpleCellAddress(sheetId, i, j))
-            dependencies.set(vertex, deps)
+            const parserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, simpleCellAddress(sheetId, i, j))
+            dependencies.set(vertex, parserResult.dependencies)
             this.graph.addNode(vertex)
             this.handleMatrix(vertex, cellAddress)
           } else if (isFormula(cellContent)) {
@@ -179,15 +179,11 @@ export class GraphBuilder {
         }
       } else {
         for (let address of elem.cells.reverse()) {
-          const cacheElem = this.parser.getCache().get(elem.hash)
-          if (!cacheElem) {
-            throw Error("Something went wrong")
-          }
-          const vertex = new FormulaCellVertex(cacheElem.ast, address)
-          const deps = absolutizeDependencies(cacheElem.relativeDependencies, address)
+          const parserResult = this.parser.getAbsolutizedParserResult(elem.hash, address)
+          const vertex = new FormulaCellVertex(parserResult.ast, address)
           this.graph.addNode(vertex)
           this.addressMapping.setCell(address, vertex)
-          dependencies.set(vertex, deps)
+          dependencies.set(vertex, parserResult.dependencies)
         }
       }
     }
