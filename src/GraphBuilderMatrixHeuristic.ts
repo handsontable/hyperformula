@@ -66,7 +66,6 @@ export class Array2d<T> {
 }
 
 export interface PossibleMatrix {
-  colour: number,
   isMatrix: boolean,
   hash: string,
   range: AbsoluteCellRange,
@@ -237,7 +236,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
         // 1 2
         // 2 *
         colours.set(x, y, ++colour)
-        result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+        result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         if (result.has(rightColour)) {
           result.get(rightColour)!.isMatrix = false
         }
@@ -252,7 +251,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
             result.get(bottomColour)!.isMatrix = false
           }
           colours.set(x, y, ++colour)
-          result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+          result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         } else if (right !== value && bottom === value) {
           // 1 0
           // 1 0
@@ -260,10 +259,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
             colours.set(x, y, bottomColour)
             const old = result.get(bottomColour)!
             old.cells.push(simpleCellAddress(sheet, x, y))
-            result.set(bottomColour, possibleMatrix(bottomColour, value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+            result.set(bottomColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
           } else {
             colours.set(x, y, ++colour)
-            result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+            result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
           }
         } else if (right === value && bottom !== value) {
           // 1 1
@@ -271,10 +270,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
           colours.set(x, y, rightColour)
           const old = result.get(rightColour)!
           old.cells.push(simpleCellAddress(sheet, x, y))
-          result.set(rightColour, possibleMatrix(rightColour, value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+          result.set(rightColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
         } else {
           colours.set(x, y, ++colour)
-          result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+          result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         }
       } else if (value === diag && diagColour === rightColour && diagColour === bottomColour) {
         // 1 1
@@ -282,10 +281,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
         colours.set(x, y, rightColour)
         const old = result.get(rightColour)!
         old.cells.push(simpleCellAddress(sheet, x, y))
-        result.set(rightColour, possibleMatrix(rightColour, value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+        result.set(rightColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
       } else if (value === diag) {
         colours.set(x, y, ++colour)
-        result.set(colour, possibleMatrix(colour, value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+        result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
       }
     }
   }
@@ -293,9 +292,8 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
   return result.values()
 }
 
-function possibleMatrix(colour: number, hash: string, range: AbsoluteCellRange, isMatrix: boolean, cells: SimpleCellAddress[]): PossibleMatrix {
+function possibleMatrix(hash: string, range: AbsoluteCellRange, isMatrix: boolean, cells: SimpleCellAddress[]): PossibleMatrix {
   return {
-    colour: colour,
     isMatrix: isMatrix,
     hash: hash,
     range: range,
