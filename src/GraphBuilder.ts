@@ -145,7 +145,7 @@ export class GraphBuilder {
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
             const vertex = this.buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
-            const parserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, simpleCellAddress(sheetId, i, j))
+            const parserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, simpleCellAddress(sheetId, j, i))
             dependencies.set(vertex, parserResult.dependencies)
             this.graph.addNode(vertex)
             this.handleMatrix(vertex, cellAddress)
