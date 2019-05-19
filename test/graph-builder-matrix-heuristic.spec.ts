@@ -1,5 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {Array2d, findMatrices} from '../src/GraphBuilderMatrixHeuristic'
+import {count} from "../src/generatorUtils";
 
 function gen(arr: number[][]): any[][] {
   const result: any[][] = []
@@ -25,14 +26,14 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
 
     expect(output.length).toEqual(1)
 
     const matrix = output[0]
 
-    expect([matrix.width(), matrix.height()]).toEqual([3, 3])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 2, 2))
+    expect([matrix.range.width(), matrix.range.height()]).toEqual([3, 3])
+    expect(matrix.range).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 2, 2))
   })
 
   it('find - different formulas', () => {
@@ -43,16 +44,16 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [2, 2, 2, 2],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
 
     expect(output.length).toEqual(2)
 
-    let matrix = output[1]
-    expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
-    matrix = output[0]
-    expect([matrix.width(), matrix.height()]).toEqual([4, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 2, 3, 3))
+    let range = output[1].range
+    expect([range.width(), range.height()]).toEqual([2, 2])
+    expect(range).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
+    range = output[0].range
+    expect([range.width(), range.height()]).toEqual([4, 2])
+    expect(range).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 2, 3, 3))
   })
 
   it('find - same formula', () => {
@@ -63,19 +64,19 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [0, 0, 1, 1, 0, 0],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
 
     expect(output.length).toEqual(3)
 
-    let matrix = output[2]
-    expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
-    matrix = output[1]
-    expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 4, 0, 5, 1))
-    matrix = output[0]
-    expect([matrix.width(), matrix.height()]).toEqual([2, 2])
-    expect(matrix).toEqual(AbsoluteCellRange.fromCoordinates(1, 2, 2, 3, 3))
+    let range = output[2].range
+    expect([range.width(), range.height()]).toEqual([2, 2])
+    expect(range).toEqual(AbsoluteCellRange.fromCoordinates(1, 0, 0, 1, 1))
+    range = output[1].range
+    expect([range.width(), range.height()]).toEqual([2, 2])
+    expect(range).toEqual(AbsoluteCellRange.fromCoordinates(1, 4, 0, 5, 1))
+    range = output[0].range
+    expect([range.width(), range.height()]).toEqual([2, 2])
+    expect(range).toEqual(AbsoluteCellRange.fromCoordinates(1, 2, 2, 3, 3))
   })
 
   it('fail 1', () => {
@@ -84,7 +85,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -96,7 +97,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -108,7 +109,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -120,7 +121,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1, 0],
     ]))
 
-    const output = findMatrices(1, input)
+    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
