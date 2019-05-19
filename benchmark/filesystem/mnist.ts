@@ -11,10 +11,24 @@ async function start() {
       csvDelimiter: ',',
       functionArgSeparator: ',',
       gpuMode: 'cpu',
+      matrixDetection: false,
     })
   })
 
-  console.info('=== MNIST - GPU ===')
+  console.info('\n=== MNIST - CPU ===')
+  await benchmark('../HandsOnEnginePrivate/mnist/sheets', [
+    {address: '$Control2.B5', value: 4},
+    {address: '$Control2.B6', value: 4},
+  ], {
+    millisecondsPerThousandRows: 1000, numberOfRuns: 3, engineConfig: new Config({
+      csvDelimiter: ',',
+      functionArgSeparator: ',',
+      gpuMode: 'cpu',
+      matrixDetection: true,
+    })
+  })
+
+  console.info('\n=== MNIST - GPU ===')
   await benchmark('../HandsOnEnginePrivate/mnist/sheets', [
     {address: '$Control2.B5', value: 4},
     {address: '$Control2.B6', value: 4},
@@ -27,7 +41,7 @@ async function start() {
     })
   })
 
-  console.info('=== MNIST - GPU matrix detection ===')
+  console.info('\n=== MNIST - GPU matrix detection ===')
   await benchmark('../HandsOnEnginePrivate/mnist/sheets', [
     {address: '$Control2.B5', value: 4},
     {address: '$Control2.B6', value: 4},
