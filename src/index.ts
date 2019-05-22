@@ -75,7 +75,7 @@ export class HandsOnEngine {
   private readonly rangeMapping: RangeMapping = new RangeMapping()
 
   /** Directed graph of cell dependencies. */
-  private readonly graph: Graph<Vertex> = new Graph()
+  private readonly graph: Graph<Vertex> = new Graph<Vertex>()
 
   /** Formula evaluator */
   private evaluator?: Evaluator
