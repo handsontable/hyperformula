@@ -1,9 +1,11 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
+import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {RangeVertex} from '../../Vertex'
 import {FunctionPlugin} from './FunctionPlugin'
+import {Matrix} from "../../Matrix";
+import {zip} from "../../generatorUtils";
 
 function cacheKey(ranges: AbsoluteCellRange[]): string {
   return `SUMPROD,${ranges[1].start.col},${ranges[1].start.row}`
@@ -21,79 +23,39 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    if (left.type !== AstNodeType.CELL_RANGE || right.type !== AstNodeType.CELL_RANGE) {
-      const leftArg = this.evaluateAst(left, formulaAddress)
-      const rightArg = this.evaluateAst(right, formulaAddress)
-      if (typeof leftArg === 'number' && typeof rightArg === 'number') {
-        return leftArg * rightArg
-      } else {
-        return new CellError(ErrorType.VALUE)
-      }
-    }
+    let leftArg: CellValue | AbsoluteCellRange = left.type === AstNodeType.CELL_RANGE
+            ? AbsoluteCellRange.fromCellRange(left, formulaAddress)
+            : this.evaluateAst(left, formulaAddress)
 
-    const simpleLeftRange = AbsoluteCellRange.fromCellRange(left as CellRangeAst, formulaAddress)
-    const simpleRightRange = AbsoluteCellRange.fromCellRange(right as CellRangeAst, formulaAddress)
+    let rightArg: CellValue | AbsoluteCellRange = right.type === AstNodeType.CELL_RANGE
+        ? AbsoluteCellRange.fromCellRange(right, formulaAddress)
+        : this.evaluateAst(right, formulaAddress)
 
-    if (!simpleLeftRange.sameDimensionsAs(simpleRightRange)) {
+    if (typeof leftArg === 'number' && typeof rightArg === 'number') {
+      return leftArg * rightArg
+    } else if (!(leftArg instanceof AbsoluteCellRange) && !(leftArg instanceof Matrix)) {
+      return new CellError(ErrorType.VALUE)
+    } else if (!(rightArg instanceof AbsoluteCellRange) && !(rightArg instanceof Matrix)) {
       return new CellError(ErrorType.VALUE)
     }
 
-    return this.evaluateSumprod(simpleLeftRange, simpleRightRange)
-  }
-
-  private evaluateSumprod(leftRange: AbsoluteCellRange, rightRange: AbsoluteCellRange): CellValue {
-    const rangeVertex = this.rangeMapping.getRange(leftRange.start, leftRange.end)
-    if (!rangeVertex) {
-      throw new Error('Range does not exists in graph')
+    if ((leftArg.width() * leftArg.height()) !== (rightArg.width() * rightArg.height())) {
+      return new CellError(ErrorType.VALUE)
     }
 
-    const ranges = [leftRange, rightRange]
-    const result = this.findAlreadyCachedValue(rangeVertex, ranges) ||
-      this.computeResultFromSmallerCache(ranges) ||
-      this.computeResultFromAllValues(ranges)
-
-    rangeVertex.setFunctionValue(cacheKey(ranges), result)
-    return result
+    return this.reduceSumprod(this.generateCellValues(leftArg), this.generateCellValues(rightArg))
   }
 
-  private findAlreadyCachedValue(rangeVertex: RangeVertex, ranges: AbsoluteCellRange[]) {
-    return rangeVertex.getFunctionValue(cacheKey(ranges))
-  }
-
-  private computeResultFromSmallerCache(ranges: AbsoluteCellRange[]) {
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, ranges)
-
-    if (smallerRangeVertex !== null) {
-      const smallerValue = smallerRangeVertex.getFunctionValue(cacheKey(ranges))
-
-      if (typeof smallerValue === 'number') {
-        const restValue = this.reduceSumprod(restRanges.map((range) => this.getCellValuesFromRange(range)))
-        const result = smallerValue + restValue
-        return result
-      }
-    }
-    return null
-  }
-
-  private computeResultFromAllValues(ranges: AbsoluteCellRange[]) {
-    return this.reduceSumprod(ranges.map((range) => this.getCellValuesFromRange(range)))
-  }
-
-  private reduceSumprod(ranges: CellValue[][]): number {
+  private reduceSumprod(left: IterableIterator<CellValue>, right: IterableIterator<CellValue>): number {
     let result = 0
-    for (let i = 0; i < ranges[0].length; ++i) {
-      let prod = 1
-      for (let j = 0; j < ranges.length; ++j) {
-        const value = ranges[j][i]
-        if (typeof value === 'number') {
-          prod = prod * value
-        } else {
-          prod = 0
-          break
-        }
+
+    let l, r
+    while (l = left.next(), r = right.next(), !l.done, !r.done) {
+      if (typeof l.value === 'number' && typeof r.value === 'number') {
+        result += l.value * r.value
       }
-      result += prod
     }
+
     return result
   }
 }

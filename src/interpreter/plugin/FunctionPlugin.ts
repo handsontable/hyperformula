@@ -1,12 +1,13 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {AddressMapping} from '../../AddressMapping'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Graph} from '../../Graph'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {RangeMapping} from '../../RangeMapping'
 import {Vertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
+import {Matrix} from "../../Matrix";
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -78,5 +79,17 @@ export abstract class FunctionPlugin {
       result.push(this.addressMapping.getCellValue(cellFromRange))
     }
     return result
+  }
+
+  protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
+    if (range instanceof AbsoluteCellRange) {
+      for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
+        yield this.addressMapping.getCellValue(cellFromRange)
+      }
+    } else {
+       for (const value of range.generateFlatValues()) {
+         yield value
+       }
+    }
   }
 }

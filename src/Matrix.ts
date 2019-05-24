@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {SimpleCellAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
 export interface Size { width: number, height: number }
@@ -173,5 +173,13 @@ export class Matrix {
 
   public raw(): number[][] {
     return this.matrix
+  }
+
+  public* generateFlatValues(): IterableIterator<number> {
+    for (let row=0; row<this.size.height; ++row) {
+      for (let col=0; col<this.size.width; ++col) {
+        yield this.matrix[row][col]
+      }
+    }
   }
 }

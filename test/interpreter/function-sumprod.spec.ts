@@ -97,6 +97,4 @@ describe('Function SUMPRODUCT', () => {
     ])
     expect(engine.getCellValue('A3')).toEqual(7)
   })
-
-
 })

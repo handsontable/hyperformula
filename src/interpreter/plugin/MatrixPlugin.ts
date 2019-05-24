@@ -1,7 +1,6 @@
-import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {Matrix} from '../../Matrix'
+import {checkMatrixSize, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
@@ -111,15 +110,19 @@ export class MatrixPlugin extends FunctionPlugin {
     }
 
     const value = this.evaluateAst(ast.args[0], formulaAddress)
-    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
     if (value instanceof CellError) {
       return value
     }
 
+    const matrixSize = checkMatrixSize(ast, formulaAddress)
+    if (!matrixSize) {
+      return new CellError(ErrorType.VALUE)
+    }
+
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][]) {
       return a[this.thread.x as number][this.thread.y as number]
-    }).setOutput([vertex.width, vertex.height])
+    }).setOutput([matrixSize.width, matrixSize.height])
 
     return new Matrix(kernel(value.raw()) as number[][])
   }

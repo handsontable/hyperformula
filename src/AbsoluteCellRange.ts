@@ -1,5 +1,5 @@
 import {AddressMapping} from './AddressMapping'
-import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress} from './CellAddress'
 import {Matrix} from './Matrix'
 import {SheetMapping} from "./SheetMapping";
@@ -81,7 +81,11 @@ export class AbsoluteCellRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
-  public* generateCellsFromRangeGenerator() {
+  public sameSizeAs(other: AbsoluteCellRange) {
+    return (this.width() * this.height()) === (other.width() * other.height())
+  }
+
+  public* generateCellsFromRangeGenerator(): IterableIterator<SimpleCellAddress> {
     let currentRow = this.start.row
     while (currentRow <= this.end.row) {
       let currentColumn = this.start.col
