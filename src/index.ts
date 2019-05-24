@@ -108,7 +108,7 @@ export class HandsOnEngine {
     this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
 
     this.stats.start(StatType.EVALUATION)
-    this.evaluator!.run()
+    await this.evaluator!.run()
     this.stats.end(StatType.EVALUATION)
 
     this.stats.end(StatType.OVERALL)
