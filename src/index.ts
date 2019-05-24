@@ -10,10 +10,8 @@ import {
 import {CellAddress} from './CellAddress'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
-import {EvaluatorPolicy} from './EvaluatorPolicy'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {ParallelEvaluator} from './ParallelEvaluator'
 import { cellAddressFromString, isFormula} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -107,15 +105,10 @@ export class HandsOnEngine {
       independentSheets = graphBuilder.buildGraph(sheets)
     })
 
-    const evaluatorPolicy = new EvaluatorPolicy(this.config)
-    if (evaluatorPolicy.shouldBeParallel(independentSheets!)) {
-      this.evaluator = new ParallelEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats, independentSheets)
-    } else {
-      this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
-    }
+    this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
 
     this.stats.start(StatType.EVALUATION)
-    await this.evaluator!.run()
+    this.evaluator!.run()
     this.stats.end(StatType.EVALUATION)
 
     this.stats.end(StatType.OVERALL)

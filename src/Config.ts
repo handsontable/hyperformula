@@ -1,7 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
-type EvaluatorMode = 'parallel' | 'single-thread' | 'auto'
 
 export interface ConfigParams {
   addressMappingFillThreshold: number,
@@ -12,7 +11,6 @@ export interface ConfigParams {
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
-  evaluator: EvaluatorMode,
 }
 
 export class Config {
@@ -25,7 +23,6 @@ export class Config {
     functionPlugins: [],
     gpuMode: 'gpu',
     matrixDetection: true,
-    evaluator: 'auto',
   }
 
   public readonly addressMappingFillThreshold: number
@@ -36,7 +33,6 @@ export class Config {
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
-  public readonly evaluator: EvaluatorMode
 
   constructor({
     addressMappingFillThreshold,
@@ -47,7 +43,6 @@ export class Config {
     functionPlugins,
     gpuMode,
     matrixDetection,
-    evaluator,
   }: Partial<ConfigParams> = {}) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
@@ -57,6 +52,5 @@ export class Config {
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
-    this.evaluator = evaluator || Config.defaultConfig.evaluator
   }
 }
