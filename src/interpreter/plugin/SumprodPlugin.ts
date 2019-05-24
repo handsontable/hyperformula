@@ -21,7 +21,7 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    if (left.type !== AstNodeType.CELL_RANGE && right.type !== AstNodeType.CELL_RANGE) {
+    if (left.type !== AstNodeType.CELL_RANGE || right.type !== AstNodeType.CELL_RANGE) {
       const leftArg = this.evaluateAst(left, formulaAddress)
       const rightArg = this.evaluateAst(right, formulaAddress)
       if (typeof leftArg === 'number' && typeof rightArg === 'number') {

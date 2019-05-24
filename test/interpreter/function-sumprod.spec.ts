@@ -77,4 +77,26 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.VALUE))
   })
+
+  it('error when not supported types', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
+      ['=SUMPRODUCT(1, B1:B2)'],
+      ['=SUMPRODUCT(B1:B2, "a")'],
+      ['=SUMPRODUCT(A1, B1:B2)'],
+    ])
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('works with matrices', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
+        ['1','2'],
+        ['3'],
+        ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))']
+    ])
+    expect(engine.getCellValue('A3')).toEqual(7)
+  })
+
+
 })
