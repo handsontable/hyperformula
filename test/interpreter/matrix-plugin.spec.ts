@@ -65,9 +65,9 @@ describe('Matrix plugin', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=sumprod($A1:$B1,transpose(A$4:A$5))', '=sumprod($A1:$B1,transpose(B$4:B$5))'],
-      ['=sumprod($A2:$B2,transpose(A$4:A$5))', '=sumprod($A2:$B2,transpose(B$4:B$5))'],
-      ['=sumprod($A3:$B3,transpose(A$4:A$5))', '=sumprod($A3:$B3,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A1:$B1,transpose(A$4:A$5))', '=SUMPRODUCT($A1:$B1,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A2:$B2,transpose(A$4:A$5))', '=SUMPRODUCT($A2:$B2,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
     ], config)
 
     expect(engine.getCellValue('A6')).toBeCloseTo(7)

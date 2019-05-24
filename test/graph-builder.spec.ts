@@ -235,9 +235,9 @@ describe('GraphBuilder', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=sumprod($A1:$B1,transpose(A$4:A$5))', '=sumprod($A1:$B1,transpose(B$4:B$5))'],
-      ['=sumprod($A2:$B2,transpose(A$4:A$5))', '=sumprod($A2:$B2,transpose(B$4:B$5))'],
-      ['=sumprod($A3:$B3,transpose(A$4:A$5))', '=sumprod($A3:$B3,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A1:$B1,transpose(A$4:A$5))', '=SUMPRODUCT($A1:$B1,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A2:$B2,transpose(A$4:A$5))', '=SUMPRODUCT($A2:$B2,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
     ]
 
     const graph = new Graph<Vertex>()
@@ -264,9 +264,9 @@ describe('GraphBuilder', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=sumprod($A4:$B4,transpose(A$4:A$5))', '=sumprod($A4:$B4,transpose(B$4:B$5))'],
-      ['=sumprod($A5:$B5,transpose(A$4:A$5))', '=sumprod($A5:$B5,transpose(B$4:B$5))'],
-      ['=sumprod($A6:$B6,transpose(A$4:A$5))', '=sumprod($A6:$B6,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A4:$B4,transpose(A$4:A$5))', '=SUMPRODUCT($A4:$B4,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A5:$B5,transpose(A$4:A$5))', '=SUMPRODUCT($A5:$B5,transpose(B$4:B$5))'],
+      ['=SUMPRODUCT($A6:$B6,transpose(A$4:A$5))', '=SUMPRODUCT($A6:$B6,transpose(B$4:B$5))'],
     ]
 
     const graph = new Graph<Vertex>()
@@ -288,9 +288,9 @@ describe('GraphBuilder', () => {
       ['5', '6'],
       ['1', '2'],
       ['3', '4'],
-      ['=sumprod(transpose($A1:$B1),A$4:A$5)', '=sumprod(transpose($A1:$B1),B$4:B$5)'],
-      ['=sumprod(transpose($A2:$B2),A$4:A$5)', '=sumprod(transpose($A2:$B2),B$4:B$5)'],
-      ['=sumprod(transpose($A3:$B3),A$4:A$5)', '=sumprod(transpose($A3:$B3),B$4:B$5)'],
+      ['=SUMPRODUCT(transpose($A1:$B1),A$4:A$5)', '=SUMPRODUCT(transpose($A1:$B1),B$4:B$5)'],
+      ['=SUMPRODUCT(transpose($A2:$B2),A$4:A$5)', '=SUMPRODUCT(transpose($A2:$B2),B$4:B$5)'],
+      ['=SUMPRODUCT(transpose($A3:$B3),A$4:A$5)', '=SUMPRODUCT(transpose($A3:$B3),B$4:B$5)'],
     ]
 
     const graph = new Graph<Vertex>()

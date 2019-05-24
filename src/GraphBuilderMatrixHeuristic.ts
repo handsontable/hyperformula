@@ -152,7 +152,7 @@ export class GraphBuilderMatrixHeuristic {
   }
 
   private ifMatrixCompatibile(address: SimpleCellAddress, formula: Ast, width: number, height: number): ({ leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange }) | false {
-    if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPROD') {
+    if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPRODUCT') {
       if (formula.args.length !== 2) {
         return false
       }
