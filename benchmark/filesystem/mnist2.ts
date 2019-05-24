@@ -1,20 +1,8 @@
 import {Config} from '../../src'
 import {benchmark} from './benchmark'
-import {save} from "../../bin/handsonengine-multisheet";
 
 async function start() {
-  console.info('=== MNIST 2 - CPU ===')
-  await benchmark('../HandsOnEnginePrivate/mnist2/sheets', [
-    {address: '$Configuration.B5', value: 3},
-    {address: '$Configuration.B6', value: 3},
-  ], {
-    millisecondsPerThousandRows: 100000000, numberOfRuns: 3, engineConfig: new Config({
-      csvDelimiter: ',',
-      functionArgSeparator: ',',
-      gpuMode: 'cpu',
-    })
-  })
-
+  console.info('=== MNIST 2 - GPU / matrix detection ===')
   await benchmark('../HandsOnEnginePrivate/mnist2/sheets', [
     {address: '$Configuration.B5', value: 3},
     {address: '$Configuration.B6', value: 3},
@@ -23,9 +11,48 @@ async function start() {
       csvDelimiter: ',',
       functionArgSeparator: ',',
       gpuMode: 'gpu',
+      matrixDetection: true
     })
   })
 
+  console.info('\n === MNIST 2 - GPU / no matrix detection ===')
+  await benchmark('../HandsOnEnginePrivate/mnist2/sheets', [
+    {address: '$Configuration.B5', value: 3},
+    {address: '$Configuration.B6', value: 3},
+  ], {
+    millisecondsPerThousandRows: 100000000, numberOfRuns: 3, engineConfig: new Config({
+      csvDelimiter: ',',
+      functionArgSeparator: ',',
+      gpuMode: 'gpu',
+      matrixDetection: false
+    })
+  })
+
+  console.info('\n === MNIST 2 - CPU / matrix detection ===')
+  await benchmark('../HandsOnEnginePrivate/mnist2/sheets', [
+    {address: '$Configuration.B5', value: 3},
+    {address: '$Configuration.B6', value: 3},
+  ], {
+    millisecondsPerThousandRows: 100000000, numberOfRuns: 3, engineConfig: new Config({
+      csvDelimiter: ',',
+      functionArgSeparator: ',',
+      gpuMode: 'cpu',
+      matrixDetection: true
+    })
+  })
+
+  console.info('\n === MNIST 2 - CPU / no matrix detection ===')
+  await benchmark('../HandsOnEnginePrivate/mnist2/sheets', [
+    {address: '$Configuration.B5', value: 3},
+    {address: '$Configuration.B6', value: 3},
+  ], {
+    millisecondsPerThousandRows: 100000000, numberOfRuns: 3, engineConfig: new Config({
+      csvDelimiter: ',',
+      functionArgSeparator: ',',
+      gpuMode: 'cpu',
+      matrixDetection: false
+    })
+  })
 }
 
 start()
