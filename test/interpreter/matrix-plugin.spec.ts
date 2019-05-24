@@ -129,4 +129,40 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('A8')).toBeCloseTo(523)
     expect(engine.getCellValue('B8')).toBeCloseTo(634)
   })
+
+  it('matrix medianpool on even square', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1', '2', '1', '2', '1', '5'],
+      ['3', '4', '3', '7', '6', '7'],
+      ['{=medianpool(A1:F2,2)}'],
+    ], config)
+
+    expect(engine.getCellValue('A3')).toBeCloseTo(2.5)
+    expect(engine.getCellValue('B3')).toBeCloseTo(2.5)
+    expect(engine.getCellValue('C3')).toBeCloseTo(5.5)
+  })
+
+  it('matrix medianpool on odd square', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1', '1', '1'], // right shot from the beginning
+      ['1', '2', '3'],
+      ['3', '3', '3'],
+
+      ['2', '2', '2'], // need one step to the left
+      ['3', '4', '6'],
+      ['10', '10', '10'],
+
+      ['0', '0', '0'], // need one step to the right
+      ['4', '6', '7'],
+      ['8', '8', '8'],
+
+      ['{=medianpool(A1:C9,3)}'],
+    ], config)
+
+    expect(engine.getCellValue('A10')).toBeCloseTo(2)
+    expect(engine.getCellValue('A11')).toBeCloseTo(4)
+    expect(engine.getCellValue('A12')).toBeCloseTo(6)
+  })
 })

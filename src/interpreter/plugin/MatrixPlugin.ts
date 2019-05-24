@@ -20,6 +20,10 @@ export class MatrixPlugin extends FunctionPlugin {
       EN: 'MAXPOOL',
       PL: 'MAKS.Z.PULI',
     },
+    medianpool: {
+      EN: 'MEDIANPOOL',
+      PL: 'MEDIANA.Z.PULI',
+    },
   }
 
   constructor(protected readonly interpreter: Interpreter) {
@@ -96,6 +100,93 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return currentMax
+    }).setOutput([
+      1 + (rangeMatrix.width() - windowSize) / stride,
+      1 + (rangeMatrix.height() - windowSize) / stride,
+    ])
+
+    return new Matrix(kernel(rangeMatrix.raw(), windowSize, stride) as number[][])
+  }
+
+  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const [rangeArg, sizeArg] = ast.args
+
+    if (sizeArg.type !== AstNodeType.NUMBER) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    const windowSize = sizeArg.value
+    let stride = windowSize
+
+    if (ast.args.length === 3) {
+      const strideArg = ast.args[2]
+      if (strideArg.type === AstNodeType.NUMBER) {
+        stride = strideArg.value
+      } else {
+        return new CellError(ErrorType.VALUE)
+      }
+    }
+
+    if (rangeMatrix instanceof CellError) {
+      return rangeMatrix
+    }
+
+    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
+      const leftCornerX = this.thread.x as number * stride
+      const leftCornerY = this.thread.y as number * stride
+      let currentMax = a[leftCornerY][leftCornerX]
+      for (let i = 0; i < windowSize; i++) {
+        for (let j = 0; j < windowSize; j++) {
+          currentMax = Math.max(currentMax, a[leftCornerY + i][leftCornerX + j])
+        }
+      }
+      let currentMin = a[leftCornerY][leftCornerX]
+      for (let i2 = 0; i2 < windowSize; i2++) {
+        for (let j2 = 0; j2 < windowSize; j2++) {
+          currentMin = Math.min(currentMin, a[leftCornerY + i2][leftCornerX + j2])
+        }
+      }
+
+      const numberOfElements = windowSize * windowSize
+      let leftEnd = currentMin
+      let rightEnd = currentMax
+      let result = 42
+      for (let iter = 0; iter < 32; iter++) {
+        let medianGuess = (leftEnd + rightEnd) / 2
+        let medianGuessCount = 0
+        for (let i3 = 0; i3 < windowSize; i3++) {
+          for (let j3 = 0; j3 < windowSize; j3++) {
+            if (a[leftCornerY + i3][leftCornerX + j3] > medianGuess) {
+              medianGuessCount++
+            }
+          }
+        }
+ 
+        if (windowSize % 2 === 0) {
+          if (medianGuessCount === numberOfElements / 2) {
+            result = medianGuess
+            break
+          } else if (medianGuessCount > numberOfElements / 2) {
+            leftEnd = medianGuess
+          } else {
+            rightEnd = medianGuess
+          }
+        } else {
+          if (medianGuessCount === (numberOfElements - 1) / 2) {
+            result = medianGuess
+            break
+          } else if (medianGuessCount > (numberOfElements - 1) / 2) {
+            leftEnd = medianGuess
+          } else {
+            rightEnd = medianGuess
+          }
+        }
+      }
+      return result
     }).setOutput([
       1 + (rangeMatrix.width() - windowSize) / stride,
       1 + (rangeMatrix.height() - windowSize) / stride,

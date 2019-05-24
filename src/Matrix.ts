@@ -25,6 +25,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           height: left.height,
         }
       }
+      case 'MEDIANPOOL':
       case 'MAXPOOL': {
         if (ast.args.length < 2) {
           return false
