@@ -326,4 +326,22 @@ describe('GraphBuilder', () => {
     expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 1))).toEqual(3)
     expect(addressMapping.getCellValue(simpleCellAddress(0, 1, 1))).toEqual(4)
   })
+
+  it('matrix detection strategy and regular values', () => {
+    const sheet = [
+      ['1', 'foobar'],
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.getCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
+  })
 })
