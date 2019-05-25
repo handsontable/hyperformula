@@ -28,14 +28,4 @@ export class RangeMapping {
     const key = `${start.sheet},${start.col},${start.row},${end.col},${end.row}`
     return this.rangeMapping.get(key) || null
   }
-
-  public getAllVerticesFromSheet(sheetId: number): RangeVertex[] {
-    const result = new Array()
-    for (const rangeVertex of this.rangeMapping.values()) {
-      if (rangeVertex.start.sheet === sheetId) {
-        result.push(rangeVertex)
-      }
-    }
-    return result
-  }
 }

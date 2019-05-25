@@ -4,22 +4,6 @@ import {Graph} from './Graph'
 import {Sheet} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
 
-export type SerializedMapping = DenseSerializedMapping | SparseSerializedMapping
-
-interface SparseSerializedMapping {
-  kind: 'sparse',
-  width: number,
-  height: number,
-  mapping: number[],
-}
-
-interface DenseSerializedMapping {
-  kind: 'dense',
-  width: number,
-  height: number,
-  mapping: number[],
-}
-
 /**
  * Interface for mapping from sheet addresses to vertices.
  */
@@ -55,10 +39,6 @@ interface IAddressMappingStrategy {
    * Returns width of stored sheet
    */
   getWidth(): number,
-
-  getAllVertices(): Vertex[],
-
-  getSerialized(): SerializedMapping,
 }
 
 /**
@@ -67,15 +47,6 @@ interface IAddressMappingStrategy {
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
 export class SparseStrategy implements IAddressMappingStrategy {
-
-  public static fromSerialized(serializedMapping: SparseSerializedMapping, graph: Graph<Vertex>): SparseStrategy {
-    const mapping = new SparseStrategy(serializedMapping.width, serializedMapping.height)
-    const numberOfElements = serializedMapping.mapping.length / 3
-    for (let i = 0; i < numberOfElements; i++) {
-      mapping.setCell({ col: serializedMapping.mapping[3 * i], row: serializedMapping.mapping[3 * i + 1]}, graph.getNodeById(serializedMapping.mapping[3 * i + 2]) as CellVertex)
-    }
-    return mapping
-  }
   /**
    * Map of Maps in which actual data is stored.
    *
@@ -123,31 +94,6 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public getWidth(): number {
     return this.width
   }
-
-  public getAllVertices(): Vertex[] {
-    const vertices = new Set<Vertex>()
-    this.mapping.forEach((rowVertices, column) => {
-      rowVertices.forEach((vertex, row) => {
-        vertices.add(vertex)
-      })
-    })
-    return Array.from(vertices)
-  }
-
-  public getSerialized(): SparseSerializedMapping {
-    const mapping: number[] = []
-    this.mapping.forEach((rowVertices, column) => {
-      rowVertices.forEach((vertex, row) => {
-        mapping.push(column, row, vertex.id)
-      })
-    })
-    return {
-      kind: 'sparse',
-      width: this.width,
-      height: this.height,
-      mapping,
-    }
-  }
 }
 
 /**
@@ -156,19 +102,6 @@ export class SparseStrategy implements IAddressMappingStrategy {
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
  */
 export class DenseStrategy implements IAddressMappingStrategy {
-
-  public static fromSerialized(serializedMapping: DenseSerializedMapping, graph: Graph<Vertex>): DenseStrategy {
-    const mapping = new DenseStrategy(serializedMapping.width, serializedMapping.height)
-    for (let row = 0; row < serializedMapping.height; row++) {
-      for (let col = 0; col < serializedMapping.width; col++) {
-        const id = serializedMapping.mapping[row * serializedMapping.width + col]
-        if (id >= 0) {
-          mapping.setCell({ col, row }, graph.getNodeById(id) as CellVertex)
-        }
-      }
-    }
-    return mapping
-  }
   /**
    * Array in which actual data is stored.
    *
@@ -218,37 +151,6 @@ export class DenseStrategy implements IAddressMappingStrategy {
   /** @inheritDoc */
   public getWidth(): number {
     return this.width
-  }
-
-  public getAllVertices(): Vertex[] {
-    const vertices = new Set<Vertex>()
-    for (const row of this.mapping) {
-      for (const vertex of row) {
-        if (vertex) {
-          vertices.add(vertex)
-        }
-      }
-    }
-    return Array.from(vertices)
-  }
-
-  public getSerialized(): DenseSerializedMapping {
-    const mapping: number[] = []
-    for (const row of this.mapping) {
-      for (const vertex of row) {
-        if (vertex) {
-          mapping.push(vertex.id)
-        } else {
-          mapping.push(-1)
-        }
-      }
-    }
-    return {
-      kind: 'dense',
-      width: this.width,
-      height: this.height,
-      mapping,
-    }
   }
 }
 
@@ -384,13 +286,5 @@ export class AddressMapping {
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
     this.matrixMapping.set(range.toString(), vertex)
-  }
-
-  public getAllVerticesFromSheet(sheetId: number): Vertex[] {
-    return this.mapping.get(sheetId)!.getAllVertices()
-  }
-
-  public getSerializedMapping(sheetId: number): SerializedMapping {
-    return this.mapping.get(sheetId)!.getSerialized()
   }
 }

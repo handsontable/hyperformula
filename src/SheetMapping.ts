@@ -33,8 +33,4 @@ export class SheetMapping {
   public names(): IterableIterator<string> {
     return this.mapping.keys()
   }
-
-  public sheetIds(): IterableIterator<number> {
-    return this.mapping.values()
-  }
 }

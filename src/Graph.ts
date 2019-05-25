@@ -30,11 +30,6 @@ export class Graph<T extends Identifiable> {
     }
   }
 
-  public removeNode(node: T) {
-    this.nodes.delete(node.id)
-    this.edges.delete(node)
-  }
-
   /**
    * Adds edge between nodes.
    *
@@ -85,20 +80,6 @@ export class Graph<T extends Identifiable> {
     let result = 0
     this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
     return result
-  }
-
-  public getNodes() {
-    return new Set(this.nodes.values())
-  }
-
-  public getEdges() {
-    return this.edges
-  }
-
-  public addEdgeByIds(fromId: number, toId: number) {
-    const fromNode = this.nodes.get(fromId)!
-    const toNode = this.nodes.get(toId)!
-    this.addEdge(fromNode, toNode)
   }
 
   /**
@@ -152,14 +133,6 @@ export class Graph<T extends Identifiable> {
     }
 
     return { sorted: topologicalOrdering, cycled: [] }
-  }
-
-  public getNodeById(id: number) {
-    const node = this.nodes.get(id)
-    if (!node) {
-      throw new Error(`Missing node with id ${id}`)
-    }
-    return node
   }
 
   /**

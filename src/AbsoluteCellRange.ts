@@ -104,23 +104,6 @@ export class AbsoluteCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
-  public toMatrix(addressMapping: AddressMapping): Matrix {
-    const values = new Array(this.height())
-    for (let i = 0; i < this.height(); ++i) {
-      values[i] = new Array(this.width())
-    }
-    for (const address of this.generateCellsFromRangeGenerator()) {
-      const value = addressMapping.getCellValue(address)
-      if (typeof value === 'number') {
-        values[address.row - this.start.row][address.col - this.start.col] = value
-      } else {
-        throw new Error('Range contains not numeric values')
-      }
-    }
-
-    return new Matrix(values)
-  }
-
   public matrixFromPlainValues(sheets: Sheets, sheetMapping: SheetMapping) {
     const values = new Array(this.height())
     const sheet = sheets[sheetMapping.name(this.start.sheet)]
