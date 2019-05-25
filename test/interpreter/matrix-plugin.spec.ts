@@ -43,17 +43,20 @@ describe('Matrix plugin', () => {
   it('matrix multiplication with string in data', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = await HandsOnEngine.buildFromArray([
-      ['1', '2'],
+      ['1', '2','{=MMULT(A1:B2,A3:B4)}'],
       ['3', 'foo'],
-      ['1', '2'],
+      ['1', '2','{=MMULT(A3:B4,A1:B2)}'],
       ['3', '4'],
-      ['{=MMULT(A1:B2,A3:B4)}'],
     ], config)
 
-    expect(engine.getCellValue('A5')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A6')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B5')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B6')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('D2')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C3')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('D4')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('C3')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('D4')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('nested matrix multiplication', async () => {
