@@ -52,6 +52,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
 
+    /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
       for (let i = 0; i < width; ++i) {
@@ -90,6 +91,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rangeMatrix
     }
 
+    /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
       const leftCornerX = this.thread.x as number * stride
       const leftCornerY = this.thread.y as number * stride
@@ -135,6 +137,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rangeMatrix
     }
 
+    /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
       const leftCornerX = this.thread.x as number * stride
       const leftCornerY = this.thread.y as number * stride
@@ -211,6 +214,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
+    /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][]) {
       return a[this.thread.x as number][this.thread.y as number]
     }).setOutput([matrixSize.width, matrixSize.height])
