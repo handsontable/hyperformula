@@ -165,6 +165,9 @@ export class Interpreter {
             return new Matrix(resultMatrix)
           } else {
             const matrixValue = matrixVertex.getCellValue()
+            if (matrixValue instanceof CellError) {
+              return matrixValue
+            }
             const kernel = this.gpu.createKernel(function(a: number[][], b: number[][]) {
               return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
             }).setOutput([matrixVertex.width, matrixVertex.height])

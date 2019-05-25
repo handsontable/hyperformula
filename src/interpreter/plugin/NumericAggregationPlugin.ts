@@ -4,6 +4,7 @@ import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
+import assert from 'assert'
 
 export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 
@@ -136,11 +137,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const rangeStart = ast.start.toSimpleCellAddress(formulaAddress)
     const rangeEnd = ast.end.toSimpleCellAddress(formulaAddress)
-    const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)
-
-    if (!rangeVertex) {
-      throw Error('Range does not exists in graph')
-    }
+    const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)!
+    assert.ok(rangeVertex, 'Range does not exists in graph')
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {

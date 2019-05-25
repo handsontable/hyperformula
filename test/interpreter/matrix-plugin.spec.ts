@@ -40,6 +40,50 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B7')).toEqual(0)
   })
 
+  it('matrix multiplication with string in data', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', 'foo'],
+      ['1', '2'],
+      ['3', '4'],
+      ['{=MMULT(A1:B2,A3:B4)}'],
+    ], config)
+
+    expect(engine.getCellValue('A5')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('A6')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B5')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue('B6')).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('nested matrix multiplication', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=MMULT(A1:B2, MMULT(A1:B2,A1:B2))}'],
+    ], config)
+
+    expect(engine.getCellValue('A3')).toEqual(37)
+    expect(engine.getCellValue('B3')).toEqual(54)
+    expect(engine.getCellValue('A4')).toEqual(81)
+    expect(engine.getCellValue('B4')).toEqual(118)
+  })
+
+  it('mmult of other mmult', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1', '2', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
+      ['3', '4', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
+      ['{=MMULT(A1:B2, C1:D2)}'],
+    ], config)
+
+    expect(engine.getCellValue('A3')).toEqual(37)
+    expect(engine.getCellValue('B3')).toEqual(54)
+    expect(engine.getCellValue('A4')).toEqual(81)
+    expect(engine.getCellValue('B4')).toEqual(118)
+  })
+
   it('matrix transpose', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = await HandsOnEngine.buildFromArray([

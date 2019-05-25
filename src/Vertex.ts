@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellValue, SimpleCellAddress} from './Cell'
+import {CellValue, CellError, SimpleCellAddress} from './Cell'
 import {CriterionLambda} from './interpreter/Criterion'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
@@ -29,7 +29,7 @@ export class MatrixVertex {
   public readonly id: number
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
-  private matrix: Matrix
+  private matrix: Matrix | CellError
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast, id: number = getNextVertexId()) {
     this.cellAddress = cellAddress
@@ -41,18 +41,22 @@ export class MatrixVertex {
   }
 
   public setCellValue(matrix: CellValue) {
-    this.matrix = matrix as Matrix
+    this.matrix = matrix as (Matrix | CellError)
   }
 
   public getCellValue() {
     return this.matrix
   }
 
-  public getMatrixCellValue(address: SimpleCellAddress): number {
+  public getMatrixCellValue(address: SimpleCellAddress): number | CellError {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
-    return this.matrix.get(col, row)
+    if (this.matrix instanceof Matrix) {
+      return this.matrix.get(col, row)
+    } else {
+      return this.matrix
+    }
   }
 
   public getAddress(): SimpleCellAddress {

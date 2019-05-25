@@ -37,9 +37,6 @@ export class MatrixPlugin extends FunctionPlugin {
     const left = ast.args[0]
     const right = ast.args[1]
 
-    if (left.type !== AstNodeType.CELL_RANGE || right.type !== AstNodeType.CELL_RANGE) {
-      return new CellError(ErrorType.VALUE)
-    }
     const leftMatrix = this.evaluateAst(left, formulaAddress)
     const rightMatrix = this.evaluateAst(right, formulaAddress)
 
@@ -239,7 +236,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return value
     }
 
-    return new CellError(ErrorType.VALUE)
+    throw new Error("Got not as a value something which is neither matrix nor range")
   }
 
   private matrixFromRange(range: AbsoluteCellRange): Matrix | CellError {
