@@ -31,9 +31,6 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
     const left = ast.args[0]
     const right = ast.args[1]
 
