@@ -208,7 +208,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     const matrixSize = checkMatrixSize(ast, formulaAddress)
     if (!matrixSize) {
-      return new CellError(ErrorType.VALUE)
+      throw new Error("Size of a transpose can't be computed")
     }
 
     /* istanbul ignore next: gpu.js */
