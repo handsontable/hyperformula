@@ -9,6 +9,7 @@ import {Cache, RelativeDependency} from './Cache'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
+import assert from 'assert';
 
 /**
  * Parses formula using caching if feasible.
@@ -88,10 +89,8 @@ export class ParserWithCaching {
   }
 
   public getAbsolutizedParserResult(hash: string, baseAddress: SimpleCellAddress): { ast: Ast, dependencies: CellDependency[] } {
-    if (!this.cache.get(hash)) {
-      throw Error(`Hash ${hash} not present in cache`)
-    }
     const cacheElem = this.cache.get(hash)!
+    assert.ok(cacheElem, `Hash ${hash} not present in cache`)
     return {
       ast: cacheElem.ast,
       dependencies: absolutizeDependencies(cacheElem.relativeDependencies, baseAddress)

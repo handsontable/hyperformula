@@ -14,6 +14,7 @@ import {CriterionCache, RangeVertex} from '../../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
+import assert from 'assert';
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(simpleConditionRange: AbsoluteCellRange): string {
@@ -208,10 +209,8 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - already parsed criterion structure
    */
   private evaluateRangeCountif(simpleConditionRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)
-    if (!conditionRangeVertex) {
-      throw Error('Range does not exists in graph')
-    }
+    const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)!
+    assert.ok(conditionRangeVertex, 'Range does not exists in graph')
 
     const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
     if (cachedResult) {
