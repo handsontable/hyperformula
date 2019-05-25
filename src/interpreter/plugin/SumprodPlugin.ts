@@ -7,10 +7,6 @@ import {FunctionPlugin} from './FunctionPlugin'
 import {Matrix} from "../../Matrix";
 import {zip} from "../../generatorUtils";
 
-function cacheKey(ranges: AbsoluteCellRange[]): string {
-  return `SUMPROD,${ranges[1].start.col},${ranges[1].start.row}`
-}
-
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumprod: {
