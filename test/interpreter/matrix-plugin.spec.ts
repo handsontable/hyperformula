@@ -87,6 +87,15 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toEqual(118)
   })
 
+  it('mmult of a number', async () => {
+    const config = new Config({functionPlugins: [MatrixPlugin]})
+    const engine = await HandsOnEngine.buildFromArray([
+      ['{=MMULT(3, 4)}'],
+    ], config)
+
+    expect(engine.getCellValue('A1')).toEqual(12)
+  })
+
   it('matrix transpose', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = await HandsOnEngine.buildFromArray([
