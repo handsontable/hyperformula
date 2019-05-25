@@ -24,10 +24,6 @@ export function dateNumberToString(dateNumber: number, dateFormat: string): stri
   return dateNumberToMoment(dateNumber).format(dateFormat)
 }
 
-export function dateNumebrToStringFormat(dateNumber: number, format: string): string {
-  return dateNumberToMoment(dateNumber).format(format.toUpperCase())
-}
-
 export function dateNumberToMonthNumber(dateNumber: number): number {
   return dateNumberToMoment(dateNumber).month() + 1
 }
