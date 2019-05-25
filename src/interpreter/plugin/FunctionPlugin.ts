@@ -73,14 +73,6 @@ export abstract class FunctionPlugin {
     return values
   }
 
-  protected getCellValuesFromRange(range: AbsoluteCellRange): CellValue[] {
-    const result = []
-    for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
-      result.push(this.addressMapping.getCellValue(cellFromRange))
-    }
-    return result
-  }
-
   protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
     if (range instanceof AbsoluteCellRange) {
       for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
