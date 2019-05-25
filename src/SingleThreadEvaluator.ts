@@ -28,7 +28,7 @@ export class SingleThreadEvaluator implements Evaluator {
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
-    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config)
+    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config, this.stats)
   }
 
   public async run() {

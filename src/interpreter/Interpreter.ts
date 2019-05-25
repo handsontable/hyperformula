@@ -23,6 +23,7 @@ import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
 import {GPU} from 'gpu.js'
+import {Statistics} from '../statistics/Statistics'
 
 export class Interpreter {
   private readonly pluginCache: Map<string, [any, string]> = new Map()
@@ -33,6 +34,7 @@ export class Interpreter {
     public readonly rangeMapping: RangeMapping,
     public readonly graph: Graph<Vertex>,
     public readonly config: Config,
+    public readonly stats: Statistics,
   ) {
     this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
     this.registerPlugins([

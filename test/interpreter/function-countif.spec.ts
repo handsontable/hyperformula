@@ -24,6 +24,7 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue('B3')).toEqual(2)
     expect(engine.getCellValue('B4')).toEqual(3)
+    expect(engine.stats.countifPartialCacheUsed).toEqual(1)
   })
 
   it('use full cache', async () => {
@@ -35,6 +36,7 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue('B1')).toEqual(2)
     expect(engine.getCellValue('B2')).toEqual(2)
+    expect(engine.stats.countifFullCacheUsed).toEqual(1)
   })
 
   it('works for only one cell', async () => {

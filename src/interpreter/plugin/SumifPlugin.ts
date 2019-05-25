@@ -173,13 +173,12 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - already parsed criterion structure
    */
   private evaluateRangeSumif(simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)
-    if (!valuesRangeVertex) {
-      throw Error('Range does not exists in graph')
-    }
+    const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+    assert.ok(valuesRangeVertex, 'Range does not exists in graph')
 
     const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
     if (cachedResult) {
+      this.interpreter.stats.sumifFullCacheUsed++
       return cachedResult
     }
 
@@ -214,11 +213,13 @@ export class SumifPlugin extends FunctionPlugin {
 
     const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
     if (cachedResult) {
+      this.interpreter.stats.countifFullCacheUsed++
       return cachedResult
     }
 
     const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, simpleConditionRange, simpleConditionRange,
       (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+        this.interpreter.stats.countifPartialCacheUsed++
         return (cacheCurrentValue as number) + count(newFilteredValues)
       })
 
@@ -230,7 +231,7 @@ export class SumifPlugin extends FunctionPlugin {
       cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
     }
 
-    conditionRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
+    conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
 
     return cache.get(criterionString)![0]
   }

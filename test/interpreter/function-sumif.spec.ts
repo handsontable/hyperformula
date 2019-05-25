@@ -192,4 +192,18 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue('C3')).toEqual(2)
     expect(engine.getCellValue('C5')).toEqual(3)
   })
+
+  it('using full cache', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
+      ['0', '3'],
+      ['1', '5'],
+      ['2', '7'],
+      ['=SUMIF(A1:A3, "=1", B1:B3)'],
+      ['=SUMIF(A1:A3, "=1", B1:B3)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(5)
+    expect(engine.getCellValue('A5')).toEqual(5)
+    expect(engine.stats.sumifFullCacheUsed).toEqual(1)
+  })
 })

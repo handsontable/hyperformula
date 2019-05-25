@@ -15,11 +15,17 @@ export enum StatType {
 export class Statistics {
   private readonly stats: Map<StatType, number> = new Map<StatType, number>()
   private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
+  public countifFullCacheUsed = 0
+  public countifPartialCacheUsed = 0
+  public sumifFullCacheUsed = 0
 
   /**
    * Resets statistics
    */
   public reset(): void {
+    this.countifFullCacheUsed = 0
+    this.countifPartialCacheUsed = 0
+    this.sumifFullCacheUsed = 0
     this.stats.clear()
   }
 

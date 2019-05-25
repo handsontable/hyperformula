@@ -79,7 +79,7 @@ export class HandsOnEngine {
   private evaluator?: Evaluator
 
   /** Statistics module for benchmarking */
-  private readonly stats: Statistics = new Statistics()
+  public readonly stats: Statistics = new Statistics()
 
   private readonly sheetMapping = new SheetMapping()
 
