@@ -94,34 +94,6 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
   }
 }
 
-/**
- * Checks if list of addresses form a rectangle
- * */
-export function checkIfMatrix(addresses: SimpleCellAddress[]): MatrixSizeCheck {
-  // addresses sorted in parsing order, we are assuming that
-  // topleft is always first
-  // bottomright is always last
-  const first = addresses[0]
-  const last = addresses[addresses.length - 1]
-  const possibleMatrixSize = (last.col - first.col + 1) * (last.row - first.row + 1)
-
-  if (addresses.length !== possibleMatrixSize) {
-    return false
-  }
-
-  for (let i = 0; i < addresses.length; ++i) {
-    const address = addresses[i]
-    if (address.col > last.col || address.col < first.col) {
-      return false
-    }
-  }
-
-  return {
-    width: last.col - first.col + 1,
-    height: last.row - first.row + 1,
-  }
-}
-
 export class Matrix {
   private matrix: number[][]
   private size: Size
