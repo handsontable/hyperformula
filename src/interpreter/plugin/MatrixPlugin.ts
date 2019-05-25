@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {checkMatrixSize, Matrix} from '../../Matrix'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {Ast, NumberAst, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../Vertex'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -59,14 +59,7 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    if (ast.args.length < 2) {
-      return new CellError(ErrorType.NA)
-    }
-    const [rangeArg, sizeArg] = ast.args
-
-    if (sizeArg.type !== AstNodeType.NUMBER) {
-      return new CellError(ErrorType.VALUE)
-    }
+    const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
     const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
     const windowSize = sizeArg.value
@@ -105,14 +98,7 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    if (ast.args.length < 2) {
-      return new CellError(ErrorType.NA)
-    }
-    const [rangeArg, sizeArg] = ast.args
-
-    if (sizeArg.type !== AstNodeType.NUMBER) {
-      return new CellError(ErrorType.VALUE)
-    }
+    const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
     const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
     const windowSize = sizeArg.value
@@ -193,10 +179,6 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
     const value = this.evaluateAst(ast.args[0], formulaAddress)
 
     if (value instanceof CellError) {
