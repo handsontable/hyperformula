@@ -10,7 +10,7 @@ export type SheetMappingFn = (sheetName: string) => number
  * @param baseAddress - base address for R0C0 conversion
  */
 export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress => {
-  const result = stringAddress.match(/^(\$([A-Za-z0-9]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
+  const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 
   let col
   if (result[4].length === 1) {
