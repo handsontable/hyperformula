@@ -2,6 +2,7 @@ const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const chevrotain = require('chevrotain');
 const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 // We need to compute token names, these variables can't be mangled.
 // http://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED
@@ -68,6 +69,21 @@ const circleBenchmark = () => {
   return config
 }
 
+const browserBenchmark = () => {
+  const config = buildConfiguration({
+    name: "browser",
+    mode: "development",
+    excludeDependencies: false,
+  })
+  config.entry = "./benchmark/browser/benchmark.ts"
+  config.plugins = [
+    new HtmlWebpackPlugin({
+      template: "./benchmark/browser/index.html"
+    })
+  ]
+  return config
+}
+
 const unoptimized_full = libraryBundleConfiguration({
   name: "unoptimized-full",
   mode: "development",
@@ -94,5 +110,6 @@ module.exports = [
   unoptimized_without_dependencies,
   optimized_full,
   optimized_without_dependencies,
-  circleBenchmark()
+  // circleBenchmark(),
+  // browserBenchmark(),
 ];
