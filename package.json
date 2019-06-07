@@ -8,7 +8,6 @@
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
-    "copyfiles": "^2.1.0",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.11.1",
     "jest": "^23.6.0",
@@ -29,8 +28,5 @@
     "csv-stringify": "^5.0.0",
     "gpu.js": "2.0.0-rc.13",
     "moment": "^2.22.2"
-  },
-  "scripts": {
-    "browser": "tsc && copyfiles benchmark/browser/index.html lib/ && browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js"
   }
 }

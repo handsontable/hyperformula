@@ -47,10 +47,6 @@ bundle: compile
 check-bundle:
 	@node script/check-minified.js
 
-browser: compile
-	@cp benchmark/browser/index.html lib/benchmark/browser/
-	@browserify lib/benchmark/browser/benchmark.js > lib/benchmark/browser/bundle.js
-
 verify-production-licenses:
 	@yarn license-checker --production --excludePackages="handsonengine@0.0.1" --onlyAllow="MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense"
 
