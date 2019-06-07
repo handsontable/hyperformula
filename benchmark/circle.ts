@@ -7,6 +7,7 @@ import {sheet as Bs} from './sheets/06-big-sum'
 import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-sheet-a'
 import {expectedValues as expectedValuesB, sheet as sheetBFn} from './sheets/10-sheet-b'
 import {sheets as sheetsManyMediansFn, expectedValues as expectedValuesManyMedians} from './sheets/11-many-medians'
+import {sheet as sheetCFn, expectedValues as expectedValuesC} from './sheets/12-sheet-c'
 
 async function start() {
   const simpleBig = Sb()
@@ -17,6 +18,7 @@ async function start() {
   const sheetA = sheetAFn()
   const sheetB = sheetBFn()
   const sheetsManyMedians = sheetsManyMediansFn()
+  const sheetC = sheetCFn()
 
   console.info(' === Simple Big === ')
   await benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 200, numberOfRuns: 3 })
@@ -32,6 +34,8 @@ async function start() {
   await benchmark(sheetA, expectedValuesA(sheetA), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
   console.info('\n === Sheet B === ')
   await benchmark(sheetB, expectedValuesB(sheetB), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
+  console.info('\n === Sheet C === ')
+  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3 })
   // console.info('\n === Sheet Many Medians === ')
   // await benchmarkSheets(sheetsManyMedians, expectedValuesManyMedians(sheetsManyMedians["Sheet1"]), { millisecondsPerThousandRows: 6000, numberOfRuns: 3 })
 }

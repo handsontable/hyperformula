@@ -1,9 +1,9 @@
 import { ExpectedValue} from '../benchmark'
 import {sheetCellAddressToString} from '../../src/Cell'
 
-export function sheet(): string[][] {
-  const matrixSize = 1000
+const matrixSize = 1000
 
+export function sheet(): string[][] {
   const sheet = []
 
   for (let i = 0; i < matrixSize; i++) {
@@ -28,8 +28,9 @@ export function sheet(): string[][] {
 
 export function expectedValues(sheet: string[][]): ExpectedValue[] {
   return [
-    { address: '$Sheet1.A1', value:  500500 },
-    { address: '$Sheet1.A2', value:  500500 },
-    { address: '$Sheet1.B1', value: 1001000 },
+    { address: `$Sheet1.${sheetCellAddressToString({ row: matrixSize, col: 0 })}`, value: 0 },
+    { address: `$Sheet1.${sheetCellAddressToString({ row: matrixSize + 1, col: 0 })}`, value: 0 },
+    { address: `$Sheet1.${sheetCellAddressToString({ row: matrixSize, col: 1 })}`, value: 499500 },
+    { address: `$Sheet1.${sheetCellAddressToString({ row: matrixSize, col: 2 })}`, value: 999000 },
   ]
 }
