@@ -111,5 +111,5 @@ module.exports = [
   optimized_full,
   optimized_without_dependencies,
   // circleBenchmark(),
-  // browserBenchmark(),
+  browserBenchmark(),
 ];

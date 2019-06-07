@@ -2,6 +2,8 @@ import {benchmark} from '../benchmark'
 import {sheet as T} from '../sheets/05-sheet-t'
 import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
+import {sheet as C} from '../sheets/12-sheet-c'
+import {Config} from '../../src/Config'
 
 let working = false
 
@@ -9,7 +11,7 @@ interface IExtendedConsole extends Console {
     olog?: any
 }
 
-function runBenchmark(fun: any, benchmarkName: string) {
+function runBenchmark(fun: any, benchmarkName: string, millisecondsPerThousandRows: number = 100, optionalConfig: Config = new Config()) {
     if (working) {
         return
     }
@@ -21,7 +23,7 @@ function runBenchmark(fun: any, benchmarkName: string) {
     setTimeout(() => {
         working = true
         console.info(`=== ${benchmarkName} ===`)
-        benchmark(fun(), [], { millisecondsPerThousandRows: 100, numberOfRuns})
+        benchmark(fun(), [], { millisecondsPerThousandRows, numberOfRuns, engineConfig: optionalConfig})
         working = false
         toggle()
     }, 500)
@@ -65,10 +67,14 @@ function init() {
     const btn_sheetA = document.getElementById('btn_sheetA')!
     const btn_sheetB = document.getElementById('btn_sheetB')!
     const btn_sheetT = document.getElementById('btn_sheetT')!
+    const btn_sheetCgpu = document.getElementById('btn_sheetCgpu')!
+    const btn_sheetCcpu = document.getElementById('btn_sheetCcpu')!
 
     btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
     btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
     btn_sheetT.addEventListener('click', () => runBenchmark(T, 'Sheet T'))
+    btn_sheetCgpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
+    btn_sheetCcpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
 }
 
 init()

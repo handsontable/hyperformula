@@ -45,7 +45,9 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
 
     if (currentRun === config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
       console.error('Sheet validation error')
-      process.exit(1)
+      if (process.exit) {
+        process.exit(1)
+      }
     }
   } while (currentRun < config.numberOfRuns)
 
