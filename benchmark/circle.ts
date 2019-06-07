@@ -1,4 +1,4 @@
-import {benchmark, benchmarkSheets} from './benchmark'
+import {benchmark, benchmarkSheets, benchmarkCsvSheets} from './benchmark'
 import {expectedValues as eSb, sheet as Sb} from './sheets/01-simple-big'
 import {expectedValues as expectedValuesMarkov, sheet as sheetMarkovFn} from './sheets/03-sheet-markov'
 import {expectedValues as expectedValuesPrefixSum, sheet as sheetPrefixSumFn} from './sheets/04-sheet-prefix-sum'
@@ -8,6 +8,8 @@ import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-
 import {expectedValues as expectedValuesB, sheet as sheetBFn} from './sheets/10-sheet-b'
 import {sheets as sheetsManyMediansFn, expectedValues as expectedValuesManyMedians} from './sheets/11-many-medians'
 import {sheet as sheetCFn, expectedValues as expectedValuesC} from './sheets/12-sheet-c'
+import {sheets as sheetsDFn, expectedValues as expectedValuesD} from './sheets/13-sheet-d'
+import {Config} from '../src'
 
 async function start() {
   const simpleBig = Sb()
@@ -19,6 +21,7 @@ async function start() {
   const sheetB = sheetBFn()
   const sheetsManyMedians = sheetsManyMediansFn()
   const sheetC = sheetCFn()
+  const sheetsD = sheetsDFn()
 
   console.info(' === Simple Big === ')
   await benchmark(simpleBig, eSb(simpleBig), { millisecondsPerThousandRows: 200, numberOfRuns: 3 })
@@ -34,10 +37,16 @@ async function start() {
   await benchmark(sheetA, expectedValuesA(sheetA), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
   console.info('\n === Sheet B === ')
   await benchmark(sheetB, expectedValuesB(sheetB), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
-  console.info('\n === Sheet C === ')
-  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3 })
-  // console.info('\n === Sheet Many Medians === ')
-  // await benchmarkSheets(sheetsManyMedians, expectedValuesManyMedians(sheetsManyMedians["Sheet1"]), { millisecondsPerThousandRows: 6000, numberOfRuns: 3 })
+  console.info('\n === Sheet C (GPU) === ')
+  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'gpu' }) })
+  console.info('\n === Sheet C (CPU) === ')
+  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'cpu' }) })
+  console.info('\n === Sheet D (GPU) === ')
+  await benchmarkCsvSheets(sheetsD, expectedValuesD(sheetsD), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'gpu' }) })
+  console.info('\n === Sheet D (CPU) === ')
+  await benchmarkCsvSheets(sheetsD, expectedValuesD(sheetsD), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'cpu' }) })
+  console.info('\n === Sheet Many Medians === ')
+  await benchmarkSheets(sheetsManyMedians, expectedValuesManyMedians(sheetsManyMedians["Sheet1"]), { millisecondsPerThousandRows: 6000, numberOfRuns: 3 })
 }
 
 start()

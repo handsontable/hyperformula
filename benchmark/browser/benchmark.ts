@@ -1,8 +1,9 @@
-import {benchmark} from '../benchmark'
+import {benchmark, benchmarkCsvSheets} from '../benchmark'
 import {sheet as T} from '../sheets/05-sheet-t'
 import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
 import {sheet as C} from '../sheets/12-sheet-c'
+import {sheets as D} from '../sheets/13-sheet-d'
 import {Config} from '../../src/Config'
 
 let working = false
@@ -23,7 +24,12 @@ function runBenchmark(fun: any, benchmarkName: string, millisecondsPerThousandRo
     setTimeout(() => {
         working = true
         console.info(`=== ${benchmarkName} ===`)
-        benchmark(fun(), [], { millisecondsPerThousandRows, numberOfRuns, engineConfig: optionalConfig})
+        const sheetOrSheets = fun()
+        if (Array.isArray(sheetOrSheets)) {
+            benchmark(sheetOrSheets, [], { millisecondsPerThousandRows, numberOfRuns, engineConfig: optionalConfig})
+        } else {
+            benchmarkCsvSheets(sheetOrSheets, [], { millisecondsPerThousandRows, numberOfRuns, engineConfig: optionalConfig})
+        }
         working = false
         toggle()
     }, 500)
@@ -69,12 +75,16 @@ function init() {
     const btn_sheetT = document.getElementById('btn_sheetT')!
     const btn_sheetCgpu = document.getElementById('btn_sheetCgpu')!
     const btn_sheetCcpu = document.getElementById('btn_sheetCcpu')!
+    const btn_sheetDgpu = document.getElementById('btn_sheetDgpu')!
+    const btn_sheetDcpu = document.getElementById('btn_sheetDcpu')!
 
     btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
     btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
     btn_sheetT.addEventListener('click', () => runBenchmark(T, 'Sheet T'))
     btn_sheetCgpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
     btn_sheetCcpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
+    btn_sheetDgpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
+    btn_sheetDcpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
 }
 
 init()

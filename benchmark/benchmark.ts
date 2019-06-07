@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
-import {Sheet, Sheets} from '../src/GraphBuilder'
+import {Sheet, Sheets, CsvSheets} from '../src/GraphBuilder'
 import {StatType} from '../src/statistics/Statistics'
 
 export interface Config {
@@ -40,6 +40,34 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
 
   do {
     engine = await HandsOnEngine.buildFromSheets(sheets, config.engineConfig)
+    stats.push(engine.getStats())
+    currentRun++
+
+    if (currentRun === config.numberOfRuns && !validate(engine, expectedValues)) {
+      console.error('Sheet validation error')
+      if (process.exit) {
+        process.exit(1)
+      }
+    }
+  } while (currentRun < config.numberOfRuns)
+
+  printStats(stats, config, rows)
+  return Promise.resolve(engine)
+}
+
+export async function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
+  config = Object.assign({}, defaultConfig, config)
+
+  const stats: Array<Map<StatType, number>> = []
+  const rows = Object.keys(sheets)
+  .map((key) => sheets[key].length)
+  .reduce((sum: number, length: number) => sum + length)
+
+  let currentRun = 0
+  let engine: HandsOnEngine
+
+  do {
+    engine = await HandsOnEngine.buildFromCsvSheets(sheets, config.engineConfig)
     stats.push(engine.getStats())
     currentRun++
 
