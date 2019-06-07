@@ -14,7 +14,7 @@ test-ci: ## Separate test configuration for CI environment
 	@yarn jest --maxWorkers=2
 
 benchmark-ci: ## Run CI benchmarks
-	@yarn ts-node benchmark/circle.ts
+	@yarn ts-node --max-old-space-size=8192 benchmark/circle.ts
 
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/stage-1.ts
