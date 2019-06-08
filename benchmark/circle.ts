@@ -7,7 +7,6 @@ import {sheet as Bs} from './sheets/06-big-sum'
 import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-sheet-a'
 import {expectedValues as expectedValuesB, sheet as sheetBFn} from './sheets/10-sheet-b'
 import {sheets as sheetsManyMediansFn, expectedValues as expectedValuesManyMedians} from './sheets/11-many-medians'
-import {sheet as sheetCFn, expectedValues as expectedValuesC} from './sheets/12-sheet-c'
 import {sheets as sheetsDFn, expectedValues as expectedValuesD} from './sheets/13-sheet-d'
 import {Config} from '../src'
 
@@ -20,7 +19,6 @@ async function start() {
   const sheetA = sheetAFn()
   const sheetB = sheetBFn()
   const sheetsManyMedians = sheetsManyMediansFn()
-  const sheetC = sheetCFn()
   const sheetsD = sheetsDFn()
 
   console.info(' === Simple Big === ')
@@ -37,10 +35,6 @@ async function start() {
   await benchmark(sheetA, expectedValuesA(sheetA), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
   console.info('\n === Sheet B === ')
   await benchmark(sheetB, expectedValuesB(sheetB), { millisecondsPerThousandRows: 60, numberOfRuns: 3 })
-  console.info('\n === Sheet C (GPU) === ')
-  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'gpu' }) })
-  console.info('\n === Sheet C (CPU) === ')
-  await benchmark(sheetC, expectedValuesC(sheetC), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'cpu' }) })
   console.info('\n === Sheet D (GPU) === ')
   await benchmarkCsvSheets(sheetsD, expectedValuesD(sheetsD), { millisecondsPerThousandRows: 10000, numberOfRuns: 3, engineConfig: new Config({ gpuMode: 'gpu' }) })
   console.info('\n === Sheet D (CPU) === ')

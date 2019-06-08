@@ -2,7 +2,7 @@ import {benchmark, benchmarkCsvSheets} from '../benchmark'
 import {sheet as T} from '../sheets/05-sheet-t'
 import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
-import {sheet as C} from '../sheets/12-sheet-c'
+import {sheet as C} from '../sheets/12-test-c'
 import {sheets as D} from '../sheets/13-sheet-d'
 import {Config} from '../../src/Config'
 
