@@ -7,7 +7,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {CellAddress} from './CellAddress'
+import {CellAddress} from './parser/CellAddress'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'

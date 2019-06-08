@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {AddressMapping} from './AddressMapping'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellAddress, CellReferenceType} from './CellAddress'
+import {CellAddress, CellReferenceType} from './parser/CellAddress'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
 import {Graph} from './Graph'

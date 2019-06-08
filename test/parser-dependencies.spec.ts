@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
-import {CellAddress} from '../src/CellAddress'
+import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
 import {ParserWithCaching} from '../src/parser'
 import {SheetMapping} from '../src/SheetMapping'

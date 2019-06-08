@@ -1,4 +1,4 @@
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {

@@ -1,4 +1,4 @@
-import {CellAddress} from './CellAddress'
+import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
 
 /**

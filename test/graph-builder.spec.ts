@@ -1,6 +1,6 @@
 import {AddressMapping} from '../src/AddressMapping'
 import {simpleCellAddress} from '../src/Cell'
-import {CellAddress} from '../src/CellAddress'
+import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'

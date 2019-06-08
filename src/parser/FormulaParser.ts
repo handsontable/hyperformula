@@ -1,7 +1,7 @@
 import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
 import {SimpleCellAddress} from '../Cell'
-import {CellAddress, CellReferenceType} from '../CellAddress'
+import {CellAddress, CellReferenceType} from './CellAddress'
 import {
   Ast,
   AstNodeType,
