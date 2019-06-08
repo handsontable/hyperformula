@@ -44,7 +44,7 @@ export function sheets() {
   }
 }
 
-export function expectedValues(sheet: string[][]): ExpectedValue[] {
+export function expectedValues(): ExpectedValue[] {
   return [
     { address: '$Sheet1.A1000', value: 1000 },
     { address: '$Sheet1.B1000', value: 500.5 },
