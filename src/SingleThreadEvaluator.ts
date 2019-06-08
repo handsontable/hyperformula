@@ -31,7 +31,7 @@ export class SingleThreadEvaluator implements Evaluator {
     this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config, this.stats)
   }
 
-  public async run() {
+  public run() {
     this.stats.measure(StatType.TOP_SORT, () => {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
     })

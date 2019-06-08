@@ -32,8 +32,8 @@ export class HandsOnEngine {
    *
    * @param csv - csv representation of sheet
    */
-  public static async buildFromCsv(csv: string, config: Config = new Config()): Promise<HandsOnEngine> {
-    return await HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
+  public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
+    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
   }
 
   /**
@@ -41,12 +41,12 @@ export class HandsOnEngine {
    *
    * @param csv - csv representation of sheet
    */
-  public static async buildFromCsvSheets(csvSheets: CsvSheets, config: Config = new Config()): Promise<HandsOnEngine> {
+  public static buildFromCsvSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
     const sheets: Sheets = {}
     for (const key of Object.keys(csvSheets)) {
       sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
     }
-    return await HandsOnEngine.buildFromSheets(sheets, config)
+    return HandsOnEngine.buildFromSheets(sheets, config)
   }
 
   /**
@@ -54,15 +54,15 @@ export class HandsOnEngine {
    *
    * @param sheet - two-dimmensional array representation of sheet
    */
-  public static async buildFromArray(sheet: Sheet, config: Config = new Config()): Promise<HandsOnEngine> {
+  public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
     const engine = new HandsOnEngine(config)
-    await engine.buildFromSheets({ Sheet1: sheet })
+    engine.buildFromSheets({ Sheet1: sheet })
     return engine
   }
 
-  public static async buildFromSheets(sheets: Sheets, config: Config = new Config()): Promise<HandsOnEngine> {
+  public static buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
     const engine = new HandsOnEngine(config)
-    await engine.buildFromSheets(sheets)
+    engine.buildFromSheets(sheets)
     return engine
   }
 
@@ -88,7 +88,7 @@ export class HandsOnEngine {
   ) {
   }
 
-  public async buildFromSheets(sheets: Sheets) {
+  public buildFromSheets(sheets: Sheets) {
     this.stats.reset()
     this.stats.start(StatType.OVERALL)
 
@@ -108,7 +108,7 @@ export class HandsOnEngine {
     this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
 
     this.stats.start(StatType.EVALUATION)
-    await this.evaluator!.run()
+    this.evaluator!.run()
     this.stats.end(StatType.EVALUATION)
 
     this.stats.end(StatType.OVERALL)
@@ -185,7 +185,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
-  public async setCellContent(address: SimpleCellAddress, newCellContent: string) {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
@@ -197,6 +197,6 @@ export class HandsOnEngine {
       throw Error('Changes to cells other than simple values not supported')
     }
 
-    await this.evaluator!.run()
+    this.evaluator!.run()
   }
 }
