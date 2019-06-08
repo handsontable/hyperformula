@@ -2,19 +2,15 @@
  * Provides graph directed structure
  */
 
-export interface Identifiable {
-  id: number
-}
-
-export class Graph<T extends Identifiable> {
+export class Graph<T> {
   /** Set with nodes in graph. */
-  public nodes: Map<number, T>
+  public nodes: Set<T>
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
 
   constructor() {
-    this.nodes = new Map()
+    this.nodes = new Set()
     this.edges = new Map()
   }
 
@@ -24,7 +20,7 @@ export class Graph<T extends Identifiable> {
    * @param node - a node to be added
    */
   public addNode(node: T) {
-    this.nodes.set(node.id, node)
+    this.nodes.add(node)
     if (!this.edges.has(node)) {
       this.edges.set(node, new Set())
     }
@@ -39,10 +35,10 @@ export class Graph<T extends Identifiable> {
    * @param toNode - node to which edge is incoming
    */
   public addEdge(fromNode: T, toNode: T) {
-    if (!this.nodes.has(fromNode.id)) {
+    if (!this.nodes.has(fromNode)) {
       throw new Error(`Unknown node ${fromNode}`)
     }
-    if (!this.nodes.has(toNode.id)) {
+    if (!this.nodes.has(toNode)) {
       throw new Error(`Unknown node ${toNode}`)
     }
     this.edges.get(fromNode)!.add(toNode)
@@ -63,7 +59,7 @@ export class Graph<T extends Identifiable> {
    * @param node - node to check
    */
   public hasNode(node: T): boolean {
-    return this.nodes.has(node.id)
+    return this.nodes.has(node)
   }
 
   /**

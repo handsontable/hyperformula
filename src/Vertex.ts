@@ -4,11 +4,6 @@ import {CriterionLambda} from './interpreter/Criterion'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
 
-let nextVertexId = 1
-const getNextVertexId = (): number => {
-  return nextVertexId++
-}
-
 /**
  * Represents vertex which keeps values of one or more cells
  */
@@ -26,18 +21,16 @@ export class MatrixVertex {
   public readonly width: number
   public readonly height: number
   public readonly kind = 'matrix'
-  public readonly id: number
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
   private matrix: Matrix | CellError
 
-  constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast, id: number = getNextVertexId()) {
+  constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
     this.width = width
     this.height = height
     this.formula = formula || null
     this.matrix = new Matrix([])
-    this.id = id
   }
 
   public setCellValue(matrix: CellValue) {
@@ -78,7 +71,6 @@ export class MatrixVertex {
 export class FormulaCellVertex {
   public readonly kind = 'formula'
 
-  public readonly id: number
   /** Most recently computed value of this formula. */
   private cachedCellValue?: CellValue
 
@@ -88,10 +80,9 @@ export class FormulaCellVertex {
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress, id: number = getNextVertexId()) {
+  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
     this.formula = formula
     this.cellAddress = cellAddress
-    this.id = id
   }
 
   /**
@@ -133,13 +124,11 @@ export class FormulaCellVertex {
 export class ValueCellVertex {
   public readonly kind = 'value'
 
-  public readonly id: number
   /** Static cell value. */
   private cellValue: CellValue
 
-  constructor(cellValue: CellValue, id: number = getNextVertexId()) {
+  constructor(cellValue: CellValue) {
     this.cellValue = cellValue
-    this.id = id
   }
 
   /**
@@ -174,7 +163,6 @@ export class EmptyCellVertex {
 
   /** Singleton instance. */
   private static instance: EmptyCellVertex
-  public readonly id: number = 0
   public readonly kind = 'empty'
 
   /**
@@ -201,7 +189,7 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(private range: AbsoluteCellRange, public readonly id: number = getNextVertexId()) {
+  constructor(private range: AbsoluteCellRange) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }
