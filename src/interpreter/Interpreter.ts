@@ -53,8 +53,7 @@ export class Interpreter {
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const reference = new CellAddress(ast.reference.sheet, ast.reference.col, ast.reference.row, ast.reference.type)
-        const address = reference.toSimpleCellAddress(formulaAddress)
+        const address = ast.reference.toSimpleCellAddress(formulaAddress)
         return this.addressMapping.getCellValue(address)
       }
       case AstNodeType.NUMBER:
