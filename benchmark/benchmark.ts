@@ -21,12 +21,23 @@ export interface ExpectedValue {
   value: CellValue
 }
 
-export async function benchmark(sheet: Sheet, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
-  return benchmarkSheets({Sheet1: sheet}, expectedValues, config)
+export function benchmark(sheet: Sheet, expectedValues: ExpectedValue[], config: Config = defaultConfig): HandsOnEngine {
+  const runEngine = (engineConfig: EngineConfig) => HandsOnEngine.buildFromArray(sheet, engineConfig)
+  return benchmarked(runEngine, expectedValues, config)
 }
 
-export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
-  config = Object.assign({}, defaultConfig, config)
+export function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): HandsOnEngine {
+  const runEngine = (engineConfig: EngineConfig) => HandsOnEngine.buildFromSheets(sheets, engineConfig)
+  return benchmarked(runEngine, expectedValues, config)
+}
+
+export function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): HandsOnEngine {
+  const runEngine = (engineConfig: EngineConfig) => HandsOnEngine.buildFromCsvSheets(sheets, engineConfig)
+  return benchmarked(runEngine, expectedValues, config)
+}
+
+function benchmarked(runEngine: (engineConfig: EngineConfig) => HandsOnEngine, expectedValues: ExpectedValue[], userConfig: Config = defaultConfig): HandsOnEngine {
+  const config = Object.assign({}, defaultConfig, userConfig)
 
   const stats: Array<Map<StatType, number>> = []
 
@@ -34,32 +45,7 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
   let engine: HandsOnEngine
 
   do {
-    engine = await HandsOnEngine.buildFromSheets(sheets, config.engineConfig)
-    stats.push(engine.getStats())
-    currentRun++
-
-    if (currentRun === config.numberOfRuns && !validate(engine, expectedValues)) {
-      console.error('Sheet validation error')
-      if (process.exit) {
-        process.exit(1)
-      }
-    }
-  } while (currentRun < config.numberOfRuns)
-
-  printStats(stats, config, rowsFromSheetsDimensions(engine.getSheetsDimensions()))
-  return Promise.resolve(engine)
-}
-
-export async function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): Promise<HandsOnEngine> {
-  config = Object.assign({}, defaultConfig, config)
-
-  const stats: Array<Map<StatType, number>> = []
-
-  let currentRun = 0
-  let engine: HandsOnEngine
-
-  do {
-    engine = await HandsOnEngine.buildFromCsvSheets(sheets, config.engineConfig)
+    engine = runEngine(config.engineConfig)
     stats.push(engine.getStats())
     currentRun++
 
@@ -72,7 +58,7 @@ export async function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: Expe
   } while (currentRun < config.numberOfRuns)
 
   printStats(stats, config, rowsFromSheetsDimensions(engine.getSheetsDimensions()))
-  return Promise.resolve(engine)
+  return engine
 }
 
 function rowsFromSheetsDimensions(sheetsDimensions: Map<string, { width: number, height: number }>) {
