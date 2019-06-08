@@ -7,14 +7,12 @@ import {StatType} from '../src/statistics/Statistics'
 export interface Config {
   millisecondsPerThousandRows: number,
   numberOfRuns: number,
-  csvDump?: boolean,
   engineConfig?: EngineConfig,
 }
 
 export const defaultConfig = {
   millisecondsPerThousandRows: 50,
   numberOfRuns: 1,
-  csvDump: false,
   engineConfig: new EngineConfig(),
 }
 
