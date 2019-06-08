@@ -29,9 +29,6 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
   config = Object.assign({}, defaultConfig, config)
 
   const stats: Array<Map<StatType, number>> = []
-  const rows = Object.keys(sheets)
-      .map((key) => sheets[key].length)
-      .reduce((sum: number, length: number) => sum + length)
 
   let currentRun = 0
   let engine: HandsOnEngine
@@ -49,7 +46,7 @@ export async function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedVa
     }
   } while (currentRun < config.numberOfRuns)
 
-  printStats(stats, config, rows)
+  printStats(stats, config, rowsFromSheetsDimensions(engine.getSheetsDimensions()))
   return Promise.resolve(engine)
 }
 
@@ -57,9 +54,6 @@ export async function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: Expe
   config = Object.assign({}, defaultConfig, config)
 
   const stats: Array<Map<StatType, number>> = []
-  const rows = Object.keys(sheets)
-  .map((key) => sheets[key].length)
-  .reduce((sum: number, length: number) => sum + length)
 
   let currentRun = 0
   let engine: HandsOnEngine
@@ -77,8 +71,16 @@ export async function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: Expe
     }
   } while (currentRun < config.numberOfRuns)
 
-  printStats(stats, config, rows)
+  printStats(stats, config, rowsFromSheetsDimensions(engine.getSheetsDimensions()))
   return Promise.resolve(engine)
+}
+
+function rowsFromSheetsDimensions(sheetsDimensions: Map<string, { width: number, height: number }>) {
+  let sum = 0
+  for (const dims of sheetsDimensions.values()) {
+    sum += dims.height
+  }
+  return sum
 }
 
 function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: number) {

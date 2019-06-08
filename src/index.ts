@@ -155,6 +155,18 @@ export class HandsOnEngine {
     return arr
   }
 
+  public getSheetsDimensions(): Map<string, { width: number, height: number }> {
+    const sheetDimensions = new Map<string, { width: number, height: number }>()
+    for (const sheetName of this.sheetMapping.names()) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      sheetDimensions.set(sheetName, {
+        width: this.addressMapping!.getWidth(sheetId),
+        height: this.addressMapping!.getHeight(sheetId),
+      })
+    }
+    return sheetDimensions
+  }
+
   /**
    * Creates CSV string out of sheet content
    */
