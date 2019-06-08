@@ -17,6 +17,8 @@ benchmark-ci: ## Run CI benchmarks
 	@yarn ts-node --max-old-space-size=8192 benchmark/circle.ts
 	@yarn ts-node benchmark/instances/12-sheet-c-gpu.ts
 	@yarn ts-node benchmark/instances/12-sheet-c-cpu.ts
+	@yarn ts-node benchmark/instances/13-sheet-d-gpu.ts
+	@yarn ts-node benchmark/instances/13-sheet-d-cpu.ts
 
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/stage-1.ts
