@@ -1,8 +1,5 @@
 import {AddressMapping} from './AddressMapping'
-import {
-  CellError,
-  ErrorType,
-} from './Cell'
+import {CellError, ErrorType,} from './Cell'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
@@ -10,7 +7,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {Statistics, StatType} from './statistics/Statistics'
-import { FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './Vertex'
 
 export class SingleThreadEvaluator implements Evaluator {
   /** Topologically sorted list of vertices. */
@@ -36,7 +33,9 @@ export class SingleThreadEvaluator implements Evaluator {
       ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
     })
 
-    this.recomputeFormulas()
+    this.stats.measure(StatType.EVALUATION, () => {
+      this.recomputeFormulas()
+    })
   }
 
   /**
