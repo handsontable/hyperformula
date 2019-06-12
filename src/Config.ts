@@ -11,6 +11,7 @@ export interface ConfigParams {
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
+  matrixDetectionThreshold: number,
 }
 
 export class Config {
@@ -23,6 +24,7 @@ export class Config {
     functionPlugins: [],
     gpuMode: 'gpu',
     matrixDetection: true,
+    matrixDetectionThreshold: 100
   }
 
   public readonly addressMappingFillThreshold: number
@@ -33,17 +35,21 @@ export class Config {
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
+  public readonly matrixDetectionThreshold: number
 
-  constructor({
-    addressMappingFillThreshold,
-    csvDelimiter,
-    dateFormat,
-    functionArgSeparator,
-    language,
-    functionPlugins,
-    gpuMode,
-    matrixDetection,
-  }: Partial<ConfigParams> = {}) {
+  constructor(
+      {
+        addressMappingFillThreshold,
+        csvDelimiter,
+        dateFormat,
+        functionArgSeparator,
+        language,
+        functionPlugins,
+        gpuMode,
+        matrixDetection,
+        matrixDetectionThreshold
+      }: Partial<ConfigParams> = {}
+  ) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
@@ -52,5 +58,6 @@ export class Config {
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
+    this.matrixDetectionThreshold = matrixDetectionThreshold || Config.defaultConfig.matrixDetectionThreshold
   }
 }

@@ -79,7 +79,8 @@ export class GraphBuilderMatrixHeuristic {
   constructor(
       private readonly graph: Graph<Vertex>,
       private readonly addressMapping: AddressMapping,
-      private readonly dependencies: Map<Vertex, CellDependency[]>
+      private readonly dependencies: Map<Vertex, CellDependency[]>,
+      private readonly threshold: number
   ) {
   }
 
@@ -99,7 +100,7 @@ export class GraphBuilderMatrixHeuristic {
     const scanResult = this.findMatrices()
 
     scanResult.forEach((elem: PossibleMatrix) => {
-      if (!elem.isMatrix || elem.range.size() < 2) {
+      if (!elem.isMatrix || elem.range.size() < this.threshold) {
         notMatrices.push(elem)
         return
       }

@@ -65,7 +65,7 @@ export class GraphBuilder {
     this.parser = new ParserWithCaching(config, this.sheetMapping.fetch)
 
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.graph, this.addressMapping, this.sheetMapping, this.parser, this.stats)
+      this.buildStrategy = new MatrixDetectionStrategy(this.graph, this.addressMapping, this.sheetMapping, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
       this.buildStrategy = new SimpleStrategy(this.graph, this.addressMapping, this.sheetMapping, this.parser, this.stats)
     }
@@ -198,13 +198,14 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       private readonly addressMapping: AddressMapping,
       private readonly sheetMapping: SheetMapping,
       private readonly parser: ParserWithCaching,
-      private readonly stats: Statistics
+      private readonly stats: Statistics,
+      private readonly threshold: number
   ) {}
 
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies)
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.graph, this.addressMapping, dependencies, this.threshold)
 
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
 

@@ -220,14 +220,16 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
   })
+})
 
+describe('GraphBuilder with matrix detection', () => {
   it('matrix no overlap', () => {
     const sheet = [
       ['1', '2'],
@@ -245,7 +247,7 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -274,7 +276,7 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -298,13 +300,12 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
   })
-
   it('matrix with plain numbers', () => {
     const sheet = [
       ['1', '2'],
@@ -316,7 +317,7 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }), sheetMapping)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -343,5 +344,30 @@ describe('GraphBuilder', () => {
 
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
     expect(addressMapping.getCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
+  })
+
+  it('matrix detection threshold', () => {
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['', ''],
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+    ]
+
+    const graph = new Graph<Vertex>()
+    const addressMapping = new AddressMapping(0.5)
+    addressMapping.autoAddSheet(0, sheet)
+    const sheetMapping = new SheetMapping()
+    sheetMapping.addSheet('Sheet1')
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
+
+    graphBuilder.buildGraph({ Sheet1: sheet })
+
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.getCell(simpleCellAddress(0, 1, 1))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
+
   })
 })
