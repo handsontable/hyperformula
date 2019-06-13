@@ -76,6 +76,15 @@ make test
 
 See other useful `make` commands available in [Makefile](Makefile) or listed with `make help` command.
 
+## Demos
+
+### Browser Benchmarks demo
+
+1. Make [Installation](#installation) step above
+2. `make bundle`, to build code artifacts
+3. `cd dist/browser && live-server` to run the server with demos, which will be available under [http://localhost:8080]
+
+
 ## Basic usage
 
 You can use the following script to process a CSV file with formulas and output a CSV file with values.
