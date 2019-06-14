@@ -66,34 +66,10 @@ describe('Integration', () => {
     expect(engine.getCellValue('C1')).toBe(11)
   })
 
-  it('#loadSheet change cell content', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
-      ['1', '=A1'],
-    ])
-
-    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '2')
-    expect(engine.getCellValue('B1')).toBe(2)
-
-    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, 'foo')
-    expect(engine.getCellValue('B1')).toBe('foo')
-  })
-
   it('#loadSheet - it should build graph without cycle but with formula with error', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=A1B1']])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME))
-  })
-
-  it('#loadSheet - changing value inside range', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
-      ['1', '0'],
-      ['2', '0'],
-      ['3', '=SUM(A1:A3)'],
-    ])
-    expect(engine.getCellValue('B3')).toEqual(6)
-
-    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
-    expect(engine.getCellValue('B3')).toEqual(8)
   })
 
   it('#loadSheet - dependency before value', async () => {

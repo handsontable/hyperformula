@@ -224,8 +224,18 @@ export class HandsOnEngine {
         this.addressMapping!.setCell(address, newVertex)
       }
 
-    } else if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
-      if (!isNaN(Number(newCellContent))) {
+    } else if (vertex instanceof ValueCellVertex) {
+      if (isFormula(newCellContent)) {
+        const { ast, hash } = this.parser.parse(newCellContent, address)
+        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const newVertex = new FormulaCellVertex(ast, address)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+      } else if (newCellContent === '') {
+        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.addressMapping!.removeCell(address)
+      } else if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
       } else {
         vertex.setCellValue(newCellContent)
