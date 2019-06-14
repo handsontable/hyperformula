@@ -44,6 +44,14 @@ export class Graph<T> {
     this.edges.get(fromNode)!.add(toNode)
   }
 
+  public removeEdge(fromNode: T, toNode: T) {
+    if (this.existsEdge(fromNode, toNode)) {
+      this.edges.get(fromNode)!.delete(toNode);
+    } else {
+      throw new Error("Edge does not exist");
+    }
+  }
+
   /**
    * Returns nodes adjacent to given node
    *

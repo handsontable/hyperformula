@@ -249,3 +249,31 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topologicalSort().cycled).toEqual([node])
   })
 })
+
+describe('Graph cruds', () => {
+  it ("#removeEdge not existing edge", () => {
+    const graph = new Graph()
+    const node0 = identifiableString(0, 'x0')
+    const node1 = identifiableString(1, 'x1')
+    graph.addNode(node0)
+    graph.addNode(node1)
+
+    expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error("Edge does not exist"))
+  })
+  it ('#removeEdge removes edge from graph', () => {
+    const graph = new Graph()
+    const node0 = identifiableString(0, 'x0')
+    const node1 = identifiableString(1, 'x1')
+
+    graph.addNode(node0)
+    graph.addNode(node1)
+
+    graph.addEdge(node0, node1)
+    expect(graph.edgesCount()).toEqual(1)
+    expect(graph.existsEdge(node0, node1)).toBe(true)
+
+    graph.removeEdge(node0, node1)
+    expect(graph.edgesCount()).toEqual(0)
+    expect(graph.existsEdge(node0, node1)).toBe(false)
+  })
+})

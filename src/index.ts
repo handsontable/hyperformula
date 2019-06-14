@@ -17,7 +17,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import { ValueCellVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export {
   Config,
@@ -197,6 +197,7 @@ export class HandsOnEngine {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
+
     if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
