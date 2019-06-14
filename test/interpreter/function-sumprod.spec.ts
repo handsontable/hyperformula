@@ -97,4 +97,14 @@ describe('Function SUMPRODUCT', () => {
     ])
     expect(engine.getCellValue('A3')).toEqual(7)
   })
+
+  it('works if same number of elements in ranges', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1','2','3'],
+      ['2'],
+      ['3'],
+      ['=SUMPRODUCT(A1:C1,A1:A3)']
+    ])
+    expect(engine.getCellValue('A4')).toEqual(14)
+  })
 })
