@@ -69,7 +69,7 @@ export class MatrixVertex {
  */
 export class FormulaCellVertex {
   /** Most recently computed value of this formula. */
-  private cachedCellValue?: CellValue
+  private cachedCellValue: CellValue | null
 
   /** Formula in AST format */
   private formula: Ast
@@ -80,6 +80,7 @@ export class FormulaCellVertex {
   constructor(formula: Ast, cellAddress: SimpleCellAddress) {
     this.formula = formula
     this.cellAddress = cellAddress
+    this.cachedCellValue = null
   }
 
   /**
@@ -87,6 +88,12 @@ export class FormulaCellVertex {
    */
   public getFormula(): Ast {
     return this.formula
+  }
+
+
+  public setFormula(formula: Ast) {
+    this.formula = formula
+    this.cachedCellValue = null
   }
 
   /**
@@ -107,7 +114,7 @@ export class FormulaCellVertex {
    * Returns cell value stored in vertex
    */
   public getCellValue() {
-    if (this.cachedCellValue != null) {
+    if (this.cachedCellValue !== null) {
       return this.cachedCellValue
     } else {
       throw Error('Value of the formula cell is not computed.')
