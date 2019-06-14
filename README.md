@@ -7,6 +7,7 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
 2. [Overview](#overview)
 3. [Examples](#examples)
 4. [Installation](#installation)
+5. [Demos](#demos)
 5. [Basic usage](#basic-usage)
       - [Config file](#config-file)
       - [handsonengine-convert](#handsonengine-convert)
