@@ -51,4 +51,20 @@ describe('CRUDS', () => {
     expect(engine.getCellValue("B1")).toBe("foo")
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
+
+  it ('update formula to empty cell', () => {
+    const sheet = [
+      ['1', '=A1']
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+    const a1 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
+    const b1 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))
+
+    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.getCellValue("B1")).toBe(1)
+
+    engine.setCellContent(simpleCellAddress(0, 1, 0), '')
+    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+    expect(engine.getCellValue("B1")).toBe(0)
+  })
 })

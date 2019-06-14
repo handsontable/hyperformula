@@ -17,7 +17,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {FormulaCellVertex, ValueCellVertex, Vertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, ValueCellVertex, Vertex} from './Vertex'
 
 export {
   Config,
@@ -212,7 +212,8 @@ export class HandsOnEngine {
         vertex.setFormula(ast)
         this.graphBuilder!.processCellDependencies(dependencies, vertex)
       } else if (newCellContent === '') {
-        /* we don't care about empty cells here */
+        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.addressMapping!.removeCell(address)
       } else if (!isNaN(Number(newCellContent))) {
         const newVertex = new ValueCellVertex(Number(newCellContent))
         this.graph.exchangeNode(vertex, newVertex)
