@@ -92,6 +92,15 @@ export class Graph<T> {
     return result
   }
 
+  public exchangeNode(oldNode: T, newNode: T) {
+    this.addNode(newNode)
+    this.adjacentNodes(oldNode).forEach(adjacentNode => {
+      this.addEdge(newNode, adjacentNode)
+    })
+    this.edges.delete(oldNode)
+    this.nodes.delete(oldNode)
+  }
+
   /**
    * Checks whether exists edge between nodes
    *

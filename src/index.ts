@@ -211,7 +211,18 @@ export class HandsOnEngine {
         const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
         vertex.setFormula(ast)
         this.graphBuilder!.processCellDependencies(dependencies, vertex)
+      } else if (newCellContent === '') {
+        /* we don't care about empty cells here */
+      } else if (!isNaN(Number(newCellContent))) {
+        const newVertex = new ValueCellVertex(Number(newCellContent))
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+      } else {
+        const newVertex = new ValueCellVertex(newCellContent)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
       }
+
     } else if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
