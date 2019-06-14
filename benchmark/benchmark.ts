@@ -49,7 +49,7 @@ function benchmarked(runEngine: (engineConfig: EngineConfig) => HandsOnEngine, e
     stats.push(engine.getStats())
     currentRun++
 
-    if (currentRun === config.numberOfRuns - 1 && !validate(engine, expectedValues)) {
+    if (currentRun === config.numberOfRuns && !validate(engine, expectedValues)) {
       console.error('Sheet validation error')
       if (process.exit) {
         process.exit(1)
