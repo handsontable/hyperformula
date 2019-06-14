@@ -40,11 +40,6 @@ export interface CsvSheets {
  * Service building the graph and mappings.
  */
 export class GraphBuilder {
-  /**
-   * Parser to use when reading formulas.
-   */
-  private parser: ParserWithCaching
-
   private buildStrategy: GraphBuilderStrategy
 
   /**
@@ -61,9 +56,8 @@ export class GraphBuilder {
               private readonly rangeMapping: RangeMapping,
               private readonly stats: Statistics,
               private readonly config: Config,
-              private readonly sheetMapping: SheetMapping) {
-    this.parser = new ParserWithCaching(config, this.sheetMapping.fetch)
-
+              private readonly sheetMapping: SheetMapping,
+              private readonly parser: ParserWithCaching) {
     if (this.config.matrixDetection) {
       this.buildStrategy = new MatrixDetectionStrategy(this.graph, this.addressMapping, this.sheetMapping, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
@@ -90,39 +84,44 @@ export class GraphBuilder {
 
   private processDependencies(dependencies: Dependencies) {
     dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
-      cellDependencies.forEach((absStartCell: CellDependency) => {
-        if (absStartCell instanceof AbsoluteCellRange) {
-          const range = absStartCell
-          let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
-          if (rangeVertex === null) {
-            rangeVertex = new RangeVertex(range)
-            this.rangeMapping.setRange(rangeVertex)
-          }
+      this.processCellDependencies(cellDependencies, endVertex)
+    })
+  }
 
-          this.graph.addNode(rangeVertex)
-
-          const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
-          const restRange = restRanges[0]
-          if (smallerRangeVertex) {
-            this.graph.addEdge(smallerRangeVertex, rangeVertex)
-          }
-
-          const matrix = this.addressMapping.getMatrix(restRange)
-          if (matrix !== undefined) {
-            this.graph.addEdge(matrix, rangeVertex!)
-          } else {
-            for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-              this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
-            }
-          }
-          this.graph.addEdge(rangeVertex, endVertex)
-        } else {
-          this.graph.addEdge(this.addressMapping.getCell(absStartCell), endVertex)
+  public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
+    cellDependencies.forEach((absStartCell: CellDependency) => {
+      if (absStartCell instanceof AbsoluteCellRange) {
+        const range = absStartCell
+        let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
+        if (rangeVertex === null) {
+          rangeVertex = new RangeVertex(range)
+          this.rangeMapping.setRange(rangeVertex)
         }
-      })
+
+        this.graph.addNode(rangeVertex)
+
+        const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
+        const restRange = restRanges[0]
+        if (smallerRangeVertex) {
+          this.graph.addEdge(smallerRangeVertex, rangeVertex)
+        }
+
+        const matrix = this.addressMapping.getMatrix(restRange)
+        if (matrix !== undefined) {
+          this.graph.addEdge(matrix, rangeVertex!)
+        } else {
+          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
+            this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
+          }
+        }
+        this.graph.addEdge(rangeVertex, endVertex)
+      } else {
+        this.graph.addEdge(this.addressMapping.getCell(absStartCell), endVertex)
+      }
     })
   }
 }
+
 
 export interface GraphBuilderStrategy {
   run(sheets: Sheets): Dependencies

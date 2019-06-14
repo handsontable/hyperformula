@@ -12,7 +12,7 @@ import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
 import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import { cellAddressFromString, isFormula} from './parser'
+import {cellAddressFromString, isFormula, ParserWithCaching} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
@@ -67,25 +67,31 @@ export class HandsOnEngine {
   }
 
   /** Address mapping from addresses to vertices from graph. */
-  private addressMapping?: AddressMapping
+  public addressMapping?: AddressMapping
 
   /** Range mapping from ranges to vertices representing these ranges. */
   private readonly rangeMapping: RangeMapping = new RangeMapping()
 
   /** Directed graph of cell dependencies. */
-  private readonly graph: Graph<Vertex> = new Graph<Vertex>()
+  public readonly graph: Graph<Vertex> = new Graph<Vertex>()
 
   /** Formula evaluator */
   private evaluator?: Evaluator
+
+  private parser: ParserWithCaching
+
+  private graphBuilder?: GraphBuilder
 
   /** Statistics module for benchmarking */
   public readonly stats: Statistics = new Statistics()
 
   private readonly sheetMapping = new SheetMapping()
 
+
   constructor(
     private readonly config: Config,
   ) {
+    this.parser = new ParserWithCaching(this.config, this.sheetMapping.fetch)
   }
 
   public buildFromSheets(sheets: Sheets) {
@@ -98,11 +104,10 @@ export class HandsOnEngine {
       this.addressMapping!.autoAddSheet(sheetId, sheets[sheetName])
     }
 
-    const graphBuilder = new GraphBuilder(this.graph, this.addressMapping!, this.rangeMapping, this.stats, this.config, this.sheetMapping)
+    this.graphBuilder = new GraphBuilder(this.graph, this.addressMapping!, this.rangeMapping, this.stats, this.config, this.sheetMapping, this.parser)
 
-    let independentSheets: boolean[]
     this.stats.measure(StatType.GRAPH_BUILD, () => {
-      independentSheets = graphBuilder.buildGraph(sheets)
+      this.graphBuilder!.buildGraph(sheets)
     })
 
     this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
@@ -198,7 +203,16 @@ export class HandsOnEngine {
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
 
-    if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
+    if (vertex instanceof FormulaCellVertex) {
+      this.graph.removeIncomingEdges(vertex)
+
+      if (isFormula(newCellContent)) {
+        const { ast, hash } = this.parser.parse(newCellContent, address)
+        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        vertex.setFormula(ast)
+        this.graphBuilder!.processCellDependencies(dependencies, vertex)
+      }
+    } else if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
       if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
       } else {

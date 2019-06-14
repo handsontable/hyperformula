@@ -260,6 +260,7 @@ describe('Graph cruds', () => {
 
     expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error("Edge does not exist"))
   })
+
   it ('#removeEdge removes edge from graph', () => {
     const graph = new Graph()
     const node0 = identifiableString(0, 'x0')
@@ -275,5 +276,25 @@ describe('Graph cruds', () => {
     graph.removeEdge(node0, node1)
     expect(graph.edgesCount()).toEqual(0)
     expect(graph.existsEdge(node0, node1)).toBe(false)
+  })
+
+  it ('#removeIncomingEdges removes all edges incoming to given node', () => {
+    const graph = new Graph()
+    const node0 = identifiableString(0, 'x0')
+    const node1 = identifiableString(1, 'x1')
+    const node2 = identifiableString(1, 'x2')
+
+    graph.addNode(node0)
+    graph.addNode(node1)
+    graph.addNode(node2)
+
+    graph.addEdge(node1, node0)
+    graph.addEdge(node2, node0)
+    expect(graph.edgesCount()).toEqual(2)
+    expect(graph.existsEdge(node1, node0)).toBe(true)
+    expect(graph.existsEdge(node2, node0)).toBe(true)
+
+    graph.removeIncomingEdges(node0)
+    expect(graph.edgesCount()).toEqual(0)
   })
 })
