@@ -78,26 +78,6 @@ describe('Integration', () => {
     expect(engine.getCellValue('B1')).toBe('foo')
   })
 
-  it('#loadSheet change cell content which was formula throws error', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
-      ['1', '=A1'],
-    ])
-
-    expect(() => {
-      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '2')
-    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
-  })
-
-  it('#loadSheet change cell content to formula throws error', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
-      ['1', '2'],
-    ])
-
-    expect(() => {
-      engine.setCellContent({ sheet: 0, col: 1, row: 0 }, '=A1')
-    }).toThrowError(new Error('Changes to cells other than simple values not supported'))
-  })
-
   it('#loadSheet - it should build graph without cycle but with formula with error', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=A1B1']])
 
