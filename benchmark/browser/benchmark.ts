@@ -73,18 +73,12 @@ function init() {
     const btn_sheetA = document.getElementById('btn_sheetA')!
     const btn_sheetB = document.getElementById('btn_sheetB')!
     const btn_sheetT = document.getElementById('btn_sheetT')!
-    const btn_sheetCgpu = document.getElementById('btn_sheetCgpu')!
-    const btn_sheetCcpu = document.getElementById('btn_sheetCcpu')!
-    const btn_sheetDgpu = document.getElementById('btn_sheetDgpu')!
     const btn_sheetDcpu = document.getElementById('btn_sheetDcpu')!
 
     btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
     btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
     btn_sheetT.addEventListener('click', () => runBenchmark(T, 'Sheet T'))
-    btn_sheetCgpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
-    btn_sheetCcpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
-    btn_sheetDgpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
-    btn_sheetDcpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
+    btn_sheetDcpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (Old Way)', 6000, new Config({ gpuMode: 'cpu', matrixDetection: false })))
 }
 
 init()

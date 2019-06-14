@@ -38,7 +38,7 @@ export class Interpreter {
   ) {
     this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin,
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, ExpPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
@@ -233,7 +233,10 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
-        return new CellError(ErrorType.VALUE)
+        return AbsoluteCellRange.fromCellRange({
+          start: ast.start,
+          end: ast.end
+        }, formulaAddress)
       }
       case AstNodeType.ERROR: {
         if (ast.args[0].type === 'StaticOffsetOutOfRangeError') {

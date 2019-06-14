@@ -13,6 +13,10 @@ export class SumprodPlugin extends FunctionPlugin {
       EN: 'SUMPRODUCT',
       PL: 'SUMA.ILOCZYNOW',
     },
+    transpose: {
+      EN: 'TRANSPOSE',
+      PL: 'TRANSPONUJ'
+    },
   }
 
   // SUMPORD(A1:A2; B1:B2, C1:C2);
@@ -40,6 +44,22 @@ export class SumprodPlugin extends FunctionPlugin {
     }
 
     return this.reduceSumprod(this.generateCellValues(leftArg), this.generateCellValues(rightArg))
+  }
+
+  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = ast.args[0]
+    if (arg.type !== AstNodeType.CELL_RANGE) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    return AbsoluteCellRange.fromCellRange({
+      start: arg.start,
+      end: arg.end
+    }, formulaAddress)
   }
 
   private reduceSumprod(left: IterableIterator<CellValue>, right: IterableIterator<CellValue>): number {

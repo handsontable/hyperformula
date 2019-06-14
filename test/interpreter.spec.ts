@@ -167,10 +167,10 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('ranges - VALUE error when evaluating without context', async () => {
-    const engine = await HandsOnEngine.buildFromArray([['1'], ['2'], ['=A1:A2']])
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
-  })
+  // it('ranges - VALUE error when evaluating without context', async () => {
+  //   const engine = await HandsOnEngine.buildFromArray([['1'], ['2'], ['=A1:A2']])
+  //   expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
+  // })
 
   it('procedures - SUM with bad args', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=SUM(B1)', 'asdf']])

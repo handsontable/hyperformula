@@ -1,5 +1,6 @@
 import {HandsOnEngine} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {CellError, ErrorType, CellRange, simpleCellAddress} from '../../src/Cell'
+import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import '../testConfig'
 
 describe('Function SUMPRODUCT', () => {
@@ -107,4 +108,13 @@ describe('Function SUMPRODUCT', () => {
     ])
     expect(engine.getCellValue('A4')).toEqual(14)
   })
+})
+
+describe("function TRANSPOSE, return untouched range argument", async () => {
+  const engine = await HandsOnEngine.buildFromArray([
+    ['=TRANSPOSE(A1:A10)']
+  ])
+  const value = engine.getCellValue('A1') as AbsoluteCellRange
+  expect(value.start).toEqual(simpleCellAddress(0, 0, 0))
+  expect(value.end).toEqual(simpleCellAddress(0, 0, 9))
 })

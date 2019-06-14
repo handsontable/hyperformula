@@ -1,5 +1,6 @@
 import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 /**
  * Possible errors returned by our interpreter.
@@ -26,7 +27,7 @@ export class CellError {
   }
 }
 
-export type CellValue = boolean | string | number | Matrix | CellError
+export type CellValue = boolean | string | number | Matrix | CellError | AbsoluteCellRange
 
 export interface SimpleCellAddress {
   col: number,
