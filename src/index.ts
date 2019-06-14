@@ -11,13 +11,15 @@ import {CellAddress} from './parser/CellAddress'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
-import {CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {cellAddressFromString, isFormula, ParserWithCaching} from './parser'
+import {buildMatrixVertex, CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {FormulaCellVertex, ValueCellVertex, Vertex} from './Vertex'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
+import {checkMatrixSize} from "./Matrix";
+import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 export {
   Config,
@@ -203,23 +205,81 @@ export class HandsOnEngine {
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)!
 
-    if (vertex instanceof FormulaCellVertex) {
-      this.graph.removeIncomingEdges(vertex)
+    /* TODO handle properly EmptyCellVertex */
 
+    if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
+      const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
+      const parseResult = this.parser.parse(matrixFormula, address)
+
+      const { vertex: newVertex, size } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+
+      if (!size || !(newVertex instanceof MatrixVertex)) {
+        throw Error("What if new matrix vertex is not properly constructed?")
+      }
+
+      const range = AbsoluteCellRange.spanFrom(address, size.width, size.height)
+      for (const x of range.generateCellsFromRangeGenerator()) {
+        if (this.addressMapping!.getCell(x) instanceof MatrixVertex) {
+          throw Error("You cannot modify only part of an array")
+        }
+      }
+
+      this.addressMapping!.setMatrix(range, newVertex)
+
+      for (const x of range.generateCellsFromRangeGenerator()) {
+        this.graph.exchangeNode(this.addressMapping!.getCell(x), newVertex)
+        this.addressMapping!.setCell(x, newVertex)
+      }
+
+      const { dependencies } = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
+      this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+    } else if (vertex instanceof FormulaCellVertex) {
+      this.graph.removeIncomingEdges(vertex)
       if (isFormula(newCellContent)) {
         const { ast, hash } = this.parser.parse(newCellContent, address)
         const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
         vertex.setFormula(ast)
         this.graphBuilder!.processCellDependencies(dependencies, vertex)
+      } else if (newCellContent === '') {
+        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.addressMapping!.removeCell(address)
+      } else if (!isNaN(Number(newCellContent))) {
+        const newVertex = new ValueCellVertex(Number(newCellContent))
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+      } else {
+        const newVertex = new ValueCellVertex(newCellContent)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
       }
-    } else if (vertex instanceof ValueCellVertex && !isFormula(newCellContent)) {
-      if (!isNaN(Number(newCellContent))) {
+    } else if (vertex instanceof ValueCellVertex) {
+      if (isFormula(newCellContent)) {
+        const { ast, hash } = this.parser.parse(newCellContent, address)
+        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const newVertex = new FormulaCellVertex(ast, address)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+      } else if (newCellContent === '') {
+        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.addressMapping!.removeCell(address)
+      } else if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
       } else {
         vertex.setCellValue(newCellContent)
       }
+    } else if (vertex instanceof EmptyCellVertex) {
+      if (isFormula(newCellContent)) {
+        throw new Error("Not implemented yet")
+      } else if (newCellContent === '') {
+        /* nothing happens */
+      } else if (!isNaN(Number(newCellContent))) {
+        throw new Error("Not implemented yet")
+      } else {
+        throw new Error("Not implemented yet")
+      }
     } else {
-      throw Error('Changes to cells other than simple values not supported')
+      throw new Error("Illegal operation")
     }
 
     this.evaluator!.run()

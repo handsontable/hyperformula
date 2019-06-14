@@ -23,6 +23,8 @@ interface IAddressMappingStrategy {
    */
   setCell(address: SheetCellAddress, newVertex: CellVertex): void,
 
+  removeCell(address: SimpleCellAddress): void
+
   /**
    * Returns whether the address is present or not
    *
@@ -94,6 +96,13 @@ export class SparseStrategy implements IAddressMappingStrategy {
   public getWidth(): number {
     return this.width
   }
+
+  public removeCell(address: SimpleCellAddress): void {
+    let colMapping = this.mapping.get(address.col)
+    if (colMapping) {
+      colMapping.delete(address.row)
+    }
+  }
 }
 
 /**
@@ -151,6 +160,12 @@ export class DenseStrategy implements IAddressMappingStrategy {
   /** @inheritDoc */
   public getWidth(): number {
     return this.width
+  }
+
+  public removeCell(address: SimpleCellAddress): void {
+    if (this.mapping[address.row] !== undefined) {
+      delete this.mapping[address.row][address.col]
+    }
   }
 }
 
@@ -255,6 +270,14 @@ export class AddressMapping {
       throw Error('Sheet not initialized')
     }
     sheetMapping.setCell(address, newVertex)
+  }
+
+  public removeCell(address: SimpleCellAddress) {
+    const sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      throw Error('Sheet not initialized')
+    }
+    sheetMapping.removeCell(address)
   }
 
   /** @inheritDoc */
