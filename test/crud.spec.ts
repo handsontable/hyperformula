@@ -1,5 +1,6 @@
 import {HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
+import './testConfig.ts'
 
 describe('CRUDS', () => {
   it('update formula vertex', () => {
