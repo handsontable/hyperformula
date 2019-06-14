@@ -6,7 +6,7 @@ import {Config} from './Config'
 import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
-import {checkMatrixSize} from './Matrix'
+import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -159,7 +159,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
-            vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+            vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress).vertex
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
@@ -229,7 +229,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, cellAddress))
-            const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
+            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, cellAddress)
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
@@ -297,10 +297,10 @@ export function handleMatrix(vertex: CellVertex, formulaAddress: SimpleCellAddre
   }
 }
 
-export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellVertex {
+export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: CellVertex, size: MatrixSizeCheck } {
   const size = checkMatrixSize(ast, formulaAddress)
   if (!size) {
-    return new ValueCellVertex(new CellError(ErrorType.VALUE))
+    return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size: size }
   }
-  return new MatrixVertex(formulaAddress, size.width, size.height, ast)
+  return { vertex: new MatrixVertex(formulaAddress, size.width, size.height, ast), size: size }
 }

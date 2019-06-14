@@ -1,6 +1,7 @@
 import {HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
+import {MatrixVertex} from "../src/Vertex";
 
 describe('CRUDS', () => {
   it('update formula vertex', () => {
@@ -107,6 +108,22 @@ describe('CRUDS', () => {
     engine.setCellContent(simpleCellAddress(0, 1, 0), '')
     expect(engine.getCellValue("B1")).toBe(0)
   })
+
+  it ('rewrite part of sheet with matrix', () => {
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['=A1', '=B1'],
+      ['1', 'foo']
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    engine.setCellContent(simpleCellAddress(0, 0, 2), '{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 3))).toBeInstanceOf(MatrixVertex)
+    expect(engine.getCellValue("A3")).toBe(7)
+  })
+
 
   it('#loadSheet - changing value inside range', async () => {
     const engine = await HandsOnEngine.buildFromArray([
