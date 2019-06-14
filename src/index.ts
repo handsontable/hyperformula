@@ -205,7 +205,6 @@ export class HandsOnEngine {
 
     if (vertex instanceof FormulaCellVertex) {
       this.graph.removeIncomingEdges(vertex)
-
       if (isFormula(newCellContent)) {
         const { ast, hash } = this.parser.parse(newCellContent, address)
         const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
@@ -223,7 +222,6 @@ export class HandsOnEngine {
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
       }
-
     } else if (vertex instanceof ValueCellVertex) {
       if (isFormula(newCellContent)) {
         const { ast, hash } = this.parser.parse(newCellContent, address)
@@ -240,8 +238,16 @@ export class HandsOnEngine {
       } else {
         vertex.setCellValue(newCellContent)
       }
-    } else {
-      throw Error('Changes to cells other than simple values not supported')
+    } else if (vertex instanceof EmptyCellVertex) {
+      if (isFormula(newCellContent)) {
+        throw new Error("Not implemented yet")
+      } else if (newCellContent === '') {
+        /* nothing happens */
+      } else if (!isNaN(Number(newCellContent))) {
+        throw new Error("Not implemented yet")
+      } else {
+        throw new Error("Not implemented yet")
+      }
     }
 
     this.evaluator!.run()
