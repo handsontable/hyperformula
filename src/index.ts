@@ -278,6 +278,8 @@ export class HandsOnEngine {
       } else {
         throw new Error("Not implemented yet")
       }
+    } else {
+      throw new Error("Illegal operation")
     }
 
     this.evaluator!.run()
