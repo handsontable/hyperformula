@@ -4,7 +4,7 @@ import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
 import {Graph} from '../src/Graph'
 import {GraphBuilder} from '../src/GraphBuilder'
-import {buildCellRangeAst, buildProcedureAst} from '../src/parser'
+import {buildCellRangeAst, buildProcedureAst, ParserWithCaching} from '../src/parser'
 import {RangeMapping} from '../src/RangeMapping'
 import {SheetMapping} from '../src/SheetMapping'
 import {Statistics} from '../src/statistics/Statistics'
@@ -19,7 +19,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -35,7 +36,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet})
 
@@ -51,7 +53,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -70,8 +73,9 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -92,8 +96,9 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -126,8 +131,9 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -150,7 +156,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -168,8 +175,9 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
     graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
@@ -196,7 +204,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -220,7 +229,8 @@ describe('GraphBuilder', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
     expect(addressMapping.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
@@ -247,7 +257,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -276,7 +287,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -300,7 +312,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -317,7 +330,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -338,7 +352,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -361,7 +376,8 @@ describe('GraphBuilder with matrix detection', () => {
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping)
+    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
