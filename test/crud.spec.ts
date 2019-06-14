@@ -1,9 +1,11 @@
 import {HandsOnEngine} from "../src";
-import {simpleCellAddress} from "../src/Cell";
+import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
-import {MatrixVertex} from "../src/Vertex";
+import {MatrixVertex, FormulaCellVertex} from "../src/Vertex";
+import {CellAddress} from "../src/parser/CellAddress"
+import {CellReferenceAst} from "../src/parser/Ast"
 
-describe('CRUDS', () => {
+describe('changing cell content', () => {
   it('update formula vertex', () => {
     const sheet = [
         ['1', '2', '=A1']
@@ -135,5 +137,115 @@ describe('CRUDS', () => {
 
     await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
     expect(engine.getCellValue('B3')).toEqual(8)
+  })
+})
+
+const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
+  return ((engine.addressMapping!.getCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+}
+
+describe("Adding row", () => {
+  xit('dependency does not change if from different sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A2'],
+        // new row
+        ['=$Sheet2.B1'],
+      ],
+      Sheet2: []
+    })
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0,0,0))).toEqual(CellAddress.relative(1, 0, 1))
+    expect(extractReference(engine, simpleCellAddress(0,0,1))).toEqual(CellAddress.relative(1, 1, 9))
+  })
+
+  it('same sheet, case Aa, absolute row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      // new row
+      ['=A$1'],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteRow(0, 0, 0))
+  })
+
+  it('same sheet, case Aa, absolute row and col', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      // new row
+      ['=$A$1'],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absolute(0, 0, 0))
+  })
+
+  it('same sheet, case Ab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=A$2'],
+      // new row
+      ['42'],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(0, 0, 2))
+  })
+
+  it('same sheet, case Raa', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=A2'],
+      ['13'],
+      // new row
+      ['42'],
+    ])
+
+    engine.addRow(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 1))
+  })
+
+  it('same sheet, case Rab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42'],
+      ['13'],
+      // new row
+      ['=A2'],
+    ])
+
+    engine.addRow(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.relative(0, 0, -2))
+  })
+
+  it('same sheet, case Rba', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=A3'],
+      ['13'],
+      // new row
+      ['42'],
+    ])
+
+    engine.addRow(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 3))
+  })
+
+  it('same sheet, case Rbb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42'],
+      // new row
+      ['=A3'],
+      ['13'],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
   })
 })

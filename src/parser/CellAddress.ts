@@ -56,4 +56,12 @@ export class CellAddress {
       return simpleCellAddress(this.sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
   }
+
+  public isRowAbsolute(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+  }
+
+  public shiftedByRows(numberOfRows: number): CellAddress {
+    return new CellAddress(this.sheet, this.col, this.row + numberOfRows, this.type)
+  }
 }

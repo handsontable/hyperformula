@@ -8,6 +8,7 @@ import {
   SimpleCellAddress,
 } from './Cell'
 import {CellAddress} from './parser/CellAddress'
+import {AstNodeType, Ast} from './parser/Ast'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
@@ -287,5 +288,101 @@ export class HandsOnEngine {
 
   public addRow(sheet: number, row: number, numberOfRows: number = 1) {
     this.addressMapping!.addRows(sheet, row, numberOfRows)
+    for (const node of this.graph.nodes) {
+      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
+        const newAst = this.fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRows)
+        node.setFormula(newAst)
+      }
+    }
+  }
+
+  private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): CellAddress | false {
+    if (cellAddress.sheet !== sheet) {
+      return false
+    }
+
+    if (cellAddress.isRowAbsolute()) {
+      if (cellAddress.row < row) { // Case Aa
+        return false
+      } else { // Case Ab
+        return cellAddress.shiftedByRows(numberOfRows)
+      }
+    } else {
+      if (cellAddress.row < row) {
+        if (baseAddress.row < row) { // Case Raa
+          return false
+        } else { // Case Rab
+          return cellAddress.shiftedByRows(-numberOfRows)
+        }
+      } else {
+        if (baseAddress.row < row) { // Case Rba
+          return cellAddress.shiftedByRows(numberOfRows)
+        } else { // Case Rbb
+          return false
+        }
+      }
+    }
+  }
+
+  private fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): Ast {
+    switch (ast.type) {
+      case AstNodeType.CELL_REFERENCE: {
+        const newCellAddress = this.fixRowDependency(ast.reference, address, sheet, row, numberOfRows)
+        if (newCellAddress) {
+          return { ...ast, reference: newCellAddress }
+        } else {
+          return ast
+        }
+      }
+      case AstNodeType.CELL_RANGE: {
+        const newStart = this.fixRowDependency(ast.start, address, sheet, row, numberOfRows)
+        const newEnd = this.fixRowDependency(ast.end, address, sheet, row, numberOfRows)
+        if (newStart || newEnd) {
+          return {
+            ...ast,
+            start: newStart || ast.start,
+            end: newEnd || ast.end,
+          }
+        } else {
+          return ast
+        }
+      }
+      case AstNodeType.ERROR:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING: {
+        return ast
+      }
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP: {
+        return {
+          type: ast.type,
+          left: this.fixDependencies(ast.left, address, sheet, row, numberOfRows),
+          right: this.fixDependencies(ast.right, address, sheet, row, numberOfRows),
+        } as Ast
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return {
+          type: ast.type,
+          value: this.fixDependencies(ast.value, address, sheet, row, numberOfRows),
+        }
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        return {
+          type: ast.type,
+          procedureName: ast.procedureName,
+          args: ast.args.map((arg) => this.fixDependencies(arg, address, sheet, row, numberOfRows))
+        }
+      }
+    }
   }
 }
