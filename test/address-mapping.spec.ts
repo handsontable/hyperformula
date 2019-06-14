@@ -93,6 +93,79 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(true)
   })
+
+  it('addRows in the beginning of a mapping', () => {
+    const mapping = builder(1, 1)
+
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(42))
+
+    mapping.addRows(0, 0, 1)
+
+    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toEqual(new ValueCellVertex(42))
+    expect(mapping.getHeight(0)).toEqual(2)
+  })
+
+  it('addRows in the middle of a mapping', () => {
+    const mapping = builder(1, 2)
+
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(42))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(43))
+
+    mapping.addRows(0, 1, 1)
+
+    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(43))
+    expect(mapping.getHeight(0)).toEqual(3)
+  })
+
+  it('addRows in the end of a mapping', () => {
+    const mapping = builder(1, 1)
+
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(42))
+
+    mapping.addRows(0, 1, 1)
+
+    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getHeight(0)).toEqual(2)
+  })
+
+  it('addRows more than one row', () => {
+    const mapping = builder(1, 2)
+
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(42))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(43))
+
+    mapping.addRows(0, 1, 3)
+
+    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 3))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 4))).toEqual(new ValueCellVertex(43))
+    expect(mapping.getHeight(0)).toEqual(5)
+  })
+
+  it('addRows when more than one column present', () => {
+    const mapping = builder(2, 2)
+
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(21))
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22))
+
+    mapping.addRows(0, 1, 1)
+
+    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(11))
+    expect(mapping.getCell(simpleCellAddress(0, 1, 0))).toEqual(new ValueCellVertex(12))
+    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 1, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(21))
+    expect(mapping.getCell(simpleCellAddress(0, 1, 2))).toEqual(new ValueCellVertex(22))
+    expect(mapping.getHeight(0)).toEqual(3)
+  })
 }
 
 describe('SparseStrategy', () => {

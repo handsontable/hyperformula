@@ -41,6 +41,8 @@ interface IAddressMappingStrategy {
    * Returns width of stored sheet
    */
   getWidth(): number,
+
+  addRows(row: number, numberOfRows: number): void,
 }
 
 /**
@@ -102,6 +104,22 @@ export class SparseStrategy implements IAddressMappingStrategy {
     if (colMapping) {
       colMapping.delete(address.row)
     }
+  }
+
+  public addRows(row: number, numberOfRows: number): void {
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+      const tmpMapping = new Map()
+      rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
+        if (rowNumber >= row) {
+          tmpMapping.set(rowNumber + numberOfRows, vertex)
+          rowMapping.delete(rowNumber)
+        }
+      })
+      tmpMapping.forEach((vertex: CellVertex, rowNumber: number) => {
+        rowMapping.set(rowNumber, vertex)
+      })
+    })
+    this.height += numberOfRows
   }
 }
 
@@ -166,6 +184,15 @@ export class DenseStrategy implements IAddressMappingStrategy {
     if (this.mapping[address.row] !== undefined) {
       delete this.mapping[address.row][address.col]
     }
+  }
+
+  public addRows(row: number, numberOfRows: number): void {
+    const newRows = []
+    for (let i = 0; i < numberOfRows; i++) {
+      newRows.push(new Array(this.width))
+    }
+    this.mapping.splice(row, 0, ...newRows)
+    this.height += numberOfRows
   }
 }
 
@@ -309,5 +336,13 @@ export class AddressMapping {
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
     this.matrixMapping.set(range.toString(), vertex)
+  }
+
+  public addRows(sheet: number, row: number, numberOfRows: number) {
+    const sheetMapping = this.mapping.get(sheet)
+    if (!sheetMapping) {
+      throw Error("Sheet does not exist")
+    }
+    sheetMapping.addRows(row, numberOfRows)
   }
 }

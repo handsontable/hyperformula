@@ -284,4 +284,8 @@ export class HandsOnEngine {
 
     this.evaluator!.run()
   }
+
+  public addRow(sheet: number, row: number, numberOfRows: number = 1) {
+    this.addressMapping.addRows(sheet, row, numberOfRows)
+  }
 }
