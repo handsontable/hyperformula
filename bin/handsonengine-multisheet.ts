@@ -1,10 +1,9 @@
-import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
 import {Config, HandsOnEngine} from '../src'
 import {Sheets} from '../src/GraphBuilder'
-import {CsvExporter, CsvSheets} from '../src/csv'
+import {CsvExporter, CsvImporter, CsvSheets} from '../src/csv'
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -47,18 +46,10 @@ export function load(inputDir: string, config: Config): Promise<Sheets> {
 
   return new Promise<Sheets>((resolve) => {
     lineReader.on('close', () => {
-      const sheets = parseCsvSheets(csvSheets, config)
+      const sheets = new CsvImporter().csvSheetsToSheets(csvSheets, config.csvDelimiter)
       resolve(sheets)
     })
   })
-}
-
-export function parseCsvSheets(csvSheets: CsvSheets, config: Config): Sheets {
-  const sheets: Sheets = {}
-  for (const key of Object.keys(csvSheets)) {
-    sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
-  }
-  return sheets
 }
 
 export function save(engine: HandsOnEngine, outputDir: string) {
