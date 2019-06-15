@@ -164,6 +164,24 @@ describe("Adding row", () => {
     expect(extractReference(engine, simpleCellAddress(1,0,1))).toEqual(CellAddress.relative(1, 1, -1))
   })
 
+  it('absolute dependency does not change if dependency is in other sheet than we add rows', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A$2'],
+        // new row
+        ['13'],
+      ],
+      Sheet2: [
+        ['42'],
+        ['78']
+      ]
+    })
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+  })
+
   it('same sheet, case Aa, absolute row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
