@@ -1,5 +1,9 @@
 import stringify from 'csv-stringify/lib/sync'
-import {HandsOnEngine, CsvSheets} from './'
+import {HandsOnEngine} from './'
+
+export interface Sheets {
+  [sheetName: string]: string
+}
 
 export class Exporter {
   constructor(
@@ -17,8 +21,8 @@ export class Exporter {
     })
   }
 
-  public exportAllSheets(engine: HandsOnEngine): CsvSheets {
-    const sheets: CsvSheets = {}
+  public exportAllSheets(engine: HandsOnEngine): Sheets {
+    const sheets: Sheets = {}
     for (const sheetName of engine.sheetMapping.names()) {
       sheets[sheetName] = this.exportSheetByName(engine, sheetName)
     }
