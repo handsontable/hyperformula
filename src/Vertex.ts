@@ -202,6 +202,10 @@ export class RangeVertex {
     return this.range.end
   }
 
+  public get sheet() {
+    return this.range.start.sheet
+  }
+
   /**
    * Returns cached value stored for given function
    *

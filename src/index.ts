@@ -73,7 +73,7 @@ export class HandsOnEngine {
   public addressMapping?: AddressMapping
 
   /** Range mapping from ranges to vertices representing these ranges. */
-  private readonly rangeMapping: RangeMapping = new RangeMapping()
+  public readonly rangeMapping: RangeMapping = new RangeMapping()
 
   /** Directed graph of cell dependencies. */
   public readonly graph: Graph<Vertex> = new Graph<Vertex>()
@@ -294,6 +294,7 @@ export class HandsOnEngine {
         node.setFormula(newAst)
       }
     }
+    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
   }
 
   private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): CellAddress | false {
