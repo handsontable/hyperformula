@@ -55,11 +55,7 @@ export class Unparser {
         return "!ERR"
       }
       default: {
-        if (binaryOpTokenMap.hasOwnProperty(ast.type)) {
-          return this.unparse(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparse(ast.right, address)
-        } else {
-          throw Error("Cannot unparse formula")
-        }
+        return this.unparse(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparse(ast.right, address)
       }
     }
   }
