@@ -193,7 +193,7 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
 
-  constructor(private range: AbsoluteCellRange) {
+  constructor(public range: AbsoluteCellRange) {
     this.functionCache = new Map()
     this.criterionFuncitonCache = new Map()
   }

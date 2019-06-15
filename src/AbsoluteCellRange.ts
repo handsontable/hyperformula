@@ -122,4 +122,13 @@ export class AbsoluteCellRange {
 
     return new Matrix(values)
   }
+
+  public shiftByRows(numberOfRows: number) {
+    this.start.row += numberOfRows
+    this.end.row += numberOfRows
+  }
+
+  public expandByRows(numberOfRows: number) {
+    this.end.row += numberOfRows
+  }
 }

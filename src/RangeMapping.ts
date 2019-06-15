@@ -32,16 +32,15 @@ export class RangeMapping {
   public shiftRanges(sheet: number, row: number, numberOfRows: number) {
     const updated = Array<RangeVertex>()
 
-    for (const [key, range] of this.rangeMapping.entries()) {
-      if (range.sheet === sheet) {
-        if (row <= range.start.row) {
-          range.start.row += numberOfRows
-          range.end.row += numberOfRows
-          updated.push(range)
+    for (const [key, vertex] of this.rangeMapping.entries()) {
+      if (vertex.sheet === sheet) {
+        if (row <= vertex.start.row) {
+          vertex.range.shiftByRows(numberOfRows)
+          updated.push(vertex)
           this.rangeMapping.delete(key)
-        } else if (row > range.start.row && row <= range.end.row) {
-          range.end.row += numberOfRows
-          updated.push(range)
+        } else if (row > vertex.start.row && row <= vertex.end.row) {
+          vertex.range.expandByRows(numberOfRows)
+          updated.push(vertex)
           this.rangeMapping.delete(key)
         }
       }
