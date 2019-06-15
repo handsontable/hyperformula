@@ -2,6 +2,7 @@ import {Ast, AstNodeType} from "./index";
 import {SimpleCellAddress} from "../Cell";
 import {CellAddress, CellReferenceType} from "./CellAddress";
 import {Config} from "../Config";
+import {cellHashFromToken} from "./ParserWithCaching";
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -33,7 +34,7 @@ export class Unparser {
         return ast.value.toString()
       }
       case AstNodeType.STRING: {
-        return ast.value
+        return "\"" + ast.value + "\""
       }
       case AstNodeType.FUNCTION_CALL: {
         const that = this
@@ -59,6 +60,49 @@ export class Unparser {
       default: {
         if (binaryOpTokenMap.hasOwnProperty(ast.type)) {
           return this.unparse(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparse(ast.right, address)
+        } else {
+          throw Error("Cannot unparse formula")
+        }
+      }
+    }
+  }
+
+  public computeHash(ast: Ast): string {
+    return "=" + this.doHash(ast)
+  }
+
+  private doHash(ast: Ast): string {
+    switch (ast.type) {
+      case AstNodeType.NUMBER: {
+        return ast.value.toString()
+      }
+      case AstNodeType.STRING: {
+        return "\"" + ast.value + "\""
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        const that = this
+        const result = ast.args.reduce(function (acc, val) {
+          return acc + that.doHash(val) + that.config.functionArgSeparator
+        }, ast.procedureName + "(")
+        return result.slice(0, result.length - 1) + ")"
+      }
+      case AstNodeType.CELL_REFERENCE: {
+        return cellHashFromToken(ast.reference)
+      }
+      case AstNodeType.CELL_RANGE: {
+        const start = cellHashFromToken(ast.start)
+        const end = cellHashFromToken(ast.end)
+        return start + ":" + end
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return "-" + this.doHash(ast.value)
+      }
+      case AstNodeType.ERROR: {
+        return "!ERR"
+      }
+      default: {
+        if (binaryOpTokenMap.hasOwnProperty(ast.type)) {
+          return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
         } else {
           throw Error("Cannot unparse formula")
         }

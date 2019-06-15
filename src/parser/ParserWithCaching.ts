@@ -127,7 +127,7 @@ export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: 
   })
 }
 
-const cellHashFromToken = (cellAddress: CellAddress): string => {
+export const cellHashFromToken = (cellAddress: CellAddress): string => {
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
       return `#${cellAddress.sheet}#${cellAddress.row}R${cellAddress.col}`
