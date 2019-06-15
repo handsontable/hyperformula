@@ -248,4 +248,45 @@ describe("Adding row", () => {
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
   })
+
+  it('insert row in middle of range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '=SUM(A1:A3)'],
+        // new row
+        ['2', ''],
+        ['3', ''],
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    engine.addRow(0, 1, 1)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))).not.toBe(null)
+  })
+
+  it('insert row above range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      // new row
+      ['1', '=SUM(A1:A3)'],
+      ['2', ''],
+      ['3', ''],
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    engine.addRow(0, 0, 1)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 1), simpleCellAddress(0, 0, 3))).not.toBe(null)
+  })
+
+  it('insert row below range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=SUM(A1:A3)'],
+      ['2', ''],
+      ['3', ''],
+      // new row
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    engine.addRow(0, 3, 0)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+  })
 })
