@@ -263,7 +263,7 @@ export class RangeVertex {
   /**
    * Clears function cache
    */
-  public clear() {
+  public clearCache() {
     this.functionCache.clear()
     this.criterionFuncitonCache.clear()
   }

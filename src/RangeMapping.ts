@@ -47,7 +47,7 @@ export class RangeMapping {
     }
 
     updated.forEach(range => {
-      range.clear()
+      range.clearCache()
       this.setRange(range)
     })
   }

@@ -52,7 +52,7 @@ export class SingleThreadEvaluator implements Evaluator {
         const cellValue = this.interpreter.evaluateAst(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {
-        vertex.clear()
+        vertex.clearCache()
       }
     })
   }
