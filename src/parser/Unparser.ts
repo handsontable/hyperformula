@@ -37,11 +37,8 @@ export class Unparser {
         return "\"" + ast.value + "\""
       }
       case AstNodeType.FUNCTION_CALL: {
-        const that = this
-        const result = ast.args.reduce(function (acc, val) {
-          return acc + that.unparse(val, address) + that.config.functionArgSeparator
-        }, ast.procedureName + "(")
-        return result.slice(0, result.length - 1) + ")"
+        const args = ast.args.map((arg) => this.unparse(arg, address)).join(this.config.functionArgSeparator)
+        return ast.procedureName + "(" + args + ")"
       }
       case AstNodeType.CELL_REFERENCE: {
         const sheet = this.sheetMappingFn(ast.reference.sheet)
@@ -80,11 +77,8 @@ export class Unparser {
         return "\"" + ast.value + "\""
       }
       case AstNodeType.FUNCTION_CALL: {
-        const that = this
-        const result = ast.args.reduce(function (acc, val) {
-          return acc + that.doHash(val) + that.config.functionArgSeparator
-        }, ast.procedureName + "(")
-        return result.slice(0, result.length - 1) + ")"
+        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
+        return ast.procedureName + "(" + args + ")"
       }
       case AstNodeType.CELL_REFERENCE: {
         return cellHashFromToken(ast.reference)
