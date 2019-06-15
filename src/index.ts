@@ -308,9 +308,9 @@ export class HandsOnEngine {
     }
   }
 
-  private fixRowDependency(dependencyAddress: CellAddress, baseAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
-    const isLocalDependency = (dependencyAddress.sheet === baseAddress.sheet)
-    if (isLocalDependency && baseAddress.sheet !== sheetInWhichWeAddRows) {
+  private fixRowDependency(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
+    const isLocalDependency = (dependencyAddress.sheet === formulaAddress.sheet)
+    if (isLocalDependency && formulaAddress.sheet !== sheetInWhichWeAddRows) {
       return false
     }
 
@@ -322,13 +322,13 @@ export class HandsOnEngine {
       }
     } else {
       if (dependencyAddress.row < row) {
-        if (baseAddress.row < row) { // Case Raa
+        if (formulaAddress.row < row) { // Case Raa
           return false
         } else { // Case Rab
           return dependencyAddress.shiftedByRows(-numberOfRows)
         }
       } else {
-        if (baseAddress.row < row) { // Case Rba
+        if (formulaAddress.row < row) { // Case Rba
           return dependencyAddress.shiftedByRows(numberOfRows)
         } else { // Case Rbb
           return false
