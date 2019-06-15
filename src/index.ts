@@ -296,6 +296,7 @@ export class HandsOnEngine {
       }
     }
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+    this.evaluator!.run()
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
