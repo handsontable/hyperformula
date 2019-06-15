@@ -1,5 +1,4 @@
 import parse from 'csv-parse/lib/sync'
-import stringify from 'csv-stringify/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {
   CellError,
@@ -24,6 +23,7 @@ import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 export {
   Config,
+  CsvSheets,
 }
 
 /**
@@ -88,7 +88,7 @@ export class HandsOnEngine {
   /** Statistics module for benchmarking */
   public readonly stats: Statistics = new Statistics()
 
-  private readonly sheetMapping = new SheetMapping()
+  public readonly sheetMapping = new SheetMapping()
 
 
   constructor(
@@ -171,23 +171,6 @@ export class HandsOnEngine {
       })
     }
     return sheetDimensions
-  }
-
-  /**
-   * Creates CSV string out of sheet content
-   */
-  public exportAsCsv(sheetName: string): string {
-    const sheet = this.sheetMapping.fetch(sheetName)
-    return stringify(this.getValues(sheet), { delimiter: ','})
-  }
-
-  public exportMultipleSheets(): CsvSheets {
-    const sheets: CsvSheets = {}
-    for (const sheetName of this.sheetMapping.names()) {
-      const sheet = this.sheetMapping.fetch(sheetName)
-      sheets[sheetName] = stringify(this.getValues(sheet), { delimiter: ','})
-    }
-    return sheets
   }
 
   /**
