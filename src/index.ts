@@ -1,4 +1,3 @@
-import parse from 'csv-parse/lib/sync'
 import {AddressMapping} from './AddressMapping'
 import {
   CellError,
@@ -24,34 +23,13 @@ import {AbsoluteCellRange} from "./AbsoluteCellRange";
 export {
   Config,
   CsvSheets,
+  Sheets,
 }
 
 /**
  * Engine for one sheet
  */
 export class HandsOnEngine {
-  /**
-   * Builds engine for sheet from CSV string representation
-   *
-   * @param csv - csv representation of sheet
-   */
-  public static buildFromCsv(csv: string, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(parse(csv, { delimiter: config.csvDelimiter }), config)
-  }
-
-  /**
-   * Builds engine for sheet from CSV string representation
-   *
-   * @param csv - csv representation of sheet
-   */
-  public static buildFromCsvSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
-    const sheets: Sheets = {}
-    for (const key of Object.keys(csvSheets)) {
-      sheets[key] = parse(csvSheets[key], { delimiter: config.csvDelimiter })
-    }
-    return HandsOnEngine.buildFromSheets(sheets, config)
-  }
-
   /**
    * Builds engine for sheet from two-dimmensional array representation
    *

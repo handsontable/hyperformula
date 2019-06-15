@@ -3,6 +3,7 @@ import {CellValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
 import {Sheet, Sheets, CsvSheets} from '../src/GraphBuilder'
 import {StatType} from '../src/statistics/Statistics'
+import {Importer} from '../src/csv'
 
 export interface Config {
   millisecondsPerThousandRows: number,
@@ -32,7 +33,7 @@ export function benchmarkSheets(sheets: Sheets, expectedValues: ExpectedValue[],
 }
 
 export function benchmarkCsvSheets(sheets: CsvSheets, expectedValues: ExpectedValue[], config: Config = defaultConfig): HandsOnEngine {
-  const runEngine = (engineConfig: EngineConfig) => HandsOnEngine.buildFromCsvSheets(sheets, engineConfig)
+  const runEngine = (engineConfig: EngineConfig) => new Importer().importSheets(sheets, engineConfig)
   return benchmarked(runEngine, expectedValues, config)
 }
 

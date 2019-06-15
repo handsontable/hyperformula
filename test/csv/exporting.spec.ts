@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {Exporter} from '../../src/csv'
+import {Exporter, Importer} from '../../src/csv'
 import '../testConfig.ts'
 
 describe('Exporting CSV', () => {
@@ -10,7 +10,7 @@ describe('Exporting CSV', () => {
     ].join('\n')
 
     const exporter = new Exporter()
-    const engine = HandsOnEngine.buildFromCsv(str)
+    const engine = new Importer().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
@@ -19,7 +19,7 @@ describe('Exporting CSV', () => {
     const str = `foo,,bar`
 
     const exporter = new Exporter()
-    const engine = HandsOnEngine.buildFromCsv(str)
+    const engine = new Importer().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
@@ -28,7 +28,7 @@ describe('Exporting CSV', () => {
     const str = `=1/0`
 
     const exporter = new Exporter()
-    const engine = HandsOnEngine.buildFromCsv(str)
+    const engine = new Importer().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual('#DIV_BY_ZERO!')
   })

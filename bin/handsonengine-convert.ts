@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {HandsOnEngine} from '../src'
-import {Exporter} from '../src/csv'
+import {Importer, Exporter} from '../src/csv'
 
 async function start() {
   if (process.argv.length < 4) {
@@ -18,7 +18,7 @@ async function start() {
   }
 
   const formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
-  const engine = await HandsOnEngine.buildFromCsv(formulasCsvString)
+  const engine = new Importer().importSheet(formulasCsvString)
   const exporter = new Exporter()
   const exportedCsvString = exporter.exportSheetByName(engine, 'Sheet1')
 
