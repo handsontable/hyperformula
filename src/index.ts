@@ -308,28 +308,28 @@ export class HandsOnEngine {
     }
   }
 
-  private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
-    const isLocalDependency = (cellAddress.sheet === baseAddress.sheet)
+  private fixRowDependency(dependencyAddress: CellAddress, baseAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
+    const isLocalDependency = (dependencyAddress.sheet === baseAddress.sheet)
     if (isLocalDependency && baseAddress.sheet !== sheetInWhichWeAddRows) {
       return false
     }
 
-    if (cellAddress.isRowAbsolute()) {
-      if (cellAddress.row < row) { // Case Aa
+    if (dependencyAddress.isRowAbsolute()) {
+      if (dependencyAddress.row < row) { // Case Aa
         return false
       } else { // Case Ab
-        return cellAddress.shiftedByRows(numberOfRows)
+        return dependencyAddress.shiftedByRows(numberOfRows)
       }
     } else {
-      if (cellAddress.row < row) {
+      if (dependencyAddress.row < row) {
         if (baseAddress.row < row) { // Case Raa
           return false
         } else { // Case Rab
-          return cellAddress.shiftedByRows(-numberOfRows)
+          return dependencyAddress.shiftedByRows(-numberOfRows)
         }
       } else {
         if (baseAddress.row < row) { // Case Rba
-          return cellAddress.shiftedByRows(numberOfRows)
+          return dependencyAddress.shiftedByRows(numberOfRows)
         } else { // Case Rbb
           return false
         }
