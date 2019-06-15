@@ -286,7 +286,20 @@ describe("Adding row", () => {
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
-    engine.addRow(0, 3, 0)
+    engine.addRow(0, 3, 1)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+  })
+
+  it('insert row, formula vertex address shifted', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      // new row
+      ['=SUM(1,2)'],
+    ])
+
+    let vertex = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0)) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 0))
+    engine.addRow(0, 0, 1)
+    vertex = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 1))
   })
 })

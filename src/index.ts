@@ -292,9 +292,20 @@ export class HandsOnEngine {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = this.fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRows)
         node.setFormula(newAst)
+        this.fixFormulaVertexAddress(node, row, numberOfRows)
       }
     }
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+  }
+
+  private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
+    const nodeAddress = node.getAddress()
+    if (row <= nodeAddress.row) {
+      node.setAddress({
+        ...nodeAddress,
+        row: nodeAddress.row + numberOfRows
+      })
+    }
   }
 
   private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): CellAddress | false {
