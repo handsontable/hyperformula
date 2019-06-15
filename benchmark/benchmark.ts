@@ -1,9 +1,9 @@
 import {HandsOnEngine} from '../src'
 import {CellValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
-import {Sheet, Sheets, CsvSheets} from '../src/GraphBuilder'
+import {Sheet, Sheets} from '../src/GraphBuilder'
 import {StatType} from '../src/statistics/Statistics'
-import {Importer} from '../src/csv'
+import {Importer, Sheets as CsvSheets} from '../src/csv'
 
 export interface Config {
   millisecondsPerThousandRows: number,

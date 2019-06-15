@@ -3,8 +3,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
 import {Config, HandsOnEngine} from '../src'
-import {CsvSheets, Sheets} from '../src/GraphBuilder'
-import {Exporter} from '../src/csv'
+import {Sheets} from '../src/GraphBuilder'
+import {Exporter, Sheets as CsvSheets} from '../src/csv'
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)

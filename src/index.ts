@@ -10,7 +10,7 @@ import {AstNodeType, Ast} from './parser/Ast'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
-import {buildMatrixVertex, CsvSheets, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -22,7 +22,6 @@ import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 export {
   Config,
-  CsvSheets,
   Sheets,
 }
 
