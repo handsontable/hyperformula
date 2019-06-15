@@ -4,7 +4,6 @@ type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
   addressMappingFillThreshold: number,
-  csvDelimiter: string,
   dateFormat: string,
   functionArgSeparator: string,
   language: string,
@@ -17,7 +16,6 @@ export interface ConfigParams {
 export class Config {
   public static defaultConfig: ConfigParams = {
     addressMappingFillThreshold: 1,
-    csvDelimiter: ',',
     dateFormat: 'MM/DD/YYYY',
     functionArgSeparator: ',',
     language: 'EN',
@@ -28,7 +26,6 @@ export class Config {
   }
 
   public readonly addressMappingFillThreshold: number
-  public readonly csvDelimiter: string
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
   public readonly language: string
@@ -40,7 +37,6 @@ export class Config {
   constructor(
       {
         addressMappingFillThreshold,
-        csvDelimiter,
         dateFormat,
         functionArgSeparator,
         language,
@@ -51,7 +47,6 @@ export class Config {
       }: Partial<ConfigParams> = {}
   ) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
-    this.csvDelimiter = csvDelimiter || Config.defaultConfig.csvDelimiter
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language

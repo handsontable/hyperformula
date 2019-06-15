@@ -46,7 +46,7 @@ export function load(inputDir: string, csvDelimiter: string): Promise<Sheets> {
 
   return new Promise<Sheets>((resolve) => {
     lineReader.on('close', () => {
-      const sheets = new CsvImporter().csvSheetsToSheets(csvSheets, csvDelimiter)
+      const sheets = new CsvImporter(csvDelimiter).csvSheetsToSheets(csvSheets)
       resolve(sheets)
     })
   })

@@ -32,13 +32,18 @@ export class CsvExporter {
 }
 
 export class CsvImporter {
+  constructor(
+    public readonly csvDelimiter: string = ","
+  ) {
+  }
+
   /**
    * Builds engine for sheet from CSV string representation
    *
    * @param csv - csv representation of sheet
    */
   public importSheet(csv: string, config: Config = new Config()): HandsOnEngine {
-    const sheet = parse(csv, { delimiter: config.csvDelimiter })
+    const sheet = parse(csv, { delimiter: this.csvDelimiter })
     return HandsOnEngine.buildFromArray(sheet, config)
   }
 
@@ -48,13 +53,13 @@ export class CsvImporter {
    * @param csv - csv representation of sheet
    */
   public importSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromSheets(this.csvSheetsToSheets(csvSheets, config.csvDelimiter), config)
+    return HandsOnEngine.buildFromSheets(this.csvSheetsToSheets(csvSheets), config)
   }
 
-  public csvSheetsToSheets(csvSheets: CsvSheets, csvDelimiter: string): Sheets {
+  public csvSheetsToSheets(csvSheets: CsvSheets): Sheets {
     const sheets: Sheets = {}
     for (const key of Object.keys(csvSheets)) {
-      sheets[key] = parse(csvSheets[key], { delimiter: csvDelimiter })
+      sheets[key] = parse(csvSheets[key], { delimiter: this.csvDelimiter })
     }
     return sheets
   }
