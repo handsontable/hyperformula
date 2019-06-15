@@ -43,8 +43,7 @@ export class CsvImporter {
    * @param csv - csv representation of sheet
    */
   public importSheet(csv: string, config: Config = new Config()): HandsOnEngine {
-    const sheet = parse(csv, { delimiter: this.csvDelimiter })
-    return HandsOnEngine.buildFromArray(sheet, config)
+    return HandsOnEngine.buildFromArray(this.csvSheetToSheet(csv), config)
   }
 
   /**
@@ -59,8 +58,12 @@ export class CsvImporter {
   public csvSheetsToSheets(csvSheets: CsvSheets): Sheets {
     const sheets: Sheets = {}
     for (const key of Object.keys(csvSheets)) {
-      sheets[key] = parse(csvSheets[key], { delimiter: this.csvDelimiter })
+      sheets[key] = this.csvSheetToSheet(csvSheets[key])
     }
     return sheets
+  }
+
+  public csvSheetToSheet(csv: string): string[][] {
+    return parse(csv, { delimiter: this.csvDelimiter })
   }
 }
