@@ -28,9 +28,7 @@ export type Sheet = string[][]
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 
-export interface Sheets {
-  [sheetName: string]: Sheet
-}
+export type Sheets = Record<string, Sheet>
 
 /**
  * Service building the graph and mappings.

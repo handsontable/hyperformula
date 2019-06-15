@@ -2,9 +2,7 @@ import stringify from 'csv-stringify/lib/sync'
 import parse from 'csv-parse/lib/sync'
 import {HandsOnEngine, Config, Sheets} from './'
 
-export interface CsvSheets {
-  [sheetName: string]: string
-}
+export type CsvSheets = Record<string, string>
 
 export class CsvExporter {
   constructor(
