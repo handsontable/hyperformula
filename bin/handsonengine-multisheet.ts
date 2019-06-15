@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as readline from 'readline'
 import {Config, HandsOnEngine} from '../src'
 import {Sheets} from '../src/GraphBuilder'
-import {Exporter, Sheets as CsvSheets} from '../src/csv'
+import {CsvExporter, CsvSheets} from '../src/csv'
 
 export function validateArguments(inputDir: string) {
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -62,7 +62,7 @@ export function parseCsvSheets(csvSheets: CsvSheets, config: Config): Sheets {
 }
 
 export function save(engine: HandsOnEngine, outputDir: string) {
-  const exporter = new Exporter()
+  const exporter = new CsvExporter()
   const sheets: CsvSheets = exporter.exportAllSheets(engine)
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir)

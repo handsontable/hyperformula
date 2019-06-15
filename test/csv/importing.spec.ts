@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {Importer} from '../../src/csv'
+import {CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 
 describe('Loading CSV', () => {
@@ -9,7 +9,7 @@ describe('Loading CSV', () => {
       `"Some simple string value","Bar"`,
     ].join('\n')
 
-    const engine = new Importer().importSheet(str)
+    const engine = new CsvImporter().importSheet(str)
 
     expect(engine.getCellValue('A1')).toBe('Some header')
     expect(engine.getCellValue('B1')).toBe('Another header')
@@ -23,7 +23,7 @@ describe('Loading CSV', () => {
       `"Some simple string value",42`,
     ].join('\n')
 
-    const engine = new Importer().importSheet(str)
+    const engine = new CsvImporter().importSheet(str)
 
     expect(engine.getCellValue('B2')).toBe(42)
   })
@@ -34,7 +34,7 @@ describe('Loading CSV', () => {
       `"Some simple string value","=B1"`,
     ].join('\n')
 
-    const engine = new Importer().importSheet(str)
+    const engine = new CsvImporter().importSheet(str)
 
     expect(engine.getCellValue('B2')).toBe('Another header')
     expect(engine.getCellValue('A2')).toBe('Some simple string value')

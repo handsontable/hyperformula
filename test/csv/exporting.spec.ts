@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {Exporter, Importer} from '../../src/csv'
+import {CsvExporter, CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 
 describe('Exporting CSV', () => {
@@ -9,8 +9,8 @@ describe('Exporting CSV', () => {
       `Some simple string value,Bar`,
     ].join('\n')
 
-    const exporter = new Exporter()
-    const engine = new Importer().importSheet(str)
+    const exporter = new CsvExporter()
+    const engine = new CsvImporter().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
@@ -18,8 +18,8 @@ describe('Exporting CSV', () => {
   it('exports empty cells as empty strings', async () => {
     const str = `foo,,bar`
 
-    const exporter = new Exporter()
-    const engine = new Importer().importSheet(str)
+    const exporter = new CsvExporter()
+    const engine = new CsvImporter().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
@@ -27,8 +27,8 @@ describe('Exporting CSV', () => {
   it('exports formatter errors', async () => {
     const str = `=1/0`
 
-    const exporter = new Exporter()
-    const engine = new Importer().importSheet(str)
+    const exporter = new CsvExporter()
+    const engine = new CsvImporter().importSheet(str)
 
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual('#DIV_BY_ZERO!')
   })

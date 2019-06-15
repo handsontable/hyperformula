@@ -114,8 +114,8 @@ You can also call HandsOnEngine class yourself:
 ````
 formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
 
-exporter = new Exporter()
-engine = new Importer().importSheet(formulasCsvString)
+exporter = new CsvExporter()
+engine = new CsvImporter().importSheet(formulasCsvString)
 exportedCsvString = exporter.exportSheetByName(engine, 'Sheet1')
 
 fs.writeFileSync(outputCsvPath, exportedCsvString)
