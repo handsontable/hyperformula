@@ -18,14 +18,6 @@ describe('Unparser', () => {
     expect(formula).toEqual("=" + unparsed)
   })
 
-  it('#unparse unary minus', async () => {
-    const formula = '=-1+3'
-    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
-    const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
-
-    expect(formula).toEqual("=" + unparsed)
-  })
-
   it('#unparse simple addreess', async () => {
     const formula = '=$Sheet1.A1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
@@ -60,6 +52,14 @@ describe('Unparser', () => {
 
   it('#unparse cell range', async () => {
     const formula = '=$Sheet1.$A$1:B$2'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
+
+    expect(formula).toEqual("=" + unparsed)
+  })
+
+  it('#unparse ops', async () => {
+    const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
