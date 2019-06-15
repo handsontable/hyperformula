@@ -308,9 +308,9 @@ export class HandsOnEngine {
     }
   }
 
-  private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): CellAddress | false {
+  private fixRowDependency(cellAddress: CellAddress, baseAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
     const isLocalDependency = (cellAddress.sheet === baseAddress.sheet)
-    if (isLocalDependency && baseAddress.sheet !== sheet) {
+    if (isLocalDependency && baseAddress.sheet !== sheetInWhichWeAddRows) {
       return false
     }
 
