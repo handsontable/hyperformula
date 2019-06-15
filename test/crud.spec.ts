@@ -145,20 +145,23 @@ const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): Ce
 }
 
 describe("Adding row", () => {
-  xit('dependency does not change if from different sheet', () => {
+  it('local dependency does not change if we add rows in other sheets', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A2'],
+        ['42'],
         // new row
-        ['=$Sheet2.B1'],
+        ['13'],
       ],
-      Sheet2: []
+      Sheet2: [
+        ['=A2'],
+        ['=B1']
+      ]
     })
 
     engine.addRow(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0,0,0))).toEqual(CellAddress.relative(1, 0, 1))
-    expect(extractReference(engine, simpleCellAddress(0,0,1))).toEqual(CellAddress.relative(1, 1, 9))
+    expect(extractReference(engine, simpleCellAddress(1,0,0))).toEqual(CellAddress.relative(1, 0, 1))
+    expect(extractReference(engine, simpleCellAddress(1,0,1))).toEqual(CellAddress.relative(1, 1, -1))
   })
 
   it('same sheet, case Aa, absolute row', () => {
