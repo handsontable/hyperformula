@@ -248,6 +248,11 @@ export class HandsOnEngine {
 
   public addRow(sheet: number, row: number, numberOfRows: number = 1) {
     this.addressMapping!.addRows(sheet, row, numberOfRows)
+
+    if (this.addressMapping!.isThereSomeMatrixAtRow(sheet, row)) {
+      throw Error("It is not possible to add row in row with matrix")
+    }
+
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = this.fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRows)

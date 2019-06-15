@@ -189,4 +189,22 @@ describe("Adding row", () => {
     vertex = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
     expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 1))
   })
+
+  it('raise error if trying to add a row in a row with matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13']
+    ])
+
+    expect(() => {
+      engine.addRow(0, 3, 1)
+    }).toThrow(new Error("It is not possible to add row in row with matrix"))
+
+    expect(() => {
+      engine.addRow(0, 2, 1)
+    }).toThrow(new Error("It is not possible to add row in row with matrix"))
+  })
 })

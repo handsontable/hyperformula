@@ -62,6 +62,12 @@ export class MatrixVertex {
   public isFormula(): boolean {
     return this.formula !== null
   }
+
+  public spansThroughSheetRow(sheet: number, row: number): boolean {
+    return (this.cellAddress.sheet === sheet) &&
+      (this.cellAddress.row <= row) &&
+      (row < this.cellAddress.row + this.height)
+  }
 }
 
 /**

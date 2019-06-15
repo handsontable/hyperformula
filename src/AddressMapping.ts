@@ -345,4 +345,13 @@ export class AddressMapping {
     }
     sheetMapping.addRows(row, numberOfRows)
   }
+
+  public isThereSomeMatrixAtRow(sheet: number, row: number) {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.spansThroughSheetRow(sheet, row)) {
+        return true
+      }
+    }
+    return false
+  }
 }
