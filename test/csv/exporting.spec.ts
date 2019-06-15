@@ -1,6 +1,6 @@
-import {HandsOnEngine} from '../src'
-import {Exporter} from '../src/csv'
-import './testConfig.ts'
+import {HandsOnEngine} from '../../src'
+import {Exporter} from '../../src/csv'
+import '../testConfig.ts'
 
 describe('Exporting CSV', () => {
   it('works', async () => {
