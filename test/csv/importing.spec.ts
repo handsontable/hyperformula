@@ -1,6 +1,6 @@
-import {HandsOnEngine} from '../src'
-import {Importer} from '../src/csv'
-import './testConfig.ts'
+import {HandsOnEngine} from '../../src'
+import {Importer} from '../../src/csv'
+import '../testConfig.ts'
 
 describe('Loading CSV', () => {
   it('with only strings', async () => {
