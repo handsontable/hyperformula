@@ -1,4 +1,4 @@
-import {benchmark, benchmarkSheets, benchmarkCsvSheets} from './benchmark'
+import {benchmark, benchmarkSheets} from './benchmark'
 import {expectedValues as eSb, sheet as Sb} from './sheets/01-simple-big'
 import {expectedValues as expectedValuesMarkov, sheet as sheetMarkovFn} from './sheets/03-sheet-markov'
 import {expectedValues as expectedValuesPrefixSum, sheet as sheetPrefixSumFn} from './sheets/04-sheet-prefix-sum'
