@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
-import {Config, HandsOnEngine} from '../src'
+import {HandsOnEngine} from '../src'
 import {Sheets} from '../src/GraphBuilder'
 import {CsvExporter, CsvImporter, CsvSheets} from '../src/csv'
 
@@ -25,7 +25,7 @@ export function validateArguments(inputDir: string) {
   }
 }
 
-export function load(inputDir: string, config: Config): Promise<Sheets> {
+export function load(inputDir: string, csvDelimiter: string): Promise<Sheets> {
   validateArguments(inputDir)
 
   const sheetsDir = path.resolve(process.cwd(), inputDir)
@@ -46,7 +46,7 @@ export function load(inputDir: string, config: Config): Promise<Sheets> {
 
   return new Promise<Sheets>((resolve) => {
     lineReader.on('close', () => {
-      const sheets = new CsvImporter().csvSheetsToSheets(csvSheets, config.csvDelimiter)
+      const sheets = new CsvImporter().csvSheetsToSheets(csvSheets, csvDelimiter)
       resolve(sheets)
     })
   })
