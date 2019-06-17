@@ -164,10 +164,9 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    const vertex = this.addressMapping!.fetchCell(address)!
+    const vertex = this.addressMapping!.getCell(address)
 
     /* TODO handle properly EmptyCellVertex */
-
     if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
@@ -229,15 +228,43 @@ export class HandsOnEngine {
       } else {
         vertex.setCellValue(newCellContent)
       }
+    } else if (vertex === null) {
+      if (isFormula(newCellContent)) {
+        const { ast, hash } = this.parser.parse(newCellContent, address)
+        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const newVertex = new FormulaCellVertex(ast, address)
+        this.graph.addNode(newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+      } else if (newCellContent === '') {
+        /* do nothing */
+      } else if (!isNaN(Number(newCellContent))) {
+        const newVertex = new ValueCellVertex(Number(newCellContent))
+        this.graph.addNode(newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+      } else {
+        const newVertex = new ValueCellVertex(newCellContent)
+        this.graph.addNode(newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+      }
     } else if (vertex instanceof EmptyCellVertex) {
       if (isFormula(newCellContent)) {
-        throw new Error("Not implemented yet")
+        const { ast, hash } = this.parser.parse(newCellContent, address)
+        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const newVertex = new FormulaCellVertex(ast, address)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
+        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
       } else if (newCellContent === '') {
         /* nothing happens */
       } else if (!isNaN(Number(newCellContent))) {
-        throw new Error("Not implemented yet")
+        const newVertex = new ValueCellVertex(Number(newCellContent))
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
       } else {
-        throw new Error("Not implemented yet")
+        const newVertex = new ValueCellVertex(newCellContent)
+        this.graph.exchangeNode(vertex, newVertex)
+        this.addressMapping!.setCell(address, newVertex)
       }
     } else {
       throw new Error("Illegal operation")
