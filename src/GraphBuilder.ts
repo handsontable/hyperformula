@@ -64,16 +64,9 @@ export class GraphBuilder {
    *
    * @param sheet - two-dimensional array representation of sheet
    */
-  public buildGraph(sheets: Sheets): boolean[] {
-    const independentSheets: boolean[] = []
-    for (const sheetName in sheets) {
-      independentSheets[this.sheetMapping.fetch(sheetName)] = false
-    }
-
+  public buildGraph(sheets: Sheets) {
     const dependencies = this.buildStrategy.run(sheets)
     this.processDependencies(dependencies)
-
-    return independentSheets
   }
 
   private processDependencies(dependencies: Dependencies) {
