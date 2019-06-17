@@ -13,7 +13,7 @@ interface IAddressMappingStrategy {
    *
    * @param address - cell address
    */
-  getCell(address: SheetCellAddress): CellVertex,
+  getCell(address: SheetCellAddress): CellVertex | null,
 
   /**
    * Set vertex for given address
@@ -62,12 +62,12 @@ export class SparseStrategy implements IAddressMappingStrategy {
   constructor(private width: number, private height: number) {}
 
   /** @inheritDoc */
-  public getCell(address: SheetCellAddress): CellVertex {
+  public getCell(address: SheetCellAddress): CellVertex | null {
     const colMapping = this.mapping.get(address.col)
     if (!colMapping) {
-      return EmptyCellVertex.getSingletonInstance()
+      return null
     }
-    return colMapping.get(address.row) || EmptyCellVertex.getSingletonInstance()
+    return colMapping.get(address.row) || null
   }
 
   /** @inheritDoc */
@@ -148,16 +148,21 @@ export class DenseStrategy implements IAddressMappingStrategy {
   }
 
   /** @inheritDoc */
-  public getCell(address: SheetCellAddress): CellVertex {
+  public getCell(address: SheetCellAddress): CellVertex | null {
     const row = this.mapping[address.row]
     if (!row) {
-      return EmptyCellVertex.getSingletonInstance()
+      return null
     }
-    return row[address.col] || EmptyCellVertex.getSingletonInstance()
+    return row[address.col] || null
   }
 
   /** @inheritDoc */
   public setCell(address: SheetCellAddress, newVertex: CellVertex) {
+    const rowMapping = this.mapping[address.row]
+    if (!rowMapping) {
+      this.mapping[address.row] = new Array(this.width)
+      this.height = address.row
+    }
     this.mapping[address.row][address.col] = newVertex
   }
 
@@ -244,7 +249,7 @@ export class AddressMapping {
   ) { }
 
   /** @inheritDoc */
-  public getCell(address: SimpleCellAddress): CellVertex {
+  public getCell(address: SimpleCellAddress): CellVertex | null {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
       throw Error('Unknown sheet id')
@@ -259,7 +264,7 @@ export class AddressMapping {
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
-      throw Error("Vertex for address ${address} missing in AddressMapping")
+      throw Error("Vertex for address missing in AddressMapping")
     }
     return vertex
   }
@@ -295,7 +300,9 @@ export class AddressMapping {
   public getCellValue(address: SimpleCellAddress): CellValue {
     const vertex = this.getCell(address)
 
-    if (vertex instanceof MatrixVertex) {
+    if (vertex === null) {
+      return 0
+    } else if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
     } else {
       return vertex.getCellValue()
@@ -339,7 +346,8 @@ export class AddressMapping {
   }
 
   public isEmpty(address: SimpleCellAddress): boolean {
-    return (this.getCell(address) instanceof EmptyCellVertex)
+    const vertex = this.getCell(address)
+    return (vertex === null || vertex instanceof EmptyCellVertex)
   }
 
   public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {

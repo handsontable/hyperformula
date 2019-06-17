@@ -98,14 +98,24 @@ export class GraphBuilder {
           this.graph.addEdge(matrix, rangeVertex!)
         } else {
           for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(this.addressMapping.fetchCell(cellFromRange), rangeVertex!)
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(cellFromRange), rangeVertex!)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
       } else {
-        this.graph.addEdge(this.addressMapping.fetchCell(absStartCell), endVertex)
+        this.graph.addEdge(this.fetchOrCreateEmptyCell(absStartCell), endVertex)
       }
     })
+  }
+
+  private fetchOrCreateEmptyCell(address: SimpleCellAddress): CellVertex {
+    let vertex = this.addressMapping.getCell(address)
+    if (!vertex) {
+      vertex = new EmptyCellVertex()
+      this.graph.addNode(vertex)
+      this.addressMapping.setCell(address, vertex)
+    }
+    return vertex
   }
 }
 

@@ -47,7 +47,7 @@ describe('GraphBuilder', () => {
   })
 
   it('building for cell with empty string should give empty vertex', () => {
-    const sheet = [['']]
+    const sheet = [['', '=A1']]
     const graph = new Graph<Vertex>()
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
@@ -58,8 +58,8 @@ describe('GraphBuilder', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    const node = addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!
-    expect(node).toBe(EmptyCellVertex.getSingletonInstance())
+    const node = addressMapping.fetchCell(simpleCellAddress(0, 0, 0))
+    expect(node).toBeInstanceOf(EmptyCellVertex)
   })
 
   it('#buildGraph', () => {
@@ -183,11 +183,12 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(
       3 + // for cells above
       1 + // for range vertex
-      1, // for EmptyCellVertex
+      1 + // for EmptyCellVertex singleton
+      2,  // for 2 EmptyCellVertex instances
     )
     expect(graph.edgesCount()).toBe(
       2 + // from cells to range vertex
-      1 + // from EmptyCellVertex to range vertices
+      2 + // from EmptyCellVertex instances to range vertices
       1, // from range to cell with SUM
     )
   })
@@ -235,7 +236,7 @@ describe('GraphBuilder', () => {
     graphBuilder.buildGraph({ Sheet1: sheet })
     expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
-    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
+    expect(addressMapping.isEmpty(simpleCellAddress(0, 0, 4))).toBe(true)
   })
 })
 
