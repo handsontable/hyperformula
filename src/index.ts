@@ -164,7 +164,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    const vertex = this.addressMapping!.getCell(address)!
+    const vertex = this.addressMapping!.fetchCell(address)!
 
     /* TODO handle properly EmptyCellVertex */
 
@@ -180,7 +180,7 @@ export class HandsOnEngine {
 
       const range = AbsoluteCellRange.spanFrom(address, size.width, size.height)
       for (const x of range.generateCellsFromRangeGenerator()) {
-        if (this.addressMapping!.getCell(x) instanceof MatrixVertex) {
+        if (this.addressMapping!.fetchCell(x) instanceof MatrixVertex) {
           throw Error("You cannot modify only part of an array")
         }
       }
@@ -188,7 +188,7 @@ export class HandsOnEngine {
       this.addressMapping!.setMatrix(range, newVertex)
 
       for (const x of range.generateCellsFromRangeGenerator()) {
-        this.graph.exchangeNode(this.addressMapping!.getCell(x), newVertex)
+        this.graph.exchangeNode(this.addressMapping!.fetchCell(x), newVertex)
         this.addressMapping!.setCell(x, newVertex)
       }
 

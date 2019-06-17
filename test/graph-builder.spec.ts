@@ -24,7 +24,7 @@ describe('GraphBuilder', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
+    const node = addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
     expect(node.getCellValue()).toBe(42)
   })
@@ -41,7 +41,7 @@ describe('GraphBuilder', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet})
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
+    const node = addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBeInstanceOf(ValueCellVertex)
     expect(node.getCellValue()).toBe('foo')
   })
@@ -58,7 +58,7 @@ describe('GraphBuilder', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    const node = addressMapping.getCell(simpleCellAddress(0, 0, 0))!
+    const node = addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!
     expect(node).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
@@ -107,16 +107,16 @@ describe('GraphBuilder', () => {
       1 + // for range vertex
       1, // for EmptyCellVertex
     )
-    const nodesA1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0, 0))!)!
-    const nodesA2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 0, 1))!)!
-    const nodesB1 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1, 0))!)!
-    const nodesB2 = graph.adjacentNodes(addressMapping.getCell(simpleCellAddress(0, 1, 1))!)!
+    const nodesA1 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!)!
+    const nodesA2 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 0, 1))!)!
+    const nodesB1 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 1, 0))!)!
+    const nodesB2 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 1, 1))!)!
     expect(nodesA1).toEqual(nodesA2)
     expect(nodesA2).toEqual(nodesB1)
     expect(nodesB1).toEqual(nodesB2)
     expect(nodesB1.size).toEqual(1)
     const rangeVertex = Array.from(nodesB2)[0]!
-    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.getCell(simpleCellAddress(0, 2, 1))!]))
+    expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.fetchCell(simpleCellAddress(0, 2, 1))!]))
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
@@ -233,9 +233,9 @@ describe('GraphBuilder', () => {
     const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 4))).toBeInstanceOf(EmptyCellVertex)
   })
 })
 
@@ -262,7 +262,7 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    const vertex = addressMapping.getCell(simpleCellAddress(0, 0, 5))
+    const vertex = addressMapping.fetchCell(simpleCellAddress(0, 0, 5))
     expect(vertex).toBeInstanceOf(MatrixVertex)
     expect((vertex as MatrixVertex).getFormula()).toEqual(buildProcedureAst('MMULT', [
       buildCellRangeAst(CellAddress.absolute(0, 0, 0), CellAddress.absolute(0, 1, 2)),
@@ -292,7 +292,7 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(MatrixVertex)
   })
 
   it('matrix no overlap 2', () => {
@@ -317,7 +317,7 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
   })
   it('matrix with plain numbers', () => {
     const sheet = [
@@ -335,7 +335,7 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(MatrixVertex)
     expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 0))).toEqual(1)
     expect(addressMapping.getCellValue(simpleCellAddress(0, 1, 0))).toEqual(2)
     expect(addressMapping.getCellValue(simpleCellAddress(0, 0, 1))).toEqual(3)
@@ -357,8 +357,8 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
-    expect(addressMapping.getCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
   })
 
   it('matrix detection threshold', () => {
@@ -381,9 +381,9 @@ describe('GraphBuilder with matrix detection', () => {
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
-    expect(addressMapping.getCell(simpleCellAddress(0, 1, 1))).toBeInstanceOf(ValueCellVertex)
-    expect(addressMapping.getCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 1, 1))).toBeInstanceOf(ValueCellVertex)
+    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 3))).toBeInstanceOf(MatrixVertex)
 
   })
 })

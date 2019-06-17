@@ -252,6 +252,18 @@ export class AddressMapping {
     return sheetMapping.getCell(address)
   }
 
+  public fetchCell(address: SimpleCellAddress): CellVertex {
+    const sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      throw Error('Unknown sheet id')
+    }
+    const vertex = sheetMapping.getCell(address)
+    if (!vertex) {
+      throw Error("Vertex for address ${address} missing in AddressMapping")
+    }
+    return vertex
+  }
+
   public strategyFor(sheetId: number): IAddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (!strategy) {

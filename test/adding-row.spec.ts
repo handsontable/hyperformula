@@ -7,7 +7,7 @@ import {CellReferenceAst} from "../src/parser/Ast"
 
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.getCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
 }
 
 describe("Adding row", () => {
@@ -183,10 +183,10 @@ describe("Adding row", () => {
       ['=SUM(1,2)'],
     ])
 
-    let vertex = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0)) as FormulaCellVertex
+    let vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as FormulaCellVertex
     expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 0))
     engine.addRow(0, 0, 1)
-    vertex = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
+    vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
     expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 1))
   })
 

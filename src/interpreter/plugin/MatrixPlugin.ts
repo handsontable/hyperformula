@@ -44,7 +44,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rightMatrix
     }
 
-    const vertex = this.addressMapping.getCell(formulaAddress) as MatrixVertex
+    const vertex = this.addressMapping.fetchCell(formulaAddress) as MatrixVertex
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {

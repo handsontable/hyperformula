@@ -105,12 +105,12 @@ export class GraphBuilder {
           this.graph.addEdge(matrix, rangeVertex!)
         } else {
           for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(this.addressMapping.getCell(cellFromRange), rangeVertex!)
+            this.graph.addEdge(this.addressMapping.fetchCell(cellFromRange), rangeVertex!)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
       } else {
-        this.graph.addEdge(this.addressMapping.getCell(absStartCell), endVertex)
+        this.graph.addEdge(this.addressMapping.fetchCell(absStartCell), endVertex)
       }
     })
   }

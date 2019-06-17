@@ -11,7 +11,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(address, vertex)
 
-    expect(mapping.getCell(address)).toBe(vertex)
+    expect(mapping.fetchCell(address)).toBe(vertex)
   })
 
   it('set and using different reference when get', () => {
@@ -20,13 +20,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(simpleCellAddress(0, 0, 0), vertex)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(vertex)
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(vertex)
   })
 
   it("get when there's even no column", () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when there was already something in that column', () => {
@@ -34,13 +34,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(42))
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it('get when asking for out of the row bound cell', () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
   })
 
   it("set when there's already something in that column", () => {
@@ -51,8 +51,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(simpleCellAddress(0, 0, 1), vertex1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(vertex0)
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(vertex1)
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(vertex0)
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(vertex1)
   })
 
   it('set overrides old value', () => {
@@ -63,7 +63,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(simpleCellAddress(0, 0, 0), vertex1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(vertex1)
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(vertex1)
   })
 
   it("has when there's even no column", () => {
@@ -101,8 +101,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 0, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toEqual(new ValueCellVertex(42))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toEqual(new ValueCellVertex(42))
     expect(mapping.getHeight(0)).toEqual(2)
   })
 
@@ -114,9 +114,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(43))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(43))
     expect(mapping.getHeight(0)).toEqual(3)
   })
 
@@ -127,8 +127,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
     expect(mapping.getHeight(0)).toEqual(2)
   })
 
@@ -140,11 +140,11 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 3)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 3))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 4))).toEqual(new ValueCellVertex(43))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(42))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 2))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 3))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 4))).toEqual(new ValueCellVertex(43))
     expect(mapping.getHeight(0)).toEqual(5)
   })
 
@@ -158,12 +158,12 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(11))
-    expect(mapping.getCell(simpleCellAddress(0, 1, 0))).toEqual(new ValueCellVertex(12))
-    expect(mapping.getCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 1, 1))).toBe(EmptyCellVertex.getSingletonInstance())
-    expect(mapping.getCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(21))
-    expect(mapping.getCell(simpleCellAddress(0, 1, 2))).toEqual(new ValueCellVertex(22))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 0))).toEqual(new ValueCellVertex(11))
+    expect(mapping.fetchCell(simpleCellAddress(0, 1, 0))).toEqual(new ValueCellVertex(12))
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 1, 1))).toBe(EmptyCellVertex.getSingletonInstance())
+    expect(mapping.fetchCell(simpleCellAddress(0, 0, 2))).toEqual(new ValueCellVertex(21))
+    expect(mapping.fetchCell(simpleCellAddress(0, 1, 2))).toEqual(new ValueCellVertex(22))
     expect(mapping.getHeight(0)).toEqual(3)
   })
 }
