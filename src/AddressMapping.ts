@@ -247,7 +247,7 @@ export class AddressMapping {
   public getCell(address: SimpleCellAddress): CellVertex {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      return EmptyCellVertex.getSingletonInstance()
+      throw Error('Unknown sheet id')
     }
     return sheetMapping.getCell(address)
   }
