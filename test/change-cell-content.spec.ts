@@ -114,7 +114,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['=A1', '=B1'],
+      ['=A1', ''],
       ['1', 'foo']
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
