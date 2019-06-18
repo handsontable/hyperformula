@@ -61,11 +61,7 @@ export class ParserWithCaching {
     }
     const { ast } = cacheResult
 
-    if (ast.type === AstNodeType.ERROR) {
-      return { ast, hash }
-    } else {
-      return { ast, hash }
-    }
+    return { ast, hash }
   }
 
   public computeHash(tokens: IToken[], baseAddress: SimpleCellAddress): string {
