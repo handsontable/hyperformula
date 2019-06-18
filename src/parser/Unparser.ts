@@ -3,23 +3,9 @@ import {SimpleCellAddress} from "../Cell";
 import {CellAddress, CellReferenceType} from "./CellAddress";
 import {Config} from "../Config";
 import {cellHashFromToken} from "./ParserWithCaching";
+import {binaryOpTokenMap} from "./binaryOpTokenMap";
 
 export type SheetMappingFn = (sheetId: number) => string
-
-const binaryOpTokenMap = {
-  [AstNodeType.PLUS_OP]: "+",
-  [AstNodeType.MINUS_OP]: "-",
-  [AstNodeType.TIMES_OP]: "*",
-  [AstNodeType.DIV_OP]: "/",
-  [AstNodeType.CONCATENATE_OP]: "&",
-  [AstNodeType.POWER_OP]: "^",
-  [AstNodeType.EQUALS_OP]: "=",
-  [AstNodeType.NOT_EQUAL_OP]: "<>",
-  [AstNodeType.GREATER_THAN_OP]: ">",
-  [AstNodeType.GREATER_THAN_OR_EQUAL_OP]: ">=",
-  [AstNodeType.LESS_THAN_OP]: "<",
-  [AstNodeType.LESS_THAN_OR_EQUAL_OP]: "<=",
-}
 
 export class Unparser {
   constructor(
@@ -59,44 +45,7 @@ export class Unparser {
       }
     }
   }
-
-  public computeHash(ast: Ast): string {
-    return "=" + this.doHash(ast)
-  }
-
-  private doHash(ast: Ast): string {
-    switch (ast.type) {
-      case AstNodeType.NUMBER: {
-        return ast.value.toString()
-      }
-      case AstNodeType.STRING: {
-        return "\"" + ast.value + "\""
-      }
-      case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
-        return ast.procedureName + "(" + args + ")"
-      }
-      case AstNodeType.CELL_REFERENCE: {
-        return cellHashFromToken(ast.reference)
-      }
-      case AstNodeType.CELL_RANGE: {
-        const start = cellHashFromToken(ast.start)
-        const end = cellHashFromToken(ast.end)
-        return start + ":" + end
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return "-" + this.doHash(ast.value)
-      }
-      case AstNodeType.ERROR: {
-        return "!ERR"
-      }
-      default: {
-        return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
-      }
-    }
-  }
 }
-
 
 export function columnIndexToLabel(column: number) {
   let result = '';

@@ -9,6 +9,7 @@ import {Cache, RelativeDependency} from './Cache'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
+import {binaryOpTokenMap} from './binaryOpTokenMap'
 import assert from 'assert';
 
 /**
@@ -82,6 +83,42 @@ export class ParserWithCaching {
       }
     }
     return hash
+  }
+
+  public computeHashFromAst(ast: Ast): string {
+    return "=" + this.doHash(ast)
+  }
+
+  private doHash(ast: Ast): string {
+    switch (ast.type) {
+      case AstNodeType.NUMBER: {
+        return ast.value.toString()
+      }
+      case AstNodeType.STRING: {
+        return "\"" + ast.value + "\""
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
+        return ast.procedureName + "(" + args + ")"
+      }
+      case AstNodeType.CELL_REFERENCE: {
+        return cellHashFromToken(ast.reference)
+      }
+      case AstNodeType.CELL_RANGE: {
+        const start = cellHashFromToken(ast.start)
+        const end = cellHashFromToken(ast.end)
+        return start + ":" + end
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return "-" + this.doHash(ast.value)
+      }
+      case AstNodeType.ERROR: {
+        return "!ERR"
+      }
+      default: {
+        return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
+      }
+    }
   }
 
   public getCache(): Cache {
