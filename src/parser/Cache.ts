@@ -23,6 +23,16 @@ export class Cache {
   public get(hash: string): CacheEntry | null {
     return this.cache.get(hash) || null
   }
+
+  public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
+    const entryFromCache = this.cache.get(hash)
+    if (entryFromCache) {
+      return entryFromCache.ast
+    } else {
+      this.set(hash, ast)
+      return ast
+    }
+  }
 }
 
 const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) => {

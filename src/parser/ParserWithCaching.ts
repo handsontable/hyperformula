@@ -83,13 +83,7 @@ export class ParserWithCaching {
 
   public rememberNewAst(ast: Ast): Ast {
     const hash = this.computeHashFromAst(ast)
-    const astFromCache = this.cache.get(hash)
-    if (astFromCache) {
-      return astFromCache.ast
-    } else {
-      this.cache.set(hash, ast)
-      return ast
-    }
+    return this.cache.maybeSetAndThenGet(hash, ast)
   }
 
   public computeHashFromAst(ast: Ast): string {
