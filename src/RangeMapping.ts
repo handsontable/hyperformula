@@ -1,5 +1,5 @@
 import {SimpleCellAddress} from './Cell'
-import {RangeVertex} from './Vertex'
+import {RangeVertex, Vertex} from './Vertex'
 
 /**
  * Mapping from address ranges to range vertices
@@ -50,5 +50,9 @@ export class RangeMapping {
       range.clearCache()
       this.setRange(range)
     })
+  }
+
+  public getEntries() {
+    return this.rangeMapping.entries()
   }
 }

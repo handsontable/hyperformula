@@ -1,12 +1,7 @@
 import {AddressMapping} from './AddressMapping'
-import {
-  CellError,
-  CellValue,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from './Cell'
+import {CellError, CellValue, simpleCellAddress, SimpleCellAddress,} from './Cell'
 import {CellAddress} from './parser/CellAddress'
-import {AstNodeType, Ast} from './parser/Ast'
+import {Ast, AstNodeType} from './parser/Ast'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
@@ -16,8 +11,15 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
-import {checkMatrixSize} from "./Matrix";
+import {
+  CellVertex,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex
+} from './Vertex'
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 /**
@@ -31,7 +33,7 @@ export class HandsOnEngine {
    */
   public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
     const engine = new HandsOnEngine(config)
-    engine.buildFromSheets({ Sheet1: sheet })
+    engine.buildFromSheets({Sheet1: sheet})
     return engine
   }
 
@@ -64,7 +66,7 @@ export class HandsOnEngine {
 
 
   constructor(
-    private readonly config: Config,
+      private readonly config: Config,
   ) {
     this.parser = new ParserWithCaching(this.config, this.sheetMapping.fetch)
   }
@@ -165,7 +167,7 @@ export class HandsOnEngine {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
 
-      const { vertex: newVertex, size } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
 
       if (!size || !(newVertex instanceof MatrixVertex)) {
         throw Error("What if new matrix vertex is not properly constructed?")
@@ -188,13 +190,13 @@ export class HandsOnEngine {
         this.addressMapping!.setCell(x, newVertex)
       }
 
-      const { dependencies } = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
+      const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
       this.graphBuilder!.processCellDependencies(dependencies, newVertex)
     } else if (vertex instanceof FormulaCellVertex) {
       this.graph.removeIncomingEdges(vertex)
       if (isFormula(newCellContent)) {
-        const { ast, hash } = this.parser.parse(newCellContent, address)
-        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const {ast, hash} = this.parser.parse(newCellContent, address)
+        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
         vertex.setFormula(ast)
         this.graphBuilder!.processCellDependencies(dependencies, vertex)
       } else if (newCellContent === '') {
@@ -211,8 +213,8 @@ export class HandsOnEngine {
       }
     } else if (vertex instanceof ValueCellVertex) {
       if (isFormula(newCellContent)) {
-        const { ast, hash } = this.parser.parse(newCellContent, address)
-        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const {ast, hash} = this.parser.parse(newCellContent, address)
+        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
@@ -227,8 +229,8 @@ export class HandsOnEngine {
       }
     } else if (vertex === null) {
       if (isFormula(newCellContent)) {
-        const { ast, hash } = this.parser.parse(newCellContent, address)
-        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const {ast, hash} = this.parser.parse(newCellContent, address)
+        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.addNode(newVertex)
         this.addressMapping!.setCell(address, newVertex)
@@ -246,8 +248,8 @@ export class HandsOnEngine {
       }
     } else if (vertex instanceof EmptyCellVertex) {
       if (isFormula(newCellContent)) {
-        const { ast, hash } = this.parser.parse(newCellContent, address)
-        const { dependencies } = this.parser.getAbsolutizedParserResult(hash, address)
+        const {ast, hash} = this.parser.parse(newCellContent, address)
+        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
@@ -285,8 +287,10 @@ export class HandsOnEngine {
         this.fixFormulaVertexAddress(node, row, numberOfRows)
       }
     }
-    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
-    this.evaluator!.run()
+
+    this.fixRanges(sheet, row, numberOfRows)
+
+    // this.evaluator!.run()
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
@@ -296,6 +300,27 @@ export class HandsOnEngine {
         ...nodeAddress,
         row: nodeAddress.row + numberOfRows
       })
+    }
+  }
+
+  private fixRanges(sheet: number, row: number, numberOfRows: number) {
+    for (const [key, range] of this.rangeMapping.getEntries()) {
+      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
+        const anyVertexInRow = this.addressMapping!.getCell(simpleCellAddress(sheet, range.start.col, row+numberOfRows))!
+        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
+          for (let y=row; y<row+numberOfRows; ++y) {
+            for (let x=range.start.col; x<=range.end.col; ++x) {
+              this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping!, simpleCellAddress(sheet, x, y)), range)
+            }
+          }
+        }
+      }
+    }
+    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+
+    for (const [key, range] of this.rangeMapping.getEntries()) {
+      const rangeDependencies = this.graph.getDependecies(range)
+      console.log(rangeDependencies)
     }
   }
 
@@ -337,7 +362,7 @@ export class HandsOnEngine {
       case AstNodeType.CELL_REFERENCE: {
         const newCellAddress = this.fixRowDependency(ast.reference, address, sheet, row, numberOfRows)
         if (newCellAddress) {
-          return { ...ast, reference: newCellAddress }
+          return {...ast, reference: newCellAddress}
         } else {
           return ast
         }
@@ -393,4 +418,14 @@ export class HandsOnEngine {
       }
     }
   }
+}
+
+export function fetchOrCreateEmptyCell(graph: Graph<Vertex>, addressMapping: AddressMapping, address: SimpleCellAddress): CellVertex {
+  let vertex = addressMapping.getCell(address)
+  if (!vertex) {
+    vertex = new EmptyCellVertex()
+    graph.addNode(vertex)
+    addressMapping.setCell(address, vertex)
+  }
+  return vertex
 }
