@@ -21,6 +21,7 @@ import {
   Vertex
 } from './Vertex'
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {Matrix} from "./Matrix";
 
 /**
  * Engine for one sheet
@@ -163,7 +164,9 @@ export class HandsOnEngine {
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)
 
-    if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
+      vertex.setMatrixCellValue(address, Number(newCellContent))
+    } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
 

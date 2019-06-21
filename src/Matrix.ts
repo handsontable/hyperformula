@@ -145,10 +145,17 @@ export class Matrix {
   }
 
   public get(col: number, row: number): number {
-    if (col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1) {
+    if (this.outOfBound(col, row)) {
       throw Error('Matrix index out of bound')
     }
     return this.matrix[row][col]
+  }
+
+  public set(col: number, row: number, value: number): void {
+    if (this.outOfBound(col, row)) {
+      throw Error('Matrix index out of bound')
+    }
+    this.matrix[row][col] = value
   }
 
   public width(): number {
@@ -161,6 +168,10 @@ export class Matrix {
 
   public raw(): number[][] {
     return this.matrix
+  }
+
+  private outOfBound(col: number, row: number): boolean {
+    return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
   }
 
   public* generateFlatValues(): IterableIterator<number> {

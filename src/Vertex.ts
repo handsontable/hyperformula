@@ -51,6 +51,14 @@ export class MatrixVertex {
     }
   }
 
+  public setMatrixCellValue(address: SimpleCellAddress, value: number): void {
+    const col = address.col - this.cellAddress.col
+    const row = address.row - this.cellAddress.row
+    if (this.matrix instanceof Matrix) {
+      this.matrix.set(col, row, value)
+    }
+  }
+
   public getAddress(): SimpleCellAddress {
     return this.cellAddress
   }
