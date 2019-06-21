@@ -1,4 +1,4 @@
-import {HandsOnEngine} from "../src";
+import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
 import {FormulaCellVertex} from "../src/Vertex";
@@ -206,5 +206,21 @@ describe("Adding row", () => {
     expect(() => {
       engine.addRow(0, 2, 1)
     }).toThrow(new Error("It is not possible to add row in row with matrix"))
+  })
+
+  it('add row inside numeric matrix, expand matrix', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+        ['1','2'],
+        ['3','4'],
+    ], config)
+
+    expect(engine.getCellValue("A2")).toEqual(3)
+
+    engine.addRow(0, 1, 2)
+
+    expect(engine.getCellValue("A2")).toEqual(0)
+    expect(engine.getCellValue("A3")).toEqual(0)
+    expect(engine.getCellValue("A4")).toEqual(3)
   })
 })

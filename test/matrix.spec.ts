@@ -45,4 +45,22 @@ describe('Matrix', () => {
       [0, 0, 0, 0, 0, 0],
     ])
   })
+
+  it('add zero rows', () => {
+    const matrix = new Matrix([
+        [1,2,3],
+        [4,5,6],
+        [7,8,9]
+    ])
+    matrix.addRows(1, 3)
+    expect(matrix.raw()).toEqual([
+      [1,2,3],
+      [0,0,0],
+      [0,0,0],
+      [0,0,0],
+      [4,5,6],
+      [7,8,9]
+    ])
+    expect(matrix.height()).toEqual(6)
+  })
 })

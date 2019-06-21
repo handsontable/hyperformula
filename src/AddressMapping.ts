@@ -3,6 +3,7 @@ import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Graph} from './Graph'
 import {Sheet} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
+import {filterWith} from "./generatorUtils";
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -366,12 +367,16 @@ export class AddressMapping {
     sheetMapping.addRows(row, numberOfRows)
   }
 
-  public isThereSomeMatrixAtRow(sheet: number, row: number) {
+  public isFormulaMatrixInRow(sheet: number, row: number) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.spansThroughSheetRow(sheet, row)) {
+      if (mtx.spansThroughSheetRow(sheet, row) && mtx.isFormula()) {
         return true
       }
     }
     return false
+  }
+
+  public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
+    yield* filterWith((mtx) => { return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
   }
 }

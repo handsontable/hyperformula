@@ -68,6 +68,12 @@ export class MatrixVertex {
       (this.cellAddress.row <= row) &&
       (row < this.cellAddress.row + this.height)
   }
+
+  public addRows(sheet: number, row: number, numberOfRows: number): void {
+    if (this.matrix instanceof Matrix) {
+      this.matrix.addRows(row - this.getAddress().row, numberOfRows)
+    }
+  }
 }
 
 /**

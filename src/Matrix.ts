@@ -131,6 +131,19 @@ export class Matrix {
     return new Matrix(result)
   }
 
+  public addRows(aboveRow: number, numberOfRows: number) {
+    this.matrix.splice(aboveRow, 0, ...this.zeroArrays(numberOfRows, this.width()))
+    this.size.height += numberOfRows
+  }
+
+  public zeroArrays(count: number, size: number) {
+    const result = []
+    for (let i=0; i<count; ++i) {
+      result.push(new Array(size).fill(0))
+    }
+    return result
+  }
+
   public get(col: number, row: number): number {
     if (col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1) {
       throw Error('Matrix index out of bound')
