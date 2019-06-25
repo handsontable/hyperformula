@@ -1,6 +1,7 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
 import {MatrixVertex, RangeVertex, ValueCellVertex} from "../src/Vertex";
+import './testConfig.ts'
 
 describe("Disable matrix optimizatoins", () => {
   it("should split matrix into value cell vertices", () => {
