@@ -301,10 +301,11 @@ export class HandsOnEngine {
   }
 
   public disableNumericMatrices() {
-    for (const matrixVertex of this.addressMapping!.numericMatrices()) {
+    for (const [key, matrixVertex] of this.addressMapping!.numericMatrices()) {
+      const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
       // 1. split matrix to chunks, add value cell vertices
       // 2. update address mapping for each address in matrix
-      for(const address of AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height).generateCellsFromRangeGenerator()) {
+      for(const address of matrixRange.generateCellsFromRangeGenerator()) {
         const value = this.addressMapping!.getCellValue(address)
         const valueVertex = new ValueCellVertex(value)
         this.graph.addNode(valueVertex)
@@ -323,6 +324,7 @@ export class HandsOnEngine {
 
       // 4. remove old matrix
       this.graph.removeNode(matrixVertex)
+      this.addressMapping!.removeMatrix(key)
     }
   }
 

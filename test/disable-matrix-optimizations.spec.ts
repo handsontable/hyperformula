@@ -36,6 +36,7 @@ describe("Disable matrix optimizatoins", () => {
     const engine = HandsOnEngine.buildFromArray(sheet, config)
     let range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)) as RangeVertex
     expect(engine.graph.getDependecies(range).length).toBe(1)
+    expect(Array.from(engine.addressMapping!.numericMatrices()).length).toBe(1)
 
     engine.disableNumericMatrices()
     const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
@@ -44,5 +45,6 @@ describe("Disable matrix optimizatoins", () => {
     expect(engine.graph.getDependecies(range).length).toBe(2)
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
+    expect(Array.from(engine.addressMapping!.numericMatrices()).length).toBe(0)
   })
 })

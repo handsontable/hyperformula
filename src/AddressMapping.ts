@@ -359,6 +359,10 @@ export class AddressMapping {
     this.matrixMapping.set(range.toString(), vertex)
   }
 
+  public removeMatrix(range: string | AbsoluteCellRange) {
+    this.matrixMapping.delete(range.toString())
+  }
+
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
@@ -376,8 +380,8 @@ export class AddressMapping {
     return false
   }
 
-  public* numericMatrices(): IterableIterator<MatrixVertex> {
-    yield* filterWith((mtx) => { return !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
+  public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
+    yield* filterWith(([_, mtx]) => { return !mtx.isFormula() }, this.matrixMapping.entries())[Symbol.iterator]()
   }
 
   public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
