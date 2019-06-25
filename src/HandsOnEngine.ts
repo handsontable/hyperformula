@@ -297,7 +297,33 @@ export class HandsOnEngine {
 
     this.fixRanges(sheet, row, numberOfRows)
 
-    // this.evaluator!.run()
+    this.evaluator!.run()
+  }
+
+  public disableNumericMatrices() {
+    for (const matrixVertex of this.addressMapping!.numericMatrices()) {
+      // 1. split matrix to chunks, add value cell vertices
+      // 2. update address mapping for each address in matrix
+      for(const address of AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height).generateCellsFromRangeGenerator()) {
+        const value = this.addressMapping!.getCellValue(address)
+        const valueVertex = new ValueCellVertex(value)
+        this.graph.addNode(valueVertex)
+        this.addressMapping!.setCell(address, valueVertex)
+      }
+
+      // 3. update dependencies for each range that has this matrix in dependecies
+      for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
+        if (adjacentNode instanceof RangeVertex) {
+          for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
+            const vertex = this.addressMapping!.fetchCell(address)
+            this.graph.addEdge(vertex, adjacentNode)
+          }
+        }
+      }
+
+      // 4. remove old matrix
+      this.graph.removeNode(matrixVertex)
+    }
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {

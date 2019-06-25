@@ -376,6 +376,10 @@ export class AddressMapping {
     return false
   }
 
+  public* numericMatrices(): IterableIterator<MatrixVertex> {
+    yield* filterWith((mtx) => { return !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
+  }
+
   public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
     yield* filterWith((mtx) => { return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
   }

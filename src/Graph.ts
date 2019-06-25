@@ -99,8 +99,12 @@ export class Graph<T> {
     this.adjacentNodes(oldNode).forEach(adjacentNode => {
       this.addEdge(newNode, adjacentNode)
     })
-    this.edges.delete(oldNode)
-    this.nodes.delete(oldNode)
+    this.removeNode(oldNode)
+  }
+
+  public removeNode(node: T) {
+    this.edges.delete(node)
+    this.nodes.delete(node)
   }
 
   /**

@@ -14,7 +14,7 @@ describe("Disable matrix optimizatoins", () => {
 
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(MatrixVertex)
 
-    engine.disableMatrixOptimizations()
+    engine.disableNumericMatrices()
 
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
@@ -36,7 +36,7 @@ describe("Disable matrix optimizatoins", () => {
     let range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)) as RangeVertex
     expect(engine.graph.getDependecies(range).length).toBe(1)
 
-    engine.disableMatrixOptimizations()
+    engine.disableNumericMatrices()
     const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
     const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0)) as ValueCellVertex
     range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)) as RangeVertex
