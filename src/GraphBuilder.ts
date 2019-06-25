@@ -151,7 +151,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
-            handleMatrix(vertex, cellAddress, this.addressMapping)
+            setAddressMappingForMatrixVertex(vertex, cellAddress, this.addressMapping)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
             vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
@@ -221,7 +221,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
-            handleMatrix(vertex, cellAddress, this.addressMapping)
+            setAddressMappingForMatrixVertex(vertex, cellAddress, this.addressMapping)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
             matrixHeuristic.add(parseResult.hash, cellAddress)
@@ -267,7 +267,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function handleMatrix(vertex: CellVertex, formulaAddress: SimpleCellAddress, addressMapping: AddressMapping) {
+export function setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress, addressMapping: AddressMapping) {
   addressMapping.setCell(formulaAddress, vertex)
 
   if (!(vertex instanceof MatrixVertex)) {
