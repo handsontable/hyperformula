@@ -387,11 +387,6 @@ export class HandsOnEngine {
     }
 
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
-
-    for (const [key, range] of this.rangeMapping.getEntries()) {
-      const rangeDependencies = this.graph.getDependecies(range)
-      console.log(rangeDependencies)
-    }
   }
 
   private fixRowDependency(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
