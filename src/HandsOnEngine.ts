@@ -385,6 +385,7 @@ export class HandsOnEngine {
         }
       }
     }
+
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
 
     for (const [key, range] of this.rangeMapping.getEntries()) {
