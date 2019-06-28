@@ -312,10 +312,17 @@ export class HandsOnEngine {
         this.addressMapping!.setCell(address, valueVertex)
       }
 
-      // 3. update dependencies for each range that has this matrix in dependecies
       for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
+        // 3. update dependencies for each range that has this matrix in dependencies
         if (adjacentNode instanceof RangeVertex) {
           for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
+            const vertex = this.addressMapping!.fetchCell(address)
+            this.graph.addEdge(vertex, adjacentNode)
+          }
+        // 4. fix edges for cell references in formulas
+        } else if (adjacentNode instanceof FormulaCellVertex) {
+          const addresses = this.addressesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
+          for (const address of addresses) {
             const vertex = this.addressMapping!.fetchCell(address)
             this.graph.addEdge(vertex, adjacentNode)
           }
@@ -325,6 +332,32 @@ export class HandsOnEngine {
       // 4. remove old matrix
       this.graph.removeNode(matrixVertex)
       this.addressMapping!.removeMatrix(key)
+    }
+  }
+
+  private addressesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<SimpleCellAddress> {
+    switch (ast.type) {
+      case AstNodeType.CELL_REFERENCE: {
+        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
+        if (range.addressInRange(dependencyAddress)) {
+          return [dependencyAddress]
+        }
+      }
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.ERROR:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING: {
+        return []
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return this.addressesInRange(ast.value, baseAddress, range)
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        return ast.args.map((arg) => this.addressesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
+      }
+      default: {
+        return [...this.addressesInRange(ast.left, baseAddress, range), ...this.addressesInRange(ast.right, baseAddress, range)]
+      }
     }
   }
 
