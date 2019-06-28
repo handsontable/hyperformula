@@ -450,24 +450,6 @@ export class HandsOnEngine {
       case AstNodeType.STRING: {
         return ast
       }
-      case AstNodeType.CONCATENATE_OP:
-      case AstNodeType.EQUALS_OP:
-      case AstNodeType.NOT_EQUAL_OP:
-      case AstNodeType.GREATER_THAN_OP:
-      case AstNodeType.LESS_THAN_OP:
-      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
-      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
-      case AstNodeType.PLUS_OP:
-      case AstNodeType.MINUS_OP:
-      case AstNodeType.TIMES_OP:
-      case AstNodeType.DIV_OP:
-      case AstNodeType.POWER_OP: {
-        return {
-          type: ast.type,
-          left: this.fixDependencies(ast.left, address, sheet, row, numberOfRows),
-          right: this.fixDependencies(ast.right, address, sheet, row, numberOfRows),
-        } as Ast
-      }
       case AstNodeType.MINUS_UNARY_OP: {
         return {
           type: ast.type,
@@ -480,6 +462,13 @@ export class HandsOnEngine {
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => this.fixDependencies(arg, address, sheet, row, numberOfRows))
         }
+      }
+      default: {
+        return {
+          type: ast.type,
+          left: this.fixDependencies(ast.left, address, sheet, row, numberOfRows),
+          right: this.fixDependencies(ast.right, address, sheet, row, numberOfRows),
+        } as Ast
       }
     }
   }
