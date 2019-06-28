@@ -410,7 +410,8 @@ export class HandsOnEngine {
         return dependencyAddress.shiftedByRows(numberOfRows)
       }
     } else {
-      if (dependencyAddress.row < row) {
+      const absolutizedAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      if (absolutizedAddress.row < row) {
         if (formulaAddress.row < row) { // Case Raa
           return false
         } else { // Case Rab

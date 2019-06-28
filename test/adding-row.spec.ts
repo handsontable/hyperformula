@@ -136,6 +136,17 @@ describe("Adding row", () => {
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
+  it('same sheet, same row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['42'],
+        ['43', '=A2']
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
   it('insert row in middle of range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=SUM(A1:A3)'],
@@ -228,7 +239,7 @@ describe("Adding row", () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1','=SUM(A1:A1)'],
       ['2','=SUM(A1:A2)'],
-      // new row
+      //
       ['3','=SUM(A1:A3)'],
       ['4','=SUM(A1:A4)'],
     ])
