@@ -252,4 +252,19 @@ describe("Adding row", () => {
     expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
     expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
   })
+
+  it ('it should insert new cell with edge to only one range below, shifted by 1', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      ['2','=SUM(A1:A1)'],
+      ['3','=SUM(A1:A2)'],
+      //
+      ['4','=SUM(A1:A3)'],
+    ])
+
+    engine.addRow(0, 3, 1)
+
+    const a4 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 3))
+    expect(a4).toBe(null)
+  })
 })
