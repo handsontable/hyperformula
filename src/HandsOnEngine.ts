@@ -321,9 +321,8 @@ export class HandsOnEngine {
           }
           // 4. fix edges for cell references in formulas
         } else if (adjacentNode instanceof FormulaCellVertex) {
-          const addresses = this.addressesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
-          for (const address of addresses) {
-            const vertex = this.addressMapping!.fetchCell(address)
+          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
+          for (const vertex of relevantReferences) {
             this.graph.addEdge(vertex, adjacentNode)
           }
         }
@@ -335,12 +334,12 @@ export class HandsOnEngine {
     }
   }
 
-  private addressesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<SimpleCellAddress> {
+  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
         if (range.addressInRange(dependencyAddress)) {
-          return [dependencyAddress]
+          return [this.addressMapping!.fetchCell(dependencyAddress)]
         }
         return []
       }
@@ -351,13 +350,13 @@ export class HandsOnEngine {
         return []
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return this.addressesInRange(ast.value, baseAddress, range)
+        return this.cellReferencesInRange(ast.value, baseAddress, range)
       }
       case AstNodeType.FUNCTION_CALL: {
-        return ast.args.map((arg) => this.addressesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
+        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
       }
       default: {
-        return [...this.addressesInRange(ast.left, baseAddress, range), ...this.addressesInRange(ast.right, baseAddress, range)]
+        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
       }
     }
   }
