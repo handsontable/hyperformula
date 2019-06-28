@@ -69,6 +69,10 @@ export class Graph<T> {
     return this.edges.get(node)!
   }
 
+  public adjacentNodesCount(node: T): number {
+    return this.adjacentNodes(node).size
+  }
+
   /**
    * Checks whether a node is present in graph
    *

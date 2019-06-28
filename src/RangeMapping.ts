@@ -52,7 +52,7 @@ export class RangeMapping {
     })
   }
 
-  public getEntries() {
-    return this.rangeMapping.entries()
+  public getValues() {
+    return this.rangeMapping.values()
   }
 }

@@ -1,7 +1,7 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
-import {FormulaCellVertex} from "../src/Vertex";
+import {EmptyCellVertex, FormulaCellVertex, RangeVertex} from "../src/Vertex";
 import {CellAddress} from "../src/parser/CellAddress"
 import {CellReferenceAst} from "../src/parser/Ast"
 
@@ -136,6 +136,17 @@ describe("Adding row", () => {
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
+  it('same sheet, same row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['42'],
+        ['43', '=A2']
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
   it('insert row in middle of range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=SUM(A1:A3)'],
@@ -222,5 +233,151 @@ describe("Adding row", () => {
     expect(engine.getCellValue("A2")).toEqual(0)
     expect(engine.getCellValue("A3")).toEqual(0)
     expect(engine.getCellValue("A4")).toEqual(3)
+  })
+
+  it('it should insert new cell with edge to only one range below', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','=SUM(A1:A1)'],
+      ['2','=SUM(A1:A2)'],
+      //
+      ['3','=SUM(A1:A3)'],
+      ['4','=SUM(A1:A4)'],
+    ])
+
+    engine.addRow(0, 2, 1)
+
+    const a3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2))
+    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))! // A1:A4
+
+    expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
+  })
+
+  it ('it should insert new cell with edge to only one range below, shifted by 1', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      ['2','=SUM(A1:A1)'],
+      ['3','=SUM(A1:A2)'],
+      //
+      ['4','=SUM(A1:A3)'],
+    ])
+
+    engine.addRow(0, 3, 1)
+
+    const a4 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 3))
+    expect(a4).toBe(null)
+  })
+
+  it ('range start in row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A2:A4)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    expect(a2).toBe(null)
+  })
+
+  it ('range start above row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A1:A4)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 4))!
+    expect(a2).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+  })
+
+  it ('range start below row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A3:A4)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    expect(a2).toBe(null)
+  })
+
+  it ('range end above row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A1:A1)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    expect(a2).toBe(null)
+  })
+
+  it ('range end in a row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A1:A2)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
+    expect(a2).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+  })
+
+  it ('range end below row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A1:A3)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))!
+    expect(a2).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+  })
+
+  it ('range start and end in a row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      //
+      ['2','=SUM(A2:A2)'],
+      ['3',''],
+      ['4',''],
+    ])
+
+    engine.addRow(0, 1, 1)
+
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    expect(a2).toBe(null)
   })
 })
