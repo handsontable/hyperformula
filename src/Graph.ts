@@ -1,6 +1,7 @@
 /**
  * Provides graph directed structure
  */
+import {RangeVertex, Vertex} from "./Vertex";
 
 export class Graph<T> {
   /** Set with nodes in graph. */
@@ -8,6 +9,7 @@ export class Graph<T> {
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
+
 
   constructor() {
     this.nodes = new Set()
@@ -97,8 +99,12 @@ export class Graph<T> {
     this.adjacentNodes(oldNode).forEach(adjacentNode => {
       this.addEdge(newNode, adjacentNode)
     })
-    this.edges.delete(oldNode)
-    this.nodes.delete(oldNode)
+    this.removeNode(oldNode)
+  }
+
+  public removeNode(node: T) {
+    this.edges.delete(node)
+    this.nodes.delete(node)
   }
 
   /**
@@ -166,5 +172,15 @@ export class Graph<T> {
       })
     })
     return incomingEdges
+  }
+
+  public getDependecies(vertex: T): Array<T> {
+    const result: Array<T> = []
+    this.edges.forEach((adjacentNodes, sourceNode) => {
+      if (adjacentNodes.has(vertex)) {
+        result.push(sourceNode)
+      }
+    })
+    return result
   }
 }

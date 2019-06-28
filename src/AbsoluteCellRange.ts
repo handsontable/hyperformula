@@ -3,6 +3,7 @@ import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
 import {SheetMapping} from "./SheetMapping";
 import {Sheets} from "./GraphBuilder";
+import {add} from "./interpreter/scalar";
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
@@ -66,6 +67,19 @@ export class AbsoluteCellRange {
       return false
     }
     return true
+  }
+
+  public addressInRange(address: SimpleCellAddress): boolean {
+    if (this.sheet !== address.sheet) {
+      return false
+    }
+
+    if (this.start.row <= address.row && this.end.row >= address.row
+        && this.start.col <= address.col && this.end.col >= address.col) {
+      return true
+    }
+
+    return false
   }
 
   public withStart(newStart: SimpleCellAddress) {

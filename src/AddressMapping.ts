@@ -3,6 +3,7 @@ import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
 import {Graph} from './Graph'
 import {Sheet} from './GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
+import {filterWith} from "./generatorUtils";
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -358,6 +359,10 @@ export class AddressMapping {
     this.matrixMapping.set(range.toString(), vertex)
   }
 
+  public removeMatrix(range: string | AbsoluteCellRange) {
+    this.matrixMapping.delete(range.toString())
+  }
+
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
@@ -366,12 +371,20 @@ export class AddressMapping {
     sheetMapping.addRows(row, numberOfRows)
   }
 
-  public isThereSomeMatrixAtRow(sheet: number, row: number) {
+  public isFormulaMatrixInRow(sheet: number, row: number) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.spansThroughSheetRow(sheet, row)) {
+      if (mtx.spansThroughSheetRow(sheet, row) && mtx.isFormula()) {
         return true
       }
     }
     return false
+  }
+
+  public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
+    yield* filterWith(([_, mtx]) => { return !mtx.isFormula() }, this.matrixMapping.entries())[Symbol.iterator]()
+  }
+
+  public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
+    yield* filterWith((mtx) => { return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
   }
 }

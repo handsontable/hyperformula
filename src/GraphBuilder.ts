@@ -20,6 +20,7 @@ import {
   ValueCellVertex,
   Vertex,
 } from './Vertex'
+import {fetchOrCreateEmptyCell} from "./HandsOnEngine";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -95,27 +96,17 @@ export class GraphBuilder {
 
         const matrix = this.addressMapping.getMatrix(restRange)
         if (matrix !== undefined) {
-          this.graph.addEdge(matrix, rangeVertex!)
+          this.graph.addEdge(matrix, rangeVertex)
         } else {
           for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(cellFromRange), rangeVertex!)
+            this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, cellFromRange), rangeVertex)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
       } else {
-        this.graph.addEdge(this.fetchOrCreateEmptyCell(absStartCell), endVertex)
+        this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, absStartCell), endVertex)
       }
     })
-  }
-
-  private fetchOrCreateEmptyCell(address: SimpleCellAddress): CellVertex {
-    let vertex = this.addressMapping.getCell(address)
-    if (!vertex) {
-      vertex = new EmptyCellVertex()
-      this.graph.addNode(vertex)
-      this.addressMapping.setCell(address, vertex)
-    }
-    return vertex
   }
 }
 
@@ -160,7 +151,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
-            handleMatrix(vertex, cellAddress, this.addressMapping)
+            setAddressMappingForMatrixVertex(vertex, cellAddress, this.addressMapping)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
             vertex = new FormulaCellVertex(parseResult.ast, cellAddress)
@@ -230,7 +221,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, cellAddress)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.graph.addNode(vertex)
-            handleMatrix(vertex, cellAddress, this.addressMapping)
+            setAddressMappingForMatrixVertex(vertex, cellAddress, this.addressMapping)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, cellAddress))
             matrixHeuristic.add(parseResult.hash, cellAddress)
@@ -276,7 +267,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function handleMatrix(vertex: CellVertex, formulaAddress: SimpleCellAddress, addressMapping: AddressMapping) {
+export function setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress, addressMapping: AddressMapping) {
   addressMapping.setCell(formulaAddress, vertex)
 
   if (!(vertex instanceof MatrixVertex)) {

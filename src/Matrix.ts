@@ -131,11 +131,31 @@ export class Matrix {
     return new Matrix(result)
   }
 
+  public addRows(aboveRow: number, numberOfRows: number) {
+    this.matrix.splice(aboveRow, 0, ...this.zeroArrays(numberOfRows, this.width()))
+    this.size.height += numberOfRows
+  }
+
+  public zeroArrays(count: number, size: number) {
+    const result = []
+    for (let i=0; i<count; ++i) {
+      result.push(new Array(size).fill(0))
+    }
+    return result
+  }
+
   public get(col: number, row: number): number {
-    if (col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1) {
+    if (this.outOfBound(col, row)) {
       throw Error('Matrix index out of bound')
     }
     return this.matrix[row][col]
+  }
+
+  public set(col: number, row: number, value: number): void {
+    if (this.outOfBound(col, row)) {
+      throw Error('Matrix index out of bound')
+    }
+    this.matrix[row][col] = value
   }
 
   public width(): number {
@@ -148,6 +168,10 @@ export class Matrix {
 
   public raw(): number[][] {
     return this.matrix
+  }
+
+  private outOfBound(col: number, row: number): boolean {
+    return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
   }
 
   public* generateFlatValues(): IterableIterator<number> {

@@ -1,4 +1,4 @@
-import {HandsOnEngine} from "../src";
+import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
 import {MatrixVertex, FormulaCellVertex, EmptyCellVertex} from "../src/Vertex";
@@ -243,5 +243,31 @@ describe('changing cell content', () => {
     const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue("A1")).toBe("foo")
+  })
+
+  it('change numeric value inside matrix to another number', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4']
+    ], config)
+
+    expect(engine.getCellValue("A1")).toBe(1)
+    engine.setCellContent(simpleCellAddress(0, 0, 0), "5")
+    expect(engine.getCellValue("A1")).toBe(5)
+  })
+
+  it('change numeric value inside matrix to NaN', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4']
+    ], config)
+
+    expect(engine.getCellValue("A1")).toBe(1)
+
+    expect(() => {
+      engine.setCellContent(simpleCellAddress(0, 0, 0), "foo")
+    }).toThrowError("Illegal operation")
   })
 })

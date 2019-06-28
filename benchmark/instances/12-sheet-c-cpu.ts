@@ -7,7 +7,7 @@ import {Config} from '../../src'
 
   console.info('\n === Sheet C (CPU) === ')
   await benchmark(s, expectedValues(s), {
-    millisecondsPerThousandRows: 10000,
+    millisecondsPerThousandRows: 12000,
     numberOfRuns: 3,
     engineConfig: new Config({ gpuMode: 'cpu' })
   })
