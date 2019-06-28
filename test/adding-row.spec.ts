@@ -1,7 +1,7 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
-import {FormulaCellVertex} from "../src/Vertex";
+import {FormulaCellVertex, RangeVertex} from "../src/Vertex";
 import {CellAddress} from "../src/parser/CellAddress"
 import {CellReferenceAst} from "../src/parser/Ast"
 
@@ -222,5 +222,23 @@ describe("Adding row", () => {
     expect(engine.getCellValue("A2")).toEqual(0)
     expect(engine.getCellValue("A3")).toEqual(0)
     expect(engine.getCellValue("A4")).toEqual(3)
+  })
+
+  it('it should insert new cell with edge to only one range below', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','=SUM(A1:A1)'],
+      ['2','=SUM(A1:A2)'],
+      // new row
+      ['3','=SUM(A1:A3)'],
+      ['4','=SUM(A1:A4)'],
+    ])
+
+    engine.addRow(0, 2, 1)
+
+    const a3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2))
+    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))! // A1:A4
+
+    expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
   })
 })
