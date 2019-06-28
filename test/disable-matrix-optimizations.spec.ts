@@ -41,10 +41,40 @@ describe("Disable matrix optimizatoins", () => {
     engine.disableNumericMatrices()
     const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
     const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0)) as ValueCellVertex
+    expect(a1).toBeInstanceOf(ValueCellVertex)
+    expect(b1).toBeInstanceOf(ValueCellVertex)
+
     range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)) as RangeVertex
     expect(engine.graph.getDependecies(range).length).toBe(2)
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
     expect(Array.from(engine.addressMapping!.numericMatrices()).length).toBe(0)
+  })
+
+  it("should update edges between matrix and formulas", () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['=A1+B2'],
+    ]
+
+    const engine = HandsOnEngine.buildFromArray(sheet, config)
+    let a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
+    let b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1)) as ValueCellVertex
+    expect(a1).toBe(b2)
+    expect(Array.from(engine.addressMapping!.numericMatrices()).length).toBe(1)
+
+    engine.disableNumericMatrices()
+
+    a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
+    b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1)) as ValueCellVertex
+    expect(a1).not.toBe(b2)
+    const a3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)) as ValueCellVertex
+
+    expect(a1).toBeInstanceOf(ValueCellVertex)
+    expect(b2).toBeInstanceOf(ValueCellVertex)
+    expect(engine.graph.existsEdge(a1, a3)).toBe(true)
+    expect(engine.graph.existsEdge(b2, a3)).toBe(true)
   })
 })

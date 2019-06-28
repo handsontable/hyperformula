@@ -342,6 +342,7 @@ export class HandsOnEngine {
         if (range.addressInRange(dependencyAddress)) {
           return [dependencyAddress]
         }
+        return []
       }
       case AstNodeType.CELL_RANGE:
       case AstNodeType.ERROR:
