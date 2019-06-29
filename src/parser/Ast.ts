@@ -1,4 +1,5 @@
 import {CellAddress} from './CellAddress'
+import {CellError} from "../Cell";
 
 export type Ast =
   NumberAst
@@ -250,6 +251,9 @@ export const buildProcedureAst = (procedureName: string, args: Ast[]): Procedure
 export interface ErrorAst {
   type: AstNodeType.ERROR,
   args: ParsingError[]
+  error?: CellError
 }
 
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
+export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args: args})
+
+export const buildCellErrorAst = (error: CellError): ErrorAst => ({type: AstNodeType.ERROR, args: [], error: error})

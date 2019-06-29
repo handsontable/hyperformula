@@ -4,6 +4,7 @@ import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress,} 
 import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
 import {Ast, AstNodeType, collectDependencies, absolutizeDependencies} from './parser'
+import {buildCellErrorAst, buildErrorAst} from './parser/Ast'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
@@ -506,8 +507,10 @@ export function fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: num
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = fixRowDependency(ast.reference, address, sheet, row, numberOfRows)
-      if (newCellAddress) {
+      if (newCellAddress && newCellAddress instanceof CellAddress) {
         return {...ast, reference: newCellAddress}
+      } else if (newCellAddress instanceof CellError) {
+        return buildCellErrorAst(newCellAddress)
       } else {
         return ast
       }
@@ -515,6 +518,12 @@ export function fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: num
     case AstNodeType.CELL_RANGE: {
       const newStart = fixRowDependency(ast.start, address, sheet, row, numberOfRows)
       const newEnd = fixRowDependency(ast.end, address, sheet, row, numberOfRows)
+      if (newStart instanceof CellError) {
+        return buildCellErrorAst(newStart)
+      }
+      if (newEnd instanceof CellError) {
+        return buildCellErrorAst(newEnd)
+      }
       if (newStart || newEnd) {
         return {
           ...ast,
