@@ -60,7 +60,8 @@ export class SparseStrategy implements IAddressMappingStrategy {
    */
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 
-  constructor(private width: number, private height: number) {}
+  constructor(private width: number, private height: number) {
+  }
 
   /** @inheritDoc */
   public getCell(address: SheetCellAddress): CellVertex | null {
@@ -246,8 +247,9 @@ export class AddressMapping {
   private matrixMapping: Map<string, MatrixVertex> = new Map()
 
   constructor(
-    private readonly threshold: number,
-  ) { }
+      private readonly threshold: number,
+  ) {
+  }
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): CellVertex | null {
@@ -371,20 +373,26 @@ export class AddressMapping {
     sheetMapping.addRows(row, numberOfRows)
   }
 
-  public isFormulaMatrixInRow(sheet: number, row: number) {
-    for (const mtx of this.matrixMapping.values()) {
-      if (mtx.spansThroughSheetRow(sheet, row) && mtx.isFormula()) {
-        return true
+  public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+    for (let row = rowStart; row <= rowEnd; ++row) {
+      for (const mtx of this.matrixMapping.values()) {
+        if (mtx.spansThroughSheetRow(sheet, row) && mtx.isFormula()) {
+          return true
+        }
       }
     }
     return false
   }
 
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
-    yield* filterWith(([_, mtx]) => { return !mtx.isFormula() }, this.matrixMapping.entries())[Symbol.iterator]()
+    yield* filterWith(([_, mtx]) => {
+      return !mtx.isFormula()
+    }, this.matrixMapping.entries())[Symbol.iterator]()
   }
 
   public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
-    yield* filterWith((mtx) => { return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula() }, this.matrixMapping.values()[Symbol.iterator]())
+    yield* filterWith((mtx) => {
+      return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula()
+    }, this.matrixMapping.values()[Symbol.iterator]())
   }
 }

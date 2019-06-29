@@ -301,8 +301,8 @@ export class HandsOnEngine {
     }
   }
 
-  public addRow(sheet: number, row: number, numberOfRows: number = 1) {
-    if (this.addressMapping!.isFormulaMatrixInRow(sheet, row)) {
+  public addRows(sheet: number, row: number, numberOfRows: number = 1) {
+    if (this.addressMapping!.isFormulaMatrixInRows(sheet, row)) {
       throw Error("It is not possible to add row in row with matrix")
     }
 
@@ -324,6 +324,12 @@ export class HandsOnEngine {
     this.fixRanges(sheet, row, numberOfRows)
 
     this.evaluator!.run()
+  }
+
+  public removeRows(sheet: number, rowStart: number, rowEnd: number) {
+    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
+      throw Error("It is not possible to add row in row with matrix")
+    }
   }
 
   public disableNumericMatrices() {

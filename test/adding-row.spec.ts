@@ -24,7 +24,7 @@ describe("Adding row", () => {
       ]
     })
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(1,0,0))).toEqual(CellAddress.relative(1, 0, 1))
     expect(extractReference(engine, simpleCellAddress(1,0,1))).toEqual(CellAddress.relative(1, 1, -1))
@@ -43,7 +43,7 @@ describe("Adding row", () => {
       ]
     })
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(1, 0, 1))
   })
@@ -55,7 +55,7 @@ describe("Adding row", () => {
       ['=A$1'],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteRow(0, 0, 0))
   })
@@ -67,7 +67,7 @@ describe("Adding row", () => {
       ['=$A$1'],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absolute(0, 0, 0))
   })
@@ -79,7 +79,7 @@ describe("Adding row", () => {
       ['42'],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(0, 0, 2))
   })
@@ -92,7 +92,7 @@ describe("Adding row", () => {
       ['42'],
     ])
 
-    engine.addRow(0, 2, 1)
+    engine.addRows(0, 2, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 1))
   })
@@ -105,7 +105,7 @@ describe("Adding row", () => {
       ['=A2'],
     ])
 
-    engine.addRow(0, 2, 1)
+    engine.addRows(0, 2, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.relative(0, 0, -2))
   })
@@ -118,7 +118,7 @@ describe("Adding row", () => {
       ['42'],
     ])
 
-    engine.addRow(0, 2, 1)
+    engine.addRows(0, 2, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 3))
   })
@@ -131,7 +131,7 @@ describe("Adding row", () => {
       ['13'],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
   })
@@ -142,7 +142,7 @@ describe("Adding row", () => {
         ['43', '=A2']
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.relative(0, -1, 0))
   })
@@ -156,7 +156,7 @@ describe("Adding row", () => {
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))).not.toBe(null)
   })
@@ -170,7 +170,7 @@ describe("Adding row", () => {
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
-    engine.addRow(0, 0, 1)
+    engine.addRows(0, 0, 1)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 1), simpleCellAddress(0, 0, 3))).not.toBe(null)
   })
@@ -184,7 +184,7 @@ describe("Adding row", () => {
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
-    engine.addRow(0, 3, 1)
+    engine.addRows(0, 3, 1)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
   })
 
@@ -196,7 +196,7 @@ describe("Adding row", () => {
 
     let vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as FormulaCellVertex
     expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 0))
-    engine.addRow(0, 0, 1)
+    engine.addRows(0, 0, 1)
     vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
     expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 1))
   })
@@ -211,11 +211,11 @@ describe("Adding row", () => {
     ])
 
     expect(() => {
-      engine.addRow(0, 3, 1)
+      engine.addRows(0, 3, 1)
     }).toThrow(new Error("It is not possible to add row in row with matrix"))
 
     expect(() => {
-      engine.addRow(0, 2, 1)
+      engine.addRows(0, 2, 1)
     }).toThrow(new Error("It is not possible to add row in row with matrix"))
   })
 
@@ -228,7 +228,7 @@ describe("Adding row", () => {
 
     expect(engine.getCellValue("A2")).toEqual(3)
 
-    engine.addRow(0, 1, 2)
+    engine.addRows(0, 1, 2)
 
     expect(engine.getCellValue("A2")).toEqual(0)
     expect(engine.getCellValue("A3")).toEqual(0)
@@ -244,7 +244,7 @@ describe("Adding row", () => {
       ['4','=SUM(A1:A4)'],
     ])
 
-    engine.addRow(0, 2, 1)
+    engine.addRows(0, 2, 1)
 
     const a3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2))
     const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))! // A1:A4
@@ -262,7 +262,7 @@ describe("Adding row", () => {
       ['4','=SUM(A1:A3)'],
     ])
 
-    engine.addRow(0, 3, 1)
+    engine.addRows(0, 3, 1)
 
     const a4 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 3))
     expect(a4).toBe(null)
@@ -277,7 +277,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
     expect(a2).toBe(null)
@@ -292,7 +292,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
     const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 4))!
@@ -309,7 +309,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
     expect(a2).toBe(null)
@@ -324,7 +324,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
     expect(a2).toBe(null)
@@ -339,7 +339,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
 
@@ -357,7 +357,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
 
@@ -375,7 +375,7 @@ describe("Adding row", () => {
       ['4',''],
     ])
 
-    engine.addRow(0, 1, 1)
+    engine.addRows(0, 1, 1)
 
     const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
     expect(a2).toBe(null)
