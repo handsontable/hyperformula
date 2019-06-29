@@ -34,35 +34,23 @@ export class SingleThreadEvaluator implements Evaluator {
     })
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas()
+      this.recomputeFormulas(this.verticesOnCycle, this.sortedVertices)
     })
   }
 
   public partialRun(vertex: Vertex) {
     const { sorted, cycled } = this.graph.getTopologicallySortedSubgraphFrom(vertex)
-    cycled.forEach((vertex: Vertex) => {
-      (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
-    })
-    sorted.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
-        const cellValue = this.interpreter.evaluateAst(formula, address)
-        vertex.setCellValue(cellValue)
-      } else if (vertex instanceof RangeVertex) {
-        vertex.clearCache()
-      }
-    })
+    this.recomputeFormulas(cycled, sorted)
   }
 
   /**
    * Recalculates formulas in the topological sort order
    */
-  private recomputeFormulas() {
-    this.verticesOnCycle.forEach((vertex: Vertex) => {
+  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]) {
+    cycled.forEach((vertex: Vertex) => {
       (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
-    this.sortedVertices.forEach((vertex: Vertex) => {
+    sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
