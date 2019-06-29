@@ -1,5 +1,6 @@
 import {AddressMapping} from './AddressMapping'
 import {CellError, CellValue, simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress,} from './Cell'
 import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
 import {Ast, AstNodeType, collectDependencies, absolutizeDependencies} from './parser'
@@ -331,7 +332,12 @@ export class HandsOnEngine {
       throw Error("It is not possible to remove row with matrix")
     }
 
-    // 2.
+    // 2. Fix dependencies
+    for (const node of this.graph.nodes) {
+      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
+        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, rowStart, rowEnd - rowStart + 1, fixRowDependencyRowsDeletion)
+      }
+    }
   }
 
   public disableNumericMatrices() {
@@ -423,11 +429,48 @@ export class HandsOnEngine {
   }
 }
 
-export type FixRowDependencyFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number) => CellAddress | false
+export type FixRowDependencyFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number) => CellAddress | CellError | false
+
+export function fixRowDependencyRowsDeletion(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): CellAddress | CellError | false {
+  if ((dependencyAddress.sheet === formulaAddress.sheet)
+      && (formulaAddress.sheet !== sheetInWhichWeRemoveRows)) {
+    return false
+  }
+
+  if (dependencyAddress.isRowAbsolute()) {
+    if (sheetInWhichWeRemoveRows !== dependencyAddress.sheet) {
+      return false
+    }
+
+    if (dependencyAddress.row < topRow) { // Aa
+      return false
+    } else if (dependencyAddress.row >= topRow + numberOfRows) { // Ab
+      return dependencyAddress.shiftedByRows(-numberOfRows)
+    }
+  } else {
+    const absolutizedAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+    if (absolutizedAddress.row < topRow) {
+      if (formulaAddress.row < topRow) {  // Raa
+        return false
+      } else if (formulaAddress.row >= topRow + numberOfRows) { // Rab
+        return dependencyAddress.shiftedByRows(numberOfRows)
+      }
+    } else if (absolutizedAddress.row >= topRow + numberOfRows) {
+      if (formulaAddress.row < topRow) {  // Rba
+        return dependencyAddress.shiftedByRows(-numberOfRows)
+      } else if (formulaAddress.row >= topRow + numberOfRows) { // Rbb
+        return false
+      }
+    }
+  }
+
+  return new CellError(ErrorType.REF)
+}
+
 
 export function fixRowDependency(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number): CellAddress | false {
-  const isLocalDependency = (dependencyAddress.sheet === formulaAddress.sheet)
-  if (isLocalDependency && formulaAddress.sheet !== sheetInWhichWeAddRows) {
+  if ((dependencyAddress.sheet === formulaAddress.sheet)
+      && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
     return false
   }
 
