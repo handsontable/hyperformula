@@ -276,11 +276,11 @@ export class HandsOnEngine {
   }
 
   public addRow(sheet: number, row: number, numberOfRows: number = 1) {
-    this.addressMapping!.addRows(sheet, row, numberOfRows)
-
     if (this.addressMapping!.isFormulaMatrixInRow(sheet, row)) {
       throw Error("It is not possible to add row in row with matrix")
     }
+
+    this.addressMapping!.addRows(sheet, row, numberOfRows)
 
     for (let matrix of this.addressMapping!.numericMatricesAtRow(sheet, row)) {
       matrix.addRows(sheet, row, numberOfRows)
