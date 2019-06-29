@@ -163,6 +163,7 @@ export class HandsOnEngine {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)
+    let vertexToRecomputeFrom = vertex
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       vertex.setMatrixCellValue(address, Number(newCellContent))
@@ -195,6 +196,7 @@ export class HandsOnEngine {
 
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
       this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+      vertexToRecomputeFrom = newVertex
     } else if (vertex instanceof FormulaCellVertex) {
       this.graph.removeIncomingEdges(vertex)
       if (isFormula(newCellContent)) {
@@ -205,14 +207,17 @@ export class HandsOnEngine {
       } else if (newCellContent === '') {
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
         this.addressMapping!.removeCell(address)
+        vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
       } else if (!isNaN(Number(newCellContent))) {
         const newVertex = new ValueCellVertex(Number(newCellContent))
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else {
         const newVertex = new ValueCellVertex(newCellContent)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       }
     } else if (vertex instanceof ValueCellVertex) {
       if (isFormula(newCellContent)) {
@@ -222,13 +227,13 @@ export class HandsOnEngine {
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
         this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
         this.addressMapping!.removeCell(address)
+        vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
       } else if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
-        this.evaluator!.partialRun(vertex)
-        return
       } else {
         vertex.setCellValue(newCellContent)
       }
@@ -240,16 +245,19 @@ export class HandsOnEngine {
         this.graph.addNode(newVertex)
         this.addressMapping!.setCell(address, newVertex)
         this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         /* do nothing */
       } else if (!isNaN(Number(newCellContent))) {
         const newVertex = new ValueCellVertex(Number(newCellContent))
         this.graph.addNode(newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else {
         const newVertex = new ValueCellVertex(newCellContent)
         this.graph.addNode(newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       }
     } else if (vertex instanceof EmptyCellVertex) {
       if (isFormula(newCellContent)) {
@@ -259,22 +267,27 @@ export class HandsOnEngine {
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
         this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         /* nothing happens */
       } else if (!isNaN(Number(newCellContent))) {
         const newVertex = new ValueCellVertex(Number(newCellContent))
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       } else {
         const newVertex = new ValueCellVertex(newCellContent)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
+        vertexToRecomputeFrom = newVertex
       }
     } else {
       throw new Error("Illegal operation")
     }
 
-    this.evaluator!.run()
+    if (vertexToRecomputeFrom) {
+      this.evaluator!.partialRun(vertexToRecomputeFrom)
+    }
   }
 
   public addRow(sheet: number, row: number, numberOfRows: number = 1) {
