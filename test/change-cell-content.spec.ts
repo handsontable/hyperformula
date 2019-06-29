@@ -125,7 +125,6 @@ describe('changing cell content', () => {
     expect(engine.getCellValue("A3")).toBe(7)
   })
 
-
   it('#loadSheet - changing value inside range', async () => {
     const engine = await HandsOnEngine.buildFromArray([
       ['1', '0'],
@@ -269,5 +268,21 @@ describe('changing cell content', () => {
     expect(() => {
       engine.setCellContent(simpleCellAddress(0, 0, 0), "foo")
     }).toThrowError("Illegal operation")
+  })
+
+  it ('ensure that only part of the tree is evaluated', () => {
+    const sheet = [
+      ['1', '2'],
+      ['=A1', '=B1']
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const b2 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 1))
+    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const b2setCellValueSpy = jest.spyOn(b2 as any, 'setCellValue')
+
+    engine.setCellContent(simpleCellAddress(0, 0, 0), '3')
+    expect(a2setCellValueSpy).toHaveBeenCalled()
+    expect(b2setCellValueSpy).not.toHaveBeenCalled()
   })
 })

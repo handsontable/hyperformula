@@ -164,6 +164,52 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
+  public getTopologicallySortedSubgraphFrom(vertex: T): { sorted: T[], cycled: T[] } {
+    const subgraphNodes = this.computeSubgraphNodes(vertex)
+    const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
+    const nodesWithNoIncomingEdge = [vertex]
+
+    let currentNodeIndex = 0
+    const topologicalOrdering: T[] = []
+    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
+      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
+      topologicalOrdering.push(currentNode)
+      this.edges.get(currentNode)!.forEach((targetNode) => {
+        if (subgraphNodes.has(targetNode)) {
+          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
+          if (incomingEdges.get(targetNode) === 0) {
+            nodesWithNoIncomingEdge.push(targetNode)
+          }
+        }
+      })
+      ++currentNodeIndex
+    }
+
+    if (topologicalOrdering.length !== subgraphNodes.size) {
+      const nodesOnCycle = new Set(subgraphNodes.values())
+      for (let i = 0; i < topologicalOrdering.length; ++i) {
+        nodesOnCycle.delete(topologicalOrdering[i])
+      }
+      return { sorted: topologicalOrdering, cycled: Array.from(nodesOnCycle) }
+    }
+
+    return { sorted: topologicalOrdering, cycled: [] }
+  }
+
+  private computeSubgraphNodes(vertex: T): Set<T> {
+    const result = new Set([vertex])
+    const rec = (n: T) => {
+      for (const adjacentNode of this.adjacentNodes(n)) {
+        if (!result.has(adjacentNode)) {
+          result.add(adjacentNode)
+          rec(adjacentNode)
+        }
+      }
+    }
+    rec(vertex)
+    return result
+  }
+
   /**
    * Builds a mapping from nodes to the count of their incoming edges.
    */
@@ -173,6 +219,20 @@ export class Graph<T> {
     this.edges.forEach((adjacentNodes, sourceNode) => {
       adjacentNodes.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
+      })
+    })
+    return incomingEdges
+  }
+
+  private incomingEdgesForSubgraph(subgraphNodes: Set<T>): Map<T, number> {
+    const incomingEdges: Map<T, number> = new Map()
+    subgraphNodes.forEach((node) => (incomingEdges.set(node, 0)))
+    subgraphNodes.forEach((sourceNode) => {
+      const adjacentNodes = this.edges.get(sourceNode)!
+      adjacentNodes.forEach((targetNode) => {
+        if (subgraphNodes.has(targetNode) && subgraphNodes.has(sourceNode)) {
+          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
+        }
       })
     })
     return incomingEdges

@@ -38,6 +38,23 @@ export class SingleThreadEvaluator implements Evaluator {
     })
   }
 
+  public partialRun(vertex: Vertex) {
+    const { sorted, cycled } = this.graph.getTopologicallySortedSubgraphFrom(vertex)
+    cycled.forEach((vertex: Vertex) => {
+      (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
+    })
+    sorted.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+        const address = vertex.getAddress()
+        const formula = vertex.getFormula() as Ast
+        const cellValue = this.interpreter.evaluateAst(formula, address)
+        vertex.setCellValue(cellValue)
+      } else if (vertex instanceof RangeVertex) {
+        vertex.clearCache()
+      }
+    })
+  }
+
   /**
    * Recalculates formulas in the topological sort order
    */

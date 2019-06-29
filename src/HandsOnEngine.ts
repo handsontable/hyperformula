@@ -227,6 +227,8 @@ export class HandsOnEngine {
         this.addressMapping!.removeCell(address)
       } else if (!isNaN(Number(newCellContent))) {
         vertex.setCellValue(Number(newCellContent))
+        this.evaluator!.partialRun(vertex)
+        return
       } else {
         vertex.setCellValue(newCellContent)
       }
