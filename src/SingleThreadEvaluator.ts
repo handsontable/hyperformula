@@ -10,12 +10,6 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './Vertex'
 
 export class SingleThreadEvaluator implements Evaluator {
-  /** Topologically sorted list of vertices. */
-  private sortedVertices: Vertex[] = []
-
-  /** List of vertices which are on some cycle */
-  private verticesOnCycle: Vertex[] = []
-
   private interpreter: Interpreter
 
   constructor(
@@ -29,12 +23,12 @@ export class SingleThreadEvaluator implements Evaluator {
   }
 
   public run() {
-    this.stats.measure(StatType.TOP_SORT, () => {
-      ({ sorted: this.sortedVertices, cycled: this.verticesOnCycle } = this.graph.topologicalSort())
-    })
+    this.stats.start(StatType.TOP_SORT)
+    const { sorted, cycled } = this.graph.topologicalSort()
+    this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas(this.verticesOnCycle, this.sortedVertices)
+      this.recomputeFormulas(cycled, sorted)
     })
   }
 
