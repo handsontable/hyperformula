@@ -60,6 +60,12 @@ export class Graph<T> {
     })
   }
 
+  public removeIncomingEdgesFrom(fromNodes: Set<T>, toNode: T) {
+    fromNodes.forEach((fromNode) => {
+      this.removeEdge(fromNode, toNode)
+    })
+  }
+
   /**
    * Returns nodes adjacent to given node
    *

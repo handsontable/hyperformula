@@ -4,7 +4,12 @@ export {
   isFormula,
   isMatrix,
   ParserWithCaching,
+  absolutizeDependencies,
 } from './ParserWithCaching'
+
+export {
+  collectDependencies,
+} from './Cache'
 
 export {
   buildLexerConfig,

@@ -1,7 +1,8 @@
 import {AddressMapping} from './AddressMapping'
 import {CellError, CellValue, simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
-import {Ast, AstNodeType} from './parser/Ast'
+import {Ast, AstNodeType, collectDependencies, absolutizeDependencies} from './parser'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {Graph} from './Graph'
@@ -198,7 +199,17 @@ export class HandsOnEngine {
       this.graphBuilder!.processCellDependencies(dependencies, newVertex)
       vertexToRecomputeFrom = newVertex
     } else if (vertex instanceof FormulaCellVertex) {
-      this.graph.removeIncomingEdges(vertex)
+      const deps: (CellAddress | [CellAddress, CellAddress])[] = []
+      collectDependencies(vertex.getFormula(), deps)
+      const absoluteDeps = absolutizeDependencies(deps, address)
+      const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
+        if (dep instanceof AbsoluteCellRange) {
+          return this.rangeMapping!.getRange(dep.start, dep.end)!
+        } else {
+          return this.addressMapping!.fetchCell(dep)
+        }
+      })) 
+      this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
