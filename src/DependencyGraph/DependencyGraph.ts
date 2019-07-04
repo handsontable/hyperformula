@@ -70,6 +70,11 @@ export class DependencyGraph {
       this.graph.addNode(newVertex)
       this.addressMapping!.setCell(address, newVertex)
       this.recentlyChangedVertices.add(newVertex)
+    } else if (vertex instanceof EmptyCellVertex) {
+      const newVertex = new ValueCellVertex(newValue)
+      this.graph.exchangeNode(vertex, newVertex)
+      this.addressMapping!.setCell(address, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     } else {
       throw Error("Not implemented yet")
     }

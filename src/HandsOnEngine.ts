@@ -264,10 +264,8 @@ export class HandsOnEngine {
       } else if (newCellContent === '') {
         /* nothing happens */
       } else if (!isNaN(Number(newCellContent))) {
-        const newVertex = new ValueCellVertex(Number(newCellContent))
-        this.graph.exchangeNode(vertex, newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
         const newVertex = new ValueCellVertex(newCellContent)
         this.graph.exchangeNode(vertex, newVertex)
