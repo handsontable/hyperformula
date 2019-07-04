@@ -1,6 +1,5 @@
 import {AddressMapping} from './AddressMapping'
-import {CellError, CellValue, simpleCellAddress, SimpleCellAddress,} from './Cell'
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress,} from './Cell'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
 import {Ast, AstNodeType, collectDependencies, absolutizeDependencies} from './parser'
