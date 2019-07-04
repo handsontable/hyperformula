@@ -56,27 +56,26 @@ export class DependencyGraph {
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
 
-    if (vertex instanceof FormulaCellVertex) {
-      this.removeIncomingEdgesFromFormulaVertex(vertex)
-      const newVertex = new ValueCellVertex(newValue)
-      this.graph.exchangeNode(vertex, newVertex)
-      this.addressMapping!.setCell(address, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
-    } else if (vertex instanceof ValueCellVertex) {
+    if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
       this.recentlyChangedVertices.add(vertex)
-    } else if (vertex === null) {
-      const newVertex = new ValueCellVertex(newValue)
-      this.graph.addNode(newVertex)
-      this.addressMapping!.setCell(address, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
-    } else if (vertex instanceof EmptyCellVertex) {
-      const newVertex = new ValueCellVertex(newValue)
-      this.graph.exchangeNode(vertex, newVertex)
-      this.addressMapping!.setCell(address, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
     } else {
-      throw Error("Not implemented yet")
+      if (vertex instanceof FormulaCellVertex) {
+        this.removeIncomingEdgesFromFormulaVertex(vertex)
+      }
+
+      const newVertex = new ValueCellVertex(newValue)
+
+      if (vertex instanceof FormulaCellVertex || vertex instanceof EmptyCellVertex) {
+        this.graph.exchangeNode(vertex, newVertex)
+      } else if (vertex === null) {
+        this.graph.addNode(newVertex)
+      } else {
+        throw Error("Not implemented yet")
+      }
+
+      this.addressMapping!.setCell(address, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     }
   }
 
