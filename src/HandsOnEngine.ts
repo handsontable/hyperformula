@@ -301,27 +301,27 @@ export class HandsOnEngine {
     }
   }
 
-  public addRows(sheet: number, row: number, numberOfRows: number = 1) {
+  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     if (this.addressMapping!.isFormulaMatrixInRows(sheet, row)) {
       throw Error("It is not possible to add row in row with matrix")
     }
 
-    this.addressMapping!.addRows(sheet, row, numberOfRows)
+    this.addressMapping!.addRows(sheet, row, numberOfRowsToAdd)
 
     for (let matrix of this.addressMapping!.numericMatricesAtRow(sheet, row)) {
-      matrix.addRows(sheet, row, numberOfRows)
+      matrix.addRows(sheet, row, numberOfRowsToAdd)
     }
 
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRows, fixRowDependency)
+        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRowsToAdd, fixRowDependency)
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
-        this.fixFormulaVertexAddress(node, row, numberOfRows)
+        this.fixFormulaVertexAddress(node, row, numberOfRowsToAdd)
       }
     }
 
-    this.fixRanges(sheet, row, numberOfRows)
+    this.fixRanges(sheet, row, numberOfRowsToAdd)
 
     this.evaluator!.run()
   }
