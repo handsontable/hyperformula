@@ -249,7 +249,7 @@ export class HandsOnEngine {
     this.evaluator!.run()
   }
 
-  public removeRows(sheet: number, rowStart: number, rowEnd: number) {
+  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     // 1. check if there is formula matrix
     if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
       throw Error("It is not possible to remove row with matrix")
