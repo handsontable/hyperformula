@@ -262,6 +262,8 @@ export class HandsOnEngine {
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, rowStart, numberOfRowsToDelete, fixRowDependencyRowsDeletion)
+        const cachedAst = this.parser.rememberNewAst(newAst)
+        node.setFormula(cachedAst)
         this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
       }
     }

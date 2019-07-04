@@ -27,4 +27,29 @@ describe('Removing rows', () => {
     engine.removeRows(0, 0, 1)
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(1, 0, 0))
   })
+
+  it('same sheet, case Aa, absolute row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      [''],
+      ['1'],
+      [''], // row to delete
+      ['=A$2'],
+    ])
+
+    engine.removeRows(0, 2)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteRow(0, 0, 1))
+  })
+
+  it('same sheet, case Ab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=A$3'],
+      [''], // row to delete
+      ['42'],
+    ])
+
+    engine.removeRows(0, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(0, 0, 1))
+  })
 })
