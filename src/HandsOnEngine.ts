@@ -333,6 +333,8 @@ export class HandsOnEngine {
     }
     const numberOfRowsToDelete = rowEnd - rowStart + 1
 
+    this.addressMapping!.removeRows(sheet, rowStart, numberOfRowsToDelete)
+
     // 2. Fix dependencies
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
