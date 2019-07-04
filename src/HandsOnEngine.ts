@@ -213,11 +213,8 @@ export class HandsOnEngine {
         this.addressMapping!.removeCell(address)
         vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
       } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
-        const newVertex = new ValueCellVertex(Number(newCellContent))
-        this.graph.exchangeNode(vertex, newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
         this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
         const newVertex = new ValueCellVertex(newCellContent)

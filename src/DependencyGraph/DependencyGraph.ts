@@ -53,6 +53,20 @@ export class DependencyGraph {
     }
   }
 
+  public setValueToCell(address: SimpleCellAddress, newValue: number) {
+    const vertex = this.addressMapping.getCell(address)
+
+    if (vertex instanceof FormulaCellVertex) {
+      this.removeIncomingEdgesFromFormulaVertex(vertex)
+      const newVertex = new ValueCellVertex(newValue)
+      this.graph.exchangeNode(vertex, newVertex)
+      this.addressMapping!.setCell(address, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
+    } else {
+      throw Error("Not implemented yet")
+    }
+  }
+
   public clearRecentlyChangedVertices() {
     this.recentlyChangedVertices = new Set()
   }
