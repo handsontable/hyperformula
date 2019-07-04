@@ -65,6 +65,11 @@ export class DependencyGraph {
     } else if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
       this.recentlyChangedVertices.add(vertex)
+    } else if (vertex === null) {
+      const newVertex = new ValueCellVertex(newValue)
+      this.graph.addNode(newVertex)
+      this.addressMapping!.setCell(address, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     } else {
       throw Error("Not implemented yet")
     }
