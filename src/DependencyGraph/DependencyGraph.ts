@@ -7,6 +7,7 @@ import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Graph} from '../Graph'
 import {Ast, CellAddress, collectDependencies, absolutizeDependencies} from '../parser'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import assert from 'assert';
 import {
   CellVertex,
   EmptyCellVertex,
@@ -31,6 +32,7 @@ export class DependencyGraph {
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
     const vertex = this.addressMapping.getCell(address)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex) {
       vertex.setFormula(ast)
@@ -38,13 +40,7 @@ export class DependencyGraph {
       this.recentlyChangedVertices.add(vertex)
     } else {
       const newVertex = new FormulaCellVertex(ast, address)
-
-      if (vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-        this.graph.exchangeOrAddNode(vertex, newVertex)
-      } else {
-        throw Error("Not implemented yet")
-      }
-
+      this.graph.exchangeOrAddNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.processCellDependencies(dependencies, newVertex)
       this.recentlyChangedVertices.add(newVertex)
@@ -54,19 +50,14 @@ export class DependencyGraph {
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
       this.recentlyChangedVertices.add(vertex)
     } else {
       const newVertex = new ValueCellVertex(newValue)
-
-      if (vertex instanceof FormulaCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-        this.graph.exchangeOrAddNode(vertex, newVertex)
-      } else {
-        throw Error("Not implemented yet")
-      }
-
+      this.graph.exchangeOrAddNode(vertex, newVertex)
       this.addressMapping!.setCell(address, newVertex)
       this.recentlyChangedVertices.add(newVertex)
     }
@@ -75,6 +66,7 @@ export class DependencyGraph {
   public setCellEmpty(address: SimpleCellAddress) {
     const vertex = this.addressMapping.getCell(address)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex) {
       this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
@@ -85,6 +77,10 @@ export class DependencyGraph {
     } else {
       throw Error("Not implemented yet")
     }
+  }
+
+  public ensureThatVertexIsNonMatrixCellVertex(vertex: Vertex | null) {
+    assert.ok(!(vertex instanceof MatrixVertex || vertex instanceof RangeVertex), `Illegal operation`)
   }
 
   public removeIncomingEdgesIfFormulaVertex(vertex: Vertex | null) {
