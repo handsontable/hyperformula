@@ -12,7 +12,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {DependencyGraph} from './DependencyGraph'
+import {DependencyGraph, fetchOrCreateEmptyCell} from './DependencyGraph'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -167,7 +167,7 @@ export class HandsOnEngine {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)
-    let vertexToRecomputeFrom = vertex
+    let vertexToRecomputeFrom: Vertex | null = vertex
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       vertex.setMatrixCellValue(address, Number(newCellContent))
@@ -199,7 +199,7 @@ export class HandsOnEngine {
       }
 
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-      this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+      this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
       vertexToRecomputeFrom = newVertex
     } else if (vertex instanceof FormulaCellVertex) {
       const deps: (CellAddress | [CellAddress, CellAddress])[] = []
@@ -216,8 +216,8 @@ export class HandsOnEngine {
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        vertex.setFormula(ast)
-        this.graphBuilder!.processCellDependencies(dependencies, vertex)
+        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
         this.addressMapping!.removeCell(address)
@@ -240,7 +240,7 @@ export class HandsOnEngine {
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
-        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
         vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
@@ -258,7 +258,7 @@ export class HandsOnEngine {
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.addNode(newVertex)
         this.addressMapping!.setCell(address, newVertex)
-        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
         vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         /* do nothing */
@@ -280,7 +280,7 @@ export class HandsOnEngine {
         const newVertex = new FormulaCellVertex(ast, address)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
-        this.graphBuilder!.processCellDependencies(dependencies, newVertex)
+        this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
         vertexToRecomputeFrom = newVertex
       } else if (newCellContent === '') {
         /* nothing happens */
@@ -566,14 +566,4 @@ export function fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: num
       } as Ast
     }
   }
-}
-
-export function fetchOrCreateEmptyCell(graph: Graph<Vertex>, addressMapping: AddressMapping, address: SimpleCellAddress): CellVertex {
-  let vertex = addressMapping.getCell(address)
-  if (!vertex) {
-    vertex = new EmptyCellVertex()
-    graph.addNode(vertex)
-    addressMapping.setCell(address, vertex)
-  }
-  return vertex
 }

@@ -11,6 +11,7 @@ import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
+import {DependencyGraph, fetchOrCreateEmptyCell} from './DependencyGraph'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -20,7 +21,6 @@ import {
   ValueCellVertex,
   Vertex,
 } from './Vertex'
-import {fetchOrCreateEmptyCell} from "./HandsOnEngine";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -36,6 +36,8 @@ export type Sheets = Record<string, Sheet>
  */
 export class GraphBuilder {
   private buildStrategy: GraphBuilderStrategy
+
+  private dependencyGraph: DependencyGraph
 
   /**
    * Configures the building service.
@@ -53,6 +55,7 @@ export class GraphBuilder {
               private readonly config: Config,
               private readonly sheetMapping: SheetMapping,
               private readonly parser: ParserWithCaching) {
+    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping)
     if (this.config.matrixDetection) {
       this.buildStrategy = new MatrixDetectionStrategy(this.graph, this.addressMapping, this.sheetMapping, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
@@ -72,40 +75,7 @@ export class GraphBuilder {
 
   private processDependencies(dependencies: Dependencies) {
     dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
-      this.processCellDependencies(cellDependencies, endVertex)
-    })
-  }
-
-  public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    cellDependencies.forEach((absStartCell: CellDependency) => {
-      if (absStartCell instanceof AbsoluteCellRange) {
-        const range = absStartCell
-        let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
-        if (rangeVertex === null) {
-          rangeVertex = new RangeVertex(range)
-          this.rangeMapping.setRange(rangeVertex)
-        }
-
-        this.graph.addNode(rangeVertex)
-
-        const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
-        const restRange = restRanges[0]
-        if (smallerRangeVertex) {
-          this.graph.addEdge(smallerRangeVertex, rangeVertex)
-        }
-
-        const matrix = this.addressMapping.getMatrix(restRange)
-        if (matrix !== undefined) {
-          this.graph.addEdge(matrix, rangeVertex)
-        } else {
-          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, cellFromRange), rangeVertex)
-          }
-        }
-        this.graph.addEdge(rangeVertex, endVertex)
-      } else {
-        this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, absStartCell), endVertex)
-      }
+      this.dependencyGraph.processCellDependencies(cellDependencies, endVertex)
     })
   }
 }

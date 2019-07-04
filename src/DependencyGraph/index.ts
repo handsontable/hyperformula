@@ -1,1 +1,2 @@
-export { DependencyGraph } from './DependencyGraph'
+export { DependencyGraph, fetchOrCreateEmptyCell } from './DependencyGraph'
+
