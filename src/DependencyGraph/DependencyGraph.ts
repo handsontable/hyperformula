@@ -62,6 +62,9 @@ export class DependencyGraph {
       this.graph.exchangeNode(vertex, newVertex)
       this.addressMapping!.setCell(address, newVertex)
       this.recentlyChangedVertices.add(newVertex)
+    } else if (vertex instanceof ValueCellVertex) {
+      vertex.setCellValue(newValue)
+      this.recentlyChangedVertices.add(vertex)
     } else {
       throw Error("Not implemented yet")
     }

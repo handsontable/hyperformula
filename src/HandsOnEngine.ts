@@ -233,7 +233,8 @@ export class HandsOnEngine {
         this.addressMapping!.removeCell(address)
         vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
       } else if (!isNaN(Number(newCellContent))) {
-        vertex.setCellValue(Number(newCellContent))
+        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
         vertex.setCellValue(newCellContent)
       }
