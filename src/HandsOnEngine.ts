@@ -202,32 +202,24 @@ export class HandsOnEngine {
       this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
       vertexToRecomputeFrom = newVertex
     } else if (vertex instanceof FormulaCellVertex) {
-      const deps: (CellAddress | [CellAddress, CellAddress])[] = []
-      collectDependencies(vertex.getFormula(), deps)
-      const absoluteDeps = absolutizeDependencies(deps, address)
-      const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
-        if (dep instanceof AbsoluteCellRange) {
-          return this.rangeMapping!.getRange(dep.start, dep.end)!
-        } else {
-          return this.addressMapping!.fetchCell(dep)
-        }
-      })) 
-      this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
         this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
+        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
         this.addressMapping!.removeCell(address)
         vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
       } else if (!isNaN(Number(newCellContent))) {
+        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
         const newVertex = new ValueCellVertex(Number(newCellContent))
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)
         vertexToRecomputeFrom = newVertex
       } else {
+        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
         const newVertex = new ValueCellVertex(newCellContent)
         this.graph.exchangeNode(vertex, newVertex)
         this.addressMapping!.setCell(address, newVertex)

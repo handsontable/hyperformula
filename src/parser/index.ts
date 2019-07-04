@@ -1,5 +1,7 @@
 export {cellAddressFromString} from './cellAddressFromString'
 
+export {CellAddress} from './CellAddress'
+
 export {
   isFormula,
   isMatrix,

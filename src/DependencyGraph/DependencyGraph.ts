@@ -5,7 +5,7 @@ import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Graph} from '../Graph'
-import {Ast} from '../parser'
+import {Ast, CellAddress, collectDependencies, absolutizeDependencies} from '../parser'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellVertex,
@@ -32,6 +32,7 @@ export class DependencyGraph {
     const vertex = this.addressMapping.getCell(address)
 
     if (vertex instanceof FormulaCellVertex) {
+      this.removeIncomingEdgesFromFormulaVertex(vertex)
       vertex.setFormula(ast)
       this.processCellDependencies(dependencies, vertex)
       this.recentlyChangedVertices.add(vertex)
@@ -76,6 +77,20 @@ export class DependencyGraph {
         this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, absStartCell), endVertex)
       }
     })
+  }
+
+  public removeIncomingEdgesFromFormulaVertex(vertex: FormulaCellVertex) {
+    const deps: (CellAddress | [CellAddress, CellAddress])[] = []
+    collectDependencies(vertex.getFormula(), deps)
+    const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
+    const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
+      if (dep instanceof AbsoluteCellRange) {
+        return this.rangeMapping!.getRange(dep.start, dep.end)!
+      } else {
+        return this.addressMapping!.fetchCell(dep)
+      }
+    })) 
+    this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
   }
 }
 
