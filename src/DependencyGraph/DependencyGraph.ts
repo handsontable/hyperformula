@@ -72,10 +72,6 @@ export class DependencyGraph {
       this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
       this.addressMapping!.removeCell(address)
       this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
-    } else if (vertex instanceof EmptyCellVertex || vertex === null) {
-      /* nothing happens */
-    } else {
-      throw Error("Not implemented yet")
     }
   }
 
