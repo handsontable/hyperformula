@@ -48,6 +48,12 @@ export class DependencyGraph {
       this.addressMapping.setCell(address, newVertex)
       this.processCellDependencies(dependencies, newVertex)
       this.recentlyChangedVertices.add(newVertex)
+    } else if (vertex instanceof EmptyCellVertex) {
+      const newVertex = new FormulaCellVertex(ast, address)
+      this.graph.exchangeNode(vertex, newVertex)
+      this.addressMapping.setCell(address, newVertex)
+      this.processCellDependencies(dependencies, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     } else {
       throw Error("Not implemented yet")
     }
