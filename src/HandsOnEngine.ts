@@ -216,11 +216,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
-        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
-        const newVertex = new ValueCellVertex(newCellContent)
-        this.graph.exchangeNode(vertex, newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setValueToCell(address, newCellContent)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       }
     } else if (vertex instanceof ValueCellVertex) {
       if (isFormula(newCellContent)) {
@@ -236,7 +233,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
-        vertex.setCellValue(newCellContent)
+        this.dependencyGraph!.setValueToCell(address, newCellContent)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       }
     } else if (vertex === null) {
       if (isFormula(newCellContent)) {
@@ -250,10 +248,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
-        const newVertex = new ValueCellVertex(newCellContent)
-        this.graph.addNode(newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setValueToCell(address, newCellContent)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       }
     } else if (vertex instanceof EmptyCellVertex) {
       if (isFormula(newCellContent)) {
@@ -267,10 +263,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else {
-        const newVertex = new ValueCellVertex(newCellContent)
-        this.graph.exchangeNode(vertex, newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setValueToCell(address, newCellContent)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       }
     } else {
       throw new Error("Illegal operation")

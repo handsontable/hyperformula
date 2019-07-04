@@ -53,7 +53,7 @@ export class DependencyGraph {
     }
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: number) {
+  public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
 
     if (vertex instanceof FormulaCellVertex) {
