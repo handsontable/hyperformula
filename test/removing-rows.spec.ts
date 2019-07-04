@@ -1,12 +1,17 @@
 import {HandsOnEngine} from "../src";
-import {SimpleCellAddress, simpleCellAddress} from "../src/Cell";
+import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
 import {CellAddress} from "../src/parser/CellAddress";
 import './testConfig.ts'
 import {FormulaCellVertex} from "../src/DependencyGraph";
-import {CellReferenceAst} from "../src/parser";
+import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+}
+
+const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: SimpleCellAddress) => {
+  const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
+  expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
 describe('Removing rows', () => {
@@ -28,7 +33,7 @@ describe('Removing rows', () => {
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(1, 0, 0))
   })
 
-  it('same sheet, case Aa, absolute row', () => {
+  it('same sheet, case Aa', () => {
     const engine = HandsOnEngine.buildFromArray([
       [''],
       ['1'],
@@ -51,5 +56,16 @@ describe('Removing rows', () => {
     engine.removeRows(0, 1)
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(0, 0, 1))
+  })
+
+  it('same sheet, case Ac', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=A$2'],
+      [''], // row to delete
+    ])
+
+    engine.removeRows(0, 1)
+
+    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
   })
 })

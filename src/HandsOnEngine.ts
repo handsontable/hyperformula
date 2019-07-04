@@ -375,6 +375,8 @@ export function fixRowDependencyRowsDeletion(dependencyAddress: CellAddress, for
       return false
     } else if (dependencyAddress.row >= topRow + numberOfRows) { // Ab
       return dependencyAddress.shiftedByRows(-numberOfRows)
+    } else {
+      return new CellError(ErrorType.REF) // Ac
     }
   } else {
     const absolutizedAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
