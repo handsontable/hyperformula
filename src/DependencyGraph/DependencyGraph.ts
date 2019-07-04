@@ -112,12 +112,12 @@ export class DependencyGraph {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
           for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-            this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, cellFromRange), rangeVertex)
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(cellFromRange), rangeVertex)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
       } else {
-        this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping, absStartCell), endVertex)
+        this.graph.addEdge(this.fetchOrCreateEmptyCell(absStartCell), endVertex)
       }
     })
   }
@@ -135,14 +135,14 @@ export class DependencyGraph {
     })) 
     this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
   }
-}
 
-export function fetchOrCreateEmptyCell(graph: Graph<Vertex>, addressMapping: AddressMapping, address: SimpleCellAddress): CellVertex {
-  let vertex = addressMapping.getCell(address)
-  if (!vertex) {
-    vertex = new EmptyCellVertex()
-    graph.addNode(vertex)
-    addressMapping.setCell(address, vertex)
+  public fetchOrCreateEmptyCell(address: SimpleCellAddress): CellVertex {
+    let vertex = this.addressMapping.getCell(address)
+    if (!vertex) {
+      vertex = new EmptyCellVertex()
+      this.graph.addNode(vertex)
+      this.addressMapping.setCell(address, vertex)
+    }
+    return vertex
   }
-  return vertex
 }

@@ -1,7 +1,7 @@
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
-import {Ast, AstNodeType, collectDependencies, absolutizeDependencies, buildCellErrorAst, buildErrorAst} from './parser'
+import {Ast, AstNodeType, collectDependencies, buildCellErrorAst, buildErrorAst} from './parser'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
@@ -10,7 +10,6 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {
   DependencyGraph,
-  fetchOrCreateEmptyCell,
   AddressMapping,
   Graph,
   RangeMapping,
@@ -346,7 +345,7 @@ export class HandsOnEngine {
         if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
           for (let y = row; y < row + numberOfRows; ++y) {
             for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(fetchOrCreateEmptyCell(this.graph, this.addressMapping!, simpleCellAddress(sheet, x, y)), range)
+              this.graph.addEdge(this.dependencyGraph!.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
             }
           }
         }

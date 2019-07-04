@@ -7,7 +7,7 @@ import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {DependencyGraph, fetchOrCreateEmptyCell} from './DependencyGraph'
+import {DependencyGraph} from './DependencyGraph'
 import {
   CellVertex,
   EmptyCellVertex,

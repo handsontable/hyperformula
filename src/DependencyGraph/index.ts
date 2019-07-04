@@ -1,4 +1,4 @@
-export { DependencyGraph, fetchOrCreateEmptyCell } from './DependencyGraph'
+export { DependencyGraph } from './DependencyGraph'
 export { AddressMapping, DenseStrategy, SparseStrategy, findBoundaries } from './AddressMapping'
 export { Graph } from './Graph'
 export { RangeMapping } from './RangeMapping'
