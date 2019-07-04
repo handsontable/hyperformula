@@ -36,26 +36,20 @@ export class DependencyGraph {
       vertex.setFormula(ast)
       this.processCellDependencies(dependencies, vertex)
       this.recentlyChangedVertices.add(vertex)
-    } else if (vertex instanceof ValueCellVertex) {
-      const newVertex = new FormulaCellVertex(ast, address)
-      this.graph.exchangeNode(vertex, newVertex)
-      this.addressMapping.setCell(address, newVertex)
-      this.processCellDependencies(dependencies, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
-    } else if (vertex === null) {
-      const newVertex = new FormulaCellVertex(ast, address)
-      this.graph.addNode(newVertex)
-      this.addressMapping.setCell(address, newVertex)
-      this.processCellDependencies(dependencies, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
-    } else if (vertex instanceof EmptyCellVertex) {
-      const newVertex = new FormulaCellVertex(ast, address)
-      this.graph.exchangeNode(vertex, newVertex)
-      this.addressMapping.setCell(address, newVertex)
-      this.processCellDependencies(dependencies, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
     } else {
-      throw Error("Not implemented yet")
+      const newVertex = new FormulaCellVertex(ast, address)
+
+      if (vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex) {
+        this.graph.exchangeNode(vertex, newVertex)
+      } else if (vertex === null) {
+        this.graph.addNode(newVertex)
+      } else {
+        throw Error("Not implemented yet")
+      }
+
+      this.addressMapping.setCell(address, newVertex)
+      this.processCellDependencies(dependencies, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     }
   }
 
