@@ -240,7 +240,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
-        /* do nothing */
+        this.dependencyGraph!.setCellEmpty(address)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (!isNaN(Number(newCellContent))) {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
@@ -255,7 +256,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
-        /* nothing happens */
+        this.dependencyGraph!.setCellEmpty(address)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (!isNaN(Number(newCellContent))) {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
