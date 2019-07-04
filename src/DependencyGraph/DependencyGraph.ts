@@ -42,6 +42,12 @@ export class DependencyGraph {
       this.addressMapping.setCell(address, newVertex)
       this.processCellDependencies(dependencies, newVertex)
       this.recentlyChangedVertices.add(newVertex)
+    } else if (vertex === null) {
+      const newVertex = new FormulaCellVertex(ast, address)
+      this.graph.addNode(newVertex)
+      this.addressMapping.setCell(address, newVertex)
+      this.processCellDependencies(dependencies, newVertex)
+      this.recentlyChangedVertices.add(newVertex)
     } else {
       throw Error("Not implemented yet")
     }

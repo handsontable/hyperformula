@@ -244,11 +244,8 @@ export class HandsOnEngine {
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        const newVertex = new FormulaCellVertex(ast, address)
-        this.graph.addNode(newVertex)
-        this.addressMapping!.setCell(address, newVertex)
-        this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
-        vertexToRecomputeFrom = newVertex
+        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
         /* do nothing */
       } else if (!isNaN(Number(newCellContent))) {
