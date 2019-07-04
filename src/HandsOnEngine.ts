@@ -214,6 +214,7 @@ export class HandsOnEngine {
         this.dependencyGraph!.setValueToCell(address, newCellContent)
       }
       verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
+      this.dependencyGraph!.clearRecentlyChangedVertices()
     } else {
       throw new Error("Illegal operation")
     }
