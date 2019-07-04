@@ -12,6 +12,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
+import {DependencyGraph} from './DependencyGraph'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -53,6 +54,8 @@ export class HandsOnEngine {
   /** Directed graph of cell dependencies. */
   public readonly graph: Graph<Vertex> = new Graph<Vertex>()
 
+  public dependencyGraph?: DependencyGraph
+
   /** Formula evaluator */
   private evaluator?: Evaluator
 
@@ -83,6 +86,7 @@ export class HandsOnEngine {
     }
 
     this.graphBuilder = new GraphBuilder(this.graph, this.addressMapping!, this.rangeMapping, this.stats, this.config, this.sheetMapping, this.parser)
+    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       this.graphBuilder!.buildGraph(sheets)
