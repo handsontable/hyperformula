@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from '../Cell'
 import {RangeVertex, Vertex} from './Vertex'
 
 /**

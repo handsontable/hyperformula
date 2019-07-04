@@ -3,7 +3,7 @@ import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
 import {checkMatrixSize, Size} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
-import {SheetMapping} from '../src/SheetMapping'
+import {SheetMapping} from '../src/DependencyGraph'
 import './testConfig.ts'
 
 describe('Matrix size check tests', () => {

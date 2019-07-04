@@ -1,15 +1,12 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {AddressMapping} from './AddressMapping'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress, CellReferenceType} from './parser/CellAddress'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
-import {Graph} from './Graph'
 import {Size} from './Matrix'
 import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, isMatrix, ProcedureAst} from './parser'
-import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './Vertex'
+import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex, SheetMapping, Graph, AddressMapping} from './DependencyGraph'
 import {Sheets} from "./GraphBuilder";
-import {SheetMapping} from "./SheetMapping";
 import {Cache} from "./parser/Cache";
 import {absolutizeDependencies} from "./parser/ParserWithCaching";
 

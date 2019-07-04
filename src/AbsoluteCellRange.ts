@@ -1,7 +1,7 @@
 import {CellRange, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
-import {SheetMapping} from "./SheetMapping";
+import {SheetMapping} from "./DependencyGraph";
 import {Sheets} from "./GraphBuilder";
 import {add} from "./interpreter/scalar";
 

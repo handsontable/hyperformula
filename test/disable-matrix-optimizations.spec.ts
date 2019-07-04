@@ -1,6 +1,6 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
-import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from "../src/Vertex";
+import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from "../src/DependencyGraph";
 import './testConfig.ts'
 
 describe("Disable matrix optimizatoins", () => {

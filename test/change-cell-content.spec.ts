@@ -1,7 +1,7 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
-import {MatrixVertex, FormulaCellVertex, EmptyCellVertex} from "../src/Vertex";
+import {MatrixVertex, FormulaCellVertex, EmptyCellVertex} from "../src/DependencyGraph";
 import {CellAddress} from "../src/parser/CellAddress"
 
 describe('changing cell content', () => {

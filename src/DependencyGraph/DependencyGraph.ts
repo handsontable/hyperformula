@@ -1,10 +1,10 @@
-import {AddressMapping} from '../AddressMapping'
-import {RangeMapping} from '../RangeMapping'
-import {SheetMapping} from '../SheetMapping'
+import {AddressMapping} from './AddressMapping'
+import {RangeMapping} from './RangeMapping'
+import {SheetMapping} from './SheetMapping'
 import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {Graph} from '../Graph'
+import {Graph} from './Graph'
 import {Ast, CellAddress, collectDependencies, absolutizeDependencies} from '../parser'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import assert from 'assert';
@@ -16,7 +16,7 @@ import {
   RangeVertex,
   ValueCellVertex,
   Vertex
-} from '../Vertex'
+} from './Vertex'
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()

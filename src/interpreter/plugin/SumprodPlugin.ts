@@ -1,8 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {RangeMapping} from '../../RangeMapping'
-import {RangeVertex} from '../../Vertex'
+import {RangeMapping, RangeVertex} from '../../DependencyGraph'
 import {FunctionPlugin} from './FunctionPlugin'
 import {Matrix} from "../../Matrix";
 import {zip} from "../../generatorUtils";

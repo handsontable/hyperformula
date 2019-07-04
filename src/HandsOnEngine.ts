@@ -1,19 +1,20 @@
-import {AddressMapping} from './AddressMapping'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
 import {Ast, AstNodeType, collectDependencies, absolutizeDependencies, buildCellErrorAst, buildErrorAst} from './parser'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
-import {Graph} from './Graph'
 import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
-import {RangeMapping} from './RangeMapping'
-import {SheetMapping} from './SheetMapping'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {DependencyGraph, fetchOrCreateEmptyCell} from './DependencyGraph'
 import {
+  DependencyGraph,
+  fetchOrCreateEmptyCell,
+  AddressMapping,
+  Graph,
+  RangeMapping,
+  SheetMapping,
   CellVertex,
   EmptyCellVertex,
   FormulaCellVertex,
@@ -21,7 +22,7 @@ import {
   RangeVertex,
   ValueCellVertex,
   Vertex
-} from './Vertex'
+} from './DependencyGraph'
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 /**

@@ -1,8 +1,8 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellValue, CellError, SimpleCellAddress} from './Cell'
-import {CriterionLambda} from './interpreter/Criterion'
-import {Matrix} from './Matrix'
-import {Ast} from './parser'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue, CellError, SimpleCellAddress} from '../Cell'
+import {CriterionLambda} from '../interpreter/Criterion'
+import {Matrix} from '../Matrix'
+import {Ast} from '../parser'
 
 /**
  * Represents vertex which keeps values of one or more cells

@@ -1,7 +1,7 @@
 import {CellAddress} from '../../src/parser/CellAddress'
 import {Config} from '../../src/Config'
 import {AstNodeType, CellRangeAst, ErrorAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
-import {SheetMapping} from '../../src/SheetMapping'
+import {SheetMapping} from '../../src/DependencyGraph'
 
 describe('Parser - range offset', () => {
   it('OFFSET - usage with range', () => {

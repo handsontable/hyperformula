@@ -1,6 +1,6 @@
 import {buildLexerConfig, CellReferenceAst, FormulaLexer, ParserWithCaching} from "../src/parser";
 import {Config} from "../src";
-import {SheetMapping} from "../src/SheetMapping";
+import {SheetMapping} from "../src/DependencyGraph";
 import {CellAddress} from "../src/parser/CellAddress";
 import {simpleCellAddress} from "../src/Cell";
 import {Unparser} from "../src/parser/Unparser";

@@ -1,7 +1,7 @@
 import {CellAddress} from '../../src/parser/CellAddress'
 import {Config} from '../../src/Config'
 import {ParserWithCaching} from '../../src/parser/ParserWithCaching'
-import {SheetMapping} from '../../src/SheetMapping'
+import {SheetMapping} from '../../src/DependencyGraph'
 
 const rows = 100000
 const millisecondsPerThousandRows = 160

@@ -1,15 +1,11 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {AddressMapping} from './AddressMapping'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
-import {Graph} from './Graph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
-import {RangeMapping} from './RangeMapping'
-import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from './statistics/Statistics'
 import {DependencyGraph, fetchOrCreateEmptyCell} from './DependencyGraph'
 import {
@@ -20,7 +16,11 @@ import {
   RangeVertex,
   ValueCellVertex,
   Vertex,
-} from './Vertex'
+  AddressMapping,
+  Graph,
+  RangeMapping,
+  SheetMapping,
+} from './DependencyGraph'
 
 /**
  * Two-dimenstional array representation of sheet

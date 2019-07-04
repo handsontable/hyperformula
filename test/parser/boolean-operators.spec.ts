@@ -9,7 +9,7 @@ import {
   LessThanOrEqualOpAst, NotEqualOpAst,
   ParserWithCaching,
 } from '../../src/parser'
-import {SheetMapping} from '../../src/SheetMapping'
+import {SheetMapping} from '../../src/DependencyGraph'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {

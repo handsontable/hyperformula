@@ -14,7 +14,7 @@ import {
   ProcedureAst,
   StringAst,
 } from '../../src/parser'
-import {SheetMapping} from '../../src/SheetMapping'
+import {SheetMapping} from '../../src/DependencyGraph'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {

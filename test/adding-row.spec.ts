@@ -1,7 +1,7 @@
 import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
 import './testConfig.ts'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex} from "../src/Vertex";
+import {EmptyCellVertex, FormulaCellVertex, RangeVertex} from "../src/DependencyGraph";
 import {CellAddress} from "../src/parser/CellAddress"
 import {CellReferenceAst} from "../src/parser/Ast"
 

@@ -7,7 +7,7 @@ import {
   ErrorAst,
   ParserWithCaching,
 } from '../../src/parser'
-import {SheetMapping} from '../../src/SheetMapping'
+import {SheetMapping} from '../../src/DependencyGraph'
 
 describe('Parser - OFFSET to reference translation', () => {
   it('OFFSET parsing into cell reference', () => {

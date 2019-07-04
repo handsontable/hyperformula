@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {AddressMapping} from '../../AddressMapping'
+import {AddressMapping, RangeMapping, CriterionCache, RangeVertex} from '../../DependencyGraph'
 import {
   CellError,
   CellValue,
@@ -9,8 +9,6 @@ import {
 } from '../../Cell'
 import {count, split} from '../../generatorUtils'
 import {AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
-import {RangeMapping} from '../../RangeMapping'
-import {CriterionCache, RangeVertex} from '../../Vertex'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'

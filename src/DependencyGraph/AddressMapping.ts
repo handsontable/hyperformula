@@ -1,9 +1,9 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {CellValue, SheetCellAddress, SimpleCellAddress} from './Cell'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue, SheetCellAddress, SimpleCellAddress} from '../Cell'
 import {Graph} from './Graph'
-import {Sheet} from './GraphBuilder'
+import {Sheet} from '../GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
-import {filterWith} from "./generatorUtils";
+import {filterWith} from "../generatorUtils";
 
 /**
  * Interface for mapping from sheet addresses to vertices.

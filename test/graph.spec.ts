@@ -1,4 +1,4 @@
-import {Graph} from '../src/Graph'
+import {Graph} from '../src/DependencyGraph'
 
 const identifiableString = (id: number, str: string) => ({ id, str })
 

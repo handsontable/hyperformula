@@ -1,5 +1,5 @@
-import {Graph} from '../src/Graph'
-import {ValueCellVertex, Vertex} from '../src/Vertex'
+import {Graph} from '../src/DependencyGraph'
+import {ValueCellVertex, Vertex} from '../src/DependencyGraph'
 
 describe('Graph with Vertex', () => {
   it('#addNode works correctly with Vertex instances', () => {

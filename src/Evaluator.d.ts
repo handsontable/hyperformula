@@ -1,4 +1,4 @@
-import {Vertex} from './Vertex'
+import {Vertex} from './DependencyGraph'
 
 export interface Evaluator {
   run(): void,

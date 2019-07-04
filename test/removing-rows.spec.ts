@@ -2,7 +2,7 @@ import {HandsOnEngine} from "../src";
 import {SimpleCellAddress, simpleCellAddress} from "../src/Cell";
 import {CellAddress} from "../src/parser/CellAddress";
 import './testConfig.ts'
-import {FormulaCellVertex} from "../src/Vertex";
+import {FormulaCellVertex} from "../src/DependencyGraph";
 import {CellReferenceAst} from "../src/parser";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {

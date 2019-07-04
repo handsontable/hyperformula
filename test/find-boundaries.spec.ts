@@ -1,4 +1,4 @@
-import {findBoundaries} from '../src/AddressMapping'
+import {findBoundaries} from '../src/DependencyGraph'
 
 describe('findBoundaries', () => {
   it('find correct dimensions', () => {

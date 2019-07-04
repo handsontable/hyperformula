@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {checkMatrixSize, Matrix} from '../../Matrix'
 import {Ast, NumberAst, AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {MatrixVertex} from '../../Vertex'
+import {MatrixVertex} from '../../DependencyGraph'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
 
