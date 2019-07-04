@@ -39,10 +39,8 @@ export class DependencyGraph {
     } else {
       const newVertex = new FormulaCellVertex(ast, address)
 
-      if (vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex) {
-        this.graph.exchangeNode(vertex, newVertex)
-      } else if (vertex === null) {
-        this.graph.addNode(newVertex)
+      if (vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
+        this.graph.exchangeOrAddNode(vertex, newVertex)
       } else {
         throw Error("Not implemented yet")
       }
@@ -63,10 +61,8 @@ export class DependencyGraph {
     } else {
       const newVertex = new ValueCellVertex(newValue)
 
-      if (vertex instanceof FormulaCellVertex || vertex instanceof EmptyCellVertex) {
-        this.graph.exchangeNode(vertex, newVertex)
-      } else if (vertex === null) {
-        this.graph.addNode(newVertex)
+      if (vertex instanceof FormulaCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
+        this.graph.exchangeOrAddNode(vertex, newVertex)
       } else {
         throw Error("Not implemented yet")
       }

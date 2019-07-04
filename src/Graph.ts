@@ -112,6 +112,14 @@ export class Graph<T> {
     this.removeNode(oldNode)
   }
 
+  public exchangeOrAddNode(oldNode: T | null, newNode: T) {
+    if (oldNode) {
+      this.exchangeNode(oldNode, newNode)
+    } else {
+      this.addNode(newNode)
+    }
+  }
+
   public removeNode(node: T) {
     this.edges.delete(node)
     this.nodes.delete(node)
