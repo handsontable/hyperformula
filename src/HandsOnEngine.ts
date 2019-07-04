@@ -331,13 +331,13 @@ export class HandsOnEngine {
     if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
       throw Error("It is not possible to remove row with matrix")
     }
-    const numberOfRows = rowEnd - rowStart + 1
+    const numberOfRowsToDelete = rowEnd - rowStart + 1
 
     // 2. Fix dependencies
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, rowStart, numberOfRows, fixRowDependencyRowsDeletion)
-        this.fixFormulaVertexAddress(node, rowStart, -numberOfRows)
+        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, rowStart, numberOfRowsToDelete, fixRowDependencyRowsDeletion)
+        this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
       }
     }
   }
