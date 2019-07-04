@@ -80,6 +80,23 @@ export class DependencyGraph {
     }
   }
 
+  public setCellEmpty(address: SimpleCellAddress) {
+    const vertex = this.addressMapping.getCell(address)
+
+    if (vertex instanceof FormulaCellVertex) {
+      this.removeIncomingEdgesFromFormulaVertex(vertex)
+      this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping!.removeCell(address)
+      this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
+    } else if (vertex instanceof ValueCellVertex) {
+      this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping!.removeCell(address)
+      this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
+    } else {
+      throw Error("Not implemented yet")
+    }
+  }
+
   public clearRecentlyChangedVertices() {
     this.recentlyChangedVertices = new Set()
   }

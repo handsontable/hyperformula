@@ -208,10 +208,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
-        this.dependencyGraph!.removeIncomingEdgesFromFormulaVertex(vertex)
-        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
-        this.addressMapping!.removeCell(address)
-        vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
+        this.dependencyGraph!.setCellEmpty(address)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (!isNaN(Number(newCellContent))) {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
@@ -226,9 +224,8 @@ export class HandsOnEngine {
         this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (newCellContent === '') {
-        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
-        this.addressMapping!.removeCell(address)
-        vertexToRecomputeFrom = EmptyCellVertex.getSingletonInstance()
+        this.dependencyGraph!.setCellEmpty(address)
+        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
       } else if (!isNaN(Number(newCellContent))) {
         this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
         vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
