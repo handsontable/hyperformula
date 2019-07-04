@@ -32,8 +32,8 @@ export class SingleThreadEvaluator implements Evaluator {
     })
   }
 
-  public partialRun(vertex: Vertex) {
-    const { sorted, cycled } = this.graph.getTopologicallySortedSubgraphFrom(vertex)
+  public partialRun(vertices: Vertex[]) {
+    const { sorted, cycled } = this.graph.getTopologicallySortedSubgraphFrom(vertices)
     this.recomputeFormulas(cycled, sorted)
   }
 

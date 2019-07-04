@@ -167,7 +167,7 @@ export class HandsOnEngine {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.addressMapping!.getCell(address)
-    let vertexToRecomputeFrom: Vertex | null = vertex
+    let verticesToRecomputeFrom: Vertex[] = vertex ? [vertex] : []
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       vertex.setMatrixCellValue(address, Number(newCellContent))
@@ -200,7 +200,7 @@ export class HandsOnEngine {
 
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
       this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
-      vertexToRecomputeFrom = newVertex
+      verticesToRecomputeFrom = [newVertex]
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
@@ -213,13 +213,13 @@ export class HandsOnEngine {
       } else {
         this.dependencyGraph!.setValueToCell(address, newCellContent)
       }
-      vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
+      verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
     } else {
       throw new Error("Illegal operation")
     }
 
-    if (vertexToRecomputeFrom) {
-      this.evaluator!.partialRun(vertexToRecomputeFrom)
+    if (verticesToRecomputeFrom) {
+      this.evaluator!.partialRun(verticesToRecomputeFrom)
     }
   }
 

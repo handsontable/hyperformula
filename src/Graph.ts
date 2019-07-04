@@ -178,10 +178,10 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
-  public getTopologicallySortedSubgraphFrom(vertex: T): { sorted: T[], cycled: T[] } {
-    const subgraphNodes = this.computeSubgraphNodes(vertex)
+  public getTopologicallySortedSubgraphFrom(vertices: T[]): { sorted: T[], cycled: T[] } {
+    const subgraphNodes = this.computeSubgraphNodes(vertices)
     const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
-    const nodesWithNoIncomingEdge = [vertex]
+    const nodesWithNoIncomingEdge = vertices
 
     let currentNodeIndex = 0
     const topologicalOrdering: T[] = []
@@ -210,8 +210,8 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
-  private computeSubgraphNodes(vertex: T): Set<T> {
-    const result = new Set([vertex])
+  private computeSubgraphNodes(vertices: T[]): Set<T> {
+    const result = new Set(vertices)
     const rec = (n: T) => {
       for (const adjacentNode of this.adjacentNodes(n)) {
         if (!result.has(adjacentNode)) {
@@ -220,7 +220,9 @@ export class Graph<T> {
         }
       }
     }
-    rec(vertex)
+    for (const vertex of vertices) {
+      rec(vertex)
+    }
     return result
   }
 
