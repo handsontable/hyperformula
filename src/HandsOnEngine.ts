@@ -201,55 +201,7 @@ export class HandsOnEngine {
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
       this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
       vertexToRecomputeFrom = newVertex
-    } else if (vertex instanceof FormulaCellVertex) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash} = this.parser.parse(newCellContent, address)
-        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (newCellContent === '') {
-        this.dependencyGraph!.setCellEmpty(address)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else {
-        this.dependencyGraph!.setValueToCell(address, newCellContent)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      }
-    } else if (vertex instanceof ValueCellVertex) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash} = this.parser.parse(newCellContent, address)
-        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (newCellContent === '') {
-        this.dependencyGraph!.setCellEmpty(address)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else {
-        this.dependencyGraph!.setValueToCell(address, newCellContent)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      }
-    } else if (vertex === null) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash} = this.parser.parse(newCellContent, address)
-        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (newCellContent === '') {
-        this.dependencyGraph!.setCellEmpty(address)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      } else {
-        this.dependencyGraph!.setValueToCell(address, newCellContent)
-        vertexToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)[0]!
-      }
-    } else if (vertex instanceof EmptyCellVertex) {
+    } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
         const {ast, hash} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
