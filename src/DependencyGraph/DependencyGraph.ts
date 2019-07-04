@@ -30,9 +30,9 @@ export class DependencyGraph {
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
     const vertex = this.addressMapping.getCell(address)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex) {
-      this.removeIncomingEdgesFromFormulaVertex(vertex)
       vertex.setFormula(ast)
       this.processCellDependencies(dependencies, vertex)
       this.recentlyChangedVertices.add(vertex)
@@ -55,15 +55,12 @@ export class DependencyGraph {
 
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
       this.recentlyChangedVertices.add(vertex)
     } else {
-      if (vertex instanceof FormulaCellVertex) {
-        this.removeIncomingEdgesFromFormulaVertex(vertex)
-      }
-
       const newVertex = new ValueCellVertex(newValue)
 
       if (vertex instanceof FormulaCellVertex || vertex instanceof EmptyCellVertex) {
@@ -81,12 +78,9 @@ export class DependencyGraph {
 
   public setCellEmpty(address: SimpleCellAddress) {
     const vertex = this.addressMapping.getCell(address)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex) {
-      if (vertex instanceof FormulaCellVertex) {
-        this.removeIncomingEdgesFromFormulaVertex(vertex)
-      }
-
       this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
       this.addressMapping!.removeCell(address)
       this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
@@ -94,6 +88,12 @@ export class DependencyGraph {
       /* nothing happens */
     } else {
       throw Error("Not implemented yet")
+    }
+  }
+
+  public removeIncomingEdgesIfFormulaVertex(vertex: Vertex | null) {
+    if (vertex instanceof FormulaCellVertex) {
+      this.removeIncomingEdgesFromFormulaVertex(vertex)
     }
   }
 
