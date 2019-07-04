@@ -44,4 +44,6 @@ export {
 
   buildProcedureAst,
   buildCellRangeAst,
+  buildErrorAst,
+  buildCellErrorAst,
 } from './Ast'
