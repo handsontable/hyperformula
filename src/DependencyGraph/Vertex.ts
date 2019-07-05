@@ -82,6 +82,14 @@ export class MatrixVertex {
       this.matrix.addRows(row - this.getAddress().row, numberOfRows)
     }
   }
+
+  public removeRows(sheet: number, topRow: number, numberOfRows: number): void {
+    if (this.matrix instanceof Matrix) {
+      const start = topRow - this.getAddress().row
+      const end = start + numberOfRows - 1
+      this.matrix.removeRows(start, end)
+    }
+  }
 }
 
 /**
