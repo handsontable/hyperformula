@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, CellError, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
-import {Matrix} from '../Matrix'
+import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 
 /**
@@ -18,18 +18,28 @@ export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
-  public width: number
-  public height: number
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
-  private matrix: Matrix | CellError
+  private matrix: IMatrix | CellError
+
+  get width(): number {
+    if (this.matrix instanceof CellError) {
+      return 0
+    }
+    return this.matrix.width()
+  }
+
+  get height(): number {
+    if (this.matrix instanceof CellError) {
+      return 0
+    }
+    return this.matrix.height()
+  }
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
-    this.width = width
-    this.height = height
     this.formula = formula || null
-    this.matrix = new Matrix([])
+    this.matrix = new NotComputedMatrix(width, height)
   }
 
   public setCellValue(matrix: CellValue) {
@@ -39,18 +49,21 @@ export class MatrixVertex {
     this.matrix = matrix
   }
 
-  public getCellValue() {
-    return this.matrix
+  public getCellValue(): Matrix | CellError {
+    if (this.matrix instanceof NotComputedMatrix) {
+      throw Error('Matrix not computed yet.')
+    }
+    return this.matrix as (Matrix | CellError)
   }
 
   public getMatrixCellValue(address: SimpleCellAddress): number | CellError {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
-    if (this.matrix instanceof Matrix) {
-      return this.matrix.get(col, row)
-    } else {
+    if (this.matrix instanceof CellError) {
       return this.matrix
+    } else {
+      return this.matrix.get(col, row)
     }
   }
 
@@ -89,7 +102,6 @@ export class MatrixVertex {
   public addRows(sheet: number, row: number, numberOfRows: number): void {
     if (this.matrix instanceof Matrix) {
       this.matrix.addRows(row - this.getAddress().row, numberOfRows)
-      this.height += numberOfRows
     }
   }
 
@@ -98,7 +110,6 @@ export class MatrixVertex {
       const start = Math.max(topRow, this.getAddress().row) - this.getAddress().row
       const end = Math.min(bottomRow, this.getAddress().row + this.height - 1) - this.getAddress().row
       this.matrix.removeRows(start, end)
-      this.height -= (end - start + 1)
     }
   }
 }

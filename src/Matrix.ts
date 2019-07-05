@@ -94,7 +94,36 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
   }
 }
 
-export class Matrix {
+export interface IMatrix {
+  width(): number
+  height(): number
+  get(col: number, row: number): number
+  raw(): number[][]
+}
+
+export class NotComputedMatrix implements IMatrix {
+  constructor(private _width: number, private _height: number) {
+
+  }
+
+  public width(): number {
+    return this._width
+  }
+
+  public height(): number {
+    return this._height
+  }
+
+  public get(col: number, row: number): number {
+    throw Error('Matrix not computed yet.')
+  }
+
+  public raw(): number[][] {
+    throw Error('Matrix not computed yet.')
+  }
+}
+
+export class Matrix implements IMatrix {
   private matrix: number[][]
   private size: Size
 
