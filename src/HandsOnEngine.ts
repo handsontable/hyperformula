@@ -1,24 +1,31 @@
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellDependency} from './CellDependency'
 import {CellAddress} from './parser/CellAddress'
-import {Ast, AstNodeType, collectDependencies, buildCellErrorAst, buildErrorAst} from './parser'
+import {
+  Ast,
+  AstNodeType,
+  buildCellErrorAst,
+  cellAddressFromString,
+  isFormula,
+  isMatrix,
+  ParserWithCaching,
+  ProcedureAst
+} from './parser'
 import {Config} from './Config'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {
-  DependencyGraph,
   AddressMapping,
-  Graph,
-  RangeMapping,
-  SheetMapping,
   CellVertex,
+  DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
+  Graph,
   MatrixVertex,
+  RangeMapping,
   RangeVertex,
+  SheetMapping,
   ValueCellVertex,
   Vertex
 } from './DependencyGraph'
