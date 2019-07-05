@@ -80,6 +80,12 @@ export class MatrixVertex {
       (row < this.cellAddress.row + this.height)
   }
 
+  public spansThroughSheetColumn(sheet: number, col: number): boolean {
+    return (this.cellAddress.sheet === sheet) &&
+      (this.cellAddress.col <= col) &&
+      (col < this.cellAddress.col + this.width)
+  }
+
   public addRows(sheet: number, row: number, numberOfRows: number): void {
     if (this.matrix instanceof Matrix) {
       this.matrix.addRows(row - this.getAddress().row, numberOfRows)

@@ -416,6 +416,17 @@ export class AddressMapping {
     return false
   }
 
+  public isFormulaMatrixInColumns(sheet: number, colStart: number, colEnd: number = colStart) {
+    for (let col = colStart; col <= colEnd; ++col) {
+      for (const mtx of this.matrixMapping.values()) {
+        if (mtx.spansThroughSheetColumn(sheet, col) && mtx.isFormula()) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
     yield* filterWith(([_, mtx]) => {
       return !mtx.isFormula()

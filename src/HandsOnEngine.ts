@@ -276,6 +276,12 @@ export class HandsOnEngine {
     }
   }
 
+  public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
+    if (this.addressMapping!.isFormulaMatrixInColumns(sheet, col)) {
+      throw Error("It is not possible to add column in column with matrix")
+    }
+  }
+
   public disableNumericMatrices() {
     for (const [key, matrixVertex] of this.addressMapping!.numericMatrices()) {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
