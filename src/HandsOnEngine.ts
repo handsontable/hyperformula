@@ -445,10 +445,10 @@ export function fixRowDependency(dependencyAddress: CellAddress, formulaAddress:
 }
 
 
-export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, sheet: number, row: number, numberOfRows: number, fixRowDependency: TransformCellAddressFunction): Ast {
+export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, sheet: number, row: number, numberOfRows: number, transformCellAddressFn: TransformCellAddressFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
-      const newCellAddress = fixRowDependency(ast.reference, address, sheet, row, numberOfRows)
+      const newCellAddress = transformCellAddressFn(ast.reference, address, sheet, row, numberOfRows)
       if (newCellAddress && newCellAddress instanceof CellAddress) {
         return {...ast, reference: newCellAddress}
       } else if (newCellAddress instanceof CellError) {
@@ -458,8 +458,8 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       }
     }
     case AstNodeType.CELL_RANGE: {
-      const newStart = fixRowDependency(ast.start, address, sheet, row, numberOfRows)
-      const newEnd = fixRowDependency(ast.end, address, sheet, row, numberOfRows)
+      const newStart = transformCellAddressFn(ast.start, address, sheet, row, numberOfRows)
+      const newEnd = transformCellAddressFn(ast.end, address, sheet, row, numberOfRows)
       if (newStart instanceof CellError) {
         return buildCellErrorAst(newStart)
       }
