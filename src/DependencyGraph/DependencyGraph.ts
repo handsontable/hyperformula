@@ -172,7 +172,11 @@ export class DependencyGraph {
 
     this.addressMapping!.removeRows(sheet, rowStart, rowEnd)
 
-    this.rangeMapping.shiftRanges(sheet, rowStart, -(rowEnd - rowStart + 1))
+    const rangesToRemove = this.rangeMapping.truncateRanges(sheet, rowStart, rowEnd)
+
+    rangesToRemove.forEach(vertex => {
+      this.graph.removeNode(vertex)
+    })
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {

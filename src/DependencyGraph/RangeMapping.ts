@@ -29,6 +29,30 @@ export class RangeMapping {
     return this.rangeMapping.get(key) || null
   }
 
+  public truncateRanges(sheet: number, rowStart: number, rowEnd: number): Array<RangeVertex> {
+    const updated = Array<RangeVertex>()
+    const rangesToRemove = Array<RangeVertex>()
+
+    for (const [key, vertex] of this.rangeMapping.entries()) {
+      if (vertex.sheet == sheet && rowStart <= vertex.range.end.row) {
+        vertex.range.removeRows(rowStart, rowEnd)
+        if (vertex.range.height() > 0) {
+          updated.push(vertex)
+        } else {
+          rangesToRemove.push(vertex)
+        }
+        this.rangeMapping.delete(key)
+      }
+    }
+
+    updated.forEach(vertex => {
+      vertex.clearCache()
+      this.setRange(vertex)
+    })
+
+    return rangesToRemove
+  }
+
   public shiftRanges(sheet: number, row: number, numberOfRows: number) {
     const updated = Array<RangeVertex>()
 

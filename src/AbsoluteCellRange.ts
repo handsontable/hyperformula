@@ -144,4 +144,21 @@ export class AbsoluteCellRange {
   public expandByRows(numberOfRows: number) {
     this.end.row += numberOfRows
   }
+
+  public removeRows(rowStart: number, rowEnd: number) {
+    if (rowStart > this.end.row) {
+      return
+    }
+
+    const numberOfRowsToRemove = rowEnd - rowStart + 1
+
+    if (rowEnd < this.start.row) {
+      return this.shiftByRows(-numberOfRowsToRemove)
+    }
+    if (rowStart <= this.start.row) {
+      this.start.row = rowStart
+    }
+
+    this.end.row -= numberOfRowsToRemove
+  }
 }
