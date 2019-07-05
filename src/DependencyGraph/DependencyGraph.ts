@@ -1,7 +1,7 @@
 import {AddressMapping} from './AddressMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {SimpleCellAddress} from '../Cell'
+import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Graph} from './Graph'
@@ -132,7 +132,7 @@ export class DependencyGraph {
       } else {
         return this.addressMapping!.fetchCell(dep)
       }
-    })) 
+    }))
     this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
   }
 
@@ -144,5 +144,21 @@ export class DependencyGraph {
       this.addressMapping.setCell(address, vertex)
     }
     return vertex
+  }
+
+  public removeRows(sheet: number, rowStart: number, numberOfRowsToDelete: number) {
+    for (let x=0; x<this.addressMapping.getWidth(sheet); ++x) {
+      for (let y = rowStart; y < rowStart + numberOfRowsToDelete; ++y) {
+        const address = simpleCellAddress(sheet, x, y)
+        const vertex = this.addressMapping.getCell(address)
+        if (vertex instanceof MatrixVertex || vertex === null) {
+          continue
+        }
+        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.addressMapping!.removeCell(address)
+        this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
+      }
+    }
+    this.addressMapping!.removeRows(sheet, rowStart, numberOfRowsToDelete)
   }
 }

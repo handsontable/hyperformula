@@ -266,9 +266,15 @@ export class HandsOnEngine {
     }
     const numberOfRowsToDelete = rowEnd - rowStart + 1
 
-    this.addressMapping!.removeRows(sheet, rowStart, numberOfRowsToDelete)
+    // 2. Remove nodes from graph
+    this.dependencyGraph!.removeRows(sheet, rowStart, numberOfRowsToDelete)
 
-    // 2. Fix dependencies
+    // 2. Remove matrices
+    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+      matrix.removeRows(sheet, rowStart, rowEnd)
+    }
+
+    // 3. Fix dependencies
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(
@@ -280,10 +286,6 @@ export class HandsOnEngine {
         node.setFormula(cachedAst)
         this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
       }
-    }
-
-    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
-      matrix.removeRows(sheet, rowStart, rowEnd)
     }
   }
 
