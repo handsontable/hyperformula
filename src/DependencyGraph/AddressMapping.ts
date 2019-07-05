@@ -1,8 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SheetCellAddress, SimpleCellAddress} from '../Cell'
-import {Graph} from './Graph'
 import {Sheet} from '../GraphBuilder'
-import {CellVertex, EmptyCellVertex, MatrixVertex, Vertex} from './Vertex'
+import {CellVertex, EmptyCellVertex, MatrixVertex} from './Vertex'
 import {filterWith} from "../generatorUtils";
 
 /**

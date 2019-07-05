@@ -1,7 +1,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {AddressMapping, RangeMapping, Graph, Vertex} from '../DependencyGraph'
+import {AddressMapping, Graph, RangeMapping, Vertex} from '../DependencyGraph'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
-import {CellAddress} from '../parser/CellAddress'
 import {Config} from '../Config'
 import {Matrix} from '../Matrix'
 import {Ast, AstNodeType} from '../parser/Ast'

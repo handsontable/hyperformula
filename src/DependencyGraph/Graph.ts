@@ -1,8 +1,6 @@
 /**
  * Provides graph directed structure
  */
-import {RangeVertex, Vertex} from "./Vertex";
-
 export class Graph<T> {
   /** Set with nodes in graph. */
   public nodes: Set<T>
