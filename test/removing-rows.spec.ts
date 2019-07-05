@@ -181,6 +181,17 @@ describe('Removing rows - matrices', () => {
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.height).toBe(1)
   })
+
+  it('should remove MatrixVertex completely from graph', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','2'],
+      ['3','4'],
+    ], config)
+
+    engine.removeRows(0, 0, 1)
+    expect(engine.graph.nodes.size).toBe(1)
+  })
 })
 
 describe('Removing rows - graph', function () {

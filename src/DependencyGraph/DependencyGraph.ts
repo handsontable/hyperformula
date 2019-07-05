@@ -146,19 +146,26 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(sheet: number, rowStart: number, numberOfRowsToDelete: number) {
+  public removeRows(sheet: number, rowStart: number, rowEnd: number) {
     for (let x=0; x<this.addressMapping.getWidth(sheet); ++x) {
-      for (let y = rowStart; y < rowStart + numberOfRowsToDelete; ++y) {
+      for (let y = rowStart; y <= rowEnd; ++y) {
         const address = simpleCellAddress(sheet, x, y)
         const vertex = this.addressMapping.getCell(address)
         if (vertex instanceof MatrixVertex || vertex === null) {
           continue
         }
         this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
-        this.addressMapping!.removeCell(address)
         this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
       }
     }
-    this.addressMapping!.removeRows(sheet, rowStart, numberOfRowsToDelete)
+
+    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+      matrix.removeRows(sheet, rowStart, rowEnd)
+      if (matrix.height === 0) {
+        this.graph.removeNode(matrix)
+      }
+    }
+
+    this.addressMapping!.removeRows(sheet, rowStart, rowEnd - rowStart + 1)
   }
 }
