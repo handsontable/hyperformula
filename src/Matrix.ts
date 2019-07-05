@@ -136,6 +136,13 @@ export class Matrix {
     this.size.height += numberOfRows
   }
 
+  public removeRows(startRow: number, endRow: number) {
+    if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
+      throw Error("Matrix index out of bound")
+    }
+    this.matrix.splice(startRow, endRow - startRow + 1)
+  }
+
   public zeroArrays(count: number, size: number) {
     const result = []
     for (let i=0; i<count; ++i) {
