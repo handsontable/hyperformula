@@ -75,11 +75,11 @@ export class DependencyGraph {
     }
   }
 
-  public ensureThatVertexIsNonMatrixCellVertex(vertex: Vertex | null) {
-    assert.ok(!(vertex instanceof MatrixVertex || vertex instanceof RangeVertex), `Illegal operation`)
+  public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
+    assert.ok(!(vertex instanceof MatrixVertex), `Illegal operation`)
   }
 
-  public removeIncomingEdgesIfFormulaVertex(vertex: Vertex | null) {
+  public removeIncomingEdgesIfFormulaVertex(vertex: CellVertex | null) {
     if (vertex instanceof FormulaCellVertex) {
       this.removeIncomingEdgesFromFormulaVertex(vertex)
     }
