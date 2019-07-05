@@ -130,4 +130,16 @@ describe('Removing rows', () => {
     engine.removeRows(0, 1, 2)
     expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
   })
+
+  it('same sheet, case Rcb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=A2'],
+    ])
+
+    engine.removeRows(0, 0, 1)
+    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 1))
+  })
 })
