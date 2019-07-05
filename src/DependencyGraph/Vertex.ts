@@ -93,12 +93,12 @@ export class MatrixVertex {
     }
   }
 
-  public removeRows(sheet: number, topRow: number, numberOfRows: number): void {
+  public removeRows(sheet: number, topRow: number, bottomRow: number): void {
     if (this.matrix instanceof Matrix) {
-      const start = topRow - this.getAddress().row
-      const end = start + numberOfRows - 1
+      const start = Math.max(topRow, this.getAddress().row) - this.getAddress().row
+      const end = Math.min(bottomRow, this.getAddress().row + this.height - 1) - this.getAddress().row
       this.matrix.removeRows(start, end)
-      this.width -= numberOfRows
+      this.height -= (end - start + 1)
     }
   }
 }

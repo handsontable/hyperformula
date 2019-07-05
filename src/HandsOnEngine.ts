@@ -283,7 +283,7 @@ export class HandsOnEngine {
     }
 
     for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
-      matrix.removeRows(sheet, rowStart, numberOfRowsToDelete)
+      matrix.removeRows(sheet, rowStart, rowEnd)
     }
   }
 
