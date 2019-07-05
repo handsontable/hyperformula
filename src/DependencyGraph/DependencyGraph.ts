@@ -166,6 +166,6 @@ export class DependencyGraph {
       }
     }
 
-    this.addressMapping!.removeRows(sheet, rowStart, rowEnd - rowStart + 1)
+    this.addressMapping!.removeRows(sheet, rowStart, rowEnd)
   }
 }

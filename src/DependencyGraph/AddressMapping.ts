@@ -44,7 +44,7 @@ interface IAddressMappingStrategy {
   getWidth(): number,
 
   addRows(row: number, numberOfRows: number): void,
-  removeRows(row: number, numberOfRows: number): void,
+  removeRows(rowStart: number, rowEnd: number): void,
   addColumns(column: number, numberOfColumns: number): void,
 }
 
@@ -140,13 +140,14 @@ export class SparseStrategy implements IAddressMappingStrategy {
     this.width += numberOfColumns
   }
 
-  public removeRows(startRow: number, numberOfRows: number): void {
+  public removeRows(rowStart: number, rowEnd: number): void {
+    const numberOfRows = rowEnd - rowStart + 1
     this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
       const tmpMapping = new Map()
       rowMapping.forEach((vertex: CellVertex, rowNumber: number) => {
-        if (rowNumber >= startRow) {
+        if (rowNumber >= rowStart) {
           rowMapping.delete(rowNumber)
-          if (rowNumber >= startRow + numberOfRows) {
+          if (rowNumber > rowEnd) {
             tmpMapping.set(rowNumber - numberOfRows, vertex)
           }
         }
@@ -243,8 +244,9 @@ export class DenseStrategy implements IAddressMappingStrategy {
     this.width += numberOfColumns
   }
 
-  public removeRows(row: number, numberOfRows: number): void {
-    this.mapping.splice(row, numberOfRows)
+  public removeRows(rowStart: number, rowEnd: number): void {
+    const numberOfRows = rowEnd - rowStart + 1
+    this.mapping.splice(rowStart, numberOfRows)
     this.height -= numberOfRows
   }
 }
@@ -419,12 +421,12 @@ export class AddressMapping {
     sheetMapping.addRows(row, numberOfRows)
   }
 
-  public removeRows(sheet: number, row: number, numberOfRows: number) {
+  public removeRows(sheet: number, rowStart: number, rowEnd: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
       throw Error("Sheet does not exist")
     }
-    sheetMapping.removeRows(row, numberOfRows)
+    sheetMapping.removeRows(rowStart, rowEnd)
   }
 
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
