@@ -378,7 +378,7 @@ export class HandsOnEngine {
   }
 }
 
-export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | CellError | false
+export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
 
 export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
@@ -414,7 +414,7 @@ export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, t
       }
     }
 
-    return new CellError(ErrorType.REF)
+    return ErrorType.REF
   }
 }
 
@@ -460,10 +460,10 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = transformCellAddressFn(ast.reference, address)
-      if (newCellAddress && newCellAddress instanceof CellAddress) {
+      if (newCellAddress instanceof CellAddress) {
         return {...ast, reference: newCellAddress}
-      } else if (newCellAddress instanceof CellError) {
-        return buildCellErrorAst(newCellAddress)
+      } else if (newCellAddress === ErrorType.REF) {
+        return buildCellErrorAst(new CellError(ErrorType.REF))
       } else {
         return ast
       }
@@ -471,11 +471,11 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
     case AstNodeType.CELL_RANGE: {
       const newStart = transformCellAddressFn(ast.start, address)
       const newEnd = transformCellAddressFn(ast.end, address)
-      if (newStart instanceof CellError) {
-        return buildCellErrorAst(newStart)
+      if (newStart === ErrorType.REF) {
+        return buildCellErrorAst(new CellError(ErrorType.REF))
       }
-      if (newEnd instanceof CellError) {
-        return buildCellErrorAst(newEnd)
+      if (newEnd === ErrorType.REF) {
+        return buildCellErrorAst(new CellError(ErrorType.REF))
       }
       if (newStart || newEnd) {
         return {
