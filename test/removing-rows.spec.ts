@@ -168,4 +168,17 @@ describe('Removing rows - matrices', () => {
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.height).toBe(1)
   })
+
+  it('should remove rows when partial overlap', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','2'],
+      ['3','4'],
+    ], config)
+
+    engine.removeRows(0, 1, 3)
+    const matrix = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as MatrixVertex
+    expect(matrix).toBeInstanceOf(MatrixVertex)
+    expect(matrix.height).toBe(1)
+  })
 })
