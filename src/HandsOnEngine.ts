@@ -289,6 +289,14 @@ export class HandsOnEngine {
     }
 
     this.addressMapping!.addColumns(sheet, col, numberOfCols)
+
+    for (const node of this.graph.nodes) {
+      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
+        const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
+        const cachedAst = this.parser.rememberNewAst(newAst)
+        node.setFormula(cachedAst)
+      }
+    }
   }
 
   public disableNumericMatrices() {
@@ -449,6 +457,41 @@ export function fixRowDependency(sheetInWhichWeAddRows: number, row: number, num
       } else {
         if (formulaAddress.row < row) { // Case Rba
           return dependencyAddress.shiftedByRows(numberOfRows)
+        } else { // Case Rbb
+          return false
+        }
+      }
+    }
+  }
+}
+
+export function fixColDependency(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
+  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+    if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== sheetInWhichWeAddColumns)) {
+      return false
+    }
+
+    if (dependencyAddress.isColumnAbsolute()) {
+      if (sheetInWhichWeAddColumns !== dependencyAddress.sheet) {
+        return false
+      }
+
+      if (dependencyAddress.col < column) { // Case Aa
+        return false
+      } else { // Case Ab
+        return dependencyAddress.shiftedByColumns(numberOfColumns)
+      }
+    } else {
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      if (absolutizedDependencyAddress.col < column) {
+        if (formulaAddress.col < column) { // Case Raa
+          return false
+        } else { // Case Rab
+          return dependencyAddress.shiftedByColumns(-numberOfColumns)
+        }
+      } else {
+        if (formulaAddress.col < column) { // Case Rba
+          return dependencyAddress.shiftedByColumns(numberOfColumns)
         } else { // Case Rbb
           return false
         }

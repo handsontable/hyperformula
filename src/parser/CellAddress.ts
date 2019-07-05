@@ -61,7 +61,15 @@ export class CellAddress {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
 
+  public isColumnAbsolute(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
+  }
+
   public shiftedByRows(numberOfRows: number): CellAddress {
     return new CellAddress(this.sheet, this.col, this.row + numberOfRows, this.type)
+  }
+
+  public shiftedByColumns(numberOfColumns: number): CellAddress {
+    return new CellAddress(this.sheet, this.col + numberOfColumns, this.row, this.type)
   }
 }

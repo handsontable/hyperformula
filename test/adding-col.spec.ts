@@ -50,4 +50,65 @@ describe("Adding column, fixing dependency", () => {
 
     expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absolute(0, 0, 0))
   })
+
+  it('same sheet, case Ab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=$B1' /* new col */, '42'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteCol(0, 2, 0))
+  })
+
+  it('same sheet, case Raa', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B1', '13', /* new col */ '42'],
+    ])
+
+    engine.addColumns(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('same sheet, case Rab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '13', /* new col */ '=B1'],
+    ])
+
+    engine.addColumns(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 3, 0))).toEqual(CellAddress.relative(0, -2, 0))
+  })
+
+  it('same sheet, case Rba', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=C1', '13', /* new col */ '42'],
+    ])
+
+    engine.addColumns(0, 2, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 3, 0))
+  })
+
+  it('same sheet, case Rbb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', /* new col */ '=C1', '13'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('same sheet, same column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '43'],
+      ['', '=B1']
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 2, 1))).toEqual(CellAddress.relative(0, 0, -1))
+  })
 })
