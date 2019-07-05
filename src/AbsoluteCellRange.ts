@@ -40,15 +40,15 @@ export class AbsoluteCellRange {
     }
   }
 
-  public toString() {
+  public toString(): string {
     return `${this.start.sheet},${this.start.col},${this.start.row},${this.end.col},${this.end.row}`
   }
 
-  public width() {
+  public width(): number {
     return this.end.col - this.start.col + 1
   }
 
-  public height() {
+  public height(): number {
     return this.end.row - this.start.row + 1
   }
 
@@ -56,7 +56,7 @@ export class AbsoluteCellRange {
     return this.height() * this.width()
   }
 
-  public doesOverlap(other: AbsoluteCellRange) {
+  public doesOverlap(other: AbsoluteCellRange): boolean {
     if (this.start.sheet != other.start.sheet) {
       return false
     }
@@ -82,11 +82,11 @@ export class AbsoluteCellRange {
     return false
   }
 
-  public withStart(newStart: SimpleCellAddress) {
+  public withStart(newStart: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }
 
-  public withEnd(newEnd: SimpleCellAddress) {
+  public withEnd(newEnd: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(this.start, newEnd)
   }
 
@@ -117,7 +117,7 @@ export class AbsoluteCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
-  public matrixFromPlainValues(sheets: Sheets, sheetMapping: SheetMapping) {
+  public matrixFromPlainValues(sheets: Sheets, sheetMapping: SheetMapping): Matrix {
     const values = new Array(this.height())
     const sheet = sheets[sheetMapping.name(this.start.sheet)]
     for (let i = 0; i < this.height(); ++i) {
