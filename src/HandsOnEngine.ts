@@ -267,6 +267,8 @@ export class HandsOnEngine {
         this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
       }
     }
+
+    this.evaluator!.run()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
