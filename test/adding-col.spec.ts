@@ -28,6 +28,18 @@ describe("Adding column", () => {
       engine.addColumns(0, 0, 1)
     }).toThrow(new Error("It is not possible to add column in column with matrix"))
   })
+
+  it('updates addresses in formulas', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '=A1'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const c1 = engine.addressMapping!.getCell(simpleCellAddress(0, 2, 0)) as FormulaCellVertex
+    expect(c1).toBeInstanceOf(FormulaCellVertex)
+    expect(c1.getAddress()).toEqual(simpleCellAddress(0, 2, 0))
+  })
 })
 
 describe("Adding column, fixing dependency", () => {

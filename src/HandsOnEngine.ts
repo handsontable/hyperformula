@@ -295,6 +295,7 @@ export class HandsOnEngine {
         const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
+        this.fixFormulaVertexAddressByColumn(node, col, numberOfCols)
       }
     }
   }
@@ -366,6 +367,16 @@ export class HandsOnEngine {
       node.setAddress({
         ...nodeAddress,
         row: nodeAddress.row + numberOfRows
+      })
+    }
+  }
+
+  private fixFormulaVertexAddressByColumn(node: FormulaCellVertex, column: number, numberOfColumns: number) {
+    const nodeAddress = node.getAddress()
+    if (column <= nodeAddress.col) {
+      node.setAddress({
+        ...nodeAddress,
+        col: nodeAddress.col + numberOfColumns
       })
     }
   }
