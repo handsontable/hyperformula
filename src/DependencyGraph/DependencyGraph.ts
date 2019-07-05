@@ -147,6 +147,10 @@ export class DependencyGraph {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number) {
+    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
+      throw Error("It is not possible to remove row with matrix")
+    }
+
     for (let x=0; x<this.addressMapping.getWidth(sheet); ++x) {
       for (let y = rowStart; y <= rowEnd; ++y) {
         const address = simpleCellAddress(sheet, x, y)
@@ -170,6 +174,10 @@ export class DependencyGraph {
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
+    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart)) {
+      throw Error("It is not possible to add row in row with matrix")
+    }
+
     this.addressMapping!.addRows(sheet, rowStart, numberOfRows)
 
     for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart)) {

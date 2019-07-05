@@ -232,10 +232,6 @@ export class HandsOnEngine {
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
-    if (this.addressMapping!.isFormulaMatrixInRows(sheet, row)) {
-      throw Error("It is not possible to add row in row with matrix")
-    }
-
     this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
 
     for (const node of this.graph.nodes) {
@@ -254,15 +250,10 @@ export class HandsOnEngine {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-    // 1. check if there is formula matrix
-    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
-      throw Error("It is not possible to remove row with matrix")
-    }
-    const numberOfRowsToDelete = rowEnd - rowStart + 1
-
-    // 2. Remove nodes from graph
+    // 1. Remove nodes from graph
     this.dependencyGraph!.removeRows(sheet, rowStart, rowEnd)
 
+    const numberOfRowsToDelete = rowEnd - rowStart + 1
     // 3. Fix dependencies
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
