@@ -14,7 +14,7 @@ const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: Simp
   expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
-describe('Removing rows', () => {
+describe('Removing rows - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
@@ -141,5 +141,17 @@ describe('Removing rows', () => {
 
     engine.removeRows(0, 0, 1)
     expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 1))
+  })
+})
+
+describe('Removing rows - matrices', () => {
+  it('should not remove row with formula matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1','2'],
+        ['3','4'],
+        ['{=MMULT(A1:B2, A1:B2)}']
+    ])
+
+    expect(() => engine.removeRows(0, 2, 2)).toThrowError("It is not possible to remove row with matrix")
   })
 })
