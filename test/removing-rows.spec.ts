@@ -182,3 +182,15 @@ describe('Removing rows - matrices', () => {
     expect(matrix.height).toBe(1)
   })
 })
+
+describe('Removing rows - graph', function () {
+  it('should remove vertices from graph', function () {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+    ])
+    expect(engine.graph.nodes.size).toBe(5)
+    engine.removeRows(0, 0, 1)
+    expect(engine.graph.nodes.size).toBe(1) //only empty vertex left
+  });
+});
