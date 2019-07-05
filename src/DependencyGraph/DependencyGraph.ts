@@ -158,7 +158,7 @@ export class DependencyGraph {
         if (vertex instanceof MatrixVertex || vertex === null) {
           continue
         }
-        this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+        this.graph.removeNode(vertex)
         this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
       }
     }
