@@ -438,7 +438,7 @@ export class AddressMapping {
   public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     for (let row = rowStart; row <= rowEnd; ++row) {
       for (const mtx of this.matrixMapping.values()) {
-        if (mtx.spansThroughSheetRow(sheet, row) && mtx.isFormula()) {
+        if (mtx.spansThroughSheetRows(sheet, row) && mtx.isFormula()) {
           return true
         }
       }
@@ -463,9 +463,9 @@ export class AddressMapping {
     }, this.matrixMapping.entries())[Symbol.iterator]()
   }
 
-  public* numericMatricesAtRow(sheet: number, row: number): IterableIterator<MatrixVertex> {
+  public* numericMatricesInRows(sheet: number, startRow: number, endRow: number = startRow): IterableIterator<MatrixVertex> {
     yield* filterWith((mtx) => {
-      return mtx.spansThroughSheetRow(sheet, row) && !mtx.isFormula()
+      return mtx.spansThroughSheetRows(sheet, startRow, endRow) && !mtx.isFormula()
     }, this.matrixMapping.values()[Symbol.iterator]())
   }
 }

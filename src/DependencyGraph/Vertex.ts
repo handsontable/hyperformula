@@ -74,10 +74,10 @@ export class MatrixVertex {
     return this.formula !== null
   }
 
-  public spansThroughSheetRow(sheet: number, row: number): boolean {
+  public spansThroughSheetRows(sheet: number, startRow: number, endRow: number = startRow): boolean {
     return (this.cellAddress.sheet === sheet) &&
-      (this.cellAddress.row <= row) &&
-      (row < this.cellAddress.row + this.height)
+      (this.cellAddress.row <= endRow) &&
+      (startRow < this.cellAddress.row + this.height)
   }
 
   public spansThroughSheetColumn(sheet: number, col: number): boolean {

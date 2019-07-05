@@ -238,7 +238,7 @@ export class HandsOnEngine {
 
     this.addressMapping!.addRows(sheet, row, numberOfRowsToAdd)
 
-    for (let matrix of this.addressMapping!.numericMatricesAtRow(sheet, row)) {
+    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, row)) {
       matrix.addRows(sheet, row, numberOfRowsToAdd)
     }
 
@@ -280,6 +280,10 @@ export class HandsOnEngine {
         node.setFormula(cachedAst)
         this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
       }
+    }
+
+    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+      matrix.removeRows(sheet, rowStart, numberOfRowsToDelete)
     }
   }
 
