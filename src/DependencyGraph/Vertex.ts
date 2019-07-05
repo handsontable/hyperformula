@@ -18,8 +18,8 @@ export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
-  public readonly width: number
-  public readonly height: number
+  public width: number
+  public height: number
   private formula: Ast | null
   private cellAddress: SimpleCellAddress
   private matrix: Matrix | CellError
@@ -89,6 +89,7 @@ export class MatrixVertex {
   public addRows(sheet: number, row: number, numberOfRows: number): void {
     if (this.matrix instanceof Matrix) {
       this.matrix.addRows(row - this.getAddress().row, numberOfRows)
+      this.height += numberOfRows
     }
   }
 
@@ -97,6 +98,7 @@ export class MatrixVertex {
       const start = topRow - this.getAddress().row
       const end = start + numberOfRows - 1
       this.matrix.removeRows(start, end)
+      this.width -= numberOfRows
     }
   }
 }

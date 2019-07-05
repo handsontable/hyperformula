@@ -1,8 +1,8 @@
-import {HandsOnEngine} from "../src";
+import {Config, HandsOnEngine} from "../src";
 import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
 import {CellAddress} from "../src/parser/CellAddress";
 import './testConfig.ts'
-import {FormulaCellVertex} from "../src/DependencyGraph";
+import {FormulaCellVertex, MatrixVertex} from "../src/DependencyGraph";
 import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
@@ -153,5 +153,19 @@ describe('Removing rows - matrices', () => {
     ])
 
     expect(() => engine.removeRows(0, 2, 2)).toThrowError("It is not possible to remove row with matrix")
+  })
+
+  it('should remove row from numeric matrix', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','2'],
+      ['3','4'],
+    ], config)
+
+    engine.removeRows(0, 1, 1)
+
+    const matrix = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as MatrixVertex
+    expect(matrix).toBeInstanceOf(MatrixVertex)
+    expect(matrix.height).toBe(1)
   })
 })
