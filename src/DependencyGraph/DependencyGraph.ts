@@ -171,6 +171,8 @@ export class DependencyGraph {
     }
 
     this.addressMapping!.removeRows(sheet, rowStart, rowEnd)
+
+    this.rangeMapping.shiftRanges(sheet, rowStart, -(rowEnd - rowStart + 1))
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {

@@ -2,7 +2,7 @@ import {Config, HandsOnEngine} from "../src";
 import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
 import {CellAddress} from "../src/parser/CellAddress";
 import './testConfig.ts'
-import {FormulaCellVertex, MatrixVertex} from "../src/DependencyGraph";
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from "../src/DependencyGraph";
 import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
@@ -204,4 +204,32 @@ describe('Removing rows - graph', function () {
     engine.removeRows(0, 0, 1)
     expect(engine.graph.nodes.size).toBe(1) //only empty vertex left
   });
+});
+
+describe('Removing rows - ranges', function () {
+  it ('shift ranges in range mapping, range start below removed rows', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1',''],
+      ['2','=SUM(A2:A3)'],
+      ['3',''],
+    ])
+
+    engine.removeRows(0, 0, 0)
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 1))!
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+  })
+
+  it ('shift ranges in range mapping, range start above removed rows', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','=SUM(A1:A3)'],
+      ['2',''],
+      ['3',''],
+    ])
+
+    engine.removeRows(0, 1, 2)
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0))!
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+  })
 });
