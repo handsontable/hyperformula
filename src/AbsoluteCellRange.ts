@@ -150,15 +150,13 @@ export class AbsoluteCellRange {
       return
     }
 
-    const numberOfRowsToRemove = rowEnd - rowStart + 1
-
     if (rowEnd < this.start.row) {
-      return this.shiftByRows(-numberOfRowsToRemove)
+      return this.shiftByRows(-(rowEnd - rowStart + 1))
     }
     if (rowStart <= this.start.row) {
       this.start.row = rowStart
     }
 
-    this.end.row -= numberOfRowsToRemove
+    this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
   }
 }

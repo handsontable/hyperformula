@@ -113,3 +113,48 @@ describe('AbsoluteCellRange#height', () => {
     expect(new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 10, 3)).height()).toBe(3)
   })
 })
+
+describe('AbsoluteCellRange#removeRows', () => {
+  it('rows below', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,0), simpleCellAddress(0,0,3))
+    range.removeRows(4, 5)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(3)
+  })
+
+  it('rows above', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,2), simpleCellAddress(0,0,4))
+    range.removeRows(0, 1)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(2)
+  })
+
+  it('middle of the range', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,0), simpleCellAddress(0,0,4))
+    range.removeRows(1, 2)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(2)
+  })
+
+  it('start above range', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,2), simpleCellAddress(0,0,4))
+    range.removeRows(0, 3)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(0)
+  })
+
+  it('end below range', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,0), simpleCellAddress(0,0,4))
+    range.removeRows(2, 5)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(1)
+  })
+
+  it('whole range', () => {
+    const range = new AbsoluteCellRange(simpleCellAddress(0,0,2), simpleCellAddress(0,0,4))
+    range.removeRows(0, 5)
+    expect(range.start.row).toBe(0)
+    expect(range.end.row).toBe(-1)
+    expect(range.height()).toBe(0)
+  })
+})
