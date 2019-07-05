@@ -106,4 +106,16 @@ describe('Removing rows', () => {
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 1))
   })
+
+  it('same sheet, case Rbb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=A4'],
+      ['42'],
+    ])
+
+    engine.removeRows(0, 0, 1)
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 1))
+  })
 })
