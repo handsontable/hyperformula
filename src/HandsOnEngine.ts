@@ -236,11 +236,7 @@ export class HandsOnEngine {
       throw Error("It is not possible to add row in row with matrix")
     }
 
-    this.addressMapping!.addRows(sheet, row, numberOfRowsToAdd)
-
-    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, row)) {
-      matrix.addRows(sheet, row, numberOfRowsToAdd)
-    }
+    this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
 
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
@@ -253,8 +249,6 @@ export class HandsOnEngine {
         this.fixFormulaVertexAddress(node, row, numberOfRowsToAdd)
       }
     }
-
-    this.fixRanges(sheet, row, numberOfRowsToAdd)
 
     this.evaluator!.run()
   }
@@ -380,23 +374,6 @@ export class HandsOnEngine {
         col: nodeAddress.col + numberOfColumns
       })
     }
-  }
-
-  private fixRanges(sheet: number, row: number, numberOfRows: number) {
-    for (const range of this.rangeMapping.getValues()) {
-      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
-        const anyVertexInRow = this.addressMapping!.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
-        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
-          for (let y = row; y < row + numberOfRows; ++y) {
-            for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(this.dependencyGraph!.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
-            }
-          }
-        }
-      }
-    }
-
-    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
   }
 }
 

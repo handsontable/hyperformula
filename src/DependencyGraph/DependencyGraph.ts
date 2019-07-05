@@ -168,4 +168,31 @@ export class DependencyGraph {
 
     this.addressMapping!.removeRows(sheet, rowStart, rowEnd)
   }
+
+  public addRows(sheet: number, rowStart: number, numberOfRows: number) {
+    this.addressMapping!.addRows(sheet, rowStart, numberOfRows)
+
+    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart)) {
+      matrix.addRows(sheet, rowStart, numberOfRows)
+    }
+
+    this.fixRanges(sheet, rowStart, numberOfRows)
+  }
+
+  private fixRanges(sheet: number, row: number, numberOfRows: number) {
+    for (const range of this.rangeMapping.getValues()) {
+      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
+        const anyVertexInRow = this.addressMapping!.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
+        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
+          for (let y = row; y < row + numberOfRows; ++y) {
+            for (let x = range.start.col; x <= range.end.col; ++x) {
+              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
+            }
+          }
+        }
+      }
+    }
+
+    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+  }
 }
