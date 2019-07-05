@@ -45,6 +45,7 @@ interface IAddressMappingStrategy {
 
   addRows(row: number, numberOfRows: number): void,
   removeRows(row: number, numberOfRows: number): void,
+  addColumns(column: number, numberOfColumns: number): void,
 }
 
 /**
@@ -123,6 +124,20 @@ export class SparseStrategy implements IAddressMappingStrategy {
       })
     })
     this.height += numberOfRows
+  }
+
+  public addColumns(column: number, numberOfColumns: number): void {
+    const tmpMapping = new Map()
+    this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+      if (colNumber >= column) {
+        tmpMapping.set(colNumber + numberOfColumns, rowMapping)
+        this.mapping.delete(colNumber)
+      }
+    })
+    tmpMapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
+      this.mapping.set(colNumber, rowMapping)
+    })
+    this.width += numberOfColumns
   }
 
   public removeRows(startRow: number, numberOfRows: number): void {
@@ -219,6 +234,13 @@ export class DenseStrategy implements IAddressMappingStrategy {
     }
     this.mapping.splice(row, 0, ...newRows)
     this.height += numberOfRows
+  }
+
+  public addColumns(column: number, numberOfColumns: number): void {
+    for (let i = 0; i < this.height; i++) {
+      this.mapping[i].splice(column, 0, ...new Array(numberOfColumns))
+    }
+    this.width += numberOfColumns
   }
 
   public removeRows(row: number, numberOfRows: number): void {
@@ -403,6 +425,14 @@ export class AddressMapping {
       throw Error("Sheet does not exist")
     }
     sheetMapping.removeRows(row, numberOfRows)
+  }
+
+  public addColumns(sheet: number, column: number, numberOfColumns: number) {
+    const sheetMapping = this.mapping.get(sheet)
+    if (!sheetMapping) {
+      throw Error("Sheet does not exist")
+    }
+    sheetMapping.addColumns(column, numberOfColumns)
   }
 
   public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {

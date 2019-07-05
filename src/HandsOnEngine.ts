@@ -287,6 +287,8 @@ export class HandsOnEngine {
     if (this.addressMapping!.isFormulaMatrixInColumns(sheet, col)) {
       throw Error("It is not possible to add column in column with matrix")
     }
+
+    this.addressMapping!.addColumns(sheet, col, numberOfCols)
   }
 
   public disableNumericMatrices() {
