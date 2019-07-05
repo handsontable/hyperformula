@@ -98,7 +98,6 @@ export interface IMatrix {
   width(): number
   height(): number
   get(col: number, row: number): number
-  raw(): number[][]
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -115,10 +114,6 @@ export class NotComputedMatrix implements IMatrix {
   }
 
   public get(col: number, row: number): number {
-    throw Error('Matrix not computed yet.')
-  }
-
-  public raw(): number[][] {
     throw Error('Matrix not computed yet.')
   }
 }
