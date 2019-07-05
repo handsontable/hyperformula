@@ -379,14 +379,14 @@ export function fixRowDependencyRowsDeletion(dependencyAddress: CellAddress, for
       return new CellError(ErrorType.REF) // Ac
     }
   } else {
-    const absolutizedAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-    if (absolutizedAddress.row < topRow) {
+    const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+    if (absolutizedDependencyAddress.row < topRow) {
       if (formulaAddress.row < topRow) {  // Raa
         return false
       } else if (formulaAddress.row >= topRow + numberOfRows) { // Rab
         return dependencyAddress.shiftedByRows(numberOfRows)
       }
-    } else if (absolutizedAddress.row >= topRow + numberOfRows) {
+    } else if (absolutizedDependencyAddress.row >= topRow + numberOfRows) {
       if (formulaAddress.row < topRow) {  // Rba
         return dependencyAddress.shiftedByRows(-numberOfRows)
       } else if (formulaAddress.row >= topRow + numberOfRows) { // Rbb
@@ -416,8 +416,8 @@ export function fixRowDependency(dependencyAddress: CellAddress, formulaAddress:
       return dependencyAddress.shiftedByRows(numberOfRows)
     }
   } else {
-    const absolutizedAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-    if (absolutizedAddress.row < row) {
+    const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+    if (absolutizedDependencyAddress.row < row) {
       if (formulaAddress.row < row) { // Case Raa
         return false
       } else { // Case Rab
