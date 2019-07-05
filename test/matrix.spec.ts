@@ -72,6 +72,7 @@ describe('Matrix', () => {
         [7,8],
     ])
     matrix.removeRows(1,2)
+    expect(matrix.height()).toEqual(2)
     expect(matrix.raw()).toEqual([
         [1,2],
         [7,8]

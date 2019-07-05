@@ -140,7 +140,9 @@ export class Matrix {
     if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
       throw Error("Matrix index out of bound")
     }
-    this.matrix.splice(startRow, endRow - startRow + 1)
+    const numberOfRows = endRow - startRow + 1
+    this.matrix.splice(startRow, numberOfRows)
+    this.size.height -= numberOfRows
   }
 
   public zeroArrays(count: number, size: number) {
