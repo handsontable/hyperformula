@@ -244,7 +244,7 @@ export class HandsOnEngine {
 
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, row, numberOfRowsToAdd, fixRowDependency)
+        const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), sheet, row, numberOfRowsToAdd, fixRowDependency)
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
         this.fixFormulaVertexAddress(node, row, numberOfRowsToAdd)
@@ -268,7 +268,7 @@ export class HandsOnEngine {
     // 2. Fix dependencies
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = fixDependencies(node.getFormula(), node.getAddress(), sheet, rowStart, numberOfRowsToDelete, fixRowDependencyRowsDeletion)
+        const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), sheet, rowStart, numberOfRowsToDelete, fixRowDependencyRowsDeletion)
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
         this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
@@ -371,7 +371,7 @@ export class HandsOnEngine {
   }
 }
 
-export type FixRowDependencyFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number) => CellAddress | CellError | false
+export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeAddRows: number, row: number, numberOfRows: number) => CellAddress | CellError | false
 
 export function fixRowDependencyRowsDeletion(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): CellAddress | CellError | false {
   if ((dependencyAddress.sheet === formulaAddress.sheet)
@@ -444,7 +444,8 @@ export function fixRowDependency(dependencyAddress: CellAddress, formulaAddress:
   }
 }
 
-export function fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: number, row: number, numberOfRows: number, fixRowDependency: FixRowDependencyFunction): Ast {
+
+export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, sheet: number, row: number, numberOfRows: number, fixRowDependency: TransformCellAddressFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = fixRowDependency(ast.reference, address, sheet, row, numberOfRows)
@@ -483,21 +484,21 @@ export function fixDependencies(ast: Ast, address: SimpleCellAddress, sheet: num
     case AstNodeType.MINUS_UNARY_OP: {
       return {
         type: ast.type,
-        value: fixDependencies(ast.value, address, sheet, row, numberOfRows, fixRowDependency),
+        value: transformAddressesInFormula(ast.value, address, sheet, row, numberOfRows, fixRowDependency),
       }
     }
     case AstNodeType.FUNCTION_CALL: {
       return {
         type: ast.type,
         procedureName: ast.procedureName,
-        args: ast.args.map((arg) => fixDependencies(arg, address, sheet, row, numberOfRows, fixRowDependency))
+        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, sheet, row, numberOfRows, fixRowDependency))
       }
     }
     default: {
       return {
         type: ast.type,
-        left: fixDependencies(ast.left, address, sheet, row, numberOfRows, fixRowDependency),
-        right: fixDependencies(ast.right, address, sheet, row, numberOfRows, fixRowDependency),
+        left: transformAddressesInFormula(ast.left, address, sheet, row, numberOfRows, fixRowDependency),
+        right: transformAddressesInFormula(ast.right, address, sheet, row, numberOfRows, fixRowDependency),
       } as Ast
     }
   }
