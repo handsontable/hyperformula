@@ -140,3 +140,19 @@ describe("Adding column, fixing dependency", () => {
     expect(extractReference(engine, simpleCellAddress(0, 2, 1))).toEqual(CellAddress.relative(0, 0, -1))
   })
 })
+
+describe("Adding column, fixing ranges", () => {
+  it('insert column in middle of range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '2', '3'],
+      ['=SUM(A1:C1)']
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
+
+    engine.addColumns(0, 1, 1)
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).toBe(null)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 3, 0))).not.toBe(null)
+  })
+})

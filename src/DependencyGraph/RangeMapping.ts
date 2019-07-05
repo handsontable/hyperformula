@@ -76,6 +76,29 @@ export class RangeMapping {
     })
   }
 
+  public shiftRangesColumns(sheet: number, column: number, numberOfColumns: number) {
+    const updated = Array<RangeVertex>()
+
+    for (const [key, vertex] of this.rangeMapping.entries()) {
+      if (vertex.sheet === sheet) {
+        if (column <= vertex.start.col) {
+          vertex.range.shiftByColumns(numberOfColumns)
+          updated.push(vertex)
+          this.rangeMapping.delete(key)
+        } else if (column > vertex.start.col && column <= vertex.end.col) {
+          vertex.range.expandByColumns(numberOfColumns)
+          updated.push(vertex)
+          this.rangeMapping.delete(key)
+        }
+      }
+    }
+
+    updated.forEach(range => {
+      range.clearCache()
+      this.setRange(range)
+    })
+  }
+
   public getValues() {
     return this.rangeMapping.values()
   }

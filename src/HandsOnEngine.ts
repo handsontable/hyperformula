@@ -282,6 +282,8 @@ export class HandsOnEngine {
       matrix.addColumns(sheet, col, numberOfCols)
     }
 
+    this.dependencyGraph!.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))

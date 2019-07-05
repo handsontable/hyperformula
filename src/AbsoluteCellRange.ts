@@ -144,6 +144,15 @@ export class AbsoluteCellRange {
     this.end.row += numberOfRows
   }
 
+  public shiftByColumns(numberOfColumns: number) {
+    this.start.col += numberOfColumns
+    this.end.col += numberOfColumns
+  }
+
+  public expandByColumns(numberOfColumns: number) {
+    this.end.col += numberOfColumns
+  }
+
   public removeRows(rowStart: number, rowEnd: number) {
     if (rowStart > this.end.row) {
       return

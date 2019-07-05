@@ -209,4 +209,21 @@ export class DependencyGraph {
 
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
   }
+
+  public fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
+    for (const range of this.rangeMapping.getValues()) {
+      if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
+        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
+        if (this.graph.adjacentNodes(anyVertexInColumn).has(range)) {
+          for (let y = column; y < column + numberOfColumns; ++y) {
+            for (let x = range.start.col; x <= range.end.col; ++x) {
+              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, y, x)), range)
+            }
+          }
+        }
+      }
+    }
+
+    this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
+  }
 }
