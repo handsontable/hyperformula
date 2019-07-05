@@ -278,6 +278,10 @@ export class HandsOnEngine {
 
     this.addressMapping!.addColumns(sheet, col, numberOfCols)
 
+    for (let matrix of this.addressMapping!.numericMatricesInColumns(sheet, col)) {
+      matrix.addColumns(sheet, col, numberOfCols)
+    }
+
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))

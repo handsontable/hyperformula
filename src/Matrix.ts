@@ -160,6 +160,13 @@ export class Matrix implements IMatrix {
     this.size.height += numberOfRows
   }
 
+  public addColumns(aboveColumn: number, numberOfColumns: number) {
+    for (let i = 0; i < this.height(); i++) {
+      this.matrix[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(0))
+    }
+    this.size.width += numberOfColumns
+  }
+
   public removeRows(startRow: number, endRow: number) {
     if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
       throw Error("Matrix index out of bound")

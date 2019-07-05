@@ -105,6 +105,12 @@ export class MatrixVertex {
     }
   }
 
+  public addColumns(sheet: number, column: number, numberOfColumns: number): void {
+    if (this.matrix instanceof Matrix) {
+      this.matrix.addColumns(column - this.getAddress().col, numberOfColumns)
+    }
+  }
+
   public removeRows(sheet: number, topRow: number, bottomRow: number): void {
     if (this.matrix instanceof Matrix) {
       const start = Math.max(topRow, this.getAddress().row) - this.getAddress().row

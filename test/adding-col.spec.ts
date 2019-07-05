@@ -40,6 +40,22 @@ describe("Adding column", () => {
     expect(c1).toBeInstanceOf(FormulaCellVertex)
     expect(c1.getAddress()).toEqual(simpleCellAddress(0, 2, 0))
   })
+
+  it('add column inside numeric matrix, expand matrix', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1','2'],
+      ['3','4'],
+    ], config)
+
+    expect(engine.getCellValue("B1")).toEqual(2)
+
+    engine.addColumns(0, 1, 2)
+
+    expect(engine.getCellValue("B1")).toEqual(0)
+    expect(engine.getCellValue("C1")).toEqual(0)
+    expect(engine.getCellValue("D1")).toEqual(2)
+  })
 })
 
 describe("Adding column, fixing dependency", () => {
