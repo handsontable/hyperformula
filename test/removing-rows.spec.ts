@@ -247,4 +247,21 @@ describe('Removing rows - ranges', function () {
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
+
+  it('should remove smaller range dependency', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(A1:A2)'],
+      ['=SUM(A1:A3)']
+    ])
+
+    const a1a3 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2)) as RangeVertex
+    expect(engine.graph.getDependecies(a1a3).length).toBe(2)
+    engine.removeRows(0, 0, 1)
+    const a1a1 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0)) as RangeVertex
+    expect(a1a1).toBe(a1a3)
+    expect(engine.graph.getDependecies(a1a1).length).toBe(1)
+  })
 });
