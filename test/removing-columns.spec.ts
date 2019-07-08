@@ -1,4 +1,5 @@
 import {Config, HandsOnEngine} from "../src";
+import './testConfig.ts'
 
 describe('Removing columns - matrices', () => {
   it('should not remove column within formula matrix', () => {
