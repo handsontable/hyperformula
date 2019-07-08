@@ -298,6 +298,20 @@ export class HandsOnEngine {
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
+
+    const numberOfColumnsToDelete = columnEnd - columnStart + 1
+    for (const node of this.graph.nodes) {
+      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
+        const newAst = transformAddressesInFormula(
+          node.getFormula(),
+          node.getAddress(),
+          fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete)
+        )
+        const cachedAst = this.parser.rememberNewAst(newAst)
+        node.setFormula(cachedAst)
+        this.fixFormulaVertexAddressByColumn(node, columnStart, -numberOfColumnsToDelete)
+      }
+    }
   }
 
   public disableNumericMatrices() {
@@ -413,6 +427,46 @@ export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, t
         if (formulaAddress.row < topRow) {  // Rba
           return dependencyAddress.shiftedByRows(-numberOfRows)
         } else if (formulaAddress.row >= topRow + numberOfRows) { // Rbb
+          return false
+        }
+      }
+    }
+
+    return ErrorType.REF
+  }
+}
+
+
+
+export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
+  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+    if ((dependencyAddress.sheet === formulaAddress.sheet)
+      && (formulaAddress.sheet !== sheetInWhichWeRemoveColumns)) {
+      return false
+    }
+
+    if (dependencyAddress.isColumnAbsolute()) {
+      if (sheetInWhichWeRemoveColumns !== dependencyAddress.sheet) {
+        return false
+      }
+
+      if (dependencyAddress.col < leftmostColumn) { // Aa
+        return false
+      } else if (dependencyAddress.col >= leftmostColumn + numberOfColumns) { // Ab
+        return dependencyAddress.shiftedByColumns(-numberOfColumns)
+      }
+    } else {
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      if (absolutizedDependencyAddress.col < leftmostColumn) {
+        if (formulaAddress.col < leftmostColumn) {  // Raa
+          return false
+        } else if (formulaAddress.col >= leftmostColumn + numberOfColumns) { // Rab
+          return dependencyAddress.shiftedByColumns(numberOfColumns)
+        }
+      } else if (absolutizedDependencyAddress.col >= leftmostColumn + numberOfColumns) {
+        if (formulaAddress.col < leftmostColumn) {  // Rba
+          return dependencyAddress.shiftedByColumns(-numberOfColumns)
+        } else if (formulaAddress.col >= leftmostColumn + numberOfColumns) { // Rbb
           return false
         }
       }

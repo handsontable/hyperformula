@@ -1,7 +1,18 @@
 import {Config, HandsOnEngine} from "../src";
 import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
+import {CellAddress} from "../src/parser/CellAddress";
+import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
 import './testConfig.ts'
 import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex} from "../src/DependencyGraph";
+
+const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
+  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+}
+
+const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: SimpleCellAddress) => {
+  const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
+  expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
+}
 
 describe('Removing columns - matrices', () => {
   it('should not remove column within formula matrix', () => {
@@ -83,3 +94,117 @@ describe('Removing columns - graph', function () {
     expect(engine.graph.nodes.size).toBe(2)
   });
 });
+
+describe('Removing columns - dependencies', () => {
+  it('should not affect absolute dependencies to other sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2', '=$Sheet2.$A1'],
+        /*      */
+      ],
+      Sheet2: [
+        ['3'],
+        ['4']
+      ]
+    })
+
+    expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+    engine.removeColumns(0, 0, 1)
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+  })
+
+  it('same sheet, case Aa', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '', '=$B1'],
+               /**/
+    ])
+
+    engine.removeColumns(0, 2)
+
+    expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+  })
+
+  it('same sheet, case Ab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=$C1', '', '42'],
+              /**/
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+  })
+
+  it('same sheet, case Ac', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=$B1', ''],
+              /**/
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+  })
+
+  it('same sheet, case Raa', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '=A1', '2'],
+                    /**/
+    ])
+
+    engine.removeColumns(0, 2, 2)
+
+    expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
+  it('same sheet, case Rab', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '1', '=A1']
+            /**/
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
+  it('same sheet, case Rba', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=C1', '1', '42']
+              /**/
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('same sheet, case Rbb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=C1', '42'],
+      /**/
+    ])
+
+    engine.removeColumns(0, 0)
+    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('same sheet, case Rca', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B1', '1']
+             /**/
+    ])
+
+    engine.removeColumns(0, 1)
+    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+  })
+
+  it('same sheet, case Rcb', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1'],
+    ])
+
+    engine.removeColumns(0, 0)
+    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+  })
+})

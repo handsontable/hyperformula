@@ -202,6 +202,8 @@ export class DependencyGraph {
         matrix.removeColumns(sheet, columnStart, columnEnd)
       }
     }
+
+    this.addressMapping!.removeColumns(sheet, columnStart, columnEnd)
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
