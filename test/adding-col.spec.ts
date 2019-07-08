@@ -155,4 +155,136 @@ describe("Adding column, fixing ranges", () => {
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).toBe(null)
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 3, 0))).not.toBe(null)
   })
+
+  it('insert column above range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      [/* new col */ '1', '2', '3'],
+      ['=SUM(A1:C1)']
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
+    engine.addColumns(0, 0, 1)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).toBe(null)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 3, 0))).not.toBe(null)
+  })
+
+  it('insert column below range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3' /* new col */],
+      ['=SUM(A1:C1)']
+    ])
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
+    engine.addColumns(0, 3, 1)
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
+  })
+
+  it('it should insert new cell with edge to only one range at right', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', /* */ '3', '4'],
+      ['=SUM(A1:A1)', '=SUM(A1:B1)', /* */ '=SUM(A1:C1)', '=SUM(A1:D1)'],
+    ])
+
+    engine.addColumns(0, 2, 1)
+
+    const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
+    const a1d1 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 3, 0))!
+    const a1e1 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 4, 0))!
+
+    expect(engine.graph.existsEdge(c1, a1d1)).toBe(true)
+    expect(engine.graph.existsEdge(c1, a1e1)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(c1)).toBe(2)
+  })
+
+  it ('range start in column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(B1:D1)']
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))
+    expect(b1).toBe(null)
+  })
+
+  it('range start before added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(A1:D1)']
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+   const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+   const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 4, 0))!
+   expect(b1).toBeInstanceOf(EmptyCellVertex)
+   expect(engine.graph.existsEdge(b1, range)).toBe(true)
+  })
+
+  it ('range start after added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(C1:D1)'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))
+    expect(b1).toBe(null)
+  })
+
+  it ('range end before added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(A1:A1)'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))
+    expect(b1).toBe(null)
+  })
+
+  it ('range end in a added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(A1:B1)'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))!
+    expect(b1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(b1, range)).toBe(true)
+  })
+
+  it ('range end after added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(A1:C1)'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 3, 0))!
+    expect(b1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(b1, range)).toBe(true)
+  })
+
+  it ('range start and end in an added column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '3', '4'],
+      ['', /* */ '=SUM(B1:B1)'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const b1 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))
+    expect(b1).toBe(null)
+  })
 })
