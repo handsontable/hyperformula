@@ -183,6 +183,17 @@ export class DependencyGraph {
     if (this.addressMapping!.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
       throw Error("It is not possible to remove column within matrix")
     }
+
+    for (let y=0; y<this.addressMapping.getHeight(sheet); ++y) {
+      for (let x = columnStart; x <= columnEnd; ++x) {
+        const address = simpleCellAddress(sheet, x, y)
+        const vertex = this.addressMapping.getCell(address)
+        if (vertex instanceof MatrixVertex || vertex === null) {
+          continue
+        }
+        this.graph.removeNode(vertex)
+      }
+    }
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
