@@ -93,9 +93,9 @@ export class MatrixVertex {
       (startRow < this.cellAddress.row + this.height)
   }
 
-  public spansThroughSheetColumn(sheet: number, col: number): boolean {
+  public spansThroughSheetColumn(sheet: number, col: number, columnEnd: number = col): boolean {
     return (this.cellAddress.sheet === sheet) &&
-      (this.cellAddress.col <= col) &&
+      (this.cellAddress.col <= columnEnd) &&
       (col < this.cellAddress.col + this.width)
   }
 
@@ -116,6 +116,14 @@ export class MatrixVertex {
       const start = Math.max(topRow, this.getAddress().row) - this.getAddress().row
       const end = Math.min(bottomRow, this.getAddress().row + this.height - 1) - this.getAddress().row
       this.matrix.removeRows(start, end)
+    }
+  }
+
+  public removeColumns(sheet: number, leftColumn: number, rightColumn: number): void {
+    if (this.matrix instanceof Matrix) {
+      const start = Math.max(leftColumn, this.getAddress().col) - this.getAddress().col
+      const end = Math.min(rightColumn, this.getAddress().col + this.width - 1) - this.getAddress().col
+      this.matrix.removeColumns(start, end)
     }
   }
 }

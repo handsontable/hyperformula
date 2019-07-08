@@ -470,9 +470,9 @@ export class AddressMapping {
     }, this.matrixMapping.values()[Symbol.iterator]())
   }
 
-  public* numericMatricesInColumns(sheet: number, startColumn: number): IterableIterator<MatrixVertex> {
+  public* numericMatricesInColumns(sheet: number, startColumn: number, endColumn: number = startColumn): IterableIterator<MatrixVertex> {
     yield* filterWith((mtx) => {
-      return mtx.spansThroughSheetColumn(sheet, startColumn) && !mtx.isFormula()
+      return mtx.spansThroughSheetColumn(sheet, startColumn, endColumn) && !mtx.isFormula()
     }, this.matrixMapping.values()[Symbol.iterator]())
   }
 }

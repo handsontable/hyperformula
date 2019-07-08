@@ -97,7 +97,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 export interface IMatrix {
   width(): number
   height(): number
-  get(col: number, row: number): number
+  get(col: number, row: number): number,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -174,6 +174,17 @@ export class Matrix implements IMatrix {
     const numberOfRows = endRow - startRow + 1
     this.matrix.splice(startRow, numberOfRows)
     this.size.height -= numberOfRows
+  }
+
+  public removeColumns(leftmostColumn: number, rightmostColumn: number) {
+    if (this.outOfBound(leftmostColumn, 0) || this.outOfBound(rightmostColumn, 0)) {
+      throw Error("Matrix index out of bound")
+    }
+    const numberOfColumns = rightmostColumn - leftmostColumn + 1
+    for (const row of this.matrix) {
+      row.splice(leftmostColumn, numberOfColumns)
+    }
+    this.size.width -= numberOfColumns
   }
 
   public zeroArrays(count: number, size: number) {

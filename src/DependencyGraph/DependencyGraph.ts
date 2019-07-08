@@ -193,6 +193,15 @@ export class DependencyGraph {
         this.graph.removeNode(vertex)
       }
     }
+
+    for (let matrix of this.addressMapping!.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+      const numberOfColumns = columnEnd - columnStart + 1
+      if (matrix.width === numberOfColumns) {
+        this.graph.removeNode(matrix)
+      } else {
+        matrix.removeColumns(sheet, columnStart, columnEnd)
+      }
+    }
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
