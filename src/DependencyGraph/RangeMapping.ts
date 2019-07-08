@@ -46,7 +46,6 @@ export class RangeMapping {
     }
 
     updated.forEach(vertex => {
-      vertex.clearCache()
       this.setRange(vertex)
     })
 
@@ -71,7 +70,6 @@ export class RangeMapping {
     }
 
     updated.forEach(range => {
-      range.clearCache()
       this.setRange(range)
     })
   }
@@ -94,7 +92,6 @@ export class RangeMapping {
     }
 
     updated.forEach(range => {
-      range.clearCache()
       this.setRange(range)
     })
   }
