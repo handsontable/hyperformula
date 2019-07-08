@@ -296,6 +296,10 @@ export class HandsOnEngine {
     this.evaluator!.run()
   }
 
+  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+    this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
+  }
+
   public disableNumericMatrices() {
     for (const [key, matrixVertex] of this.addressMapping!.numericMatrices()) {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)

@@ -179,6 +179,12 @@ export class DependencyGraph {
     })
   }
 
+  public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
+    if (this.addressMapping!.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
+      throw Error("It is not possible to remove column within matrix")
+    }
+  }
+
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
     if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart)) {
       throw Error("It is not possible to add row in row with matrix")
