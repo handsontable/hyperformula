@@ -292,6 +292,8 @@ export class HandsOnEngine {
         this.fixFormulaVertexAddressByColumn(node, col, numberOfCols)
       }
     }
+
+    this.evaluator!.run()
   }
 
   public disableNumericMatrices() {

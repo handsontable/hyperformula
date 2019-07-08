@@ -56,6 +56,16 @@ describe("Adding column", () => {
     expect(engine.getCellValue("C1")).toEqual(0)
     expect(engine.getCellValue("D1")).toEqual(2)
   })
+
+  it('reevaluates cells', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '2', '=MEDIAN(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue('C1')).toEqual(1.5)
+    engine.addColumns(0, 1, 1)
+    expect(engine.getCellValue('D1')).toEqual(1)
+  })
 })
 
 describe("Adding column, fixing dependency", () => {
