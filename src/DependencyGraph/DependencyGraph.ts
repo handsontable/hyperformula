@@ -159,7 +159,6 @@ export class DependencyGraph {
           continue
         }
         this.graph.removeNode(vertex)
-        this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
       }
     }
 
