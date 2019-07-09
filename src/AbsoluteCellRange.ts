@@ -167,4 +167,21 @@ export class AbsoluteCellRange {
 
     this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
   }
+
+  public removeColumns(columnStart: number, columnEnd: number) {
+    const numberOfColumns = columnEnd - columnStart + 1
+    if (columnStart > this.end.col) {
+      return
+    }
+
+    if (columnEnd < this.start.col) {
+      this.shiftByColumns(-numberOfColumns)
+      return
+    }
+    if (columnStart <= this.start.col) {
+      this.start.col = columnStart
+    }
+
+    this.end.col -= Math.min(columnEnd, this.end.col) - columnStart + 1
+  }
 }

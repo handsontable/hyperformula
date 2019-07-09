@@ -208,3 +208,47 @@ describe('Removing columns - dependencies', () => {
     expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
   })
 })
+
+describe('Removing columns - ranges', function () {
+  it('shift ranges in range mapping, range start at right of removed columns', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['', '=SUM(B1:C1)', ''],
+      /**/
+    ])
+
+    engine.removeColumns(0, 0, 0)
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0))!
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+  })
+
+  it('shift ranges in range mapping, range start before removed columns', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['=SUM(A1:C1)', '', ''],
+                     /*   */
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0))!
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+  })
+
+  it('shift ranges in range mapping, whole range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3', '=SUM(A1:C1)'],
+      /*          */
+    ])
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0)) as RangeVertex
+
+    engine.removeColumns(0, 0, 2)
+
+    const ranges = Array.from(engine.rangeMapping.getValues())
+    expect(ranges.length).toBe(0)
+    expect(engine.graph.hasNode(range)).toBe(false)
+  })
+});

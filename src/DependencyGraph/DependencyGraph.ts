@@ -204,6 +204,12 @@ export class DependencyGraph {
     }
 
     this.addressMapping!.removeColumns(sheet, columnStart, columnEnd)
+
+    const rangesToRemove = this.rangeMapping.truncateRangesVertically(sheet, columnStart, columnEnd)
+
+    rangesToRemove.forEach((vertex) => {
+      this.graph.removeNode(vertex)
+    })
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
