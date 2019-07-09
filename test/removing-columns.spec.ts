@@ -14,6 +14,19 @@ const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: Simp
   expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
+describe('Removing columns', () => {
+  it('reevaluates', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MEDIAN(B1:D1)', '2', '4', '3'],
+    ])
+    expect(engine.getCellValue('A1')).toEqual(3)
+
+    engine.removeColumns(0, 2, 2)
+
+    expect(engine.getCellValue('A1')).toEqual(2.5)
+  })
+})
+
 describe('Removing columns - matrices', () => {
   it('should not remove column within formula matrix', () => {
     const engine = HandsOnEngine.buildFromArray([

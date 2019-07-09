@@ -312,6 +312,8 @@ export class HandsOnEngine {
         this.fixFormulaVertexAddressByColumn(node, columnStart, -numberOfColumnsToDelete)
       }
     }
+
+    this.evaluator!.run()
   }
 
   public disableNumericMatrices() {
