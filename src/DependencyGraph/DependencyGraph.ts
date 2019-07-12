@@ -29,6 +29,7 @@ export class DependencyGraph {
       private readonly sheetMapping: SheetMapping,
       private readonly matrixMapping: MatrixMapping
   ) {
+    this.graph.addNode(EmptyCellVertex.getSingletonInstance())
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
@@ -276,8 +277,13 @@ export class DependencyGraph {
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex) {
-    this.addNode(vertex)
+    this.graph.addNode(vertex)
     this.setVertexAddress(address, vertex)
+  }
+
+  public addMatrixVertex(address: SimpleCellAddress, vertex: CellVertex) {
+    this.graph.addNode(vertex)
+    this.setAddressMappingForMatrixVertex(vertex, address)
   }
 
   public addNode(node: Vertex) {
@@ -415,6 +421,24 @@ export class DependencyGraph {
     }
 
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
+  }
+
+  private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress) {
+    this.setVertexAddress(formulaAddress, vertex)
+
+    if (!(vertex instanceof MatrixVertex)) {
+      return
+    }
+
+    const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
+    this.setMatrix(range, vertex)
+
+    for (let i = 0; i < vertex.width; ++i) {
+      for (let j = 0; j < vertex.height; ++j) {
+        const address = simpleCellAddress(formulaAddress.sheet, formulaAddress.col + i, formulaAddress.row + j)
+        this.setVertexAddress(address, vertex)
+      }
+    }
   }
 }
 
