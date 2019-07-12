@@ -1,5 +1,5 @@
 
-export type TopSortResult<T> = { sorted: T[], cycled: T[] }
+export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 /**
  * Provides graph directed structure
  */
@@ -9,7 +9,6 @@ export class Graph<T> {
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
-
 
   constructor() {
     this.nodes = new Set()
@@ -48,14 +47,14 @@ export class Graph<T> {
 
   public removeEdge(fromNode: T, toNode: T) {
     if (this.existsEdge(fromNode, toNode)) {
-      this.edges.get(fromNode)!.delete(toNode);
+      this.edges.get(fromNode)!.delete(toNode)
     } else {
-      throw new Error("Edge does not exist");
+      throw new Error('Edge does not exist')
     }
   }
 
   public removeIncomingEdges(toNode: T) {
-    this.edges.forEach(nodeEdges => {
+    this.edges.forEach((nodeEdges) => {
       nodeEdges.delete(toNode)
     })
   }
@@ -106,7 +105,7 @@ export class Graph<T> {
 
   public exchangeNode(oldNode: T, newNode: T) {
     this.addNode(newNode)
-    this.adjacentNodes(oldNode).forEach(adjacentNode => {
+    this.adjacentNodes(oldNode).forEach((adjacentNode) => {
       this.addEdge(newNode, adjacentNode)
     })
     this.removeNode(oldNode)
@@ -210,6 +209,16 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
+  public getDependecies(vertex: T): T[] {
+    const result: T[] = []
+    this.edges.forEach((adjacentNodes, sourceNode) => {
+      if (adjacentNodes.has(vertex)) {
+        result.push(sourceNode)
+      }
+    })
+    return result
+  }
+
   private computeSubgraphNodes(vertices: T[]): Set<T> {
     const result = new Set(vertices)
     const rec = (n: T) => {
@@ -252,15 +261,5 @@ export class Graph<T> {
       })
     })
     return incomingEdges
-  }
-
-  public getDependecies(vertex: T): Array<T> {
-    const result: Array<T> = []
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      if (adjacentNodes.has(vertex)) {
-        result.push(sourceNode)
-      }
-    })
-    return result
   }
 }

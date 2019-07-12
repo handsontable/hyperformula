@@ -1,8 +1,7 @@
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+
 import {CellValue, SheetCellAddress, SimpleCellAddress} from '../Cell'
 import {Sheet} from '../GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex} from './Vertex'
-import {filterWith} from "../generatorUtils";
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -104,7 +103,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public removeCell(address: SimpleCellAddress): void {
-    let colMapping = this.mapping.get(address.col)
+    const colMapping = this.mapping.get(address.col)
     if (colMapping) {
       colMapping.delete(address.row)
     }
@@ -188,7 +187,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
    *
    * It is created when building the mapping and the size of it is fixed.
    */
-  private mapping: CellVertex[][]
+  private readonly mapping: CellVertex[][]
 
   /**
    * @param width - width of the stored sheet
@@ -338,7 +337,7 @@ export class AddressMapping {
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
-      throw Error("Vertex for address missing in AddressMapping")
+      throw Error('Vertex for address missing in AddressMapping')
     }
     return vertex
   }
@@ -427,7 +426,7 @@ export class AddressMapping {
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
-      throw Error("Sheet does not exist")
+      throw Error('Sheet does not exist')
     }
     sheetMapping.addRows(row, numberOfRows)
   }
@@ -435,7 +434,7 @@ export class AddressMapping {
   public removeRows(sheet: number, rowStart: number, rowEnd: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
-      throw Error("Sheet does not exist")
+      throw Error('Sheet does not exist')
     }
     sheetMapping.removeRows(rowStart, rowEnd)
   }
@@ -443,7 +442,7 @@ export class AddressMapping {
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
-      throw Error("Sheet does not exist")
+      throw Error('Sheet does not exist')
     }
     sheetMapping.addColumns(column, numberOfColumns)
   }
@@ -451,7 +450,7 @@ export class AddressMapping {
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
-      throw Error("Sheet does not exist")
+      throw Error('Sheet does not exist')
     }
     sheetMapping.removeColumns(columnStart, columnEnd)
   }

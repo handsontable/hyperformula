@@ -1,14 +1,14 @@
-import {buildLexerConfig, CellReferenceAst, FormulaLexer, ParserWithCaching} from "../src/parser";
-import {Config} from "../src";
-import {SheetMapping} from "../src/DependencyGraph";
-import {CellAddress} from "../src/parser/CellAddress";
-import {simpleCellAddress} from "../src/Cell";
-import {Unparser} from "../src/parser/Unparser";
+import {Config} from '../src'
+import {simpleCellAddress} from '../src/Cell'
+import {SheetMapping} from '../src/DependencyGraph'
+import { ParserWithCaching} from '../src/parser'
+import {CellAddress} from '../src/parser/CellAddress'
+import {Unparser} from '../src/parser/Unparser'
 
 describe('Unparse', () => {
   const config = new Config()
   const sheetMapping = new SheetMapping()
-  sheetMapping.addSheet("Sheet1")
+  sheetMapping.addSheet('Sheet1')
   const parser = new ParserWithCaching(config, sheetMapping.fetch)
   const unparser = new Unparser(config, sheetMapping.name)
 
@@ -16,7 +16,7 @@ describe('Unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse simple addreess', async () => {
@@ -24,7 +24,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse absolute col', async () => {
@@ -32,7 +32,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse absolute row addreess', async () => {
@@ -40,7 +40,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse absolute address', async () => {
@@ -48,7 +48,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse cell ref between strings', async () => {
@@ -56,7 +56,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse  cell ref in string with escape', async () => {
@@ -64,16 +64,15 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
-
 
   it('#unparse cell range', async () => {
     const formula = '=$Sheet1.$A$1:B$2'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 
   it('#unparse ops', async () => {
@@ -81,6 +80,6 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual("=" + unparsed)
+    expect(formula).toEqual('=' + unparsed)
   })
 })

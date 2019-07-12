@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {checkMatrixSize, Matrix} from '../../Matrix'
-import {Ast, NumberAst, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {MatrixVertex} from '../../DependencyGraph'
+import {checkMatrixSize, Matrix} from '../../Matrix'
+import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser/Ast'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -139,7 +139,7 @@ export class MatrixPlugin extends FunctionPlugin {
       let rightEnd = currentMax
       let result = 42
       for (let iter = 0; iter < 32; iter++) {
-        let medianGuess = (leftEnd + rightEnd) / 2
+        const medianGuess = (leftEnd + rightEnd) / 2
         let medianGuessCount = 0
         for (let i3 = 0; i3 < windowSize; i3++) {
           for (let j3 = 0; j3 < windowSize; j3++) {
@@ -148,7 +148,7 @@ export class MatrixPlugin extends FunctionPlugin {
             }
           }
         }
- 
+
         if (windowSize % 2 === 0) {
           if (medianGuessCount === numberOfElements / 2) {
             result = medianGuess
@@ -215,7 +215,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return value
     }
 
-    throw new Error("Got not as a value something which is neither matrix nor range")
+    throw new Error('Got not as a value something which is neither matrix nor range')
   }
 
   private matrixFromRange(range: AbsoluteCellRange): Matrix | CellError {

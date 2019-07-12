@@ -1,7 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import {HandsOnEngine} from '../src'
-import {CsvImporter, CsvExporter} from '../src/csv'
+import {CsvExporter, CsvImporter} from '../src/csv'
 
 async function start() {
   if (process.argv.length < 4) {

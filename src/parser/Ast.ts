@@ -1,5 +1,5 @@
+import {CellError} from '../Cell'
 import {CellAddress} from './CellAddress'
-import {CellError} from "../Cell";
 
 export type Ast =
   NumberAst
@@ -254,6 +254,6 @@ export interface ErrorAst {
   error?: CellError
 }
 
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args: args})
+export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
 
-export const buildCellErrorAst = (error: CellError): ErrorAst => ({type: AstNodeType.ERROR, args: [], error: error})
+export const buildCellErrorAst = (error: CellError): ErrorAst => ({type: AstNodeType.ERROR, args: [], error})

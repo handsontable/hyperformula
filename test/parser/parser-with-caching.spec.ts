@@ -1,5 +1,5 @@
-import {CellAddress} from '../../src/parser/CellAddress'
 import {Config} from '../../src/Config'
+import {SheetMapping} from '../../src/DependencyGraph'
 import {
   AstNodeType,
   CellRangeAst,
@@ -14,7 +14,7 @@ import {
   ProcedureAst,
   StringAst,
 } from '../../src/parser'
-import {SheetMapping} from '../../src/DependencyGraph'
+import {CellAddress} from '../../src/parser/CellAddress'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {

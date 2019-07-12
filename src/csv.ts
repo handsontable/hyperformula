@@ -1,12 +1,12 @@
-import stringify from 'csv-stringify/lib/sync'
 import parse from 'csv-parse/lib/sync'
-import {HandsOnEngine, Config, Sheets} from './'
+import stringify from 'csv-stringify/lib/sync'
+import {Config, HandsOnEngine, Sheets} from './'
 
 export type CsvSheets = Record<string, string>
 
 export class CsvExporter {
   constructor(
-    public readonly csvDelimiter: string = ","
+    public readonly csvDelimiter: string = ',',
   ) {
   }
 
@@ -16,7 +16,7 @@ export class CsvExporter {
   public exportSheetByName(engine: HandsOnEngine, sheetName: string): string {
     const sheet = engine.sheetMapping.fetch(sheetName)
     return stringify(engine.getValues(sheet), {
-      delimiter: this.csvDelimiter
+      delimiter: this.csvDelimiter,
     })
   }
 
@@ -31,7 +31,7 @@ export class CsvExporter {
 
 export class CsvImporter {
   constructor(
-    public readonly csvDelimiter: string = ","
+    public readonly csvDelimiter: string = ',',
   ) {
   }
 

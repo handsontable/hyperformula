@@ -1,11 +1,11 @@
-import {Config, HandsOnEngine} from "../src";
-import {simpleCellAddress} from "../src/Cell";
-import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from "../src/DependencyGraph";
+import {Config, HandsOnEngine} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {simpleCellAddress} from '../src/Cell'
+import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
-describe("Disable matrix optimizatoins", () => {
-  it("should split matrix into value cell vertices", () => {
+describe('Disable matrix optimizatoins', () => {
+  it('should split matrix into value cell vertices', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
@@ -22,16 +22,16 @@ describe("Disable matrix optimizatoins", () => {
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.getCellValue("A1")).toBe(1)
-    expect(engine.getCellValue("B2")).toBe(4)
+    expect(engine.getCellValue('A1')).toBe(1)
+    expect(engine.getCellValue('B2')).toBe(4)
   })
 
-  it("should update edges between matrix and range", () => {
+  it('should update edges between matrix and range', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['=SUM(A1:B1)']
+      ['=SUM(A1:B1)'],
     ]
 
     const engine = HandsOnEngine.buildFromArray(sheet, config)
@@ -52,7 +52,7 @@ describe("Disable matrix optimizatoins", () => {
     expect(engine.dependencyGraph!.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).toBe(undefined)
   })
 
-  it("should update edges between matrix and formulas", () => {
+  it('should update edges between matrix and formulas', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
@@ -80,7 +80,7 @@ describe("Disable matrix optimizatoins", () => {
     expect(engine.graph.existsEdge(b2_after_update, a3)).toBe(true)
   })
 
-  it("should not change edges not related to matrix", () => {
+  it('should not change edges not related to matrix', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
@@ -99,8 +99,8 @@ describe("Disable matrix optimizatoins", () => {
 
     engine.disableNumericMatrices()
 
-    let a1_after_update = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
-    let c1_after_update = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0)) as EmptyCellVertex
+    const a1_after_update = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
+    const c1_after_update = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0)) as EmptyCellVertex
     expect(c1).toBe(c1_after_update)
 
     expect(a1_after_update).toBeInstanceOf(ValueCellVertex)

@@ -1,9 +1,9 @@
-import {Config, HandsOnEngine} from "../src";
-import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
-import {CellAddress} from "../src/parser/CellAddress";
-import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
+import {Config, HandsOnEngine} from '../src'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import { FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
+import {buildCellErrorAst, CellReferenceAst} from '../src/parser'
+import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex} from "../src/DependencyGraph";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
@@ -34,7 +34,7 @@ describe('Removing columns - matrices', () => {
       ['3', '4'],
     ])
 
-    expect(() => engine.removeColumns(0, 2, 2)).toThrowError("It is not possible to remove column within matrix")
+    expect(() => engine.removeColumns(0, 2, 2)).toThrowError('It is not possible to remove column within matrix')
   })
 
   it('should remove column from numeric matrix', () => {
@@ -74,10 +74,10 @@ describe('Removing columns - matrices', () => {
     engine.removeColumns(0, 0, 1)
     expect(engine.graph.nodes.size).toBe(1)
   })
-});
+})
 
-describe('Removing columns - graph', function () {
-  it('should remove vertices from graph', function () {
+describe('Removing columns - graph', function() {
+  it('should remove vertices from graph', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4'],
       ['1', '2', '3', '4'],
@@ -85,18 +85,18 @@ describe('Removing columns - graph', function () {
     expect(engine.graph.nodes.size).toBe(9)
     engine.removeColumns(0, 0, 1)
     expect(engine.graph.nodes.size).toBe(5) // left two vertices in first column, two in last and empty singleton
-  });
+  })
 
-  it('works if there are empty cells removed', function () {
+  it('works if there are empty cells removed', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '', '3'],
     ])
     expect(engine.graph.nodes.size).toBe(3)
     engine.removeColumns(0, 1, 1)
     expect(engine.graph.nodes.size).toBe(3)
-  });
+  })
 
-  it('does not remove matrix vertices from graph', function () {
+  it('does not remove matrix vertices from graph', function() {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
@@ -105,8 +105,8 @@ describe('Removing columns - graph', function () {
     expect(engine.graph.nodes.size).toBe(2)
     engine.removeColumns(0, 1, 1)
     expect(engine.graph.nodes.size).toBe(2)
-  });
-});
+  })
+})
 
 describe('Removing columns - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
@@ -117,8 +117,8 @@ describe('Removing columns - dependencies', () => {
       ],
       Sheet2: [
         ['3'],
-        ['4']
-      ]
+        ['4'],
+      ],
     })
 
     expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absoluteCol(1, 0, 0))
@@ -172,7 +172,7 @@ describe('Removing columns - dependencies', () => {
 
   it('same sheet, case Rab', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['42', '1', '=A1']
+      ['42', '1', '=A1'],
             /**/
     ])
 
@@ -183,7 +183,7 @@ describe('Removing columns - dependencies', () => {
 
   it('same sheet, case Rba', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=C1', '1', '42']
+      ['=C1', '1', '42'],
               /**/
     ])
 
@@ -204,7 +204,7 @@ describe('Removing columns - dependencies', () => {
 
   it('same sheet, case Rca', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=B1', '1']
+      ['=B1', '1'],
              /**/
     ])
 
@@ -222,7 +222,7 @@ describe('Removing columns - dependencies', () => {
   })
 })
 
-describe('Removing columns - ranges', function () {
+describe('Removing columns - ranges', function() {
   it('shift ranges in range mapping, range start at right of removed columns', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
@@ -264,4 +264,4 @@ describe('Removing columns - ranges', function () {
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
-});
+})

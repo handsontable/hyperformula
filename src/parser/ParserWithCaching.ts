@@ -1,16 +1,16 @@
+import assert from 'assert'
 import {IToken, tokenMatcher} from 'chevrotain'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
-import {CellAddress, CellReferenceType} from './CellAddress'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
+import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache, RelativeDependency} from './Cache'
+import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
-import {binaryOpTokenMap} from './binaryOpTokenMap'
-import assert from 'assert';
 
 /**
  * Parses formula using caching if feasible.
@@ -19,7 +19,7 @@ export class ParserWithCaching {
   public statsCacheUsed: number = 0
   private cache: Cache = new Cache()
   private lexer: FormulaLexer
-  private lexerConfig: ILexerConfig
+  private readonly lexerConfig: ILexerConfig
   private formulaParser: FormulaParser
 
   constructor(
@@ -87,39 +87,7 @@ export class ParserWithCaching {
   }
 
   public computeHashFromAst(ast: Ast): string {
-    return "=" + this.doHash(ast)
-  }
-
-  private doHash(ast: Ast): string {
-    switch (ast.type) {
-      case AstNodeType.NUMBER: {
-        return ast.value.toString()
-      }
-      case AstNodeType.STRING: {
-        return "\"" + ast.value + "\""
-      }
-      case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
-        return ast.procedureName + "(" + args + ")"
-      }
-      case AstNodeType.CELL_REFERENCE: {
-        return cellHashFromToken(ast.reference)
-      }
-      case AstNodeType.CELL_RANGE: {
-        const start = cellHashFromToken(ast.start)
-        const end = cellHashFromToken(ast.end)
-        return start + ":" + end
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return "-" + this.doHash(ast.value)
-      }
-      case AstNodeType.ERROR: {
-        return "!ERR"
-      }
-      default: {
-        return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
-      }
-    }
+    return '=' + this.doHash(ast)
   }
 
   public getCache(): Cache {
@@ -131,7 +99,39 @@ export class ParserWithCaching {
     assert.ok(cacheElem, `Hash ${hash} not present in cache`)
     return {
       ast: cacheElem.ast,
-      dependencies: absolutizeDependencies(cacheElem.relativeDependencies, baseAddress)
+      dependencies: absolutizeDependencies(cacheElem.relativeDependencies, baseAddress),
+    }
+  }
+
+  private doHash(ast: Ast): string {
+    switch (ast.type) {
+      case AstNodeType.NUMBER: {
+        return ast.value.toString()
+      }
+      case AstNodeType.STRING: {
+        return '"' + ast.value + '"'
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
+        return ast.procedureName + '(' + args + ')'
+      }
+      case AstNodeType.CELL_REFERENCE: {
+        return cellHashFromToken(ast.reference)
+      }
+      case AstNodeType.CELL_RANGE: {
+        const start = cellHashFromToken(ast.start)
+        const end = cellHashFromToken(ast.end)
+        return start + ':' + end
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return '-' + this.doHash(ast.value)
+      }
+      case AstNodeType.ERROR: {
+        return '!ERR'
+      }
+      default: {
+        return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
+      }
     }
   }
 }

@@ -1,13 +1,12 @@
-import {buildLexerConfig, CellReferenceAst, FormulaLexer, ParserWithCaching} from "../../src/parser";
-import {Config} from "../../src";
-import {SheetMapping} from "../../src/DependencyGraph";
-import {CellAddress} from "../../src/parser/CellAddress";
-import {simpleCellAddress} from "../../src/Cell";
+import {Config} from '../../src'
+import {simpleCellAddress} from '../../src/Cell'
+import {SheetMapping} from '../../src/DependencyGraph'
+import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 
 describe('Compute hash from ast', () => {
   const config = new Config()
   const sheetMapping = new SheetMapping()
-  sheetMapping.addSheet("Sheet1")
+  sheetMapping.addSheet('Sheet1')
   const lexer = new FormulaLexer(buildLexerConfig(config))
   const parser = new ParserWithCaching(config, sheetMapping.fetch)
 

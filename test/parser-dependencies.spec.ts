@@ -1,9 +1,9 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
-import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
-import {ParserWithCaching} from '../src/parser'
 import {SheetMapping} from '../src/DependencyGraph'
+import {ParserWithCaching} from '../src/parser'
+import {CellAddress} from '../src/parser/CellAddress'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {

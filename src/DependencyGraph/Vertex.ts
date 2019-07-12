@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, CellError, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
@@ -18,8 +18,8 @@ export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
-  private formula: Ast | null
-  private cellAddress: SimpleCellAddress
+  private readonly formula: Ast | null
+  private readonly cellAddress: SimpleCellAddress
   private matrix: IMatrix | CellError
 
   get width(): number {
@@ -44,7 +44,7 @@ export class MatrixVertex {
 
   public setCellValue(matrix: CellValue) {
     if (!(matrix instanceof Matrix) && !(matrix instanceof CellError)) {
-      throw Error("Unsupported cell type")
+      throw Error('Unsupported cell type')
     }
     this.matrix = matrix
   }
@@ -153,7 +153,6 @@ export class FormulaCellVertex {
   public getFormula(): Ast {
     return this.formula
   }
-
 
   public setFormula(formula: Ast) {
     this.formula = formula

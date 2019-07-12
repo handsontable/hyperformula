@@ -1,10 +1,9 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
+import {Matrix} from '../../Matrix'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {DependencyGraph, RangeMapping, RangeVertex} from '../../DependencyGraph'
 import {FunctionPlugin} from './FunctionPlugin'
-import {Matrix} from "../../Matrix";
-import {zip} from "../../generatorUtils";
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -18,11 +17,11 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    let leftArg: CellValue | AbsoluteCellRange = left.type === AstNodeType.CELL_RANGE
+    const leftArg: CellValue | AbsoluteCellRange = left.type === AstNodeType.CELL_RANGE
             ? AbsoluteCellRange.fromCellRange(left, formulaAddress)
             : this.evaluateAst(left, formulaAddress)
 
-    let rightArg: CellValue | AbsoluteCellRange = right.type === AstNodeType.CELL_RANGE
+    const rightArg: CellValue | AbsoluteCellRange = right.type === AstNodeType.CELL_RANGE
         ? AbsoluteCellRange.fromCellRange(right, formulaAddress)
         : this.evaluateAst(right, formulaAddress)
 

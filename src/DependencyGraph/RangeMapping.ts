@@ -29,7 +29,7 @@ export class RangeMapping {
     return this.rangeMapping.get(key) || null
   }
 
-  public truncateRanges(sheet: number, rowStart: number, rowEnd: number): Array<RangeVertex> {
+  public truncateRanges(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 
@@ -45,14 +45,14 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach(vertex => {
+    updated.forEach((vertex) => {
       this.setRange(vertex)
     })
 
     return rangesToRemove
   }
 
-  public truncateRangesVertically(sheet: number, columnStart: number, columnEnd: number): Array<RangeVertex> {
+  public truncateRangesVertically(sheet: number, columnStart: number, columnEnd: number): RangeVertex[] {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 
@@ -68,7 +68,7 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach(vertex => {
+    updated.forEach((vertex) => {
       this.setRange(vertex)
     })
 
@@ -92,7 +92,7 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach(range => {
+    updated.forEach((range) => {
       this.setRange(range)
     })
   }
@@ -114,7 +114,7 @@ export class RangeMapping {
       }
     }
 
-    updated.forEach(range => {
+    updated.forEach((range) => {
       this.setRange(range)
     })
   }

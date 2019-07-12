@@ -1,9 +1,9 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
-import {Size} from './Matrix'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
-import {Sheets} from "./GraphBuilder";
+import {Sheets} from './GraphBuilder'
+import {Size} from './Matrix'
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {
@@ -57,7 +57,7 @@ export class GraphBuilderMatrixHeuristic {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
-      private readonly threshold: number
+      private readonly threshold: number,
   ) {
   }
 
@@ -186,8 +186,8 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
 
 function possibleMatrix(range: AbsoluteCellRange, isMatrix: boolean, cells: SimpleCellAddress[]): PossibleMatrix {
   return {
-    isMatrix: isMatrix,
-    range: range,
-    cells: cells
+    isMatrix,
+    range,
+    cells,
   }
 }

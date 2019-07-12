@@ -1,7 +1,7 @@
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/DependencyGraph'
+
 import {simpleCellAddress} from '../src/Cell'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/DependencyGraph'
+import { ValueCellVertex} from '../src/DependencyGraph'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {

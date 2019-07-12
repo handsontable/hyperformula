@@ -1,5 +1,5 @@
-import {CellAddress} from './CellAddress'
 import {Ast, AstNodeType} from './Ast'
+import {CellAddress} from './CellAddress'
 
 export type RelativeDependency = CellAddress | [CellAddress, CellAddress]
 

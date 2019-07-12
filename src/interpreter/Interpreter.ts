@@ -1,9 +1,11 @@
+import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {AddressMapping, DependencyGraph, Graph, RangeMapping, Vertex} from '../DependencyGraph'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {DependencyGraph} from '../DependencyGraph'
 import {Matrix} from '../Matrix'
 import {Ast, AstNodeType} from '../parser/Ast'
+import {Statistics} from '../statistics/Statistics'
 import {BooleanPlugin} from './plugin/BooleanPlugin'
 import {CountUniquePlugin} from './plugin/CountUniquePlugin'
 import {DatePlugin} from './plugin/DatePlugin'
@@ -18,12 +20,10 @@ import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {GPU} from 'gpu.js'
-import {Statistics} from '../statistics/Statistics'
 
 export class Interpreter {
-  private readonly pluginCache: Map<string, [any, string]> = new Map()
   public readonly gpu: GPU
+  private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,

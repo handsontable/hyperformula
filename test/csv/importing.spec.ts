@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../../src'
+
 import {CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 

@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import { SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
 export interface Size { width: number, height: number }
@@ -119,7 +119,7 @@ export class NotComputedMatrix implements IMatrix {
 }
 
 export class Matrix implements IMatrix {
-  private matrix: number[][]
+  private readonly matrix: number[][]
   private size: Size
 
   constructor(matrix: number[][]) {
@@ -135,7 +135,6 @@ export class Matrix implements IMatrix {
     const additionalHeight = windowSize > this.size.height ? windowSize - this.size.height : this.size.height % windowSize
     const additionalWidth = windowSize > this.size.width ? windowSize - this.size.width : this.size.width % windowSize
     const newWidth = this.size.width + additionalWidth
-    const newHeight = this.size.height + additionalHeight
 
     const result: number[][] = []
     for (let y = 0; y < this.size.height; ++y) {
@@ -169,7 +168,7 @@ export class Matrix implements IMatrix {
 
   public removeRows(startRow: number, endRow: number) {
     if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
-      throw Error("Matrix index out of bound")
+      throw Error('Matrix index out of bound')
     }
     const numberOfRows = endRow - startRow + 1
     this.matrix.splice(startRow, numberOfRows)
@@ -178,7 +177,7 @@ export class Matrix implements IMatrix {
 
   public removeColumns(leftmostColumn: number, rightmostColumn: number) {
     if (this.outOfBound(leftmostColumn, 0) || this.outOfBound(rightmostColumn, 0)) {
-      throw Error("Matrix index out of bound")
+      throw Error('Matrix index out of bound')
     }
     const numberOfColumns = rightmostColumn - leftmostColumn + 1
     for (const row of this.matrix) {
@@ -189,7 +188,7 @@ export class Matrix implements IMatrix {
 
   public zeroArrays(count: number, size: number) {
     const result = []
-    for (let i=0; i<count; ++i) {
+    for (let i = 0; i < count; ++i) {
       result.push(new Array(size).fill(0))
     }
     return result
@@ -221,15 +220,15 @@ export class Matrix implements IMatrix {
     return this.matrix
   }
 
-  private outOfBound(col: number, row: number): boolean {
-    return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
-  }
-
   public* generateFlatValues(): IterableIterator<number> {
-    for (let row=0; row<this.size.height; ++row) {
-      for (let col=0; col<this.size.width; ++col) {
+    for (let row = 0; row < this.size.height; ++row) {
+      for (let col = 0; col < this.size.width; ++col) {
         yield this.matrix[row][col]
       }
     }
+  }
+
+  private outOfBound(col: number, row: number): boolean {
+    return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
   }
 }

@@ -1,6 +1,6 @@
-import {sheets, expectedValues} from '../sheets/11-many-medians'
+
 import {benchmarkSheets} from '../benchmark'
-import {Config} from '../../src'
+import {expectedValues, sheets} from '../sheets/11-many-medians'
 
 (async () => {
   const s = sheets()

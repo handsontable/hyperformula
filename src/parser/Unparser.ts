@@ -1,16 +1,15 @@
-import {Ast, AstNodeType} from "./index";
-import {SimpleCellAddress} from "../Cell";
-import {CellAddress, CellReferenceType} from "./CellAddress";
-import {Config} from "../Config";
-import {cellHashFromToken} from "./ParserWithCaching";
-import {binaryOpTokenMap} from "./binaryOpTokenMap";
+import {SimpleCellAddress} from '../Cell'
+import {Config} from '../Config'
+import {binaryOpTokenMap} from './binaryOpTokenMap'
+import {CellAddress, CellReferenceType} from './CellAddress'
+import {Ast, AstNodeType} from './index'
 
 export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
   constructor(
       private readonly config: Config,
-      private readonly sheetMappingFn: SheetMappingFn
+      private readonly sheetMappingFn: SheetMappingFn,
   ) {
   }
 
@@ -20,25 +19,25 @@ export class Unparser {
         return ast.value.toString()
       }
       case AstNodeType.STRING: {
-        return "\"" + ast.value + "\""
+        return '"' + ast.value + '"'
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparse(arg, address)).join(this.config.functionArgSeparator)
-        return ast.procedureName + "(" + args + ")"
+        return ast.procedureName + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
         const sheet = this.sheetMappingFn(ast.reference.sheet)
-        return "$" + sheet + "." + addressToString(ast.reference, address)
+        return '$' + sheet + '.' + addressToString(ast.reference, address)
       }
       case AstNodeType.CELL_RANGE: {
         const sheet = this.sheetMappingFn(ast.start.sheet)
-        return "$" + sheet + "." + addressToString(ast.start, address) + ":" + addressToString(ast.end, address)
+        return '$' + sheet + '.' + addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return "-" + this.unparse(ast.value, address)
+        return '-' + this.unparse(ast.value, address)
       }
       case AstNodeType.ERROR: {
-        return "!ERR"
+        return '!ERR'
       }
       default: {
         return this.unparse(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparse(ast.right, address)
@@ -48,20 +47,20 @@ export class Unparser {
 }
 
 export function columnIndexToLabel(column: number) {
-  let result = '';
+  let result = ''
 
   while (column >= 0) {
-    result = String.fromCharCode((column % 26) + 97) + result;
-    column = Math.floor(column / 26) - 1;
+    result = String.fromCharCode((column % 26) + 97) + result
+    column = Math.floor(column / 26) - 1
   }
 
-  return result.toUpperCase();
+  return result.toUpperCase()
 }
 
 export function addressToString(address: CellAddress, baseAddress: SimpleCellAddress): string {
   const simpleAddress = address.toSimpleCellAddress(baseAddress)
   const column = columnIndexToLabel(simpleAddress.col)
-  const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? "$" : ''
-  const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? "$" : ''
+  const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+  const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
   return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
 }

@@ -1,19 +1,16 @@
-import {CellError, ErrorType,} from './Cell'
+import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
-import {Evaluator} from './Evaluator'
-import {Interpreter} from './interpreter/Interpreter'
-import {Ast} from './parser'
-import {Statistics, StatType} from './statistics/Statistics'
 import {
+  DependencyGraph,
   FormulaCellVertex,
   MatrixVertex,
   RangeVertex,
   Vertex,
-  RangeMapping,
-  Graph,
-  AddressMapping,
-  DependencyGraph
 } from './DependencyGraph'
+import {Evaluator} from './Evaluator'
+import {Interpreter} from './interpreter/Interpreter'
+import {Ast} from './parser'
+import {Statistics, StatType} from './statistics/Statistics'
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter

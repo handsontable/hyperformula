@@ -91,19 +91,19 @@ describe('Function SUMPRODUCT', () => {
 
   it('works with matrices', async () => {
     const engine = await HandsOnEngine.buildFromArray([
-        ['1','2'],
+        ['1', '2'],
         ['3'],
-        ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))']
+        ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
     ])
     expect(engine.getCellValue('A3')).toEqual(7)
   })
 
   it('works if same number of elements in ranges', async () => {
     const engine = await HandsOnEngine.buildFromArray([
-      ['1','2','3'],
+      ['1', '2', '3'],
       ['2'],
       ['3'],
-      ['=SUMPRODUCT(A1:C1,A1:A3)']
+      ['=SUMPRODUCT(A1:C1,A1:A3)'],
     ])
     expect(engine.getCellValue('A4')).toEqual(14)
   })

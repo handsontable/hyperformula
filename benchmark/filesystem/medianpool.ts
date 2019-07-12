@@ -24,24 +24,24 @@ async function start() {
   // })
 
   console.info(' === MEDIANS 100/50 === ')
-  await benchmark('../HandsOnEnginePrivate/medianpool/median100_stride50', [{address: '$result.A1', value: 4.91906}], ";", { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
+  await benchmark('../HandsOnEnginePrivate/medianpool/median100_stride50', [{address: '$result.A1', value: 4.91906}], ';', { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
       functionArgSeparator: ',',
       gpuMode: 'cpu',
-    })
+    }),
   })
 
   console.info('\n === MEDIANPOOL 100/50 - CPU === ')
-  await benchmark('../HandsOnEnginePrivate/medianpool/medianpool100_stride50', [{address: '$result.A1', value: 4.90532}], ";", { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
+  await benchmark('../HandsOnEnginePrivate/medianpool/medianpool100_stride50', [{address: '$result.A1', value: 4.90532}], ';', { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
       functionArgSeparator: ',',
       gpuMode: 'cpu',
-    })
+    }),
   })
 
   console.info('\n === MEDIANPOOL 100/50 - GPU === ')
-  await benchmark('../HandsOnEnginePrivate/medianpool/medianpool100_stride50', [{address: '$result.A1', value: 4.90532}], ";", { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
+  await benchmark('../HandsOnEnginePrivate/medianpool/medianpool100_stride50', [{address: '$result.A1', value: 4.90532}], ';', { millisecondsPerThousandRows: 20000, numberOfRuns: 3, engineConfig: new Config({
       functionArgSeparator: ',',
       gpuMode: 'gpu',
-    })
+    }),
   })
 
   // console.info('\n === MEDIANPOOL 500/250 - CPU === ')

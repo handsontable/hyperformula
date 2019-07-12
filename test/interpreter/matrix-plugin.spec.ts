@@ -43,9 +43,9 @@ describe('Matrix plugin', () => {
   it('matrix multiplication with string in data', async () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = await HandsOnEngine.buildFromArray([
-      ['1', '2','{=MMULT(A1:B2,A3:B4)}'],
+      ['1', '2', '{=MMULT(A1:B2,A3:B4)}'],
       ['3', 'foo'],
-      ['1', '2','{=MMULT(A3:B4,A1:B2)}'],
+      ['1', '2', '{=MMULT(A3:B4,A1:B2)}'],
       ['3', '4'],
     ], config)
 

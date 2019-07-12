@@ -1,16 +1,15 @@
-import {Config, HandsOnEngine} from "../src";
-import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
+import {Config, HandsOnEngine} from '../src'
+import {simpleCellAddress, SimpleCellAddress} from '../src/Cell'
+import {EmptyCellVertex, FormulaCellVertex} from '../src/DependencyGraph'
+import {CellReferenceAst} from '../src/parser/Ast'
+import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex} from "../src/DependencyGraph";
-import {CellAddress} from "../src/parser/CellAddress"
-import {CellReferenceAst} from "../src/parser/Ast"
-
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
 }
 
-describe("Adding row", () => {
+describe('Adding row', () => {
   it('local dependency does not change if we add rows in other sheets', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
@@ -20,14 +19,14 @@ describe("Adding row", () => {
       ],
       Sheet2: [
         ['=A2'],
-        ['=B1']
-      ]
+        ['=B1'],
+      ],
     })
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(1,0,0))).toEqual(CellAddress.relative(1, 0, 1))
-    expect(extractReference(engine, simpleCellAddress(1,0,1))).toEqual(CellAddress.relative(1, 1, -1))
+    expect(extractReference(engine, simpleCellAddress(1, 0, 0))).toEqual(CellAddress.relative(1, 0, 1))
+    expect(extractReference(engine, simpleCellAddress(1, 0, 1))).toEqual(CellAddress.relative(1, 1, -1))
   })
 
   it('absolute dependency does not change if dependency is in other sheet than we add rows', () => {
@@ -39,8 +38,8 @@ describe("Adding row", () => {
       ],
       Sheet2: [
         ['42'],
-        ['78']
-      ]
+        ['78'],
+      ],
     })
 
     engine.addRows(0, 1, 1)
@@ -139,7 +138,7 @@ describe("Adding row", () => {
   it('same sheet, same row', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['42'],
-        ['43', '=A2']
+        ['43', '=A2'],
     ])
 
     engine.addRows(0, 1, 1)
@@ -207,41 +206,41 @@ describe("Adding row", () => {
       ['3', '4'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['13']
+      ['13'],
     ])
 
     expect(() => {
       engine.addRows(0, 3, 1)
-    }).toThrow(new Error("It is not possible to add row in row with matrix"))
+    }).toThrow(new Error('It is not possible to add row in row with matrix'))
 
     expect(() => {
       engine.addRows(0, 2, 1)
-    }).toThrow(new Error("It is not possible to add row in row with matrix"))
+    }).toThrow(new Error('It is not possible to add row in row with matrix'))
   })
 
   it('add row inside numeric matrix, expand matrix', () => {
     const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
-        ['1','2'],
-        ['3','4'],
+        ['1', '2'],
+        ['3', '4'],
     ], config)
 
-    expect(engine.getCellValue("A2")).toEqual(3)
+    expect(engine.getCellValue('A2')).toEqual(3)
 
     engine.addRows(0, 1, 2)
 
-    expect(engine.getCellValue("A2")).toEqual(0)
-    expect(engine.getCellValue("A3")).toEqual(0)
-    expect(engine.getCellValue("A4")).toEqual(3)
+    expect(engine.getCellValue('A2')).toEqual(0)
+    expect(engine.getCellValue('A3')).toEqual(0)
+    expect(engine.getCellValue('A4')).toEqual(3)
   })
 
   it('it should insert new cell with edge to only one range below', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1','=SUM(A1:A1)'],
-      ['2','=SUM(A1:A2)'],
+      ['1', '=SUM(A1:A1)'],
+      ['2', '=SUM(A1:A2)'],
       //
-      ['3','=SUM(A1:A3)'],
-      ['4','=SUM(A1:A4)'],
+      ['3', '=SUM(A1:A3)'],
+      ['4', '=SUM(A1:A4)'],
     ])
 
     engine.addRows(0, 2, 1)
@@ -255,11 +254,11 @@ describe("Adding row", () => {
 
   it ('it should insert new cell with edge to only one range below, shifted by 1', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
-      ['2','=SUM(A1:A1)'],
-      ['3','=SUM(A1:A2)'],
+      ['1', ''],
+      ['2', '=SUM(A1:A1)'],
+      ['3', '=SUM(A1:A2)'],
       //
-      ['4','=SUM(A1:A3)'],
+      ['4', '=SUM(A1:A3)'],
     ])
 
     engine.addRows(0, 3, 1)
@@ -270,11 +269,11 @@ describe("Adding row", () => {
 
   it ('range start in row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A2:A4)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A2:A4)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -285,11 +284,11 @@ describe("Adding row", () => {
 
   it ('range start above row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A1:A4)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A1:A4)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -302,11 +301,11 @@ describe("Adding row", () => {
 
   it ('range start below row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A3:A4)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A3:A4)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -317,11 +316,11 @@ describe("Adding row", () => {
 
   it ('range end above row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A1:A1)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A1:A1)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -332,11 +331,11 @@ describe("Adding row", () => {
 
   it ('range end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A1:A2)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A1:A2)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -350,11 +349,11 @@ describe("Adding row", () => {
 
   it ('range end below row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A1:A3)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A1:A3)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)
@@ -368,11 +367,11 @@ describe("Adding row", () => {
 
   it ('range start and end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1',''],
+      ['1', ''],
       //
-      ['2','=SUM(A2:A2)'],
-      ['3',''],
-      ['4',''],
+      ['2', '=SUM(A2:A2)'],
+      ['3', ''],
+      ['4', ''],
     ])
 
     engine.addRows(0, 1, 1)

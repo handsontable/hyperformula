@@ -1,5 +1,5 @@
-import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
+import {CellAddress} from './parser/CellAddress'
 
 /**
  * Possible errors returned by our interpreter.

@@ -1,5 +1,5 @@
-import {CellAddress} from '../../src/parser/CellAddress'
 import {Config} from '../../src/Config'
+import {SheetMapping} from '../../src/DependencyGraph'
 import {
   AstNodeType,
   EqualsOpAst,
@@ -9,7 +9,7 @@ import {
   LessThanOrEqualOpAst, NotEqualOpAst,
   ParserWithCaching,
 } from '../../src/parser'
-import {SheetMapping} from '../../src/DependencyGraph'
+import {CellAddress} from '../../src/parser/CellAddress'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {

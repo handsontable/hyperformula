@@ -22,7 +22,7 @@ export class Config {
     functionPlugins: [],
     gpuMode: 'gpu',
     matrixDetection: true,
-    matrixDetectionThreshold: 100
+    matrixDetectionThreshold: 100,
   }
 
   public readonly addressMappingFillThreshold: number
@@ -43,8 +43,8 @@ export class Config {
         functionPlugins,
         gpuMode,
         matrixDetection,
-        matrixDetectionThreshold
-      }: Partial<ConfigParams> = {}
+        matrixDetectionThreshold,
+      }: Partial<ConfigParams> = {},
   ) {
     this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat

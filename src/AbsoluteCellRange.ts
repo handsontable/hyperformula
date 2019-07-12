@@ -1,8 +1,6 @@
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellAddress} from './parser/CellAddress'
 import {Matrix} from './Matrix'
-import {SheetMapping} from "./DependencyGraph";
-import {Sheets} from "./GraphBuilder";
+import {CellAddress} from './parser/CellAddress'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 

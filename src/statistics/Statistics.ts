@@ -13,11 +13,11 @@ export enum StatType {
  * Provides tracking performance statistics to the engine
  */
 export class Statistics {
-  private readonly stats: Map<StatType, number> = new Map<StatType, number>()
-  private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
   public countifFullCacheUsed = 0
   public countifPartialCacheUsed = 0
   public sumifFullCacheUsed = 0
+  private readonly stats: Map<StatType, number> = new Map<StatType, number>()
+  private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
 
   /**
    * Resets statistics

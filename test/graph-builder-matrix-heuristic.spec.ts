@@ -25,7 +25,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix)
 
     expect(output.length).toEqual(1)
 
@@ -43,7 +43,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [2, 2, 2, 2],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix)
 
     expect(output.length).toEqual(2)
 
@@ -63,7 +63,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [0, 0, 1, 1, 0, 0],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix)
 
     expect(output.length).toEqual(3)
 
@@ -84,7 +84,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -96,7 +96,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -108,7 +108,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })
@@ -120,7 +120,7 @@ describe('GraphBuilderMatrixHeuristic', () => {
       [1, 1, 1, 0],
     ]))
 
-    const output = [...findMatrices(1, input)].filter(m => m.isMatrix && m.range.size() > 1)
+    const output = [...findMatrices(1, input)].filter((m) => m.isMatrix && m.range.size() > 1)
 
     expect(output.length).toEqual(0)
   })

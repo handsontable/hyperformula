@@ -1,17 +1,14 @@
-import {AddressMapping, DependencyGraph} from '../src/DependencyGraph'
 import {simpleCellAddress} from '../src/Cell'
-import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
-import {GraphBuilder} from '../src/GraphBuilder'
-import {Graph} from '../src/DependencyGraph'
-import {buildCellRangeAst, buildProcedureAst, ParserWithCaching} from '../src/parser'
 import {RangeMapping} from '../src/DependencyGraph'
+import {AddressMapping, DependencyGraph} from '../src/DependencyGraph'
 import {SheetMapping} from '../src/DependencyGraph'
-import {Statistics} from '../src/statistics/Statistics'
+import {Graph} from '../src/DependencyGraph'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/DependencyGraph'
+import {MatrixMapping} from '../src/DependencyGraph/MatrixMapping'
+import {GraphBuilder} from '../src/GraphBuilder'
+import { ParserWithCaching} from '../src/parser'
 import './testConfig.ts'
-import {add} from "../src/interpreter/scalar";
-import {MatrixMapping} from "../src/DependencyGraph/MatrixMapping";
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {

@@ -1,10 +1,10 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
+import { DependencyGraph} from '../../DependencyGraph'
+import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {Vertex, RangeMapping, Graph, AddressMapping, DependencyGraph} from '../../DependencyGraph'
 import {Interpreter} from '../Interpreter'
-import {Matrix} from "../../Matrix";
 
 interface IImplementedFunctions {
   [functionName: string]: {

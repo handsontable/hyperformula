@@ -251,14 +251,14 @@ describe('Basic Graph manipulation', () => {
 })
 
 describe('Graph cruds', () => {
-  it ("#removeEdge not existing edge", () => {
+  it ('#removeEdge not existing edge', () => {
     const graph = new Graph()
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
     graph.addNode(node0)
     graph.addNode(node1)
 
-    expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error("Edge does not exist"))
+    expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error('Edge does not exist'))
   })
 
   it ('#removeEdge removes edge from graph', () => {

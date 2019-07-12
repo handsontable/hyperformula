@@ -1,6 +1,6 @@
-import {MatrixVertex} from "./Vertex";
-import {filterWith} from "../generatorUtils";
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {filterWith} from '../generatorUtils'
+import {MatrixVertex} from './Vertex'
 
 export class MatrixMapping {
   private readonly matrixMapping: Map<string, MatrixVertex> = new Map()

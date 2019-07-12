@@ -1,5 +1,5 @@
-import { ExpectedValue} from '../benchmark'
 import {sheetCellAddressToString} from '../../src/Cell'
+import { ExpectedValue} from '../benchmark'
 
 const matrixSize = 1000
 

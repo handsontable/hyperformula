@@ -1,20 +1,5 @@
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellAddress} from './parser/CellAddress'
-import {
-  Ast,
-  AstNodeType,
-  buildCellErrorAst,
-  cellAddressFromString,
-  isFormula,
-  isMatrix,
-  ParserWithCaching,
-  ProcedureAst
-} from './parser'
 import {Config} from './Config'
-import {Evaluator} from './Evaluator'
-import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
-import {Statistics, StatType} from './statistics/Statistics'
 import {
   AddressMapping,
   DependencyGraph,
@@ -25,10 +10,24 @@ import {
   RangeMapping,
   SheetMapping,
   ValueCellVertex,
-  Vertex
+  Vertex,
 } from './DependencyGraph'
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {MatrixMapping} from "./DependencyGraph/MatrixMapping";
+import {MatrixMapping} from './DependencyGraph/MatrixMapping'
+import {Evaluator} from './Evaluator'
+import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {
+  Ast,
+  AstNodeType,
+  buildCellErrorAst,
+  cellAddressFromString,
+  isFormula,
+  isMatrix,
+  ParserWithCaching,
+  ProcedureAst,
+} from './parser'
+import {CellAddress} from './parser/CellAddress'
+import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Statistics, StatType} from './statistics/Statistics'
 
 /**
  * Engine for one sheet
@@ -62,13 +61,6 @@ export class HandsOnEngine {
 
   public dependencyGraph?: DependencyGraph
 
-  /** Formula evaluator */
-  private evaluator?: Evaluator
-
-  private parser: ParserWithCaching
-
-  private graphBuilder?: GraphBuilder
-
   /** Statistics module for benchmarking */
   public readonly stats: Statistics = new Statistics()
 
@@ -76,6 +68,12 @@ export class HandsOnEngine {
 
   public readonly matrixMapping = new MatrixMapping()
 
+  /** Formula evaluator */
+  private evaluator?: Evaluator
+
+  private readonly parser: ParserWithCaching
+
+  private graphBuilder?: GraphBuilder
 
   constructor(
       private readonly config: Config,
@@ -186,7 +184,7 @@ export class HandsOnEngine {
       const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
 
       if (!size || !(newVertex instanceof MatrixVertex)) {
-        throw Error("What if new matrix vertex is not properly constructed?")
+        throw Error('What if new matrix vertex is not properly constructed?')
       }
 
       this.dependencyGraph!.addNewMatrixVertex(newVertex)
@@ -208,7 +206,7 @@ export class HandsOnEngine {
       verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
       this.dependencyGraph!.clearRecentlyChangedVertices()
     } else {
-      throw new Error("Illegal operation")
+      throw new Error('Illegal operation')
     }
 
     if (verticesToRecomputeFrom) {
@@ -223,7 +221,7 @@ export class HandsOnEngine {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(
           node.getFormula(), node.getAddress(),
-          fixRowDependency(sheet, row, numberOfRowsToAdd)
+          fixRowDependency(sheet, row, numberOfRowsToAdd),
         )
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
@@ -245,7 +243,7 @@ export class HandsOnEngine {
         const newAst = transformAddressesInFormula(
           node.getFormula(),
           node.getAddress(),
-          fixRowDependencyRowsDeletion(sheet, rowStart, numberOfRowsToDelete)
+          fixRowDependencyRowsDeletion(sheet, rowStart, numberOfRowsToDelete),
         )
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
@@ -280,7 +278,7 @@ export class HandsOnEngine {
         const newAst = transformAddressesInFormula(
           node.getFormula(),
           node.getAddress(),
-          fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete)
+          fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete),
         )
         const cachedAst = this.parser.rememberNewAst(newAst)
         node.setFormula(cachedAst)
@@ -300,7 +298,7 @@ export class HandsOnEngine {
     if (row <= nodeAddress.row) {
       node.setAddress({
         ...nodeAddress,
-        row: nodeAddress.row + numberOfRows
+        row: nodeAddress.row + numberOfRows,
       })
     }
   }
@@ -310,7 +308,7 @@ export class HandsOnEngine {
     if (column <= nodeAddress.col) {
       node.setAddress({
         ...nodeAddress,
-        col: nodeAddress.col + numberOfColumns
+        col: nodeAddress.col + numberOfColumns,
       })
     }
   }
@@ -356,8 +354,6 @@ export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, t
   }
 }
 
-
-
 export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
     if ((dependencyAddress.sheet === formulaAddress.sheet)
@@ -395,7 +391,6 @@ export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: 
     return ErrorType.REF
   }
 }
-
 
 export function fixRowDependency(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
@@ -468,7 +463,6 @@ export function fixColDependency(sheetInWhichWeAddColumns: number, column: numbe
   }
 }
 
-
 export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
@@ -515,7 +509,7 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       return {
         type: ast.type,
         procedureName: ast.procedureName,
-        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, transformCellAddressFn))
+        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, transformCellAddressFn)),
       }
     }
     default: {

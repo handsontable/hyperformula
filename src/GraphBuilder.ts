@@ -1,26 +1,18 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
+import {DependencyGraph} from './DependencyGraph'
+import {
+  FormulaCellVertex,
+  MatrixVertex,
+  ValueCellVertex,
+  Vertex,
+} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
-import {findSmallerRange} from './interpreter/plugin/SumprodPlugin'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {DependencyGraph} from './DependencyGraph'
-import {
-  CellVertex,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  RangeVertex,
-  ValueCellVertex,
-  Vertex,
-  AddressMapping,
-  Graph,
-  RangeMapping,
-  SheetMapping,
-} from './DependencyGraph'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -76,7 +68,6 @@ export class GraphBuilder {
   }
 }
 
-
 export interface GraphBuilderStrategy {
   run(sheets: Sheets): Dependencies
 }
@@ -85,7 +76,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
       private readonly parser: ParserWithCaching,
-      private readonly stats: Statistics
+      private readonly stats: Statistics,
   ) {
   }
 
@@ -132,7 +123,6 @@ export class SimpleStrategy implements GraphBuilderStrategy {
       }
     }
 
-
     return dependencies
   }
 }
@@ -142,7 +132,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       private readonly dependencyGraph: DependencyGraph,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
-      private readonly threshold: number
+      private readonly threshold: number,
   ) {}
 
   public run(sheets: Sheets): Dependencies {
@@ -198,7 +188,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
     const notMatrices = matrixHeuristic.run(sheets)
     for (let i = notMatrices.length - 1; i >= 0; --i) {
       const elem = notMatrices[i]
-      for (let address of elem.cells.reverse()) {
+      for (const address of elem.cells.reverse()) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
         const vertex = new ValueCellVertex(Number(value))
         this.dependencyGraph.addVertex(address, vertex)
@@ -214,7 +204,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
 export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: MatrixVertex | ValueCellVertex, size: MatrixSizeCheck } {
   const size = checkMatrixSize(ast, formulaAddress)
   if (!size) {
-    return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size: size }
+    return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size }
   }
-  return { vertex: new MatrixVertex(formulaAddress, size.width, size.height, ast), size: size }
+  return { vertex: new MatrixVertex(formulaAddress, size.width, size.height, ast), size }
 }

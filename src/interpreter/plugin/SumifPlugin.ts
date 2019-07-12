@@ -1,5 +1,5 @@
+import assert from 'assert'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {AddressMapping, RangeMapping, CriterionCache, RangeVertex, DependencyGraph} from '../../DependencyGraph'
 import {
   CellError,
   CellValue,
@@ -7,12 +7,12 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from '../../Cell'
+import { CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
 import {AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
-import assert from 'assert';
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(simpleConditionRange: AbsoluteCellRange): string {

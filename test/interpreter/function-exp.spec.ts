@@ -5,7 +5,7 @@ import '../testConfig'
 describe('Interpreter', () => {
   it('function EXP happy path', async () => {
     const engine = await HandsOnEngine.buildFromArray([
-      ['=EXP(0)', '=EXP(2)']
+      ['=EXP(0)', '=EXP(2)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(1)
@@ -14,7 +14,7 @@ describe('Interpreter', () => {
 
   it('function EXP given wrong argument type', async () => {
     const engine = await HandsOnEngine.buildFromArray([
-      ['=EXP("foo")']
+      ['=EXP("foo")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))

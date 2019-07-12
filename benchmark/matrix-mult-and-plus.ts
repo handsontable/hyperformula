@@ -17,7 +17,7 @@ export function sheet(): string[][] {
     for (let j = 0; j < matrixSize; j++) {
       rowToPush.push(randomNumber(1, 1000).toString())
     }
-    rowToPush.push("")
+    rowToPush.push('')
     for (let j = 0; j < matrixSize; j++) {
       rowToPush.push(randomNumber(1, 1000).toString())
     }

@@ -1,32 +1,31 @@
-import {Config, HandsOnEngine} from "../src";
-import {simpleCellAddress, SimpleCellAddress} from "../src/Cell";
+import {Config, HandsOnEngine} from '../src'
+import {simpleCellAddress, SimpleCellAddress} from '../src/Cell'
+import {EmptyCellVertex, FormulaCellVertex} from '../src/DependencyGraph'
+import {CellReferenceAst} from '../src/parser/Ast'
+import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {EmptyCellVertex, FormulaCellVertex, RangeVertex} from "../src/DependencyGraph";
-import {CellAddress} from "../src/parser/CellAddress"
-import {CellReferenceAst} from "../src/parser/Ast"
-
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
 }
 
-describe("Adding column", () => {
+describe('Adding column', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['13']
+      ['13'],
     ])
 
     expect(() => {
       engine.addColumns(0, 0, 1)
-    }).toThrow(new Error("It is not possible to add column in column with matrix"))
+    }).toThrow(new Error('It is not possible to add column in column with matrix'))
 
     expect(() => {
       engine.addColumns(0, 0, 1)
-    }).toThrow(new Error("It is not possible to add column in column with matrix"))
+    }).toThrow(new Error('It is not possible to add column in column with matrix'))
   })
 
   it('updates addresses in formulas', () => {
@@ -44,17 +43,17 @@ describe("Adding column", () => {
   it('add column inside numeric matrix, expand matrix', () => {
     const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
-      ['1','2'],
-      ['3','4'],
+      ['1', '2'],
+      ['3', '4'],
     ], config)
 
-    expect(engine.getCellValue("B1")).toEqual(2)
+    expect(engine.getCellValue('B1')).toEqual(2)
 
     engine.addColumns(0, 1, 2)
 
-    expect(engine.getCellValue("B1")).toEqual(0)
-    expect(engine.getCellValue("C1")).toEqual(0)
-    expect(engine.getCellValue("D1")).toEqual(2)
+    expect(engine.getCellValue('B1')).toEqual(0)
+    expect(engine.getCellValue('C1')).toEqual(0)
+    expect(engine.getCellValue('D1')).toEqual(2)
   })
 
   it('reevaluates cells', () => {
@@ -68,7 +67,7 @@ describe("Adding column", () => {
   })
 })
 
-describe("Adding column, fixing dependency", () => {
+describe('Adding column, fixing dependency', () => {
   it('same sheet, case Aa, absolute column', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* new col */ '=$A1'],
@@ -142,7 +141,7 @@ describe("Adding column, fixing dependency", () => {
   it('same sheet, same column', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['42', '43'],
-      ['', '=B1']
+      ['', '=B1'],
     ])
 
     engine.addColumns(0, 1, 1)
@@ -151,11 +150,11 @@ describe("Adding column, fixing dependency", () => {
   })
 })
 
-describe("Adding column, fixing ranges", () => {
+describe('Adding column, fixing ranges', () => {
   it('insert column in middle of range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* new col */ '2', '3'],
-      ['=SUM(A1:C1)']
+      ['=SUM(A1:C1)'],
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
@@ -169,7 +168,7 @@ describe("Adding column, fixing ranges", () => {
   it('insert column above range', () => {
     const engine = HandsOnEngine.buildFromArray([
       [/* new col */ '1', '2', '3'],
-      ['=SUM(A1:C1)']
+      ['=SUM(A1:C1)'],
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
@@ -181,7 +180,7 @@ describe("Adding column, fixing ranges", () => {
   it('insert column below range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3' /* new col */],
-      ['=SUM(A1:C1)']
+      ['=SUM(A1:C1)'],
     ])
 
     expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0))).not.toBe(null)
@@ -209,7 +208,7 @@ describe("Adding column, fixing ranges", () => {
   it ('range start in column', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(B1:D1)']
+      ['', /* */ '=SUM(B1:D1)'],
     ])
 
     engine.addColumns(0, 1, 1)
@@ -221,15 +220,15 @@ describe("Adding column, fixing ranges", () => {
   it('range start before added column', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(A1:D1)']
+      ['', /* */ '=SUM(A1:D1)'],
     ])
 
     engine.addColumns(0, 1, 1)
 
-   const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-   const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 4, 0))!
-   expect(b1).toBeInstanceOf(EmptyCellVertex)
-   expect(engine.graph.existsEdge(b1, range)).toBe(true)
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 4, 0))!
+    expect(b1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(b1, range)).toBe(true)
   })
 
   it ('range start after added column', () => {

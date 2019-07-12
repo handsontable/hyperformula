@@ -1,6 +1,6 @@
-import {sheets, expectedValues} from '../sheets/13-sheet-d'
-import {benchmarkCsvSheets} from '../benchmark'
 import {Config} from '../../src'
+import {benchmarkCsvSheets} from '../benchmark'
+import {expectedValues, sheets} from '../sheets/13-sheet-d'
 
 (async () => {
   const s = sheets()
@@ -9,6 +9,6 @@ import {Config} from '../../src'
   await benchmarkCsvSheets(s, expectedValues(), {
     millisecondsPerThousandRows: 15000,
     numberOfRuns: 3,
-    engineConfig: new Config({ gpuMode: 'gpu' })
+    engineConfig: new Config({ gpuMode: 'gpu' }),
   })
 })()

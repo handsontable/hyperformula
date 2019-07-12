@@ -1,9 +1,9 @@
-import {Config, HandsOnEngine} from "../src";
-import {ErrorType, CellError, SimpleCellAddress, simpleCellAddress} from "../src/Cell";
-import {CellAddress} from "../src/parser/CellAddress";
+import {Config, HandsOnEngine} from '../src'
+import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import { FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
+import {buildCellErrorAst, CellReferenceAst} from '../src/parser'
+import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex} from "../src/DependencyGraph";
-import {buildCellErrorAst, CellReferenceAst} from "../src/parser";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
@@ -20,12 +20,12 @@ describe('Removing rows - dependencies', () => {
       Sheet1: [
         ['1'], // rows to delete
         ['2'], //
-        ['=$Sheet2.A$1']
+        ['=$Sheet2.A$1'],
       ],
       Sheet2: [
         ['3'],
-        ['4']
-      ]
+        ['4'],
+      ],
     })
 
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteRow(1, 0, 0))
@@ -73,7 +73,7 @@ describe('Removing rows - dependencies', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['42'],
       ['=A1'],
-      ['2']
+      ['2'],
     ])
 
     engine.removeRows(0, 2, 2)
@@ -124,7 +124,7 @@ describe('Removing rows - dependencies', () => {
       ['=A3'],
       ['1'],
       ['2'],
-      ['3']
+      ['3'],
     ])
 
     engine.removeRows(0, 1, 2)
@@ -149,10 +149,10 @@ describe('Removing rows - matrices', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['{=MMULT(A1:B2, A1:B2)}']
+      ['{=MMULT(A1:B2, A1:B2)}'],
     ])
 
-    expect(() => engine.removeRows(0, 2, 2)).toThrowError("It is not possible to remove row with matrix")
+    expect(() => engine.removeRows(0, 2, 2)).toThrowError('It is not possible to remove row with matrix')
   })
 
   it('should remove row from numeric matrix', () => {
@@ -194,19 +194,19 @@ describe('Removing rows - matrices', () => {
   })
 })
 
-describe('Removing rows - graph', function () {
-  it('should remove vertices from graph', function () {
+describe('Removing rows - graph', function() {
+  it('should remove vertices from graph', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ])
     expect(engine.graph.nodes.size).toBe(5)
     engine.removeRows(0, 0, 1)
-    expect(engine.graph.nodes.size).toBe(1) //only empty vertex left
-  });
-});
+    expect(engine.graph.nodes.size).toBe(1) // only empty vertex left
+  })
+})
 
-describe('Removing rows - ranges', function () {
+describe('Removing rows - ranges', function() {
   it('shift ranges in range mapping, range start below removed rows', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
@@ -238,7 +238,7 @@ describe('Removing rows - ranges', function () {
       ['1'],
       ['2'],
       ['3'],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ])
 
     const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2)) as RangeVertex
@@ -254,7 +254,7 @@ describe('Removing rows - ranges', function () {
       ['2'],
       ['3'],
       ['=SUM(A1:A2)'],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ])
 
     const a1a3 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2)) as RangeVertex
@@ -264,4 +264,4 @@ describe('Removing rows - ranges', function () {
     expect(a1a1).toBe(a1a3)
     expect(engine.graph.getDependecies(a1a1).length).toBe(1)
   })
-});
+})

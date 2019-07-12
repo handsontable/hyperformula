@@ -1,4 +1,5 @@
-import {benchmark, benchmarkSheets} from './benchmark'
+
+import {benchmark} from './benchmark'
 import {expectedValues as eSb, sheet as Sb} from './sheets/01-simple-big'
 import {expectedValues as expectedValuesMarkov, sheet as sheetMarkovFn} from './sheets/03-sheet-markov'
 import {expectedValues as expectedValuesPrefixSum, sheet as sheetPrefixSumFn} from './sheets/04-sheet-prefix-sum'
@@ -6,7 +7,6 @@ import {expectedValues as eT, sheet as T} from './sheets/05-sheet-t'
 import {sheet as Bs} from './sheets/06-big-sum'
 import {expectedValues as expectedValuesA, sheet as sheetAFn} from './sheets/09-sheet-a'
 import {expectedValues as expectedValuesB, sheet as sheetBFn} from './sheets/10-sheet-b'
-import {Config} from '../src'
 
 async function start() {
   const simpleBig = Sb()

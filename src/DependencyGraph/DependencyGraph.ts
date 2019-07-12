@@ -1,13 +1,14 @@
-import {AddressMapping} from './AddressMapping'
-import {RangeMapping} from './RangeMapping'
-import {SheetMapping} from './SheetMapping'
+import assert from 'assert'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {Graph, TopSortResult} from './Graph'
 import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import assert from 'assert';
+import {AddressMapping} from './AddressMapping'
+import {Graph, TopSortResult} from './Graph'
+import {MatrixMapping} from './MatrixMapping'
+import {RangeMapping} from './RangeMapping'
+import {SheetMapping} from './SheetMapping'
 import {
   CellVertex,
   EmptyCellVertex,
@@ -15,10 +16,8 @@ import {
   MatrixVertex,
   RangeVertex,
   ValueCellVertex,
-  Vertex
+  Vertex,
 } from './Vertex'
-import {MatrixMapping} from "./MatrixMapping";
-import {Size} from "../Matrix";
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()
@@ -28,7 +27,7 @@ export class DependencyGraph {
       private readonly rangeMapping: RangeMapping,
       private readonly graph: Graph<Vertex>,
       private readonly sheetMapping: SheetMapping,
-      private readonly matrixMapping: MatrixMapping
+      private readonly matrixMapping: MatrixMapping,
   ) {
     this.graph.addNode(EmptyCellVertex.getSingletonInstance())
   }
@@ -127,7 +126,7 @@ export class DependencyGraph {
   }
 
   public removeIncomingEdgesFromFormulaVertex(vertex: FormulaCellVertex) {
-    const deps: (CellAddress | [CellAddress, CellAddress])[] = []
+    const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
     collectDependencies(vertex.getFormula(), deps)
     const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
     const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
@@ -152,7 +151,7 @@ export class DependencyGraph {
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number) {
     if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
-      throw Error("It is not possible to remove row with matrix")
+      throw Error('It is not possible to remove row with matrix')
     }
 
     for (let x = 0; x < this.addressMapping.getWidth(sheet); ++x) {
@@ -166,7 +165,7 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+    for (const matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
       matrix.removeRows(sheet, rowStart, rowEnd)
       if (matrix.height === 0) {
         this.graph.removeNode(matrix)
@@ -177,14 +176,14 @@ export class DependencyGraph {
 
     const rangesToRemove = this.rangeMapping.truncateRanges(sheet, rowStart, rowEnd)
 
-    rangesToRemove.forEach(vertex => {
+    rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
     if (this.matrixMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
-      throw Error("It is not possible to remove column within matrix")
+      throw Error('It is not possible to remove column within matrix')
     }
 
     for (let y = 0; y < this.addressMapping.getHeight(sheet); ++y) {
@@ -198,7 +197,7 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+    for (const matrix of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
       const numberOfColumns = columnEnd - columnStart + 1
       if (matrix.width === numberOfColumns) {
         this.graph.removeNode(matrix)
@@ -218,12 +217,12 @@ export class DependencyGraph {
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
     if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart)) {
-      throw Error("It is not possible to add row in row with matrix")
+      throw Error('It is not possible to add row in row with matrix')
     }
 
     this.addressMapping.addRows(sheet, rowStart, numberOfRows)
 
-    for (let matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
+    for (const matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
     }
 
@@ -232,12 +231,12 @@ export class DependencyGraph {
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {
     if (this.matrixMapping.isFormulaMatrixInColumns(sheet, col)) {
-      throw Error("It is not possible to add column in column with matrix")
+      throw Error('It is not possible to add column in column with matrix')
     }
 
     this.addressMapping.addColumns(sheet, col, numberOfCols)
 
-    for (let matrix of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
+    for (const matrix of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
       matrix.addColumns(sheet, col, numberOfCols)
     }
 
@@ -291,7 +290,7 @@ export class DependencyGraph {
     const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
     for (const x of range.generateCellsFromRangeGenerator()) {
       if (this.getCell(x) instanceof MatrixVertex) {
-        throw Error("You cannot modify only part of an array")
+        throw Error('You cannot modify only part of an array')
       }
     }
 
@@ -374,7 +373,7 @@ export class DependencyGraph {
     return this.graph.getTopologicallySortedSubgraphFrom(vertices)
   }
 
-  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
+  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
@@ -453,4 +452,3 @@ export class DependencyGraph {
     }
   }
 }
-
