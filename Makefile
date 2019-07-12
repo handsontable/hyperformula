@@ -18,7 +18,6 @@ benchmark-ci: ## Run CI benchmarks
 	@yarn ts-node benchmark/instances/11-many-medians.ts
 	@yarn ts-node benchmark/instances/12-sheet-c-gpu.ts
 	@yarn ts-node benchmark/instances/12-sheet-c-cpu.ts
-	@yarn ts-node benchmark/instances/13-sheet-d-gpu.ts
 	@yarn ts-node benchmark/instances/13-sheet-d-cpu.ts
 
 benchmark: ## Run benchmarks
