@@ -17,15 +17,18 @@ import {
   ValueCellVertex,
   Vertex
 } from './Vertex'
+import {filterWith} from "../generatorUtils";
+import {MatrixMapping} from "./MatrixMapping";
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()
 
   constructor(
-    private readonly addressMapping: AddressMapping,
-    private readonly rangeMapping: RangeMapping,
-    private readonly graph: Graph<Vertex>,
-    private readonly sheetMapping: SheetMapping,
+      private readonly addressMapping: AddressMapping,
+      private readonly rangeMapping: RangeMapping,
+      private readonly graph: Graph<Vertex>,
+      private readonly sheetMapping: SheetMapping,
+      private readonly matrixMapping: MatrixMapping
   ) {
   }
 
@@ -107,7 +110,7 @@ export class DependencyGraph {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }
 
-        const matrix = this.addressMapping.getMatrix(restRange)
+        const matrix = this.matrixMapping.getMatrix(restRange)
         if (matrix !== undefined) {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
@@ -147,11 +150,11 @@ export class DependencyGraph {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number) {
-    if (this.addressMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
+    if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
       throw Error("It is not possible to remove row with matrix")
     }
 
-    for (let x=0; x<this.addressMapping.getWidth(sheet); ++x) {
+    for (let x = 0; x < this.addressMapping.getWidth(sheet); ++x) {
       for (let y = rowStart; y <= rowEnd; ++y) {
         const address = simpleCellAddress(sheet, x, y)
         const vertex = this.addressMapping.getCell(address)
@@ -162,7 +165,7 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.addressMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+    for (let matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
       matrix.removeRows(sheet, rowStart, rowEnd)
       if (matrix.height === 0) {
         this.graph.removeNode(matrix)
@@ -179,11 +182,11 @@ export class DependencyGraph {
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
-    if (this.addressMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
       throw Error("It is not possible to remove column within matrix")
     }
 
-    for (let y=0; y<this.addressMapping.getHeight(sheet); ++y) {
+    for (let y = 0; y < this.addressMapping.getHeight(sheet); ++y) {
       for (let x = columnStart; x <= columnEnd; ++x) {
         const address = simpleCellAddress(sheet, x, y)
         const vertex = this.addressMapping.getCell(address)
@@ -194,7 +197,7 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.addressMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+    for (let matrix of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
       const numberOfColumns = columnEnd - columnStart + 1
       if (matrix.width === numberOfColumns) {
         this.graph.removeNode(matrix)
@@ -213,17 +216,27 @@ export class DependencyGraph {
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
-    if (this.addressMapping.isFormulaMatrixInRows(sheet, rowStart)) {
+    if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart)) {
       throw Error("It is not possible to add row in row with matrix")
     }
 
     this.addressMapping.addRows(sheet, rowStart, numberOfRows)
 
-    for (let matrix of this.addressMapping.numericMatricesInRows(sheet, rowStart)) {
+    for (let matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
     }
 
     this.fixRanges(sheet, rowStart, numberOfRows)
+  }
+
+  public addColumns(sheet: number, col: number, numberOfCols: number) {
+    this.addressMapping.addColumns(sheet, col, numberOfCols)
+
+    for (let matrix of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
+      matrix.addColumns(sheet, col, numberOfCols)
+    }
+
+    this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
 
   private fixRanges(sheet: number, row: number, numberOfRows: number) {
@@ -243,7 +256,7 @@ export class DependencyGraph {
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
   }
 
-  public fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
+  private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
@@ -284,4 +297,28 @@ export class DependencyGraph {
     return this.addressMapping.getWidth(sheet)
   }
 
+  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
+    return this.matrixMapping.getMatrix(range)
+  }
+
+  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
+    this.matrixMapping.setMatrix(range, vertex)
+  }
+
+  public removeMatrix(range: string | AbsoluteCellRange, vertex: MatrixVertex) {
+    this.graph.removeNode(vertex)
+    this.matrixMapping!.removeMatrix(range)
+  }
+
+  public isFormulaMatrixInColumns(sheet: number, colStart: number, colEnd: number = colStart) {
+    return this.matrixMapping.isFormulaMatrixInColumns(sheet, colStart, colEnd)
+  }
+
+  public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+     return this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)
+  }
+
+  public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
+    yield* this.matrixMapping.numericMatrices()
+  }
 }

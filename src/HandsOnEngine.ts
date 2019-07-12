@@ -30,6 +30,7 @@ import {
   Vertex
 } from './DependencyGraph'
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {MatrixMapping} from "./DependencyGraph/MatrixMapping";
 
 /**
  * Engine for one sheet
@@ -75,6 +76,8 @@ export class HandsOnEngine {
 
   public readonly sheetMapping = new SheetMapping()
 
+  public readonly matrixMapping = new MatrixMapping()
+
 
   constructor(
       private readonly config: Config,
@@ -93,7 +96,7 @@ export class HandsOnEngine {
     }
 
     this.graphBuilder = new GraphBuilder(this.graph, this.addressMapping!, this.rangeMapping, this.stats, this.config, this.sheetMapping, this.parser)
-    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping)
+    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping, this.matrixMapping)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       this.graphBuilder!.buildGraph(sheets)
@@ -195,7 +198,7 @@ export class HandsOnEngine {
         }
       }
 
-      this.addressMapping!.setMatrix(range, newVertex)
+      this.dependencyGraph!.setMatrix(range, newVertex)
 
       for (const x of range.generateCellsFromRangeGenerator()) {
         const vertex = this.dependencyGraph!.getCell(x)
@@ -272,17 +275,11 @@ export class HandsOnEngine {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
-    if (this.addressMapping!.isFormulaMatrixInColumns(sheet, col)) {
+    if (this.dependencyGraph!.isFormulaMatrixInColumns(sheet, col)) {
       throw Error("It is not possible to add column in column with matrix")
     }
 
-    this.addressMapping!.addColumns(sheet, col, numberOfCols)
-
-    for (let matrix of this.addressMapping!.numericMatricesInColumns(sheet, col)) {
-      matrix.addColumns(sheet, col, numberOfCols)
-    }
-
-    this.dependencyGraph!.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+    this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
 
     for (const node of this.graph.nodes) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
@@ -317,7 +314,7 @@ export class HandsOnEngine {
   }
 
   public disableNumericMatrices() {
-    for (const [key, matrixVertex] of this.addressMapping!.numericMatrices()) {
+    for (const [key, matrixVertex] of this.dependencyGraph!.numericMatrices()) {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
       // 1. split matrix to chunks, add value cell vertices
       // 2. update address mapping for each address in matrix
@@ -345,8 +342,7 @@ export class HandsOnEngine {
       }
 
       // 4. remove old matrix
-      this.graph.removeNode(matrixVertex)
-      this.addressMapping!.removeMatrix(key)
+      this.dependencyGraph!.removeMatrix(key, matrixVertex)
     }
   }
 
