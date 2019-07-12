@@ -165,10 +165,11 @@ export class DependencyGraph {
       }
     }
 
-    for (const matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+    for (const [key, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
       matrix.removeRows(sheet, rowStart, rowEnd)
       if (matrix.height === 0) {
         this.graph.removeNode(matrix)
+        this.matrixMapping.removeMatrix(key)
       }
     }
 
@@ -197,10 +198,11 @@ export class DependencyGraph {
       }
     }
 
-    for (const matrix of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+    for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
       const numberOfColumns = columnEnd - columnStart + 1
       if (matrix.width === numberOfColumns) {
         this.graph.removeNode(matrix)
+        this.matrixMapping.removeMatrix(key)
       } else {
         matrix.removeColumns(sheet, columnStart, columnEnd)
       }
@@ -222,7 +224,7 @@ export class DependencyGraph {
 
     this.addressMapping.addRows(sheet, rowStart, numberOfRows)
 
-    for (const matrix of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
+    for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
     }
 
@@ -236,7 +238,7 @@ export class DependencyGraph {
 
     this.addressMapping.addColumns(sheet, col, numberOfCols)
 
-    for (const matrix of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
+    for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
       matrix.addColumns(sheet, col, numberOfCols)
     }
 
@@ -361,7 +363,7 @@ export class DependencyGraph {
     this.matrixMapping.setMatrix(range, vertex)
   }
 
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null  {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
     return this.rangeMapping.getRange(start, end)
   }
 

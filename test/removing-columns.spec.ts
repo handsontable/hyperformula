@@ -71,7 +71,9 @@ describe('Removing columns - matrices', () => {
       ['3', '4'],
     ], config)
 
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, 0, 1)
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(1)
   })
 })

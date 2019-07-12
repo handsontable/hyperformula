@@ -40,20 +40,20 @@ export class MatrixMapping {
   }
 
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
-    yield* filterWith(([_, mtx]) => {
+    yield* filterWith(([, mtx]) => {
       return !mtx.isFormula()
     }, this.matrixMapping.entries())[Symbol.iterator]()
   }
 
-  public* numericMatricesInRows(sheet: number, startRow: number, endRow: number = startRow): IterableIterator<MatrixVertex> {
-    yield* filterWith((mtx) => {
+  public* numericMatricesInRows(sheet: number, startRow: number, endRow: number = startRow): IterableIterator<[string, MatrixVertex]> {
+    yield* filterWith(([, mtx]) => {
       return mtx.spansThroughSheetRows(sheet, startRow, endRow) && !mtx.isFormula()
-    }, this.matrixMapping.values()[Symbol.iterator]())
+    }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
-  public* numericMatricesInColumns(sheet: number, startColumn: number, endColumn: number = startColumn): IterableIterator<MatrixVertex> {
-    yield* filterWith((mtx) => {
+  public* numericMatricesInColumns(sheet: number, startColumn: number, endColumn: number = startColumn): IterableIterator<[string, MatrixVertex]> {
+    yield* filterWith(([, mtx]) => {
       return mtx.spansThroughSheetColumn(sheet, startColumn, endColumn) && !mtx.isFormula()
-    }, this.matrixMapping.values()[Symbol.iterator]())
+    }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 }
