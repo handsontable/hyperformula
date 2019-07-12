@@ -132,7 +132,7 @@ export class HandsOnEngine {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        if (this.addressMapping!.isEmpty(address)) {
+        if (this.dependencyGraph!.isEmpty(address)) {
           arr[i][j] = ''
           continue
         }
