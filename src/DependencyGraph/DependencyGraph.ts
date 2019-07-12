@@ -18,6 +18,7 @@ import {
   Vertex
 } from './Vertex'
 import {MatrixMapping} from "./MatrixMapping";
+import {Size} from "../Matrix";
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()
@@ -286,8 +287,23 @@ export class DependencyGraph {
     this.setAddressMappingForMatrixVertex(vertex, address)
   }
 
-  public exchangeNode(node: Vertex, newNode: Vertex): void {
-    this.graph.exchangeNode(node, newNode)
+  public addNewMatrixVertex(matrixVertex: MatrixVertex): void {
+    const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    for (const x of range.generateCellsFromRangeGenerator()) {
+      if (this.getCell(x) instanceof MatrixVertex) {
+        throw Error("You cannot modify only part of an array")
+      }
+    }
+
+    this.setMatrix(range, matrixVertex)
+
+    for (const address of range.generateCellsFromRangeGenerator()) {
+      const vertex = this.addressMapping.getCell(address)
+      if (vertex) {
+        this.graph.exchangeNode(vertex, matrixVertex)
+      }
+      this.setVertexAddress(address, matrixVertex)
+    }
   }
 
   public nodes(): IterableIterator<Vertex> {

@@ -189,23 +189,7 @@ export class HandsOnEngine {
         throw Error("What if new matrix vertex is not properly constructed?")
       }
 
-      const range = AbsoluteCellRange.spanFrom(address, size.width, size.height)
-      for (const x of range.generateCellsFromRangeGenerator()) {
-        if (this.dependencyGraph!.getCell(x) instanceof MatrixVertex) {
-          throw Error("You cannot modify only part of an array")
-        }
-      }
-
-      this.dependencyGraph!.setMatrix(range, newVertex)
-
-      for (const x of range.generateCellsFromRangeGenerator()) {
-        const vertex = this.dependencyGraph!.getCell(x)
-        if (vertex) {
-          this.dependencyGraph!.exchangeNode(vertex, newVertex)
-        }
-        this.dependencyGraph!.setVertexAddress(x, newVertex)
-      }
-
+      this.dependencyGraph!.addNewMatrixVertex(newVertex)
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
       this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
       verticesToRecomputeFrom = [newVertex]

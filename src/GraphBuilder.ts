@@ -217,7 +217,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: CellVertex, size: MatrixSizeCheck } {
+export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: MatrixVertex | ValueCellVertex, size: MatrixSizeCheck } {
   const size = checkMatrixSize(ast, formulaAddress)
   if (!size) {
     return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size: size }
