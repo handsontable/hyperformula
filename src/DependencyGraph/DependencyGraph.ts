@@ -1,7 +1,7 @@
 import {AddressMapping} from './AddressMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Graph} from './Graph'
@@ -259,4 +259,29 @@ export class DependencyGraph {
 
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
   }
+
+  public fetchCell(address: SimpleCellAddress): CellVertex {
+    return this.addressMapping.fetchCell(address)
+  }
+
+  public getCell(address: SimpleCellAddress): CellVertex | null {
+    return this.addressMapping.getCell(address)
+  }
+
+  public getCellValue(address: SimpleCellAddress): CellValue {
+    return this.addressMapping.getCellValue(address)
+  }
+
+  public setCell(address: SimpleCellAddress, vertex: CellVertex) {
+    this.addressMapping.setCell(address, vertex)
+  }
+
+  public getSheetHeight(sheet: number) {
+    return this.addressMapping.getHeight(sheet)
+  }
+
+  public getSheetWidth(sheet: number) {
+    return this.addressMapping.getWidth(sheet)
+  }
+
 }

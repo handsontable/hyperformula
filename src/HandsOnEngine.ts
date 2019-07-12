@@ -113,15 +113,15 @@ export class HandsOnEngine {
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(this.sheetMapping.fetch, stringAddress, CellAddress.absolute(0, 0, 0))
-    return this.addressMapping!.getCellValue(address)
+    return this.dependencyGraph!.getCellValue(address)
   }
 
   /**
    * Returns array with values of all cells
    * */
   public getValues(sheet: number) {
-    const sheetHeight = this.addressMapping!.getHeight(sheet)
-    const sheetWidth = this.addressMapping!.getWidth(sheet)
+    const sheetHeight = this.dependencyGraph!.getSheetHeight(sheet)
+    const sheetWidth = this.dependencyGraph!.getSheetWidth(sheet)
 
     const arr: Sheet = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
@@ -134,7 +134,7 @@ export class HandsOnEngine {
           continue
         }
 
-        const cellValue = this.addressMapping!.getCellValue(address)
+        const cellValue = this.dependencyGraph!.getCellValue(address)
 
         if (cellValue instanceof CellError) {
           arr[i][j] = `#${cellValue.type}!`
@@ -152,8 +152,8 @@ export class HandsOnEngine {
     for (const sheetName of this.sheetMapping.names()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions.set(sheetName, {
-        width: this.addressMapping!.getWidth(sheetId),
-        height: this.addressMapping!.getHeight(sheetId),
+        width: this.dependencyGraph!.getSheetWidth(sheetId),
+        height: this.dependencyGraph!.getSheetHeight(sheetId),
       })
     }
     return sheetDimensions
@@ -173,7 +173,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    const vertex = this.addressMapping!.getCell(address)
+    const vertex = this.dependencyGraph!.getCell(address)
     let verticesToRecomputeFrom: Vertex[] = vertex ? [vertex] : []
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
@@ -190,7 +190,7 @@ export class HandsOnEngine {
 
       const range = AbsoluteCellRange.spanFrom(address, size.width, size.height)
       for (const x of range.generateCellsFromRangeGenerator()) {
-        if (this.addressMapping!.getCell(x) instanceof MatrixVertex) {
+        if (this.dependencyGraph!.getCell(x) instanceof MatrixVertex) {
           throw Error("You cannot modify only part of an array")
         }
       }
@@ -198,11 +198,11 @@ export class HandsOnEngine {
       this.addressMapping!.setMatrix(range, newVertex)
 
       for (const x of range.generateCellsFromRangeGenerator()) {
-        const vertex = this.addressMapping!.getCell(x)
+        const vertex = this.dependencyGraph!.getCell(x)
         if (vertex) {
           this.graph.exchangeNode(vertex, newVertex)
         }
-        this.addressMapping!.setCell(x, newVertex)
+        this.dependencyGraph!.setCell(x, newVertex)
       }
 
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
@@ -322,7 +322,7 @@ export class HandsOnEngine {
       // 1. split matrix to chunks, add value cell vertices
       // 2. update address mapping for each address in matrix
       for (const address of matrixRange.generateCellsFromRangeGenerator()) {
-        const value = this.addressMapping!.getCellValue(address)
+        const value = this.dependencyGraph!.getCellValue(address)
         const valueVertex = new ValueCellVertex(value)
         this.graph.addNode(valueVertex)
         this.addressMapping!.setCell(address, valueVertex)
@@ -332,7 +332,7 @@ export class HandsOnEngine {
         // 3. update dependencies for each range that has this matrix in dependencies
         if (adjacentNode instanceof RangeVertex) {
           for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
-            const vertex = this.addressMapping!.fetchCell(address)
+            const vertex = this.dependencyGraph!.fetchCell(address)
             this.graph.addEdge(vertex, adjacentNode)
           }
           // 4. fix edges for cell references in formulas
@@ -355,7 +355,7 @@ export class HandsOnEngine {
       case AstNodeType.CELL_REFERENCE: {
         const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
         if (range.addressInRange(dependencyAddress)) {
-          return [this.addressMapping!.fetchCell(dependencyAddress)]
+          return [this.dependencyGraph!.fetchCell(dependencyAddress)]
         }
         return []
       }
