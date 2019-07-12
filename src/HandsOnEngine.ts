@@ -95,8 +95,8 @@ export class HandsOnEngine {
       this.addressMapping!.autoAddSheet(sheetId, sheets[sheetName])
     }
 
-    this.graphBuilder = new GraphBuilder(this.graph, this.addressMapping!, this.rangeMapping, this.stats, this.config, this.sheetMapping, this.parser)
     this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping, this.matrixMapping)
+    this.graphBuilder = new GraphBuilder(this.dependencyGraph, this.parser, this.config, this.stats)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
       this.graphBuilder!.buildGraph(sheets)
