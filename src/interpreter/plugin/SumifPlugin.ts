@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {AddressMapping, RangeMapping, CriterionCache, RangeVertex} from '../../DependencyGraph'
+import {AddressMapping, RangeMapping, CriterionCache, RangeVertex, DependencyGraph} from '../../DependencyGraph'
 import {
   CellError,
   CellValue,
@@ -29,10 +29,10 @@ const COUNTIF_CACHE_KEY = 'COUNTIF'
  * @param conditionRange - range for condition on which criterion finds accepted cells
  * @param valuesRange - range for values on which we run aggregate functions
  */
-export const findSmallerRange = (rangeMapping: RangeMapping, conditionRange: AbsoluteCellRange, valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: AbsoluteCellRange, restValuesRange: AbsoluteCellRange} => {
+export const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRange: AbsoluteCellRange, valuesRange: AbsoluteCellRange): {smallerRangeVertex: RangeVertex | null, restConditionRange: AbsoluteCellRange, restValuesRange: AbsoluteCellRange} => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
-    const rowLessVertex = rangeMapping.getRange(valuesRange.start, valuesRangeEndRowLess)
+    const rowLessVertex = dependencyGraph.getRange(valuesRange.start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       return {
         smallerRangeVertex: rowLessVertex,
@@ -171,7 +171,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - already parsed criterion structure
    */
   private evaluateRangeSumif(simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    const valuesRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+    const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     assert.ok(valuesRangeVertex, 'Range does not exists in graph')
 
     const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
@@ -206,7 +206,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - already parsed criterion structure
    */
   private evaluateRangeCountif(simpleConditionRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeVertex = this.rangeMapping.getRange(simpleConditionRange.start, simpleConditionRange.end)!
+    const conditionRangeVertex = this.dependencyGraph.getRange(simpleConditionRange.start, simpleConditionRange.end)!
     assert.ok(conditionRangeVertex, 'Range does not exists in graph')
 
     const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
@@ -254,11 +254,11 @@ export class SumifPlugin extends FunctionPlugin {
    * @param cacheBuilder - function used to compute values in new cache
    */
   private buildNewCriterionCache(cacheKey: string, simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
-    const currentRangeVertex = this.rangeMapping.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-    const {smallerRangeVertex, restConditionRange, restValuesRange} = findSmallerRange(this.rangeMapping, simpleConditionRange, simpleValuesRange)
+    const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+    const {smallerRangeVertex, restConditionRange, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRange, simpleValuesRange)
 
     let smallerCache
-    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
     } else {
       smallerCache = new Map()
@@ -266,7 +266,7 @@ export class SumifPlugin extends FunctionPlugin {
 
     const newCache: CriterionCache = new Map()
     smallerCache.forEach(([value, criterionLambda]: [CellValue, CriterionLambda], key: string) => {
-      const filteredValues = ifFilter(criterionLambda, getRangeValues(this.addressMapping, restConditionRange), getRangeValues(this.addressMapping, restValuesRange))
+      const filteredValues = ifFilter(criterionLambda, getRangeValues(this.dependencyGraph, restConditionRange), getRangeValues(this.dependencyGraph, restValuesRange))
       const newCacheValue = cacheBuilder(key, value, filteredValues)
       newCache.set(key, [newCacheValue, criterionLambda])
     })
@@ -284,16 +284,16 @@ export class SumifPlugin extends FunctionPlugin {
    */
   private computeCriterionValue(criterion: Criterion, simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambda = buildCriterionLambda(criterion)
-    const values = getRangeValues(this.addressMapping, simpleValuesRange)
-    const conditions = getRangeValues(this.addressMapping, simpleConditionRange)
+    const values = getRangeValues(this.dependencyGraph, simpleValuesRange)
+    const conditions = getRangeValues(this.dependencyGraph, simpleConditionRange)
     const filteredValues = ifFilter(criterionLambda, conditions, values)
     return valueComputingFunction(filteredValues)
   }
 }
 
-function * getRangeValues(addressMapping: AddressMapping, cellRange: AbsoluteCellRange): IterableIterator<CellValue> {
+function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<CellValue> {
   for (const cellFromRange of cellRange.generateCellsFromRangeGenerator()) {
-    yield addressMapping.getCellValue(cellFromRange)
+    yield dependencyGraph.getCellValue(cellFromRange)
   }
 }
 

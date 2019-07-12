@@ -137,7 +137,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const rangeStart = ast.start.toSimpleCellAddress(formulaAddress)
     const rangeEnd = ast.end.toSimpleCellAddress(formulaAddress)
-    const rangeVertex = this.rangeMapping.getRange(rangeStart, rangeEnd)!
+    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
     assert.ok(rangeVertex, 'Range does not exists in graph')
 
     let value = rangeVertex.getFunctionValue(functionName)
@@ -161,14 +161,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   private getRangeValues(functionName: string, range: AbsoluteCellRange): CellValue[] {
     const rangeResult: CellValue[] = []
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
+    const {smallerRangeVertex, restRanges} = findSmallerRange(this.dependencyGraph, [range])
     const restRange = restRanges[0]
-    const currentRangeVertex = this.rangeMapping.getRange(range.start, range.end)!
-    if (smallerRangeVertex && this.graph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+    const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
+    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
     for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
-      rangeResult.push(this.addressMapping.getCellValue(cellFromRange))
+      rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
     }
 
     return rangeResult

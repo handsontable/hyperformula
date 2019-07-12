@@ -102,7 +102,7 @@ export class HandsOnEngine {
       this.graphBuilder!.buildGraph(sheets)
     })
 
-    this.evaluator = new SingleThreadEvaluator(this.addressMapping!, this.rangeMapping, this.graph, this.config, this.stats)
+    this.evaluator = new SingleThreadEvaluator(this.dependencyGraph, this.config, this.stats)
 
     this.evaluator!.run()
 

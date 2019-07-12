@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {AddressMapping, Graph, RangeMapping, Vertex} from '../DependencyGraph'
+import {AddressMapping, DependencyGraph, Graph, RangeMapping, Vertex} from '../DependencyGraph'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {Matrix} from '../Matrix'
@@ -26,9 +26,7 @@ export class Interpreter {
   public readonly gpu: GPU
 
   constructor(
-    public readonly addressMapping: AddressMapping,
-    public readonly rangeMapping: RangeMapping,
-    public readonly graph: Graph<Vertex>,
+    public readonly dependencyGraph: DependencyGraph,
     public readonly config: Config,
     public readonly stats: Statistics,
   ) {
@@ -50,7 +48,7 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
-        return this.addressMapping.getCellValue(address)
+        return this.dependencyGraph.getCellValue(address)
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
@@ -140,7 +138,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof Matrix && ast.right.type === AstNodeType.CELL_RANGE) {
           const rightRange = AbsoluteCellRange.fromCellRange(ast.right, formulaAddress)
-          const matrixVertex = this.addressMapping.getMatrix(rightRange)
+          const matrixVertex = this.dependencyGraph.getMatrix(rightRange)
           if (matrixVertex === undefined) {
             const resultMatrix: number[][] = []
             let currentRow = 0
@@ -150,7 +148,7 @@ export class Interpreter {
               while (currentColumn < leftResult.width()) {
                 row.push(addStrict(
                   leftResult.get(currentColumn, currentRow),
-                  this.addressMapping.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
+                  this.dependencyGraph.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
                 ) as number)
                 currentColumn++
               }

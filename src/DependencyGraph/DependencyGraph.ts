@@ -104,7 +104,7 @@ export class DependencyGraph {
 
         this.graph.addNode(rangeVertex)
 
-        const {smallerRangeVertex, restRanges} = findSmallerRange(this.rangeMapping, [range])
+        const {smallerRangeVertex, restRanges} = findSmallerRange(this, [range])
         const restRange = restRanges[0]
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
@@ -289,12 +289,20 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
+  public isEmpty(address: SimpleCellAddress) {
+    return this.addressMapping.isEmpty(address)
+  }
+
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.addressMapping.getCellValue(address)
   }
 
   public setCell(address: SimpleCellAddress, vertex: CellVertex) {
     this.addressMapping.setCell(address, vertex)
+  }
+
+  public existsEdge(fromNode: Vertex, toNode: Vertex) {
+    return this.graph.existsEdge(fromNode, toNode)
   }
 
   public getSheetId(sheetName: string): number {
@@ -337,4 +345,17 @@ export class DependencyGraph {
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
     yield* this.matrixMapping.numericMatrices()
   }
+
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress) {
+    return this.rangeMapping.getRange(start, end)
+  }
+
+  public topologicalSort() {
+    return this.graph.topologicalSort()
+  }
+
+  public getTopologicallySortedSubgraphFrom(vertices: Vertex[]) {
+    return this.graph.getTopologicallySortedSubgraphFrom(vertices)
+  }
 }
+

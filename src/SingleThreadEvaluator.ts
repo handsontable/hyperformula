@@ -4,24 +4,31 @@ import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {FormulaCellVertex, MatrixVertex, RangeVertex, Vertex, RangeMapping, Graph, AddressMapping} from './DependencyGraph'
+import {
+  FormulaCellVertex,
+  MatrixVertex,
+  RangeVertex,
+  Vertex,
+  RangeMapping,
+  Graph,
+  AddressMapping,
+  DependencyGraph
+} from './DependencyGraph'
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
 
   constructor(
-    private readonly addressMapping: AddressMapping,
-    private readonly rangeMapping: RangeMapping,
-    private readonly graph: Graph<Vertex>,
+    private readonly dependencyGraph: DependencyGraph,
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
-    this.interpreter = new Interpreter(this.addressMapping, this.rangeMapping, this.graph, this.config, this.stats)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.config, this.stats)
   }
 
   public run() {
     this.stats.start(StatType.TOP_SORT)
-    const { sorted, cycled } = this.graph.topologicalSort()
+    const { sorted, cycled } = this.dependencyGraph.topologicalSort()
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -30,7 +37,7 @@ export class SingleThreadEvaluator implements Evaluator {
   }
 
   public partialRun(vertices: Vertex[]) {
-    const { sorted, cycled } = this.graph.getTopologicallySortedSubgraphFrom(vertices)
+    const { sorted, cycled } = this.dependencyGraph.getTopologicallySortedSubgraphFrom(vertices)
     this.recomputeFormulas(cycled, sorted)
   }
 

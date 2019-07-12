@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {RangeMapping, RangeVertex} from '../../DependencyGraph'
+import {DependencyGraph, RangeMapping, RangeVertex} from '../../DependencyGraph'
 import {FunctionPlugin} from './FunctionPlugin'
 import {Matrix} from "../../Matrix";
 import {zip} from "../../generatorUtils";
@@ -61,10 +61,10 @@ export class SumprodPlugin extends FunctionPlugin {
  * @param rangeMapping - range mapping dependency
  * @param ranges - ranges to find smaller range in
  */
-export const findSmallerRange = (rangeMapping: RangeMapping, ranges: AbsoluteCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: AbsoluteCellRange[] } => {
+export const findSmallerRange = (dependencyGraph: DependencyGraph, ranges: AbsoluteCellRange[]): { smallerRangeVertex: RangeVertex | null, restRanges: AbsoluteCellRange[] } => {
   if (ranges[0].height() > 1) {
     const valuesRangeEndRowLess = simpleCellAddress(ranges[0].end.sheet, ranges[0].end.col, ranges[0].end.row - 1)
-    const rowLessVertex = rangeMapping.getRange(ranges[0].start, valuesRangeEndRowLess)
+    const rowLessVertex = dependencyGraph.getRange(ranges[0].start, valuesRangeEndRowLess)
     if (rowLessVertex) {
       const restRanges = ranges.map((range) => {
         return new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)

@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
-import {Vertex, RangeMapping, Graph, AddressMapping} from '../../DependencyGraph'
+import {Vertex, RangeMapping, Graph, AddressMapping, DependencyGraph} from '../../DependencyGraph'
 import {Interpreter} from '../Interpreter'
 import {Matrix} from "../../Matrix";
 
@@ -25,16 +25,12 @@ export abstract class FunctionPlugin {
    */
   public static implementedFunctions: IImplementedFunctions
   protected readonly interpreter: Interpreter
-  protected readonly addressMapping: AddressMapping
-  protected readonly rangeMapping: RangeMapping
-  protected readonly graph: Graph<Vertex>
+  protected readonly dependencyGraph: DependencyGraph
   protected readonly config: Config
 
   protected constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
-    this.addressMapping = interpreter.addressMapping
-    this.rangeMapping = interpreter.rangeMapping
-    this.graph = interpreter.graph
+    this.dependencyGraph = interpreter.dependencyGraph
     this.config = interpreter.config
   }
 
@@ -47,7 +43,7 @@ export abstract class FunctionPlugin {
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
         for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).generateCellsFromRangeGenerator()) {
-          const value = this.addressMapping.getCellValue(cellFromRange)
+          const value = this.dependencyGraph.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
           } else if (value instanceof CellError) {
@@ -73,7 +69,7 @@ export abstract class FunctionPlugin {
   protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
     if (range instanceof AbsoluteCellRange) {
       for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
-        yield this.addressMapping.getCellValue(cellFromRange)
+        yield this.dependencyGraph.getCellValue(cellFromRange)
       }
     } else {
        for (const value of range.generateFlatValues()) {

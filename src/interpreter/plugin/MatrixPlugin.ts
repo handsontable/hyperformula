@@ -44,7 +44,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rightMatrix
     }
 
-    const vertex = this.addressMapping.fetchCell(formulaAddress) as MatrixVertex
+    const vertex = this.dependencyGraph.fetchCell(formulaAddress) as MatrixVertex
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
@@ -201,7 +201,7 @@ export class MatrixPlugin extends FunctionPlugin {
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
     if (ast.type === AstNodeType.CELL_RANGE) {
       const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-      const matrixVertex = this.addressMapping.getMatrix(range)
+      const matrixVertex = this.dependencyGraph.getMatrix(range)
       if (matrixVertex !== undefined) {
         return matrixVertex.getCellValue()
       }
@@ -224,7 +224,7 @@ export class MatrixPlugin extends FunctionPlugin {
     let i = 0
     let row = []
     for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
-      const value = this.addressMapping.getCellValue(cellFromRange)
+      const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
         ++i

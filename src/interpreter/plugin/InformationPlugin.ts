@@ -53,7 +53,7 @@ export class InformationPlugin extends FunctionPlugin {
     const arg = ast.args[0]
     if (arg.type === AstNodeType.CELL_REFERENCE) {
       const address = arg.reference.toSimpleCellAddress(formulaAddress)
-      return this.addressMapping.isEmpty(address)
+      return this.dependencyGraph.isEmpty(address)
     } else {
       return false
     }
