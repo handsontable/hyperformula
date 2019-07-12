@@ -96,11 +96,7 @@ export class GraphBuilderMatrixHeuristic {
         const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
         const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
         matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
-        for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
-          this.dependencyGraph.setVertexAddress(address, matrixVertex)
-          this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
-        }
-        this.dependencyGraph.addNode(matrixVertex)
+        this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
       } else {
         const formula = parserCache.get(elem.hash)!.ast
         const output = this.ifMatrixCompatibile(elem.range.start, formula, possibleMatrix.width(), possibleMatrix.height())
@@ -109,16 +105,12 @@ export class GraphBuilderMatrixHeuristic {
           const newAst = buildMultAst(leftMatrix, rightMatrix)
           const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
           const matrixDependencies = []
-
           for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
             const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
             matrixDependencies.push(...deps)
-            this.dependencyGraph.setVertexAddress(address, matrixVertex)
-            this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
           }
-
+          this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
           this.dependencies.set(matrixVertex, matrixDependencies)
-          this.dependencyGraph.addNode(matrixVertex)
         } else {
           notMatrices.push(elem)
         }

@@ -286,10 +286,6 @@ export class DependencyGraph {
     this.setAddressMappingForMatrixVertex(vertex, address)
   }
 
-  public addNode(node: Vertex) {
-    this.graph.addNode(node)
-  }
-
   public exchangeNode(node: Vertex, newNode: Vertex) {
     this.graph.exchangeNode(node, newNode)
   }
