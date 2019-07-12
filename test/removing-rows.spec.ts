@@ -194,6 +194,20 @@ describe('Removing rows - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(1)
   })
+
+  it('should remove MatrixVertex completely from graph, more rows', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['foo', 'bar'],
+    ], config)
+
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
+    engine.removeRows(0, 0, 2)
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
+    expect(engine.graph.nodes.size).toBe(1)
+  })
 })
 
 describe('Removing rows - graph', function() {
