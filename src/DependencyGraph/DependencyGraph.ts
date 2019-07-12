@@ -273,6 +273,14 @@ export class DependencyGraph {
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
   }
 
+  public addNode(node: Vertex) {
+    this.graph.addNode(node)
+  }
+
+  public existsVertex(address: SimpleCellAddress) {
+    return this.addressMapping.has(address)
+  }
+
   public fetchCell(address: SimpleCellAddress): CellVertex {
     return this.addressMapping.fetchCell(address)
   }
@@ -289,11 +297,19 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
   }
 
-  public getSheetHeight(sheet: number) {
+  public getSheetId(sheetName: string): number {
+    return this.sheetMapping.fetch(sheetName)
+  }
+
+  public getSheetName(sheetId: number): string {
+    return this.sheetMapping.name(sheetId)
+  }
+
+  public getSheetHeight(sheet: number): number {
     return this.addressMapping.getHeight(sheet)
   }
 
-  public getSheetWidth(sheet: number) {
+  public getSheetWidth(sheet: number): number {
     return this.addressMapping.getWidth(sheet)
   }
 
