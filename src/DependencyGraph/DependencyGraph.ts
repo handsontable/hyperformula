@@ -242,40 +242,6 @@ export class DependencyGraph {
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
 
-  private fixRanges(sheet: number, row: number, numberOfRows: number) {
-    for (const range of this.rangeMapping.getValues()) {
-      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
-        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
-        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
-          for (let y = row; y < row + numberOfRows; ++y) {
-            for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
-            }
-          }
-        }
-      }
-    }
-
-    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
-  }
-
-  private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
-    for (const range of this.rangeMapping.getValues()) {
-      if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
-        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
-        if (this.graph.adjacentNodes(anyVertexInColumn).has(range)) {
-          for (let y = column; y < column + numberOfColumns; ++y) {
-            for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, y, x)), range)
-            }
-          }
-        }
-      }
-    }
-
-    this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
-  }
-
   public disableNumericMatrices() {
     for (const [key, matrixVertex] of this.matrixMapping.numericMatrices()) {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
@@ -306,33 +272,6 @@ export class DependencyGraph {
       // 4. remove old matrix
       this.graph.removeNode(matrixVertex)
       this.matrixMapping!.removeMatrix(key)
-    }
-  }
-
-  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
-    switch (ast.type) {
-      case AstNodeType.CELL_REFERENCE: {
-        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
-        if (range.addressInRange(dependencyAddress)) {
-          return [this.fetchCell(dependencyAddress)]
-        }
-        return []
-      }
-      case AstNodeType.CELL_RANGE:
-      case AstNodeType.ERROR:
-      case AstNodeType.NUMBER:
-      case AstNodeType.STRING: {
-        return []
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return this.cellReferencesInRange(ast.value, baseAddress, range)
-      }
-      case AstNodeType.FUNCTION_CALL: {
-        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
-      }
-      default: {
-        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
-      }
     }
   }
 
@@ -415,6 +354,67 @@ export class DependencyGraph {
 
   public getTopologicallySortedSubgraphFrom(vertices: Vertex[]) {
     return this.graph.getTopologicallySortedSubgraphFrom(vertices)
+  }
+
+  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
+    switch (ast.type) {
+      case AstNodeType.CELL_REFERENCE: {
+        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
+        if (range.addressInRange(dependencyAddress)) {
+          return [this.fetchCell(dependencyAddress)]
+        }
+        return []
+      }
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.ERROR:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING: {
+        return []
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return this.cellReferencesInRange(ast.value, baseAddress, range)
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
+      }
+      default: {
+        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
+      }
+    }
+  }
+
+  private fixRanges(sheet: number, row: number, numberOfRows: number) {
+    for (const range of this.rangeMapping.getValues()) {
+      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
+        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
+        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
+          for (let y = row; y < row + numberOfRows; ++y) {
+            for (let x = range.start.col; x <= range.end.col; ++x) {
+              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
+            }
+          }
+        }
+      }
+    }
+
+    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+  }
+
+  private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
+    for (const range of this.rangeMapping.getValues()) {
+      if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
+        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
+        if (this.graph.adjacentNodes(anyVertexInColumn).has(range)) {
+          for (let y = column; y < column + numberOfColumns; ++y) {
+            for (let x = range.start.col; x <= range.end.col; ++x) {
+              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, y, x)), range)
+            }
+          }
+        }
+      }
+    }
+
+    this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
   }
 }
 
