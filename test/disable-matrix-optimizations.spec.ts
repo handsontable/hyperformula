@@ -2,6 +2,7 @@ import {Config, HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
 import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from "../src/DependencyGraph";
 import './testConfig.ts'
+import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
 describe("Disable matrix optimizatoins", () => {
   it("should split matrix into value cell vertices", () => {
@@ -36,7 +37,7 @@ describe("Disable matrix optimizatoins", () => {
     const engine = HandsOnEngine.buildFromArray(sheet, config)
     let range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0)) as RangeVertex
     expect(engine.graph.getDependecies(range).length).toBe(1)
-    expect(Array.from(engine.dependencyGraph!.numericMatrices()).length).toBe(1)
+    expect(engine.dependencyGraph!.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).not.toBe(undefined)
 
     engine.disableNumericMatrices()
     const a1 = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 0)) as ValueCellVertex
@@ -48,7 +49,7 @@ describe("Disable matrix optimizatoins", () => {
     expect(engine.graph.getDependecies(range).length).toBe(2)
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
-    expect(Array.from(engine.dependencyGraph!.numericMatrices()).length).toBe(0)
+    expect(engine.dependencyGraph!.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).toBe(undefined)
   })
 
   it("should update edges between matrix and formulas", () => {

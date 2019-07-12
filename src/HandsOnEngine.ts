@@ -275,10 +275,6 @@ export class HandsOnEngine {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
-    if (this.dependencyGraph!.isFormulaMatrixInColumns(sheet, col)) {
-      throw Error("It is not possible to add column in column with matrix")
-    }
-
     this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
 
     for (const node of this.graph.nodes) {
@@ -314,62 +310,7 @@ export class HandsOnEngine {
   }
 
   public disableNumericMatrices() {
-    for (const [key, matrixVertex] of this.dependencyGraph!.numericMatrices()) {
-      const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-      // 1. split matrix to chunks, add value cell vertices
-      // 2. update address mapping for each address in matrix
-      for (const address of matrixRange.generateCellsFromRangeGenerator()) {
-        const value = this.dependencyGraph!.getCellValue(address)
-        const valueVertex = new ValueCellVertex(value)
-        this.dependencyGraph!.addVertex(address, valueVertex)
-      }
-
-      for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
-        // 3. update dependencies for each range that has this matrix in dependencies
-        if (adjacentNode instanceof RangeVertex) {
-          for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
-            const vertex = this.dependencyGraph!.fetchCell(address)
-            this.graph.addEdge(vertex, adjacentNode)
-          }
-          // 4. fix edges for cell references in formulas
-        } else if (adjacentNode instanceof FormulaCellVertex) {
-          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
-          for (const vertex of relevantReferences) {
-            this.graph.addEdge(vertex, adjacentNode)
-          }
-        }
-      }
-
-      // 4. remove old matrix
-      this.dependencyGraph!.removeMatrix(key, matrixVertex)
-    }
-  }
-
-  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
-    switch (ast.type) {
-      case AstNodeType.CELL_REFERENCE: {
-        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
-        if (range.addressInRange(dependencyAddress)) {
-          return [this.dependencyGraph!.fetchCell(dependencyAddress)]
-        }
-        return []
-      }
-      case AstNodeType.CELL_RANGE:
-      case AstNodeType.ERROR:
-      case AstNodeType.NUMBER:
-      case AstNodeType.STRING: {
-        return []
-      }
-      case AstNodeType.MINUS_UNARY_OP: {
-        return this.cellReferencesInRange(ast.value, baseAddress, range)
-      }
-      case AstNodeType.FUNCTION_CALL: {
-        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
-      }
-      default: {
-        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
-      }
-    }
+    this.dependencyGraph!.disableNumericMatrices()
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {

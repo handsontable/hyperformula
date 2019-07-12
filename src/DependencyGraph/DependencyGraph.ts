@@ -5,7 +5,7 @@ import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Graph} from './Graph'
-import {Ast, CellAddress, collectDependencies, absolutizeDependencies} from '../parser'
+import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import assert from 'assert';
 import {
@@ -17,7 +17,6 @@ import {
   ValueCellVertex,
   Vertex
 } from './Vertex'
-import {filterWith} from "../generatorUtils";
 import {MatrixMapping} from "./MatrixMapping";
 
 export class DependencyGraph {
@@ -230,6 +229,10 @@ export class DependencyGraph {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(sheet, col)) {
+      throw Error("It is not possible to add column in column with matrix")
+    }
+
     this.addressMapping.addColumns(sheet, col, numberOfCols)
 
     for (let matrix of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
@@ -271,6 +274,66 @@ export class DependencyGraph {
     }
 
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
+  }
+
+  public disableNumericMatrices() {
+    for (const [key, matrixVertex] of this.matrixMapping.numericMatrices()) {
+      const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+      // 1. split matrix to chunks, add value cell vertices
+      // 2. update address mapping for each address in matrix
+      for (const address of matrixRange.generateCellsFromRangeGenerator()) {
+        const value = this.getCellValue(address)
+        const valueVertex = new ValueCellVertex(value)
+        this.addVertex(address, valueVertex)
+      }
+
+      for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
+        // 3. update dependencies for each range that has this matrix in dependencies
+        if (adjacentNode instanceof RangeVertex) {
+          for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
+            const vertex = this.fetchCell(address)
+            this.graph.addEdge(vertex, adjacentNode)
+          }
+          // 4. fix edges for cell references in formulas
+        } else if (adjacentNode instanceof FormulaCellVertex) {
+          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
+          for (const vertex of relevantReferences) {
+            this.graph.addEdge(vertex, adjacentNode)
+          }
+        }
+      }
+
+      // 4. remove old matrix
+      this.graph.removeNode(matrixVertex)
+      this.matrixMapping!.removeMatrix(key)
+    }
+  }
+
+  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): Array<CellVertex> {
+    switch (ast.type) {
+      case AstNodeType.CELL_REFERENCE: {
+        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
+        if (range.addressInRange(dependencyAddress)) {
+          return [this.fetchCell(dependencyAddress)]
+        }
+        return []
+      }
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.ERROR:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING: {
+        return []
+      }
+      case AstNodeType.MINUS_UNARY_OP: {
+        return this.cellReferencesInRange(ast.value, baseAddress, range)
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
+      }
+      default: {
+        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
+      }
+    }
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex) {
@@ -332,23 +395,6 @@ export class DependencyGraph {
 
   public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
     this.matrixMapping.setMatrix(range, vertex)
-  }
-
-  public removeMatrix(range: string | AbsoluteCellRange, vertex: MatrixVertex) {
-    this.graph.removeNode(vertex)
-    this.matrixMapping!.removeMatrix(range)
-  }
-
-  public isFormulaMatrixInColumns(sheet: number, colStart: number, colEnd: number = colStart) {
-    return this.matrixMapping.isFormulaMatrixInColumns(sheet, colStart, colEnd)
-  }
-
-  public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-     return this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)
-  }
-
-  public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
-    yield* this.matrixMapping.numericMatrices()
   }
 
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress) {
