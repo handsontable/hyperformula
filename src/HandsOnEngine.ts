@@ -17,14 +17,12 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {
   AddressMapping,
-  CellVertex,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
   Graph,
   MatrixVertex,
   RangeMapping,
-  RangeVertex,
   SheetMapping,
   ValueCellVertex,
   Vertex
@@ -203,7 +201,7 @@ export class HandsOnEngine {
       for (const x of range.generateCellsFromRangeGenerator()) {
         const vertex = this.dependencyGraph!.getCell(x)
         if (vertex) {
-          this.graph.exchangeNode(vertex, newVertex)
+          this.dependencyGraph!.exchangeNode(vertex, newVertex)
         }
         this.dependencyGraph!.setVertexAddress(x, newVertex)
       }
@@ -237,7 +235,7 @@ export class HandsOnEngine {
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
 
-    for (const node of this.graph.nodes) {
+    for (const node of this.dependencyGraph!.nodes()) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(
           node.getFormula(), node.getAddress(),
@@ -258,7 +256,7 @@ export class HandsOnEngine {
 
     const numberOfRowsToDelete = rowEnd - rowStart + 1
     // 3. Fix dependencies
-    for (const node of this.graph.nodes) {
+    for (const node of this.dependencyGraph!.nodes()) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(
           node.getFormula(),
@@ -277,7 +275,7 @@ export class HandsOnEngine {
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
     this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
 
-    for (const node of this.graph.nodes) {
+    for (const node of this.dependencyGraph!.nodes()) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
         const cachedAst = this.parser.rememberNewAst(newAst)
@@ -293,7 +291,7 @@ export class HandsOnEngine {
     this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
 
     const numberOfColumnsToDelete = columnEnd - columnStart + 1
-    for (const node of this.graph.nodes) {
+    for (const node of this.dependencyGraph!.nodes()) {
       if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
         const newAst = transformAddressesInFormula(
           node.getFormula(),

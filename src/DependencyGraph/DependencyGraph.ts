@@ -345,6 +345,14 @@ export class DependencyGraph {
     this.graph.addNode(node)
   }
 
+  public exchangeNode(node: Vertex, newNode: Vertex) {
+    this.graph.exchangeNode(node, newNode)
+  }
+
+  public nodes(): IterableIterator<Vertex> {
+    return this.graph.nodes.values()
+  }
+
   public existsVertex(address: SimpleCellAddress) {
     return this.addressMapping.has(address)
   }
