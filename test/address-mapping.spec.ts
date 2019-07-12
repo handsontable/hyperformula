@@ -166,6 +166,46 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.fetchCell(simpleCellAddress(0, 1, 2))).toEqual(new ValueCellVertex(22))
     expect(mapping.getHeight(0)).toEqual(3)
   })
+
+  it('removeRows - one row', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11)) // to remove
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12)) // to remove
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(21))
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22))
+
+    expect(mapping.getHeight(0)).toBe(2)
+    mapping.removeRows(0, 0, 0)
+    expect(mapping.getHeight(0)).toBe(1)
+    expect(mapping.getCellValue(simpleCellAddress(0, 0, 0))).toBe(21)
+    expect(mapping.getCellValue(simpleCellAddress(0, 1, 0))).toBe(22)
+  })
+
+  it('removeRows - remove more rows thant mapping size', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(21))
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22))
+
+    expect(mapping.getHeight(0)).toBe(2)
+    mapping.removeRows(0, 0, 5)
+    expect(mapping.getHeight(0)).toBe(0)
+    expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(false)
+  })
+
+  it('removeCols - remove more cols thant mapping size', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(21))
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22))
+
+    expect(mapping.getHeight(0)).toBe(2)
+    mapping.removeColumns(0, 0, 5)
+    expect(mapping.getWidth(0)).toBe(0)
+    expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(false)
+  })
 }
 
 describe('SparseStrategy', () => {

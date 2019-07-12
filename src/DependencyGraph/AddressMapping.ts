@@ -155,7 +155,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
         rowMapping.set(rowNumber, vertex)
       })
     })
-    this.height -= numberOfRows
+    this.height = Math.max(0, this.height - numberOfRows)
   }
 
   public removeColumns(columnStart: number, columnEnd: number): void {
@@ -172,7 +172,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
     tmpMapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
       this.mapping.set(colNumber, rowMapping)
     })
-    this.width -= numberOfColumns
+    this.width = Math.max(0, this.width - numberOfColumns)
   }
 }
 
@@ -263,7 +263,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public removeRows(rowStart: number, rowEnd: number): void {
     const numberOfRows = rowEnd - rowStart + 1
     this.mapping.splice(rowStart, numberOfRows)
-    this.height -= numberOfRows
+    this.height = Math.max(0, this.height - numberOfRows)
   }
 
   public removeColumns(columnStart: number, columnEnd: number): void {
@@ -271,7 +271,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
     for (let i = 0; i < this.height; i++) {
       this.mapping[i].splice(columnStart, numberOfColumns)
     }
-    this.width -= numberOfColumns
+    this.width = Math.max(0, this.width - numberOfColumns)
   }
 }
 
