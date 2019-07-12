@@ -177,11 +177,14 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
-            matrixHeuristic.add(parseResult.hash, address)
+            const vertex = new FormulaCellVertex(parseResult.ast, address)
+            const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
+            dependencies.set(vertex, absoluteParserResult.dependencies)
+            this.dependencyGraph.addVertex(address, vertex)
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
-            matrixHeuristic.add('#', address)
+            matrixHeuristic.add(address)
           } else {
             const vertex = new ValueCellVertex(cellContent)
             this.dependencyGraph.addVertex(address, vertex)
@@ -192,22 +195,13 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
 
     this.stats.start(StatType.MATRIX_DETECTION)
 
-    const notMatrices = matrixHeuristic.run(sheets, this.parser.getCache())
+    const notMatrices = matrixHeuristic.run(sheets)
     for (let i = notMatrices.length - 1; i >= 0; --i) {
       const elem = notMatrices[i]
-      if (elem.hash === '#') {
-        for (let address of elem.cells.reverse()) {
-          const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
-          const vertex = new ValueCellVertex(Number(value))
-          this.dependencyGraph.addVertex(address, vertex)
-        }
-      } else {
-        for (let address of elem.cells.reverse()) {
-          const parserResult = this.parser.getAbsolutizedParserResult(elem.hash, address)
-          const vertex = new FormulaCellVertex(parserResult.ast, address)
-          this.dependencyGraph.addVertex(address, vertex)
-          dependencies.set(vertex, parserResult.dependencies)
-        }
+      for (let address of elem.cells.reverse()) {
+        const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
+        const vertex = new ValueCellVertex(Number(value))
+        this.dependencyGraph.addVertex(address, vertex)
       }
     }
 

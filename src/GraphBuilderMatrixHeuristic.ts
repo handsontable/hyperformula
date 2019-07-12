@@ -1,16 +1,11 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellAddress, CellReferenceType} from './parser/CellAddress'
 import {CellDependency} from './CellDependency'
 import {Size} from './Matrix'
-import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser'
-import {DependencyGraph, MatrixVertex, SheetMapping, Vertex} from './DependencyGraph'
+import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from "./GraphBuilder";
-import {Cache} from "./parser/Cache";
-import {absolutizeDependencies} from "./parser/ParserWithCaching";
 
 export class Array2d<T> {
-
   public static fromArray<T>(input: T[][]): Array2d<T> {
     const size: Size = {width: input[0].length, height: input.length}
     const array = new Array2d<T>(size)
@@ -52,14 +47,12 @@ export class Array2d<T> {
 
 export interface PossibleMatrix {
   isMatrix: boolean,
-  hash: string,
   range: AbsoluteCellRange,
   cells: SimpleCellAddress[]
 }
 
 export class GraphBuilderMatrixHeuristic {
-
-  private mapping: Map<number, Array2d<string>> = new Map()
+  private mapping: Map<number, Array2d<boolean>> = new Map()
 
   constructor(
       private readonly dependencyGraph: DependencyGraph,
@@ -69,17 +62,17 @@ export class GraphBuilderMatrixHeuristic {
   }
 
   public addSheet(id: number, size: Size) {
-    this.mapping.set(id, new Array2d<string>(size))
+    this.mapping.set(id, new Array2d<boolean>(size))
   }
 
-  public add(hash: string, cellAddress: SimpleCellAddress) {
+  public add(cellAddress: SimpleCellAddress) {
     if (!this.mapping.has(cellAddress.sheet)) {
       throw Error(`Sheet with id: ${cellAddress.sheet} does not exists`)
     }
-    this.mapping.get(cellAddress.sheet)!.set(cellAddress.col, cellAddress.row, hash)
+    this.mapping.get(cellAddress.sheet)!.set(cellAddress.col, cellAddress.row, true)
   }
 
-  public run(sheets: Sheets, parserCache: Cache): PossibleMatrix[] {
+  public run(sheets: Sheets): PossibleMatrix[] {
     const notMatrices: PossibleMatrix[] = []
     const scanResult = this.findMatrices()
 
@@ -88,36 +81,14 @@ export class GraphBuilderMatrixHeuristic {
         notMatrices.push(elem)
         return
       }
-
-      const hash = elem.hash
       const possibleMatrix = elem.range
-
-      if (hash === '#') {
-        const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
-        const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
-        matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
-        this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
-      } else {
-        const formula = parserCache.get(elem.hash)!.ast
-        const output = this.ifMatrixCompatibile(elem.range.start, formula, possibleMatrix.width(), possibleMatrix.height())
-        if (output) {
-          const {leftMatrix, rightMatrix} = output
-          const newAst = buildMultAst(leftMatrix, rightMatrix)
-          const matrixVertex = MatrixVertex.fromRange(possibleMatrix, newAst)
-          const matrixDependencies = []
-          for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
-            const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
-            matrixDependencies.push(...deps)
-          }
-          this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
-          this.dependencies.set(matrixVertex, matrixDependencies)
-        } else {
-          notMatrices.push(elem)
-        }
-      }
+      const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
+      const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
+      matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
+      this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
     })
-    this.mapping.clear()
 
+    this.mapping.clear()
     return notMatrices
   }
 
@@ -128,65 +99,9 @@ export class GraphBuilderMatrixHeuristic {
     })
     return result
   }
-
-  private ifMatrixCompatibile(address: SimpleCellAddress, formula: Ast, width: number, height: number): ({ leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange }) | false {
-    if (formula.type === AstNodeType.FUNCTION_CALL && formula.procedureName === 'SUMPRODUCT') {
-      if (formula.args.length !== 2) {
-        return false
-      }
-
-      const [leftArg, rightArg] = formula.args
-      let leftRange, rightRange
-
-      if (leftArg.type === AstNodeType.CELL_RANGE && rightArg.type === AstNodeType.FUNCTION_CALL && rightArg.procedureName === 'TRANSPOSE') {
-        leftRange = leftArg
-        rightRange = rightArg.args[0] as CellRangeAst
-      } else if (rightArg.type === AstNodeType.CELL_RANGE && leftArg.type === AstNodeType.FUNCTION_CALL && leftArg.procedureName === 'TRANSPOSE') {
-        leftRange = leftArg.args[0] as CellRangeAst
-        rightRange = rightArg
-      } else {
-        return false
-      }
-
-      if (leftRange.start.type !== CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL
-          || leftRange.end.type !== CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL
-          || rightRange.start.type !== CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW
-          || rightRange.end.type !== CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-        return false
-      }
-
-      const leftArgRange = AbsoluteCellRange.fromCellRange(leftRange, address)
-      const rightArgRange = AbsoluteCellRange.fromCellRange(rightRange, address)
-
-      if (leftArgRange.height() === 1 && rightArgRange.width() === 1 && leftArgRange.width() === rightArgRange.height()) {
-        const leftMatrix = leftArgRange.withEnd(simpleCellAddress(leftArgRange.start.sheet, leftArgRange.end.col, leftArgRange.end.row + height - 1))
-        const rightMatrix = rightArgRange.withEnd(simpleCellAddress(rightArgRange.start.sheet, rightArgRange.end.col + width - 1, rightArgRange.end.row))
-        const currentMatrix = AbsoluteCellRange.spanFrom(address, width, height)
-
-        if (!leftMatrix.doesOverlap(currentMatrix) && !rightMatrix.doesOverlap(currentMatrix)) {
-          return {leftMatrix, rightMatrix}
-        }
-      }
-    }
-
-    return false
-  }
 }
 
-export function buildMultAst(leftMatrix: AbsoluteCellRange, rightMatrix: AbsoluteCellRange): ProcedureAst {
-  return buildProcedureAst('MMULT', [
-    buildCellRangeAst(
-        CellAddress.absolute(leftMatrix.start.sheet, leftMatrix.start.col, leftMatrix.start.row),
-        CellAddress.absolute(leftMatrix.end.sheet, leftMatrix.end.col, leftMatrix.end.row),
-    ),
-    buildCellRangeAst(
-        CellAddress.absolute(rightMatrix.start.sheet, rightMatrix.start.col, rightMatrix.start.row),
-        CellAddress.absolute(rightMatrix.end.sheet, rightMatrix.end.col, rightMatrix.end.row),
-    ),
-  ])
-}
-
-export function findMatrices(sheet: number, input: Array2d<string>): IterableIterator<PossibleMatrix> {
+export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIterator<PossibleMatrix> {
   const size = input.size()
   const result = new Map<number, PossibleMatrix>()
   const colours = new Array2d<number>(size)
@@ -200,7 +115,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
       const [bottom, bottomColour] = [input.get(x, y + 1)!, colours.get(x, y + 1)!]
       const [diag, diagColour] = [input.get(x + 1, y + 1)!, colours.get(x + 1, y + 1)!]
 
-      if (value === null) {
+      if (!value) {
         colours.set(x, y, 0)
         if (rightColour === bottomColour) {
           // 0 1
@@ -213,7 +128,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
         // 1 2
         // 2 *
         colours.set(x, y, ++colour)
-        result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+        result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         if (result.has(rightColour)) {
           result.get(rightColour)!.isMatrix = false
         }
@@ -228,7 +143,7 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
             result.get(bottomColour)!.isMatrix = false
           }
           colours.set(x, y, ++colour)
-          result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+          result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         } else if (right !== value && bottom === value) {
           // 1 0
           // 1 0
@@ -236,10 +151,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
             colours.set(x, y, bottomColour)
             const old = result.get(bottomColour)!
             old.cells.push(simpleCellAddress(sheet, x, y))
-            result.set(bottomColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+            result.set(bottomColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
           } else {
             colours.set(x, y, ++colour)
-            result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+            result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
           }
         } else if (right === value && bottom !== value) {
           // 1 1
@@ -247,10 +162,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
           colours.set(x, y, rightColour)
           const old = result.get(rightColour)!
           old.cells.push(simpleCellAddress(sheet, x, y))
-          result.set(rightColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+          result.set(rightColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
         } else {
           colours.set(x, y, ++colour)
-          result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+          result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         }
       } else if (value === diag && diagColour === rightColour && diagColour === bottomColour) {
         // 1 1
@@ -258,10 +173,10 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
         colours.set(x, y, rightColour)
         const old = result.get(rightColour)!
         old.cells.push(simpleCellAddress(sheet, x, y))
-        result.set(rightColour, possibleMatrix(value, old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
+        result.set(rightColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
       } else if (value === diag) {
         colours.set(x, y, ++colour)
-        result.set(colour, possibleMatrix(value, AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
+        result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
       }
     }
   }
@@ -269,10 +184,9 @@ export function findMatrices(sheet: number, input: Array2d<string>): IterableIte
   return result.values()
 }
 
-function possibleMatrix(hash: string, range: AbsoluteCellRange, isMatrix: boolean, cells: SimpleCellAddress[]): PossibleMatrix {
+function possibleMatrix(range: AbsoluteCellRange, isMatrix: boolean, cells: SimpleCellAddress[]): PossibleMatrix {
   return {
     isMatrix: isMatrix,
-    hash: hash,
     range: range,
     cells: cells
   }

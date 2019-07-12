@@ -253,89 +253,6 @@ describe('GraphBuilder', () => {
 })
 
 describe('GraphBuilder with matrix detection', () => {
-  it('matrix no overlap', () => {
-    const sheet = [
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2'],
-      ['3', '4'],
-      ['=SUMPRODUCT($A1:$B1,transpose(A$4:A$5))', '=SUMPRODUCT($A1:$B1,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A2:$B2,transpose(A$4:A$5))', '=SUMPRODUCT($A2:$B2,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
-    ]
-
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    addressMapping.autoAddSheet(0, sheet)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
-
-    graphBuilder.buildGraph({ Sheet1: sheet })
-
-    const vertex = addressMapping.fetchCell(simpleCellAddress(0, 0, 5))
-    expect(vertex).toBeInstanceOf(MatrixVertex)
-    expect((vertex as MatrixVertex).getFormula()).toEqual(buildProcedureAst('MMULT', [
-      buildCellRangeAst(CellAddress.absolute(0, 0, 0), CellAddress.absolute(0, 1, 2)),
-      buildCellRangeAst(CellAddress.absolute(0, 0, 3), CellAddress.absolute(0, 1, 4)),
-    ]))
-  })
-
-  it('overlap', () => {
-    const sheet = [
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2'],
-      ['3', '4'],
-      ['=SUMPRODUCT($A4:$B4,transpose(A$4:A$5))', '=SUMPRODUCT($A4:$B4,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A5:$B5,transpose(A$4:A$5))', '=SUMPRODUCT($A5:$B5,transpose(B$4:B$5))'],
-      ['=SUMPRODUCT($A6:$B6,transpose(A$4:A$5))', '=SUMPRODUCT($A6:$B6,transpose(B$4:B$5))'],
-    ]
-
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    addressMapping.autoAddSheet(0, sheet)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
-
-    graphBuilder.buildGraph({ Sheet1: sheet })
-
-    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 5))).not.toBeInstanceOf(MatrixVertex)
-  })
-
-  it('matrix no overlap 2', () => {
-    const sheet = [
-      ['1', '2'],
-      ['3', '4'],
-      ['5', '6'],
-      ['1', '2'],
-      ['3', '4'],
-      ['=SUMPRODUCT(transpose($A1:$B1),A$4:A$5)', '=SUMPRODUCT(transpose($A1:$B1),B$4:B$5)'],
-      ['=SUMPRODUCT(transpose($A2:$B2),A$4:A$5)', '=SUMPRODUCT(transpose($A2:$B2),B$4:B$5)'],
-      ['=SUMPRODUCT(transpose($A3:$B3),A$4:A$5)', '=SUMPRODUCT(transpose($A3:$B3),B$4:B$5)'],
-    ]
-
-    const graph = new Graph<Vertex>()
-    const addressMapping = new AddressMapping(0.5)
-    addressMapping.autoAddSheet(0, sheet)
-    const sheetMapping = new SheetMapping()
-    sheetMapping.addSheet('Sheet1')
-    const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    new Config({ matrixDetection: true, matrixDetectionThreshold: 6 })
-    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
-
-    graphBuilder.buildGraph({ Sheet1: sheet })
-
-    expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 5))).toBeInstanceOf(MatrixVertex)
-  })
   it('matrix with plain numbers', () => {
     const sheet = [
       ['1', '2'],
@@ -372,7 +289,7 @@ describe('GraphBuilder with matrix detection', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
     const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true }))
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 2  }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
