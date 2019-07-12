@@ -2,10 +2,9 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellAddress, CellReferenceType} from './parser/CellAddress'
 import {CellDependency} from './CellDependency'
-import {Config} from './Config'
 import {Size} from './Matrix'
-import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, isMatrix, ProcedureAst} from './parser'
-import {FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex, SheetMapping, Graph, AddressMapping} from './DependencyGraph'
+import {Ast, AstNodeType, buildCellRangeAst, buildProcedureAst, CellRangeAst, ProcedureAst} from './parser'
+import {DependencyGraph, MatrixVertex, SheetMapping, Vertex} from './DependencyGraph'
 import {Sheets} from "./GraphBuilder";
 import {Cache} from "./parser/Cache";
 import {absolutizeDependencies} from "./parser/ParserWithCaching";
@@ -49,17 +48,6 @@ export class Array2d<T> {
   public size() {
     return this._size
   }
-
-  public print() {
-    let str = "";
-    for (let i = 0; i < this.size().height; ++i) {
-      for (let j = 0; j < this.size().width; ++j) {
-        str += this.array[i][j] + ","
-      }
-      str += "\n"
-    }
-    console.log(str)
-  }
 }
 
 export interface PossibleMatrix {
@@ -74,8 +62,7 @@ export class GraphBuilderMatrixHeuristic {
   private mapping: Map<number, Array2d<string>> = new Map()
 
   constructor(
-      private readonly graph: Graph<Vertex>,
-      private readonly addressMapping: AddressMapping,
+      private readonly dependencyGraph: DependencyGraph,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
       private readonly threshold: number
   ) {
@@ -109,10 +96,10 @@ export class GraphBuilderMatrixHeuristic {
         const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
         matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheets, sheetMapping))
         for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
-          this.addressMapping.setCell(address, matrixVertex)
-          this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
+          this.dependencyGraph.setCell(address, matrixVertex)
+          this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
         }
-        this.graph.addNode(matrixVertex)
+        this.dependencyGraph.addNode(matrixVertex)
       } else {
         const formula = parserCache.get(elem.hash)!.ast
         const output = this.ifMatrixCompatibile(elem.range.start, formula, possibleMatrix.width(), possibleMatrix.height())
@@ -125,12 +112,12 @@ export class GraphBuilderMatrixHeuristic {
           for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
             const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
             matrixDependencies.push(...deps)
-            this.addressMapping.setCell(address, matrixVertex)
-            this.addressMapping.setMatrix(possibleMatrix, matrixVertex)
+            this.dependencyGraph.setCell(address, matrixVertex)
+            this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
           }
 
           this.dependencies.set(matrixVertex, matrixDependencies)
-          this.graph.addNode(matrixVertex)
+          this.dependencyGraph.addNode(matrixVertex)
         } else {
           notMatrices.push(elem)
         }
