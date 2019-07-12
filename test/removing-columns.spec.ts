@@ -4,15 +4,7 @@ import { FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGr
 import {buildCellErrorAst, CellReferenceAst} from '../src/parser'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-
-const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
-}
-
-const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: SimpleCellAddress) => {
-  const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
-  expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
-}
+import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
 
 describe('Removing columns', () => {
   it('reevaluates', () => {
@@ -235,6 +227,14 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 0)
     expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+  })
+
+  it('same sheet, case Rca, range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=SUM(B1:C1)', '1', '2'],
+    ])
+    engine.removeColumns(0, 1, 2)
+    expect_function_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
   })
 })
 

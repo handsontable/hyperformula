@@ -1,18 +1,9 @@
 import {Config, HandsOnEngine} from '../src'
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
-import { FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
-import {buildCellErrorAst, CellReferenceAst} from '../src/parser'
+import {simpleCellAddress} from '../src/Cell'
+import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-
-const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
-}
-
-const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: SimpleCellAddress) => {
-  const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
-  expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
-}
+import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
 
 describe('Removing rows - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
@@ -142,6 +133,16 @@ describe('Removing rows - dependencies', () => {
     engine.removeRows(0, 0, 1)
     expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 1))
   })
+
+  it('same sheet, case Rca, range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=SUM(A2:A3)'],
+      ['1'],
+      ['2'],
+    ])
+    engine.removeRows(0, 1, 2)
+    expect_function_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+  })
 })
 
 describe('Removing rows - matrices', () => {
@@ -210,8 +211,8 @@ describe('Removing rows - matrices', () => {
   })
 })
 
-describe('Removing rows - graph', function() {
-  it('should remove vertices from graph', function() {
+describe('Removing rows - graph', function () {
+  it('should remove vertices from graph', function () {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -222,7 +223,7 @@ describe('Removing rows - graph', function() {
   })
 })
 
-describe('Removing rows - ranges', function() {
+describe('Removing rows - ranges', function () {
   it('shift ranges in range mapping, range start below removed rows', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
