@@ -199,12 +199,10 @@ export class DependencyGraph {
     }
 
     for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
-      const numberOfColumns = columnEnd - columnStart + 1
-      if (matrix.width === numberOfColumns) {
+      matrix.removeColumns(sheet, columnStart, columnEnd)
+      if (matrix.width === 0) {
         this.graph.removeNode(matrix)
         this.matrixMapping.removeMatrix(key)
-      } else {
-        matrix.removeColumns(sheet, columnStart, columnEnd)
       }
     }
 
