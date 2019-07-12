@@ -116,9 +116,9 @@ export class AbsoluteCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
-  public matrixFromPlainValues(sheets: Sheets, sheetMapping: SheetMapping): Matrix {
+  public matrixFromPlainValues(sheet: string[][]): Matrix {
     const values = new Array(this.height())
-    const sheet = sheets[sheetMapping.name(this.start.sheet)]
+
     for (let i = 0; i < this.height(); ++i) {
       values[i] = new Array(this.width())
     }

@@ -79,7 +79,7 @@ export class GraphBuilderMatrixHeuristic {
     this.mapping.get(cellAddress.sheet)!.set(cellAddress.col, cellAddress.row, hash)
   }
 
-  public run(sheets: Sheets, sheetMapping: SheetMapping, parserCache: Cache): PossibleMatrix[] {
+  public run(sheets: Sheets, parserCache: Cache): PossibleMatrix[] {
     const notMatrices: PossibleMatrix[] = []
     const scanResult = this.findMatrices()
 
@@ -94,7 +94,8 @@ export class GraphBuilderMatrixHeuristic {
 
       if (hash === '#') {
         const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
-        matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheets, sheetMapping))
+        const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
+        matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
         for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
           this.dependencyGraph.setCell(address, matrixVertex)
           this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
