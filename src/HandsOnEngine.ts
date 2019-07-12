@@ -205,7 +205,7 @@ export class HandsOnEngine {
         if (vertex) {
           this.graph.exchangeNode(vertex, newVertex)
         }
-        this.dependencyGraph!.setCell(x, newVertex)
+        this.dependencyGraph!.setVertexAddress(x, newVertex)
       }
 
       const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
@@ -321,8 +321,7 @@ export class HandsOnEngine {
       for (const address of matrixRange.generateCellsFromRangeGenerator()) {
         const value = this.dependencyGraph!.getCellValue(address)
         const valueVertex = new ValueCellVertex(value)
-        this.graph.addNode(valueVertex)
-        this.addressMapping!.setCell(address, valueVertex)
+        this.dependencyGraph!.addVertex(address, valueVertex)
       }
 
       for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {

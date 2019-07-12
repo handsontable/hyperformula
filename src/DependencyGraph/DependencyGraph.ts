@@ -273,6 +273,11 @@ export class DependencyGraph {
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
   }
 
+  public addVertex(address: SimpleCellAddress, vertex: CellVertex) {
+    this.addNode(vertex)
+    this.setVertexAddress(address, vertex)
+  }
+
   public addNode(node: Vertex) {
     this.graph.addNode(node)
   }
@@ -297,7 +302,7 @@ export class DependencyGraph {
     return this.addressMapping.getCellValue(address)
   }
 
-  public setCell(address: SimpleCellAddress, vertex: CellVertex) {
+  public setVertexAddress(address: SimpleCellAddress, vertex: CellVertex) {
     this.addressMapping.setCell(address, vertex)
   }
 

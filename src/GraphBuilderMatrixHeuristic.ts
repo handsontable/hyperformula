@@ -97,7 +97,7 @@ export class GraphBuilderMatrixHeuristic {
         const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
         matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
         for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
-          this.dependencyGraph.setCell(address, matrixVertex)
+          this.dependencyGraph.setVertexAddress(address, matrixVertex)
           this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
         }
         this.dependencyGraph.addNode(matrixVertex)
@@ -113,7 +113,7 @@ export class GraphBuilderMatrixHeuristic {
           for (const address of possibleMatrix.generateCellsFromRangeGenerator()) {
             const deps = absolutizeDependencies(parserCache.get(hash)!.relativeDependencies, address)
             matrixDependencies.push(...deps)
-            this.dependencyGraph.setCell(address, matrixVertex)
+            this.dependencyGraph.setVertexAddress(address, matrixVertex)
             this.dependencyGraph.setMatrix(possibleMatrix, matrixVertex)
           }
 
