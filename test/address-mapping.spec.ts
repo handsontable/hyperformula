@@ -181,6 +181,25 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.getCellValue(simpleCellAddress(0, 1, 0))).toBe(22)
   })
 
+  it('removeRows - more than one row', () => {
+    const mapping = builder(2, 4)
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(21)) // to
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22)) // re
+    mapping.setCell(simpleCellAddress(0, 0, 2), new ValueCellVertex(31)) // mo
+    mapping.setCell(simpleCellAddress(0, 1, 2), new ValueCellVertex(32)) // ve
+    mapping.setCell(simpleCellAddress(0, 0, 3), new ValueCellVertex(41))
+    mapping.setCell(simpleCellAddress(0, 1, 3), new ValueCellVertex(42))
+
+    expect(mapping.getHeight(0)).toBe(4)
+    mapping.removeRows(0, 1, 2)
+    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getCellValue(simpleCellAddress(0, 0, 0))).toBe(11)
+    expect(mapping.getCellValue(simpleCellAddress(0, 0, 1))).toBe(41)
+  })
+
+
   it('removeRows - remove more rows thant mapping size', () => {
     const mapping = builder(2, 2)
     mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
@@ -194,7 +213,25 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(false)
   })
 
-  it('removeCols - remove more cols thant mapping size', () => {
+  it('removeColumns - more than one col', () => {
+    const mapping = builder(4, 2)
+    mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
+    mapping.setCell(simpleCellAddress(0, 0, 1), new ValueCellVertex(12))
+    mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(21)) // to
+    mapping.setCell(simpleCellAddress(0, 1, 1), new ValueCellVertex(22)) // re
+    mapping.setCell(simpleCellAddress(0, 2, 0), new ValueCellVertex(31)) // mo
+    mapping.setCell(simpleCellAddress(0, 2, 1), new ValueCellVertex(32)) // ve
+    mapping.setCell(simpleCellAddress(0, 3, 0), new ValueCellVertex(41))
+    mapping.setCell(simpleCellAddress(0, 3, 1), new ValueCellVertex(42))
+
+    expect(mapping.getWidth(0)).toBe(4)
+    mapping.removeColumns(0, 1, 2)
+    expect(mapping.getWidth(0)).toBe(2)
+    expect(mapping.getCellValue(simpleCellAddress(0, 0, 0))).toBe(11)
+    expect(mapping.getCellValue(simpleCellAddress(0, 1, 0))).toBe(41)
+  })
+
+  it('removeColumns - remove more cols thant mapping size', () => {
     const mapping = builder(2, 2)
     mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))
     mapping.setCell(simpleCellAddress(0, 1, 0), new ValueCellVertex(12))
