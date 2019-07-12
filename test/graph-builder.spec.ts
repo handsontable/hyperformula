@@ -1,4 +1,4 @@
-import {AddressMapping} from '../src/DependencyGraph'
+import {AddressMapping, DependencyGraph} from '../src/DependencyGraph'
 import {simpleCellAddress} from '../src/Cell'
 import {CellAddress} from '../src/parser/CellAddress'
 import {Config} from '../src/Config'
@@ -10,6 +10,8 @@ import {SheetMapping} from '../src/DependencyGraph'
 import {Statistics} from '../src/statistics/Statistics'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/DependencyGraph'
 import './testConfig.ts'
+import {add} from "../src/interpreter/scalar";
+import {MatrixMapping} from "../src/DependencyGraph/MatrixMapping";
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -20,7 +22,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -37,7 +40,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet})
 
@@ -54,7 +58,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -75,7 +80,8 @@ describe('GraphBuilder', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -98,7 +104,8 @@ describe('GraphBuilder', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -133,7 +140,8 @@ describe('GraphBuilder', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -157,7 +165,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -177,7 +186,8 @@ describe('GraphBuilder', () => {
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
 
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
     graphBuilder.buildGraph({ Sheet1: sheet })
 
     expect(graph.nodesCount()).toBe(
@@ -206,7 +216,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -231,7 +242,8 @@ describe('GraphBuilder', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config(), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser)
 
     graphBuilder.buildGraph({ Sheet1: sheet })
     expect(addressMapping.fetchCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
@@ -259,7 +271,8 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -289,7 +302,8 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -314,7 +328,9 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
+    new Config({ matrixDetection: true, matrixDetectionThreshold: 6 })
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -332,7 +348,8 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -354,7 +371,8 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true }), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 
@@ -378,7 +396,8 @@ describe('GraphBuilder with matrix detection', () => {
     const sheetMapping = new SheetMapping()
     sheetMapping.addSheet('Sheet1')
     const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-    const graphBuilder = new GraphBuilder(graph, addressMapping, new RangeMapping(), new Statistics(), new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }), sheetMapping, parser)
+    const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
+    const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
 
     graphBuilder.buildGraph({ Sheet1: sheet })
 

@@ -49,8 +49,8 @@ export class GraphBuilder {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
       private readonly parser: ParserWithCaching,
-      private readonly config: Config,
-      private readonly stats: Statistics,
+      private readonly config: Config = new Config(),
+      private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
       this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.parser, this.stats, config.matrixDetectionThreshold)
