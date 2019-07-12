@@ -58,7 +58,7 @@ export class DependencyGraph {
     } else {
       const newVertex = new ValueCellVertex(newValue)
       this.graph.exchangeOrAddNode(vertex, newVertex)
-      this.addressMapping!.setCell(address, newVertex)
+      this.addressMapping.setCell(address, newVertex)
       this.recentlyChangedVertices.add(newVertex)
     }
   }
@@ -70,7 +70,7 @@ export class DependencyGraph {
 
     if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex) {
       this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
-      this.addressMapping!.removeCell(address)
+      this.addressMapping.removeCell(address)
       this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
     }
   }
@@ -130,7 +130,7 @@ export class DependencyGraph {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping!.getRange(dep.start, dep.end)!
       } else {
-        return this.addressMapping!.fetchCell(dep)
+        return this.addressMapping.fetchCell(dep)
       }
     }))
     this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
@@ -147,7 +147,7 @@ export class DependencyGraph {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number) {
-    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
+    if (this.addressMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
       throw Error("It is not possible to remove row with matrix")
     }
 
@@ -162,14 +162,14 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart, rowEnd)) {
+    for (let matrix of this.addressMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
       matrix.removeRows(sheet, rowStart, rowEnd)
       if (matrix.height === 0) {
         this.graph.removeNode(matrix)
       }
     }
 
-    this.addressMapping!.removeRows(sheet, rowStart, rowEnd)
+    this.addressMapping.removeRows(sheet, rowStart, rowEnd)
 
     const rangesToRemove = this.rangeMapping.truncateRanges(sheet, rowStart, rowEnd)
 
@@ -179,7 +179,7 @@ export class DependencyGraph {
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
-    if (this.addressMapping!.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
+    if (this.addressMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
       throw Error("It is not possible to remove column within matrix")
     }
 
@@ -194,7 +194,7 @@ export class DependencyGraph {
       }
     }
 
-    for (let matrix of this.addressMapping!.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+    for (let matrix of this.addressMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
       const numberOfColumns = columnEnd - columnStart + 1
       if (matrix.width === numberOfColumns) {
         this.graph.removeNode(matrix)
@@ -203,7 +203,7 @@ export class DependencyGraph {
       }
     }
 
-    this.addressMapping!.removeColumns(sheet, columnStart, columnEnd)
+    this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
 
     const rangesToRemove = this.rangeMapping.truncateRangesVertically(sheet, columnStart, columnEnd)
 
@@ -213,13 +213,13 @@ export class DependencyGraph {
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
-    if (this.addressMapping!.isFormulaMatrixInRows(sheet, rowStart)) {
+    if (this.addressMapping.isFormulaMatrixInRows(sheet, rowStart)) {
       throw Error("It is not possible to add row in row with matrix")
     }
 
-    this.addressMapping!.addRows(sheet, rowStart, numberOfRows)
+    this.addressMapping.addRows(sheet, rowStart, numberOfRows)
 
-    for (let matrix of this.addressMapping!.numericMatricesInRows(sheet, rowStart)) {
+    for (let matrix of this.addressMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
     }
 
@@ -229,7 +229,7 @@ export class DependencyGraph {
   private fixRanges(sheet: number, row: number, numberOfRows: number) {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
-        const anyVertexInRow = this.addressMapping!.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
+        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
         if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
           for (let y = row; y < row + numberOfRows; ++y) {
             for (let x = range.start.col; x <= range.end.col; ++x) {
