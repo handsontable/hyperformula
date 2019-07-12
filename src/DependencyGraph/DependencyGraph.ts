@@ -4,7 +4,7 @@ import {SheetMapping} from './SheetMapping'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {Graph} from './Graph'
+import {Graph, TopSortResult} from './Graph'
 import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import assert from 'assert';
@@ -276,17 +276,17 @@ export class DependencyGraph {
     }
   }
 
-  public addVertex(address: SimpleCellAddress, vertex: CellVertex) {
+  public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
     this.graph.addNode(vertex)
     this.setVertexAddress(address, vertex)
   }
 
-  public addMatrixVertex(address: SimpleCellAddress, vertex: CellVertex) {
+  public addMatrixVertex(address: SimpleCellAddress, vertex: CellVertex): void {
     this.graph.addNode(vertex)
     this.setAddressMappingForMatrixVertex(vertex, address)
   }
 
-  public exchangeNode(node: Vertex, newNode: Vertex) {
+  public exchangeNode(node: Vertex, newNode: Vertex): void {
     this.graph.exchangeNode(node, newNode)
   }
 
@@ -294,7 +294,7 @@ export class DependencyGraph {
     return this.graph.nodes.values()
   }
 
-  public existsVertex(address: SimpleCellAddress) {
+  public existsVertex(address: SimpleCellAddress): boolean {
     return this.addressMapping.has(address)
   }
 
@@ -306,7 +306,7 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public isEmpty(address: SimpleCellAddress) {
+  public isEmpty(address: SimpleCellAddress): boolean {
     return this.addressMapping.isEmpty(address)
   }
 
@@ -318,7 +318,7 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
   }
 
-  public existsEdge(fromNode: Vertex, toNode: Vertex) {
+  public existsEdge(fromNode: Vertex, toNode: Vertex): boolean {
     return this.graph.existsEdge(fromNode, toNode)
   }
 
@@ -342,19 +342,19 @@ export class DependencyGraph {
     return this.matrixMapping.getMatrix(range)
   }
 
-  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex) {
+  public setMatrix(range: AbsoluteCellRange, vertex: MatrixVertex): void {
     this.matrixMapping.setMatrix(range, vertex)
   }
 
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress) {
+  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null  {
     return this.rangeMapping.getRange(start, end)
   }
 
-  public topologicalSort() {
+  public topologicalSort(): TopSortResult<Vertex> {
     return this.graph.topologicalSort()
   }
 
-  public getTopologicallySortedSubgraphFrom(vertices: Vertex[]) {
+  public getTopologicallySortedSubgraphFrom(vertices: Vertex[]): TopSortResult<Vertex> {
     return this.graph.getTopologicallySortedSubgraphFrom(vertices)
   }
 
@@ -385,7 +385,7 @@ export class DependencyGraph {
     }
   }
 
-  private fixRanges(sheet: number, row: number, numberOfRows: number) {
+  private fixRanges(sheet: number, row: number, numberOfRows: number): void {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
@@ -402,7 +402,7 @@ export class DependencyGraph {
     this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
   }
 
-  private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number) {
+  private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
@@ -419,7 +419,7 @@ export class DependencyGraph {
     this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
   }
 
-  private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress) {
+  private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
     this.setVertexAddress(formulaAddress, vertex)
 
     if (!(vertex instanceof MatrixVertex)) {

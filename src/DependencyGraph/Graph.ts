@@ -1,3 +1,5 @@
+
+export type TopSortResult<T> = { sorted: T[], cycled: T[] }
 /**
  * Provides graph directed structure
  */
@@ -141,7 +143,7 @@ export class Graph<T> {
    * Returns topological order of nodes.
    *
    */
-  public topologicalSort(): { sorted: T[], cycled: T[] } {
+  public topologicalSort(): TopSortResult<T> {
     const incomingEdges = this.incomingEdges()
     const nodesWithNoIncomingEdge: T[] = []
 
@@ -176,7 +178,7 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
-  public getTopologicallySortedSubgraphFrom(vertices: T[]): { sorted: T[], cycled: T[] } {
+  public getTopologicallySortedSubgraphFrom(vertices: T[]): TopSortResult<T> {
     const subgraphNodes = this.computeSubgraphNodes(vertices)
     const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
     const nodesWithNoIncomingEdge = vertices
