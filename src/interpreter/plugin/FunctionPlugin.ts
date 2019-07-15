@@ -48,7 +48,7 @@ export abstract class FunctionPlugin {
             values.push(value)
           } else if (value instanceof CellError) {
             return value
-          } else {
+          } else if (typeof value === 'string' || typeof value === 'boolean') {
             return new CellError(ErrorType.NA)
           }
         }
@@ -58,7 +58,7 @@ export abstract class FunctionPlugin {
           values.push(value)
         } else if (value instanceof CellError) {
           return value
-        } else {
+        } else if (typeof value === 'string' || typeof value === 'boolean') {
           return new CellError(ErrorType.NA)
         }
       }

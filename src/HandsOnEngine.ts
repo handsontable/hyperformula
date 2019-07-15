@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
   AddressMapping,
@@ -137,6 +137,8 @@ export class HandsOnEngine {
 
         if (cellValue instanceof CellError) {
           arr[i][j] = `#${cellValue.type}!`
+        } else if (cellValue === EmptyValue) {
+          arr[i][j] = ''
         } else {
           arr[i][j] = cellValue.toString()
         }

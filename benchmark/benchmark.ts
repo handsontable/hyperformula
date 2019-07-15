@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {CellValue} from '../src/Cell'
+import {CellValue, EmptyValue} from '../src/Cell'
 import {Config as EngineConfig} from '../src/Config'
 import {CsvImporter, CsvSheets} from '../src/csv'
 import {Sheet, Sheets} from '../src/GraphBuilder'
@@ -124,7 +124,8 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
     }
 
     if (actualValue !== expectedValue) {
-      console.error(`expected ${expectedValues[i].value} but got`, actualValue)
+      const stringValue = expectedValues[i].value === EmptyValue ? "EMPTY_VALUE" : expectedValues[i].value.toString()
+      console.error(`expected ${stringValue} but got`, actualValue)
       valid = false
       break
     }

@@ -1,4 +1,4 @@
-import {CellError, CellValue} from '../Cell'
+import {CellError, CellValue, EmptyValue} from '../Cell'
 
 /**
  * Concatenates two strings
@@ -15,6 +15,8 @@ export function concatenate(args: CellValue[]): CellValue {
       return acc
     } else if (arg instanceof CellError) {
       return arg
+    } else if (arg === EmptyValue) {
+      return acc
     } else {
       return (acc as string).concat(arg.toString())
     }

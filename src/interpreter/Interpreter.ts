@@ -97,7 +97,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult > rightResult
         } else {
           return new CellError(ErrorType.VALUE)
@@ -107,7 +107,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult < rightResult
         } else {
           return new CellError(ErrorType.VALUE)
@@ -117,7 +117,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult >= rightResult
         } else {
           return new CellError(ErrorType.VALUE)
@@ -127,7 +127,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
-        if (typeof leftResult === typeof rightResult && typeof leftResult === 'number') {
+        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult <= rightResult
         } else {
           return new CellError(ErrorType.VALUE)

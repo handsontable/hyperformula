@@ -26,7 +26,9 @@ export class CellError {
   }
 }
 
-export type CellValue = boolean | string | number | Matrix | CellError
+export const EmptyValue = Symbol()
+export type EmptyValueType = typeof EmptyValue
+export type CellValue = boolean | string | number | Matrix | CellError | EmptyValueType
 
 export interface SimpleCellAddress {
   col: number,

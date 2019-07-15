@@ -58,12 +58,12 @@ describe('Adding column', () => {
 
   it('reevaluates cells', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', /* new col */ '2', '=MEDIAN(A1:B1)'],
+      ['1', /* new col */ '2', '=COLUMNS(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(1.5)
+    expect(engine.getCellValue('C1')).toEqual(2)
     engine.addColumns(0, 1, 1)
-    expect(engine.getCellValue('D1')).toEqual(1)
+    expect(engine.getCellValue('D1')).toEqual(3)
   })
 })
 

@@ -155,8 +155,8 @@ export class SumifPlugin extends FunctionPlugin {
     const conditionReferenceArg = ast.args[0] as CellReferenceAst
     const valuesReferenceArg = ast.args[2] as CellReferenceAst
 
-    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]()
-    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]()
+    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
+    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
     const criterionLambda = buildCriterionLambda(criterion)
     const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
     return reduceSum(filteredValues)

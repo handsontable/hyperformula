@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {CellError, EmptyValueType, CellValue, SimpleCellAddress, EmptyValue} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
@@ -180,7 +180,7 @@ export class FormulaCellVertex {
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue() {
+  public getCellValue(): CellValue {
     if (this.cachedCellValue !== null) {
       return this.cachedCellValue
     } else {
@@ -203,7 +203,7 @@ export class ValueCellVertex {
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue() {
+  public getCellValue(): CellValue {
     return this.cellValue
   }
 
@@ -236,8 +236,8 @@ export class EmptyCellVertex {
   /**
    * Retrieves cell value bound to that singleton
    */
-  public getCellValue() {
-    return 0
+  public getCellValue(): EmptyValueType {
+    return EmptyValue
   }
 }
 

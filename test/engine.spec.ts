@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {CellError, ErrorType} from '../src/Cell'
+import {CellError, ErrorType, EmptyValue} from '../src/Cell'
 import './testConfig.ts'
 
 describe('Integration', () => {
@@ -23,14 +23,14 @@ describe('Integration', () => {
   it('#loadSheet evaluate empty vertex', async () => {
     const engine = await HandsOnEngine.buildFromArray([['=A5']])
 
-    expect(engine.getCellValue('A1')).toBe(0)
-    expect(engine.getCellValue('A5')).toBe(0)
+    expect(engine.getCellValue('A5')).toBe(EmptyValue)
+    expect(engine.getCellValue('A1')).toBe(EmptyValue)
   })
 
   it('#loadSheet evaluate empty vertex', async () => {
     const engine = await HandsOnEngine.buildFromArray([['', '=A1']])
 
-    expect(engine.getCellValue('B1')).toBe(0)
+    expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
   it('loadSheet with a loop', async () => {
