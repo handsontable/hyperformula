@@ -42,4 +42,14 @@ describe('MAX', () => {
     const engine = await HandsOnEngine.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAX(A1:A3)']])
     expect(engine.getCellValue('A4')).toEqual(-1)
   })
+
+  it('MAX of empty value', async () => {
+    const engine = await HandsOnEngine.buildFromArray([['', '=MAX(A1)']])
+    expect(engine.getCellValue('B1')).toEqual(0)
+  })
+
+  it('MAX of empty value and some negative number', async () => {
+    const engine = await HandsOnEngine.buildFromArray([['', '-1', '=MAX(A1,B1)']])
+    expect(engine.getCellValue('C1')).toEqual(-1)
+  })
 })
