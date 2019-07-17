@@ -57,4 +57,14 @@ describe('SUM', () => {
     const engine = await HandsOnEngine.buildFromArray([['1'], ['2'], ['=TRUE()'], ['=SUM(A1:A3)']])
     expect(engine.getCellValue('A4')).toEqual(3)
   })
+
+  xit('a bug', async () => {
+    const engine = await HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=MAX(A1:A2)'],
+      ['=SUM(A1:A3)'], // it does assume, that since Range(A1:A2) exists, it MUST have already computed value for SUM(A1:A2). Which is simply not true.
+    ])
+    expect(engine.getCellValue('A4')).toEqual(5)
+  })
 })
