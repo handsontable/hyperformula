@@ -42,4 +42,14 @@ describe('MIN', () => {
     const engine = await HandsOnEngine.buildFromArray([['foo'], ['bar'], ['5'], ['=MIN(A1:A3)']])
     expect(engine.getCellValue('A4')).toEqual(5)
   })
+
+  it('MIN of empty value', async () => {
+    const engine = await HandsOnEngine.buildFromArray([['', '=MIN(A1)']])
+    expect(engine.getCellValue('B1')).toEqual(0)
+  })
+
+  it('MIN of empty value and some negative number', async () => {
+    const engine = await HandsOnEngine.buildFromArray([['', '1', '=MIN(A1,B1)']])
+    expect(engine.getCellValue('C1')).toEqual(1)
+  })
 })
