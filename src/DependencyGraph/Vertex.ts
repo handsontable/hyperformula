@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {CellValue, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
-import {FormulaCellVertex, EmptyCellVertex, MatrixVertex} from './'
+import {FormulaCellVertex, EmptyCellVertex, MatrixVertex, ValueCellVertex} from './'
 
 /**
  * Represents vertex which keeps values of one or more cells
@@ -12,33 +12,6 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex |
  * Represents any vertex
  */
 export type Vertex = CellVertex | RangeVertex
-
-/**
- * Represents vertex which keeps static cell value
- */
-type ValueCellVertexValue = number | boolean | string | CellError
-export class ValueCellVertex {
-  /** Static cell value. */
-  private cellValue: ValueCellVertexValue
-
-  constructor(cellValue: ValueCellVertexValue) {
-    this.cellValue = cellValue
-  }
-
-  /**
-   * Returns cell value stored in vertex
-   */
-  public getCellValue(): ValueCellVertexValue {
-    return this.cellValue
-  }
-
-  /**
-   * Sets computed cell value stored in this vertex
-   */
-  public setCellValue(cellValue: ValueCellVertexValue) {
-    this.cellValue = cellValue
-  }
-}
 
 /**
  * Represents cache structure for one criterion

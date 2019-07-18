@@ -12,10 +12,9 @@ import {SheetMapping} from './SheetMapping'
 import {
   CellVertex,
   RangeVertex,
-  ValueCellVertex,
   Vertex,
 } from './Vertex'
-import { MatrixVertex, FormulaCellVertex, EmptyCellVertex } from './'
+import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex } from './'
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()

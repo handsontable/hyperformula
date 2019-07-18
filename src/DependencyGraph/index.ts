@@ -6,10 +6,10 @@ export { SheetMapping } from './SheetMapping'
 export {
   CellVertex,
   Vertex,
-  ValueCellVertex,
   RangeVertex,
   CriterionCache,
 } from './Vertex'
 export { MatrixVertex } from './MatrixVertex'
 export { FormulaCellVertex } from './FormulaCellVertex'
 export { EmptyCellVertex } from './EmptyCellVertex'
+export { ValueCellVertex } from './ValueCellVertex'
