@@ -1,4 +1,3 @@
-
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 /**
  * Provides graph directed structure

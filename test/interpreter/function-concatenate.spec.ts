@@ -24,6 +24,6 @@ describe('function CONCATENATE', () => {
   it('empty value is empty string', () => {
     const engine = HandsOnEngine.buildFromArray([['foo', '', 'bar', '=CONCATENATE(A1, B1, C1)']])
 
-    expect(engine.getCellValue('D1')).toEqual("foobar")
+    expect(engine.getCellValue('D1')).toEqual('foobar')
   })
 })

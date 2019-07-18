@@ -1,10 +1,9 @@
 import {Config, HandsOnEngine} from '../src'
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
-import { FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
-import {buildCellErrorAst, CellReferenceAst} from '../src/parser'
+import { simpleCellAddress} from '../src/Cell'
+import { MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
+import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing columns', () => {
   it('reevaluates', () => {

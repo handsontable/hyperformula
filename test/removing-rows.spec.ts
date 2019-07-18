@@ -3,7 +3,7 @@ import {simpleCellAddress} from '../src/Cell'
 import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
+import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing rows - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
@@ -211,8 +211,8 @@ describe('Removing rows - matrices', () => {
   })
 })
 
-describe('Removing rows - graph', function () {
-  it('should remove vertices from graph', function () {
+describe('Removing rows - graph', function() {
+  it('should remove vertices from graph', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -223,7 +223,7 @@ describe('Removing rows - graph', function () {
   })
 })
 
-describe('Removing rows - ranges', function () {
+describe('Removing rows - ranges', function() {
   it('shift ranges in range mapping, range start below removed rows', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],

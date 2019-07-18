@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, EmptyValueType, CellValue, SimpleCellAddress, EmptyValue} from '../Cell'
+import {CellError, CellValue, EmptyValue, EmptyValueType, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'

@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {CellError, ErrorType, EmptyValue} from '../src/Cell'
+import {CellError, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 
 describe('Integration', () => {

@@ -1,4 +1,4 @@
-import {CellError, EmptyValue, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, CellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
   AddressMapping,

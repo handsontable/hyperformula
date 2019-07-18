@@ -199,7 +199,6 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.getCellValue(simpleCellAddress(0, 0, 1))).toBe(41)
   })
 
-
   it('removeRows - remove more rows thant mapping size', () => {
     const mapping = builder(2, 2)
     mapping.setCell(simpleCellAddress(0, 0, 0), new ValueCellVertex(11))

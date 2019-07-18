@@ -124,7 +124,7 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
     }
 
     if (actualValue !== expectedValue) {
-      const stringValue = expectedValues[i].value === EmptyValue ? "EMPTY_VALUE" : expectedValues[i].value.toString()
+      const stringValue = expectedValues[i].value === EmptyValue ? 'EMPTY_VALUE' : expectedValues[i].value.toString()
       console.error(`expected ${stringValue} but got`, actualValue)
       valid = false
       break

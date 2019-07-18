@@ -1,4 +1,3 @@
-
 import {CellValue, SheetCellAddress, SimpleCellAddress} from '../Cell'
 import {Sheet} from '../GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex} from './Vertex'
