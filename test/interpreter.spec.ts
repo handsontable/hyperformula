@@ -309,24 +309,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('A1')).toEqual(false)
   })
 
-  it('function CONCATENATE by default returns empty string', async () => {
-    const engine = await HandsOnEngine.buildFromArray([['=CONCATENATE()']])
-
-    expect(engine.getCellValue('A1')).toEqual('')
-  })
-
-  it('function CONCATENATE works', async () => {
-    const engine = await HandsOnEngine.buildFromArray([['John', 'Smith', '=CONCATENATE(A1, B1)']])
-
-    expect(engine.getCellValue('C1')).toEqual('JohnSmith')
-  })
-
-  it('function CONCATENATE returns error if one of the arguments is error', async () => {
-    const engine = await HandsOnEngine.buildFromArray([['John', '=1/0', '=CONCATENATE(A1, B1)']])
-
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-  })
-
   it('function ISERROR should return true for common errors', async () => {
     const engine = await HandsOnEngine.buildFromArray([
         ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],
