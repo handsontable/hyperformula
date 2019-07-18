@@ -406,7 +406,7 @@ export class DependencyGraph {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
-        if (this.graph.adjacentNodes(anyVertexInRow).has(range)) {
+        if (this.graph.existsEdge(anyVertexInRow, range)) {
           for (let y = row; y < row + numberOfRows; ++y) {
             for (let x = range.start.col; x <= range.end.col; ++x) {
               this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
@@ -423,7 +423,7 @@ export class DependencyGraph {
     for (const range of this.rangeMapping.getValues()) {
       if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
-        if (this.graph.adjacentNodes(anyVertexInColumn).has(range)) {
+        if (this.graph.existsEdge(anyVertexInColumn, range)) {
           for (let y = column; y < column + numberOfColumns; ++y) {
             for (let x = range.start.col; x <= range.end.col; ++x) {
               this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, y, x)), range)
