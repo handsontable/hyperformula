@@ -52,7 +52,7 @@ export class RangeMapping {
     return rangesToRemove
   }
 
-  public truncateRangesVertically(sheet: number, columnStart: number, columnEnd: number): RangeVertex[] {
+  public truncateRangesByColumns(sheet: number, columnStart: number, columnEnd: number): RangeVertex[] {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 
