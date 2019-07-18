@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine} from '../src'
+import {Config, HandsOnEngine, EmptyValue} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
@@ -67,7 +67,7 @@ describe('changing cell content', () => {
 
     engine.setCellContent(simpleCellAddress(0, 1, 0), '')
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
-    expect(engine.getCellValue('B1')).toBe(0)
+    expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
   it ('update value cell to formula', () => {
@@ -106,7 +106,7 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue('B1')).toBe(2)
     engine.setCellContent(simpleCellAddress(0, 1, 0), '')
-    expect(engine.getCellValue('B1')).toBe(0)
+    expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
   it ('rewrite part of sheet with matrix', () => {
@@ -159,7 +159,7 @@ describe('changing cell content', () => {
     engine.setCellContent(simpleCellAddress(0, 0, 0), '')
     const a1 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
     expect(a1).toBe(null)
-    expect(engine.getCellValue('A1')).toBe(0)
+    expect(engine.getCellValue('A1')).toBe(EmptyValue)
   })
 
   it('set number for the first time', () => {

@@ -1,4 +1,4 @@
-import {CellValue, SheetCellAddress, SimpleCellAddress} from '../Cell'
+import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue} from '../Cell'
 import {Sheet} from '../GraphBuilder'
 import {CellVertex, EmptyCellVertex, MatrixVertex} from './Vertex'
 
@@ -373,7 +373,7 @@ export class AddressMapping {
     const vertex = this.getCell(address)
 
     if (vertex === null) {
-      return 0
+      return EmptyValue
     } else if (vertex instanceof MatrixVertex) {
       return vertex.getMatrixCellValue(address)
     } else {

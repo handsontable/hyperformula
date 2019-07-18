@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../../src'
+import {HandsOnEngine, EmptyValue} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
@@ -37,7 +37,7 @@ describe('Matrix plugin', () => {
     ], config)
 
     expect(engine.getCellValue('A7')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B7')).toEqual(0)
+    expect(engine.getCellValue('B7')).toEqual(EmptyValue)
   })
 
   it('matrix multiplication with string in data', async () => {
