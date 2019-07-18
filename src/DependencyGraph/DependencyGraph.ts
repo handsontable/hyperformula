@@ -401,10 +401,9 @@ export class DependencyGraph {
       if (range.range.includesRow(row)) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, range)) {
-          for (let y = row; y < row + numberOfRows; ++y) {
-            for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, x, y)), range)
-            }
+          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, range.start.col, row), range.range.width(), numberOfRows)
+          for (const address of addedSubrangeInThatRange.generateCellsFromRangeGenerator()) {
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
           }
         }
       }
@@ -418,10 +417,9 @@ export class DependencyGraph {
       if (range.range.includesColumn(column)) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, range)) {
-          for (let y = column; y < column + numberOfColumns; ++y) {
-            for (let x = range.start.col; x <= range.end.col; ++x) {
-              this.graph.addEdge(this.fetchOrCreateEmptyCell(simpleCellAddress(sheet, y, x)), range)
-            }
+          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, range.start.row), numberOfColumns, range.range.height())
+          for (const address of addedSubrangeInThatRange.generateCellsFromRangeGenerator()) {
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
           }
         }
       }
