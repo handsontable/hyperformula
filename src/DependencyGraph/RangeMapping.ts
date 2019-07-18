@@ -97,7 +97,7 @@ export class RangeMapping {
     })
   }
 
-  public shiftRangesColumns(sheet: number, column: number, numberOfColumns: number) {
+  public shiftRangesByColumns(sheet: number, column: number, numberOfColumns: number) {
     const updated = Array<RangeVertex>()
 
     for (const [key, vertex] of this.rangeMapping.entries()) {

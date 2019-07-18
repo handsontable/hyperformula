@@ -433,7 +433,7 @@ export class DependencyGraph {
       }
     }
 
-    this.rangeMapping.shiftRangesColumns(sheet, column, numberOfColumns)
+    this.rangeMapping.shiftRangesByColumns(sheet, column, numberOfColumns)
   }
 
   private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
