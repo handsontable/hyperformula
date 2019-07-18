@@ -202,13 +202,7 @@ export class DependencyGraph {
 
     this.addressMapping.addColumns(sheet, col, numberOfCols)
 
-    for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
-      matrix.addColumns(sheet, col, numberOfCols)
-      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, col, matrix.getAddress().row), numberOfCols, matrix.height)
-      for (const address of addedRange.addresses()) {
-        this.addressMapping.setCell(address, matrix)
-      }
-    }
+    this.expandMatricesAfterAddingColumns(sheet, col, numberOfCols)
 
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
@@ -458,6 +452,16 @@ export class DependencyGraph {
     for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
+      for (const address of addedRange.addresses()) {
+        this.addressMapping.setCell(address, matrix)
+      }
+    }
+  }
+
+  private expandMatricesAfterAddingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, columnStart)) {
+      matrix.addColumns(sheet, columnStart, numberOfColumns)
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress().row), numberOfColumns, matrix.height)
       for (const address of addedRange.addresses()) {
         this.addressMapping.setCell(address, matrix)
       }
