@@ -456,12 +456,18 @@ export class AddressMapping {
     sheetMapping.removeColumns(columnStart, columnEnd)
   }
 
-  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex | null> {
+  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {
     for (const address of range.addresses()) {
       const vertex = this.getCell(address)
       if (vertex) {
         yield vertex
       }
+    }
+  }
+
+  public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+    for (const address of range.addresses()) {
+      yield [address, this.getCell(address)]
     }
   }
 }

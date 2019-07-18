@@ -260,8 +260,10 @@ export class DependencyGraph {
 
     this.setMatrix(range, matrixVertex)
 
-    for (const vertex of this.addressMapping.verticesFromRange(range)) {
-      this.graph.exchangeNode(vertex, matrixVertex)
+    for (const [address, vertex] of this.addressMapping.entriesFromRange(range)) {
+      if (vertex) {
+        this.graph.exchangeNode(vertex, matrixVertex)
+      }
       this.setVertexAddress(address, matrixVertex)
     }
   }
