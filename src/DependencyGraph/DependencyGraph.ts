@@ -190,13 +190,7 @@ export class DependencyGraph {
 
     this.addressMapping.addRows(sheet, rowStart, numberOfRows)
 
-    for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
-      matrix.addRows(sheet, rowStart, numberOfRows)
-      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
-      for (const address of addedRange.addresses()) {
-        this.addressMapping.setCell(address, matrix)
-      }
-    }
+    this.expandMatricesAfterAddingRows(sheet, rowStart, numberOfRows)
 
     this.fixRanges(sheet, rowStart, numberOfRows)
   }
@@ -458,5 +452,15 @@ export class DependencyGraph {
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
+  }
+
+  private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {
+    for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
+      matrix.addRows(sheet, rowStart, numberOfRows)
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
+      for (const address of addedRange.addresses()) {
+        this.addressMapping.setCell(address, matrix)
+      }
+    }
   }
 }
