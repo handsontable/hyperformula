@@ -1,8 +1,18 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
-import {Config, HandsOnEngine, Sheets} from './'
+import {Config, HandsOnEngine, Sheets, CellValue, EmptyValue, CellError} from './'
 
 export type CsvSheets = Record<string, string>
+
+function cellValueToCsvString(value: CellValue): string {
+  if (value === EmptyValue) {
+    return ''
+  } else if (value instanceof CellError) {
+    return `#${value.type}!`
+  } else {
+    return value.toString()
+  }
+}
 
 export class CsvExporter {
   constructor(
@@ -15,7 +25,8 @@ export class CsvExporter {
    */
   public exportSheetByName(engine: HandsOnEngine, sheetName: string): string {
     const sheet = engine.sheetMapping.fetch(sheetName)
-    return stringify(engine.getValues(sheet), {
+    const values = engine.getValues(sheet).map((row) => row.map(cellValueToCsvString))
+    return stringify(values, {
       delimiter: this.csvDelimiter,
     })
   }

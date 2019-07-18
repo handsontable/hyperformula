@@ -118,25 +118,18 @@ export class HandsOnEngine {
   /**
    * Returns array with values of all cells
    * */
-  public getValues(sheet: number) {
+  public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph!.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph!.getSheetWidth(sheet)
 
-    const arr: Sheet = new Array(sheetHeight)
+    const arr: CellValue[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
         const cellValue = this.dependencyGraph!.getCellValue(address)
-
-        if (cellValue instanceof CellError) {
-          arr[i][j] = `#${cellValue.type}!`
-        } else if (cellValue === EmptyValue) {
-          arr[i][j] = ''
-        } else {
-          arr[i][j] = cellValue.toString()
-        }
+        arr[i][j] = cellValue
       }
     }
 
