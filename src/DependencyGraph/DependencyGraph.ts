@@ -180,11 +180,7 @@ export class DependencyGraph {
 
     this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
 
-    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(sheet, columnStart, columnEnd)
-
-    rangesToRemove.forEach((vertex) => {
-      this.graph.removeNode(vertex)
-    })
+    this.truncateRangesAfterRemovingColumns(sheet, columnStart, columnEnd)
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
@@ -455,5 +451,12 @@ export class DependencyGraph {
         this.matrixMapping.removeMatrix(key)
       }
     }
+  }
+
+  private truncateRangesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {
+    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(sheet, columnStart, columnEnd)
+    rangesToRemove.forEach((vertex) => {
+      this.graph.removeNode(vertex)
+    })
   }
 }
