@@ -149,7 +149,7 @@ export class DependencyGraph {
 
     const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
     for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
-      if (vertex instanceof MatrixVertex || vertex === null) {
+      if (vertex instanceof MatrixVertex) {
         continue
       }
       this.graph.removeNode(vertex)
@@ -170,7 +170,7 @@ export class DependencyGraph {
 
     const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
     for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
-      if (vertex instanceof MatrixVertex || vertex === null) {
+      if (vertex instanceof MatrixVertex) {
         continue
       }
       this.graph.removeNode(vertex)
@@ -261,9 +261,7 @@ export class DependencyGraph {
     this.setMatrix(range, matrixVertex)
 
     for (const vertex of this.addressMapping.verticesFromRange(range)) {
-      if (vertex) {
-        this.graph.exchangeNode(vertex, matrixVertex)
-      }
+      this.graph.exchangeNode(vertex, matrixVertex)
       this.setVertexAddress(address, matrixVertex)
     }
   }

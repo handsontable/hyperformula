@@ -458,7 +458,10 @@ export class AddressMapping {
 
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex | null> {
     for (const address of range.addresses()) {
-      yield this.getCell(address)
+      const vertex = this.getCell(address)
+      if (vertex) {
+        yield vertex
+      }
     }
   }
 }
