@@ -398,7 +398,7 @@ export class DependencyGraph {
 
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
     for (const range of this.rangeMapping.rangesInSheet(sheet)) {
-      if (range.start.row < row && range.end.row >= row) {
+      if (range.range.includesRow(row)) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, range)) {
           for (let y = row; y < row + numberOfRows; ++y) {

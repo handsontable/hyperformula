@@ -182,4 +182,8 @@ export class AbsoluteCellRange {
 
     this.end.col -= Math.min(columnEnd, this.end.col) - columnStart + 1
   }
+
+  public includesRow(row: number) {
+    return this.start.row < row && this.end.row >= row
+  }
 }
