@@ -7,9 +7,9 @@ export {
   CellVertex,
   Vertex,
   ValueCellVertex,
-  EmptyCellVertex,
   RangeVertex,
   CriterionCache,
 } from './Vertex'
 export { MatrixVertex } from './MatrixVertex'
 export { FormulaCellVertex } from './FormulaCellVertex'
+export { EmptyCellVertex } from './EmptyCellVertex'

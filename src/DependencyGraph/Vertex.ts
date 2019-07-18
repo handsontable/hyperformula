@@ -1,8 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, EmptyValue, EmptyValueType, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
-import {MatrixVertex} from './MatrixVertex'
-import {FormulaCellVertex} from './'
+import {FormulaCellVertex, EmptyCellVertex, MatrixVertex} from './'
 
 /**
  * Represents vertex which keeps values of one or more cells
@@ -38,32 +37,6 @@ export class ValueCellVertex {
    */
   public setCellValue(cellValue: ValueCellVertexValue) {
     this.cellValue = cellValue
-  }
-}
-
-/**
- * Represents singleton vertex bound to all empty cells
- */
-export class EmptyCellVertex {
-
-  /**
-   * Retrieves singleton
-   */
-  public static getSingletonInstance() {
-    if (!EmptyCellVertex.instance) {
-      EmptyCellVertex.instance = new EmptyCellVertex()
-    }
-    return EmptyCellVertex.instance
-  }
-
-  /** Singleton instance. */
-  private static instance: EmptyCellVertex
-
-  /**
-   * Retrieves cell value bound to that singleton
-   */
-  public getCellValue(): EmptyValueType {
-    return EmptyValue
   }
 }
 

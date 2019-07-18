@@ -1,7 +1,7 @@
 import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue} from '../Cell'
 import {Sheet} from '../GraphBuilder'
-import {CellVertex, EmptyCellVertex} from './Vertex'
-import { MatrixVertex } from './'
+import {CellVertex} from './Vertex'
+import { MatrixVertex, EmptyCellVertex } from './'
 
 /**
  * Interface for mapping from sheet addresses to vertices.
