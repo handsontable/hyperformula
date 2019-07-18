@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, EmptyValueType, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 import {MatrixVertex} from './MatrixVertex'
-import {Ast} from '../parser'
+import {FormulaCellVertex} from './'
 
 /**
  * Represents vertex which keeps values of one or more cells
@@ -13,67 +13,6 @@ export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex |
  * Represents any vertex
  */
 export type Vertex = CellVertex | RangeVertex
-
-/**
- * Represents vertex which keeps formula
- */
-export class FormulaCellVertex {
-  /** Most recently computed value of this formula. */
-  private cachedCellValue: CellValue | null
-
-  /** Formula in AST format */
-  private formula: Ast
-
-  /** Address which this vertex represents */
-  private cellAddress: SimpleCellAddress
-
-  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
-    this.formula = formula
-    this.cellAddress = cellAddress
-    this.cachedCellValue = null
-  }
-
-  /**
-   * Returns formula stored in this vertex
-   */
-  public getFormula(): Ast {
-    return this.formula
-  }
-
-  public setFormula(formula: Ast) {
-    this.formula = formula
-    this.cachedCellValue = null
-  }
-
-  /**
-   * Returns address of the cell associated with vertex
-   */
-  public getAddress(): SimpleCellAddress {
-    return this.cellAddress
-  }
-
-  public setAddress(address: SimpleCellAddress) {
-    this.cellAddress = address
-  }
-
-  /**
-   * Sets computed cell value stored in this vertex
-   */
-  public setCellValue(cellValue: CellValue) {
-    this.cachedCellValue = cellValue
-  }
-
-  /**
-   * Returns cell value stored in vertex
-   */
-  public getCellValue(): CellValue {
-    if (this.cachedCellValue !== null) {
-      return this.cachedCellValue
-    } else {
-      throw Error('Value of the formula cell is not computed.')
-    }
-  }
-}
 
 /**
  * Represents vertex which keeps static cell value
