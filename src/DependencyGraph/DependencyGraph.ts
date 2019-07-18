@@ -212,10 +212,9 @@ export class DependencyGraph {
 
     for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
-      for (let x = rowStart; x < rowStart + numberOfRows; x++) {
-        for (let y = matrix.getAddress().col; y < matrix.getAddress().col + matrix.width; y++) {
-          this.addressMapping.setCell(simpleCellAddress(sheet, y, x), matrix)
-        }
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
+      for (const address of addedRange.generateCellsFromRangeGenerator()) {
+        this.addressMapping.setCell(address, matrix)
       }
     }
 
@@ -231,10 +230,9 @@ export class DependencyGraph {
 
     for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
       matrix.addColumns(sheet, col, numberOfCols)
-      for (let y = col; y < col + numberOfCols; y++) {
-        for (let x = matrix.getAddress().row; x < matrix.getAddress().row + matrix.height; x++) {
-          this.addressMapping.setCell(simpleCellAddress(sheet, y, x), matrix)
-        }
+      const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, col, matrix.getAddress().row), numberOfCols, matrix.height)
+      for (const address of addedRange.generateCellsFromRangeGenerator()) {
+        this.addressMapping.setCell(address, matrix)
       }
     }
 
