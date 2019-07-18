@@ -406,11 +406,8 @@ export class DependencyGraph {
     const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
     this.setMatrix(range, vertex)
 
-    for (let i = 0; i < vertex.width; ++i) {
-      for (let j = 0; j < vertex.height; ++j) {
-        const address = simpleCellAddress(formulaAddress.sheet, formulaAddress.col + i, formulaAddress.row + j)
-        this.setVertexAddress(address, vertex)
-      }
+    for (const address of range.addresses()) {
+      this.setVertexAddress(address, vertex)
     }
   }
 
