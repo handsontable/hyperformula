@@ -145,16 +145,15 @@ export class DependencyGraph {
     if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
       throw Error('It is not possible to remove row with matrix')
     }
+    const numberOfRows = rowEnd - rowStart + 1
 
-    for (let x = 0; x < this.addressMapping.getWidth(sheet); ++x) {
-      for (let y = rowStart; y <= rowEnd; ++y) {
-        const address = simpleCellAddress(sheet, x, y)
-        const vertex = this.addressMapping.getCell(address)
-        if (vertex instanceof MatrixVertex || vertex === null) {
-          continue
-        }
-        this.graph.removeNode(vertex)
+    const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
+    for (const address of removedRange.generateCellsFromRangeGenerator()) {
+      const vertex = this.addressMapping.getCell(address)
+      if (vertex instanceof MatrixVertex || vertex === null) {
+        continue
       }
+      this.graph.removeNode(vertex)
     }
 
     for (const [key, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
@@ -178,16 +177,15 @@ export class DependencyGraph {
     if (this.matrixMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
       throw Error('It is not possible to remove column within matrix')
     }
+    const numberOfColumns = columnEnd - columnStart + 1
 
-    for (let y = 0; y < this.addressMapping.getHeight(sheet); ++y) {
-      for (let x = columnStart; x <= columnEnd; ++x) {
-        const address = simpleCellAddress(sheet, x, y)
-        const vertex = this.addressMapping.getCell(address)
-        if (vertex instanceof MatrixVertex || vertex === null) {
-          continue
-        }
-        this.graph.removeNode(vertex)
+    const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
+    for (const address of removedRange.generateCellsFromRangeGenerator()) {
+      const vertex = this.addressMapping.getCell(address)
+      if (vertex instanceof MatrixVertex || vertex === null) {
+        continue
       }
+      this.graph.removeNode(vertex)
     }
 
     for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
