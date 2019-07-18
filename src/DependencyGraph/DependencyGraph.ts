@@ -13,11 +13,11 @@ import {
   CellVertex,
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex,
 } from './Vertex'
+import { MatrixVertex } from './'
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()
