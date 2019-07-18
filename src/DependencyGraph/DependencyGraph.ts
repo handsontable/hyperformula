@@ -148,8 +148,7 @@ export class DependencyGraph {
     const numberOfRows = rowEnd - rowStart + 1
 
     const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
-    for (const address of removedRange.generateCellsFromRangeGenerator()) {
-      const vertex = this.addressMapping.getCell(address)
+    for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
       if (vertex instanceof MatrixVertex || vertex === null) {
         continue
       }
@@ -180,8 +179,7 @@ export class DependencyGraph {
     const numberOfColumns = columnEnd - columnStart + 1
 
     const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
-    for (const address of removedRange.generateCellsFromRangeGenerator()) {
-      const vertex = this.addressMapping.getCell(address)
+    for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
       if (vertex instanceof MatrixVertex || vertex === null) {
         continue
       }

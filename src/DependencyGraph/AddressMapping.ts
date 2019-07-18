@@ -2,6 +2,7 @@ import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue} from '../Cel
 import {Sheet} from '../GraphBuilder'
 import {CellVertex} from './Vertex'
 import { MatrixVertex, EmptyCellVertex } from './'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -453,5 +454,11 @@ export class AddressMapping {
       throw Error('Sheet does not exist')
     }
     sheetMapping.removeColumns(columnStart, columnEnd)
+  }
+
+  public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex | null> {
+    for (const address of range.generateCellsFromRangeGenerator()) {
+      yield this.getCell(address)
+    }
   }
 }
