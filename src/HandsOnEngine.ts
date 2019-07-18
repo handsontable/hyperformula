@@ -163,10 +163,11 @@ export class HandsOnEngine {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
     const vertex = this.dependencyGraph!.getCell(address)
-    let verticesToRecomputeFrom: Vertex[] = vertex ? [vertex] : []
+    let verticesToRecomputeFrom: Vertex[]
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       vertex.setMatrixCellValue(address, Number(newCellContent))
+      verticesToRecomputeFrom = [vertex]
     } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
