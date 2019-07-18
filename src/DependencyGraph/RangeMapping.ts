@@ -122,4 +122,12 @@ export class RangeMapping {
   public getValues() {
     return this.rangeMapping.values()
   }
+
+  public* rangesInSheet(sheet: number): IterableIterator<RangeVertex> {
+    for (const range of this.rangeMapping.values()) {
+      if (range.sheet === sheet) {
+        yield range
+      }
+    }
+  }
 }

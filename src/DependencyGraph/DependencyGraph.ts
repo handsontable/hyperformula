@@ -403,8 +403,8 @@ export class DependencyGraph {
   }
 
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
-    for (const range of this.rangeMapping.getValues()) {
-      if (range.sheet === sheet && range.start.row < row && range.end.row >= row) {
+    for (const range of this.rangeMapping.rangesInSheet(sheet)) {
+      if (range.start.row < row && range.end.row >= row) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, range)) {
           for (let y = row; y < row + numberOfRows; ++y) {
@@ -420,8 +420,8 @@ export class DependencyGraph {
   }
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
-    for (const range of this.rangeMapping.getValues()) {
-      if (range.sheet === sheet && range.start.col < column && range.end.col >= column) {
+    for (const range of this.rangeMapping.rangesInSheet(sheet)) {
+      if (range.start.col < column && range.end.col >= column) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, range)) {
           for (let y = column; y < column + numberOfColumns; ++y) {

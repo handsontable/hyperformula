@@ -275,7 +275,7 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, 0, 2)
 
-    const ranges = Array.from(engine.rangeMapping.getValues())
+    const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
