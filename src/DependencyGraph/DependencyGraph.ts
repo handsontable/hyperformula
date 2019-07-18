@@ -397,13 +397,13 @@ export class DependencyGraph {
   }
 
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
-    for (const range of this.rangeMapping.rangesInSheet(sheet)) {
-      if (range.range.includesRow(row)) {
-        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
-        if (this.graph.existsEdge(anyVertexInRow, range)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, range.start.col, row), range.range.width(), numberOfRows)
+    for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
+      if (rangeVertex.range.includesRow(row)) {
+        const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, rangeVertex.start.col, row + numberOfRows))!
+        if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
+          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, rangeVertex.start.col, row), rangeVertex.range.width(), numberOfRows)
           for (const address of addedSubrangeInThatRange.addresses()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), rangeVertex)
           }
         }
       }
@@ -413,13 +413,13 @@ export class DependencyGraph {
   }
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
-    for (const range of this.rangeMapping.rangesInSheet(sheet)) {
-      if (range.range.includesColumn(column)) {
-        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
-        if (this.graph.existsEdge(anyVertexInColumn, range)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, range.start.row), numberOfColumns, range.range.height())
+    for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
+      if (rangeVertex.range.includesColumn(column)) {
+        const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, rangeVertex.start.row))
+        if (this.graph.existsEdge(anyVertexInColumn, rangeVertex)) {
+          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.start.row), numberOfColumns, rangeVertex.range.height())
           for (const address of addedSubrangeInThatRange.addresses()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
+            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), rangeVertex)
           }
         }
       }
