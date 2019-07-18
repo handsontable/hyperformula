@@ -29,7 +29,7 @@ export class RangeMapping {
     return this.rangeMapping.get(key) || null
   }
 
-  public truncateRanges(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
+  public truncateRangesByRows(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 

@@ -165,7 +165,7 @@ export class DependencyGraph {
 
     this.addressMapping.removeRows(sheet, rowStart, rowEnd)
 
-    const rangesToRemove = this.rangeMapping.truncateRanges(sheet, rowStart, rowEnd)
+    const rangesToRemove = this.rangeMapping.truncateRangesByRows(sheet, rowStart, rowEnd)
 
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
