@@ -252,8 +252,8 @@ export class DependencyGraph {
 
   public addNewMatrixVertex(matrixVertex: MatrixVertex): void {
     const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-    for (const x of range.addresses()) {
-      if (this.getCell(x) instanceof MatrixVertex) {
+    for (const vertex of this.addressMapping.verticesFromRange(range)) {
+      if (vertex instanceof MatrixVertex) {
         throw Error('You cannot modify only part of an array')
       }
     }
