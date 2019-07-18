@@ -128,11 +128,6 @@ export class HandsOnEngine {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        if (this.dependencyGraph!.isEmpty(address)) {
-          arr[i][j] = ''
-          continue
-        }
-
         const cellValue = this.dependencyGraph!.getCellValue(address)
 
         if (cellValue instanceof CellError) {
