@@ -259,7 +259,7 @@ export class DependencyGraph {
       // 1. split matrix to chunks, add value cell vertices
       // 2. update address mapping for each address in matrix
       for (const address of matrixRange.generateCellsFromRangeGenerator()) {
-        const value = this.getCellValue(address)
+        const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
         const valueVertex = new ValueCellVertex(value)
         this.addVertex(address, valueVertex)
       }

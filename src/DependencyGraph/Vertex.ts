@@ -192,25 +192,26 @@ export class FormulaCellVertex {
 /**
  * Represents vertex which keeps static cell value
  */
+type ValueCellVertexValue = number | boolean | string | CellError
 export class ValueCellVertex {
   /** Static cell value. */
-  private cellValue: CellValue
+  private cellValue: ValueCellVertexValue
 
-  constructor(cellValue: CellValue) {
+  constructor(cellValue: ValueCellVertexValue) {
     this.cellValue = cellValue
   }
 
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue(): CellValue {
+  public getCellValue(): ValueCellVertexValue {
     return this.cellValue
   }
 
   /**
    * Sets computed cell value stored in this vertex
    */
-  public setCellValue(cellValue: CellValue) {
+  public setCellValue(cellValue: ValueCellVertexValue) {
     this.cellValue = cellValue
   }
 }
