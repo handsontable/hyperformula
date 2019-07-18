@@ -411,13 +411,10 @@ export class DependencyGraph {
   }
 
   private truncateMatricesAfterRemovingRows(sheet: number, rowStart: number, rowEnd: number) {
-    for (const [key, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart, rowEnd)) {
-      matrix.removeRows(sheet, rowStart, rowEnd)
-      if (matrix.height === 0) {
-        this.graph.removeNode(matrix)
-        this.matrixMapping.removeMatrix(key)
-      }
-    }
+    const verticesToRemove = this.matrixMapping.truncateMatricesByRows(sheet, rowStart, rowEnd)
+    verticesToRemove.forEach((vertex) => {
+      this.graph.removeNode(vertex)
+    })
   }
 
   private truncateRangesAfterRemovingRows(sheet: number, rowStart: number, rowEnd: number) {
@@ -428,13 +425,10 @@ export class DependencyGraph {
   }
 
   private truncateMatricesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {
-    for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
-      matrix.removeColumns(sheet, columnStart, columnEnd)
-      if (matrix.width === 0) {
-        this.graph.removeNode(matrix)
-        this.matrixMapping.removeMatrix(key)
-      }
-    }
+    const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(sheet, columnStart, columnEnd)
+    verticesToRemove.forEach((vertex) => {
+      this.graph.removeNode(vertex)
+    })
   }
 
   private truncateRangesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {

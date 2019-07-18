@@ -56,4 +56,28 @@ export class MatrixMapping {
       return mtx.spansThroughSheetColumn(sheet, startColumn, endColumn) && !mtx.isFormula()
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
+
+  public truncateMatricesByRows(sheet: number, startRow: number, endRow: number): Array<MatrixVertex> {
+    const verticesToRemove = Array<MatrixVertex>()
+    for (const [key, matrix] of this.numericMatricesInRows(sheet, startRow, endRow)) {
+      matrix.removeRows(sheet, startRow, endRow)
+      if (matrix.height === 0) {
+        this.removeMatrix(key)
+        verticesToRemove.push(matrix)
+      }
+    }
+    return verticesToRemove
+  }
+
+  public truncateMatricesByColumns(sheet: number, startColumn: number, endColumn: number): Array<MatrixVertex> {
+    const verticesToRemove = Array<MatrixVertex>()
+    for (const [key, matrix] of this.numericMatricesInColumns(sheet, startColumn, endColumn)) {
+      matrix.removeColumns(sheet, startColumn, endColumn)
+      if (matrix.width === 0) {
+        this.removeMatrix(key)
+        verticesToRemove.push(matrix)
+      }
+    }
+    return verticesToRemove
+  }
 }
