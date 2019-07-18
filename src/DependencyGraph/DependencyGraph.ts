@@ -272,6 +272,14 @@ export class DependencyGraph {
     return this.graph.nodes.values()
   }
 
+  public* formulaNodesFromSheet(sheet: number): IterableIterator<FormulaCellVertex> {
+    for (const vertex of this.graph.nodes) {
+      if (vertex instanceof FormulaCellVertex && vertex.address.sheet === sheet) {
+        yield vertex
+      }
+    }
+  }
+
   public existsVertex(address: SimpleCellAddress): boolean {
     return this.addressMapping.has(address)
   }

@@ -43,6 +43,10 @@ export class FormulaCellVertex {
     this.cellAddress = address
   }
 
+  public get address() {
+    return this.cellAddress
+  }
+
   /**
    * Sets computed cell value stored in this vertex
    */

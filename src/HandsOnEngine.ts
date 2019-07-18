@@ -248,13 +248,11 @@ export class HandsOnEngine {
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
     this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
 
-    for (const node of this.dependencyGraph!.nodes()) {
-      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
-        const cachedAst = this.parser.rememberNewAst(newAst)
-        node.setFormula(cachedAst)
-        this.fixFormulaVertexAddressByColumn(node, col, numberOfCols)
-      }
+    for (const node of this.dependencyGraph!.formulaNodesFromSheet(sheet)) {
+      const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
+      const cachedAst = this.parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      this.fixFormulaVertexAddressByColumn(node, col, numberOfCols)
     }
 
     this.evaluator!.run()
@@ -264,17 +262,15 @@ export class HandsOnEngine {
     this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
 
     const numberOfColumnsToDelete = columnEnd - columnStart + 1
-    for (const node of this.dependencyGraph!.nodes()) {
-      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = transformAddressesInFormula(
-          node.getFormula(),
-          node.getAddress(),
-          fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete),
-        )
-        const cachedAst = this.parser.rememberNewAst(newAst)
-        node.setFormula(cachedAst)
-        this.fixFormulaVertexAddressByColumn(node, columnStart, -numberOfColumnsToDelete)
-      }
+    for (const node of this.dependencyGraph!.formulaNodesFromSheet(sheet)) {
+      const newAst = transformAddressesInFormula(
+        node.getFormula(),
+        node.getAddress(),
+        fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete),
+      )
+      const cachedAst = this.parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      this.fixFormulaVertexAddressByColumn(node, columnStart, -numberOfColumnsToDelete)
     }
 
     this.evaluator!.run()
