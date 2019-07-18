@@ -3,13 +3,9 @@ export { AddressMapping, DenseStrategy, SparseStrategy, findBoundaries } from '.
 export { Graph } from './Graph'
 export { RangeMapping } from './RangeMapping'
 export { SheetMapping } from './SheetMapping'
-export {
-  CellVertex,
-  Vertex,
-  RangeVertex,
-  CriterionCache,
-} from './Vertex'
+export { CellVertex, Vertex } from './Vertex'
 export { MatrixVertex } from './MatrixVertex'
 export { FormulaCellVertex } from './FormulaCellVertex'
 export { EmptyCellVertex } from './EmptyCellVertex'
 export { ValueCellVertex } from './ValueCellVertex'
+export { RangeVertex, CriterionCache } from './RangeVertex'

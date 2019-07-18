@@ -9,12 +9,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {
-  CellVertex,
-  RangeVertex,
-  Vertex,
-} from './Vertex'
-import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex } from './'
+import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex, RangeVertex, Vertex, CellVertex } from './'
 
 export class DependencyGraph {
   public recentlyChangedVertices: Set<Vertex> = new Set()
