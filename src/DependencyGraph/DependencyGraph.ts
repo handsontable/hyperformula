@@ -176,13 +176,7 @@ export class DependencyGraph {
       this.graph.removeNode(vertex)
     }
 
-    for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
-      matrix.removeColumns(sheet, columnStart, columnEnd)
-      if (matrix.width === 0) {
-        this.graph.removeNode(matrix)
-        this.matrixMapping.removeMatrix(key)
-      }
-    }
+    this.truncateMatricesAfterRemovingColumns(sheet, columnStart, columnEnd)
 
     this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
 
@@ -451,5 +445,15 @@ export class DependencyGraph {
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
+  }
+
+  private truncateMatricesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {
+    for (const [key, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart, columnEnd)) {
+      matrix.removeColumns(sheet, columnStart, columnEnd)
+      if (matrix.width === 0) {
+        this.graph.removeNode(matrix)
+        this.matrixMapping.removeMatrix(key)
+      }
+    }
   }
 }
