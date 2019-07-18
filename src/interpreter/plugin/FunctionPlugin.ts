@@ -42,7 +42,7 @@ export abstract class FunctionPlugin {
     const values: number[] = []
     for (const ast of asts) {
       if (ast.type === AstNodeType.CELL_RANGE) {
-        for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).generateCellsFromRangeGenerator()) {
+        for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).addresses()) {
           const value = this.dependencyGraph.getCellValue(cellFromRange)
           if (typeof value === 'number') {
             values.push(value)
@@ -68,7 +68,7 @@ export abstract class FunctionPlugin {
 
   protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
     if (range instanceof AbsoluteCellRange) {
-      for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
+      for (const cellFromRange of range.addresses()) {
         yield this.dependencyGraph.getCellValue(cellFromRange)
       }
     } else {

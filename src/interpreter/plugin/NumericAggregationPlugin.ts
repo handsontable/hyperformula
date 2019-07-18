@@ -167,7 +167,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
     }
-    for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
+    for (const cellFromRange of restRange.addresses()) {
       rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
     }
 

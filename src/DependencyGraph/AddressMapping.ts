@@ -457,7 +457,7 @@ export class AddressMapping {
   }
 
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex | null> {
-    for (const address of range.generateCellsFromRangeGenerator()) {
+    for (const address of range.addresses()) {
       yield this.getCell(address)
     }
   }

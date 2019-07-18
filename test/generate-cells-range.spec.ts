@@ -3,7 +3,7 @@ import {simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 
 describe('generateCellsFromRange', () => {
   const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {
-    return Array.from(range.generateCellsFromRangeGenerator())
+    return Array.from(range.addresses())
   }
 
   it('one element', () => {

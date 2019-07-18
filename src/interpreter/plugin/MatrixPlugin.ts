@@ -223,7 +223,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     let i = 0
     let row = []
-    for (const cellFromRange of range.generateCellsFromRangeGenerator()) {
+    for (const cellFromRange of range.addresses()) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)

@@ -292,7 +292,7 @@ export class SumifPlugin extends FunctionPlugin {
 }
 
 function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<CellValue> {
-  for (const cellFromRange of cellRange.generateCellsFromRangeGenerator()) {
+  for (const cellFromRange of cellRange.addresses()) {
     yield dependencyGraph.getCellValue(cellFromRange)
   }
 }

@@ -95,7 +95,7 @@ export class AbsoluteCellRange {
     return (this.width() * this.height()) === (other.width() * other.height())
   }
 
-  public* generateCellsFromRangeGenerator(): IterableIterator<SimpleCellAddress> {
+  public* addresses(): IterableIterator<SimpleCellAddress> {
     let currentRow = this.start.row
     while (currentRow <= this.end.row) {
       let currentColumn = this.start.col
@@ -121,7 +121,7 @@ export class AbsoluteCellRange {
       values[i] = new Array(this.width())
     }
 
-    for (const address of this.generateCellsFromRangeGenerator()) {
+    for (const address of this.addresses()) {
       const value = sheet[address.row][address.col]
       if (!isNaN(Number(value))) {
         values[address.row - this.start.row][address.col - this.start.col] = Number(value)

@@ -106,7 +106,7 @@ export class DependencyGraph {
         if (matrix !== undefined) {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
-          for (const cellFromRange of restRange.generateCellsFromRangeGenerator()) {
+          for (const cellFromRange of restRange.addresses()) {
             this.graph.addEdge(this.fetchOrCreateEmptyCell(cellFromRange), rangeVertex)
           }
         }
@@ -213,7 +213,7 @@ export class DependencyGraph {
     for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
       matrix.addRows(sheet, rowStart, numberOfRows)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
-      for (const address of addedRange.generateCellsFromRangeGenerator()) {
+      for (const address of addedRange.addresses()) {
         this.addressMapping.setCell(address, matrix)
       }
     }
@@ -231,7 +231,7 @@ export class DependencyGraph {
     for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, col)) {
       matrix.addColumns(sheet, col, numberOfCols)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, col, matrix.getAddress().row), numberOfCols, matrix.height)
-      for (const address of addedRange.generateCellsFromRangeGenerator()) {
+      for (const address of addedRange.addresses()) {
         this.addressMapping.setCell(address, matrix)
       }
     }
@@ -244,7 +244,7 @@ export class DependencyGraph {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
       // 1. split matrix to chunks, add value cell vertices
       // 2. update address mapping for each address in matrix
-      for (const address of matrixRange.generateCellsFromRangeGenerator()) {
+      for (const address of matrixRange.addresses()) {
         const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
         const valueVertex = new ValueCellVertex(value)
         this.addVertex(address, valueVertex)
@@ -253,7 +253,7 @@ export class DependencyGraph {
       for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
         // 3. update dependencies for each range that has this matrix in dependencies
         if (adjacentNode instanceof RangeVertex) {
-          for (const address of adjacentNode.range.generateCellsFromRangeGenerator()) {
+          for (const address of adjacentNode.range.addresses()) {
             const vertex = this.fetchCell(address)
             this.graph.addEdge(vertex, adjacentNode)
           }
@@ -284,7 +284,7 @@ export class DependencyGraph {
 
   public addNewMatrixVertex(matrixVertex: MatrixVertex): void {
     const range = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-    for (const x of range.generateCellsFromRangeGenerator()) {
+    for (const x of range.addresses()) {
       if (this.getCell(x) instanceof MatrixVertex) {
         throw Error('You cannot modify only part of an array')
       }
@@ -292,7 +292,7 @@ export class DependencyGraph {
 
     this.setMatrix(range, matrixVertex)
 
-    for (const address of range.generateCellsFromRangeGenerator()) {
+    for (const address of range.addresses()) {
       const vertex = this.addressMapping.getCell(address)
       if (vertex) {
         this.graph.exchangeNode(vertex, matrixVertex)
@@ -402,7 +402,7 @@ export class DependencyGraph {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, range.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, range)) {
           const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, range.start.col, row), range.range.width(), numberOfRows)
-          for (const address of addedSubrangeInThatRange.generateCellsFromRangeGenerator()) {
+          for (const address of addedSubrangeInThatRange.addresses()) {
             this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
           }
         }
@@ -418,7 +418,7 @@ export class DependencyGraph {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, range)) {
           const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, range.start.row), numberOfColumns, range.range.height())
-          for (const address of addedSubrangeInThatRange.generateCellsFromRangeGenerator()) {
+          for (const address of addedSubrangeInThatRange.addresses()) {
             this.graph.addEdge(this.fetchOrCreateEmptyCell(address), range)
           }
         }
