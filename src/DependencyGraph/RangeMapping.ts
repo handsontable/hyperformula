@@ -75,7 +75,7 @@ export class RangeMapping {
     return rangesToRemove
   }
 
-  public shiftRanges(sheet: number, row: number, numberOfRows: number) {
+  public shiftRangesByRows(sheet: number, row: number, numberOfRows: number) {
     const updated = Array<RangeVertex>()
 
     for (const [key, vertex] of this.rangeMapping.entries()) {

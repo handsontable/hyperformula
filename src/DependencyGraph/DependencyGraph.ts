@@ -416,7 +416,7 @@ export class DependencyGraph {
       }
     }
 
-    this.rangeMapping.shiftRanges(sheet, row, numberOfRows)
+    this.rangeMapping.shiftRangesByRows(sheet, row, numberOfRows)
   }
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
