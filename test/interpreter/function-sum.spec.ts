@@ -67,4 +67,14 @@ describe('SUM', () => {
     ])
     expect(engine.getCellValue('A4')).toEqual(5)
   })
+
+  it('range only with empty value', () => {
+    const engine = HandsOnEngine.buildFromArray([['', '=SUM(A1:A1)']])
+    expect(engine.getCellValue('B1')).toEqual(0)
+  })
+
+  it('range only with some empty values', () => {
+    const engine = HandsOnEngine.buildFromArray([['42', '', '13', '=SUM(A1:C1)']])
+    expect(engine.getCellValue('D1')).toEqual(55)
+  })
 })
