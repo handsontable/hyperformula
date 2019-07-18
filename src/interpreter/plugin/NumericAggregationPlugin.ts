@@ -165,7 +165,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const restRange = restRanges[0]
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      rangeResult.push(smallerRangeVertex.getFunctionValue(functionName)!)
+      const cachedValue = smallerRangeVertex.getFunctionValue(functionName)
+      if (cachedValue) {
+        rangeResult.push(cachedValue)
+      } else {
+        for (const cellFromRange of smallerRangeVertex.range.addresses()) {
+          rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
+        }
+      }
     }
     for (const cellFromRange of restRange.addresses()) {
       rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
