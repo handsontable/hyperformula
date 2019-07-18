@@ -186,4 +186,8 @@ export class AbsoluteCellRange {
   public includesRow(row: number) {
     return this.start.row < row && this.end.row >= row
   }
+
+  public includesColumn(column: number) {
+    return this.start.col < column && this.end.col >= column
+  }
 }

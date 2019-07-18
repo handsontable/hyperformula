@@ -415,7 +415,7 @@ export class DependencyGraph {
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
     for (const range of this.rangeMapping.rangesInSheet(sheet)) {
-      if (range.start.col < column && range.end.col >= column) {
+      if (range.range.includesColumn(column)) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, range.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, range)) {
           for (let y = column; y < column + numberOfColumns; ++y) {
