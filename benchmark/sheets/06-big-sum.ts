@@ -1,7 +1,5 @@
 
-export function sheet() {
-  const rows = 100000
-
+export function sheet(rows: number = 100000) {
   const sheet = []
   sheet.push(['1', '2', '3', '5', `=SUM(A1:D${rows})`])
 

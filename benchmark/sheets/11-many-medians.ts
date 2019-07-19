@@ -1,7 +1,6 @@
 import { ExpectedValue} from '../benchmark'
 
-export function sheet() {
-  const rows = 2000
+export function sheet(rows: number = 2000) {
   const divider = 10
 
   let dependent = 0

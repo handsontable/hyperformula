@@ -1,7 +1,6 @@
 import { ExpectedValue} from '../benchmark'
 
-export function sheet() {
-  const rows = 30000
+export function sheet(rows: number = 30000) {
   const differentValues = 5
 
   const sheet = []

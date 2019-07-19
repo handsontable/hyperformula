@@ -1,8 +1,6 @@
 import { ExpectedValue} from '../benchmark'
 
-export function sheet() {
-  const rows = 10000
-
+export function sheet(rows: number = 10000) {
   const sheet = []
   sheet.push(['=1*E$1', '=SUM($A$1:A1)', '=A1', `=SUM(B1:B${rows})`, '5'])
 

@@ -1,8 +1,6 @@
 import { ExpectedValue} from '../benchmark'
 
-export function sheet() {
-  const rows = 100000
-
+export function sheet(rows: number = 100000) {
   const X = [
     ['0.5', '0.1', '0.4'],
     ['0.2', '0.7', '0.1'],
