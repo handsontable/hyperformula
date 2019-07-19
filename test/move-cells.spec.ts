@@ -1,10 +1,10 @@
 import {HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
-import {extractReference} from "./testUtils";
+import {extractRange, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
 
 describe("Move cells", () => {
-  it('should move static content', function () {
+  it('should move static content', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['foo'],
         [''],
@@ -14,7 +14,7 @@ describe("Move cells", () => {
     expect(engine.getCellValue("A2")).toEqual('foo')
   });
 
-  it('should update reference of moved formula', function () {
+  it('should update reference of moved formula', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo', /* =A1 */],
       ['=A1'],
@@ -27,7 +27,7 @@ describe("Move cells", () => {
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
   });
 
-  it('should update reference', function () {
+  it('should update reference', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo', /* foo */],
       ['=A1'],
@@ -44,4 +44,34 @@ describe("Move cells", () => {
     const movedVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 1, 0))
     expect(engine.graph.existsEdge(movedVertex, formulaVertex)).toBe(true)
   });
+
+  it('should not update range when only part of it is moved', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* 1 */],
+      ['2', /* 2 */],
+      ['=SUM(A1:A2)']
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
+
+    const range = extractRange(engine, simpleCellAddress(0, 0, 2))
+    expect(range.start).toEqual(simpleCellAddress(0, 0, 0))
+    expect(range.end).toEqual(simpleCellAddress(0, 0, 1))
+  })
+
+  it('should update moved range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', /* 1 */],
+        ['2', /* 2 */],
+        ['=SUM(A1:A2)']
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 2, simpleCellAddress(0, 1, 0))
+
+    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 1, 0), simpleCellAddress(0, 1, 1))).not.toBe(null)
+
+    const range = extractRange(engine, simpleCellAddress(0, 0, 2))
+    expect(range.start).toEqual(simpleCellAddress(0, 1, 0))
+    expect(range.end).toEqual(simpleCellAddress(0, 1, 1))
+  })
 })
