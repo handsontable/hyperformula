@@ -281,6 +281,10 @@ export class HandsOnEngine {
     this.evaluator!.run()
   }
 
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+
+  }
+
   public disableNumericMatrices() {
     this.dependencyGraph!.disableNumericMatrices()
   }
