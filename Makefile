@@ -23,6 +23,10 @@ benchmark-ci: ## Run CI benchmarks
 benchmark: ## Run benchmarks
 	@yarn ts-node benchmark/stage-1.ts
 
+benchmark-cruds:
+	@yarn ts-node benchmark/cruds/1-cruds.ts
+	@yarn ts-node benchmark/cruds/2-matrix.ts
+
 check: typecheck test ## Check whether code is working correctly (types + specs)
 
 full: check lint-fix ## Check whether code is ready to commit (types + specs + lint)

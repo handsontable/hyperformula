@@ -33,6 +33,13 @@ export function removeRows(engine: HandsOnEngine) {
   measure("Remove row at the end      ", () => engine.removeRows(0, dimensions.height, dimensions.height))
 }
 
+export function batch(engine: HandsOnEngine) {
+  addRows(engine)
+  addColumns(engine)
+  removeRows(engine)
+  removeColumns(engine)
+}
+
 function half(num: number) {
   return Math.floor(num / 2)
 }

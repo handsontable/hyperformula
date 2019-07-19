@@ -1,14 +1,7 @@
 import {HandsOnEngine} from "../../src";
 import {sheet as Sb} from "../sheets/01-simple-big";
 import {sheet as Bs} from "../sheets/06-big-sum";
-import {addColumns, addRows, removeColumns, removeRows } from "./operations";
-
-function batch(engine: HandsOnEngine) {
-  addRows(engine)
-  addColumns(engine)
-  removeRows(engine)
-  removeColumns(engine)
-}
+import {batch} from "./operations";
 
 function start() {
   let engine = HandsOnEngine.buildFromArray(Sb(10000))
