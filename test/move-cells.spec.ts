@@ -48,7 +48,7 @@ describe("Move cells", () => {
   it('should not update range when only part of it is moved', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* 1 */],
-      ['2', /* 2 */],
+      ['2', ],
       ['=SUM(A1:A2)']
     ])
 
@@ -57,6 +57,7 @@ describe("Move cells", () => {
     const range = extractRange(engine, simpleCellAddress(0, 0, 2))
     expect(range.start).toEqual(simpleCellAddress(0, 0, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 0, 1))
+    expect(engine.getCellValue("A3")).toEqual(2)
   })
 
   it('should update moved range', () => {
@@ -73,5 +74,6 @@ describe("Move cells", () => {
     const range = extractRange(engine, simpleCellAddress(0, 0, 2))
     expect(range.start).toEqual(simpleCellAddress(0, 1, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 1, 1))
+    expect(engine.getCellValue("A3")).toEqual(3)
   })
 })
