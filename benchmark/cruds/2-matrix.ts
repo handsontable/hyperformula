@@ -19,7 +19,6 @@ function start() {
   console.log("\n== Matrix - detection on ==", dimensions)
 
   batch(engine)
-  console.log()
 }
 
 start()
