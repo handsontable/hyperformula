@@ -26,6 +26,7 @@ import {
   ProcedureAst,
 } from './parser'
 import {CellAddress} from './parser/CellAddress'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
@@ -278,6 +279,9 @@ export class HandsOnEngine {
 
   public disableNumericMatrices() {
     this.dependencyGraph!.disableNumericMatrices()
+  }
+
+  public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
