@@ -183,6 +183,34 @@ export class AbsoluteCellRange {
     this.end.col -= Math.min(columnEnd, this.end.col) - columnStart + 1
   }
 
+  public withoutPrefix(prefixRange: AbsoluteCellRange): AbsoluteCellRange {
+    if (this.isHorizontalPrefix(prefixRange)) {
+      return this.withStart(simpleCellAddress(this.start.sheet, this.start.col + prefixRange.width(), this.start.row))
+    } else if (this.isVerticalPrefix(prefixRange)) {
+      return this.withStart(simpleCellAddress(this.start.sheet, this.start.col, this.start.row + prefixRange.height()))
+    } else {
+      throw Error("Not a prefix")
+    }
+  }
+
+  public isPrefix(prefixRange: AbsoluteCellRange): boolean {
+    return this.isVerticalPrefix(prefixRange) || this.isHorizontalPrefix(prefixRange)
+  }
+
+  public isVerticalPrefix(prefixRange: AbsoluteCellRange): boolean {
+    return (this.start.row === prefixRange.start.row) &&
+      (this.end.row >= prefixRange.end.row) &&
+      (this.start.col === prefixRange.start.col) &&
+      (this.end.col === prefixRange.end.col);
+  }
+
+  public isHorizontalPrefix(prefixRange: AbsoluteCellRange): boolean {
+    return (this.start.col === prefixRange.start.col) &&
+      (this.end.col >= prefixRange.end.col) &&
+      (this.start.row === prefixRange.start.row) &&
+      (this.end.row === prefixRange.end.row);
+  }
+
   public includesRow(row: number) {
     return this.start.row < row && this.end.row >= row
   }

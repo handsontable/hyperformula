@@ -465,6 +465,12 @@ export class AddressMapping {
     }
   }
 
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<CellValue> {
+    for (const address of range.addresses()) {
+      yield this.getCellValue(address)
+    }
+  }
+
   public* entriesFromRange(range: AbsoluteCellRange): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const address of range.addresses()) {
       yield [address, this.getCell(address)]

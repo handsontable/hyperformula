@@ -30,6 +30,40 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
+
+class ArithmeticSeriesCrossHeuristic {
+  private firstValue?: number;
+  private lastValue?: number;
+  private step?: number;
+
+  constructor(private readonly values: CellValue[]) {
+  }
+
+  public follows(): boolean {
+    if (this.values.length === 1 && typeof this.values[0] === "number") {
+      this.firstValue = this.values[0] as number
+      this.lastValue = this.values[0] as number
+      this.step = 1
+      return true
+    } else if (this.values.length === 2 && typeof this.values[0] === "number" && typeof this.values[1] === "number") {
+      this.firstValue = this.values[0] as number
+      this.lastValue = this.values[1] as number
+      this.step = this.lastValue - this.firstValue
+      return true
+    } else {
+      return false
+    }
+  }
+
+  public getNext(): number {
+    if (!this.lastValue || !this.firstValue || !this.step) {
+      throw Error("Uninitialized")
+    }
+    this.lastValue += this.step
+    return this.lastValue
+  }
+}
+
 /**
  * Engine for one sheet
  */
@@ -282,6 +316,15 @@ export class HandsOnEngine {
   }
 
   public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
+    const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
+    const arithmeticSeriesCrossHeuristic = new ArithmeticSeriesCrossHeuristic(startingRangeValues)
+
+    if (arithmeticSeriesCrossHeuristic.follows()) {
+      const remainingRange = finalRange.withoutPrefix(startingRange)
+      for (const address of remainingRange.addresses()) {
+        this.dependencyGraph!.setValueToCell(address, arithmeticSeriesCrossHeuristic.getNext())
+      }
+    }
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
