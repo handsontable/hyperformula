@@ -136,11 +136,13 @@ class RegularIntegersCrossHeuristic {
   }
 
   public check(vertices: (CellVertex | null)[]): ICrossGenerator | null {
+    if (vertices.length === 1) {
+      return this.findForOne(vertices[0])
+    }
+
     if (this.onlyNumbers(vertices)) {
       const values = vertices.map((v) => v.getCellValue()) as number[]
-      if (values.length === 1) {
-        return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
-      } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
+      if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
         return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
       } else {
         return new ComposedCrossGenerator(
