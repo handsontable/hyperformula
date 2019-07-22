@@ -347,6 +347,13 @@ export class HandsOnEngine {
     } else {
       throw Error("Cross generator not found")
     }
+
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
+    this.dependencyGraph!.clearRecentlyChangedVertices()
+
+    if (verticesToRecomputeFrom) {
+      this.evaluator!.partialRun(verticesToRecomputeFrom)
+    }
   }
 
   private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {

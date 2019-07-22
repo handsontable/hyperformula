@@ -23,6 +23,19 @@ describe("Cross operation", () => {
       engine.crossOperation(range(engine, "A1:A2"), range(engine, "B1:B2"))
     }).toThrowError('neither prefix nor suffix')
   })
+
+  it("recomputes", () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['', '=A2'],
+      ['', '=A3']
+    ])
+
+    engine.crossOperation(range(engine, "A1:A1"), range(engine, "A1:A3"))
+
+    expect(engine.getCellValue("B2")).toEqual(2)
+    expect(engine.getCellValue("B3")).toEqual(3)
+  })
 })
 
 describe("Cross operation - integers vertically", () => {
