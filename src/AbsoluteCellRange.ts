@@ -184,31 +184,31 @@ export class AbsoluteCellRange {
   }
 
   public withoutPrefix(prefixRange: AbsoluteCellRange): AbsoluteCellRange {
-    if (this.isHorizontalPrefix(prefixRange)) {
+    if (prefixRange.isHorizontalPrefixOf(this)) {
       return this.withStart(simpleCellAddress(this.start.sheet, this.start.col + prefixRange.width(), this.start.row))
-    } else if (this.isVerticalPrefix(prefixRange)) {
+    } else if (prefixRange.isVerticalPrefixOf(this)) {
       return this.withStart(simpleCellAddress(this.start.sheet, this.start.col, this.start.row + prefixRange.height()))
     } else {
       throw Error("Not a prefix")
     }
   }
 
-  public isPrefix(prefixRange: AbsoluteCellRange): boolean {
-    return this.isVerticalPrefix(prefixRange) || this.isHorizontalPrefix(prefixRange)
+  public isPrefixOf(otherRange: AbsoluteCellRange): boolean {
+    return this.isVerticalPrefixOf(otherRange) || this.isHorizontalPrefixOf(otherRange)
   }
 
-  public isVerticalPrefix(prefixRange: AbsoluteCellRange): boolean {
-    return (this.start.row === prefixRange.start.row) &&
-      (this.end.row >= prefixRange.end.row) &&
-      (this.start.col === prefixRange.start.col) &&
-      (this.end.col === prefixRange.end.col);
+  public isVerticalPrefixOf(otherRange: AbsoluteCellRange): boolean {
+    return (otherRange.start.row === this.start.row) &&
+      (otherRange.end.row >= this.end.row) &&
+      (otherRange.start.col === this.start.col) &&
+      (otherRange.end.col === this.end.col);
   }
 
-  public isHorizontalPrefix(prefixRange: AbsoluteCellRange): boolean {
-    return (this.start.col === prefixRange.start.col) &&
-      (this.end.col >= prefixRange.end.col) &&
-      (this.start.row === prefixRange.start.row) &&
-      (this.end.row === prefixRange.end.row);
+  public isHorizontalPrefixOf(otherRange: AbsoluteCellRange): boolean {
+    return (otherRange.start.col === this.start.col) &&
+      (otherRange.end.col >= this.end.col) &&
+      (otherRange.start.row === this.start.row) &&
+      (otherRange.end.row === this.end.row);
   }
 
   public includesRow(row: number) {
