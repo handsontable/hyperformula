@@ -10,6 +10,7 @@ import {
   RangeMapping,
   SheetMapping,
   ValueCellVertex,
+  CellVertex,
   Vertex,
 } from './DependencyGraph'
 import {MatrixMapping} from './DependencyGraph/MatrixMapping'
@@ -109,8 +110,9 @@ class RegularIntegersCrossHeuristic {
   constructor() {
   }
 
-  public check(values: CellValue[]): ICrossGenerator | null {
-    if (this.onlyNumbers(values)) {
+  public check(vertices: (CellVertex | null)[]): ICrossGenerator | null {
+    if (this.onlyNumbers(vertices)) {
+      const values = vertices.map((v) => v.getCellValue()) as number[]
       if (values.length === 1) {
         return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
       } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
@@ -125,9 +127,9 @@ class RegularIntegersCrossHeuristic {
     }
   }
 
-  private onlyNumbers(values: CellValue[]): values is number[] {
-    for (const val of values) {
-      if (typeof val !== "number") {
+  private onlyNumbers(vertices: (CellVertex | null)[]): vertices is ValueCellVertex[] {
+    for (const vertex of vertices) {
+      if (!(vertex instanceof ValueCellVertex) || (typeof vertex.getCellValue() !== "number")) {
         return false
       }
     }
@@ -397,10 +399,10 @@ export class HandsOnEngine {
   }
 
   public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
-    const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
+    const startingRangeVertices = Array.from(this.addressMapping!.entriesFromRange(startingRange)).map(([a,v]) => v)
     const arithmeticSeriesCrossHeuristic = new RegularIntegersCrossHeuristic()
 
-    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues)
+    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeVertices)
     if (generator) {
       if (startingRange.isPrefixOf(finalRange)) {
         const remainingRange = finalRange.withoutPrefix(startingRange)
