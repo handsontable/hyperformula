@@ -42,6 +42,11 @@ class ArithmeticSeriesCrossGenerator {
     this.lastValue += this.step
     return this.lastValue
   }
+
+  public getPrevious() {
+    this.firstValue -= this.step
+    return this.firstValue
+  }
 }
 
 class RegularIntegersCrossHeuristic {
@@ -326,9 +331,16 @@ export class HandsOnEngine {
 
     let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues as number[])
     if (generator) {
-      const remainingRange = finalRange.withoutPrefix(startingRange)
-      for (const address of remainingRange.addresses()) {
-        this.dependencyGraph!.setValueToCell(address, generator.getNext())
+      if (startingRange.isPrefixOf(finalRange)) {
+        const remainingRange = finalRange.withoutPrefix(startingRange)
+        for (const address of remainingRange.addresses()) {
+          this.dependencyGraph!.setValueToCell(address, generator.getNext())
+        }
+      } else if (startingRange.isSuffixOf(finalRange)) {
+        const remainingRange = finalRange.withoutSuffix(startingRange)
+        for (const address of Array.from(remainingRange.addresses()).reverse()) {
+          this.dependencyGraph!.setValueToCell(address, generator.getPrevious())
+        }
       }
     } else {
       throw Error("Cross generator not found")

@@ -90,6 +90,23 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A8")).toEqual(9)
     expect(engine.getCellValue("A9")).toEqual(36)
   })
+
+  it('subsequent integers, crossoping upwards', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      [''],
+      [''],
+      [''],
+      ['3'],
+      ['4'],
+      ['5'],
+    ])
+
+    engine.crossOperation(range(engine, "A4:A6"), range(engine, "A1:A6"))
+
+    expect(engine.getCellValue("A1")).toEqual(0)
+    expect(engine.getCellValue("A2")).toEqual(1)
+    expect(engine.getCellValue("A3")).toEqual(2)
+  })
 })
 
 describe("Cross operation - integers horizontally", () => {

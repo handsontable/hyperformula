@@ -211,6 +211,34 @@ export class AbsoluteCellRange {
       (otherRange.end.row === this.end.row);
   }
 
+  public withoutSuffix(suffixRange: AbsoluteCellRange): AbsoluteCellRange {
+    if (suffixRange.isHorizontalSuffixOf(this)) {
+      return this.withEnd(simpleCellAddress(this.end.sheet, this.end.col - suffixRange.width(), this.end.row))
+    } else if (suffixRange.isVerticalSuffixOf(this)) {
+      return this.withEnd(simpleCellAddress(this.end.sheet, this.end.col, this.end.row - suffixRange.height()))
+    } else {
+      throw Error("Not a suffix")
+    }
+  }
+
+  public isSuffixOf(otherRange: AbsoluteCellRange): boolean {
+    return this.isVerticalSuffixOf(otherRange) || this.isHorizontalSuffixOf(otherRange)
+  }
+
+  public isVerticalSuffixOf(otherRange: AbsoluteCellRange): boolean {
+    return (otherRange.end.row === this.end.row) &&
+      (otherRange.start.row <= this.start.row) &&
+      (otherRange.start.col === this.start.col) &&
+      (otherRange.end.col === this.end.col);
+  }
+
+  public isHorizontalSuffixOf(otherRange: AbsoluteCellRange): boolean {
+    return (otherRange.end.col === this.end.col) &&
+      (otherRange.start.col <= this.start.col) &&
+      (otherRange.start.row === this.start.row) &&
+      (otherRange.end.row === this.end.row);
+  }
+
   public includesRow(row: number) {
     return this.start.row < row && this.end.row >= row
   }
