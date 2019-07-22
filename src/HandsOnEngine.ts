@@ -35,8 +35,8 @@ import {Statistics, StatType} from './statistics/Statistics'
 
 
 interface ICrossGenerator {
-  getNext(): number | Ast,
-  getPrevious(): number | Ast,
+  getNext(address: SimpleCellAddress): number | Ast,
+  getPrevious(address: SimpleCellAddress): number | Ast,
 }
 
 class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
@@ -46,12 +46,12 @@ class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
     private readonly step: number
   ) { }
 
-  public getNext() {
+  public getNext(address: SimpleCellAddress) {
     this.lastValue += this.step
     return this.lastValue
   }
 
-  public getPrevious() {
+  public getPrevious(address: SimpleCellAddress) {
     this.firstValue -= this.step
     return this.firstValue
   }
@@ -99,12 +99,12 @@ class ComposedCrossGenerator implements ICrossGenerator {
     this.lastNextUsed = RollingCounter.startAtMax(0, this.generators.length - 1)
   }
 
-  public getNext() {
-    return this.generators[this.lastNextUsed.increment()].getNext()
+  public getNext(address: SimpleCellAddress) {
+    return this.generators[this.lastNextUsed.increment()].getNext(address)
   }
 
-  public getPrevious() {
-    return this.generators[this.lastPreviousUsed.decrement()].getPrevious()
+  public getPrevious(address: SimpleCellAddress) {
+    return this.generators[this.lastPreviousUsed.decrement()].getPrevious(address)
   }
 }
 
@@ -114,11 +114,11 @@ class DummyFormulaCrossGenerator implements ICrossGenerator {
   ) {
   }
 
-  public getNext(): Ast {
+  public getNext(address: SimpleCellAddress): Ast {
     return this.ast
   }
 
-  public getPrevious(): Ast {
+  public getPrevious(address: SimpleCellAddress): Ast {
     return this.ast
   }
 }
@@ -435,7 +435,7 @@ export class HandsOnEngine {
       if (startingRange.isPrefixOf(finalRange)) {
         const remainingRange = finalRange.withoutPrefix(startingRange)
         for (const address of remainingRange.addresses()) {
-          const newValue = generator.getNext()
+          const newValue = generator.getNext(address)
           if (typeof newValue === "number") {
             this.dependencyGraph!.setValueToCell(address, newValue)
           } else {
@@ -448,7 +448,7 @@ export class HandsOnEngine {
       } else if (startingRange.isSuffixOf(finalRange)) {
         const remainingRange = finalRange.withoutSuffix(startingRange)
         for (const address of Array.from(remainingRange.addresses()).reverse()) {
-          const newValue = generator.getPrevious()
+          const newValue = generator.getPrevious(address)
           if (typeof newValue === "number") {
             this.dependencyGraph!.setValueToCell(address, newValue)
           } else {
