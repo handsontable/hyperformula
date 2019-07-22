@@ -141,16 +141,12 @@ class FindingRightGeneratorService {
       const values = vertices.map((v) => v.getCellValue()) as number[]
       if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
         return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
-      } else {
-        return new ComposedCrossGenerator(
-          values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
-        )
       }
-    } else {
-      return new ComposedCrossGenerator(
-        vertices.map((v) => this.findForOne(v))
-      )
     }
+
+    return new ComposedCrossGenerator(
+      vertices.map((v) => this.findForOne(v))
+    )
   }
 
   private findForOne(vertex: CellVertex | null): ICrossGenerator {
