@@ -146,10 +146,6 @@ class FindingRightGeneratorService {
           values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
         )
       }
-    } else if (this.onlyFormulas(vertices)) {
-      return new ComposedCrossGenerator(
-        vertices.map((v) => new FormulaCrossGenerator(v.getFormula()))
-      )
     } else {
       return new ComposedCrossGenerator(
         vertices.map((v) => this.findForOne(v))
@@ -181,15 +177,6 @@ class FindingRightGeneratorService {
     const step = values[1] - values[0]
     for (let i = 2; i < values.length; i++) {
       if ((values[i] - values[i-1]) !== step) {
-        return false
-      }
-    }
-    return true
-  }
-
-  private onlyFormulas(vertices: (CellVertex | null)[]): vertices is FormulaCellVertex[] {
-    for (const vertex of vertices) {
-      if (!(vertex instanceof FormulaCellVertex)) {
         return false
       }
     }
