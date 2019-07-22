@@ -109,16 +109,29 @@ class RegularIntegersCrossHeuristic {
   constructor() {
   }
 
-  public check(values: number[]): ICrossGenerator | null {
-    if (values.length === 1) {
-      return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
-    } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
-      return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
+  public check(values: CellValue[]): ICrossGenerator | null {
+    if (this.onlyNumbers(values)) {
+      if (values.length === 1) {
+        return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
+      } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
+        return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
+      } else {
+        return new ComposedCrossGenerator(
+          values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
+        )
+      }
     } else {
-      return new ComposedCrossGenerator(
-        values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
-      )
+      return null
     }
+  }
+
+  private onlyNumbers(values: CellValue[]): values is number[] {
+    for (const val of values) {
+      if (typeof val !== "number") {
+        return false
+      }
+    }
+    return true
   }
 
   private onlyNumbersWithEqualDistantBetweenElements(values: number[]) {
@@ -387,7 +400,7 @@ export class HandsOnEngine {
     const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
     const arithmeticSeriesCrossHeuristic = new RegularIntegersCrossHeuristic()
 
-    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues as number[])
+    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues)
     if (generator) {
       if (startingRange.isPrefixOf(finalRange)) {
         const remainingRange = finalRange.withoutPrefix(startingRange)
