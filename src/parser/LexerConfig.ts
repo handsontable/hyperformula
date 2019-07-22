@@ -59,6 +59,9 @@ export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
+/* error literal */
+export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z]+!/})
+
 /* skipping whitespaces */
 export const WhiteSpace = createToken({
   name: 'WhiteSpace',
@@ -104,6 +107,7 @@ export const buildLexerConfig = (config: Config): ILexerConfig => {
     ArgSeparator,
     NumberLiteral,
     StringLiteral,
+    ErrorLiteral,
     ConcatenateOp,
     BooleanOp,
     AdditionOp,

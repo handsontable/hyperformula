@@ -1,5 +1,6 @@
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {ErrorType, CellError} from '../../src/Cell'
 import {
   AstNodeType,
   CellRangeAst,
@@ -277,5 +278,13 @@ describe('ParserWithCaching', () => {
     expect(ast1.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast2.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast1).toEqual(ast2)
+  })
+
+  it('error literal', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const ast = parser.parse('=#REF!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
 })

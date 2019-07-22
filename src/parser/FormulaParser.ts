@@ -1,6 +1,6 @@
 import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
-import {SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress, ErrorType, CellError} from '../Cell'
 import {
   Ast,
   AstNodeType,
@@ -25,6 +25,7 @@ import {
   buildTimesOpAst,
   CellReferenceAst,
   ParsingErrorType,
+  buildCellErrorAst,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
@@ -52,8 +53,13 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
+  ErrorLiteral,
   TimesOp,
 } from './LexerConfig'
+
+const errors: Record<string, ErrorType> = {
+  'REF': ErrorType.REF,
+}
 
 /**
  * LL(k) formula parser described using Chevrotain DSL
@@ -256,6 +262,17 @@ export class FormulaParser extends Parser {
           return buildStringAst(str.image.slice(1, -1))
         },
       },
+      {
+        ALT: () => {
+          const err = this.CONSUME(ErrorLiteral)
+          const errString = err.image.slice(1, -1)
+          if (errors[errString]) {
+            return buildCellErrorAst(new CellError(errors[errString]))
+          } else {
+            return buildErrorAst([])
+          }
+        }
+      }
     ]))
   })
 
