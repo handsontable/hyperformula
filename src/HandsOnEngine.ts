@@ -45,21 +45,17 @@ class ArithmeticSeriesCrossGenerator {
 }
 
 class ArithmeticSeriesCrossHeuristic {
-  constructor(private readonly values: CellValue[]) {
+  constructor() {
   }
 
-  public check(): ArithmeticSeriesCrossGenerator | null {
-    if (this.values.length === 1 && typeof this.values[0] === "number") {
+  public check(values: CellValue[]): ArithmeticSeriesCrossGenerator | null {
+    if (values.length === 1 && typeof values[0] === "number") {
+      return new ArithmeticSeriesCrossGenerator(values[0] as number, values[0] as number, 1)
+    } else if (this.onlyNumbersWithEqualDistantBetweenElements(values as number[])) {
       return new ArithmeticSeriesCrossGenerator(
-        this.values[0] as number,
-        this.values[0] as number,
-        1
-      )
-    } else if (this.onlyNumbersWithEqualDistantBetweenElements(this.values as number[])) {
-      return new ArithmeticSeriesCrossGenerator(
-        this.values[0] as number,
-        this.values[this.values.length - 1] as number,
-        (this.values[1] as number) - (this.values[0] as number)
+        values[0] as number,
+        values[values.length - 1] as number,
+        (values[1] as number) - (values[0] as number)
       )
     } else {
       return null
@@ -330,9 +326,9 @@ export class HandsOnEngine {
 
   public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
     const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
-    const arithmeticSeriesCrossHeuristic = new ArithmeticSeriesCrossHeuristic(startingRangeValues)
+    const arithmeticSeriesCrossHeuristic = new ArithmeticSeriesCrossHeuristic()
 
-    let generator = arithmeticSeriesCrossHeuristic.check()
+    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues)
     if (generator) {
       const remainingRange = finalRange.withoutPrefix(startingRange)
       for (const address of remainingRange.addresses()) {
