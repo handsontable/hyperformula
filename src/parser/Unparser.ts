@@ -26,12 +26,20 @@ export class Unparser {
         return ast.procedureName + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
-        const sheet = this.sheetMappingFn(ast.reference.sheet)
-        return '$' + sheet + '.' + addressToString(ast.reference, address)
+        if (ast.reference.sheet === address.sheet) {
+          return addressToString(ast.reference, address)
+        } else {
+          const sheet = this.sheetMappingFn(ast.reference.sheet)
+          return '$' + sheet + '.' + addressToString(ast.reference, address)
+        }
       }
       case AstNodeType.CELL_RANGE: {
-        const sheet = this.sheetMappingFn(ast.start.sheet)
-        return '$' + sheet + '.' + addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
+        if (ast.start.sheet === address.sheet) {
+          return addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
+        } else {
+          const sheet = this.sheetMappingFn(ast.start.sheet)
+          return '$' + sheet + '.' + addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
+        }
       }
       case AstNodeType.MINUS_UNARY_OP: {
         return '-' + this.unparse(ast.value, address)
