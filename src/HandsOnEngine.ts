@@ -131,11 +131,8 @@ class FormulaCrossGenerator implements ICrossGenerator {
   }
 }
 
-class RegularIntegersCrossHeuristic {
-  constructor() {
-  }
-
-  public check(vertices: (CellVertex | null)[]): ICrossGenerator | null {
+class FindingRightGeneratorService {
+  public findForMany(vertices: (CellVertex | null)[]): ICrossGenerator | null {
     if (vertices.length === 1) {
       return this.findForOne(vertices[0])
     }
@@ -453,9 +450,9 @@ export class HandsOnEngine {
 
   public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
     const startingRangeVertices = Array.from(this.addressMapping!.entriesFromRange(startingRange)).map(([a,v]) => v)
-    const arithmeticSeriesCrossHeuristic = new RegularIntegersCrossHeuristic()
+    const findingRightGeneratorService = new FindingRightGeneratorService()
 
-    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeVertices)
+    let generator = findingRightGeneratorService.findForMany(startingRangeVertices)
     if (generator) {
       if (startingRange.isPrefixOf(finalRange)) {
         const remainingRange = finalRange.withoutPrefix(startingRange)
