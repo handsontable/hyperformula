@@ -25,6 +25,8 @@ import {
   isMatrix,
   ParserWithCaching,
   ProcedureAst,
+  collectDependencies,
+  absolutizeDependencies,
 } from './parser'
 import {CellAddress} from './parser/CellAddress'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
@@ -33,8 +35,8 @@ import {Statistics, StatType} from './statistics/Statistics'
 
 
 interface ICrossGenerator {
-  getNext(): number,
-  getPrevious(): number,
+  getNext(): number | Ast,
+  getPrevious(): number | Ast,
 }
 
 class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
@@ -106,6 +108,21 @@ class ComposedCrossGenerator implements ICrossGenerator {
   }
 }
 
+class DummyFormulaCrossGenerator implements ICrossGenerator {
+  constructor(
+    private readonly ast: Ast
+  ) {
+  }
+
+  public getNext(): Ast {
+    return this.ast
+  }
+
+  public getPrevious(): Ast {
+    return this.ast
+  }
+}
+
 class RegularIntegersCrossHeuristic {
   constructor() {
   }
@@ -122,6 +139,8 @@ class RegularIntegersCrossHeuristic {
           values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
         )
       }
+    } else if (this.onlyFormulas(vertices)) {
+      return new DummyFormulaCrossGenerator(vertices[0].getFormula())
     } else {
       return null
     }
@@ -140,6 +159,15 @@ class RegularIntegersCrossHeuristic {
     const step = values[1] - values[0]
     for (let i = 2; i < values.length; i++) {
       if ((values[i] - values[i-1]) !== step) {
+        return false
+      }
+    }
+    return true
+  }
+
+  private onlyFormulas(vertices: (CellVertex | null)[]): vertices is FormulaCellVertex[] {
+    for (const vertex of vertices) {
+      if (!(vertex instanceof FormulaCellVertex)) {
         return false
       }
     }
@@ -194,7 +222,7 @@ export class HandsOnEngine {
   private graphBuilder?: GraphBuilder
 
   constructor(
-      private readonly config: Config,
+      public readonly config: Config,
   ) {
     this.parser = new ParserWithCaching(this.config, this.sheetMapping.fetch)
   }
@@ -407,12 +435,25 @@ export class HandsOnEngine {
       if (startingRange.isPrefixOf(finalRange)) {
         const remainingRange = finalRange.withoutPrefix(startingRange)
         for (const address of remainingRange.addresses()) {
-          this.dependencyGraph!.setValueToCell(address, generator.getNext())
+          const newValue = generator.getNext()
+          if (typeof newValue === "number") {
+            this.dependencyGraph!.setValueToCell(address, newValue)
+          } else {
+            const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
+            collectDependencies(newValue, deps)
+            const absoluteDeps = absolutizeDependencies(deps, address)
+            this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
+          }
         }
       } else if (startingRange.isSuffixOf(finalRange)) {
         const remainingRange = finalRange.withoutSuffix(startingRange)
         for (const address of Array.from(remainingRange.addresses()).reverse()) {
-          this.dependencyGraph!.setValueToCell(address, generator.getPrevious())
+          const newValue = generator.getPrevious()
+          if (typeof newValue === "number") {
+            this.dependencyGraph!.setValueToCell(address, newValue)
+          } else {
+            throw Error("Not implemented yet")
+          }
         }
       } else {
         throw Error("starting range is neither prefix nor suffix of final range")

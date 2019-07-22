@@ -2,6 +2,7 @@ import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
 import {cellAddressFromString, CellAddress} from '../src/parser'
+import {expect_cell_to_have_formula} from './testUtils'
 import './testConfig.ts'
 
 const range = (engine: HandsOnEngine, rangeString: string): AbsoluteCellRange => {
@@ -155,6 +156,19 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A1")).toEqual(0)
     expect(engine.getCellValue("A2")).toEqual(1)
     expect(engine.getCellValue("A3")).toEqual(2)
+  })
+})
+
+describe("Cross operation - formulas", () => {
+  it('simple relative reference', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B1']
+    ])
+
+    engine.crossOperation(range(engine, "A1:A1"), range(engine, "A1:A3"))
+
+    expect_cell_to_have_formula(engine, "A2", "B2")
+    expect_cell_to_have_formula(engine, "A3", "B3")
   })
 })
 

@@ -49,3 +49,5 @@ export {
   buildErrorAst,
   buildCellErrorAst,
 } from './Ast'
+
+export { Unparser } from './Unparser'
