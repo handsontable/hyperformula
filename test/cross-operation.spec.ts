@@ -167,8 +167,8 @@ describe("Cross operation - formulas", () => {
 
     engine.crossOperation(range(engine, "A1:A1"), range(engine, "A1:A3"))
 
-    expect_cell_to_have_formula(engine, "A2", "B2")
-    expect_cell_to_have_formula(engine, "A3", "B3")
+    expect_cell_to_have_formula(engine, "A2", "=B2")
+    expect_cell_to_have_formula(engine, "A3", "=B3")
   })
 })
 

@@ -13,7 +13,11 @@ export class Unparser {
   ) {
   }
 
-  public unparseAst(ast: Ast, address: SimpleCellAddress): string {
+  public unparse(ast: Ast, address: SimpleCellAddress): string {
+    return '=' + this.unparseAst(ast, address)
+  }
+
+  private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
         return ast.value.toString()
@@ -72,7 +76,3 @@ export function addressToString(address: CellAddress, baseAddress: SimpleCellAdd
   const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
   return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
 }
-// public unparseWithEqual(ast: Ast, address: SimpleCellAddress): string {
-//   return '=' + this.unparseAst(ast, address)
-// }
-
