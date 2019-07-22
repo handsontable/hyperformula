@@ -55,15 +55,25 @@ class ArithmeticSeriesCrossHeuristic {
         this.values[0] as number,
         1
       )
-    } else if (this.values.length === 2 && typeof this.values[0] === "number" && typeof this.values[1] === "number") {
+    } else if (this.onlyNumbersWithEqualDistantBetweenElements(this.values as number[])) {
       return new ArithmeticSeriesCrossGenerator(
         this.values[0] as number,
-        this.values[1] as number,
+        this.values[this.values.length - 1] as number,
         (this.values[1] as number) - (this.values[0] as number)
       )
     } else {
       return null
     }
+  }
+
+  private onlyNumbersWithEqualDistantBetweenElements(values: number[]) {
+    const step = values[1] - values[0]
+    for (let i = 2; i < values.length; i++) {
+      if ((values[i] - values[i-1]) !== step) {
+        return false
+      }
+    }
+    return true
   }
 }
 

@@ -35,7 +35,7 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A3")).toEqual(5)
   })
 
-  xit('starting from few subsequent integers', () => {
+  it('starting from few subsequent integers', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['3'],
       ['4'],
@@ -48,7 +48,7 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A5")).toEqual(7)
   })
 
-  xit('starting from few integers with regular step (2)', () => {
+  it('starting from few integers with regular step (2)', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['3'],
       ['5'],
@@ -61,7 +61,7 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A5")).toEqual(11)
   })
 
-  xit('starting from few integers with regular step (3)', () => {
+  it('starting from few integers with regular step (3)', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['3'],
       ['6'],
