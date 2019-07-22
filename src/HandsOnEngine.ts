@@ -55,6 +55,10 @@ class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
     this.firstValue -= this.step
     return this.firstValue
   }
+
+  public static fromOne(value: number) {
+    return new ArithmeticSeriesCrossGenerator(value, value, 1)
+  }
 }
 
 class RollingCounter {
@@ -154,7 +158,7 @@ class FindingRightGeneratorService {
       return new FormulaCrossGenerator(vertex.getFormula())
     } else if (vertex instanceof ValueCellVertex && typeof vertex.getCellValue() === "number") {
       const val = vertex.getCellValue() as number
-      return new ArithmeticSeriesCrossGenerator(val, val, 1)
+      return ArithmeticSeriesCrossGenerator.fromOne(val)
     } else {
       throw Error("Not implemented yet")
     }
