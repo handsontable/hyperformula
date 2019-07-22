@@ -17,7 +17,7 @@ describe('Unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse simple addreess', async () => {
@@ -25,7 +25,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse simple addreess from other sheet', async () => {
@@ -33,7 +33,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(1, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse absolute col', async () => {
@@ -41,7 +41,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse absolute row addreess', async () => {
@@ -49,7 +49,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse absolute address', async () => {
@@ -57,7 +57,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse cell ref between strings', async () => {
@@ -65,7 +65,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse  cell ref in string with escape', async () => {
@@ -73,7 +73,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse cell range from same sheet', async () => {
@@ -81,7 +81,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse cell range from other sheet', async () => {
@@ -89,7 +89,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(1, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 
   it('#unparse ops', async () => {
@@ -97,6 +97,6 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
 
-    expect(formula).toEqual(unparsed)
+    expect(unparsed).toEqual(formula)
   })
 })
