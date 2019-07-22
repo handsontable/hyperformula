@@ -148,7 +148,9 @@ class RegularIntegersCrossHeuristic {
         )
       }
     } else if (this.onlyFormulas(vertices)) {
-      return new DummyFormulaCrossGenerator(vertices[0].getFormula())
+      return new ComposedCrossGenerator(
+        vertices.map((v) => new DummyFormulaCrossGenerator(v.getFormula()))
+      )
     } else {
       return null
     }
