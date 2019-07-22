@@ -348,6 +348,10 @@ export class HandsOnEngine {
       throw Error("Cross generator not found")
     }
 
+    this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  private recomputeIfDependencyGraphNeedsIt() {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
     this.dependencyGraph!.clearRecentlyChangedVertices()
 
