@@ -100,7 +100,7 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A5")).toEqual(15)
   })
 
-  xit('few integers with irregular steps', () => {
+  it('few integers with irregular steps', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['2'],
       ['7'],
@@ -115,6 +115,29 @@ describe("Cross operation - integers vertically", () => {
     expect(engine.getCellValue("A7")).toEqual(4)
     expect(engine.getCellValue("A8")).toEqual(9)
     expect(engine.getCellValue("A9")).toEqual(36)
+  })
+
+  it('few integers with irregular steps, upwards', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      [''],
+      [''],
+      [''],
+      [''],
+      [''],
+      [''],
+      ['2'],
+      ['7'],
+      ['34'],
+    ])
+
+    engine.crossOperation(range(engine, "A7:A9"), range(engine, "A1:A9"))
+
+    expect(engine.getCellValue("A1")).toEqual(0)
+    expect(engine.getCellValue("A2")).toEqual(5)
+    expect(engine.getCellValue("A3")).toEqual(32)
+    expect(engine.getCellValue("A4")).toEqual(1)
+    expect(engine.getCellValue("A5")).toEqual(6)
+    expect(engine.getCellValue("A6")).toEqual(33)
   })
 
   it('subsequent integers, crossoping upwards', () => {

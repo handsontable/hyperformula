@@ -31,7 +31,12 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
 
-class ArithmeticSeriesCrossGenerator {
+interface ICrossGenerator {
+  getNext(): number,
+  getPrevious(): number,
+}
+
+class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
   constructor(
     private firstValue: number,
     private lastValue: number,
@@ -49,17 +54,44 @@ class ArithmeticSeriesCrossGenerator {
   }
 }
 
+class ComposedCrossGenerator implements ICrossGenerator {
+  private lastNextUsed: number
+  private lastPreviousUsed: number
+
+  constructor(
+    private generators: ICrossGenerator[],
+  ) {
+    this.lastPreviousUsed = 0
+    this.lastNextUsed = this.generators.length - 1
+  }
+
+  public getNext() {
+    this.lastNextUsed = (this.lastNextUsed + 1) % this.generators.length
+    return this.generators[this.lastNextUsed].getNext()
+  }
+
+  public getPrevious() {
+    this.lastPreviousUsed--;
+    if (this.lastPreviousUsed < 0) {
+      this.lastPreviousUsed = this.generators.length - 1
+    }
+    return this.generators[this.lastPreviousUsed].getPrevious()
+  }
+}
+
 class RegularIntegersCrossHeuristic {
   constructor() {
   }
 
-  public check(values: number[]): ArithmeticSeriesCrossGenerator | null {
+  public check(values: number[]): ICrossGenerator | null {
     if (values.length === 1) {
       return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
     } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
       return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
     } else {
-      return null
+      return new ComposedCrossGenerator(
+        values.map((v) => new ArithmeticSeriesCrossGenerator(v, v, 1))
+      )
     }
   }
 
