@@ -99,4 +99,20 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('#unparse with unspecified error', () => {
+    const formula = '=1+'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
+
+    expect(unparsed).toEqual('=#ERR!')
+  })
+
+  it('#unparse with known error', () => {
+    const formula = '=#REF!'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, simpleCellAddress(0, 0, 0))
+
+    expect(unparsed).toEqual('=#REF!')
+  })
 })

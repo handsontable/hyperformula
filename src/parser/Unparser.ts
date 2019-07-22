@@ -49,7 +49,11 @@ export class Unparser {
         return '-' + this.unparseAst(ast.value, address)
       }
       case AstNodeType.ERROR: {
-        return '!ERR'
+        if (ast.error) {
+          return `#${ast.error.type}!`
+        } else {
+          return '#ERR!'
+        }
       }
       default: {
         return this.unparseAst(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparseAst(ast.right, address)
