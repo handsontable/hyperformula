@@ -31,36 +31,39 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
 
-class ArithmeticSeriesCrossHeuristic {
-  private firstValue?: number;
-  private lastValue?: number;
-  private step?: number;
+class ArithmeticSeriesCrossGenerator {
+  constructor(
+    private firstValue: number,
+    private lastValue: number,
+    private readonly step: number
+  ) { }
 
+  public getNext() {
+    this.lastValue += this.step
+    return this.lastValue
+  }
+}
+
+class ArithmeticSeriesCrossHeuristic {
   constructor(private readonly values: CellValue[]) {
   }
 
-  public follows(): boolean {
+  public check(): ArithmeticSeriesCrossGenerator | null {
     if (this.values.length === 1 && typeof this.values[0] === "number") {
-      this.firstValue = this.values[0] as number
-      this.lastValue = this.values[0] as number
-      this.step = 1
-      return true
+      return new ArithmeticSeriesCrossGenerator(
+        this.values[0] as number,
+        this.values[0] as number,
+        1
+      )
     } else if (this.values.length === 2 && typeof this.values[0] === "number" && typeof this.values[1] === "number") {
-      this.firstValue = this.values[0] as number
-      this.lastValue = this.values[1] as number
-      this.step = this.lastValue - this.firstValue
-      return true
+      return new ArithmeticSeriesCrossGenerator(
+        this.values[0] as number,
+        this.values[1] as number,
+        (this.values[1] as number) - (this.values[0] as number)
+      )
     } else {
-      return false
+      return null
     }
-  }
-
-  public getNext(): number {
-    if (!this.lastValue || !this.firstValue || !this.step) {
-      throw Error("Uninitialized")
-    }
-    this.lastValue += this.step
-    return this.lastValue
   }
 }
 
@@ -319,11 +322,14 @@ export class HandsOnEngine {
     const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
     const arithmeticSeriesCrossHeuristic = new ArithmeticSeriesCrossHeuristic(startingRangeValues)
 
-    if (arithmeticSeriesCrossHeuristic.follows()) {
+    let generator = arithmeticSeriesCrossHeuristic.check()
+    if (generator) {
       const remainingRange = finalRange.withoutPrefix(startingRange)
       for (const address of remainingRange.addresses()) {
-        this.dependencyGraph!.setValueToCell(address, arithmeticSeriesCrossHeuristic.getNext())
+        this.dependencyGraph!.setValueToCell(address, generator.getNext())
       }
+    } else {
+      throw Error("Cross generator not found")
     }
   }
 
