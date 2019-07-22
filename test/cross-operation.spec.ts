@@ -170,6 +170,19 @@ describe("Cross operation - formulas", () => {
     expect_cell_to_have_formula(engine, "A2", "=B2")
     expect_cell_to_have_formula(engine, "A3", "=B3")
   })
+
+  it('simple relative reference, going upwards', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      [''],
+      [''],
+      ['=B4']
+    ])
+
+    engine.crossOperation(range(engine, "A3:A3"), range(engine, "A1:A3"))
+
+    expect_cell_to_have_formula(engine, "A1", "=B2")
+    expect_cell_to_have_formula(engine, "A2", "=B3")
+  })
 })
 
 describe("Cross operation - integers horizontally", () => {

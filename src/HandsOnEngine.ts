@@ -452,7 +452,10 @@ export class HandsOnEngine {
           if (typeof newValue === "number") {
             this.dependencyGraph!.setValueToCell(address, newValue)
           } else {
-            throw Error("Not implemented yet")
+            const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
+            collectDependencies(newValue, deps)
+            const absoluteDeps = absolutizeDependencies(deps, address)
+            this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
           }
         }
       } else {
