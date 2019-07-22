@@ -54,28 +54,54 @@ class ArithmeticSeriesCrossGenerator implements ICrossGenerator {
   }
 }
 
+class RollingCounter {
+  constructor(
+    private readonly min: number,
+    private readonly max: number,
+    private value: number,
+  ) {
+  }
+
+  public increment(): number {
+    this.value++
+    if (this.value > this.max)
+      this.value = this.min
+    return this.value
+  }
+
+  public decrement(): number {
+    this.value--
+    if (this.value < this.min)
+      this.value = this.max
+    return this.value
+  }
+
+  public static startAtMax(min: number, max: number) {
+    return new RollingCounter(min, max, max)
+  }
+
+  public static startAtMin(min: number, max: number) {
+    return new RollingCounter(min, max, min)
+  }
+}
+
 class ComposedCrossGenerator implements ICrossGenerator {
-  private lastNextUsed: number
-  private lastPreviousUsed: number
+  private lastNextUsed: RollingCounter
+  private lastPreviousUsed: RollingCounter
 
   constructor(
     private generators: ICrossGenerator[],
   ) {
-    this.lastPreviousUsed = 0
-    this.lastNextUsed = this.generators.length - 1
+    this.lastPreviousUsed = RollingCounter.startAtMin(0, this.generators.length - 1)
+    this.lastNextUsed = RollingCounter.startAtMax(0, this.generators.length - 1)
   }
 
   public getNext() {
-    this.lastNextUsed = (this.lastNextUsed + 1) % this.generators.length
-    return this.generators[this.lastNextUsed].getNext()
+    return this.generators[this.lastNextUsed.increment()].getNext()
   }
 
   public getPrevious() {
-    this.lastPreviousUsed--;
-    if (this.lastPreviousUsed < 0) {
-      this.lastPreviousUsed = this.generators.length - 1
-    }
-    return this.generators[this.lastPreviousUsed].getPrevious()
+    return this.generators[this.lastPreviousUsed.decrement()].getPrevious()
   }
 }
 
