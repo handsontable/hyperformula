@@ -108,6 +108,14 @@ class ComposedCrossGenerator implements ICrossGenerator {
   }
 }
 
+const replaceIncorrectAddressesWithRefs = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress): CellAddress | ErrorType.REF | false => {
+  if (dependencyAddress.isOutOfBoundsFor(formulaAddress)) {
+    return ErrorType.REF
+  } else {
+    return false
+  }
+}
+
 class DummyFormulaCrossGenerator implements ICrossGenerator {
   constructor(
     private readonly ast: Ast
@@ -115,11 +123,11 @@ class DummyFormulaCrossGenerator implements ICrossGenerator {
   }
 
   public getNext(address: SimpleCellAddress): Ast {
-    return this.ast
+    return transformAddressesInFormula(this.ast, address, replaceIncorrectAddressesWithRefs)
   }
 
   public getPrevious(address: SimpleCellAddress): Ast {
-    return this.ast
+    return transformAddressesInFormula(this.ast, address, replaceIncorrectAddressesWithRefs)
   }
 }
 

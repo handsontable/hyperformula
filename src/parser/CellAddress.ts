@@ -65,11 +65,24 @@ export class CellAddress {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
+  public isColumnRelative(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
+  }
+
+  public isRowRelative(): boolean {
+    return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
+  }
+
   public shiftedByRows(numberOfRows: number): CellAddress {
     return new CellAddress(this.sheet, this.col, this.row + numberOfRows, this.type)
   }
 
   public shiftedByColumns(numberOfColumns: number): CellAddress {
     return new CellAddress(this.sheet, this.col + numberOfColumns, this.row, this.type)
+  }
+
+  public isOutOfBoundsFor(baseAddress: SimpleCellAddress): boolean {
+    return (this.isColumnRelative() && (baseAddress.col + this.col < 0)) ||
+      (this.isRowRelative() && (baseAddress.row + this.row < 0))
   }
 }
