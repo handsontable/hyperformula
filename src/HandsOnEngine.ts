@@ -116,7 +116,7 @@ const replaceIncorrectAddressesWithRefs = (dependencyAddress: CellAddress, formu
   }
 }
 
-class DummyFormulaCrossGenerator implements ICrossGenerator {
+class FormulaCrossGenerator implements ICrossGenerator {
   constructor(
     private readonly ast: Ast
   ) {
@@ -149,7 +149,7 @@ class RegularIntegersCrossHeuristic {
       }
     } else if (this.onlyFormulas(vertices)) {
       return new ComposedCrossGenerator(
-        vertices.map((v) => new DummyFormulaCrossGenerator(v.getFormula()))
+        vertices.map((v) => new FormulaCrossGenerator(v.getFormula()))
       )
     } else {
       return new ComposedCrossGenerator(
@@ -160,7 +160,7 @@ class RegularIntegersCrossHeuristic {
 
   private findForOne(vertex: CellVertex | null): ICrossGenerator {
     if (vertex instanceof FormulaCellVertex) {
-      return new DummyFormulaCrossGenerator(vertex.getFormula())
+      return new FormulaCrossGenerator(vertex.getFormula())
     } else if (vertex instanceof ValueCellVertex && typeof vertex.getCellValue() === "number") {
       const val = vertex.getCellValue() as number
       return new ArithmeticSeriesCrossGenerator(val, val, 1)
