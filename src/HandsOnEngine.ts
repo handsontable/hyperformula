@@ -132,7 +132,7 @@ class FormulaCrossGenerator implements ICrossGenerator {
 }
 
 class FindingRightGeneratorService {
-  public findForMany(vertices: (CellVertex | null)[]): ICrossGenerator | null {
+  public findForMany(vertices: (CellVertex | null)[]): ICrossGenerator {
     if (vertices.length === 1) {
       return this.findForOne(vertices[0])
     }
@@ -452,39 +452,35 @@ export class HandsOnEngine {
     const startingRangeVertices = Array.from(this.addressMapping!.entriesFromRange(startingRange)).map(([a,v]) => v)
     const findingRightGeneratorService = new FindingRightGeneratorService()
 
-    let generator = findingRightGeneratorService.findForMany(startingRangeVertices)
-    if (generator) {
-      if (startingRange.isPrefixOf(finalRange)) {
-        const remainingRange = finalRange.withoutPrefix(startingRange)
-        for (const address of remainingRange.addresses()) {
-          const newValue = generator.getNext(address)
-          if (typeof newValue === "number") {
-            this.dependencyGraph!.setValueToCell(address, newValue)
-          } else {
-            const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
-            collectDependencies(newValue, deps)
-            const absoluteDeps = absolutizeDependencies(deps, address)
-            this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
-          }
+    const generator = findingRightGeneratorService.findForMany(startingRangeVertices)
+    if (startingRange.isPrefixOf(finalRange)) {
+      const remainingRange = finalRange.withoutPrefix(startingRange)
+      for (const address of remainingRange.addresses()) {
+        const newValue = generator.getNext(address)
+        if (typeof newValue === "number") {
+          this.dependencyGraph!.setValueToCell(address, newValue)
+        } else {
+          const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
+          collectDependencies(newValue, deps)
+          const absoluteDeps = absolutizeDependencies(deps, address)
+          this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
         }
-      } else if (startingRange.isSuffixOf(finalRange)) {
-        const remainingRange = finalRange.withoutSuffix(startingRange)
-        for (const address of Array.from(remainingRange.addresses()).reverse()) {
-          const newValue = generator.getPrevious(address)
-          if (typeof newValue === "number") {
-            this.dependencyGraph!.setValueToCell(address, newValue)
-          } else {
-            const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
-            collectDependencies(newValue, deps)
-            const absoluteDeps = absolutizeDependencies(deps, address)
-            this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
-          }
+      }
+    } else if (startingRange.isSuffixOf(finalRange)) {
+      const remainingRange = finalRange.withoutSuffix(startingRange)
+      for (const address of Array.from(remainingRange.addresses()).reverse()) {
+        const newValue = generator.getPrevious(address)
+        if (typeof newValue === "number") {
+          this.dependencyGraph!.setValueToCell(address, newValue)
+        } else {
+          const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
+          collectDependencies(newValue, deps)
+          const absoluteDeps = absolutizeDependencies(deps, address)
+          this.dependencyGraph!.setFormulaToCell(address, newValue, absoluteDeps)
         }
-      } else {
-        throw Error("starting range is neither prefix nor suffix of final range")
       }
     } else {
-      throw Error("Cross generator not found")
+      throw Error("starting range is neither prefix nor suffix of final range")
     }
 
     this.recomputeIfDependencyGraphNeedsIt()
