@@ -208,6 +208,20 @@ describe("Cross operation - formulas", () => {
   })
 })
 
+describe("Cross operation - mixing types", () => {
+  it('just use what fits for every type', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['=B1'],
+    ])
+
+    engine.crossOperation(range(engine, "A1:A2"), range(engine, "A1:A4"))
+
+    expect(engine.getCellValue("A3")).toEqual(2)
+    expect_cell_to_have_formula(engine, "A4", "=B3")
+  })
+})
+
 describe("Cross operation - integers horizontally", () => {
   xit('starting from one simple integer', () => {
     const engine = HandsOnEngine.buildFromArray([

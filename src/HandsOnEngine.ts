@@ -152,7 +152,20 @@ class RegularIntegersCrossHeuristic {
         vertices.map((v) => new DummyFormulaCrossGenerator(v.getFormula()))
       )
     } else {
-      return null
+      return new ComposedCrossGenerator(
+        vertices.map((v) => this.findForOne(v))
+      )
+    }
+  }
+
+  private findForOne(vertex: CellVertex | null): ICrossGenerator {
+    if (vertex instanceof FormulaCellVertex) {
+      return new DummyFormulaCrossGenerator(vertex.getFormula())
+    } else if (vertex instanceof ValueCellVertex && typeof vertex.getCellValue() === "number") {
+      const val = vertex.getCellValue() as number
+      return new ArithmeticSeriesCrossGenerator(val, val, 1)
+    } else {
+      throw Error("Not implemented yet")
     }
   }
 
