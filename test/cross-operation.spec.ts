@@ -12,6 +12,19 @@ const range = (engine: HandsOnEngine, rangeString: string): AbsoluteCellRange =>
   )
 }
 
+describe("Cross operation", () => {
+  it("raise error when not prefix nor suffix", () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+    ])
+
+    expect(() => {
+      engine.crossOperation(range(engine, "A1:A2"), range(engine, "B1:B2"))
+    }).toThrowError('neither prefix nor suffix')
+  })
+})
+
 describe("Cross operation - integers vertically", () => {
   it('starting from one simple integer', () => {
     const engine = HandsOnEngine.buildFromArray([

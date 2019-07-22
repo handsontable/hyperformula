@@ -341,6 +341,8 @@ export class HandsOnEngine {
         for (const address of Array.from(remainingRange.addresses()).reverse()) {
           this.dependencyGraph!.setValueToCell(address, generator.getPrevious())
         }
+      } else {
+        throw Error("starting range is neither prefix nor suffix of final range")
       }
     } else {
       throw Error("Cross generator not found")
