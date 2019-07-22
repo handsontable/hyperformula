@@ -21,5 +21,5 @@ export const expect_cell_to_have_formula = (engine: HandsOnEngine, addressString
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
   const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
   const unparser = new Unparser(engine.config, engine.sheetMapping.name)
-  expect(unparser.unparse(formula, address)).toEqual(expectedFormula)
+  expect(unparser.unparseAst(formula, address)).toEqual(expectedFormula)
 }

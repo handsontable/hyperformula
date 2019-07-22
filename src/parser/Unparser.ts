@@ -13,7 +13,7 @@ export class Unparser {
   ) {
   }
 
-  public unparse(ast: Ast, address: SimpleCellAddress): string {
+  public unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
         return ast.value.toString()
@@ -22,7 +22,7 @@ export class Unparser {
         return '"' + ast.value + '"'
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.unparse(arg, address)).join(this.config.functionArgSeparator)
+        const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
         return ast.procedureName + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
@@ -42,13 +42,13 @@ export class Unparser {
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.unparse(ast.value, address)
+        return '-' + this.unparseAst(ast.value, address)
       }
       case AstNodeType.ERROR: {
         return '!ERR'
       }
       default: {
-        return this.unparse(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparse(ast.right, address)
+        return this.unparseAst(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparseAst(ast.right, address)
       }
     }
   }
@@ -72,3 +72,7 @@ export function addressToString(address: CellAddress, baseAddress: SimpleCellAdd
   const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
   return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
 }
+// public unparseWithEqual(ast: Ast, address: SimpleCellAddress): string {
+//   return '=' + this.unparseAst(ast, address)
+// }
+
