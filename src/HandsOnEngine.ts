@@ -44,19 +44,15 @@ class ArithmeticSeriesCrossGenerator {
   }
 }
 
-class ArithmeticSeriesCrossHeuristic {
+class RegularIntegersCrossHeuristic {
   constructor() {
   }
 
-  public check(values: CellValue[]): ArithmeticSeriesCrossGenerator | null {
-    if (values.length === 1 && typeof values[0] === "number") {
-      return new ArithmeticSeriesCrossGenerator(values[0] as number, values[0] as number, 1)
-    } else if (this.onlyNumbersWithEqualDistantBetweenElements(values as number[])) {
-      return new ArithmeticSeriesCrossGenerator(
-        values[0] as number,
-        values[values.length - 1] as number,
-        (values[1] as number) - (values[0] as number)
-      )
+  public check(values: number[]): ArithmeticSeriesCrossGenerator | null {
+    if (values.length === 1) {
+      return new ArithmeticSeriesCrossGenerator(values[0], values[0], 1)
+    } else if (this.onlyNumbersWithEqualDistantBetweenElements(values)) {
+      return new ArithmeticSeriesCrossGenerator(values[0], values[values.length - 1], values[1] - values[0])
     } else {
       return null
     }
@@ -326,9 +322,9 @@ export class HandsOnEngine {
 
   public crossOperation(startingRange: AbsoluteCellRange, finalRange: AbsoluteCellRange) {
     const startingRangeValues = Array.from(this.addressMapping!.valuesFromRange(startingRange))
-    const arithmeticSeriesCrossHeuristic = new ArithmeticSeriesCrossHeuristic()
+    const arithmeticSeriesCrossHeuristic = new RegularIntegersCrossHeuristic()
 
-    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues)
+    let generator = arithmeticSeriesCrossHeuristic.check(startingRangeValues as number[])
     if (generator) {
       const remainingRange = finalRange.withoutPrefix(startingRange)
       for (const address of remainingRange.addresses()) {
