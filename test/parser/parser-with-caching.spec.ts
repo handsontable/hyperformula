@@ -288,6 +288,14 @@ describe('ParserWithCaching', () => {
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
 
+  it('error literals are case insensitive', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const ast = parser.parse('=#rEf!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error).toEqual(new CellError(ErrorType.REF))
+  })
+
   it('unknown error literal', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 

@@ -265,7 +265,7 @@ export class FormulaParser extends Parser {
       {
         ALT: () => {
           const err = this.CONSUME(ErrorLiteral)
-          const errString = err.image.slice(1, -1)
+          const errString = err.image.slice(1, -1).toUpperCase()
           if (errors[errString]) {
             return buildCellErrorAst(new CellError(errors[errString]))
           } else {
