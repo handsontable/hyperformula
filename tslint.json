@@ -20,7 +20,10 @@
     },
     "object-literal-sort-keys": false,
     "max-line-length": false,
-    "no-unused-declaration": { "severity": "warning"}
+    "no-unused-declaration": { "severity": "warning"},
+    "no-non-null-assertion": {
+      "severity": "warning"
+    }
   },
   "rulesDirectory": []
 }
