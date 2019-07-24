@@ -123,7 +123,7 @@ export class DependencyGraph {
     const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
     const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
-        return this.rangeMapping!.getRange(dep.start, dep.end)!
+        return this.rangeMapping.getRange(dep.start, dep.end)!
       } else {
         return this.addressMapping.fetchCell(dep)
       }
@@ -236,7 +236,7 @@ export class DependencyGraph {
 
       // 4. remove old matrix
       this.graph.removeNode(matrixVertex)
-      this.matrixMapping!.removeMatrix(key)
+      this.matrixMapping.removeMatrix(key)
     }
   }
 
@@ -457,7 +457,7 @@ export class DependencyGraph {
   }
 
   private expandMatricesAfterAddingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-    for (const [, matrix] of this.matrixMapping!.numericMatricesInColumns(sheet, columnStart)) {
+    for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart)) {
       matrix.addColumns(sheet, columnStart, numberOfColumns)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress().row), numberOfColumns, matrix.height)
       for (const address of addedRange.addresses()) {

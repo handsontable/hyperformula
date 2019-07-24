@@ -411,12 +411,20 @@ export class AddressMapping {
 
   /** @inheritDoc */
   public getHeight(sheetId: number): number {
-    return this.mapping.get(sheetId)!.getHeight()
+    const sheetMapping = this.mapping.get(sheetId)
+    if (!sheetMapping) {
+      throw Error('Sheet does not exist')
+    }
+    return sheetMapping.getHeight()
   }
 
   /** @inheritDoc */
   public getWidth(sheetId: number): number {
-    return this.mapping.get(sheetId)!.getWidth()
+    const sheetMapping = this.mapping.get(sheetId)
+    if (!sheetMapping) {
+      throw Error('Sheet does not exist')
+    }
+    return sheetMapping.getWidth()
   }
 
   public isEmpty(address: SimpleCellAddress): boolean {
