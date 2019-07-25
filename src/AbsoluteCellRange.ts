@@ -79,6 +79,10 @@ export class AbsoluteCellRange {
     return false
   }
 
+  public containsRange(range: AbsoluteCellRange): boolean {
+    return this.sheet === range.sheet && this.addressInRange(range.start) && this.addressInRange(range.end)
+  }
+
   public withStart(newStart: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }
