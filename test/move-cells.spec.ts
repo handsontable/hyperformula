@@ -27,6 +27,19 @@ describe("Move cells", () => {
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
   });
 
+  it('should update reference of moved formula when moving to other sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo', /* =A1 */],
+      ['=A1'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 1), 1, 1, simpleCellAddress(1, 1, 0))
+
+    /* reference */
+    const reference = extractReference(engine, simpleCellAddress(0, 1, 0))
+    expect(reference).toEqual(CellAddress.relative(1, -1, 0))
+  });
+
   it('should update reference', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo', /* foo */],
