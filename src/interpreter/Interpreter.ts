@@ -18,6 +18,7 @@ import {SumifPlugin} from './plugin/SumifPlugin'
 import {SumprodPlugin} from './plugin/SumprodPlugin'
 import {TextPlugin} from './plugin/TextPlugin'
 import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
+import {RandomPlugin} from './plugin/RandomPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
 
@@ -32,7 +33,7 @@ export class Interpreter {
   ) {
     this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
     this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin,
+      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin, RandomPlugin,
     ])
 
     this.registerPlugins(this.config.functionPlugins)
