@@ -303,7 +303,9 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toBeUndefined()
   })
+})
 
+describe('ParserWithCaching - volatile functions detection', () => {
   it('detects volatile functions', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
 
