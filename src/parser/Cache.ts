@@ -5,9 +5,10 @@ export type RelativeDependency = CellAddress | [CellAddress, CellAddress]
 
 export interface CacheEntry {
   ast: Ast,
-  relativeDependencies: RelativeDependency[]
+  relativeDependencies: RelativeDependency[],
+  hasVolatileFunction: boolean,
 }
-const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[]) => ({ ast, relativeDependencies })
+const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean) => ({ ast, relativeDependencies, hasVolatileFunction })
 
 export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
@@ -15,7 +16,7 @@ export class Cache {
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies: RelativeDependency[] = []
     collectDependencies(ast, astRelativeDependencies)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies)
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, new Set(["RAND"])))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }
@@ -55,6 +56,7 @@ export const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependenc
       collectDependencies(ast.value, dependenciesSet)
       return
     }
+    case AstNodeType.CONCATENATE_OP:
     case AstNodeType.EQUALS_OP:
     case AstNodeType.NOT_EQUAL_OP:
     case AstNodeType.LESS_THAN_OP:
@@ -65,6 +67,7 @@ export const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependenc
     case AstNodeType.PLUS_OP:
     case AstNodeType.TIMES_OP:
     case AstNodeType.DIV_OP:
+    case AstNodeType.POWER_OP:
       collectDependencies(ast.left, dependenciesSet)
       collectDependencies(ast.right, dependenciesSet)
       return
@@ -73,5 +76,38 @@ export const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependenc
         ast.args.forEach((argAst: Ast) => collectDependencies(argAst, dependenciesSet))
       }
       return
+  }
+}
+
+export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>): boolean => {
+  switch (ast.type) {
+    case AstNodeType.NUMBER:
+    case AstNodeType.STRING:
+    case AstNodeType.ERROR:
+    case AstNodeType.CELL_REFERENCE:
+    case AstNodeType.CELL_RANGE:
+      return false
+    case AstNodeType.MINUS_UNARY_OP: {
+      return doesContainFunctions(ast.value, interestingFunctions)
+    }
+    case AstNodeType.CONCATENATE_OP:
+    case AstNodeType.EQUALS_OP:
+    case AstNodeType.NOT_EQUAL_OP:
+    case AstNodeType.LESS_THAN_OP:
+    case AstNodeType.GREATER_THAN_OP:
+    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+    case AstNodeType.MINUS_OP:
+    case AstNodeType.PLUS_OP:
+    case AstNodeType.TIMES_OP:
+    case AstNodeType.DIV_OP:
+    case AstNodeType.POWER_OP:
+      return doesContainFunctions(ast.left, interestingFunctions) || doesContainFunctions(ast.right, interestingFunctions)
+    case AstNodeType.FUNCTION_CALL: {
+      if (interestingFunctions.has(ast.procedureName)) {
+        return true
+      }
+      return ast.args.some((arg) => doesContainFunctions(arg, interestingFunctions))
+    }
   }
 }

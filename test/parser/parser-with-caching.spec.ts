@@ -303,4 +303,46 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toBeUndefined()
   })
+
+  it('detects volatile functions', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=RAND()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(true)
+  })
+
+  it('detects volatile functions inside other functions', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=SUM(RAND())', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(true)
+  })
+
+  it('detects volatile functions in unary operators', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=-RAND()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(true)
+  })
+
+  it('detects volatile functions in right arg of binary operators', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=42+RAND()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(true)
+  })
+
+  it('detects volatile functions in left arg of binary operators', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=RAND()+42', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(true)
+  })
+
+  it('not all functions are volatile', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=SUM()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasVolatileFunction).toBe(false)
+  })
 })

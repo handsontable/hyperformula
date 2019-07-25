@@ -37,7 +37,7 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, hash: string } {
+  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, hasVolatileFunction: boolean, hash: string } {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
@@ -47,7 +47,7 @@ export class ParserWithCaching {
             message: e.message,
           }),
       ))
-      return { ast, hash: '' }
+      return { ast, hasVolatileFunction: false, hash: '' }
     }
 
     const hash = this.computeHash(lexerResult.tokens, formulaAddress)
@@ -56,12 +56,12 @@ export class ParserWithCaching {
     if (cacheResult) {
       ++this.statsCacheUsed
     } else {
-      const ast = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
-      cacheResult = this.cache.set(hash, ast)
+      const parsingResult = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
+      cacheResult = this.cache.set(hash, parsingResult)
     }
-    const { ast } = cacheResult
+    const { ast, hasVolatileFunction } = cacheResult
 
-    return { ast, hash }
+    return { ast, hasVolatileFunction, hash }
   }
 
   public computeHash(tokens: IToken[], baseAddress: SimpleCellAddress): string {
