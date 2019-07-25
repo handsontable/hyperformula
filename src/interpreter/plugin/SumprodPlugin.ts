@@ -8,8 +8,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumprod: {
-      EN: 'SUMPRODUCT',
-      PL: 'SUMA.ILOCZYNOW',
+      translationKey: 'SUMPRODUCT',
     },
   }
 

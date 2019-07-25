@@ -8,16 +8,13 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class InformationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     iserror: {
-      EN: 'ISERROR',
-      PL: 'CZYBLAD',
+      translationKey: 'ISERROR',
     },
     isblank: {
-      EN: 'ISBLANK',
-      PL: 'CZYPUSTA',
+      translationKey: 'ISBLANK',
     },
     columns: {
-      EN: 'COLUMNS',
-      PL: 'LICZBAKOLUMN',
+      translationKey: 'COLUMNS',
     },
   }
 

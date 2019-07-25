@@ -8,7 +8,7 @@ import {Interpreter} from '../Interpreter'
 
 interface IImplementedFunctions {
   [functionName: string]: {
-    [language: string]: string,
+    translationKey: string,
   }
 }
 

@@ -9,20 +9,16 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     mmult: {
-      EN: 'MMULT',
-      PL: 'MACIERZ.ILOCZYN',
+      translationKey: 'MMULT',
     },
     transpose: {
-      EN: 'TRANSPOSE',
-      PL: 'TRANSPONUJ',
+      translationKey: 'TRANSPOSE',
     },
     maxpool: {
-      EN: 'MAXPOOL',
-      PL: 'MAKS.Z.PULI',
+      translationKey: 'MAXPOOL',
     },
     medianpool: {
-      EN: 'MEDIANPOOL',
-      PL: 'MEDIANA.Z.PULI',
+      translationKey: 'MEDIANPOOL',
     },
   }
 

@@ -11,16 +11,13 @@ export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sum: {
-      EN: 'SUM',
-      PL: 'SUMA',
+      translationKey: 'SUM',
     },
     max: {
-      EN: 'MAX',
-      PL: 'MAKS',
+      translationKey: 'MAX',
     },
     min: {
-      EN: 'MIN',
-      PL: 'MIN',
+      translationKey: 'MIN',
     },
   }
 

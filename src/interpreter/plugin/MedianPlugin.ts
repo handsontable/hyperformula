@@ -9,8 +9,7 @@ export class MedianPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
     median: {
-      EN: 'MEDIAN',
-      PL: 'MEDIANA',
+      translationKey: 'MEDIAN',
     },
   }
 

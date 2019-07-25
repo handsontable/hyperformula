@@ -8,8 +8,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class CountUniquePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     countunique: {
-      EN: 'COUNTUNIQUE',
-      PL: 'COUNTUNIQUE',
+      translationKey: 'COUNTUNIQUE',
     },
   }
 

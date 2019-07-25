@@ -9,8 +9,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
 
   public static implementedFunctions = {
     acos: {
-      EN: 'ACOS',
-      PL: 'ACOS',
+      translationKey: 'ACOS',
     },
   }
 

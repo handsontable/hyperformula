@@ -1,13 +1,13 @@
 import {HandsOnEngine} from '../src'
 import {Config} from '../src/Config'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
+import {enGB, extendFunctions} from '../src/i18n'
 import './testConfig.ts'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     foo: {
-      EN: 'foo',
-      PL: 'fu',
+      translationKey: 'FOO',
     },
   }
 
@@ -18,17 +18,12 @@ class FooPlugin extends FunctionPlugin {
 
 describe('Plugins', () => {
   it('Extending with a plugin', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+    const enGBextended = extendFunctions(enGB, {
+      FOO: 'FOO',
+    })
+    const engine = HandsOnEngine.buildFromArray([
       ['=foo()'],
-    ], new Config({functionPlugins: [FooPlugin]}))
-
-    expect(engine.getCellValue('A1')).toBe(42)
-  })
-
-  it('using translation', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
-      ['=fu()'],
-    ], new Config({functionPlugins: [FooPlugin], language: 'PL'}))
+    ], new Config({functionPlugins: [FooPlugin], language: enGBextended}))
 
     expect(engine.getCellValue('A1')).toBe(42)
   })

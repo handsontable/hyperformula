@@ -9,12 +9,10 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class TextPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     concatenate: {
-      EN: 'CONCATENATE',
-      PL: 'ZLACZTEKST',
+      translationKey: 'CONCATENATE',
     },
     split: {
-      EN: 'SPLIT',
-      PL: 'PODZIELTEKST',
+      translationKey: 'SPLIT',
     },
   }
 

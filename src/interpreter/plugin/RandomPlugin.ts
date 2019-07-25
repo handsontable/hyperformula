@@ -5,8 +5,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class RandomPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     rand: {
-      EN: 'RAND',
-      PL: 'LOSUJ',
+      translationKey: 'RAND',
     },
   }
 

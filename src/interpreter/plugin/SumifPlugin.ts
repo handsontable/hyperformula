@@ -53,12 +53,10 @@ type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, ne
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sumif: {
-      EN: 'SUMIF',
-      PL: 'SUMAJEZELI',
+      translationKey: 'SUMIF',
     },
     countif: {
-      EN: 'COUNTIF',
-      PL: 'LICZJEZELI',
+      translationKey: 'COUNTIF',
     },
   }
 

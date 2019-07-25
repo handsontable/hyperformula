@@ -9,24 +9,19 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     literal_true: {
-      EN: 'TRUE',
-      PL: 'PRAWDA',
+      translationKey: 'TRUE',
     },
     literal_false: {
-      EN: 'FALSE',
-      PL: 'FALSZ',
+      translationKey: 'FALSE',
     },
     conditional_if: {
-      EN: 'IF',
-      PL: 'JEZELI',
+      translationKey: 'IF',
     },
     and: {
-      EN: 'AND',
-      PL: 'ORAZ',
+      translationKey: 'AND',
     },
     or: {
-      EN: 'OR',
-      PL: 'LUB',
+      translationKey: 'OR',
     },
   }
 

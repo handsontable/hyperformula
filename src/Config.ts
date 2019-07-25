@@ -1,4 +1,5 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {TranslationPackage, enGB} from './i18n'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -6,7 +7,7 @@ export interface ConfigParams {
   addressMappingFillThreshold: number,
   dateFormat: string,
   functionArgSeparator: string,
-  language: string,
+  language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
@@ -18,7 +19,7 @@ export class Config {
     addressMappingFillThreshold: 1,
     dateFormat: 'MM/DD/YYYY',
     functionArgSeparator: ',',
-    language: 'EN',
+    language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
     matrixDetection: true,
@@ -28,7 +29,7 @@ export class Config {
   public readonly addressMappingFillThreshold: number
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
-  public readonly language: string
+  public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
@@ -54,5 +55,9 @@ export class Config {
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = matrixDetectionThreshold || Config.defaultConfig.matrixDetectionThreshold
+  }
+
+  public getFunctionTranslationFor(functionTranslationKey: string): string {
+    return this.language.functions[functionTranslationKey]
   }
 }

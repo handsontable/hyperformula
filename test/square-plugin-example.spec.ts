@@ -2,16 +2,15 @@ import {HandsOnEngine} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
+import {enGB, extendFunctions} from '../src/i18n'
 import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
-    // Value of the mapping is mapping with translations to different languages
     square: {
-      EN: 'SQUARE',
-      PL: 'KWADRAT',
+      translationKey: 'SQUARE',
     },
   }
 
@@ -42,7 +41,10 @@ class SquarePlugin extends FunctionPlugin {
 
 describe('Documentation example spec', () => {
   it('works', async () => {
-    const config = new Config({ functionPlugins: [SquarePlugin] })
+    const enGBextended = extendFunctions(enGB, {
+      SQUARE: 'SQUARE',
+    })
+    const config = new Config({ functionPlugins: [SquarePlugin], language: enGBextended })
     const engine = await HandsOnEngine.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],

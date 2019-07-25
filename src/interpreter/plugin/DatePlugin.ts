@@ -12,20 +12,16 @@ import {FunctionPlugin} from './FunctionPlugin'
 export class DatePlugin extends FunctionPlugin {
   public static implementedFunctions = {
     date: {
-      EN: 'DATE',
-      PL: 'DATA',
+      translationKey: 'DATE',
     },
     month: {
-      EN: 'MONTH',
-      PL: 'MIESIAC',
+      translationKey: 'MONTH',
     },
     year: {
-      EN: 'YEAR',
-      PL: 'ROK',
+      translationKey: 'YEAR',
     },
     text: {
-      EN: 'TEXT',
-      PL: 'TEKST',
+      translationKey: 'TEXT',
     },
   }
 
