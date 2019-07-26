@@ -214,20 +214,14 @@ export class DependencyGraph {
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    /* TODO check if moved area is a part of any matrix */
     for (const sourceAddress of sourceRange.addresses()) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
-      this.moveCell(sourceAddress, targetAddress)
-    }
-  }
+      const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
+      const targetVertex = this.addressMapping.getCell(targetAddress)
 
-  private moveCell(sourceAddress: SimpleCellAddress, targetAddress: SimpleCellAddress) {
-    const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
-    const targetVertex = this.addressMapping.getCell(targetAddress)
-
-    this.graph.exchangeNode(vertexToMove, EmptyCellVertex.getSingletonInstance())
-    this.graph.exchangeOrAddNode(targetVertex, vertexToMove)
-    this.addressMapping.setCell(targetAddress, vertexToMove)
+      this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping.setCell(sourceAddress, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping.setCell(targetAddress, vertexToMove)    }
   }
 
   public disableNumericMatrices() {
