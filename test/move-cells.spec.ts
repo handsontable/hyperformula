@@ -28,6 +28,25 @@ describe("Move cells", () => {
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
   });
 
+  it('should update reference of moved formula - different types of reference', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo'],
+      ['=A1'],
+      ['=$A1'],
+      ['=A$1'],
+      ['=$A$1'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 1), 1, 4, simpleCellAddress(0, 1, 0))
+
+    /* reference */
+    expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, simpleCellAddress(0, 1, 1))).toEqual(CellAddress.absoluteCol(0, 0, -1))
+    expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.absoluteRow(0, -1, 0))
+    expect(extractReference(engine, simpleCellAddress(0, 1, 3))).toEqual(CellAddress.absolute(0, 0, 0))
+  });
+
+
   it('should update reference of moved formula when moving to other sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       "Sheet1": [
