@@ -39,7 +39,7 @@ export namespace MoveCellsDependencyTransformer {
 
   function fixDependenciesInMovedCells(toRight: number, toBottom: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, _) => {
-      return dependencyAddress.adjusted(toRight, toBottom)
+      return dependencyAddress.shiftRelativeDimensions(toRight, toBottom)
     }
   }
 
