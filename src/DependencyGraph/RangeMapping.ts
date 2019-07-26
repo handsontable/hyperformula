@@ -1,5 +1,6 @@
 import {SimpleCellAddress} from '../Cell'
 import {RangeVertex} from './'
+import {AbsoluteCellRange} from "../AbsoluteCellRange";
 
 /**
  * Mapping from address ranges to range vertices
@@ -111,6 +112,24 @@ export class RangeMapping {
           updated.push(vertex)
           this.rangeMapping.delete(key)
         }
+      }
+    }
+
+    updated.forEach((range) => {
+      this.setRange(range)
+    })
+  }
+
+  public moveRangesInsideArea(area: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    const updated = Array<RangeVertex>()
+
+    for (const [key, vertex] of this.rangeMapping.entries()) {
+      if (area.containsRange(vertex.range)) {
+        vertex.range.shiftByColumns(toRight)
+        vertex.range.shiftByRows(toBottom)
+        vertex.range.moveToSheet(toSheet)
+        this.rangeMapping.delete(key)
+        updated.push(vertex)
       }
     }
 

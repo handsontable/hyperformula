@@ -3,13 +3,14 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
+import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies, ParserWithCaching} from '../parser'
 import {AddressMapping} from './AddressMapping'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex, RangeVertex, Vertex, CellVertex } from './'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {filterWith, map} from "../generatorUtils";
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
@@ -212,6 +213,20 @@ export class DependencyGraph {
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
 
+  public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    for (const sourceAddress of sourceRange.addresses()) {
+      const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
+      const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
+      const targetVertex = this.addressMapping.getCell(targetAddress)
+
+      this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping.setCell(sourceAddress, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping.setCell(targetAddress, vertexToMove)
+    }
+
+    this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)
+  }
+
   public disableNumericMatrices() {
     for (const [key, matrixVertex] of this.matrixMapping.numericMatrices()) {
       const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
@@ -351,6 +366,16 @@ export class DependencyGraph {
 
   public markAsVolatile(vertex: Vertex) {
     this.volatileVertices.add(vertex)
+  }
+
+  public* formulaVerticesInRange(range: AbsoluteCellRange): IterableIterator<FormulaCellVertex> {
+    const vertices = map((address) => {
+      return this.addressMapping.getCell(address)
+    }, range.addresses())
+
+    yield* filterWith((vertex) => {
+      return vertex !== null && vertex instanceof FormulaCellVertex
+    }, vertices) as IterableIterator<FormulaCellVertex>
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {

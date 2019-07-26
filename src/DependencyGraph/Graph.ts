@@ -1,3 +1,5 @@
+import {EmptyCellVertex} from "./EmptyCellVertex";
+
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 /**
  * Provides graph directed structure
@@ -115,6 +117,17 @@ export class Graph<T> {
       this.exchangeNode(oldNode, newNode)
     } else {
       this.addNode(newNode)
+    }
+  }
+
+  public moveNode(sourceNode: T, targetNode: T | null, emptyNode: T) {
+    this.adjacentNodes(sourceNode).forEach(adjacentNode => {
+      this.addEdge(emptyNode, adjacentNode)
+    })
+    if (targetNode !== null) {
+      this.adjacentNodes(targetNode).forEach(adjacentNode => {
+        this.addEdge(sourceNode, adjacentNode)
+      })
     }
   }
 

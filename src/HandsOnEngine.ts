@@ -1,4 +1,4 @@
-import {CellError, CellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
   AddressMapping,
@@ -10,7 +10,6 @@ import {
   RangeMapping,
   SheetMapping,
   ValueCellVertex,
-  CellVertex,
   Vertex,
 } from './DependencyGraph'
 import {MatrixMapping} from './DependencyGraph/MatrixMapping'
@@ -25,13 +24,11 @@ import {
   isMatrix,
   ParserWithCaching,
   ProcedureAst,
-  collectDependencies,
-  absolutizeDependencies,
 } from './parser'
 import {CellAddress} from './parser/CellAddress'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
+import {AbsoluteCellRange} from "./AbsoluteCellRange";
 
 
 /**
@@ -133,8 +130,7 @@ export class HandsOnEngine {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        const cellValue = this.dependencyGraph!.getCellValue(address)
-        arr[i][j] = cellValue
+        arr[i][j] = this.dependencyGraph!.getCellValue(address)
       }
     }
 
@@ -281,6 +277,47 @@ export class HandsOnEngine {
     this.evaluator!.run()
   }
 
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    /* Fix dependencies in formulas dependent on moved cells */
+    for (const node of this.dependencyGraph!.formulaNodesFromSheet(sourceLeftCorner.sheet)) {
+      const newAst = transformAddressesWhenMovingCells(
+          node.getFormula(),
+          node.getAddress(),
+          sourceRange,
+          toRight,
+          toBottom,
+          toSheet
+      )
+      const cachedAst = this.parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+    }
+
+    /* Fix formulas in moved cells */
+    for (const node of this.dependencyGraph!.formulaVerticesInRange(sourceRange)) {
+      const newAst = transformAddressesInFormula(
+          node.getFormula(),
+          node.getAddress(),
+          fixDependenciesInMovedCells(-toRight, -toBottom)
+      )
+      const cachedAst = this.parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      node.setAddress({
+        sheet: node.address.sheet,
+        col: node.address.col + toRight,
+        row: node.address.row + toBottom
+      })
+    }
+
+    this.dependencyGraph!.moveCells(sourceRange, toRight, toBottom, toSheet)
+
+    this.evaluator!.run()
+  }
+
   public disableNumericMatrices() {
     this.dependencyGraph!.disableNumericMatrices()
   }
@@ -358,7 +395,7 @@ export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, t
 export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
     if ((dependencyAddress.sheet === formulaAddress.sheet)
-      && (formulaAddress.sheet !== sheetInWhichWeRemoveColumns)) {
+        && (formulaAddress.sheet !== sheetInWhichWeRemoveColumns)) {
       return false
     }
 
@@ -396,7 +433,7 @@ export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: 
 export function fixRowDependency(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
     if ((dependencyAddress.sheet === formulaAddress.sheet)
-      && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
+        && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
       return false
     }
 
@@ -464,6 +501,12 @@ export function fixColDependency(sheetInWhichWeAddColumns: number, column: numbe
   }
 }
 
+export function fixDependenciesInMovedCells(toRight: number, toBottom: number): TransformCellAddressFunction {
+  return (dependencyAddress: CellAddress, _) => {
+    return dependencyAddress.adjusted(toRight, toBottom)
+  }
+}
+
 export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
@@ -521,4 +564,63 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       } as Ast
     }
   }
+}
+
+export function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+  if (sourceArea.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
+    return dependencyAddress.moved(toSheet, toRight, toBottom)
+  }
+  return false
+}
+
+export function transformAddressesWhenMovingCells(ast: Ast, address: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
+  switch (ast.type) {
+    case AstNodeType.CELL_REFERENCE: {
+      const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceArea, toRight, toBottom, toSheet)
+      if (newCellAddress) {
+        return {...ast, reference: newCellAddress}
+      } else {
+        return ast
+      }
+    }
+    case AstNodeType.CELL_RANGE: {
+      const newStart = fixDependenciesWhenMovingCells(ast.start, address, sourceArea, toRight, toBottom, toSheet)
+      const newEnd = fixDependenciesWhenMovingCells(ast.end, address, sourceArea, toRight, toBottom, toSheet)
+      if (newStart && newEnd) {
+        return {
+          ...ast,
+          start: newStart,
+          end: newEnd,
+        }
+      } else {
+        return ast
+      }
+    }
+    case AstNodeType.ERROR:
+    case AstNodeType.NUMBER:
+    case AstNodeType.STRING: {
+      return ast
+    }
+    case AstNodeType.MINUS_UNARY_OP: {
+      return {
+        type: ast.type,
+        value: transformAddressesWhenMovingCells(ast.value, address, sourceArea, toRight, toBottom, toSheet),
+      }
+    }
+    case AstNodeType.FUNCTION_CALL: {
+      return {
+        type: ast.type,
+        procedureName: ast.procedureName,
+        args: ast.args.map((arg) => transformAddressesWhenMovingCells(arg, address, sourceArea, toRight, toBottom, toSheet))
+      }
+    }
+    default: {
+      return {
+        type: ast.type,
+        left: transformAddressesWhenMovingCells(ast.left, address, sourceArea, toRight, toBottom, toSheet),
+        right: transformAddressesWhenMovingCells(ast.right, address, sourceArea, toRight, toBottom, toSheet)
+      } as Ast
+    }
+  }
+
 }

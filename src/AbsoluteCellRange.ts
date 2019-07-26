@@ -79,6 +79,10 @@ export class AbsoluteCellRange {
     return false
   }
 
+  public containsRange(range: AbsoluteCellRange): boolean {
+    return this.sheet === range.sheet && this.addressInRange(range.start) && this.addressInRange(range.end)
+  }
+
   public withStart(newStart: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }
@@ -149,6 +153,11 @@ export class AbsoluteCellRange {
 
   public expandByColumns(numberOfColumns: number) {
     this.end.col += numberOfColumns
+  }
+
+  public moveToSheet(toSheet: number) {
+    this.start.sheet = toSheet
+    this.end.sheet = toSheet
   }
 
   public removeRows(rowStart: number, rowEnd: number) {

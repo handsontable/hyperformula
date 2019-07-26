@@ -1,10 +1,26 @@
 import {HandsOnEngine} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {FormulaCellVertex} from '../src/DependencyGraph'
-import {AstNodeType, Unparser, buildCellErrorAst, CellAddress, CellReferenceAst, ProcedureAst, cellAddressFromString} from '../src/parser'
+import {
+  AstNodeType,
+  buildCellErrorAst,
+  CellAddress,
+  cellAddressFromString,
+  CellRangeAst,
+  CellReferenceAst,
+  ProcedureAst,
+  Unparser
+} from '../src/parser'
+import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
 export const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+}
+
+export const extractRange = (engine: HandsOnEngine, address: SimpleCellAddress): AbsoluteCellRange => {
+  const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as ProcedureAst
+  const rangeAst = formula.args[0] as CellRangeAst
+  return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
 }
 
 export const expect_reference_to_have_ref_error = (engine: HandsOnEngine, address: SimpleCellAddress) => {
