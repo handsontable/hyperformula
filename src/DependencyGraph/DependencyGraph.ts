@@ -9,7 +9,8 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex, RangeVertex, Vertex, CellVertex } from './'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {filterWith, map} from "../generatorUtils";
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
@@ -351,6 +352,16 @@ export class DependencyGraph {
 
   public markAsVolatile(vertex: Vertex) {
     this.volatileVertices.add(vertex)
+  }
+
+  public* formulaVerticesInRange(range: AbsoluteCellRange): IterableIterator<FormulaCellVertex> {
+    const vertices = map((address) => {
+      return this.addressMapping.getCell(address)
+    }, range.addresses())
+
+    yield* filterWith((vertex) => {
+      return vertex !== null && vertex instanceof FormulaCellVertex
+    }, vertices) as IterableIterator<FormulaCellVertex>
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {

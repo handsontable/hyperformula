@@ -21,6 +21,17 @@ export function first<T>(iterable: IterableIterator<T>): T | undefined {
   return undefined
 }
 
+export function * map<T, R>(fn: ((x: T) => R), iterable: IterableIterator<T>): IterableIterator<R> {
+  const asSplit = split(iterable)
+
+  if (asSplit.hasOwnProperty('value')) {
+    const value = asSplit.value as T
+    
+    yield fn(value)
+    yield * map(fn, asSplit.rest)
+  }
+}
+
 export function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {
   const asSplit = split(iterable)
 
