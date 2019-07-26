@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
   AddressMapping,
@@ -15,20 +15,16 @@ import {
 import {MatrixMapping} from './DependencyGraph/MatrixMapping'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {
-  Ast,
-  AstNodeType,
-  buildCellErrorAst,
-  cellAddressFromString,
-  isFormula,
-  isMatrix,
-  ParserWithCaching,
-  ProcedureAst,
-} from './parser'
+import {Ast, AstNodeType, cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst,} from './parser'
 import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
+import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
+import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
+import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
+import {transformAddressesInFormula, TransformCellAddressFunction} from "./dependencyTransformers/common";
 
 
 /**
@@ -208,72 +204,26 @@ export class HandsOnEngine {
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
-
-    for (const node of this.dependencyGraph!.nodes()) {
-      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = transformAddressesInFormula(
-          node.getFormula(), node.getAddress(),
-          fixRowDependency(sheet, row, numberOfRowsToAdd),
-        )
-        const cachedAst = this.parser.rememberNewAst(newAst)
-        node.setFormula(cachedAst)
-        this.fixFormulaVertexAddress(node, row, numberOfRowsToAdd)
-      }
-    }
-
+    AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph!, this.parser)
     this.evaluator!.run()
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     // 1. Remove nodes from graph
     this.dependencyGraph!.removeRows(sheet, rowStart, rowEnd)
-
-    const numberOfRowsToDelete = rowEnd - rowStart + 1
-    // 3. Fix dependencies
-    for (const node of this.dependencyGraph!.nodes()) {
-      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = transformAddressesInFormula(
-          node.getFormula(),
-          node.getAddress(),
-          fixRowDependencyRowsDeletion(sheet, rowStart, numberOfRowsToDelete),
-        )
-        const cachedAst = this.parser.rememberNewAst(newAst)
-        node.setFormula(cachedAst)
-        this.fixFormulaVertexAddress(node, rowStart, -numberOfRowsToDelete)
-      }
-    }
-
+    RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph!, this.parser)
     this.evaluator!.run()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
     this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
-
-    for (const node of this.dependencyGraph!.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), fixColDependency(sheet, col, numberOfCols))
-      const cachedAst = this.parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      this.fixFormulaVertexAddressByColumn(node, col, numberOfCols)
-    }
-
+    AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph!, this.parser)
     this.evaluator!.run()
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
-
-    const numberOfColumnsToDelete = columnEnd - columnStart + 1
-    for (const node of this.dependencyGraph!.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(
-        node.getFormula(),
-        node.getAddress(),
-        fixColumnDependencyColumnsDeletion(sheet, columnStart, numberOfColumnsToDelete),
-      )
-      const cachedAst = this.parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      this.fixFormulaVertexAddressByColumn(node, columnStart, -numberOfColumnsToDelete)
-    }
-
+    RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph!, this.parser)
     this.evaluator!.run()
   }
 
@@ -330,239 +280,11 @@ export class HandsOnEngine {
       this.evaluator!.partialRun(verticesToRecomputeFrom)
     }
   }
-
-  private fixFormulaVertexAddress(node: FormulaCellVertex, row: number, numberOfRows: number) {
-    const nodeAddress = node.getAddress()
-    if (row <= nodeAddress.row) {
-      node.setAddress({
-        ...nodeAddress,
-        row: nodeAddress.row + numberOfRows,
-      })
-    }
-  }
-
-  private fixFormulaVertexAddressByColumn(node: FormulaCellVertex, column: number, numberOfColumns: number) {
-    const nodeAddress = node.getAddress()
-    if (column <= nodeAddress.col) {
-      node.setAddress({
-        ...nodeAddress,
-        col: nodeAddress.col + numberOfColumns,
-      })
-    }
-  }
-}
-
-export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
-
-export function fixRowDependencyRowsDeletion(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {
-  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-    if ((dependencyAddress.sheet === formulaAddress.sheet)
-        && (formulaAddress.sheet !== sheetInWhichWeRemoveRows)) {
-      return false
-    }
-
-    if (dependencyAddress.isRowAbsolute()) {
-      if (sheetInWhichWeRemoveRows !== dependencyAddress.sheet) {
-        return false
-      }
-
-      if (dependencyAddress.row < topRow) { // Aa
-        return false
-      } else if (dependencyAddress.row >= topRow + numberOfRows) { // Ab
-        return dependencyAddress.shiftedByRows(-numberOfRows)
-      }
-    } else {
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-      if (absolutizedDependencyAddress.row < topRow) {
-        if (formulaAddress.row < topRow) {  // Raa
-          return false
-        } else if (formulaAddress.row >= topRow + numberOfRows) { // Rab
-          return dependencyAddress.shiftedByRows(numberOfRows)
-        }
-      } else if (absolutizedDependencyAddress.row >= topRow + numberOfRows) {
-        if (formulaAddress.row < topRow) {  // Rba
-          return dependencyAddress.shiftedByRows(-numberOfRows)
-        } else if (formulaAddress.row >= topRow + numberOfRows) { // Rbb
-          return false
-        }
-      }
-    }
-
-    return ErrorType.REF
-  }
-}
-
-export function fixColumnDependencyColumnsDeletion(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
-  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-    if ((dependencyAddress.sheet === formulaAddress.sheet)
-        && (formulaAddress.sheet !== sheetInWhichWeRemoveColumns)) {
-      return false
-    }
-
-    if (dependencyAddress.isColumnAbsolute()) {
-      if (sheetInWhichWeRemoveColumns !== dependencyAddress.sheet) {
-        return false
-      }
-
-      if (dependencyAddress.col < leftmostColumn) { // Aa
-        return false
-      } else if (dependencyAddress.col >= leftmostColumn + numberOfColumns) { // Ab
-        return dependencyAddress.shiftedByColumns(-numberOfColumns)
-      }
-    } else {
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-      if (absolutizedDependencyAddress.col < leftmostColumn) {
-        if (formulaAddress.col < leftmostColumn) {  // Raa
-          return false
-        } else if (formulaAddress.col >= leftmostColumn + numberOfColumns) { // Rab
-          return dependencyAddress.shiftedByColumns(numberOfColumns)
-        }
-      } else if (absolutizedDependencyAddress.col >= leftmostColumn + numberOfColumns) {
-        if (formulaAddress.col < leftmostColumn) {  // Rba
-          return dependencyAddress.shiftedByColumns(-numberOfColumns)
-        } else if (formulaAddress.col >= leftmostColumn + numberOfColumns) { // Rbb
-          return false
-        }
-      }
-    }
-
-    return ErrorType.REF
-  }
-}
-
-export function fixRowDependency(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
-  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-    if ((dependencyAddress.sheet === formulaAddress.sheet)
-        && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
-      return false
-    }
-
-    if (dependencyAddress.isRowAbsolute()) {
-      if (sheetInWhichWeAddRows !== dependencyAddress.sheet) {
-        return false
-      }
-
-      if (dependencyAddress.row < row) { // Case Aa
-        return false
-      } else { // Case Ab
-        return dependencyAddress.shiftedByRows(numberOfRows)
-      }
-    } else {
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-      if (absolutizedDependencyAddress.row < row) {
-        if (formulaAddress.row < row) { // Case Raa
-          return false
-        } else { // Case Rab
-          return dependencyAddress.shiftedByRows(-numberOfRows)
-        }
-      } else {
-        if (formulaAddress.row < row) { // Case Rba
-          return dependencyAddress.shiftedByRows(numberOfRows)
-        } else { // Case Rbb
-          return false
-        }
-      }
-    }
-  }
-}
-
-export function fixColDependency(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
-  return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-    if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== sheetInWhichWeAddColumns)) {
-      return false
-    }
-
-    if (dependencyAddress.isColumnAbsolute()) {
-      if (sheetInWhichWeAddColumns !== dependencyAddress.sheet) {
-        return false
-      }
-
-      if (dependencyAddress.col < column) { // Case Aa
-        return false
-      } else { // Case Ab
-        return dependencyAddress.shiftedByColumns(numberOfColumns)
-      }
-    } else {
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-      if (absolutizedDependencyAddress.col < column) {
-        if (formulaAddress.col < column) { // Case Raa
-          return false
-        } else { // Case Rab
-          return dependencyAddress.shiftedByColumns(-numberOfColumns)
-        }
-      } else {
-        if (formulaAddress.col < column) { // Case Rba
-          return dependencyAddress.shiftedByColumns(numberOfColumns)
-        } else { // Case Rbb
-          return false
-        }
-      }
-    }
-  }
 }
 
 export function fixDependenciesInMovedCells(toRight: number, toBottom: number): TransformCellAddressFunction {
   return (dependencyAddress: CellAddress, _) => {
     return dependencyAddress.adjusted(toRight, toBottom)
-  }
-}
-
-export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction): Ast {
-  switch (ast.type) {
-    case AstNodeType.CELL_REFERENCE: {
-      const newCellAddress = transformCellAddressFn(ast.reference, address)
-      if (newCellAddress instanceof CellAddress) {
-        return {...ast, reference: newCellAddress}
-      } else if (newCellAddress === ErrorType.REF) {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      } else {
-        return ast
-      }
-    }
-    case AstNodeType.CELL_RANGE: {
-      const newStart = transformCellAddressFn(ast.start, address)
-      const newEnd = transformCellAddressFn(ast.end, address)
-      if (newStart === ErrorType.REF) {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      }
-      if (newEnd === ErrorType.REF) {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      }
-      if (newStart || newEnd) {
-        return {
-          ...ast,
-          start: newStart || ast.start,
-          end: newEnd || ast.end,
-        }
-      } else {
-        return ast
-      }
-    }
-    case AstNodeType.ERROR:
-    case AstNodeType.NUMBER:
-    case AstNodeType.STRING: {
-      return ast
-    }
-    case AstNodeType.MINUS_UNARY_OP: {
-      return {
-        type: ast.type,
-        value: transformAddressesInFormula(ast.value, address, transformCellAddressFn),
-      }
-    }
-    case AstNodeType.FUNCTION_CALL: {
-      return {
-        type: ast.type,
-        procedureName: ast.procedureName,
-        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, transformCellAddressFn)),
-      }
-    }
-    default: {
-      return {
-        type: ast.type,
-        left: transformAddressesInFormula(ast.left, address, transformCellAddressFn),
-        right: transformAddressesInFormula(ast.right, address, transformCellAddressFn),
-      } as Ast
-    }
   }
 }
 
