@@ -213,6 +213,12 @@ export class DependencyGraph {
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
 
+  public ensureNoMatrixInArea(area: AbsoluteCellRange) {
+    if (this.matrixMapping.isMatrixInArea(area)) {
+      throw Error("It is not possible to move / replace cells with matrix")
+    }
+  }
+
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     for (const sourceAddress of sourceRange.addresses()) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)

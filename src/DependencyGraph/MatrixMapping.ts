@@ -39,6 +39,15 @@ export class MatrixMapping {
     return false
   }
 
+  public isMatrixInArea(area: AbsoluteCellRange) {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.getRange().doesOverlap(area)) {
+        return true
+      }
+    }
+    return false
+  }
+
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
     yield* filterWith(([, mtx]) => {
       return !mtx.isFormula()

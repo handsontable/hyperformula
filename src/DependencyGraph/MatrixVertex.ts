@@ -64,6 +64,10 @@ export class MatrixVertex {
     }
   }
 
+  public getRange(): AbsoluteCellRange {
+    return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
+  }
+
   public getAddress(): SimpleCellAddress {
     return this.cellAddress
   }

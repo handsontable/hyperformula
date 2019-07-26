@@ -114,4 +114,26 @@ describe("Move cells", () => {
     expect(range.end).toEqual(simpleCellAddress(0, 1, 1))
     expect(engine.getCellValue("A3")).toEqual(3)
   })
+
+  it('should not be possible to move area with matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(() => {
+      engine.moveCells(simpleCellAddress(0, 0, 1), 2, 2, simpleCellAddress(0, 2, 0))
+    }).toThrow("It is not possible to move / replace cells with matrix")
+  })
+
+  it('should not be possible to move cells to area with matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(() => {
+      engine.moveCells(simpleCellAddress(0, 0, 0), 2, 1, simpleCellAddress(0, 0, 1))
+    }).toThrow("It is not possible to move / replace cells with matrix")
+  })
 })
