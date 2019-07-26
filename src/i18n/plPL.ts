@@ -1,6 +1,6 @@
 import {TranslationPackage} from './'
 
-export default const plPL: TranslationPackage = {
+export const plPL: TranslationPackage = {
   functions: {
     ACOS: 'ACOS',
     AND: 'ORAZ',
