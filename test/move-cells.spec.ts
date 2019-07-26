@@ -48,18 +48,25 @@ describe("Move cells", () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo', /* foo */],
       ['=A1'],
+      ['=$A1'],
+      ['=A$1'],
+      ['=$A$1'],
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
 
     /* reference */
-    const reference = extractReference(engine, simpleCellAddress(0, 0, 1))
-    expect(reference).toEqual(CellAddress.relative(0, 1, -1))
+    expect(extractReference(engine, simpleCellAddress(0, 0, 1))).toEqual(CellAddress.relative(0, 1, -1))
+    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteCol(0, 1, -2))
+    expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.absoluteRow(0, 1, 0))
+    expect(extractReference(engine, simpleCellAddress(0, 0, 4))).toEqual(CellAddress.absolute(0, 1, 0))
 
     /* edge */
-    const formulaVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 1))
     const movedVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 1, 0))
-    expect(engine.graph.existsEdge(movedVertex, formulaVertex)).toBe(true)
+    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 1)))).toBe(true)
+    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 2)))).toBe(true)
+    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 3)))).toBe(true)
+    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 4)))).toBe(true)
   });
 
   it('should update reference when moving to different sheet', () => {
