@@ -128,6 +128,7 @@ export class Graph<T> {
       this.adjacentNodes(targetNode).forEach(adjacentNode => {
         this.addEdge(sourceNode, adjacentNode)
       })
+      this.removeNode(targetNode)
     }
   }
 

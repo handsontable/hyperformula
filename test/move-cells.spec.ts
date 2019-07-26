@@ -1,4 +1,4 @@
-import {HandsOnEngine} from "../src";
+import {EmptyValue, HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
 import {extractRange, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
@@ -161,5 +161,43 @@ describe("Move cells", () => {
     expect(() => {
       engine.moveCells(simpleCellAddress(0, 0, 0), 2, 1, simpleCellAddress(0, 0, 1))
     }).toThrow("It is not possible to move / replace cells with matrix")
+  })
+
+  it('should override and remove formula', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['=A1'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
+    expect(engine.graph.edgesCount()).toBe(0)
+    expect(engine.graph.nodesCount()).toBe(1 + 1)
+    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+    expect(engine.getCellValue("A2")).toBe(1)
+  })
+
+  it('should adjust edges properly', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1'],
+      ['2', '=A2'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const source = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+
+    expect(source.getCellValue()).toBe(EmptyValue)
+    /* TODO is this state correct? */
+    // Empty -> B1, A2 -> B1, A2 -> B2
+    expect(engine.graph.edgesCount()).toBe(3)
+    expect(engine.graph.existsEdge(target, b2))
+    expect(engine.graph.existsEdge(target, b1))
+    expect(engine.graph.existsEdge(source, b1))
+    expect(engine.graph.nodesCount()).toBe(4)
+    expect(engine.getCellValue("A2")).toBe(1)
   })
 })

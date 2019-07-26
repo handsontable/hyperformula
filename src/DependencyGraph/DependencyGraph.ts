@@ -225,9 +225,10 @@ export class DependencyGraph {
       const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
       const targetVertex = this.addressMapping.getCell(targetAddress)
 
-      this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
       this.addressMapping.setCell(sourceAddress, EmptyCellVertex.getSingletonInstance())
       this.addressMapping.setCell(targetAddress, vertexToMove)
+      this.removeIncomingEdgesIfFormulaVertex(targetVertex)
+      this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
     }
 
     this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)
