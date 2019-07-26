@@ -314,6 +314,8 @@ export class HandsOnEngine {
     }
 
     this.dependencyGraph!.moveCells(sourceRange, toRight, toBottom, toSheet)
+
+    this.evaluator!.run()
   }
 
   public disableNumericMatrices() {
