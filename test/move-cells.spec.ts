@@ -2,6 +2,7 @@ import {HandsOnEngine} from "../src";
 import {simpleCellAddress} from "../src/Cell";
 import {extractRange, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
+import './testConfig.ts'
 
 describe("Move cells", () => {
   it('should move static content', () => {
