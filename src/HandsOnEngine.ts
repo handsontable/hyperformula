@@ -292,7 +292,8 @@ export class HandsOnEngine {
           node.getAddress(),
           sourceRange,
           toRight,
-          toBottom
+          toBottom,
+          toSheet
       )
       const cachedAst = this.parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
@@ -563,19 +564,17 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
   }
 }
 
-export function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number) {
+export function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
   if (sourceArea.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
-    return dependencyAddress
-        .shiftedByColumns(toRight)
-        .shiftedByRows(toBottom)
+    return dependencyAddress.moved(toSheet, toRight, toBottom)
   }
   return false
 }
 
-export function transformAddressesWhenMovingCells(ast: Ast, address: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number): Ast {
+export function transformAddressesWhenMovingCells(ast: Ast, address: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
-      const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceArea, toRight, toBottom)
+      const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceArea, toRight, toBottom, toSheet)
       if (newCellAddress) {
         return {...ast, reference: newCellAddress}
       } else {
@@ -583,8 +582,8 @@ export function transformAddressesWhenMovingCells(ast: Ast, address: SimpleCellA
       }
     }
     case AstNodeType.CELL_RANGE: {
-      const newStart = fixDependenciesWhenMovingCells(ast.start, address, sourceArea, toRight, toBottom)
-      const newEnd = fixDependenciesWhenMovingCells(ast.end, address, sourceArea, toRight, toBottom)
+      const newStart = fixDependenciesWhenMovingCells(ast.start, address, sourceArea, toRight, toBottom, toSheet)
+      const newEnd = fixDependenciesWhenMovingCells(ast.end, address, sourceArea, toRight, toBottom, toSheet)
       if (newStart && newEnd) {
         return {
           ...ast,
@@ -603,21 +602,21 @@ export function transformAddressesWhenMovingCells(ast: Ast, address: SimpleCellA
     case AstNodeType.MINUS_UNARY_OP: {
       return {
         type: ast.type,
-        value: transformAddressesWhenMovingCells(ast.value, address, sourceArea, toRight, toBottom),
+        value: transformAddressesWhenMovingCells(ast.value, address, sourceArea, toRight, toBottom, toSheet),
       }
     }
     case AstNodeType.FUNCTION_CALL: {
       return {
         type: ast.type,
         procedureName: ast.procedureName,
-        args: ast.args.map((arg) => transformAddressesWhenMovingCells(arg, address, sourceArea, toRight, toBottom))
+        args: ast.args.map((arg) => transformAddressesWhenMovingCells(arg, address, sourceArea, toRight, toBottom, toSheet))
       }
     }
     default: {
       return {
         type: ast.type,
-        left: transformAddressesWhenMovingCells(ast.left, address, sourceArea, toRight, toBottom),
-        right: transformAddressesWhenMovingCells(ast.right, address, sourceArea, toRight, toBottom)
+        left: transformAddressesWhenMovingCells(ast.left, address, sourceArea, toRight, toBottom, toSheet),
+        right: transformAddressesWhenMovingCells(ast.right, address, sourceArea, toRight, toBottom, toSheet)
       } as Ast
     }
   }

@@ -81,6 +81,10 @@ export class CellAddress {
     return new CellAddress(this.sheet, this.col + numberOfColumns, this.row, this.type)
   }
 
+  public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
+    return new CellAddress(toSheet, this.col + toRight, this.row + toBottom, this.type)
+  }
+
   public adjusted(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnAbsolute() ? this.col : this.col + toRight
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
