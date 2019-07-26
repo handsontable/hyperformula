@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
+import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies, ParserWithCaching} from '../parser'
 import {AddressMapping} from './AddressMapping'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
@@ -211,6 +211,23 @@ export class DependencyGraph {
     this.expandMatricesAfterAddingColumns(sheet, col, numberOfCols)
 
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+  }
+
+  public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    /* TODO check if moved area is a part of any matrix */
+    for (const sourceAddress of sourceRange.addresses()) {
+      const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
+      this.moveCell(sourceAddress, targetAddress)
+    }
+  }
+
+  private moveCell(sourceAddress: SimpleCellAddress, targetAddress: SimpleCellAddress) {
+    const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
+    const targetVertex = this.addressMapping.getCell(targetAddress)
+
+    this.graph.exchangeNode(vertexToMove, EmptyCellVertex.getSingletonInstance())
+    this.graph.exchangeOrAddNode(targetVertex, vertexToMove)
+    this.addressMapping.setCell(targetAddress, vertexToMove)
   }
 
   public disableNumericMatrices() {

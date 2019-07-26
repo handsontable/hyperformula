@@ -281,6 +281,9 @@ export class HandsOnEngine {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    this.dependencyGraph!.moveCells(sourceRange, toRight, toBottom, toSheet)
 
     /* Fix dependencies in formulas dependent on moved cells */
     for (const node of this.dependencyGraph!.formulaNodesFromSheet(sourceLeftCorner.sheet)) {
