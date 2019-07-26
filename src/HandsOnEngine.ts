@@ -278,16 +278,37 @@ export class HandsOnEngine {
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+
+    /* Fix dependencies in formulas dependent on moved cells */
     for (const node of this.dependencyGraph!.formulaNodesFromSheet(sourceLeftCorner.sheet)) {
       const newAst = transformAddressesWhenMovingCells(
           node.getFormula(),
           node.getAddress(),
-          AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height),
-          destinationLeftCorner.col - sourceLeftCorner.col,
-          destinationLeftCorner.row - sourceLeftCorner.row
+          sourceRange,
+          toRight,
+          toBottom
       )
       const cachedAst = this.parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
+    }
+
+    /* Fix formulas in moved cells */
+    for (const node of this.dependencyGraph!.formulaVerticesInRange(sourceRange)) {
+      const newAst = transformAddressesInFormula(
+          node.getFormula(),
+          node.getAddress(),
+          fixDependenciesInMovedCells(toRight, toBottom)
+      )
+      const cachedAst = this.parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      node.setAddress({
+        sheet: node.address.sheet,
+        col: node.address.col + toRight,
+        row: node.address.row + toBottom
+      })
     }
   }
 
@@ -471,6 +492,12 @@ export function fixColDependency(sheetInWhichWeAddColumns: number, column: numbe
         }
       }
     }
+  }
+}
+
+export function fixDependenciesInMovedCells(toRight: number, toBottom: number): TransformCellAddressFunction {
+  return (dependencyAddress: CellAddress, _) => {
+    return dependencyAddress.adjusted(toRight, toBottom)
   }
 }
 
