@@ -104,12 +104,18 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.dependencyGraph.addMatrixVertex(address, vertex)
+            if (parseResult.hasVolatileFunction) {
+              this.dependencyGraph.markAsVolatile(vertex)
+            }
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
             vertex = new FormulaCellVertex(parseResult.ast, address)
             const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
             dependencies.set(vertex, absoluteParserResult.dependencies)
             this.dependencyGraph.addVertex(address, vertex)
+            if (parseResult.hasVolatileFunction) {
+              this.dependencyGraph.markAsVolatile(vertex)
+            }
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {

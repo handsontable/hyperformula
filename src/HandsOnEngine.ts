@@ -199,7 +199,7 @@ export class HandsOnEngine {
       } else {
         this.dependencyGraph!.setValueToCell(address, newCellContent)
       }
-      verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
+      verticesToRecomputeFrom = Array.from(this.dependencyGraph!.verticesToRecompute())
       this.dependencyGraph!.clearRecentlyChangedVertices()
     } else {
       throw new Error('Illegal operation')
@@ -285,8 +285,8 @@ export class HandsOnEngine {
     this.dependencyGraph!.disableNumericMatrices()
   }
 
-  private recomputeIfDependencyGraphNeedsIt() {
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.recentlyChangedVertices)
+  public recomputeIfDependencyGraphNeedsIt() {
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.verticesToRecompute())
     this.dependencyGraph!.clearRecentlyChangedVertices()
 
     if (verticesToRecomputeFrom) {

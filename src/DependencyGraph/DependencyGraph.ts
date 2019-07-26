@@ -12,7 +12,8 @@ import {SheetMapping} from './SheetMapping'
 import { MatrixVertex, FormulaCellVertex, EmptyCellVertex, ValueCellVertex, RangeVertex, Vertex, CellVertex } from './'
 
 export class DependencyGraph {
-  public recentlyChangedVertices: Set<Vertex> = new Set()
+  private recentlyChangedVertices: Set<Vertex> = new Set()
+  private volatileVertices: Set<Vertex> = new Set()
 
   constructor(
       private readonly addressMapping: AddressMapping,
@@ -82,6 +83,10 @@ export class DependencyGraph {
 
   public clearRecentlyChangedVertices() {
     this.recentlyChangedVertices = new Set()
+  }
+
+  public verticesToRecompute() {
+    return new Set([...this.recentlyChangedVertices, ...this.volatileVertices])
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
@@ -342,6 +347,10 @@ export class DependencyGraph {
 
   public getTopologicallySortedSubgraphFrom(vertices: Vertex[]): TopSortResult<Vertex> {
     return this.graph.getTopologicallySortedSubgraphFrom(vertices)
+  }
+
+  public markAsVolatile(vertex: Vertex) {
+    this.volatileVertices.add(vertex)
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {
