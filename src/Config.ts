@@ -47,14 +47,14 @@ export class Config {
         matrixDetectionThreshold,
       }: Partial<ConfigParams> = {},
   ) {
-    this.addressMappingFillThreshold = addressMappingFillThreshold || Config.defaultConfig.addressMappingFillThreshold
+    this.addressMappingFillThreshold = typeof addressMappingFillThreshold === 'number' ? addressMappingFillThreshold : Config.defaultConfig.addressMappingFillThreshold
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
-    this.matrixDetectionThreshold = matrixDetectionThreshold || Config.defaultConfig.matrixDetectionThreshold
+    this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
