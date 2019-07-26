@@ -303,7 +303,7 @@ export class HandsOnEngine {
       const newAst = transformAddressesInFormula(
           node.getFormula(),
           node.getAddress(),
-          fixDependenciesInMovedCells(toRight, toBottom)
+          fixDependenciesInMovedCells(-toRight, -toBottom)
       )
       const cachedAst = this.parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
