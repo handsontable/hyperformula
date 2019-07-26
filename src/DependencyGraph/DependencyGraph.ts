@@ -221,7 +221,10 @@ export class DependencyGraph {
 
       this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
       this.addressMapping.setCell(sourceAddress, EmptyCellVertex.getSingletonInstance())
-      this.addressMapping.setCell(targetAddress, vertexToMove)    }
+      this.addressMapping.setCell(targetAddress, vertexToMove)
+    }
+
+    this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)
   }
 
   public disableNumericMatrices() {

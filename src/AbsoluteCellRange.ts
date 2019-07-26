@@ -155,6 +155,11 @@ export class AbsoluteCellRange {
     this.end.col += numberOfColumns
   }
 
+  public moveToSheet(toSheet: number) {
+    this.start.sheet = toSheet
+    this.end.sheet = toSheet
+  }
+
   public removeRows(rowStart: number, rowEnd: number) {
     if (rowStart > this.end.row) {
       return
