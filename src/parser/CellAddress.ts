@@ -90,9 +90,4 @@ export class CellAddress {
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
     return new CellAddress(this.sheet, col, row, this.type)
   }
-
-  public isOutOfBoundsFor(baseAddress: SimpleCellAddress): boolean {
-    return (this.isColumnRelative() && (baseAddress.col + this.col < 0)) ||
-      (this.isRowRelative() && (baseAddress.row + this.row < 0))
-  }
 }
