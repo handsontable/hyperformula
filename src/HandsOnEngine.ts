@@ -209,7 +209,6 @@ export class HandsOnEngine {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-    // 1. Remove nodes from graph
     this.dependencyGraph!.removeRows(sheet, rowStart, rowEnd)
     RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph!, this.parser)
     this.evaluator!.run()
