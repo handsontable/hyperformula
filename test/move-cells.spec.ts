@@ -3,6 +3,7 @@ import {simpleCellAddress} from "../src/Cell";
 import {extractRange, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
 import './testConfig.ts'
+import {EmptyCellVertex} from "../src/DependencyGraph";
 
 describe("Move cells", () => {
   it('should move static content', () => {
@@ -186,18 +187,93 @@ describe("Move cells", () => {
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
 
     const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-    const source = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))
+    const source = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
     const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
 
-    expect(source.getCellValue()).toBe(EmptyValue)
-    /* TODO is this state correct? */
-    // Empty -> B1, A2 -> B1, A2 -> B2
-    expect(engine.graph.edgesCount()).toBe(3)
-    expect(engine.graph.existsEdge(target, b2))
-    expect(engine.graph.existsEdge(target, b1))
-    expect(engine.graph.existsEdge(source, b1))
-    expect(engine.graph.nodesCount()).toBe(4)
+    expect(engine.graph.edgesCount()).toBe(
+        2 // A2 -> B1, A2 -> B2
+    )
+    expect(engine.graph.nodesCount()).toBe(
+        + 1 // Empty singleton
+        + 2 // formulas
+        + 1 // A2
+    )
+
+    expect(source).toBe(null)
+    expect(engine.graph.existsEdge(target, b2)).toBe(true)
+    expect(engine.graph.existsEdge(target, b1)).toBe(true)
     expect(engine.getCellValue("A2")).toBe(1)
+  })
+
+  it('should adjust edges when moving part of range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1:A2'],
+      ['2', '=A2'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))
+    const source = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 1))!
+
+    expect(source).not.toBe(EmptyCellVertex.getSingletonInstance())
+    expect(source.getCellValue()).toBe(EmptyValue)
+    expect(engine.graph.nodesCount()).toBe(
+        + 1 // Empty singleton
+        + 2 // formulas
+        + 1 // A2
+        + 1 // A1 (Empty)
+        + 1 // A1:A2 range
+    )
+    expect(engine.graph.edgesCount()).toBe(
+        + 2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
+        + 1 // A1:A2 -> B1
+        + 1 // A2 -> B2
+    )
+    expect(engine.graph.existsEdge(target, b2)).toBe(true)
+    expect(engine.graph.existsEdge(source, range)).toBe(true)
+    expect(engine.graph.existsEdge(target, range)).toBe(true)
+    expect(engine.graph.existsEdge(range, b1)).toBe(true)
+    expect(engine.getCellValue("A2")).toBe(1)
+  })
+
+  it('should adjust edges when moving whole range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1:A2'],
+      ['2', '=A2'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 2, simpleCellAddress(0, 2, 0))
+
+    const a1 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
+    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))
+    const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
+    const c2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
+    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 1))!
+
+    expect(a1).toBe(null)
+    expect(a2).toBe(null)
+
+    expect(engine.graph.nodesCount()).toBe(
+        + 1 // Empty singleton
+        + 2 // formulas
+        + 2 // C1, C2
+        + 1 // A1:A2 range
+    )
+    expect(engine.graph.edgesCount()).toBe(
+        + 2 // C1 -> A1:A2, C2 -> A1:A2
+        + 1 // A1:A2 -> B1
+        + 1 // C2 -> B2
+    )
+
+    expect(engine.graph.existsEdge(c1, range)).toBe(true)
+    expect(engine.graph.existsEdge(c2, range)).toBe(true)
+    expect(engine.graph.existsEdge(range, b1)).toBe(true)
   })
 })
