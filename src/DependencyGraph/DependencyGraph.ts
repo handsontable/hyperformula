@@ -222,13 +222,33 @@ export class DependencyGraph {
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     for (const sourceAddress of sourceRange.addresses()) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
-      const vertexToMove = this.addressMapping.getCell(sourceAddress) || EmptyCellVertex.getSingletonInstance()
+      let sourceVertex = this.addressMapping.getCell(sourceAddress)
       const targetVertex = this.addressMapping.getCell(targetAddress)
 
-      this.addressMapping.setCell(sourceAddress, EmptyCellVertex.getSingletonInstance())
-      this.addressMapping.setCell(targetAddress, vertexToMove)
-      this.removeIncomingEdgesIfFormulaVertex(targetVertex)
-      this.graph.moveNode(vertexToMove, targetVertex, EmptyCellVertex.getSingletonInstance())
+      this.addressMapping.removeCell(sourceAddress)
+
+      if (sourceVertex !== null) {
+        this.addressMapping.setCell(targetAddress, sourceVertex)
+        let emptyVertex = null
+        for (let adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
+          if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
+            emptyVertex = emptyVertex || this.fetchOrCreateEmptyCell(sourceAddress)
+            this.graph.addEdge(emptyVertex, adjacentNode)
+          }
+        }
+        if (emptyVertex) {
+          this.addressMapping.setCell(sourceAddress, emptyVertex)
+        }
+      }
+
+      if (targetVertex !== null) {
+        for (let adjacentNode of this.graph.adjacentNodes(targetVertex)) {
+          sourceVertex = sourceVertex || this.fetchOrCreateEmptyCell(targetAddress)
+          this.graph.addEdge(sourceVertex, adjacentNode)
+        }
+        this.removeIncomingEdgesIfFormulaVertex(targetVertex)
+        this.graph.removeNode(targetVertex)
+      }
     }
 
     this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)

@@ -120,18 +120,6 @@ export class Graph<T> {
     }
   }
 
-  public moveNode(sourceNode: T, targetNode: T | null, emptyNode: T) {
-    this.adjacentNodes(sourceNode).forEach(adjacentNode => {
-      this.addEdge(emptyNode, adjacentNode)
-    })
-    if (targetNode !== null) {
-      this.adjacentNodes(targetNode).forEach(adjacentNode => {
-        this.addEdge(sourceNode, adjacentNode)
-      })
-      this.removeNode(targetNode)
-    }
-  }
-
   public removeNode(node: T) {
     this.edges.delete(node)
     this.nodes.delete(node)
