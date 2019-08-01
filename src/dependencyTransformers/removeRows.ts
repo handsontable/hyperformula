@@ -6,17 +6,15 @@ import {ErrorType, SimpleCellAddress} from "../Cell";
 export namespace RemoveRowsDependencyTransformer {
   export function transform(sheet: number, rowStart: number, rowEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
     const numberOfRowsToDelete = rowEnd - rowStart + 1
-    for (const node of graph.nodes()) {
-      if (node instanceof FormulaCellVertex && node.getAddress().sheet === sheet) {
-        const newAst = transformAddressesInFormula(
-            node.getFormula(),
-            node.getAddress(),
-            transformDependencies(sheet, rowStart, numberOfRowsToDelete),
-        )
-        const cachedAst = parser.rememberNewAst(newAst)
-        node.setFormula(cachedAst)
-        fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
-      }
+    for (const node of graph.formulaNodesFromSheet(sheet)) {
+      const newAst = transformAddressesInFormula(
+          node.getFormula(),
+          node.getAddress(),
+          transformDependencies(sheet, rowStart, numberOfRowsToDelete),
+      )
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
     }
   }
 
