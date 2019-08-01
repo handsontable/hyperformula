@@ -11,9 +11,12 @@ export class Graph<T> {
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
 
+  public specialNodes: Set<T>
+
   constructor() {
     this.nodes = new Set()
     this.edges = new Map()
+    this.specialNodes = new Set()
   }
 
   /**
@@ -123,6 +126,11 @@ export class Graph<T> {
   public removeNode(node: T) {
     this.edges.delete(node)
     this.nodes.delete(node)
+    this.specialNodes.delete(node)
+  }
+
+  public markNodeAsSpecial(node: T) {
+    this.specialNodes.add(node)
   }
 
   /**

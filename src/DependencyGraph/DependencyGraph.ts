@@ -14,7 +14,6 @@ import {filterWith, map} from "../generatorUtils";
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
-  private volatileVertices: Set<Vertex> = new Set()
 
   constructor(
       private readonly addressMapping: AddressMapping,
@@ -87,7 +86,7 @@ export class DependencyGraph {
   }
 
   public verticesToRecompute() {
-    return new Set([...this.recentlyChangedVertices, ...this.volatileVertices])
+    return new Set([...this.recentlyChangedVertices, ...this.volatileVertices()])
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
@@ -392,7 +391,7 @@ export class DependencyGraph {
   }
 
   public markAsVolatile(vertex: Vertex) {
-    this.volatileVertices.add(vertex)
+    this.graph.markNodeAsSpecial(vertex)
   }
 
   public* formulaVerticesInRange(range: AbsoluteCellRange): IterableIterator<FormulaCellVertex> {
@@ -403,6 +402,10 @@ export class DependencyGraph {
     yield* filterWith((vertex) => {
       return vertex !== null && vertex instanceof FormulaCellVertex
     }, vertices) as IterableIterator<FormulaCellVertex>
+  }
+
+  private volatileVertices() {
+    return this.graph.specialNodes
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {
