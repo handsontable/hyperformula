@@ -4,6 +4,7 @@ import {extractRange, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
 import './testConfig.ts'
 import {EmptyCellVertex} from "../src/DependencyGraph";
+import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
 describe("Move cells", () => {
   it('should move static content', () => {
@@ -275,5 +276,70 @@ describe("Move cells", () => {
     expect(engine.graph.existsEdge(c1, range)).toBe(true)
     expect(engine.graph.existsEdge(c2, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
+  })
+
+  it('should adjust edges when moving smaller range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '',            /* 1 */],
+        ['2', '=SUM(A1:A2)', /* 2 */],
+        ['3', '=SUM(A1:A3)'         ],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 2, simpleCellAddress(0, 2, 0))
+
+    /* ranges in formulas*/
+    expect(extractRange(engine, simpleCellAddress(0, 1, 1))).toEqual(new AbsoluteCellRange(
+        simpleCellAddress(0, 2, 0),
+        simpleCellAddress(0, 2, 1),
+    ))
+    expect(extractRange(engine, simpleCellAddress(0, 1, 2))).toEqual(new AbsoluteCellRange(
+        simpleCellAddress(0, 0, 0),
+        simpleCellAddress(0, 0, 2),
+    ))
+
+    /* edges */
+    const c1c2 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 1))!
+    const a1a3 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
+    expect(engine.graph.existsEdge(c1c2, a1a3)).toBe(false)
+
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a3)).toBe(true)
+
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0)), c1c2)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1)), c1c2)).toBe(true)
+  })
+
+  it('should adjust edges when moving smaller ranges - more complex', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '',            /* 1 */],
+      ['2', '=SUM(A1:A2)', /* 2 */],
+      ['3', '=SUM(A1:A3)'  /* 3 */],
+      ['4', '=SUM(A1:A4)'         ],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 3, simpleCellAddress(0, 2, 0))
+
+    /* edges */
+    const c1c2 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 1))!
+    const c1c3 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 2))!
+    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
+
+    expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(false)
+    expect(engine.graph.existsEdge(c1c3, a1a4)).toBe(false)
+
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a4)).toBe(true)
+
+    const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
+    const c2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
+    const c3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
+    expect(engine.graph.existsEdge(c1, c1c2)).toBe(true)
+    expect(engine.graph.existsEdge(c2, c1c2)).toBe(true)
+    expect(engine.graph.existsEdge(c1, c1c3)).toBe(true)
+    expect(engine.graph.existsEdge(c2, c1c3)).toBe(true)
+    expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
   })
 })
