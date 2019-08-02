@@ -132,8 +132,7 @@ export class DependencyGraph {
   }
 
   public removeIncomingEdgesFromFormulaVertex(vertex: FormulaCellVertex) {
-    const deps: Array<CellAddress | [CellAddress, CellAddress]> = []
-    collectDependencies(vertex.getFormula(), deps)
+    const deps = collectDependencies(vertex.getFormula())
     const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
     const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {

@@ -1,6 +1,6 @@
 import {Ast, AstNodeType} from './Ast'
 import {CellAddress} from './CellAddress'
-import {RelativeDependency} from './'
+import {RelativeDependency, collectDependencies} from './'
 
 export interface CacheEntry {
   ast: Ast,
@@ -13,8 +13,7 @@ export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
   public set(hash: string, ast: Ast): CacheEntry {
-    const astRelativeDependencies: RelativeDependency[] = []
-    collectDependencies(ast, astRelativeDependencies)
+    const astRelativeDependencies = collectDependencies(ast)
     const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, new Set(['RAND'])))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
@@ -32,49 +31,6 @@ export class Cache {
       this.set(hash, ast)
       return ast
     }
-  }
-}
-
-export const collectDependencies = (ast: Ast, dependenciesSet: RelativeDependency[]) => {
-  switch (ast.type) {
-    case AstNodeType.NUMBER:
-    case AstNodeType.STRING:
-    case AstNodeType.ERROR:
-      return
-    case AstNodeType.CELL_REFERENCE: {
-      dependenciesSet.push(ast.reference)
-      return
-    }
-    case AstNodeType.CELL_RANGE: {
-      if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push([ast.start, ast.end])
-      }
-      return
-    }
-    case AstNodeType.MINUS_UNARY_OP: {
-      collectDependencies(ast.value, dependenciesSet)
-      return
-    }
-    case AstNodeType.CONCATENATE_OP:
-    case AstNodeType.EQUALS_OP:
-    case AstNodeType.NOT_EQUAL_OP:
-    case AstNodeType.LESS_THAN_OP:
-    case AstNodeType.GREATER_THAN_OP:
-    case AstNodeType.LESS_THAN_OR_EQUAL_OP:
-    case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
-    case AstNodeType.MINUS_OP:
-    case AstNodeType.PLUS_OP:
-    case AstNodeType.TIMES_OP:
-    case AstNodeType.DIV_OP:
-    case AstNodeType.POWER_OP:
-      collectDependencies(ast.left, dependenciesSet)
-      collectDependencies(ast.right, dependenciesSet)
-      return
-    case AstNodeType.FUNCTION_CALL:
-      if (ast.procedureName !== 'COLUMNS') {
-        ast.args.forEach((argAst: Ast) => collectDependencies(argAst, dependenciesSet))
-      }
-      return
   }
 }
 

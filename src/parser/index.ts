@@ -11,7 +11,7 @@ export {
 
 export {
   collectDependencies,
-} from './Cache'
+} from './collectDependencies'
 
 export {
   buildLexerConfig,
