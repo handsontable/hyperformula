@@ -58,7 +58,7 @@ export class ParserWithCaching {
       return { ast, hasVolatileFunction: false, hash: '', dependencies: [] }
     }
 
-    const hash = this.computeHash(lexerResult.tokens, formulaAddress)
+    const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
 
     let cacheResult = this.cache.get(hash)
     if (cacheResult) {
@@ -72,7 +72,7 @@ export class ParserWithCaching {
     return { ast, hasVolatileFunction, hash, dependencies: relativeDependencies }
   }
 
-  public computeHash(tokens: IToken[], baseAddress: SimpleCellAddress): string {
+  public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
     let hash = ''
     let idx = 0
     while (idx < tokens.length) {

@@ -3,7 +3,7 @@ import {SheetMapping} from '../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../src/parser'
 import {CellAddress} from '../src/parser/CellAddress'
 
-describe('computeHash', () => {
+describe('computeHashFromTokens', () => {
   const computeFunc = (code: string, address: CellAddress): string => {
     const config = new Config()
     const sheetMapping = new SheetMapping()
@@ -11,7 +11,7 @@ describe('computeHash', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(config, sheetMapping.fetch)
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
-    return parser.computeHash(tokens, address)
+    return parser.computeHashFromTokens(tokens, address)
   }
 
   it('simple case', () => {

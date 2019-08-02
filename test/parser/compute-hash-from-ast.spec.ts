@@ -16,7 +16,7 @@ describe('Compute hash from ast', () => {
     const formula = '=1+SUM(1,2,3)*3'
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -27,7 +27,7 @@ describe('Compute hash from ast', () => {
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -38,7 +38,7 @@ describe('Compute hash from ast', () => {
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -49,7 +49,7 @@ describe('Compute hash from ast', () => {
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -60,7 +60,7 @@ describe('Compute hash from ast', () => {
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -71,7 +71,7 @@ describe('Compute hash from ast', () => {
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -82,7 +82,7 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -93,7 +93,7 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
@@ -104,7 +104,7 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
-    const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
