@@ -61,13 +61,19 @@ export class DependencyGraph {
 
   public setCellEmpty(address: SimpleCellAddress) {
     const vertex = this.addressMapping.getCell(address)
+    if (vertex === null) {
+      return
+    }
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
 
-    if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex) {
-      this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
+    if (this.graph.adjacentNodes(vertex).size > 0) {
+      const emptyVertex = new EmptyCellVertex()
+      this.graph.exchangeNode(vertex, emptyVertex)
+      this.recentlyChangedVertices.add(emptyVertex)
+      this.addressMapping.setCell(address, emptyVertex)
+    } else {
       this.addressMapping.removeCell(address)
-      this.recentlyChangedVertices.add(EmptyCellVertex.getSingletonInstance())
     }
   }
 
