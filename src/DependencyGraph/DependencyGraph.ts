@@ -231,6 +231,7 @@ export class DependencyGraph {
       this.addressMapping.removeCell(sourceAddress)
 
       if (sourceVertex !== null) {
+        this.recentlyChangedVertices.add(sourceVertex)
         this.addressMapping.setCell(targetAddress, sourceVertex)
         let emptyVertex = null
         for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
@@ -241,6 +242,7 @@ export class DependencyGraph {
           }
         }
         if (emptyVertex) {
+          this.recentlyChangedVertices.add(emptyVertex)
           this.addressMapping.setCell(sourceAddress, emptyVertex)
         }
       }
@@ -252,6 +254,7 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
           sourceVertex = sourceVertex || this.fetchOrCreateEmptyCell(targetAddress)
           this.graph.addEdge(sourceVertex, adjacentNode)
+          this.recentlyChangedVertices.add(sourceVertex)
         }
         this.removeIncomingEdgesIfFormulaVertex(targetVertex)
         this.graph.removeNode(targetVertex)
@@ -267,6 +270,7 @@ export class DependencyGraph {
             const newEmptyVertex = this.fetchOrCreateEmptyCell(address)
             this.graph.addEdge(newEmptyVertex, adjacentNode)
             this.addressMapping.setCell(address, newEmptyVertex)
+            this.recentlyChangedVertices.add(newEmptyVertex)
           }
         }
       }

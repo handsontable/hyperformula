@@ -241,7 +241,11 @@ export class HandsOnEngine {
 
     this.dependencyGraph!.moveCells(sourceRange, toRight, toBottom, toSheet)
 
-    this.evaluator!.run()
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.verticesToRecompute())
+    this.dependencyGraph!.clearRecentlyChangedVertices()
+    if (verticesToRecomputeFrom) {
+      this.evaluator!.partialRun(verticesToRecomputeFrom)
+    }
   }
 
   public disableNumericMatrices() {
