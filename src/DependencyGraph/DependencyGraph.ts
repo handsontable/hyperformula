@@ -255,7 +255,7 @@ export class DependencyGraph {
         if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
           this.graph.removeEdge(rangeVertex, adjacentNode)
 
-          for (const address of adjacentNode.range.addresses()) {
+          for (const address of rangeVertex.range.addresses()) {
             const newEmptyVertex = this.fetchOrCreateEmptyCell(address)
             this.graph.addEdge(newEmptyVertex, adjacentNode)
             this.addressMapping.setCell(address, newEmptyVertex)
