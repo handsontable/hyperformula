@@ -47,23 +47,23 @@ export class EngineComparator {
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
           strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
-
+          continue
         } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
           throw Error("Not implemented yet.")
         } else {
           throw Error("Different vertex types")
         }
 
-        const expectedDependencies = new Set<SimpleCellAddress | AbsoluteCellRange>()
-        const actualDependencies = new Set<SimpleCellAddress | AbsoluteCellRange>()
+        const expectedAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
+        const actualAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
 
         for (const adjacentNode of expectedGraph.adjacentNodes(expectedVertex)) {
-          expectedDependencies.add(this.getAddressOfVertex(this.expected, adjacentNode, sheet))
+          expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode, sheet))
         }
         for (const adjacentNode of actualGraph.adjacentNodes(actualVertex)) {
-          actualDependencies.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
+          actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
-        deepStrictEqual(expectedDependencies, actualDependencies, "Dependencies of vertices are not same")
+        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, "Dependent vertices are not same")
       }
     }
   }
