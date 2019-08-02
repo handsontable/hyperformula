@@ -94,4 +94,10 @@ describe('computeHashFromTokens', () => {
 
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#1#3R-1')
   })
+
+  it('function call names are normalized', () => {
+    const code = '=rAnd()'
+
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=rAnd()')
+  })
 })
