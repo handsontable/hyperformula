@@ -4,6 +4,7 @@ import {EmptyCellVertex, FormulaCellVertex} from '../src/DependencyGraph'
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
+import {adr} from "./testUtils";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
@@ -25,8 +26,8 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(1, 0, 0))).toEqual(CellAddress.relative(1, 0, 1))
-    expect(extractReference(engine, simpleCellAddress(1, 0, 1))).toEqual(CellAddress.relative(1, 1, -1))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 1))
+    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 1, -1))
   })
 
   it('absolute dependency does not change if dependency is in other sheet than we add rows', () => {
@@ -44,7 +45,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
   })
 
   it('same sheet, case Aa, absolute row', () => {
@@ -56,7 +57,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteRow(0, 0, 0))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 0))
   })
 
   it('same sheet, case Aa, absolute row and col', () => {
@@ -68,7 +69,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absolute(0, 0, 0))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute(0, 0, 0))
   })
 
   it('same sheet, case Ab', () => {
@@ -80,7 +81,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteRow(0, 0, 2))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 2))
   })
 
   it('same sheet, case Raa', () => {
@@ -93,7 +94,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 2, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
   it('same sheet, case Rab', () => {
@@ -106,7 +107,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 2, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.relative(0, 0, -2))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(0, 0, -2))
   })
 
   it('same sheet, case Rba', () => {
@@ -119,7 +120,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 2, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 0, 3))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 3))
   })
 
   it('same sheet, case Rbb', () => {
@@ -132,7 +133,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
   it('same sheet, same row', () => {
@@ -143,7 +144,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(0, -1, 0))
   })
 
   it('insert row in middle of range', () => {
@@ -154,10 +155,10 @@ describe('Adding row', () => {
       ['3', ''],
     ])
 
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
     engine.addRows(0, 1, 1)
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(null)
   })
 
   it('insert row above range', () => {
@@ -168,10 +169,10 @@ describe('Adding row', () => {
       ['3', ''],
     ])
 
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
     engine.addRows(0, 0, 1)
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).toBe(null)
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 1), simpleCellAddress(0, 0, 3))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(null)
   })
 
   it('insert row below range', () => {
@@ -182,9 +183,9 @@ describe('Adding row', () => {
       // new row
     ])
 
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
     engine.addRows(0, 3, 1)
-    expect(engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))).not.toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
   })
 
   it('insert row, formula vertex address shifted', () => {
@@ -193,11 +194,11 @@ describe('Adding row', () => {
       ['=SUM(1,2)'],
     ])
 
-    let vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as FormulaCellVertex
-    expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 0))
+    let vertex = engine.addressMapping!.fetchCell(adr('A1')) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(adr('A1'))
     engine.addRows(0, 0, 1)
-    vertex = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)) as FormulaCellVertex
-    expect(vertex.getAddress()).toEqual(simpleCellAddress(0, 0, 1))
+    vertex = engine.addressMapping!.fetchCell(adr('A2')) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(adr('A2'))
   })
 
   it('raise error if trying to add a row in a row with matrix', () => {
@@ -245,8 +246,8 @@ describe('Adding row', () => {
 
     engine.addRows(0, 2, 1)
 
-    const a3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2))
-    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))! // A1:A4
+    const a3 = engine.addressMapping!.fetchCell(adr('A3'))
+    const a1a4 = engine.rangeMapping.getRange(adr('A1'), adr('A4'))! // A1:A4
 
     expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
     expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
@@ -263,7 +264,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 3, 1)
 
-    const a4 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 3))
+    const a4 = engine.addressMapping!.getCell(adr('A4'))
     expect(a4).toBe(null)
   })
 
@@ -278,7 +279,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -293,8 +294,8 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 4))!
+    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('A5'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
@@ -310,7 +311,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -325,7 +326,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -340,9 +341,9 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
 
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('A3'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
@@ -358,9 +359,9 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
 
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))!
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('A4'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
@@ -376,7 +377,7 @@ describe('Adding row', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 })

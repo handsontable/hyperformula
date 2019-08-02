@@ -2,6 +2,7 @@ import {Config} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
+import {adr} from "../testUtils";
 
 describe('Compute hash from ast', () => {
   const config = new Config()
@@ -11,7 +12,7 @@ describe('Compute hash from ast', () => {
   const parser = new ParserWithCaching(config, sheetMapping.fetch)
 
   it('#computeHash', async () => {
-    const address = simpleCellAddress(0, 0, 0)
+    const address = adr('A1')
     const formula = '=1+SUM(1,2,3)*3'
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -23,7 +24,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash simple addreess', async () => {
     const formula = '=$Sheet1.A1'
-    const address = simpleCellAddress(0, 3, 5)
+    const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -34,7 +35,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash absolute col', async () => {
     const formula = '=$Sheet1.$A1'
-    const address = simpleCellAddress(0, 3, 5)
+    const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -45,7 +46,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash absolute row addreess', async () => {
     const formula = '=$Sheet1.A$1'
-    const address = simpleCellAddress(0, 3, 5)
+    const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -56,7 +57,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash absolute address', async () => {
     const formula = '=$Sheet1.$A$1'
-    const address = simpleCellAddress(0, 3, 5)
+    const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -67,7 +68,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash cell range', async () => {
     const formula = '=$Sheet1.$A$1:B$2'
-    const address = simpleCellAddress(0, 3, 5)
+    const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -78,7 +79,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash ops', async () => {
     const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1'
-    const address = simpleCellAddress(0, 0, 0)
+    const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -89,7 +90,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash cell ref between strings', () => {
     const formula = '="A5"+A4+"A6"'
-    const address = simpleCellAddress(0, 0, 0)
+    const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)
@@ -100,7 +101,7 @@ describe('Compute hash from ast', () => {
 
   it('#computeHash cell ref in string with escape', () => {
     const formula = '="fdsaf\\"A5"'
-    const address = simpleCellAddress(0, 0, 0)
+    const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHash(lexerResult.tokens, address)

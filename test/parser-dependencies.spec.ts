@@ -4,6 +4,7 @@ import {Config} from '../src/Config'
 import {SheetMapping} from '../src/DependencyGraph'
 import {ParserWithCaching} from '../src/parser'
 import {CellAddress} from '../src/parser/CellAddress'
+import {adr} from "./testUtils";
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
@@ -14,7 +15,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies).toEqual([
-      simpleCellAddress(0, 1, 1),
+      adr('B2'),
     ])
   })
 
@@ -26,7 +27,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies.length).toEqual(1)
-    expect(dependencies[0]).toMatchObject(simpleCellAddress(0, 1, 1))
+    expect(dependencies[0]).toMatchObject(adr('B2'))
   })
 
   it('works for CELL_RANGE', () => {
@@ -37,7 +38,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies).toEqual([
-      new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 2, 3)),
+      new AbsoluteCellRange(adr('B2'), adr('C4')),
     ])
   })
 
@@ -49,7 +50,7 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies).toEqual([
-      simpleCellAddress(0, 1, 1),
+      adr('B2'),
     ])
   })
 
@@ -61,8 +62,8 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies).toEqual([
-      simpleCellAddress(0, 1, 1),
-      simpleCellAddress(0, 2, 2),
+      adr('B2'),
+      adr('C3'),
     ])
   })
 
@@ -74,8 +75,8 @@ describe('Parsing collecting dependencies', () => {
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
 
     expect(dependencies).toEqual([
-      simpleCellAddress(0, 1, 1),
-      simpleCellAddress(0, 2, 2),
+      adr('B2'),
+      adr('C3'),
     ])
   })
 
@@ -86,7 +87,7 @@ describe('Parsing collecting dependencies', () => {
     const parseResult = parser.parse('=OFFSET(D4, 0, 0)', formulaAddress)
     const dependencies = parser.getAbsolutizedParserResult(parseResult.hash, formulaAddress).dependencies
     expect(dependencies).toEqual([
-      simpleCellAddress(0, 3, 3),
+      adr('D4'),
     ])
   })
 

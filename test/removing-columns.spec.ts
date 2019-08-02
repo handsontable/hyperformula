@@ -3,7 +3,7 @@ import {simpleCellAddress} from '../src/Cell'
 import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing columns', () => {
   it('reevaluates', () => {
@@ -37,7 +37,7 @@ describe('Removing columns - matrices', () => {
 
     engine.removeColumns(0, 1, 1)
 
-    const matrix = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as MatrixVertex
+    const matrix = engine.addressMapping!.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.width).toBe(2)
   })
@@ -50,7 +50,7 @@ describe('Removing columns - matrices', () => {
     ], config)
 
     engine.removeColumns(0, 1, 3)
-    const matrix = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)) as MatrixVertex
+    const matrix = engine.addressMapping!.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.width).toBe(1)
   })
@@ -128,9 +128,9 @@ describe('Removing columns - dependencies', () => {
       ],
     })
 
-    expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
     engine.removeColumns(0, 0, 1)
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
   })
 
   it('same sheet, case Aa', () => {
@@ -141,7 +141,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 2)
 
-    expect(extractReference(engine, simpleCellAddress(0, 2, 0))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
   })
 
   it('same sheet, case Ab', () => {
@@ -152,7 +152,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
   })
 
   it('same sheet, case Ac', () => {
@@ -163,7 +163,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 1)
 
-    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+    expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
   it('same sheet, case Raa', () => {
@@ -174,7 +174,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 2, 2)
 
-    expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
   })
 
   it('same sheet, case Rab', () => {
@@ -185,7 +185,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
   })
 
   it('same sheet, case Rba', () => {
@@ -196,7 +196,7 @@ describe('Removing columns - dependencies', () => {
 
     engine.removeColumns(0, 1)
 
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
   })
 
   it('same sheet, case Rbb', () => {
@@ -206,7 +206,7 @@ describe('Removing columns - dependencies', () => {
     ])
 
     engine.removeColumns(0, 0)
-    expect(extractReference(engine, simpleCellAddress(0, 0, 0))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
   })
 
   it('same sheet, case Rca', () => {
@@ -216,7 +216,7 @@ describe('Removing columns - dependencies', () => {
     ])
 
     engine.removeColumns(0, 1)
-    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+    expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
   it('same sheet, case Rcb', () => {
@@ -225,7 +225,7 @@ describe('Removing columns - dependencies', () => {
     ])
 
     engine.removeColumns(0, 0)
-    expect_reference_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+    expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
   it('same sheet, case Rca, range', () => {
@@ -233,7 +233,7 @@ describe('Removing columns - dependencies', () => {
       ['=SUM(B1:C1)', '1', '2'],
     ])
     engine.removeColumns(0, 1, 2)
-    expect_function_to_have_ref_error(engine, simpleCellAddress(0, 0, 0))
+    expect_function_to_have_ref_error(engine, adr('A1'))
   })
 })
 
@@ -247,8 +247,8 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, 0, 0)
 
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 1, 0))!
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('B1'))!
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
@@ -261,8 +261,8 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, 1, 2)
 
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 0))!
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('A1'))!
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
@@ -271,7 +271,7 @@ describe('Removing columns - ranges', function() {
       ['1', '2', '3', '=SUM(A1:C1)'],
       /*          */
     ])
-    const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 2, 0)) as RangeVertex
+    const range = engine.rangeMapping.getRange(adr('A1'), adr('C1')) as RangeVertex
 
     engine.removeColumns(0, 0, 2)
 

@@ -1,6 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
+import {adr} from "./testUtils";
 
 describe('Interpreter - function RAND', () => {
   it('works', () => {
@@ -9,7 +10,7 @@ describe('Interpreter - function RAND', () => {
     ])
     const valueBeforeRecomputation = engine.getCellValue('A1')
 
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '35')
+    engine.setCellContent(adr('B1'), '35')
 
     expect(engine.getCellValue('A1')).not.toEqual(valueBeforeRecomputation)
   })
@@ -30,7 +31,7 @@ describe('Interpreter - function RAND', () => {
       ['=RAND()', '42'],
     ])
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '35')
+    engine.setCellContent(adr('A1'), '35')
 
     expect(engine.dependencyGraph!.verticesToRecompute()).toEqual(new Set())
   })

@@ -2,16 +2,17 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
 import {CriterionCache, RangeVertex} from '../src/DependencyGraph'
 import {buildCriterionLambda, parseCriterion} from '../src/interpreter/Criterion'
+import {adr} from "./testUtils";
 
 describe('RangeVertex with cache', () => {
   it('cache for criterion fuctions empty', () => {
-    const rangeVertex = new RangeVertex(new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 1, 10)))
+    const rangeVertex = new RangeVertex(new AbsoluteCellRange(adr('B2'), adr('B11')))
 
     expect(rangeVertex.getCriterionFunctionValues('SUMIF,1,1').size).toBe(0)
   })
 
   it('cache for functions with criterion basic usage', () => {
-    const rangeVertex = new RangeVertex(new AbsoluteCellRange(simpleCellAddress(0, 1, 1), simpleCellAddress(0, 1, 10)))
+    const rangeVertex = new RangeVertex(new AbsoluteCellRange(adr('B2'), adr('B11')))
 
     const criterionString1 = '>=0'
     const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!)

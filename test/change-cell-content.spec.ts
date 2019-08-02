@@ -2,6 +2,7 @@ import {Config, EmptyValue, HandsOnEngine} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
+import {adr} from "./testUtils";
 
 describe('changing cell content', () => {
   it('update formula vertex', () => {
@@ -9,14 +10,14 @@ describe('changing cell content', () => {
       ['1', '2', '=A1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-    const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
+    const c1 = engine.addressMapping!.fetchCell(adr('C1'))
 
     expect(engine.graph.existsEdge(a1, c1)).toBe(true)
     expect(engine.getCellValue('C1')).toBe(1)
 
-    engine.setCellContent(simpleCellAddress(0, 2, 0), '=B1')
+    engine.setCellContent(adr('C1'), '=B1')
 
     expect(engine.graph.existsEdge(a1, c1)).toBe(false)
     expect(engine.graph.existsEdge(b1, c1)).toBe(true)
@@ -29,12 +30,12 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(1)
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '7')
+    engine.setCellContent(adr('B1'), '7')
     expect(engine.getCellValue('B1')).toBe(7)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -44,12 +45,12 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(1)
-    engine.setCellContent(simpleCellAddress(0, 1, 0), 'foo')
+    engine.setCellContent(adr('B1'), 'foo')
     expect(engine.getCellValue('B1')).toBe('foo')
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -60,10 +61,10 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ])
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
+    engine.setCellContent(adr('A1'), '')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const a2 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(a1).toEqual(new EmptyCellVertex())
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
     expect(engine.getCellValue('A1')).toBe(EmptyValue)
@@ -74,13 +75,13 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(1)
 
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '')
+    engine.setCellContent(adr('B1'), '')
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
@@ -90,14 +91,14 @@ describe('changing cell content', () => {
       ['1', '2'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    let b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    let b1 = engine.addressMapping!.fetchCell(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
     expect(engine.getCellValue('B1')).toBe(2)
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '=A1')
+    engine.setCellContent(adr('B1'), '=A1')
 
-    b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    b1 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(1)
   })
@@ -109,7 +110,7 @@ describe('changing cell content', () => {
     const engine = HandsOnEngine.buildFromArray(sheet)
 
     expect(engine.getCellValue('B1')).toBe(2)
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '3')
+    engine.setCellContent(adr('B1'), '3')
     expect(engine.getCellValue('B1')).toBe(3)
   })
 
@@ -120,8 +121,8 @@ describe('changing cell content', () => {
     const engine = HandsOnEngine.buildFromArray(sheet)
 
     expect(engine.getCellValue('B1')).toBe(2)
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '')
-    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
+    engine.setCellContent(adr('B1'), '')
+    expect(engine.addressMapping!.getCell(adr('B1'))).toBe(null)
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
@@ -134,9 +135,9 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 2), '{=MMULT(A1:B2,A1:B2)}')
-    expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2))).toBeInstanceOf(MatrixVertex)
-    expect(engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 3))).toBeInstanceOf(MatrixVertex)
+    engine.setCellContent(adr('A3'), '{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.addressMapping!.fetchCell(adr('A3'))).toBeInstanceOf(MatrixVertex)
+    expect(engine.addressMapping!.fetchCell(adr('B4'))).toBeInstanceOf(MatrixVertex)
     expect(engine.getCellValue('A3')).toBe(7)
   })
 
@@ -158,10 +159,10 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '=A1')
+    engine.setCellContent(adr('B1'), '=A1')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(42)
   })
@@ -172,8 +173,8 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
-    const a1 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
+    engine.setCellContent(adr('A1'), '')
+    const a1 = engine.addressMapping!.getCell(adr('A1'))
     expect(a1).toBe(null)
     expect(engine.getCellValue('A1')).toBe(EmptyValue)
   })
@@ -184,7 +185,7 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '7')
+    engine.setCellContent(adr('A1'), '7')
 
     expect(engine.getCellValue('A1')).toBe(7)
   })
@@ -195,7 +196,7 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), 'foo')
+    engine.setCellContent(adr('A1'), 'foo')
 
     expect(engine.getCellValue('A1')).toBe('foo')
   })
@@ -206,11 +207,11 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 1, 0), '=A1')
+    engine.setCellContent(adr('B1'), '=A1')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-    const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
+    const c1 = engine.addressMapping!.fetchCell(adr('C1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.graph.existsEdge(b1, c1)).toBe(true)
     expect(engine.getCellValue('B1')).toBe(42)
@@ -223,10 +224,10 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
+    engine.setCellContent(adr('A1'), '')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
   })
@@ -237,10 +238,10 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '7')
+    engine.setCellContent(adr('A1'), '7')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('A1')).toBe(7)
   })
@@ -251,10 +252,10 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), 'foo')
+    engine.setCellContent(adr('A1'), 'foo')
 
-    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue('A1')).toBe('foo')
   })
@@ -267,7 +268,7 @@ describe('changing cell content', () => {
     ], config)
 
     expect(engine.getCellValue('A1')).toBe(1)
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '5')
+    engine.setCellContent(adr('A1'), '5')
     expect(engine.getCellValue('A1')).toBe(5)
   })
 
@@ -281,7 +282,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('A1')).toBe(1)
 
     expect(() => {
-      engine.setCellContent(simpleCellAddress(0, 0, 0), 'foo')
+      engine.setCellContent(adr('A1'), 'foo')
     }).toThrowError('Illegal operation')
   })
 
@@ -291,12 +292,12 @@ describe('changing cell content', () => {
       ['=A1', '=B1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
-    const a2 = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))
-    const b2 = engine.addressMapping!.getCell(simpleCellAddress(0, 1, 1))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const b2 = engine.addressMapping!.getCell(adr('B2'))
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
     const b2setCellValueSpy = jest.spyOn(b2 as any, 'setCellValue')
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '3')
+    engine.setCellContent(adr('A1'), '3')
     expect(a2setCellValueSpy).toHaveBeenCalled()
     expect(b2setCellValueSpy).not.toHaveBeenCalled()
   })
@@ -308,7 +309,7 @@ describe('changing cell content', () => {
     ])
 
     expect(() => {
-      engine.setCellContent(simpleCellAddress(0, 0, 1), '{=TRANSPOSE(C1:C2)}')
+      engine.setCellContent(adr('A2'), '{=TRANSPOSE(C1:C2)}')
     }).toThrow('You cannot modify only part of an array')
   })
 })
