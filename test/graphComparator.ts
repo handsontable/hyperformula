@@ -13,35 +13,39 @@ import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 export class EngineComparator {
 
   constructor(private expected: HandsOnEngine,
-              private actual: HandsOnEngine) {}
+              private actual: HandsOnEngine) {
+  }
 
   public compare(sheet: number = 0) {
-    const expectedAddressMapping = this.expected.addressMapping!
-    const actualAddressMapping = this.actual.addressMapping!
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
-    // if (expectedAddressMapping.getHeight(sheet) !== actualAddressMapping.getHeight(sheet)) {
-    //   throw Error("Different height")
-    // }
-    // if (expectedAddressMapping.getWidth(sheet) !== actualAddressMapping.getWidth(sheet)) {
-    //   throw Error("Different width")
-    // }
+    const expectedWidth = this.expected.addressMapping!.getWidth(sheet)
+    const expectedHeight = this.expected.addressMapping!.getHeight(sheet)
+    const actualWidth = this.actual.addressMapping!.getWidth(sheet)
+    const actualHeight = this.actual.addressMapping!.getHeight(sheet)
 
-    for (let x=0; x<expectedAddressMapping.getWidth(sheet); ++x) {
-      for (let y = 0; y < expectedAddressMapping.getWidth(sheet); ++y) {
+    if (expectedHeight !== actualHeight) {
+      console.warn(`Expected sheet of height ${expectedHeight}, actual: ${actualHeight}`)
+    }
+    if (expectedWidth !== actualWidth) {
+      console.warn(`Expected sheet of width ${expectedWidth}, actual: ${actualWidth}`)
+    }
+
+    for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
+      for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
-        const expectedVertex = expectedAddressMapping.getCell(address)
-        const actualVertex = actualAddressMapping.getCell(address)
+        const expectedVertex = this.expected.addressMapping!.getCell(address)
+        const actualVertex = this.actual.addressMapping!.getCell(address)
 
         if (expectedVertex === null && actualVertex === null) {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
-          deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas: expected ${expectedVertex.address}, actual ${actualVertex.address}`)
+          deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
           deepStrictEqual(expectedVertex.getFormula(), actualVertex.getFormula(), "Different AST in formulas")
-          strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas: expected ${expectedVertex.getCellValue().toString()}, actual ${actualVertex.getCellValue().toString()}`)
+          strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
-          strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values: expected ${expectedVertex.getCellValue().toString()}, actual:${actualVertex.getCellValue().toString()}`)
+          strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
 
         } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
