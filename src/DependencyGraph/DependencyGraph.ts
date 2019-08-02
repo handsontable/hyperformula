@@ -25,10 +25,10 @@ export class DependencyGraph {
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
-    let finalVertex: FormulaCellVertex
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
 
+    let finalVertex: FormulaCellVertex
     if (vertex instanceof FormulaCellVertex) {
       vertex.setFormula(ast)
       finalVertex = vertex
