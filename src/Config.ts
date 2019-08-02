@@ -1,5 +1,18 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {enGB, TranslationPackage} from './i18n'
+import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
+import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
+import {DatePlugin} from './interpreter/plugin/DatePlugin'
+import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
+import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
+import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
+import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
+import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
+import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
+import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
+import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
+import {TextPlugin} from './interpreter/plugin/TextPlugin'
+import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -15,6 +28,22 @@ export interface ConfigParams {
 }
 
 export class Config {
+  private static defaultPlugins: any[] = [
+    SumifPlugin,
+    TextPlugin,
+    NumericAggregationPlugin,
+    MedianPlugin,
+    DatePlugin,
+    BooleanPlugin,
+    InformationPlugin,
+    TrigonometryPlugin,
+    CountUniquePlugin,
+    SumprodPlugin,
+    MatrixPlugin,
+    ExpPlugin,
+    RandomPlugin,
+  ]
+
   public static defaultConfig: ConfigParams = {
     addressMappingFillThreshold: 1,
     dateFormat: 'MM/DD/YYYY',
@@ -59,5 +88,9 @@ export class Config {
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
     return this.language.functions[functionTranslationKey]
+  }
+
+  public allFunctionPlugins(): any[] {
+    return [...Config.defaultPlugins, ...this.functionPlugins]
   }
 }

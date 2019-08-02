@@ -6,19 +6,6 @@ import {DependencyGraph} from '../DependencyGraph'
 import {Matrix} from '../Matrix'
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {BooleanPlugin} from './plugin/BooleanPlugin'
-import {CountUniquePlugin} from './plugin/CountUniquePlugin'
-import {DatePlugin} from './plugin/DatePlugin'
-import {ExpPlugin} from './plugin/ExpPlugin'
-import {InformationPlugin} from './plugin/InformationPlugin'
-import {MatrixPlugin} from './plugin/MatrixPlugin'
-import {MedianPlugin} from './plugin/MedianPlugin'
-import {NumericAggregationPlugin} from './plugin/NumericAggregationPlugin'
-import {RandomPlugin} from './plugin/RandomPlugin'
-import {SumifPlugin} from './plugin/SumifPlugin'
-import {SumprodPlugin} from './plugin/SumprodPlugin'
-import {TextPlugin} from './plugin/TextPlugin'
-import {TrigonometryPlugin} from './plugin/TrigonometryPlugin'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
 
@@ -32,11 +19,8 @@ export class Interpreter {
     public readonly stats: Statistics,
   ) {
     this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
-    this.registerPlugins([
-      SumifPlugin, TextPlugin, NumericAggregationPlugin, MedianPlugin, DatePlugin, BooleanPlugin, InformationPlugin, TrigonometryPlugin, CountUniquePlugin, SumprodPlugin, MatrixPlugin, ExpPlugin, RandomPlugin,
-    ])
 
-    this.registerPlugins(this.config.functionPlugins)
+    this.registerPlugins(this.config.allFunctionPlugins())
   }
 
   /**
