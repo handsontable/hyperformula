@@ -1,6 +1,5 @@
 import assert from 'assert'
 import {IToken, tokenMatcher} from 'chevrotain'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
