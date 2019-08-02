@@ -65,7 +65,7 @@ describe('Removing columns - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, 0, 1)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.graph.nodes.size).toBe(1)
+    expect(engine.graph.nodes.size).toBe(0)
   })
 
   it('should remove MatrixVertex completely from graph, more cols', () => {
@@ -79,7 +79,7 @@ describe('Removing columns - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, 0, 2)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.graph.nodes.size).toBe(1)
+    expect(engine.graph.nodes.size).toBe(0)
   })
 })
 
@@ -89,18 +89,18 @@ describe('Removing columns - graph', function() {
       ['1', '2', '3', '4'],
       ['1', '2', '3', '4'],
     ])
-    expect(engine.graph.nodes.size).toBe(9)
+    expect(engine.graph.nodes.size).toBe(8)
     engine.removeColumns(0, 0, 1)
-    expect(engine.graph.nodes.size).toBe(5) // left two vertices in first column, two in last and empty singleton
+    expect(engine.graph.nodes.size).toBe(4) // left two vertices in first column, two in last
   })
 
   it('works if there are empty cells removed', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '', '3'],
     ])
-    expect(engine.graph.nodes.size).toBe(3)
+    expect(engine.graph.nodes.size).toBe(2)
     engine.removeColumns(0, 1, 1)
-    expect(engine.graph.nodes.size).toBe(3)
+    expect(engine.graph.nodes.size).toBe(2)
   })
 
   it('does not remove matrix vertices from graph', function() {
@@ -109,9 +109,9 @@ describe('Removing columns - graph', function() {
       ['1', '2', '3'],
       ['1', '2', '3'],
     ], config)
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.nodes.size).toBe(1)
     engine.removeColumns(0, 1, 1)
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.nodes.size).toBe(1)
   })
 })
 

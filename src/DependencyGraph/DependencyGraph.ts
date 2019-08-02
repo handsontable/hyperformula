@@ -21,9 +21,7 @@ export class DependencyGraph {
       private readonly graph: Graph<Vertex>,
       private readonly sheetMapping: SheetMapping,
       private readonly matrixMapping: MatrixMapping,
-  ) {
-    this.graph.addNode(EmptyCellVertex.getSingletonInstance())
-  }
+  ) {}
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
     const vertex = this.addressMapping.getCell(address)

@@ -118,7 +118,7 @@ describe("Move cells", () => {
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
 
     expect(engine.graph.edgesCount()).toBe(0)
-    expect(engine.graph.nodesCount()).toBe(1 + 1)
+    expect(engine.graph.nodesCount()).toBe(1)
     expect(engine.getCellValue("A1")).toBe(EmptyValue)
     expect(engine.getCellValue("A2")).toBe(1)
   })
@@ -177,7 +177,6 @@ describe("Move cells", () => {
       2 // A2 -> B1, A2 -> B2
     )
     expect(engine.graph.nodesCount()).toBe(
-      + 1 // Empty singleton
       + 2 // formulas
       + 1 // A2
     )
@@ -281,10 +280,9 @@ describe('moving ranges', () => {
     const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
     const range = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 1))!
 
-    expect(source).not.toBe(EmptyCellVertex.getSingletonInstance())
+    expect(source).toEqual(new EmptyCellVertex())
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
-        + 1 // Empty singleton
         + 2 // formulas
         + 1 // A2
         + 1 // A1 (Empty)
@@ -327,7 +325,6 @@ describe('moving ranges', () => {
     expect(a2).toBe(null)
 
     expect(engine.graph.nodesCount()).toBe(
-        + 1 // Empty singleton
         + 2 // formulas
         + 2 // C1, C2
         + 1 // C1:C2 range

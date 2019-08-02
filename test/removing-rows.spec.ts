@@ -193,7 +193,7 @@ describe('Removing rows - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeRows(0, 0, 1)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.graph.nodes.size).toBe(1)
+    expect(engine.graph.nodes.size).toBe(0)
   })
 
   it('should remove MatrixVertex completely from graph, more rows', () => {
@@ -207,7 +207,7 @@ describe('Removing rows - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeRows(0, 0, 2)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.graph.nodes.size).toBe(1)
+    expect(engine.graph.nodes.size).toBe(0)
   })
 })
 
@@ -217,9 +217,9 @@ describe('Removing rows - graph', function() {
       ['1', '2'],
       ['3', '4'],
     ])
-    expect(engine.graph.nodes.size).toBe(5)
+    expect(engine.graph.nodes.size).toBe(4)
     engine.removeRows(0, 0, 1)
-    expect(engine.graph.nodes.size).toBe(1) // only empty vertex left
+    expect(engine.graph.nodes.size).toBe(0)
   })
 })
 
