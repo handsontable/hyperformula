@@ -197,11 +197,11 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
 
-    // new EngineComparator(HandsOnEngine.buildFromArray([
-    //   ['' , '1'],
-    //   ['2',    ],
-    //   ['=SUM(A1:A2)']
-    // ]), engine).compare()
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['' , '1'],
+      ['2',    ],
+      ['=SUM(A1:A2)']
+    ]), engine).compare()
   })
 
   it('should update moved range', () => {

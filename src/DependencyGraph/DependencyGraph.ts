@@ -233,6 +233,7 @@ export class DependencyGraph {
           if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
             emptyVertex = emptyVertex || this.fetchOrCreateEmptyCell(sourceAddress)
             this.graph.addEdge(emptyVertex, adjacentNode)
+            this.graph.removeEdge(sourceVertex, adjacentNode)
           }
         }
         if (emptyVertex) {
