@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine, EmptyValue} from '../src'
+import {Config, EmptyValue, HandsOnEngine} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
@@ -6,7 +6,7 @@ import './testConfig.ts'
 describe('changing cell content', () => {
   it('update formula vertex', () => {
     const sheet = [
-        ['1', '2', '=A1'],
+      ['1', '2', '=A1'],
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
     const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
@@ -54,7 +54,32 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
-  it ('update formula to empty cell', () => {
+  it('update vertex without adjacent nodes to empty cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1']
+    ])
+
+    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
+
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
+    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+  })
+
+  it('set vertex with edge to empty cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1']
+    ])
+
+    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
+
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    expect(a1).toEqual(new EmptyCellVertex())
+    expect(engine.graph.existsEdge(a1, a2)).toBe(true)
+    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+  })
+
+  it('update formula to empty cell', () => {
     const sheet = [
       ['1', '=A1'],
     ]
@@ -70,7 +95,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
-  it ('update value cell to formula', () => {
+  it('update value cell to formula', () => {
     const sheet = [
       ['1', '2'],
     ]
@@ -87,7 +112,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(1)
   })
 
-  it ('update value cell to value cell', () => {
+  it('update value cell to value cell', () => {
     const sheet = [
       ['1', '2'],
     ]
@@ -98,7 +123,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(3)
   })
 
-  it ('update value cell to empty', () => {
+  it('update value cell to empty', () => {
     const sheet = [
       ['1', '2'],
     ]
@@ -109,7 +134,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
-  it ('rewrite part of sheet with matrix', () => {
+  it('rewrite part of sheet with matrix', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -132,7 +157,7 @@ describe('changing cell content', () => {
     ])
     expect(engine.getCellValue('B3')).toEqual(6)
 
-    await engine.setCellContent({ sheet: 0, col: 0, row: 0 }, '3')
+    await engine.setCellContent({sheet: 0, col: 0, row: 0}, '3')
     expect(engine.getCellValue('B3')).toEqual(8)
   })
 
@@ -244,7 +269,7 @@ describe('changing cell content', () => {
   })
 
   it('change numeric value inside matrix to another number', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -256,7 +281,7 @@ describe('changing cell content', () => {
   })
 
   it('change numeric value inside matrix to NaN', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -269,7 +294,7 @@ describe('changing cell content', () => {
     }).toThrowError('Illegal operation')
   })
 
-  it ('ensure that only part of the tree is evaluated', () => {
+  it('ensure that only part of the tree is evaluated', () => {
     const sheet = [
       ['1', '2'],
       ['=A1', '=B1'],
@@ -285,10 +310,10 @@ describe('changing cell content', () => {
     expect(b2setCellValueSpy).not.toHaveBeenCalled()
   })
 
-  it ('should not be possible to edit part of a Matrix', () => {
+  it('should not be possible to edit part of a Matrix', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['1', '2'],
-        ['' , '{=TRANSPOSE(A1:B1)}']
+      ['1', '2'],
+      ['', '{=TRANSPOSE(A1:B1)}']
     ])
 
     expect(() => {
