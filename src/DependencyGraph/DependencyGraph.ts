@@ -25,25 +25,24 @@ export class DependencyGraph {
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
+    let finalVertex: FormulaCellVertex
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex) {
       vertex.setFormula(ast)
-      this.processCellDependencies(dependencies, vertex)
-      this.recentlyChangedVertices.add(vertex)
-      if (hasVolatileFunction) {
-        this.markAsVolatile(vertex)
-      }
+      finalVertex = vertex
     } else {
       const newVertex = new FormulaCellVertex(ast, address)
       this.graph.exchangeOrAddNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
-      this.processCellDependencies(dependencies, newVertex)
-      this.recentlyChangedVertices.add(newVertex)
-      if (hasVolatileFunction) {
-        this.markAsVolatile(newVertex)
-      }
+      finalVertex = newVertex
+    }
+
+    this.processCellDependencies(dependencies, finalVertex)
+    this.recentlyChangedVertices.add(finalVertex)
+    if (hasVolatileFunction) {
+      this.markAsVolatile(finalVertex)
     }
   }
 
