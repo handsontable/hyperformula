@@ -24,4 +24,18 @@ describe('i18n', () => {
       }
     }
   })
+
+  it('all translation packages should translate all enGB functions', () => {
+    const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
+
+    for (const lang in languages) {
+      if (lang === "enGB") {
+        continue
+      }
+
+      const translationPackage = languages[lang]
+      const translatedFunctionsIn_lang = new Set(Object.keys(languages[lang].functions))
+      expect(translatedFunctionsIn_lang).toEqual(translatedFunctionsIn_enGB)
+    }
+  })
 })
