@@ -198,7 +198,7 @@ export class AbsoluteCellRange {
     } else if (prefixRange.isVerticalPrefixOf(this)) {
       return this.withStart(simpleCellAddress(this.start.sheet, this.start.col, this.start.row + prefixRange.height()))
     } else {
-      throw Error("Not a prefix")
+      throw Error('Not a prefix')
     }
   }
 
@@ -210,14 +210,14 @@ export class AbsoluteCellRange {
     return (otherRange.start.row === this.start.row) &&
       (otherRange.end.row >= this.end.row) &&
       (otherRange.start.col === this.start.col) &&
-      (otherRange.end.col === this.end.col);
+      (otherRange.end.col === this.end.col)
   }
 
   public isHorizontalPrefixOf(otherRange: AbsoluteCellRange): boolean {
     return (otherRange.start.col === this.start.col) &&
       (otherRange.end.col >= this.end.col) &&
       (otherRange.start.row === this.start.row) &&
-      (otherRange.end.row === this.end.row);
+      (otherRange.end.row === this.end.row)
   }
 
   public withoutSuffix(suffixRange: AbsoluteCellRange): AbsoluteCellRange {
@@ -226,7 +226,7 @@ export class AbsoluteCellRange {
     } else if (suffixRange.isVerticalSuffixOf(this)) {
       return this.withEnd(simpleCellAddress(this.end.sheet, this.end.col, this.end.row - suffixRange.height()))
     } else {
-      throw Error("Not a suffix")
+      throw Error('Not a suffix')
     }
   }
 
@@ -238,14 +238,14 @@ export class AbsoluteCellRange {
     return (otherRange.end.row === this.end.row) &&
       (otherRange.start.row <= this.start.row) &&
       (otherRange.start.col === this.start.col) &&
-      (otherRange.end.col === this.end.col);
+      (otherRange.end.col === this.end.col)
   }
 
   public isHorizontalSuffixOf(otherRange: AbsoluteCellRange): boolean {
     return (otherRange.end.col === this.end.col) &&
       (otherRange.start.col <= this.start.col) &&
       (otherRange.start.row === this.start.row) &&
-      (otherRange.end.row === this.end.row);
+      (otherRange.end.row === this.end.row)
   }
 
   public includesRow(row: number) {

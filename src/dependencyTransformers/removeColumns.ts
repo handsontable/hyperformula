@@ -1,7 +1,7 @@
-import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddressFunction} from "./common";
-import {DependencyGraph} from "../DependencyGraph";
-import {CellAddress, ParserWithCaching} from "../parser";
-import {ErrorType, SimpleCellAddress} from "../Cell";
+import {ErrorType, SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
+import {CellAddress, ParserWithCaching} from '../parser'
+import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddressFunction} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(sheet: number, columnStart: number, columnEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {

@@ -1,14 +1,7 @@
-
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
-import {DependencyGraph} from './DependencyGraph'
-import {
-  FormulaCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-  Vertex,
-} from './DependencyGraph'
+import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'

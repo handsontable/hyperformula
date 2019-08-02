@@ -6,7 +6,8 @@ import {
   GreaterThanOpAst,
   GreaterThanOrEqualOpAst,
   LessThanOpAst,
-  LessThanOrEqualOpAst, NotEqualOpAst,
+  LessThanOrEqualOpAst,
+  NotEqualOpAst,
   ParserWithCaching,
 } from '../../src/parser'
 import {CellAddress} from '../../src/parser/CellAddress'

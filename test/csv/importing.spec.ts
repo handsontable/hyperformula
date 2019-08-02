@@ -1,4 +1,3 @@
-
 import {CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 

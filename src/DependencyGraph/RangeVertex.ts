@@ -10,7 +10,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda]>
   /**
    * Represents vertex bound to range
    */
-  export class RangeVertex {
+export class RangeVertex {
     /** Cache for associative aggregate functions. */
     private functionCache: Map<string, CellValue>
 

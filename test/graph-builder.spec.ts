@@ -1,13 +1,19 @@
 import {simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {RangeMapping} from '../src/DependencyGraph'
-import {AddressMapping, DependencyGraph} from '../src/DependencyGraph'
-import {SheetMapping} from '../src/DependencyGraph'
-import {Graph} from '../src/DependencyGraph'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex, Vertex} from '../src/DependencyGraph'
+import {
+  AddressMapping,
+  DependencyGraph,
+  EmptyCellVertex,
+  Graph,
+  MatrixVertex,
+  RangeMapping,
+  SheetMapping,
+  ValueCellVertex,
+  Vertex,
+} from '../src/DependencyGraph'
 import {MatrixMapping} from '../src/DependencyGraph/MatrixMapping'
 import {GraphBuilder} from '../src/GraphBuilder'
-import { ParserWithCaching} from '../src/parser'
+import {ParserWithCaching} from '../src/parser'
 import './testConfig.ts'
 
 describe('GraphBuilder', () => {
@@ -105,7 +111,7 @@ describe('GraphBuilder', () => {
 
     expect(graph.nodesCount()).toBe(
       6 + // for cells above
-      1   // for range vertex
+      1,   // for range vertex
     )
     const nodesA1 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 0, 0))!)!
     const nodesA2 = graph.adjacentNodes(addressMapping.fetchCell(simpleCellAddress(0, 0, 1))!)!
@@ -140,7 +146,7 @@ describe('GraphBuilder', () => {
 
     expect(graph.nodesCount()).toBe(
       9 + // for cells above
-      1   // for both ranges (reuse same ranges)
+      1,   // for both ranges (reuse same ranges)
     )
   })
 
@@ -185,7 +191,7 @@ describe('GraphBuilder', () => {
     expect(graph.nodesCount()).toBe(
       3 + // for cells above
       1 + // for range vertex
-      2   // for 2 EmptyCellVertex instances
+      2,   // for 2 EmptyCellVertex instances
     )
     expect(graph.edgesCount()).toBe(
       2 + // from cells to range vertex

@@ -1,13 +1,13 @@
-import {EmptyValue, HandsOnEngine} from "../src";
-import {simpleCellAddress} from "../src/Cell";
-import {extractRange, extractReference} from "./testUtils";
-import {CellAddress} from "../src/parser";
+import {EmptyValue, HandsOnEngine} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {simpleCellAddress} from '../src/Cell'
+import {EmptyCellVertex} from '../src/DependencyGraph'
+import {CellAddress} from '../src/parser'
+import {EngineComparator} from './graphComparator'
 import './testConfig.ts'
-import {EmptyCellVertex} from "../src/DependencyGraph";
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
-import {EngineComparator} from "./graphComparator";
+import {extractRange, extractReference} from './testUtils'
 
-describe("Move cells", () => {
+describe('Move cells', () => {
   it('should move static content', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo'],
@@ -16,12 +16,12 @@ describe("Move cells", () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
 
-    expect(engine.getCellValue("A2")).toEqual('foo')
-  });
+    expect(engine.getCellValue('A2')).toEqual('foo')
+  })
 
   it('should update reference of moved formula', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['foo', /* =A1 */],
+      ['foo' /* =A1 */],
       ['=A1'],
     ])
 
@@ -29,7 +29,7 @@ describe("Move cells", () => {
 
     const reference = extractReference(engine, simpleCellAddress(0, 1, 0))
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
-  });
+  })
 
   it('should update reference of moved formula - different types of reference', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -46,28 +46,27 @@ describe("Move cells", () => {
     expect(extractReference(engine, simpleCellAddress(0, 1, 1))).toEqual(CellAddress.absoluteCol(0, 0, -1))
     expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.absoluteRow(0, -1, 0))
     expect(extractReference(engine, simpleCellAddress(0, 1, 3))).toEqual(CellAddress.absolute(0, 0, 0))
-  });
-
+  })
 
   it('should update reference of moved formula when moving to other sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
-      "Sheet1": [
+      Sheet1: [
         ['foo'],
         ['=A1'],
       ],
-      "Sheet2": [
-        ['', /* =A1 */]
-      ]
+      Sheet2: [
+        ['' /* =A1 */],
+      ],
     })
 
     engine.moveCells(simpleCellAddress(0, 0, 1), 1, 1, simpleCellAddress(1, 1, 0))
 
     expect(extractReference(engine, simpleCellAddress(1, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
-  });
+  })
 
   it('should update reference', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['foo', /* foo */],
+      ['foo' /* foo */],
       ['=A1'],
       ['=$A1'],
       ['=A$1'],
@@ -80,11 +79,11 @@ describe("Move cells", () => {
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteCol(0, 1, -2))
     expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.absoluteRow(0, 1, 0))
     expect(extractReference(engine, simpleCellAddress(0, 0, 4))).toEqual(CellAddress.absolute(0, 1, 0))
-  });
+  })
 
   it('value moved has appropriate edges', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['foo', /* foo */],
+      ['foo' /* foo */],
       ['=A1'],
     ])
 
@@ -96,18 +95,18 @@ describe("Move cells", () => {
 
   it('should update reference when moving to different sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
-      "Sheet1": [
+      Sheet1: [
         ['foo'],
         ['=A1'],
       ],
-      "Sheet2": []
+      Sheet2: [],
     })
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(1, 1, 0))
 
     const reference = extractReference(engine, simpleCellAddress(0, 0, 1))
     expect(reference).toEqual(CellAddress.relative(1, 1, -1))
-  });
+  })
 
   it('should override and remove formula', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -119,8 +118,8 @@ describe("Move cells", () => {
 
     expect(engine.graph.edgesCount()).toBe(0)
     expect(engine.graph.nodesCount()).toBe(1)
-    expect(engine.getCellValue("A1")).toBe(EmptyValue)
-    expect(engine.getCellValue("A2")).toBe(1)
+    expect(engine.getCellValue('A1')).toBe(EmptyValue)
+    expect(engine.getCellValue('A2')).toBe(1)
   })
 
   it('moving empty vertex', () => {
@@ -137,17 +136,16 @@ describe("Move cells", () => {
   it('replacing formula dependency with null one', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '42'],
-      ['=B1']
+      ['=B1'],
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
 
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['', ''],
-      ['=B1']
+      ['=B1'],
     ]), engine).compare(0)
   })
-
 
   it('moving empty vertex to empty vertex', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -174,27 +172,26 @@ describe("Move cells", () => {
     const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
 
     expect(engine.graph.edgesCount()).toBe(
-      2 // A2 -> B1, A2 -> B2
+      2, // A2 -> B1, A2 -> B2
     )
     expect(engine.graph.nodesCount()).toBe(
       + 2 // formulas
-      + 1 // A2
+      + 1, // A2
     )
 
     expect(source).toBe(null)
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(target, b1)).toBe(true)
-    expect(engine.getCellValue("A2")).toBe(1)
+    expect(engine.getCellValue('A2')).toBe(1)
   })
 })
-
 
 describe('moving ranges', () => {
   it('should not update range when only part of it is moved', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', /* 1 */],
-      ['2',],
-      ['=SUM(A1:A2)']
+      ['1' /* 1 */],
+      ['2'],
+      ['=SUM(A1:A2)'],
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
@@ -202,7 +199,7 @@ describe('moving ranges', () => {
     const range = extractRange(engine, simpleCellAddress(0, 0, 2))
     expect(range.start).toEqual(simpleCellAddress(0, 0, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 0, 1))
-    expect(engine.getCellValue("A3")).toEqual(2)
+    expect(engine.getCellValue('A3')).toEqual(2)
 
     const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
     const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
@@ -213,16 +210,16 @@ describe('moving ranges', () => {
 
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['' , '1'],
-      ['2',    ],
-      ['=SUM(A1:A2)']
+      ['2'    ],
+      ['=SUM(A1:A2)'],
     ]), engine).compare()
   })
 
   it('should update moved range', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', /* 1 */],
-      ['2', /* 2 */],
-      ['=SUM(A1:A2)']
+      ['1' /* 1 */],
+      ['2' /* 2 */],
+      ['=SUM(A1:A2)'],
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 2, simpleCellAddress(0, 1, 0))
@@ -232,7 +229,7 @@ describe('moving ranges', () => {
     const range = extractRange(engine, simpleCellAddress(0, 0, 2))
     expect(range.start).toEqual(simpleCellAddress(0, 1, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 1, 1))
-    expect(engine.getCellValue("A3")).toEqual(3)
+    expect(engine.getCellValue('A3')).toEqual(3)
 
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))).toBe(null)
@@ -240,7 +237,7 @@ describe('moving ranges', () => {
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['', '1'],
       ['', '2'],
-      ['=SUM(B1:B2)']
+      ['=SUM(B1:B2)'],
     ]), engine).compare()
   })
 
@@ -252,7 +249,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(simpleCellAddress(0, 0, 1), 2, 2, simpleCellAddress(0, 2, 0))
-    }).toThrow("It is not possible to move / replace cells with matrix")
+    }).toThrow('It is not possible to move / replace cells with matrix')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -263,7 +260,7 @@ describe('moving ranges', () => {
 
     expect(() => {
       engine.moveCells(simpleCellAddress(0, 0, 0), 2, 1, simpleCellAddress(0, 0, 1))
-    }).toThrow("It is not possible to move / replace cells with matrix")
+    }).toThrow('It is not possible to move / replace cells with matrix')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -286,18 +283,18 @@ describe('moving ranges', () => {
         + 2 // formulas
         + 1 // A2
         + 1 // A1 (Empty)
-        + 1 // A1:A2 range
+        + 1, // A1:A2 range
     )
     expect(engine.graph.edgesCount()).toBe(
         + 2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
         + 1 // A1:A2 -> B1
-        + 1 // A2 -> B2
+        + 1, // A2 -> B2
     )
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(source, range)).toBe(true)
     expect(engine.graph.existsEdge(target, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
-    expect(engine.getCellValue("A2")).toBe(1)
+    expect(engine.getCellValue('A2')).toBe(1)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['' , '=SUM(A1:A2)'],
@@ -327,12 +324,12 @@ describe('moving ranges', () => {
     expect(engine.graph.nodesCount()).toBe(
         + 2 // formulas
         + 2 // C1, C2
-        + 1 // C1:C2 range
+        + 1, // C1:C2 range
     )
     expect(engine.graph.edgesCount()).toBe(
         + 2 // C1 -> C1:C2, C2 -> C1:C2
         + 1 // C1:C2 -> B1
-        + 1 // C2 -> B2
+        + 1, // C2 -> B2
     )
 
     expect(engine.graph.existsEdge(c1, range)).toBe(true)
@@ -347,8 +344,8 @@ describe('moving ranges', () => {
 
   it('should adjust edges when moving smaller range', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['1', '',            /* 1 */],
-        ['2', '=SUM(A1:A2)', /* 2 */],
+        ['1', ''            /* 1 */],
+        ['2', '=SUM(A1:A2)' /* 2 */],
         ['3', '=SUM(A1:A3)'         ],
     ])
 
@@ -379,14 +376,14 @@ describe('moving ranges', () => {
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['' , ''           , '1'],
       ['' , '=SUM(C1:C2)', '2'],
-      ['3', '=SUM(A1:A3)',    ],
+      ['3', '=SUM(A1:A3)'    ],
     ]), engine).compare()
   })
 
   it('should adjust edges when moving smaller ranges - more complex', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '',            /* 1 */],
-      ['2', '=SUM(A1:A2)', /* 2 */],
+      ['1', ''            /* 1 */],
+      ['2', '=SUM(A1:A2)' /* 2 */],
       ['3', '=SUM(A1:A3)'  /* 3 */],
       ['4', '=SUM(A1:A4)'         ],
     ])
@@ -416,9 +413,9 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , ''            ,'1'],
-      ['' , '=SUM(C1:C2)' ,'2'],
-      ['' , '=SUM(C1:C3)' ,'3'],
+      ['' , ''            , '1'],
+      ['' , '=SUM(C1:C2)' , '2'],
+      ['' , '=SUM(C1:C3)' , '3'],
       ['4', '=SUM(A1:A4)'     ],
     ]), engine).compare(0)
   })
@@ -428,7 +425,7 @@ describe('moving ranges', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-      ['=SUM(A1:B1)', '=SUM(A1:B2)', '=SUM(A1:B3)']
+      ['=SUM(A1:B1)', '=SUM(A1:B2)', '=SUM(A1:B3)'],
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 2, 2, simpleCellAddress(0, 2, 0))
@@ -437,7 +434,7 @@ describe('moving ranges', () => {
       ['', '', '1', '2'],
       ['', '', '3', '4'],
       ['5', '6'],
-      ['=SUM(C1:D1)', '=SUM(C1:D2)', '=SUM(A1:B3)']
+      ['=SUM(C1:D1)', '=SUM(C1:D2)', '=SUM(A1:B3)'],
     ]), engine).compare(0)
   })
 })

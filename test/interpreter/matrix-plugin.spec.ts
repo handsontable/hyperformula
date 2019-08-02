@@ -1,4 +1,4 @@
-import {HandsOnEngine, EmptyValue} from '../../src'
+import {EmptyValue, HandsOnEngine} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'

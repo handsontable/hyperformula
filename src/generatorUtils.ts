@@ -26,7 +26,7 @@ export function * map<T, R>(fn: ((x: T) => R), iterable: IterableIterator<T>): I
 
   if (asSplit.hasOwnProperty('value')) {
     const value = asSplit.value as T
-    
+
     yield fn(value)
     yield * map(fn, asSplit.rest)
   }

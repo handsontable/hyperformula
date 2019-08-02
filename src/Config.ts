@@ -1,5 +1,5 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
-import {TranslationPackage, enGB} from './i18n'
+import {enGB, TranslationPackage} from './i18n'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 

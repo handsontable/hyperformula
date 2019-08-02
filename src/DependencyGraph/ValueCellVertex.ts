@@ -1,4 +1,4 @@
-import {CellError, CellValue} from '../Cell'
+import {CellError} from '../Cell'
 
 type ValueCellVertexValue = number | boolean | string | CellError
 

@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
-import { DependencyGraph} from '../../DependencyGraph'
+import {DependencyGraph} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {Interpreter} from '../Interpreter'

@@ -2,15 +2,15 @@ import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
+import {filterWith, map} from '../generatorUtils'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies, ParserWithCaching} from '../parser'
+import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
-import {filterWith, map} from "../generatorUtils";
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
@@ -218,7 +218,7 @@ export class DependencyGraph {
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
     if (this.matrixMapping.isMatrixInRange(range)) {
-      throw Error("It is not possible to move / replace cells with matrix")
+      throw Error('It is not possible to move / replace cells with matrix')
     }
   }
 
@@ -233,7 +233,7 @@ export class DependencyGraph {
       if (sourceVertex !== null) {
         this.addressMapping.setCell(targetAddress, sourceVertex)
         let emptyVertex = null
-        for (let adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
+        for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
           if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
             emptyVertex = emptyVertex || this.fetchOrCreateEmptyCell(sourceAddress)
             this.graph.addEdge(emptyVertex, adjacentNode)
@@ -249,7 +249,7 @@ export class DependencyGraph {
         if (sourceVertex === null) {
           this.addressMapping.removeCell(targetAddress)
         }
-        for (let adjacentNode of this.graph.adjacentNodes(targetVertex)) {
+        for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
           sourceVertex = sourceVertex || this.fetchOrCreateEmptyCell(targetAddress)
           this.graph.addEdge(sourceVertex, adjacentNode)
         }

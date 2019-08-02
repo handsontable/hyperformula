@@ -1,7 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
-import {RangeMapping} from '../src/DependencyGraph'
-import {RangeVertex} from '../src/DependencyGraph'
+import {RangeMapping, RangeVertex} from '../src/DependencyGraph'
 
 describe('RangeMapping', () => {
   it('range mapping when there is none', () => {

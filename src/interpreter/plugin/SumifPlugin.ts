@@ -1,13 +1,7 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {
-  CellError,
-  CellValue,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from '../../Cell'
-import { CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
 import {AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'

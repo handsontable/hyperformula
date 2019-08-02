@@ -1,7 +1,7 @@
-import {CellAddress, ParserWithCaching} from "../parser";
-import {SimpleCellAddress} from "../Cell";
-import {DependencyGraph, FormulaCellVertex} from "../DependencyGraph";
-import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFunction} from "./common";
+import {SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
+import {CellAddress, ParserWithCaching} from '../parser'
+import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFunction} from './common'
 
 export namespace AddRowsDependencyTransformer {
   export function transform(sheet: number, row: number, numberOfRowsToAdd: number, graph: DependencyGraph, parser: ParserWithCaching) {

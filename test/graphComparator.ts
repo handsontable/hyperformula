@@ -1,14 +1,15 @@
+import {deepStrictEqual, strictEqual} from 'assert'
+import {HandsOnEngine} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
-  AddressMapping, CellVertex, DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex, RangeVertex,
-  ValueCellVertex, Vertex
-} from "../src/DependencyGraph";
-import {SimpleCellAddress, simpleCellAddress} from "../src/Cell";
-import {deepStrictEqual, strictEqual} from "assert";
-import {HandsOnEngine} from "../src";
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
+  MatrixVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex,
+} from '../src/DependencyGraph'
 
 export class EngineComparator {
 
@@ -42,16 +43,16 @@ export class EngineComparator {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
           deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
-          deepStrictEqual(expectedVertex.getFormula(), actualVertex.getFormula(), "Different AST in formulas")
+          deepStrictEqual(expectedVertex.getFormula(), actualVertex.getFormula(), 'Different AST in formulas')
           strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
           strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
         } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
-          throw Error("Not implemented yet.")
+          throw Error('Not implemented yet.')
         } else {
-          throw Error("Different vertex types")
+          throw Error('Different vertex types')
         }
 
         const expectedAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
@@ -63,7 +64,7 @@ export class EngineComparator {
         for (const adjacentNode of actualGraph.adjacentNodes(actualVertex)) {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, "Dependent vertices are not same")
+        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, 'Dependent vertices are not same')
       }
     }
   }
@@ -77,6 +78,6 @@ export class EngineComparator {
         return address
       }
     }
-    throw Error("No such vertex in address mapping: ")
+    throw Error('No such vertex in address mapping: ')
   }
 }

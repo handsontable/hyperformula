@@ -1,4 +1,4 @@
-import {FormulaCellVertex, EmptyCellVertex, MatrixVertex, ValueCellVertex, RangeVertex} from './'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from './'
 
 /**
  * Represents vertex which keeps values of one or more cells

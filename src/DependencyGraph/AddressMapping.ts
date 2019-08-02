@@ -1,8 +1,8 @@
-import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue, simpleCellAddress} from '../Cell'
-import {Sheet} from '../GraphBuilder'
-import {CellVertex} from './Vertex'
-import { MatrixVertex, EmptyCellVertex } from './'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue, EmptyValue, SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
+import {Sheet} from '../GraphBuilder'
+import {EmptyCellVertex, MatrixVertex} from './'
+import {CellVertex} from './Vertex'
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -181,8 +181,8 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
-    for (const [colNumber,col] of this.mapping) {
-      for (const [rowNumber,value] of col) {
+    for (const [colNumber, col] of this.mapping) {
+      for (const [rowNumber, value] of col) {
         yield [simpleCellAddress(sheet, colNumber, rowNumber), value]
       }
     }
@@ -290,8 +290,8 @@ export class DenseStrategy implements IAddressMappingStrategy {
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
-    for (let y=0; y<this.height; ++y) {
-      for (let x=0; x<this.width; ++x) {
+    for (let y = 0; y < this.height; ++y) {
+      for (let x = 0; x < this.width; ++x) {
         yield [simpleCellAddress(sheet, x, y), this.mapping[y][x]]
       }
     }

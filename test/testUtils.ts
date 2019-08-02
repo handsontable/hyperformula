@@ -1,4 +1,5 @@
 import {HandsOnEngine} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {FormulaCellVertex} from '../src/DependencyGraph'
 import {
@@ -9,9 +10,8 @@ import {
   CellRangeAst,
   CellReferenceAst,
   ProcedureAst,
-  Unparser
+  Unparser,
 } from '../src/parser'
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
 export const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference

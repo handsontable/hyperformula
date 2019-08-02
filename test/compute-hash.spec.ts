@@ -1,7 +1,7 @@
-import { Config } from '../src/Config'
-import { SheetMapping } from '../src/DependencyGraph'
-import { buildLexerConfig, FormulaLexer, ParserWithCaching } from '../src/parser'
-import { CellAddress } from '../src/parser/CellAddress'
+import {Config} from '../src/Config'
+import {SheetMapping} from '../src/DependencyGraph'
+import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../src/parser'
+import {CellAddress} from '../src/parser/CellAddress'
 
 describe('computeHash', () => {
   const computeFunc = (code: string, address: CellAddress): string => {

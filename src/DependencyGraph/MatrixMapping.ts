@@ -66,7 +66,7 @@ export class MatrixMapping {
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
-  public truncateMatricesByRows(sheet: number, startRow: number, endRow: number): Array<MatrixVertex> {
+  public truncateMatricesByRows(sheet: number, startRow: number, endRow: number): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
     for (const [key, matrix] of this.numericMatricesInRows(sheet, startRow, endRow)) {
       matrix.removeRows(sheet, startRow, endRow)
@@ -78,7 +78,7 @@ export class MatrixMapping {
     return verticesToRemove
   }
 
-  public truncateMatricesByColumns(sheet: number, startColumn: number, endColumn: number): Array<MatrixVertex> {
+  public truncateMatricesByColumns(sheet: number, startColumn: number, endColumn: number): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
     for (const [key, matrix] of this.numericMatricesInColumns(sheet, startColumn, endColumn)) {
       matrix.removeColumns(sheet, startColumn, endColumn)

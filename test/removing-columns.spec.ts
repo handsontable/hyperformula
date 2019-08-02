@@ -1,6 +1,6 @@
 import {Config, HandsOnEngine} from '../src'
-import { simpleCellAddress} from '../src/Cell'
-import { MatrixVertex, RangeVertex} from '../src/DependencyGraph'
+import {simpleCellAddress} from '../src/Cell'
+import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
 import {expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'

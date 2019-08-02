@@ -1,5 +1,5 @@
-import {Ast} from '../parser'
 import {CellValue, SimpleCellAddress} from '../Cell'
+import {Ast} from '../parser'
 
 /**
  * Represents vertex which keeps formula

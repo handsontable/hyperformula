@@ -1,8 +1,8 @@
-import {transformAddressesInFormula, TransformCellAddressFunction} from "./common";
-import {Ast, AstNodeType, CellAddress, ParserWithCaching} from "../parser";
-import {SimpleCellAddress} from "../Cell";
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
-import {DependencyGraph} from "../DependencyGraph";
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
+import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
+import {transformAddressesInFormula, TransformCellAddressFunction} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transformDependentFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -13,7 +13,7 @@ export namespace MoveCellsDependencyTransformer {
           sourceRange,
           toRight,
           toBottom,
-          toSheet
+          toSheet,
       )
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
@@ -25,14 +25,14 @@ export namespace MoveCellsDependencyTransformer {
       const newAst = transformAddressesInFormula(
           node.getFormula(),
           node.getAddress(),
-          fixDependenciesInMovedCells(-toRight, -toBottom)
+          fixDependenciesInMovedCells(-toRight, -toBottom),
       )
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress({
         sheet: node.address.sheet,
         col: node.address.col + toRight,
-        row: node.address.row + toBottom
+        row: node.address.row + toBottom,
       })
     }
   }
@@ -88,17 +88,16 @@ export namespace MoveCellsDependencyTransformer {
         return {
           type: ast.type,
           procedureName: ast.procedureName,
-          args: ast.args.map((arg) => transformAddressesInMovedFormula(arg, address, sourceRange, toRight, toBottom, toSheet))
+          args: ast.args.map((arg) => transformAddressesInMovedFormula(arg, address, sourceRange, toRight, toBottom, toSheet)),
         }
       }
       default: {
         return {
           type: ast.type,
           left: transformAddressesInMovedFormula(ast.left, address, sourceRange, toRight, toBottom, toSheet),
-          right: transformAddressesInMovedFormula(ast.right, address, sourceRange, toRight, toBottom, toSheet)
+          right: transformAddressesInMovedFormula(ast.right, address, sourceRange, toRight, toBottom, toSheet),
         } as Ast
       }
     }
   }
 }
-

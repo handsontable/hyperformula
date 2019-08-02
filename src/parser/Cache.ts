@@ -16,7 +16,7 @@ export class Cache {
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies: RelativeDependency[] = []
     collectDependencies(ast, astRelativeDependencies)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, new Set(["RAND"])))
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, new Set(['RAND'])))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }

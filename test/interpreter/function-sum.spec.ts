@@ -63,7 +63,7 @@ describe('SUM', () => {
       ['1'],
       ['2'],
       ['=MAX(A1:A2)'],
-      ['=SUM(A1:A3)'], 
+      ['=SUM(A1:A3)'],
     ])
     expect(engine.getCellValue('A4')).toEqual(5)
   })

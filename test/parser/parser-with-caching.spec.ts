@@ -1,6 +1,6 @@
+import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {ErrorType, CellError} from '../../src/Cell'
 import {
   AstNodeType,
   CellRangeAst,
@@ -9,7 +9,8 @@ import {
   MinusOpAst,
   MinusUnaryOpAst,
   NumberAst,
-  ParserWithCaching, ParsingErrorType,
+  ParserWithCaching,
+  ParsingErrorType,
   PlusOpAst,
   PowerOpAst,
   ProcedureAst,

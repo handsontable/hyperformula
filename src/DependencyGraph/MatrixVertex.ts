@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 
 export class MatrixVertex {

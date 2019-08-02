@@ -25,4 +25,3 @@ export class RandomPlugin extends FunctionPlugin {
     }
   }
 }
-

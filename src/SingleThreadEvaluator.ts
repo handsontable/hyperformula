@@ -1,12 +1,6 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
-import {
-  DependencyGraph,
-  FormulaCellVertex,
-  MatrixVertex,
-  RangeVertex,
-  Vertex,
-} from './DependencyGraph'
+import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'

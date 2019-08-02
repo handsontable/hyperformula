@@ -1,12 +1,6 @@
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {
-  AstNodeType,
-  CellRangeAst,
-  CellReferenceAst,
-  ErrorAst,
-  ParserWithCaching,
-} from '../../src/parser'
+import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser/CellAddress'
 
 describe('Parser - OFFSET to reference translation', () => {

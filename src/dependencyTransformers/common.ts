@@ -1,6 +1,6 @@
-import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from "../parser";
-import {CellError, ErrorType, SimpleCellAddress} from "../Cell";
-import {FormulaCellVertex} from "../DependencyGraph";
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {FormulaCellVertex} from '../DependencyGraph'
+import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
 
@@ -72,7 +72,6 @@ export function fixFormulaVertexRow(node: FormulaCellVertex, row: number, number
     })
   }
 }
-
 
 export function fixFormulaVertexColumn(node: FormulaCellVertex, column: number, numberOfColumns: number) {
   const nodeAddress = node.getAddress()

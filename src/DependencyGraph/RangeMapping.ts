@@ -1,6 +1,6 @@
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {RangeVertex} from './'
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
 
 /**
  * Mapping from address ranges to range vertices

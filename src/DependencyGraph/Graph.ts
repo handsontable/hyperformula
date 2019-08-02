@@ -1,4 +1,3 @@
-import {EmptyCellVertex} from "./EmptyCellVertex";
 
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 /**
@@ -8,10 +7,10 @@ export class Graph<T> {
   /** Set with nodes in graph. */
   public nodes: Set<T>
 
+  public specialNodes: Set<T>
+
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
-
-  public specialNodes: Set<T>
 
   constructor() {
     this.nodes = new Set()

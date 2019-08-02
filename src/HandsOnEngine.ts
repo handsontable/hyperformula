@@ -1,3 +1,4 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
@@ -13,19 +14,17 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {MatrixMapping} from './DependencyGraph/MatrixMapping'
+import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
+import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
+import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
+import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst,} from './parser'
+import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
-import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
-import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
-import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
-import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-
 
 /**
  * Engine for one sheet

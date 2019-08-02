@@ -56,18 +56,18 @@ describe('changing cell content', () => {
 
   it('update vertex without adjacent nodes to empty cell', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1']
+      ['1'],
     ])
 
     engine.setCellContent(simpleCellAddress(0, 0, 0), '')
 
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
-    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+    expect(engine.getCellValue('A1')).toBe(EmptyValue)
   })
 
   it('set vertex with edge to empty cell', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '=A1']
+      ['1', '=A1'],
     ])
 
     engine.setCellContent(simpleCellAddress(0, 0, 0), '')
@@ -76,7 +76,7 @@ describe('changing cell content', () => {
     const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
     expect(a1).toEqual(new EmptyCellVertex())
     expect(engine.graph.existsEdge(a1, a2)).toBe(true)
-    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+    expect(engine.getCellValue('A1')).toBe(EmptyValue)
   })
 
   it('update formula to empty cell', () => {
@@ -313,11 +313,11 @@ describe('changing cell content', () => {
   it('should not be possible to edit part of a Matrix', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
-      ['', '{=TRANSPOSE(A1:B1)}']
+      ['', '{=TRANSPOSE(A1:B1)}'],
     ])
 
     expect(() => {
-      engine.setCellContent(simpleCellAddress(0, 0, 1), "{=TRANSPOSE(C1:C2)}")
+      engine.setCellContent(simpleCellAddress(0, 0, 1), '{=TRANSPOSE(C1:C2)}')
     }).toThrow('You cannot modify only part of an array')
   })
 })

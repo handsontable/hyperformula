@@ -1,9 +1,10 @@
 import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
-import {SimpleCellAddress, ErrorType, CellError} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
   AstNodeType,
+  buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
   buildConcatenateOpAst,
@@ -25,7 +26,6 @@ import {
   buildTimesOpAst,
   CellReferenceAst,
   ParsingErrorType,
-  buildCellErrorAst,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
@@ -36,6 +36,7 @@ import {
   ConcatenateOp,
   DivOp,
   EqualsOp,
+  ErrorLiteral,
   GreaterThanOp,
   GreaterThanOrEqualOp,
   ILexerConfig,
@@ -53,12 +54,11 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
-  ErrorLiteral,
   TimesOp,
 } from './LexerConfig'
 
 const errors: Record<string, ErrorType> = {
-  'REF': ErrorType.REF,
+  REF: ErrorType.REF,
 }
 
 /**
@@ -271,8 +271,8 @@ export class FormulaParser extends Parser {
           } else {
             return buildErrorAst([])
           }
-        }
-      }
+        },
+      },
     ]))
   })
 
