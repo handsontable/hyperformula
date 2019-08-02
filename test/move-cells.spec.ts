@@ -410,4 +410,22 @@ describe('moving ranges', () => {
       ['4', '=SUM(A1:A4)'     ],
     ]), engine).compare(0)
   })
+
+  it('move wider dependent ranges', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=SUM(A1:B1)', '=SUM(A1:B2)', '=SUM(A1:B3)']
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 2, 2, simpleCellAddress(0, 2, 0))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '', '1', '2'],
+      ['', '', '3', '4'],
+      ['5', '6'],
+      ['=SUM(C1:D1)', '=SUM(C1:D2)', '=SUM(A1:B3)']
+    ]), engine).compare(0)
+  })
 })
