@@ -9,6 +9,7 @@ import {Interpreter} from '../Interpreter'
 interface IImplementedFunctions {
   [functionName: string]: {
     translationKey: string,
+    isVolatile?: boolean,
   }
 }
 

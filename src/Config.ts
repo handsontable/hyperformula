@@ -95,6 +95,17 @@ export class Config {
   }
 
   public volatileFunctions(): Set<string> {
-    return new Set(['RAND'])
+    const volatileFunctions = new Set<string>()
+
+    for (const plugin of this.allFunctionPlugins()) {
+      for (const functionKey in plugin.implementedFunctions) {
+        const pluginFunctionData = plugin.implementedFunctions[functionKey]
+        if (pluginFunctionData.isVolatile) {
+          volatileFunctions.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+        }
+      }
+    }
+
+    return volatileFunctions
   }
 }

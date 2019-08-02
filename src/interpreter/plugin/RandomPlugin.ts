@@ -6,6 +6,7 @@ export class RandomPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     rand: {
       translationKey: 'RAND',
+      isVolatile: true,
     },
   }
 
