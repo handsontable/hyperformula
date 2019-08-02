@@ -1,7 +1,7 @@
-import {simpleCellAddress} from '../src/Cell'
-import {SheetMapping} from '../src/DependencyGraph'
-import {cellAddressFromString} from '../src/parser'
-import {CellAddress} from '../src/parser/CellAddress'
+import {simpleCellAddress} from '../../src/Cell'
+import {SheetMapping} from '../../src/DependencyGraph'
+import {cellAddressFromString} from '../../src/parser'
+import {CellAddress} from '../../src/parser/CellAddress'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
