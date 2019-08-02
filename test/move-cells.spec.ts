@@ -14,6 +14,7 @@ describe("Move cells", () => {
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
     expect(engine.getCellValue("A2")).toEqual('foo')
   });
 
@@ -25,7 +26,6 @@ describe("Move cells", () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 1), 1, 1, simpleCellAddress(0, 1, 0))
 
-    /* reference */
     const reference = extractReference(engine, simpleCellAddress(0, 1, 0))
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
   });
@@ -41,7 +41,6 @@ describe("Move cells", () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 1), 1, 4, simpleCellAddress(0, 1, 0))
 
-    /* reference */
     expect(extractReference(engine, simpleCellAddress(0, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
     expect(extractReference(engine, simpleCellAddress(0, 1, 1))).toEqual(CellAddress.absoluteCol(0, 0, -1))
     expect(extractReference(engine, simpleCellAddress(0, 1, 2))).toEqual(CellAddress.absoluteRow(0, -1, 0))
@@ -55,14 +54,14 @@ describe("Move cells", () => {
         ['foo'],
         ['=A1'],
       ],
-      "Sheet2": []
+      "Sheet2": [
+        ['', /* =A1 */]
+      ]
     })
 
     engine.moveCells(simpleCellAddress(0, 0, 1), 1, 1, simpleCellAddress(1, 1, 0))
 
-    /* reference */
-    const reference = extractReference(engine, simpleCellAddress(1, 1, 0))
-    expect(reference).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, simpleCellAddress(1, 1, 0))).toEqual(CellAddress.relative(0, -1, 0))
   });
 
   it('should update reference', () => {
@@ -76,19 +75,23 @@ describe("Move cells", () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
 
-    /* reference */
     expect(extractReference(engine, simpleCellAddress(0, 0, 1))).toEqual(CellAddress.relative(0, 1, -1))
     expect(extractReference(engine, simpleCellAddress(0, 0, 2))).toEqual(CellAddress.absoluteCol(0, 1, -2))
     expect(extractReference(engine, simpleCellAddress(0, 0, 3))).toEqual(CellAddress.absoluteRow(0, 1, 0))
     expect(extractReference(engine, simpleCellAddress(0, 0, 4))).toEqual(CellAddress.absolute(0, 1, 0))
+  });
 
-    /* edge */
+  it('value moved has appropriate edges', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo', /* foo */],
+      ['=A1'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
+
     const movedVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 1, 0))
     expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 1)))).toBe(true)
-    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 2)))).toBe(true)
-    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 3)))).toBe(true)
-    expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 4)))).toBe(true)
-  });
+  })
 
   it('should update reference when moving to different sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
@@ -101,14 +104,8 @@ describe("Move cells", () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(1, 1, 0))
 
-    /* reference */
     const reference = extractReference(engine, simpleCellAddress(0, 0, 1))
     expect(reference).toEqual(CellAddress.relative(1, 1, -1))
-
-    /* edge */
-    const formulaVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(0, 0, 1))
-    const movedVertex = engine.dependencyGraph!.fetchCell(simpleCellAddress(1, 1, 0))
-    expect(engine.graph.existsEdge(movedVertex, formulaVertex)).toBe(true)
   });
 
   it('should not update range when only part of it is moved', () => {
