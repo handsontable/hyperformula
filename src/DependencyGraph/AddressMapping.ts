@@ -1,4 +1,4 @@
-import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue} from '../Cell'
+import {CellValue, SheetCellAddress, SimpleCellAddress, EmptyValue, simpleCellAddress} from '../Cell'
 import {Sheet} from '../GraphBuilder'
 import {CellVertex} from './Vertex'
 import { MatrixVertex, EmptyCellVertex } from './'
@@ -46,6 +46,7 @@ interface IAddressMappingStrategy {
   removeRows(rowStart: number, rowEnd: number): void,
   addColumns(column: number, numberOfColumns: number): void,
   removeColumns(columnStart: number, columnEnd: number): void,
+  getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>
 }
 
 /**
@@ -175,6 +176,14 @@ export class SparseStrategy implements IAddressMappingStrategy {
     })
     this.width = Math.max(0, this.width - numberOfColumns)
   }
+
+  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+    for (const [colNumber,col] of this.mapping) {
+      for (const [rowNumber,value] of col) {
+        yield [simpleCellAddress(sheet, colNumber, rowNumber), value]
+      }
+    }
+  }
 }
 
 /**
@@ -273,6 +282,14 @@ export class DenseStrategy implements IAddressMappingStrategy {
       this.mapping[i].splice(columnStart, numberOfColumns)
     }
     this.width = Math.max(0, this.width - numberOfColumns)
+  }
+
+  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+    for (let y=0; y<this.height; ++y) {
+      for (let x=0; x<this.width; ++x) {
+        yield [simpleCellAddress(sheet, x, y), this.mapping[y][x]]
+      }
+    }
   }
 }
 
@@ -483,5 +500,9 @@ export class AddressMapping {
     for (const address of range.addresses()) {
       yield [address, this.getCell(address)]
     }
+  }
+
+  public* entriesFromSheet(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+    yield* this.mapping.get(sheet)!.getEntries(sheet)
   }
 }

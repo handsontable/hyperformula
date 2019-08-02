@@ -5,6 +5,7 @@ import {CellAddress} from "../src/parser";
 import './testConfig.ts'
 import {EmptyCellVertex} from "../src/DependencyGraph";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
+import {EngineComparator} from "./graphComparator";
 
 describe("Move cells", () => {
   it('should move static content', () => {
@@ -188,6 +189,13 @@ describe('moving ranges', () => {
     expect(range.start).toEqual(simpleCellAddress(0, 0, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 0, 1))
     expect(engine.getCellValue("A3")).toEqual(2)
+
+    const a1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0))
+    const a2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+    const a1a2 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 1))!
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
+    expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
   })
 
   it('should update moved range', () => {
@@ -205,6 +213,9 @@ describe('moving ranges', () => {
     expect(range.start).toEqual(simpleCellAddress(0, 1, 0))
     expect(range.end).toEqual(simpleCellAddress(0, 1, 1))
     expect(engine.getCellValue("A3")).toEqual(3)
+
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))).toBe(null)
   })
 
   it('should not be possible to move area with matrix', () => {
@@ -363,5 +374,15 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c1, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c2, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
+
+    const expectedEngine = HandsOnEngine.buildFromArray([
+      ['' , ''            ,'1'],
+      ['' , '=SUM(C1:C2)' ,'2'],
+      ['' , '=SUM(C1:C3)' ,'3'],
+      ['4', '=SUM(A1:A4)'     ],
+    ])
+
+    const comparator = new EngineComparator(expectedEngine, engine)
+    comparator.compare(0)
   })
 })
