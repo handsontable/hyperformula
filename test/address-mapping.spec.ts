@@ -1,6 +1,6 @@
 
 import {simpleCellAddress} from '../src/Cell'
-import {AddressMapping, DenseStrategy, SparseStrategy} from '../src/DependencyGraph'
+import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy} from '../src/DependencyGraph'
 import { ValueCellVertex} from '../src/DependencyGraph'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
@@ -241,6 +241,18 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.removeColumns(0, 0, 5)
     expect(mapping.getWidth(0)).toBe(0)
     expect(mapping.has(simpleCellAddress(0, 0, 0))).toBe(false)
+  })
+
+  it ('should expand columns when adding cell', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(simpleCellAddress(0, 2, 0), new EmptyCellVertex())
+    expect(mapping.getWidth(0)).toBe(3)
+  })
+
+  it ('should expand rows when adding cell', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(simpleCellAddress(0, 0, 2), new EmptyCellVertex())
+    expect(mapping.getHeight(0)).toBe(3)
   })
 }
 

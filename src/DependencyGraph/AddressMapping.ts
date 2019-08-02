@@ -77,6 +77,9 @@ export class SparseStrategy implements IAddressMappingStrategy {
 
   /** @inheritDoc */
   public setCell(address: SheetCellAddress, newVertex: CellVertex) {
+    this.width = Math.max(this.width, address.col + 1)
+    this.height = Math.max(this.height, address.row + 1)
+
     let colMapping = this.mapping.get(address.col)
     if (!colMapping) {
       colMapping = new Map()
@@ -221,10 +224,12 @@ export class DenseStrategy implements IAddressMappingStrategy {
 
   /** @inheritDoc */
   public setCell(address: SheetCellAddress, newVertex: CellVertex) {
+    this.width = Math.max(this.width, address.col + 1)
+    this.height = Math.max(this.height, address.row + 1)
+
     const rowMapping = this.mapping[address.row]
     if (!rowMapping) {
       this.mapping[address.row] = new Array(this.width)
-      this.height = address.row
     }
     this.mapping[address.row][address.col] = newVertex
   }
