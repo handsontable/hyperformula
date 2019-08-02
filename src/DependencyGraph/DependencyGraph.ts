@@ -241,6 +241,9 @@ export class DependencyGraph {
       }
 
       if (targetVertex !== null) {
+        if (sourceVertex === null) {
+          this.addressMapping.removeCell(targetAddress)
+        }
         for (let adjacentNode of this.graph.adjacentNodes(targetVertex)) {
           sourceVertex = sourceVertex || this.fetchOrCreateEmptyCell(targetAddress)
           this.graph.addEdge(sourceVertex, adjacentNode)

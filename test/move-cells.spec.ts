@@ -108,6 +108,62 @@ describe("Move cells", () => {
     expect(reference).toEqual(CellAddress.relative(1, 1, -1))
   });
 
+  it('should override and remove formula', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['=A1'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
+    expect(engine.graph.edgesCount()).toBe(0)
+    expect(engine.graph.nodesCount()).toBe(1 + 1)
+    expect(engine.getCellValue("A1")).toBe(EmptyValue)
+    expect(engine.getCellValue("A2")).toBe(1)
+  })
+
+  it('moving empty vertex', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '42'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
+
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
+  })
+
+  it('should adjust edges properly', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=A1'],
+      ['2', '=A2'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
+
+    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
+    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))
+    const source = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
+    const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
+
+    expect(engine.graph.edgesCount()).toBe(
+      2 // A2 -> B1, A2 -> B2
+    )
+    expect(engine.graph.nodesCount()).toBe(
+      + 1 // Empty singleton
+      + 2 // formulas
+      + 1 // A2
+    )
+
+    expect(source).toBe(null)
+    expect(engine.graph.existsEdge(target, b2)).toBe(true)
+    expect(engine.graph.existsEdge(target, b1)).toBe(true)
+    expect(engine.getCellValue("A2")).toBe(1)
+  })
+})
+
+
+describe('moving ranges', () => {
   it('should not update range when only part of it is moved', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* 1 */],
@@ -160,48 +216,6 @@ describe("Move cells", () => {
     expect(() => {
       engine.moveCells(simpleCellAddress(0, 0, 0), 2, 1, simpleCellAddress(0, 0, 1))
     }).toThrow("It is not possible to move / replace cells with matrix")
-  })
-
-  it('should override and remove formula', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['=A1'],
-    ])
-
-    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
-
-    expect(engine.graph.edgesCount()).toBe(0)
-    expect(engine.graph.nodesCount()).toBe(1 + 1)
-    expect(engine.getCellValue("A1")).toBe(EmptyValue)
-    expect(engine.getCellValue("A2")).toBe(1)
-  })
-
-  it('should adjust edges properly', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '=A1'],
-      ['2', '=A2'],
-    ])
-
-    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 0, 1))
-
-    const b1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 0))
-    const b2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 1, 1))
-    const source = engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))
-    const target = engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1))
-
-    expect(engine.graph.edgesCount()).toBe(
-        2 // A2 -> B1, A2 -> B2
-    )
-    expect(engine.graph.nodesCount()).toBe(
-        + 1 // Empty singleton
-        + 2 // formulas
-        + 1 // A2
-    )
-
-    expect(source).toBe(null)
-    expect(engine.graph.existsEdge(target, b2)).toBe(true)
-    expect(engine.graph.existsEdge(target, b1)).toBe(true)
-    expect(engine.getCellValue("A2")).toBe(1)
   })
 
   it('should adjust edges when moving part of range', () => {
