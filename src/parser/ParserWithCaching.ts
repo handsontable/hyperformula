@@ -95,14 +95,14 @@ export class ParserWithCaching {
   }
 
   public computeHashFromAst(ast: Ast): string {
-    return '=' + this.doHash(ast)
+    return '=' + this.computeHashOfAstNode(ast)
   }
 
   public getCache(): Cache {
     return this.cache
   }
 
-  private doHash(ast: Ast): string {
+  private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
         return ast.value.toString()
@@ -111,7 +111,7 @@ export class ParserWithCaching {
         return '"' + ast.value + '"'
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => this.doHash(arg)).join(this.config.functionArgSeparator)
+        const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
         return ast.procedureName + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
@@ -123,13 +123,13 @@ export class ParserWithCaching {
         return start + ':' + end
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.doHash(ast.value)
+        return '-' + this.computeHashOfAstNode(ast.value)
       }
       case AstNodeType.ERROR: {
         return '!ERR'
       }
       default: {
-        return this.doHash(ast.left) + binaryOpTokenMap[ast.type] + this.doHash(ast.right)
+        return this.computeHashOfAstNode(ast.left) + binaryOpTokenMap[ast.type] + this.computeHashOfAstNode(ast.right)
       }
     }
   }
