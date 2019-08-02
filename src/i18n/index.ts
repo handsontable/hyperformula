@@ -1,6 +1,8 @@
 export type TranslationSet = Record<string, string>
 export {plPL} from './plPL'
 export {enGB} from './enGB'
+import {plPL} from './plPL'
+import {enGB} from './enGB'
 
 export interface TranslationPackage {
   functions: TranslationSet,
@@ -10,4 +12,9 @@ export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTrans
   return {
     functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
   }
+}
+
+export const languages: Record<string, TranslationPackage> = {
+  plPL,
+  enGB,
 }
