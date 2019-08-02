@@ -51,3 +51,5 @@ export {
 } from './Ast'
 
 export { Unparser } from './Unparser'
+
+export { RelativeDependency } from './RelativeDependency'

@@ -1,7 +1,6 @@
 import {Ast, AstNodeType} from './Ast'
 import {CellAddress} from './CellAddress'
-
-export type RelativeDependency = CellAddress | [CellAddress, CellAddress]
+import {RelativeDependency} from './'
 
 export interface CacheEntry {
   ast: Ast,

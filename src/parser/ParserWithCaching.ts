@@ -6,11 +6,12 @@ import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {Cache, RelativeDependency} from './Cache'
+import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
+import {RelativeDependency} from './'
 
 /**
  * Parses formula using caching if feasible.
