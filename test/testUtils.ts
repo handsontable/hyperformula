@@ -1,12 +1,11 @@
 import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 import {FormulaCellVertex} from '../src/DependencyGraph'
 import {
   AstNodeType,
   buildCellErrorAst,
-  CellAddress,
-  cellAddressFromString,
+  CellAddress, cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
   ProcedureAst,
@@ -38,4 +37,21 @@ export const expect_cell_to_have_formula = (engine: HandsOnEngine, addressString
   const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula()
   const unparser = new Unparser(engine.config, engine.sheetMapping.name)
   expect(unparser.unparse(formula, address)).toEqual(expectedFormula)
+}
+
+export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
+  const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
+
+  let col
+  if (result[4].length === 1) {
+    col = result[4].toUpperCase().charCodeAt(0) - 65
+  } else {
+    col = result[4].split('').reduce((currentColumn, nextLetter) => {
+      return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
+    }, 0) - 1
+  }
+
+  const row = Number(result[6] as string) - 1
+
+  return simpleCellAddress(sheet, col, row)
 }
