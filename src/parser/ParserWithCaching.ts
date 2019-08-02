@@ -13,6 +13,13 @@ import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
 import {RelativeDependency} from './'
 
+export interface ParsingResult {
+  ast: Ast,
+  hash: string,
+  dependencies: RelativeDependency[],
+  hasVolatileFunction: boolean,
+}
+
 /**
  * Parses formula using caching if feasible.
  */
@@ -38,7 +45,7 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): { ast: Ast, hasVolatileFunction: boolean, hash: string, dependencies: RelativeDependency[] } {
+  public parse(text: string, formulaAddress: SimpleCellAddress): ParsingResult {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
