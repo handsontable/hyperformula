@@ -1,5 +1,5 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
-import {Config} from '../Config'
+import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
 // abstract for + -
@@ -73,7 +73,7 @@ export interface ILexerConfig {
   ArgSeparator: TokenType,
   allTokens: TokenType[],
 }
-export const buildLexerConfig = (config: Config): ILexerConfig => {
+export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
 

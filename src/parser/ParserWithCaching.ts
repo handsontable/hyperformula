@@ -2,7 +2,7 @@ import assert from 'assert'
 import {IToken, tokenMatcher} from 'chevrotain'
 import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
-import {Config} from '../Config'
+import {ParserConfig} from './ParserConfig'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
@@ -30,7 +30,7 @@ export class ParserWithCaching {
   private formulaParser: FormulaParser
 
   constructor(
-    private readonly config: Config,
+    private readonly config: ParserConfig,
     private readonly sheetMapping: SheetMappingFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)

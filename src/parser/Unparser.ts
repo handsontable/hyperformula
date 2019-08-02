@@ -1,5 +1,5 @@
 import {SimpleCellAddress} from '../Cell'
-import {Config} from '../Config'
+import {ParserConfig} from './ParserConfig'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {Ast, AstNodeType} from './index'
@@ -8,7 +8,7 @@ export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
   constructor(
-      private readonly config: Config,
+      private readonly config: ParserConfig,
       private readonly sheetMappingFn: SheetMappingFn,
   ) {
   }
