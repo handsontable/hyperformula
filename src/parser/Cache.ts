@@ -12,9 +12,14 @@ const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], h
 export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
+  constructor(
+    private readonly volatileFunctions: Set<string>
+  ) {
+  }
+
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, new Set(['RAND'])))
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.volatileFunctions))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }

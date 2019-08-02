@@ -24,7 +24,7 @@ export interface ParsingResult {
  */
 export class ParserWithCaching {
   public statsCacheUsed: number = 0
-  private cache: Cache = new Cache()
+  private cache: Cache
   private lexer: FormulaLexer
   private readonly lexerConfig: ILexerConfig
   private formulaParser: FormulaParser
@@ -36,6 +36,7 @@ export class ParserWithCaching {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
+    this.cache = new Cache(this.config.volatileFunctions())
   }
 
   /**

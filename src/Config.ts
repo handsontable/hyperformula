@@ -93,4 +93,8 @@ export class Config {
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
   }
+
+  public volatileFunctions(): Set<string> {
+    return new Set(['RAND'])
+  }
 }
