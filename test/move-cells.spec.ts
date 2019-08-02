@@ -325,7 +325,7 @@ describe("Move cells", () => {
     const c1c3 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 2))!
     const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
 
-    expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(false)
+    expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(true)
     expect(engine.graph.existsEdge(c1c3, a1a4)).toBe(false)
 
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a4)).toBe(true)
@@ -338,8 +338,8 @@ describe("Move cells", () => {
     const c3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
     expect(engine.graph.existsEdge(c1, c1c2)).toBe(true)
     expect(engine.graph.existsEdge(c2, c1c2)).toBe(true)
-    expect(engine.graph.existsEdge(c1, c1c3)).toBe(true)
-    expect(engine.graph.existsEdge(c2, c1c3)).toBe(true)
+    expect(engine.graph.existsEdge(c1, c1c3)).toBe(false)
+    expect(engine.graph.existsEdge(c2, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
   })
 })
