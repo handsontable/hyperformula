@@ -43,17 +43,17 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    if (sourceArea.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
+  function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    if (sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
       return dependencyAddress.moved(toSheet, toRight, toBottom)
     }
     return false
   }
 
-  function transformAddressesInMovedFormula(ast: Ast, address: SimpleCellAddress, sourceArea: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
+  function transformAddressesInMovedFormula(ast: Ast, address: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
-        const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceArea, toRight, toBottom, toSheet)
+        const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceRange, toRight, toBottom, toSheet)
         if (newCellAddress) {
           return {...ast, reference: newCellAddress}
         } else {
@@ -61,8 +61,8 @@ export namespace MoveCellsDependencyTransformer {
         }
       }
       case AstNodeType.CELL_RANGE: {
-        const newStart = fixDependenciesWhenMovingCells(ast.start, address, sourceArea, toRight, toBottom, toSheet)
-        const newEnd = fixDependenciesWhenMovingCells(ast.end, address, sourceArea, toRight, toBottom, toSheet)
+        const newStart = fixDependenciesWhenMovingCells(ast.start, address, sourceRange, toRight, toBottom, toSheet)
+        const newEnd = fixDependenciesWhenMovingCells(ast.end, address, sourceRange, toRight, toBottom, toSheet)
         if (newStart && newEnd) {
           return {
             ...ast,
@@ -81,21 +81,21 @@ export namespace MoveCellsDependencyTransformer {
       case AstNodeType.MINUS_UNARY_OP: {
         return {
           type: ast.type,
-          value: transformAddressesInMovedFormula(ast.value, address, sourceArea, toRight, toBottom, toSheet),
+          value: transformAddressesInMovedFormula(ast.value, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       case AstNodeType.FUNCTION_CALL: {
         return {
           type: ast.type,
           procedureName: ast.procedureName,
-          args: ast.args.map((arg) => transformAddressesInMovedFormula(arg, address, sourceArea, toRight, toBottom, toSheet))
+          args: ast.args.map((arg) => transformAddressesInMovedFormula(arg, address, sourceRange, toRight, toBottom, toSheet))
         }
       }
       default: {
         return {
           type: ast.type,
-          left: transformAddressesInMovedFormula(ast.left, address, sourceArea, toRight, toBottom, toSheet),
-          right: transformAddressesInMovedFormula(ast.right, address, sourceArea, toRight, toBottom, toSheet)
+          left: transformAddressesInMovedFormula(ast.left, address, sourceRange, toRight, toBottom, toSheet),
+          right: transformAddressesInMovedFormula(ast.right, address, sourceRange, toRight, toBottom, toSheet)
         } as Ast
       }
     }

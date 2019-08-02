@@ -120,11 +120,11 @@ export class RangeMapping {
     })
   }
 
-  public moveRangesInsideArea(area: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+  public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     const updated = Array<RangeVertex>()
 
     for (const [key, vertex] of this.rangeMapping.entries()) {
-      if (area.containsRange(vertex.range)) {
+      if (sourceRange.containsRange(vertex.range)) {
         vertex.range.shiftByColumns(toRight)
         vertex.range.shiftByRows(toBottom)
         vertex.range.moveToSheet(toSheet)

@@ -230,8 +230,8 @@ export class HandsOnEngine {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    this.dependencyGraph!.ensureNoMatrixInArea(sourceRange)
-    this.dependencyGraph!.ensureNoMatrixInArea(targetRange)
+    this.dependencyGraph!.ensureNoMatrixInRange(sourceRange)
+    this.dependencyGraph!.ensureNoMatrixInRange(targetRange)
 
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row

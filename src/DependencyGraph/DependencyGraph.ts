@@ -212,8 +212,8 @@ export class DependencyGraph {
     this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
   }
 
-  public ensureNoMatrixInArea(area: AbsoluteCellRange) {
-    if (this.matrixMapping.isMatrixInArea(area)) {
+  public ensureNoMatrixInRange(range: AbsoluteCellRange) {
+    if (this.matrixMapping.isMatrixInRange(range)) {
       throw Error("It is not possible to move / replace cells with matrix")
     }
   }
@@ -268,7 +268,7 @@ export class DependencyGraph {
       }
     }
 
-    this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)
+    this.rangeMapping.moveRangesInsideSourceRange(sourceRange, toRight, toBottom, toSheet)
   }
 
   public disableNumericMatrices() {

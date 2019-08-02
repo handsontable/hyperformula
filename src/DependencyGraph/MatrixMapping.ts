@@ -39,9 +39,9 @@ export class MatrixMapping {
     return false
   }
 
-  public isMatrixInArea(area: AbsoluteCellRange) {
+  public isMatrixInRange(range: AbsoluteCellRange) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.getRange().doesOverlap(area)) {
+      if (mtx.getRange().doesOverlap(range)) {
         return true
       }
     }
