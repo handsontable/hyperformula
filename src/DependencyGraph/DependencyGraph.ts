@@ -4,13 +4,14 @@ import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {filterWith, map} from '../generatorUtils'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {absolutizeDependencies, Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
+import {Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {absolutizeDependencies} from '../absolutizeDependencies'
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()

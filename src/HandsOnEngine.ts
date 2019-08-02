@@ -25,6 +25,7 @@ import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, Procedure
 import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
+import {absolutizeDependencies} from './absolutizeDependencies'
 
 /**
  * Engine for one sheet
@@ -175,14 +176,12 @@ export class HandsOnEngine {
       }
 
       this.dependencyGraph!.addNewMatrixVertex(newVertex)
-      const {dependencies} = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-      this.dependencyGraph!.processCellDependencies(dependencies, newVertex)
+      this.dependencyGraph!.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
       verticesToRecomputeFrom = [newVertex]
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
-        const {ast, hash, hasVolatileFunction} = this.parser.parse(newCellContent, address)
-        const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies, hasVolatileFunction)
+        const {ast, hash, hasVolatileFunction, dependencies} = this.parser.parse(newCellContent, address)
+        this.dependencyGraph!.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction)
       } else if (newCellContent === '') {
         this.dependencyGraph!.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {

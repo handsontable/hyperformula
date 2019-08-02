@@ -6,7 +6,6 @@ export {
   isFormula,
   isMatrix,
   ParserWithCaching,
-  absolutizeDependencies,
 } from './ParserWithCaching'
 
 export {

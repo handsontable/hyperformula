@@ -6,6 +6,7 @@ import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {absolutizeDependencies} from './absolutizeDependencies'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -94,14 +95,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
             vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address).vertex
-            const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-            dependencies.set(vertex, absoluteParserResult.dependencies)
+            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
             vertex = new FormulaCellVertex(parseResult.ast, address)
-            const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-            dependencies.set(vertex, absoluteParserResult.dependencies)
+            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
             if (parseResult.hasVolatileFunction) {
               this.dependencyGraph.markAsVolatile(vertex)
@@ -158,14 +157,12 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
             const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-            const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-            dependencies.set(vertex, absoluteParserResult.dependencies)
+            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
             const vertex = new FormulaCellVertex(parseResult.ast, address)
-            const absoluteParserResult = this.parser.getAbsolutizedParserResult(parseResult.hash, address)
-            dependencies.set(vertex, absoluteParserResult.dependencies)
+            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
