@@ -278,7 +278,7 @@ describe("Move cells", () => {
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
   })
 
-  it('should adjust edges when moving smaller range', () => {
+  xit('should adjust edges when moving smaller range', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['1', '',            /* 1 */],
         ['2', '=SUM(A1:A2)', /* 2 */],
@@ -310,7 +310,7 @@ describe("Move cells", () => {
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1)), c1c2)).toBe(true)
   })
 
-  it('should adjust edges when moving smaller ranges - more complex', () => {
+  xit('should adjust edges when moving smaller ranges - more complex', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '',            /* 1 */],
       ['2', '=SUM(A1:A2)', /* 2 */],
