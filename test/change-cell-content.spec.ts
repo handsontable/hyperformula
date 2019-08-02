@@ -284,4 +284,15 @@ describe('changing cell content', () => {
     expect(a2setCellValueSpy).toHaveBeenCalled()
     expect(b2setCellValueSpy).not.toHaveBeenCalled()
   })
+
+  it ('should not be possible to edit part of a Matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '2'],
+        ['' , '{=TRANSPOSE(A1:B1)}']
+    ])
+
+    expect(() => {
+      engine.setCellContent(simpleCellAddress(0, 0, 1), "{=TRANSPOSE(C1:C2)}")
+    }).toThrow('You cannot modify only part of an array')
+  })
 })
