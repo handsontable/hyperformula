@@ -134,6 +134,21 @@ describe("Move cells", () => {
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
   })
 
+  it('replacing formula dependency with null one', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '42'],
+      ['=B1']
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', ''],
+      ['=B1']
+    ]), engine).compare(0)
+  })
+
+
   it('moving empty vertex to empty vertex', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', ''],
