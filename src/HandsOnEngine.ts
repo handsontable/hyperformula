@@ -180,9 +180,9 @@ export class HandsOnEngine {
       verticesToRecomputeFrom = [newVertex]
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
-        const {ast, hash} = this.parser.parse(newCellContent, address)
+        const {ast, hash, hasVolatileFunction} = this.parser.parse(newCellContent, address)
         const {dependencies} = this.parser.getAbsolutizedParserResult(hash, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies)
+        this.dependencyGraph!.setFormulaToCell(address, ast, dependencies, hasVolatileFunction)
       } else if (newCellContent === '') {
         this.dependencyGraph!.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {

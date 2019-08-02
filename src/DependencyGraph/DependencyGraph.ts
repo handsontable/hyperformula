@@ -23,7 +23,7 @@ export class DependencyGraph {
       private readonly matrixMapping: MatrixMapping,
   ) {}
 
-  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
+  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     this.removeIncomingEdgesIfFormulaVertex(vertex)
@@ -32,12 +32,18 @@ export class DependencyGraph {
       vertex.setFormula(ast)
       this.processCellDependencies(dependencies, vertex)
       this.recentlyChangedVertices.add(vertex)
+      if (hasVolatileFunction) {
+        this.markAsVolatile(vertex)
+      }
     } else {
       const newVertex = new FormulaCellVertex(ast, address)
       this.graph.exchangeOrAddNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
       this.processCellDependencies(dependencies, newVertex)
       this.recentlyChangedVertices.add(newVertex)
+      if (hasVolatileFunction) {
+        this.markAsVolatile(newVertex)
+      }
     }
   }
 
@@ -430,7 +436,7 @@ export class DependencyGraph {
     }, vertices) as IterableIterator<FormulaCellVertex>
   }
 
-  private volatileVertices() {
+  public volatileVertices() {
     return this.graph.specialNodes
   }
 
