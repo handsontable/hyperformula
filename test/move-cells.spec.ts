@@ -316,7 +316,6 @@ describe("Move cells", () => {
       ['2', '=SUM(A1:A2)', /* 2 */],
       ['3', '=SUM(A1:A3)'  /* 3 */],
       ['4', '=SUM(A1:A4)'         ],
-      ['',  '=SUM(A1:)']
     ])
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 1, 3, simpleCellAddress(0, 2, 0))
