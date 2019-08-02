@@ -27,8 +27,8 @@ export class DependencyGraph {
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[]) {
     const vertex = this.addressMapping.getCell(address)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex) {
       vertex.setFormula(ast)
@@ -45,8 +45,8 @@ export class DependencyGraph {
 
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
@@ -61,8 +61,8 @@ export class DependencyGraph {
 
   public setCellEmpty(address: SimpleCellAddress) {
     const vertex = this.addressMapping.getCell(address)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.removeIncomingEdgesIfFormulaVertex(vertex)
 
     if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex) {
       this.graph.exchangeNode(vertex, EmptyCellVertex.getSingletonInstance())
