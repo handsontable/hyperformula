@@ -133,6 +133,17 @@ describe("Move cells", () => {
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
   })
 
+  it('moving empty vertex to empty vertex', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', ''],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 1, 1, simpleCellAddress(0, 1, 0))
+
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
+  })
+
   it('should adjust edges properly', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=A1'],
