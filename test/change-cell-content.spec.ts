@@ -54,16 +54,6 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
-  it('update vertex without adjacent nodes to empty cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-    ])
-
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '')
-
-    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
-    expect(engine.getCellValue('A1')).toBe(EmptyValue)
-  })
 
   it('set vertex with edge to empty cell', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -131,6 +121,7 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue('B1')).toBe(2)
     engine.setCellContent(simpleCellAddress(0, 1, 0), '')
+    expect(engine.addressMapping!.getCell(simpleCellAddress(0, 1, 0))).toBe(null)
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
   })
 
