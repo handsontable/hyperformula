@@ -145,4 +145,12 @@ export class RangeMapping {
       }
     }
   }
+
+  public* rangeVerticesContainedInRange(sourceRange: AbsoluteCellRange): IterableIterator<RangeVertex> {
+    for (const rangeVertex of this.rangesInSheet(sourceRange.sheet)) {
+      if (sourceRange.containsRange(rangeVertex.range)) {
+        yield rangeVertex
+      }
+    }
+  }
 }

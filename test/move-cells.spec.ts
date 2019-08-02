@@ -278,7 +278,7 @@ describe("Move cells", () => {
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
   })
 
-  xit('should adjust edges when moving smaller range', () => {
+  it('should adjust edges when moving smaller range', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['1', '',            /* 1 */],
         ['2', '=SUM(A1:A2)', /* 2 */],
@@ -302,15 +302,15 @@ describe("Move cells", () => {
     const a1a3 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
     expect(engine.graph.existsEdge(c1c2, a1a3)).toBe(false)
 
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a3)).toBe(true)
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a3)).toBe(true)
+    // expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a3)).toBe(true)
+    // expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a3)).toBe(true)
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a3)).toBe(true)
 
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0)), c1c2)).toBe(true)
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1)), c1c2)).toBe(true)
   })
 
-  xit('should adjust edges when moving smaller ranges - more complex', () => {
+  it('should adjust edges when moving smaller ranges - more complex', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '',            /* 1 */],
       ['2', '=SUM(A1:A2)', /* 2 */],
@@ -323,19 +323,19 @@ describe("Move cells", () => {
     /* edges */
     const c1c2 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 1))!
     const c1c3 = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 2, 2))!
-    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 2))!
+    const a1a4 = engine.rangeMapping.getRange(simpleCellAddress(0, 0, 0), simpleCellAddress(0, 0, 3))!
 
     expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(true)
     expect(engine.graph.existsEdge(c1c3, a1a4)).toBe(false)
 
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a4)).toBe(true)
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a4)).toBe(true)
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a4)).toBe(true)
-    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a4)).toBe(true)
+    // expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 0)), a1a4)).toBe(true)
+    // expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 1)), a1a4)).toBe(true)
+    // expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 2)), a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 0, 3)), a1a4)).toBe(true)
 
     const c1 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0))
     const c2 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
-    const c3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1))
+    const c3 = engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 2))
     expect(engine.graph.existsEdge(c1, c1c2)).toBe(true)
     expect(engine.graph.existsEdge(c2, c1c2)).toBe(true)
     expect(engine.graph.existsEdge(c1, c1c3)).toBe(false)

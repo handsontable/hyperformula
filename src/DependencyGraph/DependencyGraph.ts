@@ -250,6 +250,14 @@ export class DependencyGraph {
       }
     }
 
+    for (const rangeVertex of this.rangeMapping.rangeVerticesContainedInRange(sourceRange)) {
+      for (const adjacentNode of this.graph.adjacentNodes(rangeVertex)) {
+        if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
+          this.graph.removeEdge(rangeVertex, adjacentNode)
+        }
+      }
+    }
+
     this.rangeMapping.moveRangesInsideArea(sourceRange, toRight, toBottom, toSheet)
   }
 
