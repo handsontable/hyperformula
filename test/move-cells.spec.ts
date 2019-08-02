@@ -172,11 +172,11 @@ describe('Move cells', () => {
     const target = engine.addressMapping!.fetchCell(adr('A2'))
 
     expect(engine.graph.edgesCount()).toBe(
-      2, // A2 -> B1, A2 -> B2
+        2, // A2 -> B1, A2 -> B2
     )
     expect(engine.graph.nodesCount()).toBe(
-      + 2 // formulas
-      + 1, // A2
+        +2 // formulas
+        + 1, // A2
     )
 
     expect(source).toBe(null)
@@ -209,8 +209,8 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , '1'],
-      ['2'    ],
+      ['', '1'],
+      ['2'],
       ['=SUM(A1:A2)'],
     ]), engine).compare()
   })
@@ -280,13 +280,13 @@ describe('moving ranges', () => {
     expect(source).toEqual(new EmptyCellVertex())
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
-        + 2 // formulas
+        +2 // formulas
         + 1 // A2
         + 1 // A1 (Empty)
         + 1, // A1:A2 range
     )
     expect(engine.graph.edgesCount()).toBe(
-        + 2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
+        +2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
         + 1 // A1:A2 -> B1
         + 1, // A2 -> B2
     )
@@ -297,8 +297,8 @@ describe('moving ranges', () => {
     expect(engine.getCellValue('A2')).toBe(1)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , '=SUM(A1:A2)'],
-      ['1', '=A2'        ],
+      ['', '=SUM(A1:A2)'],
+      ['1', '=A2'],
     ]), engine).compare()
   })
 
@@ -322,12 +322,12 @@ describe('moving ranges', () => {
     expect(a2).toBe(null)
 
     expect(engine.graph.nodesCount()).toBe(
-        + 2 // formulas
+        +2 // formulas
         + 2 // C1, C2
         + 1, // C1:C2 range
     )
     expect(engine.graph.edgesCount()).toBe(
-        + 2 // C1 -> C1:C2, C2 -> C1:C2
+        +2 // C1 -> C1:C2, C2 -> C1:C2
         + 1 // C1:C2 -> B1
         + 1, // C2 -> B2
     )
@@ -337,16 +337,16 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , '=SUM(C1:C2)', '1'],
-      ['' , '=C2'        , '2'],
+      ['', '=SUM(C1:C2)', '1'],
+      ['', '=C2', '2'],
     ]), engine).compare()
   })
 
   it('should adjust edges when moving smaller range', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['1', ''            /* 1 */],
-        ['2', '=SUM(A1:A2)' /* 2 */],
-        ['3', '=SUM(A1:A3)'         ],
+      ['1', ''            /* 1 */],
+      ['2', '=SUM(A1:A2)' /* 2 */],
+      ['3', '=SUM(A1:A3)'],
     ])
 
     engine.moveCells(adr('A1'), 1, 2, adr('C1'))
@@ -374,9 +374,9 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(adr('C2')), c1c2)).toBe(true)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , ''           , '1'],
-      ['' , '=SUM(C1:C2)', '2'],
-      ['3', '=SUM(A1:A3)'    ],
+      ['', '', '1'],
+      ['', '=SUM(C1:C2)', '2'],
+      ['3', '=SUM(A1:A3)'],
     ]), engine).compare()
   })
 
@@ -385,7 +385,7 @@ describe('moving ranges', () => {
       ['1', ''            /* 1 */],
       ['2', '=SUM(A1:A2)' /* 2 */],
       ['3', '=SUM(A1:A3)'  /* 3 */],
-      ['4', '=SUM(A1:A4)'         ],
+      ['4', '=SUM(A1:A4)'],
     ])
 
     engine.moveCells(adr('A1'), 1, 3, adr('C1'))
@@ -413,10 +413,10 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
 
     new EngineComparator(HandsOnEngine.buildFromArray([
-      ['' , ''            , '1'],
-      ['' , '=SUM(C1:C2)' , '2'],
-      ['' , '=SUM(C1:C3)' , '3'],
-      ['4', '=SUM(A1:A4)'     ],
+      ['', '', '1'],
+      ['', '=SUM(C1:C2)', '2'],
+      ['', '=SUM(C1:C3)', '3'],
+      ['4', '=SUM(A1:A4)'],
     ]), engine).compare(0)
   })
 
@@ -435,6 +435,102 @@ describe('moving ranges', () => {
       ['', '', '3', '4'],
       ['5', '6'],
       ['=SUM(C1:D1)', '=SUM(C1:D2)', '=SUM(A1:B3)'],
+    ]), engine).compare(0)
+  })
+})
+
+describe('overlapping areas', () => {
+  xit('overlapped rows', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+    ])
+
+    engine.moveCells(adr('A1'), 2, 2, adr('A2'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', ''],
+      ['1', '2'],
+      ['3', '4'],
+    ]), engine).compare(0)
+  })
+
+  it('overlapped rows - oposit way', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+    ])
+
+    engine.moveCells(adr('A2'), 2, 2, adr('A1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['3', '4'],
+      ['5', '6'],
+      ['', ''],
+    ]), engine).compare(0)
+  })
+
+  xit('overlapped columns', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+    ])
+
+    engine.moveCells(adr('A1'), 2, 2, adr('B1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '1', '2'],
+      ['', '4', '5'],
+    ]), engine).compare(0)
+  })
+
+  it('overlapped columns - oposit way', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+    ])
+
+    engine.moveCells(adr('B1'), 2, 2, adr('A1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['2', '3', ''],
+      ['5', '6', ''],
+    ]), engine).compare(0)
+  })
+
+  xit('overlapped rows with ranges', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=SUM(A1:B2)', '=SUM(A1:B3)', '=SUM(A2:B2)'],
+    ])
+
+    engine.moveCells(adr('A1'), 2, 2, adr('A2'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', ''],
+      ['1', '2'],
+      ['3', '4'],
+      ['=SUM(A2:B2)', '=SUM(A1:B3)', '=SUM(A2:B2)'],
+    ]), engine).compare(0)
+  })
+
+  xit('overlapped columns with ranges', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['=SUM(A1:B2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
+    ])
+
+    engine.moveCells(adr('A1'), 2, 2, adr('B1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '1', '2'],
+      ['', '4', '5'],
+      ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
     ]), engine).compare(0)
   })
 })
