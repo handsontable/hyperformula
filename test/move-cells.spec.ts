@@ -196,6 +196,12 @@ describe('moving ranges', () => {
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
+
+    // new EngineComparator(HandsOnEngine.buildFromArray([
+    //   ['' , '1'],
+    //   ['2',    ],
+    //   ['=SUM(A1:A2)']
+    // ]), engine).compare()
   })
 
   it('should update moved range', () => {
@@ -216,6 +222,12 @@ describe('moving ranges', () => {
 
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 0))).toBe(null)
     expect(engine.addressMapping!.getCell(simpleCellAddress(0, 0, 1))).toBe(null)
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '1'],
+      ['', '2'],
+      ['=SUM(B1:B2)']
+    ]), engine).compare()
   })
 
   it('should not be possible to move area with matrix', () => {
@@ -242,7 +254,7 @@ describe('moving ranges', () => {
 
   it('should adjust edges when moving part of range', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '=A1:A2'],
+      ['1', '=SUM(A1:A2)'],
       ['2', '=A2'],
     ])
 
@@ -273,11 +285,16 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(target, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
     expect(engine.getCellValue("A2")).toBe(1)
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['' , '=SUM(A1:A2)'],
+      ['1', '=A2'        ],
+    ]), engine).compare()
   })
 
   it('should adjust edges when moving whole range', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '=A1:A2'],
+      ['1', '=SUM(A1:A2)'],
       ['2', '=A2'],
     ])
 
@@ -298,17 +315,22 @@ describe('moving ranges', () => {
         + 1 // Empty singleton
         + 2 // formulas
         + 2 // C1, C2
-        + 1 // A1:A2 range
+        + 1 // C1:C2 range
     )
     expect(engine.graph.edgesCount()).toBe(
-        + 2 // C1 -> A1:A2, C2 -> A1:A2
-        + 1 // A1:A2 -> B1
+        + 2 // C1 -> C1:C2, C2 -> C1:C2
+        + 1 // C1:C2 -> B1
         + 1 // C2 -> B2
     )
 
     expect(engine.graph.existsEdge(c1, range)).toBe(true)
     expect(engine.graph.existsEdge(c2, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['' , '=SUM(C1:C2)', '1'],
+      ['' , '=C2'        , '2'],
+    ]), engine).compare()
   })
 
   it('should adjust edges when moving smaller range', () => {
@@ -341,6 +363,12 @@ describe('moving ranges', () => {
 
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 0)), c1c2)).toBe(true)
     expect(engine.graph.existsEdge(engine.addressMapping!.fetchCell(simpleCellAddress(0, 2, 1)), c1c2)).toBe(true)
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['' , ''           , '1'],
+      ['' , '=SUM(C1:C2)', '2'],
+      ['3', '=SUM(A1:A3)',    ],
+    ]), engine).compare()
   })
 
   it('should adjust edges when moving smaller ranges - more complex', () => {
@@ -375,14 +403,11 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c2, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
 
-    const expectedEngine = HandsOnEngine.buildFromArray([
+    new EngineComparator(HandsOnEngine.buildFromArray([
       ['' , ''            ,'1'],
       ['' , '=SUM(C1:C2)' ,'2'],
       ['' , '=SUM(C1:C3)' ,'3'],
       ['4', '=SUM(A1:A4)'     ],
-    ])
-
-    const comparator = new EngineComparator(expectedEngine, engine)
-    comparator.compare(0)
+    ]), engine).compare(0)
   })
 })
