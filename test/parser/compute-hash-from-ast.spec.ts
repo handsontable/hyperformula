@@ -11,9 +11,21 @@ describe('Compute hash from ast', () => {
   const lexer = new FormulaLexer(buildLexerConfig(config))
   const parser = new ParserWithCaching(config, sheetMapping.fetch)
 
-  it('#computeHash', async () => {
+  it('#computeHash literals', async () => {
+    const formula = '=CONCATENATE("foo", 42.34)'
     const address = adr('A1')
-    const formula = '=1+SUM(1,2,3)*3'
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+
+    const hash = parser.computeHashFromAst(ast)
+
+    expect(hash).toEqual(hashFromTokens)
+  })
+
+  it('#computeHash function call', async () => {
+    const address = adr('A1')
+    const formula = '=SUM(1,2,3)'
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
