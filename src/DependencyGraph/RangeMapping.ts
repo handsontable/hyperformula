@@ -7,7 +7,7 @@ import {RangeVertex} from './'
  */
 export class RangeMapping {
   /** Map in which actual data is stored. */
-  private rangeMapping: Map<string, RangeVertex> = new Map()
+  private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
 
   /**
    * Saves range vertex
@@ -15,8 +15,13 @@ export class RangeMapping {
    * @param vertex - vertex to save
    */
   public setRange(vertex: RangeVertex) {
-    const key = `${vertex.getStart().sheet},${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
-    this.rangeMapping.set(key, vertex)
+    let sheetMap = this.rangeMapping.get(vertex.getStart().sheet)
+    if (!sheetMap) {
+      sheetMap = new Map()
+      this.rangeMapping.set(vertex.getStart().sheet, sheetMap)
+    }
+    const key = `${vertex.getStart().col},${vertex.getStart().row},${vertex.getEnd().col},${vertex.getEnd().row}`
+    sheetMap.set(key, vertex)
   }
 
   /**
@@ -26,23 +31,27 @@ export class RangeMapping {
    * @param end - bottom-right corner of the range
    */
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
-    const key = `${start.sheet},${start.col},${start.row},${end.col},${end.row}`
-    return this.rangeMapping.get(key) || null
+    const sheetMap = this.rangeMapping.get(start.sheet)
+    if (!sheetMap) {
+      return null
+    }
+    const key = `${start.col},${start.row},${end.col},${end.row}`
+    return sheetMap.get(key) || null
   }
 
   public truncateRangesByRows(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 
-    for (const [key, vertex] of this.rangeMapping.entries()) {
-      if (vertex.sheet == sheet && rowStart <= vertex.range.end.row) {
+    for (const [key, vertex] of this.entriesFromSheet(sheet)) {
+      if (rowStart <= vertex.range.end.row) {
         vertex.range.removeRows(rowStart, rowEnd)
         if (vertex.range.height() > 0) {
           updated.push(vertex)
         } else {
           rangesToRemove.push(vertex)
         }
-        this.rangeMapping.delete(key)
+        this.removeByKey(sheet, key)
       }
     }
 
@@ -57,15 +66,15 @@ export class RangeMapping {
     const updated = Array<RangeVertex>()
     const rangesToRemove = Array<RangeVertex>()
 
-    for (const [key, vertex] of this.rangeMapping.entries()) {
-      if (vertex.sheet == sheet && columnStart <= vertex.range.end.col) {
+    for (const [key, vertex] of this.entriesFromSheet(sheet)) {
+      if (columnStart <= vertex.range.end.col) {
         vertex.range.removeColumns(columnStart, columnEnd)
         if (vertex.range.width() > 0) {
           updated.push(vertex)
         } else {
           rangesToRemove.push(vertex)
         }
-        this.rangeMapping.delete(key)
+        this.removeByKey(sheet, key)
       }
     }
 
@@ -79,17 +88,15 @@ export class RangeMapping {
   public shiftRangesByRows(sheet: number, row: number, numberOfRows: number) {
     const updated = Array<RangeVertex>()
 
-    for (const [key, vertex] of this.rangeMapping.entries()) {
-      if (vertex.sheet === sheet) {
-        if (row <= vertex.start.row) {
-          vertex.range.shiftByRows(numberOfRows)
-          updated.push(vertex)
-          this.rangeMapping.delete(key)
-        } else if (row > vertex.start.row && row <= vertex.end.row) {
-          vertex.range.expandByRows(numberOfRows)
-          updated.push(vertex)
-          this.rangeMapping.delete(key)
-        }
+    for (const [key, vertex] of this.entriesFromSheet(sheet)) {
+      if (row <= vertex.start.row) {
+        vertex.range.shiftByRows(numberOfRows)
+        updated.push(vertex)
+        this.removeByKey(sheet, key)
+      } else if (row > vertex.start.row && row <= vertex.end.row) {
+        vertex.range.expandByRows(numberOfRows)
+        updated.push(vertex)
+        this.removeByKey(sheet, key)
       }
     }
 
@@ -101,17 +108,15 @@ export class RangeMapping {
   public shiftRangesByColumns(sheet: number, column: number, numberOfColumns: number) {
     const updated = Array<RangeVertex>()
 
-    for (const [key, vertex] of this.rangeMapping.entries()) {
-      if (vertex.sheet === sheet) {
-        if (column <= vertex.start.col) {
-          vertex.range.shiftByColumns(numberOfColumns)
-          updated.push(vertex)
-          this.rangeMapping.delete(key)
-        } else if (column > vertex.start.col && column <= vertex.end.col) {
-          vertex.range.expandByColumns(numberOfColumns)
-          updated.push(vertex)
-          this.rangeMapping.delete(key)
-        }
+    for (const [key, vertex] of this.entriesFromSheet(sheet)) {
+      if (column <= vertex.start.col) {
+        vertex.range.shiftByColumns(numberOfColumns)
+        updated.push(vertex)
+        this.removeByKey(sheet, key)
+      } else if (column > vertex.start.col && column <= vertex.end.col) {
+        vertex.range.expandByColumns(numberOfColumns)
+        updated.push(vertex)
+        this.removeByKey(sheet, key)
       }
     }
 
@@ -123,12 +128,12 @@ export class RangeMapping {
   public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     const updated = Array<RangeVertex>()
 
-    for (const [key, vertex] of this.rangeMapping.entries()) {
+    for (const [key, vertex] of this.entriesFromSheet(sourceRange.sheet)) {
       if (sourceRange.containsRange(vertex.range)) {
         vertex.range.shiftByColumns(toRight)
         vertex.range.shiftByRows(toBottom)
         vertex.range.moveToSheet(toSheet)
-        this.rangeMapping.delete(key)
+        this.removeByKey(sourceRange.sheet, key)
         updated.push(vertex)
       }
     }
@@ -139,11 +144,19 @@ export class RangeMapping {
   }
 
   public* rangesInSheet(sheet: number): IterableIterator<RangeVertex> {
-    for (const range of this.rangeMapping.values()) {
-      if (range.sheet === sheet) {
-        yield range
-      }
+    const sheetMap = this.rangeMapping.get(sheet)
+    if (!sheetMap) {
+      return
     }
+    yield* sheetMap.values()
+  }
+
+  public* entriesFromSheet(sheet: number): IterableIterator<[string, RangeVertex]> {
+    const sheetMap = this.rangeMapping.get(sheet)
+    if (!sheetMap) {
+      return
+    }
+    yield* sheetMap.entries()
   }
 
   public* rangeVerticesContainedInRange(sourceRange: AbsoluteCellRange): IterableIterator<RangeVertex> {
@@ -152,5 +165,9 @@ export class RangeMapping {
         yield rangeVertex
       }
     }
+  }
+
+  private removeByKey(sheet: number, key: string) {
+    this.rangeMapping.get(sheet)!.delete(key)
   }
 }
