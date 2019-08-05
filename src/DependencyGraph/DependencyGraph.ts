@@ -12,6 +12,7 @@ import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {absolutizeDependencies} from '../absolutizeDependencies'
+import {Statistics, StatType} from '../statistics/Statistics'
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
@@ -22,6 +23,7 @@ export class DependencyGraph {
       private readonly graph: Graph<Vertex>,
       private readonly sheetMapping: SheetMapping,
       private readonly matrixMapping: MatrixMapping,
+      private readonly stats: Statistics = new Statistics(),
   ) {}
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
@@ -161,19 +163,27 @@ export class DependencyGraph {
     }
     const numberOfRows = rowEnd - rowStart + 1
 
-    const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
-    for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
-      if (vertex instanceof MatrixVertex) {
-        continue
+    this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
+      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
+      for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
+        if (vertex instanceof MatrixVertex) {
+          continue
+        }
+        this.graph.removeNode(vertex)
       }
-      this.graph.removeNode(vertex)
-    }
+    })
 
-    this.truncateMatricesAfterRemovingRows(sheet, rowStart, rowEnd)
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.truncateMatricesAfterRemovingRows(sheet, rowStart, rowEnd)
+    })
 
-    this.addressMapping.removeRows(sheet, rowStart, rowEnd)
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.addressMapping.removeRows(sheet, rowStart, rowEnd)
+    })
 
-    this.truncateRangesAfterRemovingRows(sheet, rowStart, rowEnd)
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      this.truncateRangesAfterRemovingRows(sheet, rowStart, rowEnd)
+    })
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
@@ -182,19 +192,27 @@ export class DependencyGraph {
     }
     const numberOfColumns = columnEnd - columnStart + 1
 
-    const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
-    for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
-      if (vertex instanceof MatrixVertex) {
-        continue
+    this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
+      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
+      for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
+        if (vertex instanceof MatrixVertex) {
+          continue
+        }
+        this.graph.removeNode(vertex)
       }
-      this.graph.removeNode(vertex)
-    }
+    })
 
-    this.truncateMatricesAfterRemovingColumns(sheet, columnStart, columnEnd)
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.truncateMatricesAfterRemovingColumns(sheet, columnStart, columnEnd)
+    })
 
-    this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
+    })
 
-    this.truncateRangesAfterRemovingColumns(sheet, columnStart, columnEnd)
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      this.truncateRangesAfterRemovingColumns(sheet, columnStart, columnEnd)
+    })
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
@@ -202,11 +220,17 @@ export class DependencyGraph {
       throw Error('It is not possible to add row in row with matrix')
     }
 
-    this.addressMapping.addRows(sheet, rowStart, numberOfRows)
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.addressMapping.addRows(sheet, rowStart, numberOfRows)
+    })
 
-    this.expandMatricesAfterAddingRows(sheet, rowStart, numberOfRows)
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.expandMatricesAfterAddingRows(sheet, rowStart, numberOfRows)
+    })
 
-    this.fixRanges(sheet, rowStart, numberOfRows)
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      this.fixRanges(sheet, rowStart, numberOfRows)
+    })
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {
@@ -214,11 +238,17 @@ export class DependencyGraph {
       throw Error('It is not possible to add column in column with matrix')
     }
 
-    this.addressMapping.addColumns(sheet, col, numberOfCols)
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.addressMapping.addColumns(sheet, col, numberOfCols)
+    })
 
-    this.expandMatricesAfterAddingColumns(sheet, col, numberOfCols)
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      this.expandMatricesAfterAddingColumns(sheet, col, numberOfCols)
+    })
 
-    this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+    })
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {

@@ -89,7 +89,7 @@ export class HandsOnEngine {
       this.addressMapping!.autoAddSheet(sheetId, sheets[sheetName])
     }
 
-    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping, this.matrixMapping)
+    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping, this.matrixMapping, this.stats)
     this.graphBuilder = new GraphBuilder(this.dependencyGraph, this.parser, this.config, this.stats)
 
     this.stats.measure(StatType.GRAPH_BUILD, () => {
@@ -201,26 +201,50 @@ export class HandsOnEngine {
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+    this.stats.reset()
+
     this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
-    AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph!, this.parser)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph!, this.parser)
+    })
+
     this.evaluator!.run()
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+    this.stats.reset()
+
     this.dependencyGraph!.removeRows(sheet, rowStart, rowEnd)
-    RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph!, this.parser)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph!, this.parser)
+    })
+
     this.evaluator!.run()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
+    this.stats.reset()
+
     this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
-    AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph!, this.parser)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph!, this.parser)
+    })
+
     this.evaluator!.run()
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+    this.stats.reset()
+
     this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
-    RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph!, this.parser)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph!, this.parser)
+    })
+
     this.evaluator!.run()
   }
 
