@@ -9,8 +9,6 @@ export class BuildEngineFromArraysFactory {
   }
 
   public buildFromSheet(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
-    const engine = new HandsOnEngine(config)
-    engine.buildFromSheets({Sheet1: sheet})
-    return engine
+    return this.buildFromSheets({Sheet1: sheet}, config)
   }
 }
