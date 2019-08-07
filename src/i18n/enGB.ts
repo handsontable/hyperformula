@@ -6,6 +6,7 @@ export const enGB: TranslationPackage = {
     AND: 'AND',
     COLUMNS: 'COLUMNS',
     CONCATENATE: 'CONCATENATE',
+    COUNTBLANK: 'COUNTBLANK',
     COUNTIF: 'COUNTIF',
     COUNTUNIQUE: 'COUNTUNIQUE',
     DATE: 'DATE',

@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress, EmptyValue} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -19,6 +19,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     min: {
       translationKey: 'MIN',
     },
+    countblank: {
+      translationKey: 'COUNTBLANK',
+    },
   }
 
   /**
@@ -31,6 +34,20 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.reduce(ast, formulaAddress, 0, 'SUM', add)
+  }
+
+  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const values = this.computeListOfValues(ast.args, formulaAddress)
+    let counter = 0
+    for (const value of values) {
+      if (value === EmptyValue) {
+        counter++
+      }
+    }
+    return counter
   }
 
   /**

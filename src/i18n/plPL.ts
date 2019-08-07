@@ -6,6 +6,7 @@ export const plPL: TranslationPackage = {
     AND: 'ORAZ',
     COLUMNS: 'LICZBAKOLUMN',
     CONCATENATE: 'ZLACZTEKST',
+    COUNTBLANK: 'LICZPUSTE',
     COUNTIF: 'LICZJEZELI',
     COUNTUNIQUE: 'COUNTUNIQUE',
     DATE: 'DATA',
