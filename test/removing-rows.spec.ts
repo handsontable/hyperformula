@@ -6,6 +6,35 @@ import './testConfig.ts'
 import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing rows - dependencies', () => {
+  it('reevaluates cells', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A3)'],
+      [''], // deleted
+      ['3'],
+    ])
+
+    expect(engine.getCellValue('B1')).toEqual(1)
+    engine.removeRows(0, 1, 1)
+    expect(engine.getCellValue('B1')).toEqual(0)
+  })
+
+  xit('dont reevaluate everything', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
+      [''], // deleted
+      ['3'],
+    ])
+    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const c1 = engine.addressMapping!.getCell(adr('C1'))
+    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.removeRows(0, 1, 1)
+
+    expect(b1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+  })
+
   it('should not affect absolute dependencies to other sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
