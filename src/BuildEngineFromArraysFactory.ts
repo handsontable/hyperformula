@@ -19,8 +19,9 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.OVERALL)
 
-    const sheetMapping = new SheetMapping()
-    const addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
+    const dependencyGraph = DependencyGraph.buildEmpty(config, stats)
+    const sheetMapping = dependencyGraph.sheetMapping
+    const addressMapping = dependencyGraph.addressMapping
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
@@ -28,13 +29,8 @@ export class BuildEngineFromArraysFactory {
 
     const parser = new ParserWithCaching(config, sheetMapping.fetch)
 
-    const graph = new Graph<Vertex>()
-    const rangeMapping = new RangeMapping()
-    const matrixMapping = new MatrixMapping()
-    const dependencyGraph = new DependencyGraph(addressMapping, rangeMapping, graph, sheetMapping, matrixMapping, stats)
-    const graphBuilder = new GraphBuilder(dependencyGraph, parser, config, stats)
-
     stats.measure(StatType.GRAPH_BUILD, () => {
+      const graphBuilder = new GraphBuilder(dependencyGraph, parser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 

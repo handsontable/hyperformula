@@ -13,15 +13,27 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {Statistics, StatType} from '../statistics/Statistics'
+import {Config} from '../Config'
 
 export class DependencyGraph {
   private recentlyChangedVertices: Set<Vertex> = new Set()
 
+  public static buildEmpty(config: Config, stats: Statistics) {
+    return new DependencyGraph(
+      AddressMapping.build(config.addressMappingFillThreshold),
+      new RangeMapping(),
+      new Graph<Vertex>(),
+      new SheetMapping(),
+      new MatrixMapping(),
+      stats
+    )
+  }
+
   constructor(
-      private readonly addressMapping: AddressMapping,
+      public readonly addressMapping: AddressMapping,
       public readonly rangeMapping: RangeMapping,
       public readonly graph: Graph<Vertex>,
-      private readonly sheetMapping: SheetMapping,
+      public readonly sheetMapping: SheetMapping,
       public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
   ) {}
