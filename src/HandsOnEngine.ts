@@ -209,7 +209,7 @@ export class HandsOnEngine {
       AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph!, this.parser)
     })
 
-    this.evaluator!.run()
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {

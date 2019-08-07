@@ -231,6 +231,10 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.fixRanges(sheet, rowStart, numberOfRows)
     })
+
+    for (const vertex of this.addressMapping.verticesFromRow(sheet, rowStart)) {
+      this.recentlyChangedVertices.add(vertex)
+    }
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {

@@ -11,6 +11,35 @@ const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): Ce
 }
 
 describe('Adding row', () => {
+  it('reevaluates cells', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A2)'],
+      // new row
+      ['2'],
+    ])
+
+    expect(engine.getCellValue('B1')).toEqual(0)
+    engine.addRows(0, 1, 1)
+    expect(engine.getCellValue('B1')).toEqual(1)
+  })
+
+  it('dont reevaluate everything', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A2)', '=SUM(A1:A1)'],
+      // new row
+      ['2'],
+    ])
+    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const c1 = engine.addressMapping!.getCell(adr('C1'))
+    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.addRows(0, 1, 1)
+
+    expect(b1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+  })
+
   it('local dependency does not change if we add rows in other sheets', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [

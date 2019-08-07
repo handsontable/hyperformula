@@ -48,6 +48,7 @@ interface IAddressMappingStrategy {
   removeColumns(columnStart: number, columnEnd: number): void,
   getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
+  verticesFromRow(row: number): IterableIterator<CellVertex>,
 }
 
 /**
@@ -190,13 +191,21 @@ export class SparseStrategy implements IAddressMappingStrategy {
   }
 
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
-    const result = new Set()
     const colMapping = this.mapping.get(column)
     if (!colMapping) {
       return
     }
     for (const [rowNumber, vertex] of colMapping) {
       yield vertex
+    }
+  }
+
+  public* verticesFromRow(row: number): IterableIterator<CellVertex> {
+    for (const colMapping of this.mapping.values()) {
+      const rowVertex = colMapping.get(row)
+      if (rowVertex) {
+        yield rowVertex
+      }
     }
   }
 }
@@ -312,6 +321,15 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
       const vertex = this.mapping[y][column]
+      if (vertex) {
+        yield vertex
+      }
+    }
+  }
+
+  public* verticesFromRow(row: number): IterableIterator<CellVertex> {
+    for (let x = 0; x < this.width; ++x) {
+      const vertex = this.mapping[row][x]
       if (vertex) {
         yield vertex
       }
@@ -534,5 +552,9 @@ export class AddressMapping {
 
   public* verticesFromColumn(sheet: number, column: number): IterableIterator<CellVertex> {
     yield* this.mapping.get(sheet)!.verticesFromColumn(column)
+  }
+
+  public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
+    yield* this.mapping.get(sheet)!.verticesFromRow(row)
   }
 }
