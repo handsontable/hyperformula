@@ -1,15 +1,7 @@
 import {Config, HandsOnEngine} from './'
 import {Sheet, Sheets, GraphBuilder} from './GraphBuilder'
 import {Statistics, StatType} from './statistics/Statistics'
-import {
-  AddressMapping,
-  DependencyGraph,
-  Graph,
-  RangeMapping,
-  SheetMapping,
-  MatrixMapping,
-  Vertex,
-} from './DependencyGraph'
+import {DependencyGraph} from './DependencyGraph'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParserWithCaching} from './parser'
 
