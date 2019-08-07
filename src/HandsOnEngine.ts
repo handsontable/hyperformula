@@ -69,12 +69,12 @@ export class HandsOnEngine {
 
     public readonly matrixMapping: MatrixMapping,
 
-    public dependencyGraph: DependencyGraph,
+    public readonly dependencyGraph: DependencyGraph,
 
     private readonly parser: ParserWithCaching,
 
     /** Formula evaluator */
-    private evaluator: Evaluator
+    private readonly evaluator: Evaluator
   ) {
   }
 
