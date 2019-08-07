@@ -74,15 +74,15 @@ export class HandsOnEngine {
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(this.sheetMapping.fetch, stringAddress, CellAddress.absolute(0, 0, 0))
-    return this.dependencyGraph!.getCellValue(address)
+    return this.dependencyGraph.getCellValue(address)
   }
 
   /**
    * Returns array with values of all cells
    * */
   public getValues(sheet: number): CellValue[][] {
-    const sheetHeight = this.dependencyGraph!.getSheetHeight(sheet)
-    const sheetWidth = this.dependencyGraph!.getSheetWidth(sheet)
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
     const arr: CellValue[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
@@ -90,7 +90,7 @@ export class HandsOnEngine {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.dependencyGraph!.getCellValue(address)
+        arr[i][j] = this.dependencyGraph.getCellValue(address)
       }
     }
 
@@ -102,8 +102,8 @@ export class HandsOnEngine {
     for (const sheetName of this.sheetMapping.names()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions.set(sheetName, {
-        width: this.dependencyGraph!.getSheetWidth(sheetId),
-        height: this.dependencyGraph!.getSheetHeight(sheetId),
+        width: this.dependencyGraph.getSheetWidth(sheetId),
+        height: this.dependencyGraph.getSheetHeight(sheetId),
       })
     }
     return sheetDimensions
@@ -123,7 +123,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    const vertex = this.dependencyGraph!.getCell(address)
+    const vertex = this.dependencyGraph.getCell(address)
     let verticesToRecomputeFrom: Vertex[]
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
@@ -139,38 +139,38 @@ export class HandsOnEngine {
         throw Error('What if new matrix vertex is not properly constructed?')
       }
 
-      this.dependencyGraph!.addNewMatrixVertex(newVertex)
-      this.dependencyGraph!.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
+      this.dependencyGraph.addNewMatrixVertex(newVertex)
+      this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
       verticesToRecomputeFrom = [newVertex]
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
         const {ast, hash, hasVolatileFunction, dependencies} = this.parser.parse(newCellContent, address)
-        this.dependencyGraph!.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction)
+        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction)
       } else if (newCellContent === '') {
-        this.dependencyGraph!.setCellEmpty(address)
+        this.dependencyGraph.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph!.setValueToCell(address, Number(newCellContent))
+        this.dependencyGraph.setValueToCell(address, Number(newCellContent))
       } else {
-        this.dependencyGraph!.setValueToCell(address, newCellContent)
+        this.dependencyGraph.setValueToCell(address, newCellContent)
       }
-      verticesToRecomputeFrom = Array.from(this.dependencyGraph!.verticesToRecompute())
-      this.dependencyGraph!.clearRecentlyChangedVertices()
+      verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+      this.dependencyGraph.clearRecentlyChangedVertices()
     } else {
       throw new Error('Illegal operation')
     }
 
     if (verticesToRecomputeFrom) {
-      this.evaluator!.partialRun(verticesToRecomputeFrom)
+      this.evaluator.partialRun(verticesToRecomputeFrom)
     }
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     this.stats.reset()
 
-    this.dependencyGraph!.addRows(sheet, row, numberOfRowsToAdd)
+    this.dependencyGraph.addRows(sheet, row, numberOfRowsToAdd)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph!, this.parser)
+      AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph, this.parser)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
@@ -179,22 +179,22 @@ export class HandsOnEngine {
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     this.stats.reset()
 
-    this.dependencyGraph!.removeRows(sheet, rowStart, rowEnd)
+    this.dependencyGraph.removeRows(sheet, rowStart, rowEnd)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph!, this.parser)
+      RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph, this.parser)
     })
 
-    this.evaluator!.run()
+    this.evaluator.run()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
     this.stats.reset()
 
-    this.dependencyGraph!.addColumns(sheet, col, numberOfCols)
+    this.dependencyGraph.addColumns(sheet, col, numberOfCols)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph!, this.parser)
+      AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph, this.parser)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
@@ -203,44 +203,44 @@ export class HandsOnEngine {
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     this.stats.reset()
 
-    this.dependencyGraph!.removeColumns(sheet, columnStart, columnEnd)
+    this.dependencyGraph.removeColumns(sheet, columnStart, columnEnd)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph!, this.parser)
+      RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph, this.parser)
     })
 
-    this.evaluator!.run()
+    this.evaluator.run()
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    this.dependencyGraph!.ensureNoMatrixInRange(sourceRange)
-    this.dependencyGraph!.ensureNoMatrixInRange(targetRange)
+    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
+    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
 
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
-    MoveCellsDependencyTransformer.transformDependentFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph!, this.parser)
-    MoveCellsDependencyTransformer.transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph!, this.parser)
+    MoveCellsDependencyTransformer.transformDependentFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+    MoveCellsDependencyTransformer.transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
 
-    this.dependencyGraph!.moveCells(sourceRange, toRight, toBottom, toSheet)
+    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
 
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public disableNumericMatrices() {
-    this.dependencyGraph!.disableNumericMatrices()
+    this.dependencyGraph.disableNumericMatrices()
   }
 
   public recomputeIfDependencyGraphNeedsIt() {
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph!.verticesToRecompute())
-    this.dependencyGraph!.clearRecentlyChangedVertices()
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+    this.dependencyGraph.clearRecentlyChangedVertices()
 
     if (verticesToRecomputeFrom) {
-      this.evaluator!.partialRun(verticesToRecomputeFrom)
+      this.evaluator.partialRun(verticesToRecomputeFrom)
     }
   }
 
