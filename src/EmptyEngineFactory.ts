@@ -21,8 +21,6 @@ export class EmptyEngineFactory {
     const engine = new HandsOnEngine(
       config,
       stats,
-      dependencyGraph.sheetMapping,
-      dependencyGraph.addressMapping,
       dependencyGraph,
       parser,
       evaluator

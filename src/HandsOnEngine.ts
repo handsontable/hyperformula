@@ -53,11 +53,6 @@ export class HandsOnEngine {
     /** Statistics module for benchmarking */
     public readonly stats: Statistics,
 
-    public readonly sheetMapping: SheetMapping,
-
-    /** Address mapping from addresses to vertices from graph. */
-    public addressMapping: AddressMapping,
-
     public readonly dependencyGraph: DependencyGraph,
 
     private readonly parser: ParserWithCaching,
@@ -254,5 +249,13 @@ export class HandsOnEngine {
 
   public get matrixMapping() {
     return this.dependencyGraph.matrixMapping
+  }
+
+  public get sheetMapping() {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public get addressMapping() {
+    return this.dependencyGraph.addressMapping
   }
 }

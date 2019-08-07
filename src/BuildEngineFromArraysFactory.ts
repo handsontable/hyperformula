@@ -42,8 +42,6 @@ export class BuildEngineFromArraysFactory {
     const engine = new HandsOnEngine(
       config,
       stats,
-      sheetMapping,
-      addressMapping,
       dependencyGraph,
       parser,
       evaluator
