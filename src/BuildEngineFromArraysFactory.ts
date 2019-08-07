@@ -48,9 +48,6 @@ export class BuildEngineFromArraysFactory {
       stats,
       sheetMapping,
       addressMapping,
-      graph,
-      rangeMapping,
-      matrixMapping,
       dependencyGraph,
       parser,
       evaluator

@@ -6,14 +6,11 @@ import {
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
-  Graph,
   MatrixVertex,
-  RangeMapping,
   SheetMapping,
   ValueCellVertex,
   Vertex,
 } from './DependencyGraph'
-import {MatrixMapping} from './DependencyGraph/MatrixMapping'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -60,14 +57,6 @@ export class HandsOnEngine {
 
     /** Address mapping from addresses to vertices from graph. */
     public addressMapping: AddressMapping,
-
-    /** Directed graph of cell dependencies. */
-    public readonly graph: Graph<Vertex>,
-
-    /** Range mapping from ranges to vertices representing these ranges. */
-    public readonly rangeMapping: RangeMapping,
-
-    public readonly matrixMapping: MatrixMapping,
 
     public readonly dependencyGraph: DependencyGraph,
 
@@ -253,5 +242,17 @@ export class HandsOnEngine {
     if (verticesToRecomputeFrom) {
       this.evaluator!.partialRun(verticesToRecomputeFrom)
     }
+  }
+
+  public get graph() {
+    return this.dependencyGraph.graph
+  }
+
+  public get rangeMapping() {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  public get matrixMapping() {
+    return this.dependencyGraph.matrixMapping
   }
 }

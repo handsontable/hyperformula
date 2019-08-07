@@ -28,9 +28,6 @@ export class EmptyEngineFactory {
       stats,
       sheetMapping,
       addressMapping,
-      graph,
-      rangeMapping,
-      matrixMapping,
       dependencyGraph,
       parser,
       evaluator

@@ -19,10 +19,10 @@ export class DependencyGraph {
 
   constructor(
       private readonly addressMapping: AddressMapping,
-      private readonly rangeMapping: RangeMapping,
-      private readonly graph: Graph<Vertex>,
+      public readonly rangeMapping: RangeMapping,
+      public readonly graph: Graph<Vertex>,
       private readonly sheetMapping: SheetMapping,
-      private readonly matrixMapping: MatrixMapping,
+      public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
   ) {}
 
