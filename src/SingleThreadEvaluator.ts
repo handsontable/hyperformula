@@ -28,8 +28,13 @@ export class SingleThreadEvaluator implements Evaluator {
   }
 
   public partialRun(vertices: Vertex[]) {
+    this.stats.start(StatType.TOP_SORT)
     const { sorted, cycled } = this.dependencyGraph.getTopologicallySortedSubgraphFrom(vertices)
-    this.recomputeFormulas(cycled, sorted)
+    this.stats.end(StatType.TOP_SORT)
+
+    this.stats.measure(StatType.EVALUATION, () => {
+      this.recomputeFormulas(cycled, sorted)
+    })
   }
 
   /**
