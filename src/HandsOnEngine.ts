@@ -26,6 +26,7 @@ import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {EmptyEngineFactory} from './EmptyEngineFactory'
 
 /**
  * Engine for one sheet
@@ -48,9 +49,8 @@ export class HandsOnEngine {
     return engine
   }
 
-  public static buildEmpty(config: Config = new Config()): HandsOnEngine {
-    const engine = new HandsOnEngine(config)
-    return engine
+  public static buildEmpty(maybeConfig?: Config): HandsOnEngine {
+    return new EmptyEngineFactory().build(maybeConfig)
   }
 
   /** Address mapping from addresses to vertices from graph. */
