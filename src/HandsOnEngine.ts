@@ -233,7 +233,7 @@ export class HandsOnEngine {
       AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph!, this.parser)
     })
 
-    this.evaluator!.run()
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {

@@ -249,6 +249,10 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
     })
+
+    for (const vertex of this.addressMapping.verticesFromColumn(sheet, col)) {
+      this.recentlyChangedVertices.add(vertex)
+    }
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {

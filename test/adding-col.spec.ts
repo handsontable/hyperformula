@@ -1,5 +1,5 @@
 import {Config, HandsOnEngine} from '../src'
-import {simpleCellAddress, SimpleCellAddress} from '../src/Cell'
+import {simpleCellAddress, SimpleCellAddress, CellError, ErrorType} from '../src/Cell'
 import {EmptyCellVertex, FormulaCellVertex} from '../src/DependencyGraph'
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
@@ -59,12 +59,28 @@ describe('Adding column', () => {
 
   it('reevaluates cells', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', /* new col */ '2', '=COLUMNS(A1:B1)'],
+      ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(2)
+    expect(engine.getCellValue('C1')).toEqual(0)
     engine.addColumns(0, 1, 1)
-    expect(engine.getCellValue('D1')).toEqual(3)
+    expect(engine.getCellValue('D1')).toEqual(1)
+  })
+
+  it('dont reevaluate everything', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
+      ['=SUM(A1:A1)'],
+    ])
+    const c1 = engine.addressMapping!.getCell(adr('C1'))
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+
+    engine.addColumns(0, 1, 1)
+
+    expect(a2setCellValueSpy).not.toHaveBeenCalled()
+    expect(c1setCellValueSpy).toHaveBeenCalled()
   })
 })
 

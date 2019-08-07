@@ -29,7 +29,6 @@ export class FormulaCellVertex {
 
   public setFormula(formula: Ast) {
     this.formula = formula
-    this.cachedCellValue = null
   }
 
   /**
