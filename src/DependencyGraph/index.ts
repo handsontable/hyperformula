@@ -3,6 +3,7 @@ export { AddressMapping, DenseStrategy, SparseStrategy, findBoundaries } from '.
 export { Graph } from './Graph'
 export { RangeMapping } from './RangeMapping'
 export { SheetMapping } from './SheetMapping'
+export { MatrixMapping } from './MatrixMapping'
 export { CellVertex, Vertex } from './Vertex'
 export { MatrixVertex } from './MatrixVertex'
 export { FormulaCellVertex } from './FormulaCellVertex'

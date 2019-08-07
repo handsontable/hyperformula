@@ -20,7 +20,7 @@ import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {Evaluator} from './Evaluator'
-import {buildMatrixVertex, GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
 import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
@@ -50,59 +50,32 @@ export class HandsOnEngine {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  /** Address mapping from addresses to vertices from graph. */
-  public addressMapping?: AddressMapping
-
-  /** Range mapping from ranges to vertices representing these ranges. */
-  public readonly rangeMapping: RangeMapping = new RangeMapping()
-
-  /** Directed graph of cell dependencies. */
-  public readonly graph: Graph<Vertex> = new Graph<Vertex>()
-
-  public dependencyGraph?: DependencyGraph
-
-  /** Statistics module for benchmarking */
-  public readonly stats: Statistics = new Statistics()
-
-  public readonly sheetMapping = new SheetMapping()
-
-  public readonly matrixMapping = new MatrixMapping()
-
-  /** Formula evaluator */
-  private evaluator?: Evaluator
-
-  private readonly parser: ParserWithCaching
-
-  private graphBuilder?: GraphBuilder
-
   constructor(
-      public readonly config: Config,
+    public readonly config: Config,
+
+    /** Statistics module for benchmarking */
+    public readonly stats: Statistics,
+
+    public readonly sheetMapping: SheetMapping,
+
+    /** Address mapping from addresses to vertices from graph. */
+    public addressMapping: AddressMapping,
+
+    /** Directed graph of cell dependencies. */
+    public readonly graph: Graph<Vertex>,
+
+    /** Range mapping from ranges to vertices representing these ranges. */
+    public readonly rangeMapping: RangeMapping,
+
+    public readonly matrixMapping: MatrixMapping,
+
+    public dependencyGraph: DependencyGraph,
+
+    private readonly parser: ParserWithCaching,
+
+    /** Formula evaluator */
+    private evaluator: Evaluator
   ) {
-    this.parser = new ParserWithCaching(this.config, this.sheetMapping.fetch)
-  }
-
-  public buildFromSheets(sheets: Sheets) {
-    this.stats.reset()
-    this.stats.start(StatType.OVERALL)
-
-    this.addressMapping = AddressMapping.build(this.config.addressMappingFillThreshold)
-    for (const sheetName in sheets) {
-      const sheetId = this.sheetMapping.addSheet(sheetName)
-      this.addressMapping!.autoAddSheet(sheetId, sheets[sheetName])
-    }
-
-    this.dependencyGraph = new DependencyGraph(this.addressMapping, this.rangeMapping, this.graph, this.sheetMapping, this.matrixMapping, this.stats)
-    this.graphBuilder = new GraphBuilder(this.dependencyGraph, this.parser, this.config, this.stats)
-
-    this.stats.measure(StatType.GRAPH_BUILD, () => {
-      this.graphBuilder!.buildGraph(sheets)
-    })
-
-    this.evaluator = new SingleThreadEvaluator(this.dependencyGraph, this.config, this.stats)
-
-    this.evaluator!.run()
-
-    this.stats.end(StatType.OVERALL)
   }
 
   /**
