@@ -27,6 +27,7 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
+import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 
 /**
  * Engine for one sheet
@@ -37,16 +38,12 @@ export class HandsOnEngine {
    *
    * @param sheet - two-dimmensional array representation of sheet
    */
-  public static buildFromArray(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
-    const engine = new HandsOnEngine(config)
-    engine.buildFromSheets({Sheet1: sheet})
-    return engine
+  public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HandsOnEngine {
+    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
   }
 
-  public static buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
-    const engine = new HandsOnEngine(config)
-    engine.buildFromSheets(sheets)
-    return engine
+  public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HandsOnEngine {
+    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
   }
 
   public static buildEmpty(maybeConfig?: Config): HandsOnEngine {
