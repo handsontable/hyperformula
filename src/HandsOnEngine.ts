@@ -48,6 +48,11 @@ export class HandsOnEngine {
     return engine
   }
 
+  public static buildEmpty(config: Config = new Config()): HandsOnEngine {
+    const engine = new HandsOnEngine(config)
+    return engine
+  }
+
   /** Address mapping from addresses to vertices from graph. */
   public addressMapping?: AddressMapping
 
