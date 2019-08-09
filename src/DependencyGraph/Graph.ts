@@ -247,28 +247,50 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
-  public getTopologicallySortedSubgraphFrom2(vertices: T[], operatingFunction: (node: T) => boolean): void {
+  public getTopologicallySortedSubgraphFrom2(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
     const subgraphNodes = this.computeSubgraphNodes(vertices)
     const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
     const shouldBeUpdatedMapping = new Set(vertices)
-    const nodesWithNoIncomingEdge = vertices
+    const nodesWithNoIncomingEdge: T[] = []
+    incomingEdges.forEach((currentCount, targetNode) => {
+      if (currentCount === 0) {
+        nodesWithNoIncomingEdge.push(targetNode)
+      }
+    })
 
     let currentNodeIndex = 0
     while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
       const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
-      const result = operatingFunction(currentNode)
+      let result: boolean
+      if (shouldBeUpdatedMapping.has(currentNode)) {
+        result = operatingFunction(currentNode)
+      } else {
+        result = false
+      }
       this.edges.get(currentNode)!.forEach((targetNode) => {
         if (subgraphNodes.has(targetNode)) {
           if (result) {
             shouldBeUpdatedMapping.add(targetNode)
           }
           incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-          if (incomingEdges.get(targetNode) === 0 && shouldBeUpdatedMapping.has(targetNode)) {
+          if (incomingEdges.get(targetNode) === 0) {
             nodesWithNoIncomingEdge.push(targetNode)
           }
         }
       })
       ++currentNodeIndex
+    }
+
+    if (nodesWithNoIncomingEdge.length !== subgraphNodes.size) {
+      const nodesOnCycle: T[] = []
+      for (const [node, incomingEdgesCount] of incomingEdges) {
+        if (incomingEdgesCount !== 0) {
+          nodesOnCycle.push(node)
+        }
+      }
+      return nodesOnCycle
+    } else {
+      return []
     }
   }
 

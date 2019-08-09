@@ -310,6 +310,53 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     expect(fn).toHaveBeenCalledTimes(3)
     expect(fn).toHaveBeenLastCalledWith(nodes[2])
   })
+
+  it('returns cycled vertices', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const nodes = ['foo', 'c0', 'c1', 'c2']
+    nodes.forEach((n) => graph.addNode(n))
+    graph.addEdge(nodes[0], nodes[1])
+    graph.addEdge(nodes[1], nodes[2])
+    graph.addEdge(nodes[2], nodes[3])
+    graph.addEdge(nodes[3], nodes[1])
+
+    const fn = jest.fn((node: string) => true)
+    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(cycled).toEqual(['c0', 'c1', 'c2'])
+  })
+
+  it('doesnt call first one of the given vertices if its on cycle', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const nodes = ['c0', 'c1', 'c2']
+    nodes.forEach((n) => graph.addNode(n))
+    graph.addEdge(nodes[0], nodes[1])
+    graph.addEdge(nodes[1], nodes[2])
+    graph.addEdge(nodes[2], nodes[0])
+
+    const fn = jest.fn((node: string) => true)
+    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+
+    expect(fn).toHaveBeenCalledTimes(0)
+    expect(cycled).toEqual(['c0', 'c1', 'c2'])
+  })
+
+  it('returns cycled vertices even if they were not tried to be computed', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const nodes = ['foo', 'c0', 'c1', 'c2']
+    nodes.forEach((n) => graph.addNode(n))
+    graph.addEdge(nodes[0], nodes[1])
+    graph.addEdge(nodes[1], nodes[2])
+    graph.addEdge(nodes[2], nodes[3])
+    graph.addEdge(nodes[3], nodes[1])
+
+    const fn = jest.fn((node: string) => false)
+    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(cycled).toEqual(['c0', 'c1', 'c2'])
+  })
 })
 
 describe('Graph cruds', () => {
