@@ -251,6 +251,67 @@ describe('Basic Graph manipulation', () => {
   })
 })
 
+describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
+  it('case without edges', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const node0 = 'foo'
+    const node1 = 'bar'
+    graph.addNode(node0)
+    graph.addNode(node1)
+
+    const fn = jest.fn((node: string) => true)
+    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn).toHaveBeenCalledWith(node0)
+  })
+
+  it('case with obvious edge', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const node0 = 'foo'
+    const node1 = 'bar'
+    graph.addNode(node0)
+    graph.addNode(node1)
+    graph.addEdge(node0, node1)
+
+    const fn = jest.fn((node: string) => true)
+    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+
+    expect(fn).toHaveBeenCalledTimes(2)
+    expect(fn).toHaveBeenNthCalledWith(1, node0)
+    expect(fn).toHaveBeenNthCalledWith(2, node1)
+  })
+
+  it('it doesnt call other if didnt change', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const node0 = 'foo'
+    const node1 = 'bar'
+    graph.addNode(node0)
+    graph.addNode(node1)
+    graph.addEdge(node0, node1)
+
+    const fn = jest.fn((node: string) => false)
+    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn).toHaveBeenNthCalledWith(1, node0)
+  })
+
+  it('does call if some previous vertex marked as changed', () => {
+    const graph = new Graph(new DummyGetDependenciesQuery())
+    const nodes = ['foo', 'bar', 'baz']
+    nodes.forEach((n) => graph.addNode(n))
+    graph.addEdge(nodes[0], nodes[2])
+    graph.addEdge(nodes[1], nodes[2])
+
+    const fn = jest.fn((node: string) => node === nodes[0] ? true : false)
+    graph.getTopologicallySortedSubgraphFrom2([nodes[0], nodes[1]], fn)
+
+    expect(fn).toHaveBeenCalledTimes(3)
+    expect(fn).toHaveBeenLastCalledWith(nodes[2])
+  })
+})
+
 describe('Graph cruds', () => {
   it ('#removeEdge not existing edge', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())

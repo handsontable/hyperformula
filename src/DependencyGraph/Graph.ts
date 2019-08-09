@@ -247,6 +247,31 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
+  public getTopologicallySortedSubgraphFrom2(vertices: T[], operatingFunction: (node: T) => boolean): void {
+    const subgraphNodes = this.computeSubgraphNodes(vertices)
+    const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
+    const shouldBeUpdatedMapping = new Set(vertices)
+    const nodesWithNoIncomingEdge = vertices
+
+    let currentNodeIndex = 0
+    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
+      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
+      const result = operatingFunction(currentNode)
+      this.edges.get(currentNode)!.forEach((targetNode) => {
+        if (subgraphNodes.has(targetNode)) {
+          if (result) {
+            shouldBeUpdatedMapping.add(targetNode)
+          }
+          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
+          if (incomingEdges.get(targetNode) === 0 && shouldBeUpdatedMapping.has(targetNode)) {
+            nodesWithNoIncomingEdge.push(targetNode)
+          }
+        }
+      })
+      ++currentNodeIndex
+    }
+  }
+
   public getDependecies(vertex: T): T[] {
     const result: T[] = []
     this.edges.forEach((adjacentNodes, sourceNode) => {
