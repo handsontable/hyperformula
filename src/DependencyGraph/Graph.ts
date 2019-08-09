@@ -1,5 +1,10 @@
 
+export interface IGetDependenciesQuery<T> {
+  call(node: T): Set<T>
+}
+
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
+
 /**
  * Provides graph directed structure
  *
@@ -18,7 +23,9 @@ export class Graph<T> {
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
 
-  constructor() {
+  constructor(
+    private readonly getDependenciesQuery: IGetDependenciesQuery<T>
+  ) {
     this.nodes = new Set()
     this.edges = new Map()
     this.specialNodes = new Set()

@@ -7,7 +7,7 @@ import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping'
-import {Graph, TopSortResult} from './Graph'
+import {Graph, TopSortResult, IGetDependenciesQuery} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -15,7 +15,7 @@ import {absolutizeDependencies} from '../absolutizeDependencies'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 
-class GetDependenciesQuery {
+class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping
@@ -47,10 +47,12 @@ export class DependencyGraph {
    */
 
   public static buildEmpty(config: Config, stats: Statistics) {
+    const addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
+    const rangeMapping = new RangeMapping()
     return new DependencyGraph(
-      AddressMapping.build(config.addressMappingFillThreshold),
-      new RangeMapping(),
-      new Graph<Vertex>(),
+      addressMapping,
+      rangeMapping,
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping)),
       new SheetMapping(),
       new MatrixMapping(),
       stats

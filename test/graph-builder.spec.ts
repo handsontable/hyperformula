@@ -14,13 +14,14 @@ import {
 import {MatrixMapping} from '../src/DependencyGraph/MatrixMapping'
 import {GraphBuilder} from '../src/GraphBuilder'
 import {ParserWithCaching} from '../src/parser'
+import {DummyGetDependenciesQuery} from './DummyGetDependenciesQuery'
 import './testConfig.ts'
 import {adr} from "./testUtils";
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
     const sheet = [['42']]
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -38,7 +39,7 @@ describe('GraphBuilder', () => {
 
   it('build sheet with simple string cell', () => {
     const sheet = [['foo']]
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -56,7 +57,7 @@ describe('GraphBuilder', () => {
 
   it('building for cell with empty string should give empty vertex', () => {
     const sheet = [['', '=A1']]
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -77,7 +78,7 @@ describe('GraphBuilder', () => {
       ['foo', 'bar', 'A2'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -98,7 +99,7 @@ describe('GraphBuilder', () => {
       ['3', '4', '=A1:B2'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -133,7 +134,7 @@ describe('GraphBuilder', () => {
       ['5', '6', '=A1:B2'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -158,7 +159,7 @@ describe('GraphBuilder', () => {
       ['5', '=A1:A3'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -178,7 +179,7 @@ describe('GraphBuilder', () => {
 
   it('#buildGraph should work even if range dependencies are empty', () => {
     const sheet = [['1', '2', '=SUM(A1:B2)']]
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -208,7 +209,7 @@ describe('GraphBuilder', () => {
       ['5', '=A1:A2'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -234,7 +235,7 @@ describe('GraphBuilder', () => {
       ['{=mmult(A1:B2,C1:C2)}'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -257,7 +258,7 @@ describe('GraphBuilder with matrix detection', () => {
       ['3', '4'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -280,7 +281,7 @@ describe('GraphBuilder with matrix detection', () => {
       ['1', 'foobar'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
@@ -305,7 +306,7 @@ describe('GraphBuilder with matrix detection', () => {
       ['5', '6'],
     ]
 
-    const graph = new Graph<Vertex>()
+    const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
     const addressMapping = new AddressMapping(0.5)
     addressMapping.autoAddSheet(0, sheet)
     const sheetMapping = new SheetMapping()
