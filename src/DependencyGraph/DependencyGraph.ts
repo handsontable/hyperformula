@@ -202,7 +202,6 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
-        this.removeIncomingEdgesIfFormulaVertex(vertex)
         this.graph.removeNode(vertex)
       }
     })
@@ -235,7 +234,6 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
-        this.removeIncomingEdgesIfFormulaVertex(vertex)
         this.graph.removeNode(vertex)
       }
     })
@@ -337,7 +335,6 @@ export class DependencyGraph {
           this.graph.addEdge(sourceVertex, adjacentNode)
           this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
         }
-        this.removeIncomingEdgesIfFormulaVertex(targetVertex)
         this.graph.removeNode(targetVertex)
       }
     }
