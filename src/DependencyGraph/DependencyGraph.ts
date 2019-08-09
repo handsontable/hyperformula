@@ -175,11 +175,15 @@ export class DependencyGraph {
     }
     const numberOfRows = rowEnd - rowStart + 1
 
+    const verticesDependentOnRemovedVertices = new Set()
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
       for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
         if (vertex instanceof MatrixVertex) {
           continue
+        }
+        for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
+          verticesDependentOnRemovedVertices.add(adjacentNode)
         }
         this.graph.removeNode(vertex)
       }
@@ -196,6 +200,12 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.truncateRangesAfterRemovingRows(sheet, rowStart, rowEnd)
     })
+
+    for (const vertex of verticesDependentOnRemovedVertices) {
+      if (this.graph.hasNode(vertex)) {
+        this.recentlyChangedVertices.add(vertex)
+      }
+    }
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {

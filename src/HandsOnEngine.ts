@@ -180,7 +180,7 @@ export class HandsOnEngine {
       RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph, this.parser)
     })
 
-    this.evaluator.run()
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {

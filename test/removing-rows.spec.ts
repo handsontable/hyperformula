@@ -18,7 +18,7 @@ describe('Removing rows - dependencies', () => {
     expect(engine.getCellValue('B1')).toEqual(0)
   })
 
-  xit('dont reevaluate everything', () => {
+  it('dont reevaluate everything', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
       [''], // deleted
@@ -166,8 +166,8 @@ describe('Removing rows - dependencies', () => {
   it('same sheet, case Rca, range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=SUM(A2:A3)'],
-      ['1'],
-      ['2'],
+      ['1'], // 
+      ['2'], //
     ])
     engine.removeRows(0, 1, 2)
     expect_function_to_have_ref_error(engine, adr('A1'))
