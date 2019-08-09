@@ -132,8 +132,7 @@ export class DependencyGraph {
   public removeIncomingEdgesIfFormulaVertex(vertex: CellVertex | null) {
     if (!vertex)
       return
-    const verticesForDeps = new GetDependenciesQuery(this.rangeMapping, this.addressMapping).call(vertex)
-    this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
+    this.graph.removeDependencies(vertex)
   }
 
   public clearRecentlyChangedVertices() {
