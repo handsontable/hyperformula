@@ -2,6 +2,11 @@
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
 /**
  * Provides graph directed structure
+ *
+ * Invariants:
+ * - this.edges(node) exists if and only if node is in the graph
+ * - this.specialNodes* are always subset of this.nodes
+ * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
  */
 export class Graph<T> {
   /** Set with nodes in graph. */
