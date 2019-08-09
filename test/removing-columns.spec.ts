@@ -16,6 +16,23 @@ describe('Removing columns', () => {
 
     expect(engine.getCellValue('A1')).toEqual(2.5)
   })
+
+  it('dont reevaluate everything', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '', '3'],
+      ['=COUNTBLANK(A1:C1)'],
+      ['=SUM(A1:A1)'],
+    ])
+    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const a3 = engine.addressMapping!.getCell(adr('A3'))
+    const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(a2setCellValueSpy).toHaveBeenCalled()
+    expect(a3setCellValueSpy).not.toHaveBeenCalled()
+  })
 })
 
 describe('Removing columns - matrices', () => {

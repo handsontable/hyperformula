@@ -211,6 +211,9 @@ export class DependencyGraph {
         if (vertex instanceof MatrixVertex) {
           continue
         }
+        for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
+          this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
+        }
         this.graph.removeNode(vertex)
       }
     })

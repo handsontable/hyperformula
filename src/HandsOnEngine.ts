@@ -204,7 +204,7 @@ export class HandsOnEngine {
       RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph, this.parser)
     })
 
-    this.evaluator.run()
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
