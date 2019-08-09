@@ -147,9 +147,7 @@ export class Graph<T> {
     this.nodes.delete(node)
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
-    for (const dependentNode of this.getDependenciesQuery.call(node)) {
-      this.softRemoveEdge(dependentNode, node)
-    }
+    this.removeDependencies(node)
   }
 
   public markNodeAsSpecial(node: T) {
@@ -162,6 +160,12 @@ export class Graph<T> {
 
   public clearSpecialNodesRecentlyChanged() {
     this.specialNodesRecentlyChanged = new Set()
+  }
+
+  public removeDependencies(node: T) {
+    for (const dependentNode of this.getDependenciesQuery.call(node)) {
+      this.softRemoveEdge(dependentNode, node)
+    }
   }
 
   /**
