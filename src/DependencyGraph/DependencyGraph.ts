@@ -61,7 +61,6 @@ export class DependencyGraph {
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeMaybeVertexDependencies(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
@@ -80,7 +79,6 @@ export class DependencyGraph {
       return
     }
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeMaybeVertexDependencies(vertex)
 
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex()
@@ -95,12 +93,6 @@ export class DependencyGraph {
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
     assert.ok(!(vertex instanceof MatrixVertex), `Illegal operation`)
-  }
-
-  public removeMaybeVertexDependencies(vertex: CellVertex | null) {
-    if (!vertex)
-      return
-    this.graph.removeDependencies(vertex)
   }
 
   public clearRecentlyChangedVertices() {
