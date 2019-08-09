@@ -24,7 +24,7 @@ class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
 
   public call(vertex: Vertex) {
     if (!(vertex instanceof FormulaCellVertex)) {
-      return new Set()
+      return null
     }
 
     const deps = collectDependencies(vertex.getFormula())

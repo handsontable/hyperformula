@@ -1,6 +1,6 @@
 
 export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T>
+  call(node: T): Set<T> | null
 }
 
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }
@@ -154,7 +154,10 @@ export class Graph<T> {
   }
 
   public removeDependencies(node: T) {
-    for (const dependentNode of this.getDependenciesQuery.call(node)) {
+    const dependentNodes = this.getDependenciesQuery.call(node)
+    if (!dependentNodes)
+      return
+    for (const dependentNode of dependentNodes) {
       this.softRemoveEdge(dependentNode, node)
     }
   }
