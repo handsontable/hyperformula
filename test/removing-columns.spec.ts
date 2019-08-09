@@ -2,8 +2,9 @@ import {Config, HandsOnEngine} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig.ts'
-import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {extractRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing columns - reevaluation', () => {
   it('reevaluates', () => {
@@ -277,6 +278,16 @@ describe('Removing columns - dependencies', () => {
     ])
     engine.removeColumns(0, 1, 2)
     expect_function_to_have_ref_error(engine, adr('A1'))
+  })
+
+  xit('truncates range by one column', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B1)']
+    ])
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(CellAddress.relative(0, -1, 0), CellAddress.relative(0, -1, 0)))
   })
 })
 
