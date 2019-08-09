@@ -57,6 +57,13 @@ export class Graph<T> {
     }
   }
 
+  public softRemoveEdge(fromNode: T, toNode: T) {
+    const edges = this.edges.get(fromNode)
+    if (edges) {
+      edges.delete(toNode)
+    }
+  }
+
   public removeIncomingEdges(toNode: T) {
     this.edges.forEach((nodeEdges) => {
       nodeEdges.delete(toNode)
@@ -65,7 +72,7 @@ export class Graph<T> {
 
   public removeIncomingEdgesFrom(fromNodes: Set<T>, toNode: T) {
     fromNodes.forEach((fromNode) => {
-      this.removeEdge(fromNode, toNode)
+      this.softRemoveEdge(fromNode, toNode)
     })
   }
 
