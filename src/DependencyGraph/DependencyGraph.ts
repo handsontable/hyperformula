@@ -46,7 +46,6 @@ export class DependencyGraph {
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeMaybeVertexDependencies(vertex)
 
     const newVertex = new FormulaCellVertex(ast, address)
     this.graph.exchangeOrAddNode(vertex, newVertex)
