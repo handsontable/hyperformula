@@ -198,17 +198,8 @@ export class Graph<T> {
       ++currentNodeIndex
     }
 
-    if (nodesWithNoIncomingEdge.length !== this.nodes.size) {
-      const nodesOnCycle: T[] = []
-      for (const [node, incomingEdgesCount] of incomingEdges) {
-        if (incomingEdgesCount !== 0) {
-          nodesOnCycle.push(node)
-        }
-      }
-      return { sorted: topologicalOrdering, cycled: nodesOnCycle }
-    } else {
-      return { sorted: topologicalOrdering, cycled: [] }
-    }
+    const cycled = this.findCycles(this.nodes, nodesWithNoIncomingEdge, incomingEdges)
+    return { sorted: topologicalOrdering, cycled }
   }
 
   public getTopologicallySortedSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
@@ -240,7 +231,12 @@ export class Graph<T> {
       ++currentNodeIndex
     }
 
-    if (nodesWithNoIncomingEdge.length !== subgraphNodes.size) {
+    const cycled = this.findCycles(subgraphNodes, nodesWithNoIncomingEdge, incomingEdges)
+    return cycled
+  }
+
+  private findCycles(nodes: Set<T>, nodesWithNoIncomingEdge: T[], incomingEdges: Map<T, number>): T[] {
+    if (nodesWithNoIncomingEdge.length !== nodes.size) {
       const nodesOnCycle: T[] = []
       for (const [node, incomingEdgesCount] of incomingEdges) {
         if (incomingEdgesCount !== 0) {
