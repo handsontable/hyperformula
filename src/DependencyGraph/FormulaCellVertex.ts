@@ -63,4 +63,8 @@ export class FormulaCellVertex {
       throw Error('Value of the formula cell is not computed.')
     }
   }
+
+  public isComputed() {
+    return (this.cachedCellValue !== null)
+  }
 }

@@ -28,12 +28,25 @@ export class SingleThreadEvaluator implements Evaluator {
   }
 
   public partialRun(vertices: Vertex[]) {
-    this.stats.start(StatType.TOP_SORT)
-    const { sorted, cycled } = this.dependencyGraph.getTopologicallySortedSubgraphFrom(vertices)
-    this.stats.end(StatType.TOP_SORT)
-
     this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas(cycled, sorted)
+      const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom2(vertices, (vertex: Vertex) => {
+        if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
+          const address = vertex.getAddress()
+          const formula = vertex.getFormula() as Ast
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+          const newCellValue = this.interpreter.evaluateAst(formula, address)
+          vertex.setCellValue(newCellValue)
+          return (currentValue !== newCellValue)
+        } else if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+          return true
+        } else {
+          return true
+        }
+      })
+      cycled.forEach((vertex: Vertex) => {
+        (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
+      })
     })
   }
 

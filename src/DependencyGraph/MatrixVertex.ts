@@ -119,4 +119,8 @@ export class MatrixVertex {
       this.matrix.removeColumns(start, end)
     }
   }
+
+  public isComputed() {
+    return (!(this.matrix instanceof NotComputedMatrix))
+  }
 }
