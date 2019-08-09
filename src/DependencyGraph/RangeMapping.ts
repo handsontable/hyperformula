@@ -75,7 +75,7 @@ export class RangeMapping {
     return rangesToRemove
   }
 
-  public shiftRangesByRows(sheet: number, row: number, numberOfRows: number) {
+  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
     this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
@@ -87,7 +87,7 @@ export class RangeMapping {
     })
   }
 
-  public shiftRangesByColumns(sheet: number, column: number, numberOfColumns: number) {
+  public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
     this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)

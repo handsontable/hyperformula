@@ -240,6 +240,8 @@ export class DependencyGraph {
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.fixRanges(sheet, rowStart, numberOfRows)
+
+      this.rangeMapping.moveAllRangesInSheetAfterRowByRows(sheet, rowStart, numberOfRows)
     })
 
     for (const vertex of this.addressMapping.verticesFromRow(sheet, rowStart)) {
@@ -262,6 +264,8 @@ export class DependencyGraph {
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+
+      this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(sheet, col, numberOfCols)
     })
 
     for (const vertex of this.addressMapping.verticesFromColumn(sheet, col)) {
@@ -525,8 +529,6 @@ export class DependencyGraph {
         }
       }
     }
-
-    this.rangeMapping.shiftRangesByRows(sheet, row, numberOfRows)
   }
 
   private fixRangesWhenAddingColumns(sheet: number, column: number, numberOfColumns: number): void {
@@ -541,8 +543,6 @@ export class DependencyGraph {
         }
       }
     }
-
-    this.rangeMapping.shiftRangesByColumns(sheet, column, numberOfColumns)
   }
 
   private setAddressMappingForMatrixVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
