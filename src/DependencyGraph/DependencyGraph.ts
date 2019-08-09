@@ -88,6 +88,7 @@ export class DependencyGraph {
       this.graph.markNodeAsSpecialRecentlyChanged(emptyVertex)
       this.addressMapping.setCell(address, emptyVertex)
     } else {
+      this.graph.removeNode(vertex)
       this.addressMapping.removeCell(address)
     }
   }

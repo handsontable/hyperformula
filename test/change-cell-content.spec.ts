@@ -83,8 +83,9 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(1)
 
     engine.setCellContent(adr('B1'), '')
-    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
     expect(engine.getCellValue('B1')).toBe(EmptyValue)
+    expect(engine.graph.nodes).not.toContain(b1)
+    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
   it('update value cell to formula', () => {
