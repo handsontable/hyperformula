@@ -53,6 +53,19 @@ describe('Removing rows - dependencies', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
   })
 
+  it('should remove edges from other cells to removed nodes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=A2'], //
+    ])
+
+    engine.removeRows(0, 2, 2)
+
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
+  })
+
   it('same sheet, case Aa', () => {
     const engine = HandsOnEngine.buildFromArray([
       [''],

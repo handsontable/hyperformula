@@ -6,6 +6,17 @@ import './testConfig.ts'
 import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing columns', () => {
+  it('should remove edges from other cells to removed nodes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=B1'],
+    ])
+
+    engine.removeColumns(0, 2, 2)
+
+    const b1 = engine.addressMapping.fetchCell(adr('b1'))
+    expect(engine.graph.adjacentNodes(b1)).toEqual(new Set())
+  })
+
   it('reevaluates', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MEDIAN(B1:D1)', '2', '4', '3'],
