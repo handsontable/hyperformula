@@ -182,13 +182,7 @@ export class Graph<T> {
    */
   public topologicalSort(): TopSortResult<T> {
     const incomingEdges = this.incomingEdges()
-    const nodesWithNoIncomingEdge: T[] = []
-
-    incomingEdges.forEach((currentCount, targetNode) => {
-      if (currentCount === 0) {
-        nodesWithNoIncomingEdge.push(targetNode)
-      }
-    })
+    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
 
     let currentNodeIndex = 0
     const topologicalOrdering: T[] = []
@@ -219,12 +213,7 @@ export class Graph<T> {
     const subgraphNodes = this.computeSubgraphNodes(vertices)
     const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
     const shouldBeUpdatedMapping = new Set(vertices)
-    const nodesWithNoIncomingEdge: T[] = []
-    incomingEdges.forEach((currentCount, targetNode) => {
-      if (currentCount === 0) {
-        nodesWithNoIncomingEdge.push(targetNode)
-      }
-    })
+    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
 
     let currentNodeIndex = 0
     while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
@@ -260,6 +249,16 @@ export class Graph<T> {
     } else {
       return []
     }
+  }
+
+  private nodesWithNoIncomingEdge(incomingEdges: Map<T, number>): T[] {
+    const result: T[] = []
+    incomingEdges.forEach((currentCount, targetNode) => {
+      if (currentCount === 0) {
+        result.push(targetNode)
+      }
+    })
+    return result
   }
 
   public getDependecies(vertex: T): T[] {
