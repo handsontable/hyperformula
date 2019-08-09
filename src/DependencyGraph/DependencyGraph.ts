@@ -453,8 +453,8 @@ export class DependencyGraph {
     return this.graph.topologicalSort()
   }
 
-  public getTopologicallySortedSubgraphFrom(vertices: Vertex[]): TopSortResult<Vertex> {
-    return this.graph.getTopologicallySortedSubgraphFrom(vertices)
+  public getTopologicallySortedSubgraphFrom(vertices: Vertex[], operatingFunction: (node: Vertex) => boolean): Vertex[] {
+    return this.graph.getTopologicallySortedSubgraphFrom(vertices, operatingFunction)
   }
 
   public markAsVolatile(vertex: Vertex) {

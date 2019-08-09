@@ -215,39 +215,7 @@ export class Graph<T> {
     return { sorted: topologicalOrdering, cycled: [] }
   }
 
-  public getTopologicallySortedSubgraphFrom(vertices: T[]): TopSortResult<T> {
-    const subgraphNodes = this.computeSubgraphNodes(vertices)
-    const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
-    const nodesWithNoIncomingEdge = vertices
-
-    let currentNodeIndex = 0
-    const topologicalOrdering: T[] = []
-    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
-      topologicalOrdering.push(currentNode)
-      this.edges.get(currentNode)!.forEach((targetNode) => {
-        if (subgraphNodes.has(targetNode)) {
-          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-          if (incomingEdges.get(targetNode) === 0) {
-            nodesWithNoIncomingEdge.push(targetNode)
-          }
-        }
-      })
-      ++currentNodeIndex
-    }
-
-    if (topologicalOrdering.length !== subgraphNodes.size) {
-      const nodesOnCycle = new Set(subgraphNodes.values())
-      for (let i = 0; i < topologicalOrdering.length; ++i) {
-        nodesOnCycle.delete(topologicalOrdering[i])
-      }
-      return { sorted: topologicalOrdering, cycled: Array.from(nodesOnCycle) }
-    }
-
-    return { sorted: topologicalOrdering, cycled: [] }
-  }
-
-  public getTopologicallySortedSubgraphFrom2(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
+  public getTopologicallySortedSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
     const subgraphNodes = this.computeSubgraphNodes(vertices)
     const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
     const shouldBeUpdatedMapping = new Set(vertices)

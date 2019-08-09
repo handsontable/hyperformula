@@ -251,7 +251,7 @@ describe('Basic Graph manipulation', () => {
   })
 })
 
-describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
+describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   it('case without edges', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = 'foo'
@@ -260,7 +260,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addNode(node1)
 
     const fn = jest.fn((node: string) => true)
-    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+    graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith(node0)
@@ -275,7 +275,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(node0, node1)
 
     const fn = jest.fn((node: string) => true)
-    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+    graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn).toHaveBeenNthCalledWith(1, node0)
@@ -291,7 +291,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(node0, node1)
 
     const fn = jest.fn((node: string) => false)
-    graph.getTopologicallySortedSubgraphFrom2([node0], fn)
+    graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenNthCalledWith(1, node0)
@@ -305,7 +305,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(nodes[1], nodes[2])
 
     const fn = jest.fn((node: string) => node === nodes[0] ? true : false)
-    graph.getTopologicallySortedSubgraphFrom2([nodes[0], nodes[1]], fn)
+    graph.getTopologicallySortedSubgraphFrom([nodes[0], nodes[1]], fn)
 
     expect(fn).toHaveBeenCalledTimes(3)
     expect(fn).toHaveBeenLastCalledWith(nodes[2])
@@ -321,7 +321,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(nodes[3], nodes[1])
 
     const fn = jest.fn((node: string) => true)
-    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+    const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
@@ -336,7 +336,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(nodes[2], nodes[0])
 
     const fn = jest.fn((node: string) => true)
-    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+    const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(0)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
@@ -352,7 +352,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom2', () => {
     graph.addEdge(nodes[3], nodes[1])
 
     const fn = jest.fn((node: string) => false)
-    const cycled = graph.getTopologicallySortedSubgraphFrom2([nodes[0]], fn)
+    const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])

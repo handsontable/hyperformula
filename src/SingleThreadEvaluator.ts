@@ -29,7 +29,7 @@ export class SingleThreadEvaluator implements Evaluator {
 
   public partialRun(vertices: Vertex[]) {
     this.stats.measure(StatType.EVALUATION, () => {
-      const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom2(vertices, (vertex: Vertex) => {
+      const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
           const address = vertex.getAddress()
           const formula = vertex.getFormula() as Ast
