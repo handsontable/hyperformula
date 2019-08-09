@@ -15,6 +15,31 @@ import {absolutizeDependencies} from '../absolutizeDependencies'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 
+class GetDependenciesQuery {
+  constructor(
+    private readonly rangeMapping: RangeMapping,
+    private readonly addressMapping: AddressMapping
+  ) {
+  }
+
+  public call(vertex: Vertex) {
+    if (!(vertex instanceof FormulaCellVertex)) {
+      return new Set()
+    }
+
+    const deps = collectDependencies(vertex.getFormula())
+    const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
+    const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
+      if (dep instanceof AbsoluteCellRange) {
+        return this.rangeMapping.getRange(dep.start, dep.end)!
+      } else {
+        return this.addressMapping.fetchCell(dep)
+      }
+    }))
+    return verticesForDeps
+  }
+}
+
 export class DependencyGraph {
   /*
    * Invariants:
@@ -103,9 +128,10 @@ export class DependencyGraph {
   }
 
   public removeIncomingEdgesIfFormulaVertex(vertex: CellVertex | null) {
-    if (vertex instanceof FormulaCellVertex) {
-      this.removeIncomingEdgesFromFormulaVertex(vertex)
-    }
+    if (!vertex)
+      return
+    const verticesForDeps = new GetDependenciesQuery(this.rangeMapping, this.addressMapping).call(vertex)
+    this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
   }
 
   public clearRecentlyChangedVertices() {
@@ -147,19 +173,6 @@ export class DependencyGraph {
         this.graph.addEdge(this.fetchOrCreateEmptyCell(absStartCell), endVertex)
       }
     })
-  }
-
-  public removeIncomingEdgesFromFormulaVertex(vertex: FormulaCellVertex) {
-    const deps = collectDependencies(vertex.getFormula())
-    const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
-    const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
-      if (dep instanceof AbsoluteCellRange) {
-        return this.rangeMapping.getRange(dep.start, dep.end)!
-      } else {
-        return this.addressMapping.fetchCell(dep)
-      }
-    }))
-    this.graph.removeIncomingEdgesFrom(verticesForDeps, vertex)
   }
 
   public fetchOrCreateEmptyCell(address: SimpleCellAddress): CellVertex {
