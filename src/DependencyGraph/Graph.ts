@@ -246,16 +246,17 @@ export class Graph<T> {
 
   private computeSubgraphNodes(vertices: T[]): Set<T> {
     const result = new Set(vertices)
-    const rec = (n: T) => {
-      for (const adjacentNode of this.adjacentNodes(n)) {
+    const queue = Array.from(vertices)
+    let currentNodeIndex = 0
+    while (currentNodeIndex < queue.length) {
+      const vertex = queue[currentNodeIndex]
+      for (const adjacentNode of this.adjacentNodes(vertex)) {
         if (!result.has(adjacentNode)) {
           result.add(adjacentNode)
-          rec(adjacentNode)
+          queue.push(adjacentNode)
         }
       }
-    }
-    for (const vertex of vertices) {
-      rec(vertex)
+      currentNodeIndex++
     }
     return result
   }
