@@ -12,13 +12,14 @@ describe('changing cell content', () => {
     const engine = HandsOnEngine.buildFromArray(sheet)
     const a1 = engine.addressMapping!.fetchCell(adr('A1'))
     const b1 = engine.addressMapping!.fetchCell(adr('B1'))
-    const c1 = engine.addressMapping!.fetchCell(adr('C1'))
+    let c1 = engine.addressMapping!.fetchCell(adr('C1'))
 
     expect(engine.graph.existsEdge(a1, c1)).toBe(true)
     expect(engine.getCellValue('C1')).toBe(1)
 
     engine.setCellContent(adr('C1'), '=B1')
 
+    c1 = engine.addressMapping!.fetchCell(adr('C1'))
     expect(engine.graph.existsEdge(a1, c1)).toBe(false)
     expect(engine.graph.existsEdge(b1, c1)).toBe(true)
 

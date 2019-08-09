@@ -48,21 +48,14 @@ export class DependencyGraph {
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
     this.removeMaybeVertexDependencies(vertex)
 
-    let finalVertex: FormulaCellVertex
-    if (vertex instanceof FormulaCellVertex) {
-      vertex.setFormula(ast)
-      finalVertex = vertex
-    } else {
-      const newVertex = new FormulaCellVertex(ast, address)
-      this.graph.exchangeOrAddNode(vertex, newVertex)
-      this.addressMapping.setCell(address, newVertex)
-      finalVertex = newVertex
-    }
+    const newVertex = new FormulaCellVertex(ast, address)
+    this.graph.exchangeOrAddNode(vertex, newVertex)
+    this.addressMapping.setCell(address, newVertex)
 
-    this.processCellDependencies(dependencies, finalVertex)
-    this.graph.markNodeAsSpecialRecentlyChanged(finalVertex)
+    this.processCellDependencies(dependencies, newVertex)
+    this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     if (hasVolatileFunction) {
-      this.markAsVolatile(finalVertex)
+      this.markAsVolatile(newVertex)
     }
   }
 
