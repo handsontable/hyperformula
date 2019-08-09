@@ -198,15 +198,17 @@ export class Graph<T> {
       ++currentNodeIndex
     }
 
-    if (topologicalOrdering.length !== this.nodes.size) {
-      const nodesOnCycle = new Set(this.nodes.values())
-      for (let i = 0; i < topologicalOrdering.length; ++i) {
-        nodesOnCycle.delete(topologicalOrdering[i])
+    if (nodesWithNoIncomingEdge.length !== this.nodes.size) {
+      const nodesOnCycle: T[] = []
+      for (const [node, incomingEdgesCount] of incomingEdges) {
+        if (incomingEdgesCount !== 0) {
+          nodesOnCycle.push(node)
+        }
       }
-      return { sorted: topologicalOrdering, cycled: Array.from(nodesOnCycle) }
+      return { sorted: topologicalOrdering, cycled: nodesOnCycle }
+    } else {
+      return { sorted: topologicalOrdering, cycled: [] }
     }
-
-    return { sorted: topologicalOrdering, cycled: [] }
   }
 
   public getTopologicallySortedSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
