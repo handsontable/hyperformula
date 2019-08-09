@@ -71,7 +71,7 @@ export class DependencyGraph {
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.removeMaybeVertexDependencies(vertex)
 
     let finalVertex: FormulaCellVertex
     if (vertex instanceof FormulaCellVertex) {
@@ -94,7 +94,7 @@ export class DependencyGraph {
   public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.removeMaybeVertexDependencies(vertex)
 
     if (vertex instanceof ValueCellVertex) {
       vertex.setCellValue(newValue)
@@ -113,7 +113,7 @@ export class DependencyGraph {
       return
     }
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
-    this.removeIncomingEdgesIfFormulaVertex(vertex)
+    this.removeMaybeVertexDependencies(vertex)
 
     if (this.graph.adjacentNodes(vertex).size > 0) {
       const emptyVertex = new EmptyCellVertex()
@@ -129,7 +129,7 @@ export class DependencyGraph {
     assert.ok(!(vertex instanceof MatrixVertex), `Illegal operation`)
   }
 
-  public removeIncomingEdgesIfFormulaVertex(vertex: CellVertex | null) {
+  public removeMaybeVertexDependencies(vertex: CellVertex | null) {
     if (!vertex)
       return
     this.graph.removeDependencies(vertex)
