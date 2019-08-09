@@ -16,6 +16,11 @@ import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 
 export class DependencyGraph {
+  /*
+   * Invariants:
+   * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
+   */
+
   public static buildEmpty(config: Config, stats: Statistics) {
     return new DependencyGraph(
       AddressMapping.build(config.addressMappingFillThreshold),
