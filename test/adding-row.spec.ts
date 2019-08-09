@@ -10,7 +10,27 @@ const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): Ce
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
 }
 
-describe('Adding row', () => {
+describe('Adding row - matrix check', () => {
+  it('raise error if trying to add a row in a row with matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(() => {
+      engine.addRows(0, 3, 1)
+    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+
+    expect(() => {
+      engine.addRows(0, 2, 1)
+    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+  })
+})
+
+describe('Adding row - reevaluation', () => {
   it('reevaluates cells', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=COUNTBLANK(A1:A2)'],
@@ -39,7 +59,59 @@ describe('Adding row', () => {
     expect(b1setCellValueSpy).toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
   })
+})
 
+describe('Adding row - FormulaCellVertex#address update', () => {
+  it('insert row, formula vertex address shifted', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      // new row
+      ['=SUM(1,2)'],
+    ])
+
+    let vertex = engine.addressMapping!.fetchCell(adr('A1')) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(adr('A1'))
+    engine.addRows(0, 0, 1)
+    vertex = engine.addressMapping!.fetchCell(adr('A2')) as FormulaCellVertex
+    expect(vertex.getAddress()).toEqual(adr('A2'))
+  })
+})
+
+describe('Adding row - matrices adjustments', () => {
+  it('add row inside numeric matrix, expand matrix', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+
+    expect(engine.getCellValue('A2')).toEqual(3)
+
+    engine.addRows(0, 1, 2)
+
+    expect(engine.getCellValue('A2')).toEqual(0)
+    expect(engine.getCellValue('A3')).toEqual(0)
+    expect(engine.getCellValue('A4')).toEqual(3)
+  })
+})
+
+describe('Adding row - address mapping', () => {
+  it('verify sheet dimensions', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      // new col
+      ['2']
+    ])
+
+    engine.addRows(0, 1, 1)
+
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 3,
+    })
+  })
+})
+
+describe('Adding row, fixing dependencies', () => {
   it('local dependency does not change if we add rows in other sheets', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
@@ -175,7 +247,9 @@ describe('Adding row', () => {
 
     expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(0, -1, 0))
   })
+})
 
+describe('Adding row, ranges', () => {
   it('insert row in middle of range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=SUM(A1:A3)'],
@@ -215,53 +289,6 @@ describe('Adding row', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
     engine.addRows(0, 3, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
-  })
-
-  it('insert row, formula vertex address shifted', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      // new row
-      ['=SUM(1,2)'],
-    ])
-
-    let vertex = engine.addressMapping!.fetchCell(adr('A1')) as FormulaCellVertex
-    expect(vertex.getAddress()).toEqual(adr('A1'))
-    engine.addRows(0, 0, 1)
-    vertex = engine.addressMapping!.fetchCell(adr('A2')) as FormulaCellVertex
-    expect(vertex.getAddress()).toEqual(adr('A2'))
-  })
-
-  it('raise error if trying to add a row in a row with matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['13'],
-    ])
-
-    expect(() => {
-      engine.addRows(0, 3, 1)
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
-
-    expect(() => {
-      engine.addRows(0, 2, 1)
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
-  })
-
-  it('add row inside numeric matrix, expand matrix', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
-        ['1', '2'],
-        ['3', '4'],
-    ], config)
-
-    expect(engine.getCellValue('A2')).toEqual(3)
-
-    engine.addRows(0, 1, 2)
-
-    expect(engine.getCellValue('A2')).toEqual(0)
-    expect(engine.getCellValue('A3')).toEqual(0)
-    expect(engine.getCellValue('A4')).toEqual(3)
   })
 
   it('it should insert new cell with edge to only one range below', () => {

@@ -104,6 +104,13 @@ export class HandsOnEngine {
     return sheetDimensions
   }
 
+  public getSheetDimensions(sheetId: number): { width: number, height: number } {
+    return {
+      width: this.dependencyGraph.getSheetWidth(sheetId),
+      height: this.dependencyGraph.getSheetHeight(sheetId),
+    }
+  }
+
   /**
    * Returns snapshot of a computation time statistics
    */

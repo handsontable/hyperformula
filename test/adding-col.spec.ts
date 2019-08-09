@@ -10,7 +10,7 @@ const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): Ce
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
 }
 
-describe('Adding column', () => {
+describe('Adding column - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
@@ -28,35 +28,9 @@ describe('Adding column', () => {
       engine.addColumns(0, 0, 1)
     }).toThrow(new Error('It is not possible to add column in column with matrix'))
   })
+})
 
-  it('updates addresses in formulas', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', /* new col */ '=A1'],
-    ])
-
-    engine.addColumns(0, 1, 1)
-
-    const c1 = engine.addressMapping!.getCell(adr('C1')) as FormulaCellVertex
-    expect(c1).toBeInstanceOf(FormulaCellVertex)
-    expect(c1.getAddress()).toEqual(adr('C1'))
-  })
-
-  it('add column inside numeric matrix, expand matrix', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], config)
-
-    expect(engine.getCellValue('B1')).toEqual(2)
-
-    engine.addColumns(0, 1, 2)
-
-    expect(engine.getCellValue('B1')).toEqual(0)
-    expect(engine.getCellValue('C1')).toEqual(0)
-    expect(engine.getCellValue('D1')).toEqual(2)
-  })
-
+describe('Adding column - reevaluation', () => {
   it('reevaluates cells', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
@@ -81,6 +55,53 @@ describe('Adding column', () => {
 
     expect(a2setCellValueSpy).not.toHaveBeenCalled()
     expect(c1setCellValueSpy).toHaveBeenCalled()
+  })
+})
+
+describe('Adding column - FormulaCellVertex#address update', () => {
+  it('updates addresses in formulas', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '=A1'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const c1 = engine.addressMapping!.getCell(adr('C1')) as FormulaCellVertex
+    expect(c1).toBeInstanceOf(FormulaCellVertex)
+    expect(c1.getAddress()).toEqual(adr('C1'))
+  })
+})
+
+describe('Adding column', () => {
+  it('add column inside numeric matrix, expand matrix', () => {
+    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+
+    expect(engine.getCellValue('B1')).toEqual(2)
+
+    engine.addColumns(0, 1, 2)
+
+    expect(engine.getCellValue('B1')).toEqual(0)
+    expect(engine.getCellValue('C1')).toEqual(0)
+    expect(engine.getCellValue('D1')).toEqual(2)
+  })
+})
+
+describe('Adding column - address mapping', () => {
+  it('verify sheet dimensions', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* new col */ '=A1'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 3,
+      height: 1,
+    })
   })
 })
 
@@ -168,6 +189,20 @@ describe('Adding column, fixing dependency', () => {
 })
 
 describe('Adding column, fixing ranges', () => {
+  it('insert column to empty range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', /* new col */ '', ''],
+      ['=SUM(A1:C1)'],
+    ])
+
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(null)
+
+    engine.addColumns(0, 1, 1)
+
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(null)
+    expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(null)
+  })
+
   it('insert column in middle of range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', /* new col */ '2', '3'],
