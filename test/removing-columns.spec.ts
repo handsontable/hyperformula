@@ -5,18 +5,7 @@ import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
 import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
-describe('Removing columns', () => {
-  it('should remove edges from other cells to removed nodes', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=B1'],
-    ])
-
-    engine.removeColumns(0, 2, 2)
-
-    const b1 = engine.addressMapping.fetchCell(adr('b1'))
-    expect(engine.graph.adjacentNodes(b1)).toEqual(new Set())
-  })
-
+describe('Removing columns - reevaluation', () => {
   it('reevaluates', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MEDIAN(B1:D1)', '2', '4', '3'],
@@ -109,9 +98,31 @@ describe('Removing columns - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
+
+  it('does not remove matrix vertices from graph', function() {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['1', '2', '3'],
+    ], config)
+    expect(engine.graph.nodes.size).toBe(1)
+    engine.removeColumns(0, 1, 1)
+    expect(engine.graph.nodes.size).toBe(1)
+  })
 })
 
 describe('Removing columns - graph', function() {
+  it('should remove edges from other cells to removed nodes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=B1'],
+    ])
+
+    engine.removeColumns(0, 2, 2)
+
+    const b1 = engine.addressMapping.fetchCell(adr('b1'))
+    expect(engine.graph.adjacentNodes(b1)).toEqual(new Set())
+  })
+
   it('should remove vertices from graph', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4'],
@@ -129,17 +140,6 @@ describe('Removing columns - graph', function() {
     expect(engine.graph.nodes.size).toBe(2)
     engine.removeColumns(0, 1, 1)
     expect(engine.graph.nodes.size).toBe(2)
-  })
-
-  it('does not remove matrix vertices from graph', function() {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '3'],
-      ['1', '2', '3'],
-    ], config)
-    expect(engine.graph.nodes.size).toBe(1)
-    engine.removeColumns(0, 1, 1)
-    expect(engine.graph.nodes.size).toBe(1)
   })
 })
 

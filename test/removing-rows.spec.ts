@@ -5,7 +5,7 @@ import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
 import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
-describe('Removing rows - dependencies', () => {
+describe('Removing rows - reevaluation', () => {
   it('reevaluates cells', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)'],
@@ -34,7 +34,9 @@ describe('Removing rows - dependencies', () => {
     expect(b1setCellValueSpy).toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
   })
+})
 
+describe('Removing rows - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
@@ -51,19 +53,6 @@ describe('Removing rows - dependencies', () => {
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
     engine.removeRows(0, 0, 1)
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
-  })
-
-  it('should remove edges from other cells to removed nodes', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['2'],
-      ['=A2'], //
-    ])
-
-    engine.removeRows(0, 2, 2)
-
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
   })
 
   it('same sheet, case Aa', () => {
@@ -251,9 +240,34 @@ describe('Removing rows - matrices', () => {
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
+
+  it('does not remove matrix vertices from graph', function() {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['1', '2'],
+      ['1', '2'],
+    ], config)
+    expect(engine.graph.nodes.size).toBe(1)
+    engine.removeRows(0, 1, 1)
+    expect(engine.graph.nodes.size).toBe(1)
+  })
 })
 
 describe('Removing rows - graph', function() {
+  it('should remove edges from other cells to removed nodes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=A2'], //
+    ])
+
+    engine.removeRows(0, 2, 2)
+
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
+  })
+
   it('should remove vertices from graph', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
@@ -262,6 +276,17 @@ describe('Removing rows - graph', function() {
     expect(engine.graph.nodes.size).toBe(4)
     engine.removeRows(0, 0, 1)
     expect(engine.graph.nodes.size).toBe(0)
+  })
+
+  it('works if there are empty cells removed', function() {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      [''],
+      ['3'],
+    ])
+    expect(engine.graph.nodes.size).toBe(2)
+    engine.removeRows(0, 1, 1)
+    expect(engine.graph.nodes.size).toBe(2)
   })
 })
 
