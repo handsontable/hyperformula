@@ -8,6 +8,7 @@ export class Graph<T> {
   public nodes: Set<T>
 
   public specialNodes: Set<T>
+  public specialNodesRecentlyChanged: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>>
@@ -126,10 +127,19 @@ export class Graph<T> {
     this.edges.delete(node)
     this.nodes.delete(node)
     this.specialNodes.delete(node)
+    this.specialNodesRecentlyChanged.delete(node)
   }
 
   public markNodeAsSpecial(node: T) {
     this.specialNodes.add(node)
+  }
+
+  public markNodeAsSpecialRecentlyChanged(node: T) {
+    this.specialNodesRecentlyChanged.add(node)
+  }
+
+  public clearSpecialNodesRecentlyChanged() {
+    this.specialNodesRecentlyChanged = new Set()
   }
 
   /**
