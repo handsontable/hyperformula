@@ -109,6 +109,21 @@ describe('Removing columns - matrices', () => {
     engine.removeColumns(0, 1, 1)
     expect(engine.graph.nodes.size).toBe(1)
   })
+
+  it('reevaluates cells dependent on matrix vertex', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1', '1'],
+      ['2', '2', '2'],
+      ['=SUM(A1:C2)']
+    ], config)
+
+    expect(engine.getCellValue('A3')).toEqual(9)
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(engine.getCellValue('A3')).toEqual(6)
+  })
 })
 
 describe('Removing columns - graph', function() {

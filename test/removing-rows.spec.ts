@@ -252,6 +252,19 @@ describe('Removing rows - matrices', () => {
     engine.removeRows(0, 1, 1)
     expect(engine.graph.nodes.size).toBe(1)
   })
+
+  it('reevaluates cells dependent on matrix vertex', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B3)'],
+      ['1', '2'],
+      ['1', '2'],
+    ], config)
+
+    engine.removeRows(0, 1, 1)
+
+    expect(engine.getCellValue('C1')).toEqual(6)
+  })
 })
 
 describe('Removing rows - graph', function() {
