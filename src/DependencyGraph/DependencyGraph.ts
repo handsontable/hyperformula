@@ -4,41 +4,16 @@ import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {filterWith, map} from '../generatorUtils'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
-import {Ast, AstNodeType, CellAddress, collectDependencies} from '../parser'
+import {Ast, AstNodeType} from '../parser'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping'
-import {Graph, TopSortResult, IGetDependenciesQuery} from './Graph'
+import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {absolutizeDependencies} from '../absolutizeDependencies'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
-
-class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
-  constructor(
-    private readonly rangeMapping: RangeMapping,
-    private readonly addressMapping: AddressMapping
-  ) {
-  }
-
-  public call(vertex: Vertex) {
-    if (!(vertex instanceof FormulaCellVertex)) {
-      return null
-    }
-
-    const deps = collectDependencies(vertex.getFormula())
-    const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress())
-    const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
-      if (dep instanceof AbsoluteCellRange) {
-        return this.rangeMapping.getRange(dep.start, dep.end)!
-      } else {
-        return this.addressMapping.fetchCell(dep)
-      }
-    }))
-    return verticesForDeps
-  }
-}
+import {GetDependenciesQuery} from './GetDependenciesQuery'
 
 export class DependencyGraph {
   /*
