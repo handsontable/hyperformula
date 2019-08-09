@@ -153,7 +153,7 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged = new Set()
   }
 
-  public removeDependencies(node: T) {
+  private removeDependencies(node: T) {
     const dependentNodes = this.getDependenciesQuery.call(node)
     if (!dependentNodes)
       return
