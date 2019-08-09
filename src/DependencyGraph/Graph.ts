@@ -15,20 +15,17 @@ export interface TopSortResult<T> { sorted: T[], cycled: T[] }
  */
 export class Graph<T> {
   /** Set with nodes in graph. */
-  public nodes: Set<T>
+  public nodes: Set<T> = new Set()
 
-  public specialNodes: Set<T>
+  public specialNodes: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
-  private edges: Map<T, Set<T>>
+  private edges: Map<T, Set<T>> = new Map()
 
   constructor(
     private readonly getDependenciesQuery: IGetDependenciesQuery<T>
   ) {
-    this.nodes = new Set()
-    this.edges = new Map()
-    this.specialNodes = new Set()
   }
 
   /**
