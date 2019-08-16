@@ -26,6 +26,93 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 
+export enum TransformationType {
+  ADD_ROWS,
+  ADD_COLUMNS,
+  REMOVE_ROWS,
+  REMOVE_COLUMNS,
+}
+
+export interface AddColumnsTransformation {
+  type: TransformationType.ADD_COLUMNS,
+  sheet: number,
+  col: number,
+  numberOfCols: number,
+}
+
+export interface AddRowsTransformation {
+  type: TransformationType.ADD_ROWS,
+  sheet: number,
+  row: number,
+  numberOfRowsToAdd: number,
+}
+
+export interface RemoveRowsTransformation {
+  type: TransformationType.REMOVE_ROWS,
+  sheet: number,
+  rowStart: number,
+  rowEnd: number,
+}
+
+export interface RemoveColumnsTransformation {
+  type: TransformationType.REMOVE_COLUMNS,
+  sheet: number,
+  columnStart: number,
+  columnEnd: number,
+}
+
+export type Transformation =
+  AddRowsTransformation
+  | AddColumnsTransformation
+  | RemoveRowsTransformation
+  | RemoveColumnsTransformation
+
+export class LazilyTransformingAstService {
+  private transformations: Transformation[] = []
+
+  constructor(
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly parser: ParserWithCaching,
+  ) {
+  }
+
+  public addAddColumnsTransformation(sheet: number, col: number, numberOfCols: number) {
+    this.transformations.push({
+      type: TransformationType.ADD_COLUMNS,
+      sheet,
+      col,
+      numberOfCols
+    })
+  }
+
+  public addAddRowsTransformation(sheet: number, row: number, numberOfRowsToAdd: number) {
+    this.transformations.push({
+      type: TransformationType.ADD_ROWS,
+      sheet,
+      row,
+      numberOfRowsToAdd,
+    })
+  }
+
+  public addRemoveRowsTransformation(sheet: number, rowStart: number, rowEnd: number) {
+    this.transformations.push({
+      type: TransformationType.REMOVE_ROWS,
+      sheet,
+      rowStart,
+      rowEnd,
+    })
+  }
+
+  public addRemoveColumnsTransformation(sheet: number, columnStart: number, columnEnd: number) {
+    this.transformations.push({
+      type: TransformationType.REMOVE_COLUMNS,
+      sheet,
+      columnStart,
+      columnEnd,
+    })
+  }
+}
+
 /**
  * Engine for one sheet
  */
@@ -58,7 +145,9 @@ export class HandsOnEngine {
     private readonly parser: ParserWithCaching,
 
     /** Formula evaluator */
-    private readonly evaluator: Evaluator
+    private readonly evaluator: Evaluator,
+
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 
@@ -173,6 +262,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddRowsTransformation(sheet, row, numberOfRowsToAdd)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
@@ -185,6 +275,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveRowsTransformation(sheet, rowStart, rowEnd)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
@@ -197,6 +288,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddColumnsTransformation(sheet, col, numberOfCols)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
@@ -209,6 +301,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveColumnsDependencyTransformer.transform(sheet, columnStart, columnEnd, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveColumnsTransformation(sheet, columnStart, columnEnd)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()

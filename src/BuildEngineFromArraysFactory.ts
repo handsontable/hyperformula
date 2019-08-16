@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine} from './'
+import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
 import {Sheet, Sheets, GraphBuilder} from './GraphBuilder'
 import {Statistics, StatType} from './statistics/Statistics'
 import {DependencyGraph} from './DependencyGraph'
@@ -26,6 +26,8 @@ export class BuildEngineFromArraysFactory {
       graphBuilder.buildGraph(sheets)
     })
 
+    const lazilyTransformingAstService = new LazilyTransformingAstService(dependencyGraph, parser)
+
     const evaluator = new SingleThreadEvaluator(dependencyGraph, config, stats)
     evaluator.run()
 
@@ -36,7 +38,8 @@ export class BuildEngineFromArraysFactory {
       stats,
       dependencyGraph,
       parser,
-      evaluator
+      evaluator,
+      lazilyTransformingAstService
     )
     return engine
   }
