@@ -5,15 +5,15 @@ import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddres
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(sheet: number, col: number, numberOfCols: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), transformDependencies(sheet, col, numberOfCols))
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      fixFormulaVertexColumn(node, col, numberOfCols)
-    }
+    // for (const node of graph.formulaNodesFromSheet(sheet)) {
+    //   const newAst = transformAddressesInFormula(node.getFormula(), node.getAddress(), transformDependencies(sheet, col, numberOfCols))
+    //   const cachedAst = parser.rememberNewAst(newAst)
+    //   node.setFormula(cachedAst)
+    //   fixFormulaVertexColumn(node, col, numberOfCols)
+    // }
   }
 
-  function transformDependencies(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
+  export function transformDependencies(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== sheetInWhichWeAddColumns)) {
         return false

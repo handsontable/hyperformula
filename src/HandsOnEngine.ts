@@ -16,9 +16,10 @@ import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {transformAddressesInFormula} from './dependencyTransformers/common'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
-import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
+import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, Ast, ProcedureAst} from './parser'
 import {CellAddress} from './parser/CellAddress'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -70,10 +71,14 @@ export type Transformation =
 export class LazilyTransformingAstService {
   private transformations: Transformation[] = []
 
+  public parser?: ParserWithCaching
+
   constructor(
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly parser: ParserWithCaching,
   ) {
+  }
+
+  public version(): number {
+    return this.transformations.length
   }
 
   public addAddColumnsTransformation(sheet: number, col: number, numberOfCols: number) {
@@ -111,6 +116,46 @@ export class LazilyTransformingAstService {
       columnEnd,
     })
   }
+
+  public applyTransformations(ast: Ast, address: SimpleCellAddress, version: number): [Ast, SimpleCellAddress, number] {
+    for (let v = version; v < this.transformations.length; v++) {
+      const transformation = this.transformations[v]
+      switch (transformation.type) {
+        case TransformationType.ADD_COLUMNS: {
+          ast = transformAddressesInFormula(ast, address, AddColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.col, transformation.numberOfCols))
+          if (transformation.col <= address.col) {
+            address = { ...address, col: address.col + transformation.numberOfCols }
+          }
+          break;
+        }
+        case TransformationType.ADD_ROWS: {
+          ast = transformAddressesInFormula(ast, address, AddRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.row, transformation.numberOfRowsToAdd))
+          if (transformation.row <= address.row) {
+            address = { ...address, row: address.row + transformation.numberOfRowsToAdd }
+          }
+          break;
+        }
+        case TransformationType.REMOVE_COLUMNS: {
+          const numberOfColumnsToDelete = transformation.columnEnd - transformation.columnStart + 1
+          ast = transformAddressesInFormula(ast, address, RemoveColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.columnStart, numberOfColumnsToDelete))
+          if (transformation.columnStart <= address.col) {
+            address = {...address, col: address.col - numberOfColumnsToDelete }
+          }
+          break;
+        }
+        case TransformationType.REMOVE_ROWS: {
+          const numberOfRowsToDelete = transformation.rowEnd - transformation.rowStart + 1
+          ast = transformAddressesInFormula(ast, address, RemoveRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.rowStart, numberOfRowsToDelete))
+          if (transformation.rowStart <= address.row) {
+            address = { ...address, row: address.row - numberOfRowsToDelete }
+          }
+          break;
+        }
+      }
+    }
+    const cachedAst = this.parser!.rememberNewAst(ast)
+    return [cachedAst, address, this.transformations.length]
+  }
 }
 
 /**
@@ -147,7 +192,7 @@ export class HandsOnEngine {
     /** Formula evaluator */
     private readonly evaluator: Evaluator,
 
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 

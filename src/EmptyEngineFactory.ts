@@ -7,10 +7,11 @@ import {ParserWithCaching} from './parser'
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HandsOnEngine {
     const stats = new Statistics()
-    const dependencyGraph = DependencyGraph.buildEmpty(config, stats)
+    const lazilyTransformingAstService = new LazilyTransformingAstService()
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
-    const lazilyTransformingAstService = new LazilyTransformingAstService(dependencyGraph, parser)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, config, stats)
+    lazilyTransformingAstService.parser = parser
     const engine = new HandsOnEngine(
       config,
       stats,

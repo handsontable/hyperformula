@@ -7,7 +7,7 @@ import './testConfig.ts'
 import {adr} from "./testUtils";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula() as CellReferenceAst).reference
+  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
 }
 
 describe('Adding column - matrix check', () => {
@@ -68,7 +68,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
 
     const c1 = engine.addressMapping!.getCell(adr('C1')) as FormulaCellVertex
     expect(c1).toBeInstanceOf(FormulaCellVertex)
-    expect(c1.getAddress()).toEqual(adr('C1'))
+    expect(c1.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 })
 

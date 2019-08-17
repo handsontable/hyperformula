@@ -14,6 +14,7 @@ import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
+import {LazilyTransformingAstService} from '../HandsOnEngine'
 
 export class DependencyGraph {
   /*
@@ -21,16 +22,17 @@ export class DependencyGraph {
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
-  public static buildEmpty(config: Config, stats: Statistics) {
+  public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, stats: Statistics) {
     const addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
       new SheetMapping(),
       new MatrixMapping(),
-      stats
+      stats,
+      lazilyTransformingAstService
     )
   }
 
@@ -41,13 +43,14 @@ export class DependencyGraph {
       public readonly sheetMapping: SheetMapping,
       public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService
   ) {}
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
-    const newVertex = new FormulaCellVertex(ast, address)
+    const newVertex = new FormulaCellVertex(ast, address, this.lazilyTransformingAstService.version())
     this.graph.exchangeOrAddNode(vertex, newVertex)
     this.addressMapping.setCell(address, newVertex)
 
@@ -340,7 +343,7 @@ export class DependencyGraph {
           }
           // 4. fix edges for cell references in formulas
         } else if (adjacentNode instanceof FormulaCellVertex) {
-          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(), adjacentNode.getAddress(), matrixRange)
+          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(this.lazilyTransformingAstService), adjacentNode.getAddress(this.lazilyTransformingAstService), matrixRange)
           for (const vertex of relevantReferences) {
             this.graph.addEdge(vertex, adjacentNode)
           }

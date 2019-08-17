@@ -43,7 +43,7 @@ export class EngineComparator {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
           deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
-          deepStrictEqual(expectedVertex.getFormula(), actualVertex.getFormula(), 'Different AST in formulas')
+          deepStrictEqual(expectedVertex.getFormula(this.expected.lazilyTransformingAstService), actualVertex.getFormula(this.actual.lazilyTransformingAstService), 'Different AST in formulas')
           strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
           strictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)

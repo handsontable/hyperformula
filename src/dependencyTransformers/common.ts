@@ -64,21 +64,21 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
 }
 
 export function fixFormulaVertexRow(node: FormulaCellVertex, row: number, numberOfRows: number) {
-  const nodeAddress = node.getAddress()
-  if (row <= nodeAddress.row) {
-    node.setAddress({
-      ...nodeAddress,
-      row: nodeAddress.row + numberOfRows,
-    })
-  }
+  // const nodeAddress = node.getAddress()
+  // if (row <= nodeAddress.row) {
+  //   node.setAddress({
+  //     ...nodeAddress,
+  //     row: nodeAddress.row + numberOfRows,
+  //   })
+  // }
 }
 
 export function fixFormulaVertexColumn(node: FormulaCellVertex, column: number, numberOfColumns: number) {
-  const nodeAddress = node.getAddress()
-  if (column <= nodeAddress.col) {
-    node.setAddress({
-      ...nodeAddress,
-      col: nodeAddress.col + numberOfColumns,
-    })
-  }
+  // const nodeAddress = node.getAddress()
+  // if (column <= nodeAddress.col) {
+  //   node.setAddress({
+  //     ...nodeAddress,
+  //     col: nodeAddress.col + numberOfColumns,
+  //   })
+  // }
 }

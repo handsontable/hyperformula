@@ -11,7 +11,8 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.OVERALL)
 
-    const dependencyGraph = DependencyGraph.buildEmpty(config, stats)
+    const lazilyTransformingAstService = new LazilyTransformingAstService()
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
     for (const sheetName in sheets) {
@@ -26,7 +27,7 @@ export class BuildEngineFromArraysFactory {
       graphBuilder.buildGraph(sheets)
     })
 
-    const lazilyTransformingAstService = new LazilyTransformingAstService(dependencyGraph, parser)
+    lazilyTransformingAstService.parser = parser
 
     const evaluator = new SingleThreadEvaluator(dependencyGraph, config, stats)
     evaluator.run()

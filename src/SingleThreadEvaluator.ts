@@ -31,8 +31,14 @@ export class SingleThreadEvaluator implements Evaluator {
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-          const address = vertex.getAddress()
-          const formula = vertex.getFormula() as Ast
+          let address, formula
+          if (vertex instanceof FormulaCellVertex) {
+            address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+            formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+          } else {
+            address = vertex.getAddress()
+            formula = vertex.getFormula() as Ast
+          }
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
           const newCellValue = this.interpreter.evaluateAst(formula, address)
           vertex.setCellValue(newCellValue)
@@ -59,8 +65,14 @@ export class SingleThreadEvaluator implements Evaluator {
     })
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        const address = vertex.getAddress()
-        const formula = vertex.getFormula() as Ast
+        let address, formula
+        if (vertex instanceof FormulaCellVertex) {
+          address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+          formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+        } else {
+          address = vertex.getAddress()
+          formula = vertex.getFormula() as Ast
+        }
         const cellValue = this.interpreter.evaluateAst(formula, address)
         vertex.setCellValue(cellValue)
       } else if (vertex instanceof RangeVertex) {

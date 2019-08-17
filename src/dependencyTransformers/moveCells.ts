@@ -8,8 +8,8 @@ export namespace MoveCellsDependencyTransformer {
   export function transformDependentFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.formulaNodesFromSheet(sourceRange.start.sheet)) {
       const newAst = transformAddressesInMovedFormula(
-          node.getFormula(),
-          node.getAddress(),
+          node.getFormula(graph.lazilyTransformingAstService),
+          node.getAddress(graph.lazilyTransformingAstService),
           sourceRange,
           toRight,
           toBottom,
@@ -23,8 +23,8 @@ export namespace MoveCellsDependencyTransformer {
   export function transformMovedFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.formulaVerticesInRange(sourceRange)) {
       const newAst = transformAddressesInFormula(
-          node.getFormula(),
-          node.getAddress(),
+          node.getFormula(graph.lazilyTransformingAstService),
+          node.getAddress(graph.lazilyTransformingAstService),
           fixDependenciesInMovedCells(-toRight, -toBottom),
       )
       const cachedAst = parser.rememberNewAst(newAst)

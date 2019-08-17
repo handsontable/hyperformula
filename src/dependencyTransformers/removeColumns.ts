@@ -5,20 +5,20 @@ import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddres
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(sheet: number, columnStart: number, columnEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    const numberOfColumnsToDelete = columnEnd - columnStart + 1
-    for (const node of graph.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(
-          node.getFormula(),
-          node.getAddress(),
-          transformDependencies(sheet, columnStart, numberOfColumnsToDelete),
-      )
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      fixFormulaVertexColumn(node, columnStart, -numberOfColumnsToDelete)
-    }
+    // const numberOfColumnsToDelete = columnEnd - columnStart + 1
+    // for (const node of graph.formulaNodesFromSheet(sheet)) {
+    //   const newAst = transformAddressesInFormula(
+    //       node.getFormula(),
+    //       node.getAddress(),
+    //       transformDependencies(sheet, columnStart, numberOfColumnsToDelete),
+    //   )
+    //   const cachedAst = parser.rememberNewAst(newAst)
+    //   node.setFormula(cachedAst)
+    //   fixFormulaVertexColumn(node, columnStart, -numberOfColumnsToDelete)
+    // }
   }
 
-  function transformDependencies(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
+  export function transformDependencies(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       if ((dependencyAddress.sheet === formulaAddress.sheet)
           && (formulaAddress.sheet !== sheetInWhichWeRemoveColumns)) {

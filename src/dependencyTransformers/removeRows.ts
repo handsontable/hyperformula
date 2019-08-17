@@ -5,20 +5,20 @@ import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFu
 
 export namespace RemoveRowsDependencyTransformer {
   export function transform(sheet: number, rowStart: number, rowEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    const numberOfRowsToDelete = rowEnd - rowStart + 1
-    for (const node of graph.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(
-          node.getFormula(),
-          node.getAddress(),
-          transformDependencies(sheet, rowStart, numberOfRowsToDelete),
-      )
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
-    }
+    // const numberOfRowsToDelete = rowEnd - rowStart + 1
+    // for (const node of graph.formulaNodesFromSheet(sheet)) {
+    //   const newAst = transformAddressesInFormula(
+    //       node.getFormula(),
+    //       node.getAddress(),
+    //       transformDependencies(sheet, rowStart, numberOfRowsToDelete),
+    //   )
+    //   const cachedAst = parser.rememberNewAst(newAst)
+    //   node.setFormula(cachedAst)
+    //   fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
+    // }
   }
 
-  function transformDependencies(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {
+  export function transformDependencies(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       if ((dependencyAddress.sheet === formulaAddress.sheet)
           && (formulaAddress.sheet !== sheetInWhichWeRemoveRows)) {

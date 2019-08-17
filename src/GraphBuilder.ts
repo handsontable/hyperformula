@@ -99,7 +99,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
-            vertex = new FormulaCellVertex(parseResult.ast, address)
+            vertex = new FormulaCellVertex(parseResult.ast, address, 0)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
             if (parseResult.hasVolatileFunction) {
@@ -161,7 +161,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
-            const vertex = new FormulaCellVertex(parseResult.ast, address)
+            const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
           } else if (cellContent === '') {

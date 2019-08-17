@@ -1,5 +1,6 @@
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {Ast} from '../parser'
+import {LazilyTransformingAstService} from '../HandsOnEngine'
 
 /**
  * Represents vertex which keeps formula
@@ -14,7 +15,11 @@ export class FormulaCellVertex {
   /** Address which this vertex represents */
   private cellAddress: SimpleCellAddress
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress) {
+  constructor(
+    formula: Ast,
+    cellAddress: SimpleCellAddress,
+    public version: number
+  ) {
     this.formula = formula
     this.cellAddress = cellAddress
     this.cachedCellValue = null
@@ -23,8 +28,18 @@ export class FormulaCellVertex {
   /**
    * Returns formula stored in this vertex
    */
-  public getFormula(): Ast {
+  public getFormula(updatingService: LazilyTransformingAstService): Ast {
+    this.ensureRecentData(updatingService)
     return this.formula
+  }
+
+  private ensureRecentData(updatingService: LazilyTransformingAstService) {
+    if (this.version != updatingService.version()) {
+      const [newAst, newAddress, newVersion] = updatingService.applyTransformations(this.formula, this.address, this.version)
+      this.formula = newAst
+      this.cellAddress = newAddress
+      this.version = newVersion
+    }
   }
 
   public setFormula(formula: Ast) {
@@ -34,7 +49,8 @@ export class FormulaCellVertex {
   /**
    * Returns address of the cell associated with vertex
    */
-  public getAddress(): SimpleCellAddress {
+  public getAddress(updatingService: LazilyTransformingAstService): SimpleCellAddress {
+    this.ensureRecentData(updatingService)
     return this.cellAddress
   }
 

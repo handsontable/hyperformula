@@ -5,18 +5,18 @@ import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFu
 
 export namespace AddRowsDependencyTransformer {
   export function transform(sheet: number, row: number, numberOfRowsToAdd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.formulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(
-          node.getFormula(), node.getAddress(),
-          transformDependencies(sheet, row, numberOfRowsToAdd),
-      )
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      fixFormulaVertexRow(node, row, numberOfRowsToAdd)
-    }
+    // for (const node of graph.formulaNodesFromSheet(sheet)) {
+    //   const newAst = transformAddressesInFormula(
+    //       node.getFormula(), node.getAddress(),
+    //       transformDependencies(sheet, row, numberOfRowsToAdd),
+    //   )
+    //   const cachedAst = parser.rememberNewAst(newAst)
+    //   node.setFormula(cachedAst)
+    //   fixFormulaVertexRow(node, row, numberOfRowsToAdd)
+    // }
   }
 
-  function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
+  export function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       if ((dependencyAddress.sheet === formulaAddress.sheet)
           && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {

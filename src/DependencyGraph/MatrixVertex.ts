@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
+import {LazilyTransformingAstService} from '../HandsOnEngine'
 
 export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
