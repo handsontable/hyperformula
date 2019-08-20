@@ -416,10 +416,6 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public isEmpty(address: SimpleCellAddress): boolean {
-    return this.addressMapping.isEmpty(address)
-  }
-
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.addressMapping.getCellValue(address)
   }

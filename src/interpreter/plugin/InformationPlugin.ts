@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -48,12 +48,8 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
     const arg = ast.args[0]
-    if (arg.type === AstNodeType.CELL_REFERENCE) {
-      const address = arg.reference.toSimpleCellAddress(formulaAddress)
-      return this.dependencyGraph.isEmpty(address)
-    } else {
-      return false
-    }
+    const value = this.evaluateAst(arg, formulaAddress)
+    return (value === EmptyValue)
   }
 
   /**

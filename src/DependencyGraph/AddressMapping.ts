@@ -488,11 +488,6 @@ export class AddressMapping {
     return sheetMapping.getWidth()
   }
 
-  public isEmpty(address: SimpleCellAddress): boolean {
-    const vertex = this.getCell(address)
-    return (vertex === null || vertex instanceof EmptyCellVertex)
-  }
-
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
