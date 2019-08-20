@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {FormulaCellVertex} from '../src/DependencyGraph'
+import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -18,6 +18,12 @@ export const extractReference = (engine: HandsOnEngine, address: SimpleCellAddre
 
 export const extractRange = (engine: HandsOnEngine, address: SimpleCellAddress): AbsoluteCellRange => {
   const formula = (engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const rangeAst = formula.args[0] as CellRangeAst
+  return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
+}
+
+export const extractMatrixRange = (engine: HandsOnEngine, address: SimpleCellAddress): AbsoluteCellRange => {
+  const formula = (engine.addressMapping!.fetchCell(address) as MatrixVertex).getFormula() as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
   return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
 }

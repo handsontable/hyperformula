@@ -8,8 +8,8 @@ export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
-  private readonly formula: Ast | null
-  private readonly cellAddress: SimpleCellAddress
+  private formula: Ast | null
+  public cellAddress: SimpleCellAddress
   private matrix: IMatrix | CellError
 
   get width(): number {
@@ -24,6 +24,10 @@ export class MatrixVertex {
       return 0
     }
     return this.matrix.height()
+  }
+
+  get sheet(): number {
+    return this.cellAddress.sheet
   }
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
@@ -73,8 +77,16 @@ export class MatrixVertex {
     return this.cellAddress
   }
 
+  public setAddress(address: SimpleCellAddress) {
+    this.cellAddress = address
+  }
+
   public getFormula(): Ast | null {
     return this.formula
+  }
+
+  public setFormula(newFormula: Ast) {
+    this.formula = newFormula
   }
 
   public isFormula(): boolean {

@@ -5,17 +5,13 @@ import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFu
 
 export namespace RemoveRowsDependencyTransformer {
   export function transform(sheet: number, rowStart: number, rowEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    // const numberOfRowsToDelete = rowEnd - rowStart + 1
-    // for (const node of graph.formulaNodesFromSheet(sheet)) {
-    //   const newAst = transformAddressesInFormula(
-    //       node.getFormula(),
-    //       node.getAddress(),
-    //       transformDependencies(sheet, rowStart, numberOfRowsToDelete),
-    //   )
-    //   const cachedAst = parser.rememberNewAst(newAst)
-    //   node.setFormula(cachedAst)
-    //   fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
-    // }
+    const numberOfRowsToDelete = rowEnd - rowStart + 1
+    for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
+      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformDependencies(sheet, rowStart, numberOfRowsToDelete))
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      fixFormulaVertexRow(node, rowStart, -numberOfRowsToDelete)
+    }
   }
 
   export function transformDependencies(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {

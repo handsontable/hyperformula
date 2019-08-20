@@ -396,6 +396,14 @@ export class DependencyGraph {
     }
   }
 
+  public* matrixFormulaNodesFromSheet(sheet: number): IterableIterator<MatrixVertex> {
+    for (const vertex of this.graph.nodes) {
+      if (vertex instanceof MatrixVertex && vertex.sheet === sheet && vertex.isFormula()) {
+        yield vertex
+      }
+    }
+  }
+
   public existsVertex(address: SimpleCellAddress): boolean {
     return this.addressMapping.has(address)
   }

@@ -5,17 +5,13 @@ import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddres
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(sheet: number, columnStart: number, columnEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    // const numberOfColumnsToDelete = columnEnd - columnStart + 1
-    // for (const node of graph.formulaNodesFromSheet(sheet)) {
-    //   const newAst = transformAddressesInFormula(
-    //       node.getFormula(),
-    //       node.getAddress(),
-    //       transformDependencies(sheet, columnStart, numberOfColumnsToDelete),
-    //   )
-    //   const cachedAst = parser.rememberNewAst(newAst)
-    //   node.setFormula(cachedAst)
-    //   fixFormulaVertexColumn(node, columnStart, -numberOfColumnsToDelete)
-    // }
+    const numberOfColumnsToDelete = columnEnd - columnStart + 1
+    for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
+      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformDependencies(sheet, columnStart, numberOfColumnsToDelete))
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+      fixFormulaVertexColumn(node, columnStart, -numberOfColumnsToDelete)
+    }
   }
 
   export function transformDependencies(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {

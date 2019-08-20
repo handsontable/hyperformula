@@ -3,7 +3,8 @@ import {simpleCellAddress} from '../src/Cell'
 import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing rows - reevaluation', () => {
   it('reevaluates cells', () => {
@@ -264,6 +265,35 @@ describe('Removing rows - matrices', () => {
     engine.removeRows(0, 1, 1)
 
     expect(engine.getCellValue('C1')).toEqual(6)
+  })
+
+  it('MatrixVertex#formula should be updated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '4'],
+      ['2', '5'],
+      ['3', '6'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+    ])
+
+    engine.removeRows(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
+  })
+
+  it('MatrixVertex#address should be updated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '4'],
+      ['2', '5'],
+      ['3', '6'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+    ])
+
+    engine.removeRows(0, 1, 1)
+
+    const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as MatrixVertex
+    expect(matrixVertex.cellAddress).toEqual(adr('A3'))
   })
 })
 

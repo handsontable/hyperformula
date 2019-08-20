@@ -1,10 +1,11 @@
 import {Config, HandsOnEngine} from '../src'
 import {simpleCellAddress, SimpleCellAddress, CellError, ErrorType} from '../src/Cell'
-import {EmptyCellVertex, FormulaCellVertex} from '../src/DependencyGraph'
+import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr} from "./testUtils";
+import {adr, extractMatrixRange} from "./testUtils";
+import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -69,6 +70,31 @@ describe('Adding column - FormulaCellVertex#address update', () => {
     const c1 = engine.addressMapping!.getCell(adr('C1')) as FormulaCellVertex
     expect(c1).toBeInstanceOf(FormulaCellVertex)
     expect(c1.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
+  })
+})
+
+describe('Adding column', () => {
+  it('MatrixVertex#formula should be updated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
+  })
+
+  it('MatrixVertex#address should be updated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+    ])
+
+    engine.addColumns(0, 1, 1)
+
+    const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
+    expect(matrixVertex.cellAddress).toEqual(adr('D1'))
   })
 })
 

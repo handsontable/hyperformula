@@ -1,5 +1,5 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {FormulaCellVertex} from '../DependencyGraph'
+import {MatrixVertex} from '../DependencyGraph'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
@@ -63,22 +63,22 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
   }
 }
 
-export function fixFormulaVertexRow(node: FormulaCellVertex, row: number, numberOfRows: number) {
-  // const nodeAddress = node.getAddress()
-  // if (row <= nodeAddress.row) {
-  //   node.setAddress({
-  //     ...nodeAddress,
-  //     row: nodeAddress.row + numberOfRows,
-  //   })
-  // }
+export function fixFormulaVertexRow(node: MatrixVertex, row: number, numberOfRows: number) {
+  const nodeAddress = node.cellAddress
+  if (row <= nodeAddress.row) {
+    node.setAddress({
+      ...nodeAddress,
+      row: nodeAddress.row + numberOfRows,
+    })
+  }
 }
 
-export function fixFormulaVertexColumn(node: FormulaCellVertex, column: number, numberOfColumns: number) {
-  // const nodeAddress = node.getAddress()
-  // if (column <= nodeAddress.col) {
-  //   node.setAddress({
-  //     ...nodeAddress,
-  //     col: nodeAddress.col + numberOfColumns,
-  //   })
-  // }
+export function fixFormulaVertexColumn(node: MatrixVertex, column: number, numberOfColumns: number) {
+  const nodeAddress = node.cellAddress
+  if (column <= nodeAddress.col) {
+    node.setAddress({
+      ...nodeAddress,
+      col: nodeAddress.col + numberOfColumns,
+    })
+  }
 }
