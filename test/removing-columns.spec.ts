@@ -24,8 +24,8 @@ describe('Removing columns - reevaluation', () => {
       ['=COUNTBLANK(A1:C1)'],
       ['=SUM(A1:A1)'],
     ])
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
-    const a3 = engine.addressMapping!.getCell(adr('A3'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
     const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
 
@@ -55,7 +55,7 @@ describe('Removing columns - matrices', () => {
 
     engine.removeColumns(0, 1, 1)
 
-    const matrix = engine.addressMapping!.fetchCell(adr('A1')) as MatrixVertex
+    const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.width).toBe(2)
   })
@@ -68,7 +68,7 @@ describe('Removing columns - matrices', () => {
     ], config)
 
     engine.removeColumns(0, 1, 3)
-    const matrix = engine.addressMapping!.fetchCell(adr('A1')) as MatrixVertex
+    const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.width).toBe(1)
   })
@@ -325,7 +325,7 @@ describe('Removing columns - ranges', function() {
     engine.removeColumns(0, 0, 0)
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('B1'))!
-    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
@@ -339,7 +339,7 @@ describe('Removing columns - ranges', function() {
     engine.removeColumns(0, 1, 2)
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('A1'))!
-    const a1 = engine.addressMapping!.fetchCell(adr('A1'))
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 

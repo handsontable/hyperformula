@@ -8,7 +8,7 @@ import {adr, extractMatrixRange} from "./testUtils";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
+  return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
 }
 
 describe('Adding column - matrix check', () => {
@@ -47,8 +47,8 @@ describe('Adding column - reevaluation', () => {
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
       ['=SUM(A1:A1)'],
     ])
-    const c1 = engine.addressMapping!.getCell(adr('C1'))
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
 
@@ -67,7 +67,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const c1 = engine.addressMapping!.getCell(adr('C1')) as FormulaCellVertex
+    const c1 = engine.addressMapping.getCell(adr('C1')) as FormulaCellVertex
     expect(c1).toBeInstanceOf(FormulaCellVertex)
     expect(c1.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
@@ -274,7 +274,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 2, 1)
 
-    const c1 = engine.addressMapping!.fetchCell(adr('C1'))
+    const c1 = engine.addressMapping.fetchCell(adr('C1'))
     const a1d1 = engine.rangeMapping.getRange(adr('A1'), adr('D1'))!
     const a1e1 = engine.rangeMapping.getRange(adr('A1'), adr('E1'))!
 
@@ -291,7 +291,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
   })
 
@@ -303,7 +303,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
     const range = engine.rangeMapping.getRange(adr('A1'), adr('E1'))!
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
@@ -317,7 +317,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
   })
 
@@ -329,7 +329,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
   })
 
@@ -341,7 +341,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('C1'))!
     expect(b1).toBeInstanceOf(EmptyCellVertex)
@@ -356,7 +356,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.fetchCell(adr('B1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('D1'))!
     expect(b1).toBeInstanceOf(EmptyCellVertex)
@@ -371,7 +371,7 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, 1, 1)
 
-    const b1 = engine.addressMapping!.getCell(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
   })
 })

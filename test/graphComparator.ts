@@ -73,7 +73,7 @@ export class EngineComparator {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }
-    for (const [address, v] of engine.addressMapping!.entriesFromSheet(sheet)) {
+    for (const [address, v] of engine.addressMapping.entriesFromSheet(sheet)) {
       if (v === vertex) {
         return address
       }

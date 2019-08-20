@@ -8,7 +8,7 @@ import './testConfig.ts'
 import {adr, extractMatrixRange} from "./testUtils";
 
 const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping!.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
+  return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
 }
 
 describe('Adding row - matrix check', () => {
@@ -50,8 +50,8 @@ describe('Adding row - reevaluation', () => {
       // new row
       ['2'],
     ])
-    const b1 = engine.addressMapping!.getCell(adr('B1'))
-    const c1 = engine.addressMapping!.getCell(adr('C1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
@@ -98,10 +98,10 @@ describe('Adding row - FormulaCellVertex#address update', () => {
       ['=SUM(1,2)'],
     ])
 
-    let vertex = engine.addressMapping!.fetchCell(adr('A1')) as FormulaCellVertex
+    let vertex = engine.addressMapping.fetchCell(adr('A1')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1'))
     engine.addRows(0, 0, 1)
-    vertex = engine.addressMapping!.fetchCell(adr('A2')) as FormulaCellVertex
+    vertex = engine.addressMapping.fetchCell(adr('A2')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A2'))
   })
 })
@@ -332,7 +332,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 2, 1)
 
-    const a3 = engine.addressMapping!.fetchCell(adr('A3'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
     const a1a4 = engine.rangeMapping.getRange(adr('A1'), adr('A4'))! // A1:A4
 
     expect(engine.graph.existsEdge(a3, a1a4)).toBe(true)
@@ -350,7 +350,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 3, 1)
 
-    const a4 = engine.addressMapping!.getCell(adr('A4'))
+    const a4 = engine.addressMapping.getCell(adr('A4'))
     expect(a4).toBe(null)
   })
 
@@ -365,7 +365,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -380,7 +380,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
     const range = engine.rangeMapping.getRange(adr('A1'), adr('A5'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
@@ -397,7 +397,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -412,7 +412,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 
@@ -427,7 +427,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('A3'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
@@ -445,7 +445,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
 
     const range = engine.rangeMapping.getRange(adr('A1'), adr('A4'))!
     expect(a2).toBeInstanceOf(EmptyCellVertex)
@@ -463,7 +463,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, 1, 1)
 
-    const a2 = engine.addressMapping!.getCell(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
   })
 })
