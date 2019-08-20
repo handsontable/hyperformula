@@ -324,7 +324,7 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, 0, 0)
 
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('B1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -338,7 +338,7 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, 1, 2)
 
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('A1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })

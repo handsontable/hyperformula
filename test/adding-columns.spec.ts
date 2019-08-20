@@ -271,8 +271,8 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, 2, 1)
 
     const c1 = engine.addressMapping.fetchCell(adr('C1'))
-    const a1d1 = engine.rangeMapping.getRange(adr('A1'), adr('D1'))!
-    const a1e1 = engine.rangeMapping.getRange(adr('A1'), adr('E1'))!
+    const a1d1 = engine.rangeMapping.fetchRange(adr('A1'), adr('D1'))
+    const a1e1 = engine.rangeMapping.fetchRange(adr('A1'), adr('E1'))
 
     expect(engine.graph.existsEdge(c1, a1d1)).toBe(true)
     expect(engine.graph.existsEdge(c1, a1e1)).toBe(true)
@@ -300,7 +300,7 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, 1, 1)
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('E1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('E1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
   })
@@ -339,7 +339,7 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('C1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('C1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
   })
@@ -354,7 +354,7 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('D1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('D1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
   })

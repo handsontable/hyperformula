@@ -203,7 +203,7 @@ describe('moving ranges', () => {
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    const a1a2 = engine.rangeMapping.getRange(adr('A1'), adr('A2'))!
+    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
@@ -275,7 +275,7 @@ describe('moving ranges', () => {
     const b2 = engine.addressMapping.fetchCell(adr('B2'))
     const source = engine.addressMapping.fetchCell(adr('A1'))
     const target = engine.addressMapping.fetchCell(adr('A2'))
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('A2'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
 
     expect(source).toEqual(new EmptyCellVertex())
     expect(source.getCellValue()).toBe(EmptyValue)
@@ -316,7 +316,7 @@ describe('moving ranges', () => {
     const b2 = engine.addressMapping.fetchCell(adr('B2'))
     const c1 = engine.addressMapping.fetchCell(adr('C1'))
     const c2 = engine.addressMapping.fetchCell(adr('C2'))
-    const range = engine.rangeMapping.getRange(adr('C1'), adr('C2'))!
+    const range = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
 
     expect(a1).toBe(null)
     expect(a2).toBe(null)
@@ -362,8 +362,8 @@ describe('moving ranges', () => {
     ))
 
     /* edges */
-    const c1c2 = engine.rangeMapping.getRange(adr('C1'), adr('C2'))!
-    const a1a3 = engine.rangeMapping.getRange(adr('A1'), adr('A3'))!
+    const c1c2 = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
+    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     expect(engine.graph.existsEdge(c1c2, a1a3)).toBe(false)
 
     expect(engine.graph.existsEdge(engine.addressMapping.fetchCell(adr('A1')), a1a3)).toBe(true)
@@ -391,9 +391,9 @@ describe('moving ranges', () => {
     engine.moveCells(adr('A1'), 1, 3, adr('C1'))
 
     /* edges */
-    const c1c2 = engine.rangeMapping.getRange(adr('C1'), adr('C2'))!
-    const c1c3 = engine.rangeMapping.getRange(adr('C1'), adr('C3'))!
-    const a1a4 = engine.rangeMapping.getRange(adr('A1'), adr('A4'))!
+    const c1c2 = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
+    const c1c3 = engine.rangeMapping.fetchRange(adr('C1'), adr('C3'))
+    const a1a4 = engine.rangeMapping.fetchRange(adr('A1'), adr('A4'))
 
     expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(true)
     expect(engine.graph.existsEdge(c1c3, a1a4)).toBe(false)

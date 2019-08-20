@@ -342,7 +342,7 @@ describe('Removing rows - ranges', function() {
     ])
 
     engine.removeRows(0, 0, 0)
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('A2'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -355,7 +355,7 @@ describe('Removing rows - ranges', function() {
     ])
 
     engine.removeRows(0, 1, 2)
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('A1'))!
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -368,7 +368,7 @@ describe('Removing rows - ranges', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('A3')) as RangeVertex
+    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     engine.removeRows(0, 0, 2)
     const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
     expect(ranges.length).toBe(0)
@@ -384,10 +384,10 @@ describe('Removing rows - ranges', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const a1a3 = engine.rangeMapping.getRange(adr('A1'), adr('A3')) as RangeVertex
+    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     expect(engine.graph.getDependecies(a1a3).length).toBe(2)
     engine.removeRows(0, 0, 1)
-    const a1a1 = engine.rangeMapping.getRange(adr('A1'), adr('A1')) as RangeVertex
+    const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
     expect(engine.graph.getDependecies(a1a1).length).toBe(1)
   })
