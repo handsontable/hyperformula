@@ -1,5 +1,6 @@
 import {simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
+import {HandsOnEngine} from '../src'
 import {
   AddressMapping,
   DependencyGraph,
@@ -19,308 +20,169 @@ import './testConfig.ts'
 import {adr} from "./testUtils";
 
 describe('GraphBuilder', () => {
-  it('', () => {})
-  // it('build sheet with simple number cell', () => {
-  //   const sheet = [['42']]
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
+  it('build sheet with simple number cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42']
+    ])
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
+    const vertex = engine.addressMapping.fetchCell(adr('A1'))
+    expect(vertex).toBeInstanceOf(ValueCellVertex)
+    expect(vertex.getCellValue()).toBe(42)
+  })
 
-  //   const node = addressMapping.fetchCell(adr('A1'))!
-  //   expect(node).toBeInstanceOf(ValueCellVertex)
-  //   expect(node.getCellValue()).toBe(42)
-  // })
+  it('build sheet with simple string cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo']
+    ])
 
-  // it('build sheet with simple string cell', () => {
-  //   const sheet = [['foo']]
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
+    const vertex = engine.addressMapping.fetchCell(adr('A1'))
+    expect(vertex).toBeInstanceOf(ValueCellVertex)
+    expect(vertex.getCellValue()).toBe('foo')
+  })
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet})
+  it('building for cell with empty string should give empty vertex', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=A1']
+    ])
 
-  //   const node = addressMapping.fetchCell(adr('A1'))!
-  //   expect(node).toBeInstanceOf(ValueCellVertex)
-  //   expect(node.getCellValue()).toBe('foo')
-  // })
+    const vertex = engine.addressMapping.fetchCell(adr('A1'))
+    expect(vertex).toBeInstanceOf(EmptyCellVertex)
+  })
 
-  // it('building for cell with empty string should give empty vertex', () => {
-  //   const sheet = [['', '=A1']]
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
+  it('#buildGraph works with ranges', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['=A1:B1'],
+    ])
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1b2 = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.adjacentNodes(a1)).toContain(a1b2)
+    expect(engine.graph.adjacentNodes(b1)).toContain(a1b2)
+    expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
+  })
 
-  //   const node = addressMapping.fetchCell(adr('A1'))
-  //   expect(node).toBeInstanceOf(EmptyCellVertex)
-  // })
+  it('#loadSheet - it should build graph with only one RangeVertex', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['=A1:B1'],
+      ['=A1:B1'],
+    ])
 
-  // it('#buildGraph', () => {
-  //   const sheet = [
-  //     ['1', 'A5', '2'],
-  //     ['foo', 'bar', 'A2'],
-  //   ]
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1b2 = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
 
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    expect(engine.graph.existsEdge(a1, a1b2)).toBe(true)
+    expect(engine.graph.existsEdge(b1, a1b2)).toBe(true)
+    expect(engine.graph.existsEdge(a1b2, a2)).toBe(true)
+    expect(engine.graph.existsEdge(a1b2, a3)).toBe(true)
+    expect(engine.graph.nodesCount()).toBe(
+      4 + // for cells above
+      1,  // for both ranges (reuse same ranges)
+    )
+  })
 
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
+  it('build with range one row smaller', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '0'],
+      ['3', '=A1:A2'],
+      ['5', '=A1:A3'],
+    ])
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
+    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
 
-  //   expect(graph.nodesCount()).toBe(6)
-  // })
+    expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(true)
+    expect(engine.graph.edgesCount()).toBe(
+      2 + // from cells to range(A1:A2)
+      2 + // from A3 and range(A1:A2) to range(A1:A3)
+      2, // from range vertexes to formulas
+    )
+  })
 
-  // it('#buildGraph works with ranges', () => {
-  //   const sheet = [
-  //     ['1', '2', '0'],
-  //     ['3', '4', '=A1:B2'],
-  //   ]
+  it('#buildGraph should work even if range dependencies are empty', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '0', '=SUM(A1:B2)'],
+    ])
 
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
+    expect(engine.graph.nodesCount()).toBe(
+      3 + // for cells above
+      1 + // for range vertex
+      2,  // for 2 EmptyCellVertex instances
+    )
+    expect(engine.graph.edgesCount()).toBe(
+      2 + // from cells to range vertex
+      2 + // from EmptyCellVertex instances to range vertices
+      1,  // from range to cell with SUM
+    )
+  })
 
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
+  it("optimization doesn't work if smaller range is after bigger", () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '0'],
+      ['3', '=A1:A3'],
+      ['5', '=A1:A2'],
+    ])
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(graph.nodesCount()).toBe(
-  //     6 + // for cells above
-  //     1,   // for range vertex
-  //   )
-  //   const nodesA1 = graph.adjacentNodes(addressMapping.fetchCell(adr('A1'))!)!
-  //   const nodesA2 = graph.adjacentNodes(addressMapping.fetchCell(adr('A2'))!)!
-  //   const nodesB1 = graph.adjacentNodes(addressMapping.fetchCell(adr('B1'))!)!
-  //   const nodesB2 = graph.adjacentNodes(addressMapping.fetchCell(adr('B2'))!)!
-  //   expect(nodesA1).toEqual(nodesA2)
-  //   expect(nodesA2).toEqual(nodesB1)
-  //   expect(nodesB1).toEqual(nodesB2)
-  //   expect(nodesB1.size).toEqual(1)
-  //   const rangeVertex = Array.from(nodesB2)[0]!
-  //   expect(graph.adjacentNodes(rangeVertex)!).toEqual(new Set([addressMapping.fetchCell(adr('C2'))!]))
-  // })
-
-  // it('#loadSheet - it should build graph with only one RangeVertex', () => {
-  //   const sheet = [
-  //     ['1', '2', '0'],
-  //     ['3', '4', '=A1:B2'],
-  //     ['5', '6', '=A1:B2'],
-  //   ]
-
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(graph.nodesCount()).toBe(
-  //     9 + // for cells above
-  //     1,   // for both ranges (reuse same ranges)
-  //   )
-  // })
-
-  // it('build with range one row smaller', () => {
-  //   const sheet = [
-  //     ['1', '0'],
-  //     ['3', '=A1:A2'],
-  //     ['5', '=A1:A3'],
-  //   ]
-
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(graph.edgesCount()).toBe(
-  //     2 + // from cells to range(A1:A2)
-  //     2 + // from A3 and range(A1:A2) to range(A1:A3)
-  //     2, // from range vertexes to formulas
-  //   )
-  // })
-
-  // it('#buildGraph should work even if range dependencies are empty', () => {
-  //   const sheet = [['1', '2', '=SUM(A1:B2)']]
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(graph.nodesCount()).toBe(
-  //     3 + // for cells above
-  //     1 + // for range vertex
-  //     2,   // for 2 EmptyCellVertex instances
-  //   )
-  //   expect(graph.edgesCount()).toBe(
-  //     2 + // from cells to range vertex
-  //     2 + // from EmptyCellVertex instances to range vertices
-  //     1, // from range to cell with SUM
-  //   )
-  // })
-
-  // it("optimization doesn't work if smaller range is after bigger", () => {
-  //   const sheet = [
-  //     ['1', '0'],
-  //     ['3', '=A1:A3'],
-  //     ['5', '=A1:A2'],
-  //   ]
-
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(graph.edgesCount()).toBe(
-  //     3 + // from 3 cells to range(A1:A2)
-  //     2 + // from 2 cells to range(A1:A2)
-  //     2, // from range vertexes to formulas
-  //   )
-  // })
-
-  // it('matrix cause next cells to be ignored', () => {
-  //   const sheet = [
-  //     ['1', '2', '8'],
-  //     ['3', '4', '9'],
-  //     ['{=mmult(A1:B2,C1:C2)}'],
-  //     ['{=mmult(A1:B2,C1:C2)}'],
-  //   ]
-
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser)
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-  //   expect(addressMapping.fetchCell(adr('A3'))).toBeInstanceOf(MatrixVertex)
-  //   expect(addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
-  //   expect(addressMapping.isEmpty(adr('A5'))).toBe(true)
-  // })
+    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
+    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    expect(engine.graph.existsEdge(a2, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
+    expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(false)
+    expect(engine.graph.edgesCount()).toBe(
+      3 + // from 3 cells to range(A1:A2)
+      2 + // from 2 cells to range(A1:A2)
+      2, // from range vertexes to formulas
+    )
+  })
 })
 
 describe('GraphBuilder with matrix detection', () => {
-  // it('matrix with plain numbers', () => {
-  //   const sheet = [
-  //     ['1', '2'],
-  //     ['3', '4'],
-  //   ]
+  it('matrix with plain numbers', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 4 }))
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    expect(engine.addressMapping.fetchCell(adr('A2'))).toBe(a1)
+    expect(engine.addressMapping.fetchCell(adr('B1'))).toBe(a1)
+    expect(engine.addressMapping.fetchCell(adr('B2'))).toBe(a1)
+    expect(engine.addressMapping.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.addressMapping.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.addressMapping.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.addressMapping.getCellValue(adr('B2'))).toEqual(4)
+  })
 
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
+  it('matrix detection strategy and regular values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'foobar'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
 
-  //   expect(addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(MatrixVertex)
-  //   expect(addressMapping.getCellValue(adr('A1'))).toEqual(1)
-  //   expect(addressMapping.getCellValue(adr('B1'))).toEqual(2)
-  //   expect(addressMapping.getCellValue(adr('A2'))).toEqual(3)
-  //   expect(addressMapping.getCellValue(adr('B2'))).toEqual(4)
-  // })
+    expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
+  })
 
-  // it('matrix detection strategy and regular values', () => {
-  //   const sheet = [
-  //     ['1', 'foobar'],
-  //   ]
+  it('matrix detection threshold', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['', ''],
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
 
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 2  }))
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
-  //   expect(addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
-  // })
-
-  // it('matrix detection threshold', () => {
-  //   const sheet = [
-  //     ['1', '2'],
-  //     ['3', '4'],
-  //     ['', ''],
-  //     ['1', '2'],
-  //     ['3', '4'],
-  //     ['5', '6'],
-  //   ]
-
-  //   const graph = new Graph<Vertex>(new DummyGetDependenciesQuery())
-  //   const addressMapping = new AddressMapping(0.5)
-  //   addressMapping.autoAddSheet(0, sheet)
-  //   const sheetMapping = new SheetMapping()
-  //   sheetMapping.addSheet('Sheet1')
-  //   const parser = new ParserWithCaching(new Config, sheetMapping.fetch)
-  //   const dependencyGraph = new DependencyGraph(addressMapping, new RangeMapping(), graph, sheetMapping, new MatrixMapping())
-  //   const graphBuilder = new GraphBuilder(dependencyGraph, parser, new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
-
-  //   graphBuilder.buildGraph({ Sheet1: sheet })
-
-  //   expect(addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
-  //   expect(addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
-  //   expect(addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
-
-  // })
+    expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.fetchCell(adr('A4'))).toBeInstanceOf(MatrixVertex)
+  })
 })

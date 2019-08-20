@@ -39,6 +39,14 @@ export class RangeMapping {
     return sheetMap.get(key) || null
   }
 
+  public fetchRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {
+    const maybeRange = this.getRange(start, end)
+    if (!maybeRange) {
+      throw Error("Range does not exist")
+    }
+    return maybeRange
+  }
+
   public truncateRangesByRows(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
     const rangesToRemove = Array<RangeVertex>()
 
