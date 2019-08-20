@@ -4,12 +4,8 @@ import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/Dependenc
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr, extractMatrixRange} from "./testUtils";
+import {adr, extractReference, extractMatrixRange} from "./testUtils";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
-
-const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
-}
 
 describe('Adding column - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {

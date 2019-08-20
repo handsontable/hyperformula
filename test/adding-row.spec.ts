@@ -5,11 +5,7 @@ import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig.ts'
-import {adr, extractMatrixRange} from "./testUtils";
-
-const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
-}
+import {extractReference, adr, extractMatrixRange} from "./testUtils";
 
 describe('Adding row - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
