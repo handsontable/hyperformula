@@ -131,29 +131,6 @@ export class Matrix implements IMatrix {
     this.matrix = matrix
   }
 
-  public alignWithWindow(windowSize: number): Matrix {
-    const additionalHeight = windowSize > this.size.height ? windowSize - this.size.height : this.size.height % windowSize
-    const additionalWidth = windowSize > this.size.width ? windowSize - this.size.width : this.size.width % windowSize
-    const newWidth = this.size.width + additionalWidth
-
-    const result: number[][] = []
-    for (let y = 0; y < this.size.height; ++y) {
-      const row = [...this.matrix[y]]
-      for (let x = 0; x < additionalWidth; ++x) {
-        row.push(0)
-      }
-      result.push(row)
-    }
-
-    for (let y = 0; y < additionalHeight; ++y) {
-      const zeros = Array(newWidth)
-      zeros.fill(0)
-      result.push(zeros)
-    }
-
-    return new Matrix(result)
-  }
-
   public addRows(aboveRow: number, numberOfRows: number) {
     this.matrix.splice(aboveRow, 0, ...this.zeroArrays(numberOfRows, this.width()))
     this.size.height += numberOfRows
