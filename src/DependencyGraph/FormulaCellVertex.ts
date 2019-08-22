@@ -9,15 +9,13 @@ export class FormulaCellVertex {
   /** Most recently computed value of this formula. */
   private cachedCellValue: CellValue | null
 
-  /** Formula in AST format */
-  private formula: Ast
-
-  /** Address which this vertex represents */
-  private cellAddress: SimpleCellAddress
-
   constructor(
-    formula: Ast,
-    cellAddress: SimpleCellAddress,
+    /** Formula in AST format */
+    private formula: Ast,
+
+    /** Address which this vertex represents */
+    private cellAddress: SimpleCellAddress,
+
     public version: number
   ) {
     this.formula = formula
