@@ -398,10 +398,10 @@ describe('Removing rows - ranges', function() {
     ])
 
     const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
-    expect(engine.graph.getDependecies(a1a3).length).toBe(2)
+    expect(engine.graph.getDependencies(a1a3).length).toBe(2)
     engine.removeRows(0, 0, 1)
     const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
-    expect(engine.graph.getDependecies(a1a1).length).toBe(1)
+    expect(engine.graph.getDependencies(a1a1).length).toBe(1)
   })
 })

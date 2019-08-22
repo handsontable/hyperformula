@@ -265,7 +265,7 @@ export class Graph<T> {
     return result
   }
 
-  public getDependecies(vertex: T): T[] {
+  public getDependencies(vertex: T): T[] {
     const result: T[] = []
     this.edges.forEach((adjacentNodes, sourceNode) => {
       if (adjacentNodes.has(vertex)) {
