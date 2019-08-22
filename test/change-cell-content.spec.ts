@@ -116,6 +116,22 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe(3)
   })
 
+  it('update value cell to value cell with the same value', () => {
+    const sheet = [
+      ['1', '2', '=SUM(A1:B1)'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.setCellContent(adr('B1'), '2')
+
+    expect(b1setCellValueSpy).not.toHaveBeenCalled()
+    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+  })
+
   it('update value cell to empty', () => {
     const sheet = [
       ['1', '2'],

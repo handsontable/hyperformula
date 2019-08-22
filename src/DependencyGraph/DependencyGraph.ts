@@ -69,8 +69,11 @@ export class DependencyGraph {
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
     if (vertex instanceof ValueCellVertex) {
-      vertex.setCellValue(newValue)
-      this.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      const oldValue = vertex.getCellValue()
+      if (oldValue !== newValue) {
+        vertex.setCellValue(newValue)
+        this.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      }
     } else {
       const newVertex = new ValueCellVertex(newValue)
       this.graph.exchangeOrAddNode(vertex, newVertex)
