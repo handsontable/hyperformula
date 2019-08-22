@@ -34,6 +34,19 @@ describe('Removing columns - reevaluation', () => {
     expect(a2setCellValueSpy).toHaveBeenCalled()
     expect(a3setCellValueSpy).not.toHaveBeenCalled()
   })
+
+  it('reevaluates cells which are dependent on structure changes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3', '=COLUMNS(A1:C1)'],
+    ])
+    const d1 = engine.addressMapping.getCell(adr('D1'))
+    const d1setCellValueSpy = jest.spyOn(d1 as any, 'setCellValue')
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(d1setCellValueSpy).toHaveBeenCalled()
+    expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
+  })
 })
 
 describe('Removing columns - matrices', () => {

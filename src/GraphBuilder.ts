@@ -105,6 +105,9 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             if (parseResult.hasVolatileFunction) {
               this.dependencyGraph.markAsVolatile(vertex)
             }
+            if (parseResult.hasStructuralChangeFunction) {
+              this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+            }
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {

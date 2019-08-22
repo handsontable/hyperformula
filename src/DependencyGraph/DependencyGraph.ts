@@ -46,7 +46,7 @@ export class DependencyGraph {
       public readonly lazilyTransformingAstService: LazilyTransformingAstService
   ) {}
 
-  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean) {
+  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
@@ -58,6 +58,9 @@ export class DependencyGraph {
     this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     if (hasVolatileFunction) {
       this.markAsVolatile(newVertex)
+    }
+    if (hasStructuralChangeFunction) {
+      this.markAsDependentOnStructureChange(newVertex)
     }
   }
 
@@ -179,6 +182,8 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.truncateRangesAfterRemovingRows(sheet, rowStart, rowEnd)
     })
+
+    this.addStructuralNodesToChangeSet()
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
@@ -211,6 +216,8 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       this.truncateRangesAfterRemovingColumns(sheet, columnStart, columnEnd)
     })
+
+    this.addStructuralNodesToChangeSet()
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
@@ -235,6 +242,8 @@ export class DependencyGraph {
     for (const vertex of this.addressMapping.verticesFromRow(sheet, rowStart)) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
+
+    this.addStructuralNodesToChangeSet()
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {
@@ -257,6 +266,14 @@ export class DependencyGraph {
     })
 
     for (const vertex of this.addressMapping.verticesFromColumn(sheet, col)) {
+      this.graph.markNodeAsSpecialRecentlyChanged(vertex)
+    }
+
+    this.addStructuralNodesToChangeSet()
+  }
+
+  private addStructuralNodesToChangeSet() {
+    for (const vertex of this.graph.specialNodesStructuralChanges) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
   }
@@ -466,6 +483,10 @@ export class DependencyGraph {
 
   public markAsVolatile(vertex: Vertex) {
     this.graph.markNodeAsSpecial(vertex)
+  }
+
+  public markAsDependentOnStructureChange(vertex: Vertex) {
+    this.graph.markNodeAsChangingWithStructure(vertex)
   }
 
   public* formulaVerticesInRange(range: AbsoluteCellRange): IterableIterator<FormulaCellVertex> {

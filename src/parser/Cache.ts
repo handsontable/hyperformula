@@ -6,20 +6,22 @@ export interface CacheEntry {
   ast: Ast,
   relativeDependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
+  hasStructuralChangeFunction: boolean,
 }
-const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean) => ({ ast, relativeDependencies, hasVolatileFunction })
+const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) => ({ ast, relativeDependencies, hasVolatileFunction, hasStructuralChangeFunction })
 
 export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
   constructor(
-    private readonly volatileFunctions: Set<string>
+    private readonly volatileFunctions: Set<string>,
+    private readonly structuralChangeFunctions: Set<string>,
   ) {
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.volatileFunctions))
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.volatileFunctions), doesContainFunctions(ast, this.structuralChangeFunctions))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }

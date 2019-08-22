@@ -18,6 +18,7 @@ export class Graph<T> {
   public nodes: Set<T> = new Set()
 
   public specialNodes: Set<T> = new Set()
+  public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
@@ -138,6 +139,7 @@ export class Graph<T> {
     this.nodes.delete(node)
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
+    this.specialNodesStructuralChanges.delete(node)
     this.removeDependencies(node)
   }
 
@@ -147,6 +149,10 @@ export class Graph<T> {
 
   public markNodeAsSpecialRecentlyChanged(node: T) {
     this.specialNodesRecentlyChanged.add(node)
+  }
+
+  public markNodeAsChangingWithStructure(node: T) {
+    this.specialNodesStructuralChanges.add(node)
   }
 
   public clearSpecialNodesRecentlyChanged() {

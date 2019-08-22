@@ -17,6 +17,7 @@ export interface ParsingResult {
   hash: string,
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
+  hasStructuralChangeFunction: boolean,
 }
 
 /**
@@ -36,7 +37,7 @@ export class ParserWithCaching {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
-    this.cache = new Cache(this.config.volatileFunctions())
+    this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions())
   }
 
   /**
@@ -55,7 +56,7 @@ export class ParserWithCaching {
             message: e.message,
           }),
       ))
-      return { ast, hasVolatileFunction: false, hash: '', dependencies: [] }
+      return { ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -67,9 +68,9 @@ export class ParserWithCaching {
       const parsingResult = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
       cacheResult = this.cache.set(hash, parsingResult)
     }
-    const { ast, hasVolatileFunction, relativeDependencies } = cacheResult
+    const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
 
-    return { ast, hasVolatileFunction, hash, dependencies: relativeDependencies }
+    return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
   }
 
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {

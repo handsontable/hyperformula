@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, EmptyValue, SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
 import {Sheet} from '../GraphBuilder'
-import {EmptyCellVertex, MatrixVertex} from './'
+import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
 
 /**

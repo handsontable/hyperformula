@@ -4,7 +4,7 @@ import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/Dependenc
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr, extractReference, extractMatrixRange} from "./testUtils";
+import {extractRange, adr, extractReference, extractMatrixRange} from "./testUtils";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
 
 describe('Adding column - matrix check', () => {
@@ -52,6 +52,19 @@ describe('Adding column - reevaluation', () => {
 
     expect(a2setCellValueSpy).not.toHaveBeenCalled()
     expect(c1setCellValueSpy).toHaveBeenCalled()
+  })
+
+  it('reevaluates cells which are dependent on structure changes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', /* */ '2', '=COLUMNS(A1:B1)'],
+    ])
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.addColumns(0, 1, 1)
+
+    expect(c1setCellValueSpy).toHaveBeenCalled()
+    expect(extractRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C1')))
   })
 })
 

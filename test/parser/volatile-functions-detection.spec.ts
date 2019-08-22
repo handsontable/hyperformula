@@ -48,3 +48,19 @@ describe('ParserWithCaching - volatile functions detection', () => {
     expect(result.hasVolatileFunction).toBe(false)
   })
 })
+
+describe('ParserWithCaching - structural change functions detection', () => {
+  it('detects volatile functions', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=COLUMNS()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasStructuralChangeFunction).toBe(true)
+  })
+
+  it('not all functions are dependent on structure changes', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+
+    const result = parser.parse('=SUM()', CellAddress.absolute(0, 0, 0))
+    expect(result.hasStructuralChangeFunction).toBe(false)
+  })
+})

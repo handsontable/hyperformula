@@ -15,6 +15,7 @@ export class InformationPlugin extends FunctionPlugin {
     },
     columns: {
       translationKey: 'COLUMNS',
+      isDependentOnSheetStructureChange: true,
     },
   }
 

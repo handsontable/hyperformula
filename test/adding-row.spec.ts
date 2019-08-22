@@ -56,6 +56,19 @@ describe('Adding row - reevaluation', () => {
     expect(b1setCellValueSpy).toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
   })
+
+  it('reevaluates cells which are dependent on structure changes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      /* */
+      ['1', '2', '=COLUMNS(A1:B1)'],
+    ])
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.addRows(0, 0, 1)
+
+    expect(c1setCellValueSpy).toHaveBeenCalled()
+  })
 })
 
 describe('Adding row', () => {

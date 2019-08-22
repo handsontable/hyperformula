@@ -108,4 +108,19 @@ export class Config {
 
     return volatileFunctions
   }
+
+  public structuralChangeFunctions(): Set<string> {
+    const structuralChangeFunctions = new Set<string>()
+
+    for (const plugin of this.allFunctionPlugins()) {
+      for (const functionKey in plugin.implementedFunctions) {
+        const pluginFunctionData = plugin.implementedFunctions[functionKey]
+        if (pluginFunctionData.isDependentOnSheetStructureChange) {
+          structuralChangeFunctions.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+        }
+      }
+    }
+
+    return structuralChangeFunctions
+  }
 }
