@@ -144,10 +144,10 @@ export class LazilyTransformingAstService {
           break;
         }
         case TransformationType.REMOVE_ROWS: {
-          const numberOfRowsToDelete = transformation.rowEnd - transformation.rowStart + 1
-          ast = transformAddressesInFormula(ast, address, RemoveRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.rowStart, numberOfRowsToDelete))
+          const numberOfRows = transformation.rowEnd - transformation.rowStart + 1
+          ast = transformAddressesInFormula(ast, address, RemoveRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.rowStart, numberOfRows))
           if (transformation.rowStart <= address.row) {
-            address = { ...address, row: address.row - numberOfRowsToDelete }
+            address = { ...address, row: address.row - numberOfRows }
           }
           break;
         }
