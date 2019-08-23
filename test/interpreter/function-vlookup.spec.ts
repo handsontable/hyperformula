@@ -1,5 +1,6 @@
-import {CellError, HandsOnEngine} from "../../src";
+import {CellError, Config, HandsOnEngine} from "../../src";
 import {ErrorType} from "../../src/Cell";
+import {VlookupPlugin} from "../../src/interpreter/plugin/VlookupPlugin";
 
 describe('VLOOKUP - args validation', () => {
   it('not enough parameters', function () {
@@ -57,9 +58,76 @@ describe('VLOOKUP', () => {
       ['1', 'a'],
       ['2', 'b'],
       ['3', 'c'],
-      ['=VLOOKUP(2, A1:B3, 2)'],
+      ['4', 'd'],
+      ['5', 'e'],
+      ['=VLOOKUP(2, A1:B5, 2)'],
+    ], new Config({ vlookupThreshold: 1}))
+
+    expect(engine.getCellValue('A6')).toEqual('b')
+  })
+
+  it('should find value in sorted range using linearSearch', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['4', 'd'],
+      ['5', 'e'],
+      ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual('b')
+    expect(engine.getCellValue('A6')).toEqual('b')
+  })
+
+  it('should find value in unsorted range using linearSearch', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['5', 'a'],
+      ['4', 'b'],
+      ['3', 'c'],
+      ['2', 'd'],
+      ['1', 'e'],
+      ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
+    ])
+
+    expect(engine.getCellValue('A6')).toEqual('d')
+  })
+
+  it('should find value in unsorted range using linearSearch', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['5', 'a'],
+      ['4', 'b'],
+      ['3', 'c'],
+      ['2', 'd'],
+      ['1', 'e'],
+      ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
+    ])
+
+    expect(engine.getCellValue('A6')).toEqual('d')
+  })
+
+  it('should find value in sorted range with different types', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['=TRUE()', 'd'],
+      ['foo', 'e'],
+      ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
+    ], new Config({ vlookupThreshold: 1}))
+
+    expect(engine.getCellValue('A6')).toEqual('d')
+  })
+
+  it('should find value in unsorted range with different types', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TRUE()', 'a'],
+      ['4', 'b'],
+      ['foo', 'c'],
+      ['2', 'd'],
+      ['bar', 'e'],
+      ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
+    ])
+
+    expect(engine.getCellValue('A6')).toEqual('d')
   })
 })
