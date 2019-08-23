@@ -316,14 +316,24 @@ describe('Removing columns - dependencies', () => {
     expect_function_to_have_ref_error(engine, adr('A1'))
   })
 
-  xit('truncates range by one column', () => {
+  it('truncates range by one column from left if first column removed', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '=SUM(A1:B1)']
     ])
 
     engine.removeColumns(0, 0, 0)
 
-    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(CellAddress.relative(0, -1, 0), CellAddress.relative(0, -1, 0)))
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
+  })
+
+  it('truncates range by one column from right if last column removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B1)']
+    ])
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
   })
 })
 

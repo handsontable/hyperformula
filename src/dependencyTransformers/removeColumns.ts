@@ -1,7 +1,7 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching, Ast} from '../parser'
-import {fixFormulaVertexColumn, transformCellRangeByReferences, transformAddressesInFormula, TransformCellAddressFunction} from './common'
+import {TransformCellRangeFunction, fixFormulaVertexColumn, transformCellRangeByReferences, transformAddressesInFormula, TransformCellAddressFunction} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(sheet: number, columnStart: number, columnEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -18,6 +18,36 @@ export namespace RemoveColumnsDependencyTransformer {
     const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
     return [newAst, fixFormulaVertexColumn(nodeAddress, col, -numberOfCols)]
+  }
+
+  export const transformCellRangeByReferences = (transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+    return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
+      const newStart = transformCellAddressFn(dependencyRangeStart, address)
+      const newEnd = transformCellAddressFn(dependencyRangeEnd, address)
+      if (newStart === ErrorType.REF && newEnd === ErrorType.REF) {
+        return ErrorType.REF
+      } else if (newStart === false && newEnd === false) {
+        return false
+      } else {
+        let realNewStart, realNewEnd
+
+        if (newStart === ErrorType.REF) {
+          const shifted = dependencyRangeStart.shiftedByColumns(1)
+          realNewStart = (transformCellAddressFn(shifted, address) || shifted) as CellAddress
+        } else {
+          realNewStart = newStart || dependencyRangeStart
+        }
+
+        if (newEnd === ErrorType.REF) {
+          const shifted = dependencyRangeEnd.shiftedByColumns(-1)
+          realNewEnd = (transformCellAddressFn(shifted, address) || shifted) as CellAddress
+        } else {
+          realNewEnd = newEnd || dependencyRangeEnd
+        }
+
+        return [realNewStart, realNewEnd]
+      }
+    }
   }
 
   export function transformDependencies(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
