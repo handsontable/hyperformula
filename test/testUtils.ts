@@ -11,6 +11,7 @@ import {
   ProcedureAst,
   Unparser,
 } from '../src/parser'
+import {EngineComparator} from './graphComparator'
 
 export const extractReference = (engine: HandsOnEngine, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -60,4 +61,10 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
   const row = Number(result[6] as string) - 1
 
   return simpleCellAddress(sheet, col, row)
+}
+
+export const expectEngineToBeTheSameAs = (actual: HandsOnEngine, expected: HandsOnEngine) => {
+  const sheetId = 0
+  const comparator = new EngineComparator(expected, actual)
+  comparator.compare(sheetId)
 }

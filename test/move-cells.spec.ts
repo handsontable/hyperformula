@@ -3,9 +3,8 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser'
-import {EngineComparator} from './graphComparator'
 import './testConfig.ts'
-import {adr, extractRange, extractReference} from './testUtils'
+import {adr, extractRange, extractReference, expectEngineToBeTheSameAs} from './testUtils'
 
 describe('Move cells', () => {
   it('should move static content', () => {
@@ -141,10 +140,10 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', ''],
       ['=B1'],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('moving empty vertex to empty vertex', () => {
@@ -208,11 +207,11 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1'],
       ['2'],
       ['=SUM(A1:A2)'],
-    ]), engine).compare()
+    ]))
   })
 
   it('should update moved range', () => {
@@ -234,11 +233,11 @@ describe('moving ranges', () => {
     expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
     expect(engine.addressMapping.getCell(adr('A2'))).toBe(null)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1'],
       ['', '2'],
       ['=SUM(B1:B2)'],
-    ]), engine).compare()
+    ]))
   })
 
   it('should not be possible to move area with matrix', () => {
@@ -296,10 +295,10 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
     expect(engine.getCellValue('A2')).toBe(1)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '=SUM(A1:A2)'],
       ['1', '=A2'],
-    ]), engine).compare()
+    ]))
   })
 
   it('should adjust edges when moving whole range', () => {
@@ -336,10 +335,10 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c2, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '=SUM(C1:C2)', '1'],
       ['', '=C2', '2'],
-    ]), engine).compare()
+    ]))
   })
 
   it('should adjust edges when moving smaller range', () => {
@@ -373,11 +372,11 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(engine.addressMapping.fetchCell(adr('C1')), c1c2)).toBe(true)
     expect(engine.graph.existsEdge(engine.addressMapping.fetchCell(adr('C2')), c1c2)).toBe(true)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '', '1'],
       ['', '=SUM(C1:C2)', '2'],
       ['3', '=SUM(A1:A3)'],
-    ]), engine).compare()
+    ]))
   })
 
   it('should adjust edges when moving smaller ranges - more complex', () => {
@@ -412,12 +411,12 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c2, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '', '1'],
       ['', '=SUM(C1:C2)', '2'],
       ['', '=SUM(C1:C3)', '3'],
       ['4', '=SUM(A1:A4)'],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('move wider dependent ranges', () => {
@@ -430,12 +429,12 @@ describe('moving ranges', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('C1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '', '1', '2'],
       ['', '', '3', '4'],
       ['5', '6'],
       ['=SUM(C1:D1)', '=SUM(C1:D2)', '=SUM(A1:B3)'],
-    ]), engine).compare(0)
+    ]))
   })
 })
 
@@ -449,11 +448,11 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('A2'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', ''],
       ['1', '2'],
       ['3', '4'],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('overlapped rows - oposit way', () => {
@@ -465,11 +464,11 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A2'), 2, 2, adr('A1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['3', '4'],
       ['5', '6'],
       ['', ''],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('overlapped columns', () => {
@@ -480,10 +479,10 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('B1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1', '2'],
       ['', '4', '5'],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('overlapped columns - oposit way', () => {
@@ -494,10 +493,10 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('B1'), 2, 2, adr('A1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['2', '3', ''],
       ['5', '6', ''],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('moving along diagonal', () => {
@@ -508,11 +507,11 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 3, 2, adr('B2'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '', '', ''],
       ['', '1', '2', '3'],
       ['', '4', '5', '6'],
-    ]), engine).compare(0)
+    ]))
   })
 
   xit('overlapped rows with ranges', () => {
@@ -525,12 +524,12 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('A2'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', ''],
       ['1', '2'],
       ['3', '4'],
       ['=SUM(A2:B3)', '=SUM(A2:B3)', '=SUM(A3:B3)'],
-    ]), engine).compare(0)
+    ]))
   })
 
   xit('overlapped columns with ranges', () => {
@@ -542,11 +541,11 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('B1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1', '2'],
       ['', '4', '5'],
       ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
-    ]), engine).compare(0)
+    ]))
   })
 
   it('expecting range to be same when moving part of a range inside this range', () => {
@@ -559,12 +558,12 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       [''],
       ['1'],
       ['3'],
       ['=SUM(A1:A3)']
-    ]), engine).compare(0)
+    ]))
   })
 
   /* excel works like this*/
@@ -578,12 +577,12 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       [''],
       ['1'],
       ['3'],
       ['=SUM(A2:A3)']
-    ]), engine).compare(0)
+    ]))
   })
 
   it('expecting range to be same when moving part of a range outside of this range', () => {
@@ -597,13 +596,13 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('A4'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       [''],
       ['2'],
       ['3'],
       ['1'],
       ['=SUM(A1:A3)']
-    ]), engine).compare(0)
+    ]))
   })
 
   /* excel works like this */
@@ -615,10 +614,10 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1', '3'],
       ['=SUM(B1:C1)']
-    ]), engine).compare(0)
+    ]))
   })
 
   it('expecting range to be same when moving part of a range outside of this range - row', () => {
@@ -629,9 +628,9 @@ describe('overlapping areas', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('D1'))
 
-    new EngineComparator(HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '2', '3', '1'],
       ['=SUM(A1:C1)']
-    ]), engine).compare(0)
+    ]))
   })
 })
