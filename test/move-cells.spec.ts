@@ -529,7 +529,7 @@ describe('overlapping areas', () => {
       ['', ''],
       ['1', '2'],
       ['3', '4'],
-      ['=SUM(A2:B2)', '=SUM(A1:B3)', '=SUM(A2:B2)'],
+      ['=SUM(A2:B3)', '=SUM(A2:B3)', '=SUM(A3:B3)'],
     ]), engine).compare(0)
   })
 
@@ -546,6 +546,72 @@ describe('overlapping areas', () => {
       ['', '1', '2'],
       ['', '4', '5'],
       ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
+    ]), engine).compare(0)
+  })
+
+  xit('expecting range to be shorten when moving part of a range inside this range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(A1:A3)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      [''],
+      ['1'],
+      ['3'],
+      ['=SUM(A2:A3)']
+    ]), engine).compare(0)
+  })
+
+  it('expecting range to be same when moving part of a range outside of this range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      [''],
+      ['=SUM(A1:A3)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A4'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      [''],
+      ['2'],
+      ['3'],
+      ['1'],
+      ['=SUM(A1:A3)']
+    ]), engine).compare(0)
+  })
+
+  xit('expecting range to be shorten when moving part of a range inside this range - row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['=SUM(A1:C1)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '1', '3'],
+      ['=SUM(B1:C1)']
+    ]), engine).compare(0)
+  })
+
+  it('expecting range to be same when moving part of a range outside of this range - row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3', ''],
+      ['=SUM(A1:C1)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('D1'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '2', '3', '1'],
+      ['=SUM(A1:C1)']
     ]), engine).compare(0)
   })
 })
