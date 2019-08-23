@@ -1,17 +1,22 @@
 import {SimpleCellAddress} from '../Cell'
-import {DependencyGraph} from '../DependencyGraph'
-import {CellAddress, ParserWithCaching} from '../parser'
+import {FormulaCellVertex, MatrixVertex, DependencyGraph} from '../DependencyGraph'
+import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {fixFormulaVertexRow, transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 
 export namespace AddRowsDependencyTransformer {
   export function transform(sheet: number, row: number, numberOfRowsToAdd: number, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
-      const transformCellAddressFn = transformDependencies(sheet, row, numberOfRowsToAdd)
-      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+      const [newAst, newAddress] = transform2(sheet, row, numberOfRowsToAdd, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
-      fixFormulaVertexRow(node, row, numberOfRowsToAdd)
+      node.setAddress(newAddress)
     }
+  }
+
+  export function transform2(sheet: number, row: number, numberOfRows: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = transformDependencies(sheet, row, numberOfRows)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+    return [newAst, fixFormulaVertexRow(nodeAddress, row, numberOfRows)]
   }
 
   export function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {

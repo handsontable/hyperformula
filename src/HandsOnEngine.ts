@@ -122,33 +122,53 @@ export class LazilyTransformingAstService {
       const transformation = this.transformations[v]
       switch (transformation.type) {
         case TransformationType.ADD_COLUMNS: {
-          ast = transformAddressesInFormula(ast, address, AddColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.col, transformation.numberOfCols), transformCellRangeByReferences(AddColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.col, transformation.numberOfCols)))
-          if (transformation.col <= address.col) {
-            address = { ...address, col: address.col + transformation.numberOfCols }
-          }
+          const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(
+            transformation.sheet,
+            transformation.col,
+            transformation.numberOfCols,
+            ast,
+            address,
+          )
+          ast = newAst
+          address = newAddress
           break;
         }
         case TransformationType.ADD_ROWS: {
-          ast = transformAddressesInFormula(ast, address, AddRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.row, transformation.numberOfRowsToAdd), transformCellRangeByReferences(AddRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.row, transformation.numberOfRowsToAdd)))
-          if (transformation.row <= address.row) {
-            address = { ...address, row: address.row + transformation.numberOfRowsToAdd }
-          }
+          const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(
+            transformation.sheet,
+            transformation.row,
+            transformation.numberOfRowsToAdd,
+            ast,
+            address,
+          )
+          ast = newAst
+          address = newAddress
           break;
         }
         case TransformationType.REMOVE_COLUMNS: {
           const numberOfColumnsToDelete = transformation.columnEnd - transformation.columnStart + 1
-          ast = transformAddressesInFormula(ast, address, RemoveColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.columnStart, numberOfColumnsToDelete), transformCellRangeByReferences(RemoveColumnsDependencyTransformer.transformDependencies(transformation.sheet, transformation.columnStart, numberOfColumnsToDelete)))
-          if (transformation.columnStart <= address.col) {
-            address = {...address, col: address.col - numberOfColumnsToDelete }
-          }
+          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(
+            transformation.sheet,
+            transformation.columnStart,
+            numberOfColumnsToDelete,
+            ast,
+            address,
+          )
+          ast = newAst
+          address = newAddress
           break;
         }
         case TransformationType.REMOVE_ROWS: {
           const numberOfRows = transformation.rowEnd - transformation.rowStart + 1
-          ast = transformAddressesInFormula(ast, address, RemoveRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.rowStart, numberOfRows), transformCellRangeByReferences(RemoveRowsDependencyTransformer.transformDependencies(transformation.sheet, transformation.rowStart, numberOfRows)))
-          if (transformation.rowStart <= address.row) {
-            address = { ...address, row: address.row - numberOfRows }
-          }
+          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(
+            transformation.sheet,
+            transformation.rowStart,
+            numberOfRows,
+            ast,
+            address,
+          )
+          ast = newAst
+          address = newAddress
           break;
         }
       }

@@ -1,5 +1,5 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {MatrixVertex} from '../DependencyGraph'
+import {FormulaCellVertex, MatrixVertex} from '../DependencyGraph'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
@@ -70,22 +70,24 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
   }
 }
 
-export function fixFormulaVertexRow(node: MatrixVertex, row: number, numberOfRows: number) {
-  const nodeAddress = node.cellAddress
+export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, row: number, numberOfRows: number): SimpleCellAddress {
   if (row <= nodeAddress.row) {
-    node.setAddress({
+    return {
       ...nodeAddress,
       row: nodeAddress.row + numberOfRows,
-    })
+    }
+  } else {
+    return nodeAddress
   }
 }
 
-export function fixFormulaVertexColumn(node: MatrixVertex, column: number, numberOfColumns: number) {
-  const nodeAddress = node.cellAddress
+export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, column: number, numberOfColumns: number) {
   if (column <= nodeAddress.col) {
-    node.setAddress({
+    return {
       ...nodeAddress,
       col: nodeAddress.col + numberOfColumns,
-    })
+    }
+  } else {
+    return nodeAddress
   }
 }

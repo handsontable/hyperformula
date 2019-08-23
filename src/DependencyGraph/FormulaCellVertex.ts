@@ -14,7 +14,7 @@ export class FormulaCellVertex {
     private formula: Ast,
 
     /** Address which this vertex represents */
-    private cellAddress: SimpleCellAddress,
+    public cellAddress: SimpleCellAddress,
 
     public version: number
   ) {

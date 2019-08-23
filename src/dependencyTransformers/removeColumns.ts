@@ -1,18 +1,23 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {CellAddress, ParserWithCaching} from '../parser'
+import {CellAddress, ParserWithCaching, Ast} from '../parser'
 import {fixFormulaVertexColumn, transformCellRangeByReferences, transformAddressesInFormula, TransformCellAddressFunction} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(sheet: number, columnStart: number, columnEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
     const numberOfColumnsToDelete = columnEnd - columnStart + 1
     for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
-      const transformCellAddressFn = transformDependencies(sheet, columnStart, numberOfColumnsToDelete)
-      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+      const [newAst, newAddress] = transform2(sheet, columnStart, numberOfColumnsToDelete, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
-      fixFormulaVertexColumn(node, columnStart, -numberOfColumnsToDelete)
+      node.setAddress(newAddress)
     }
+  }
+
+  export function transform2(sheet: number, col: number, numberOfCols: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+    return [newAst, fixFormulaVertexColumn(nodeAddress, col, -numberOfCols)]
   }
 
   export function transformDependencies(sheetInWhichWeRemoveColumns: number, leftmostColumn: number, numberOfColumns: number): TransformCellAddressFunction {
