@@ -549,6 +549,25 @@ describe('overlapping areas', () => {
     ]), engine).compare(0)
   })
 
+  it('expecting range to be same when moving part of a range inside this range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(A1:A3)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      [''],
+      ['1'],
+      ['3'],
+      ['=SUM(A1:A3)']
+    ]), engine).compare(0)
+  })
+
+  /* excel works like this*/
   xit('expecting range to be shorten when moving part of a range inside this range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
@@ -587,6 +606,7 @@ describe('overlapping areas', () => {
     ]), engine).compare(0)
   })
 
+  /* excel works like this */
   xit('expecting range to be shorten when moving part of a range inside this range - row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
