@@ -26,6 +26,7 @@ export interface ConfigParams {
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
+  vlookupThreshold: number
 }
 
 export class Config {
@@ -55,6 +56,7 @@ export class Config {
     gpuMode: 'gpu',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    vlookupThreshold: 20
   }
 
   public readonly addressMappingFillThreshold: number
@@ -65,6 +67,7 @@ export class Config {
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
+  public readonly vlookupThreshold: number
 
   constructor(
       {
@@ -76,6 +79,7 @@ export class Config {
         gpuMode,
         matrixDetection,
         matrixDetectionThreshold,
+        vlookupThreshold
       }: Partial<ConfigParams> = {},
   ) {
     this.addressMappingFillThreshold = typeof addressMappingFillThreshold === 'number' ? addressMappingFillThreshold : Config.defaultConfig.addressMappingFillThreshold
@@ -86,6 +90,7 @@ export class Config {
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
+    this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {

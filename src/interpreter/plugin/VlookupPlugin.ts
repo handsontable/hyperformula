@@ -57,7 +57,12 @@ export class VlookupPlugin extends FunctionPlugin {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
     const values = this.computeListOfValuesInRange(searchedRange)
 
-    const rowIndex = this.binSearch(values, key)
+    let rowIndex = -1
+    if (values.length < this.config.vlookupThreshold || !sorted) {
+      rowIndex = values.indexOf(key)
+    } else {
+      rowIndex = this.binSearch(values, key)
+    }
 
     if (rowIndex === -1) {
       return new CellError(ErrorType.NA)
