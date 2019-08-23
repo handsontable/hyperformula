@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
-import {transformAddressesInFormula, TransformCellAddressFunction} from './common'
+import {transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transformDependentFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -26,6 +26,7 @@ export namespace MoveCellsDependencyTransformer {
           node.getFormula(graph.lazilyTransformingAstService),
           node.getAddress(graph.lazilyTransformingAstService),
           fixDependenciesInMovedCells(-toRight, -toBottom),
+          transformCellRangeByReferences(fixDependenciesInMovedCells(-toRight, -toBottom))
       )
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)

@@ -4,7 +4,23 @@ import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
 
-export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction): Ast {
+export type TransformCellRangeFunction = (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, formulaAddress: SimpleCellAddress) => [CellAddress, CellAddress] | ErrorType.REF | false
+
+export const transformCellRangeByReferences = (transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+  return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
+    const newStart = transformCellAddressFn(dependencyRangeStart, address)
+    const newEnd = transformCellAddressFn(dependencyRangeEnd, address)
+    if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
+      return ErrorType.REF
+    } else if (newStart || newEnd) {
+      return [newStart || dependencyRangeStart, newEnd || dependencyRangeEnd]
+    } else {
+      return false
+    }
+  }
+}
+
+export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction, transformCellRangeFn: TransformCellRangeFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = transformCellAddressFn(ast.reference, address)
@@ -17,20 +33,11 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       }
     }
     case AstNodeType.CELL_RANGE: {
-      const newStart = transformCellAddressFn(ast.start, address)
-      const newEnd = transformCellAddressFn(ast.end, address)
-      if (newStart === ErrorType.REF) {
+      const newRange = transformCellRangeFn(ast.start, ast.end, address)
+      if (Array.isArray(newRange)) {
+        return { ...ast, start: newRange[0], end: newRange[1] }
+      } else if (newRange === ErrorType.REF) {
         return buildCellErrorAst(new CellError(ErrorType.REF))
-      }
-      if (newEnd === ErrorType.REF) {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      }
-      if (newStart || newEnd) {
-        return {
-          ...ast,
-          start: newStart || ast.start,
-          end: newEnd || ast.end,
-        }
       } else {
         return ast
       }
@@ -43,21 +50,21 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
     case AstNodeType.MINUS_UNARY_OP: {
       return {
         type: ast.type,
-        value: transformAddressesInFormula(ast.value, address, transformCellAddressFn),
+        value: transformAddressesInFormula(ast.value, address, transformCellAddressFn, transformCellRangeFn),
       }
     }
     case AstNodeType.FUNCTION_CALL: {
       return {
         type: ast.type,
         procedureName: ast.procedureName,
-        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, transformCellAddressFn)),
+        args: ast.args.map((arg) => transformAddressesInFormula(arg, address, transformCellAddressFn, transformCellRangeFn)),
       }
     }
     default: {
       return {
         type: ast.type,
-        left: transformAddressesInFormula(ast.left, address, transformCellAddressFn),
-        right: transformAddressesInFormula(ast.right, address, transformCellAddressFn),
+        left: transformAddressesInFormula(ast.left, address, transformCellAddressFn, transformCellRangeFn),
+        right: transformAddressesInFormula(ast.right, address, transformCellAddressFn, transformCellRangeFn),
       } as Ast
     }
   }

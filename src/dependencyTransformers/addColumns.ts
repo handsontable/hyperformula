@@ -1,12 +1,13 @@
 import {SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching} from '../parser'
-import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddressFunction} from './common'
+import {fixFormulaVertexColumn, transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(sheet: number, col: number, numberOfCols: number, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
-      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformDependencies(sheet, col, numberOfCols))
+      const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
+      const newAst = transformAddressesInFormula(node.getFormula()!, node.getAddress(), transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       fixFormulaVertexColumn(node, col, numberOfCols)
