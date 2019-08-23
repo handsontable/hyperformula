@@ -50,6 +50,14 @@ describe('VLOOKUP - args validation', () => {
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
+
+  it('should return error when index argument greater that range width', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=VLOOKUP(1, A2:B3, 3)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.REF))
+  })
 })
 
 describe('VLOOKUP', () => {
