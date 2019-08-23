@@ -139,12 +139,23 @@ describe('VLOOKUP', () => {
     expect(engine.getCellValue('A6')).toEqual('d')
   })
 
-  it('should return error when value not present', () => {
+  it('should return lower bound for sorted values', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', 'a'],
       ['2', 'b'],
       ['3', 'c'],
       ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
+    ], new Config({ vlookupThreshold: 1}))
+
+    expect(engine.getCellValue('A4')).toEqual('c')
+  })
+
+  it('should return error when all values are greater', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
     ], new Config({ vlookupThreshold: 1}))
 
     expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.NA))

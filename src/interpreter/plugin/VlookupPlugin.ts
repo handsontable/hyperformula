@@ -2,6 +2,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 import {AbsoluteCellRange} from "../../AbsoluteCellRange";
+import {binarySearch} from "../binarySearch";
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -50,7 +51,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.REF)
     }
 
-    return this.doVlookup(key, range , index, sorted)
+    return this.doVlookup(key, range, index, sorted)
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
@@ -61,7 +62,7 @@ export class VlookupPlugin extends FunctionPlugin {
     if (values.length < this.config.vlookupThreshold || !sorted) {
       rowIndex = values.indexOf(key)
     } else {
-      rowIndex = this.binSearch(values, key)
+      rowIndex = binarySearch(values, key)
     }
 
     if (rowIndex === -1) {
@@ -70,46 +71,5 @@ export class VlookupPlugin extends FunctionPlugin {
 
     const address = range.getAddress(index - 1, rowIndex)
     return this.dependencyGraph.getCellValue(address)
-  }
-
-  private binSearch(values: CellValue[], key: any): number {
-    let start = 0
-    let end = values.length - 1
-
-    while (start <= end) {
-      let center = Math.floor((start + end) / 2)
-      let cmp = this.compare(key, values[center])
-      if (cmp > 0) {
-        start = center + 1
-      } else if (cmp < 0) {
-        end = center - 1
-      } else {
-        return center
-      }
-    }
-
-     return -1
-  }
-
-  /*
-  * numbers < strings < false < true
-  * */
-  private compare(left: any, right: any): number {
-    if (typeof left === typeof right) {
-      return (left < right ? - 1 : (left > right ? 1 : 0))
-    }
-    if (typeof left === 'number' && typeof right === 'string') {
-      return -1
-    }
-    if (typeof left === 'number' && typeof right === 'boolean') {
-      return -1
-    }
-    if (typeof left === 'string' && typeof right === 'number') {
-      return 1
-    }
-    if (typeof left === 'string' && typeof right === 'boolean') {
-      return -1
-    }
-    return 1
   }
 }
