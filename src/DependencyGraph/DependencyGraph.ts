@@ -288,7 +288,7 @@ export class DependencyGraph {
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    for (const sourceAddress of sourceRange.addresses()) {
+    for (const sourceAddress of sourceRange.addressesWithDirection(toRight, toBottom)) {
       const targetAddress = simpleCellAddress(toSheet, sourceAddress.col + toRight, sourceAddress.row + toBottom)
       let sourceVertex = this.addressMapping.getCell(sourceAddress)
       const targetVertex = this.addressMapping.getCell(targetAddress)

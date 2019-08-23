@@ -111,6 +111,55 @@ export class AbsoluteCellRange {
     }
   }
 
+  public* addressesWithDirection(right: number, bottom: number): IterableIterator<SimpleCellAddress> {
+    if (right > 0) {
+      if (bottom > 0) {
+        let currentRow = this.end.row
+        while (currentRow >= this.start.row) {
+          let currentColumn = this.end.col
+          while (currentColumn >= this.start.col) {
+            yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+            currentColumn -= 1
+          }
+          currentRow -= 1
+        }
+      } else {
+        let currentRow = this.start.row
+        while (currentRow <= this.end.row) {
+          let currentColumn = this.end.col
+          while (currentColumn >= this.start.col) {
+            yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+            currentColumn -= 1
+          }
+          currentRow += 1
+        }
+      }
+    } else {
+      if (bottom > 0) {
+        let currentRow = this.end.row
+        while (currentRow >= this.start.row) {
+          let currentColumn = this.start.col
+          while (currentColumn <= this.end.col) {
+            yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+            currentColumn += 1
+          }
+          currentRow -= 1
+        }
+      } else {
+        let currentRow = this.start.row
+        while (currentRow <= this.end.row) {
+          let currentColumn = this.start.col
+          while (currentColumn <= this.end.col) {
+            yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+            currentColumn += 1
+          }
+          currentRow += 1
+        }
+      }
+    }
+  }
+
+
   public getAddress(col: number, row: number): SimpleCellAddress {
     if (col < 0 || row < 0 || row > this.height() - 1 || col > this.width() - 1) {
       throw Error('Index out of bound')

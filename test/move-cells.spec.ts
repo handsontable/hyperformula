@@ -440,7 +440,7 @@ describe('moving ranges', () => {
 })
 
 describe('overlapping areas', () => {
-  xit('overlapped rows', () => {
+  it('overlapped rows', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -472,7 +472,7 @@ describe('overlapping areas', () => {
     ]), engine).compare(0)
   })
 
-  xit('overlapped columns', () => {
+  it('overlapped columns', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
@@ -497,6 +497,21 @@ describe('overlapping areas', () => {
     new EngineComparator(HandsOnEngine.buildFromArray([
       ['2', '3', ''],
       ['5', '6', ''],
+    ]), engine).compare(0)
+  })
+
+  it('moving along diagonal', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+    ])
+
+    engine.moveCells(adr('A1'), 3, 2, adr('B2'))
+
+    new EngineComparator(HandsOnEngine.buildFromArray([
+      ['', '', '', ''],
+      ['', '1', '2', '3'],
+      ['', '4', '5', '6'],
     ]), engine).compare(0)
   })
 
