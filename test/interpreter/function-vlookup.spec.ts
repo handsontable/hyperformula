@@ -1,6 +1,6 @@
 import {CellError, Config, HandsOnEngine} from "../../src";
 import {ErrorType} from "../../src/Cell";
-import {VlookupPlugin} from "../../src/interpreter/plugin/VlookupPlugin";
+import '../testConfig.ts'
 
 describe('VLOOKUP - args validation', () => {
   it('not enough parameters', function () {
