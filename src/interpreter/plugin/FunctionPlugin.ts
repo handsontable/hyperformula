@@ -83,6 +83,16 @@ export abstract class FunctionPlugin {
     return values
   }
 
+  protected computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
+    const values: CellValue[] = []
+    for (const cellFromRange of range.addresses()) {
+      const value = this.dependencyGraph.getCellValue(cellFromRange)
+      values.push(value)
+    }
+
+    return values
+  }
+
   protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
     if (range instanceof AbsoluteCellRange) {
       for (const cellFromRange of range.addresses()) {

@@ -26,8 +26,8 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const range = ast.args[1]
-    if (range.type !== AstNodeType.CELL_RANGE) {
+    const rangeArg = ast.args[1]
+    if (rangeArg.type !== AstNodeType.CELL_RANGE) {
       /* gsheet returns REF */
       return new CellError(ErrorType.VALUE)
     }
@@ -45,10 +45,66 @@ export class VlookupPlugin extends FunctionPlugin {
       }
     }
 
-    return this.doVlookup(key, AbsoluteCellRange.fromCellRange(range, formulaAddress), index, sorted)
+    const range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
+    if (index > range.width()) {
+      return new CellError(ErrorType.REF)
+    }
+
+    return this.doVlookup(key, range , index, sorted)
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
-    return 0
+    const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
+    const values = this.computeListOfValuesInRange(searchedRange)
+
+    const rowIndex = this.binSearch(values, key)
+
+    if (rowIndex === -1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const address = range.getAddress(index - 1, rowIndex)
+    return this.dependencyGraph.getCellValue(address)
+  }
+
+  private binSearch(values: CellValue[], key: any): number {
+    let start = 0
+    let end = values.length - 1
+
+    while (start <= end) {
+      let center = Math.floor((start + end) / 2)
+      let cmp = this.compare(key, values[center])
+      if (cmp > 0) {
+        start = center + 1
+      } else if (cmp < 0) {
+        end = center - 1
+      } else {
+        return center
+      }
+    }
+
+     return -1
+  }
+
+  /*
+  * numbers < strings < false < true
+  * */
+  private compare(left: any, right: any): number {
+    if (typeof left === typeof right) {
+      return (left < right ? - 1 : (left > right ? 1 : 0))
+    }
+    if (typeof left === 'number' && typeof right === 'string') {
+      return -1
+    }
+    if (typeof left === 'number' && typeof right === 'boolean') {
+      return -1
+    }
+    if (typeof left === 'string' && typeof right === 'number') {
+      return 1
+    }
+    if (typeof left === 'string' && typeof right === 'boolean') {
+      return -1
+    }
+    return 1
   }
 }

@@ -1,7 +1,7 @@
 import {CellError, HandsOnEngine} from "../../src";
 import {ErrorType} from "../../src/Cell";
 
-describe('VLOOKUP', () => {
+describe('VLOOKUP - args validation', () => {
   it('not enough parameters', function () {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, A2:B3)'],
@@ -48,5 +48,18 @@ describe('VLOOKUP', () => {
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+  })
+})
+
+describe('VLOOKUP', () => {
+  it('should find value in sorted range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['=VLOOKUP(2, A1:B3, 2)'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual('b')
   })
 })
