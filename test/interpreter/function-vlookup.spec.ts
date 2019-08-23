@@ -130,4 +130,26 @@ describe('VLOOKUP', () => {
 
     expect(engine.getCellValue('A6')).toEqual('d')
   })
+
+  it('should return error when value not present', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
+    ], new Config({ vlookupThreshold: 1}))
+
+    expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.NA))
+  })
+
+  it('should return error when value not present using linear search', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', 'a'],
+      ['2', 'b'],
+      ['3', 'c'],
+      ['=VLOOKUP(4, A1:B3, 2, FALSE())'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.NA))
+  })
 })
