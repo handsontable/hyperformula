@@ -2,7 +2,7 @@ import {CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 
 describe('Loading CSV', () => {
-  it('with only strings', async () => {
+  it('with only strings',  () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value","Bar"`,
@@ -16,7 +16,7 @@ describe('Loading CSV', () => {
     expect(engine.getCellValue('B2')).toBe('Bar')
   })
 
-  it('with some number', async () => {
+  it('with some number',  () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value",42`,
@@ -27,7 +27,7 @@ describe('Loading CSV', () => {
     expect(engine.getCellValue('B2')).toBe(42)
   })
 
-  it('with some formula', async () => {
+  it('with some formula',  () => {
     const str = [
       `"Some header","Another header"`,
       `"Some simple string value","=B1"`,

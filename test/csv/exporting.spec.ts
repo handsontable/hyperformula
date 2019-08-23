@@ -2,7 +2,7 @@ import {CsvExporter, CsvImporter} from '../../src/csv'
 import '../testConfig.ts'
 
 describe('Exporting CSV', () => {
-  it('works', async () => {
+  it('works',  () => {
     const str = [
       `Some header,Another header`,
       `Some simple string value,Bar`,
@@ -14,7 +14,7 @@ describe('Exporting CSV', () => {
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
 
-  it('exports empty cells as empty strings', async () => {
+  it('exports empty cells as empty strings',  () => {
     const str = `foo,,bar`
 
     const exporter = new CsvExporter()
@@ -23,7 +23,7 @@ describe('Exporting CSV', () => {
     expect(exporter.exportSheetByName(engine, 'Sheet1').trim()).toEqual(str)
   })
 
-  it('exports formatter errors', async () => {
+  it('exports formatter errors',  () => {
     const str = `=1/0`
 
     const exporter = new CsvExporter()

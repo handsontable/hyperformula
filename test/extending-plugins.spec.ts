@@ -17,7 +17,7 @@ class FooPlugin extends FunctionPlugin {
 }
 
 describe('Plugins', () => {
-  it('Extending with a plugin', async () => {
+  it('Extending with a plugin',  () => {
     const enGBextended = extendFunctions(enGB, {
       FOO: 'FOO',
     })

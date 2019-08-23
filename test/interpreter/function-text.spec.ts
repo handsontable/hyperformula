@@ -3,8 +3,8 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Text', () => {
-  it('works', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('works',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
     ]])
@@ -12,32 +12,32 @@ describe('Text', () => {
     expect(engine.getCellValue('B1')).toEqual('01/01/1900')
   })
 
-  it('wrong number of arguments', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('wrong number of arguments',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=TEXT(42)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('wrong format argument', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('wrong format argument',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=TEXT(2, 42)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('wrong date argument', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('wrong date argument',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=TEXT(TRUE(), "mm/dd/yyyy")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('day formats', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('day formats',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "d d")',
       '=TEXT(A1, "dd DD")',
@@ -51,8 +51,8 @@ describe('Text', () => {
     expect(engine.getCellValue('E1')).toEqual('Wednesday Wednesday')
   })
 
-  it('month formats', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('month formats',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "m M")',
       '=TEXT(A1, "mm MM")',
@@ -68,8 +68,8 @@ describe('Text', () => {
     expect(engine.getCellValue('F1')).toEqual('A A')
   })
 
-  it('year formats', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('year formats',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "yy YY")',
       '=TEXT(A1, "yyyy YYYY")',
@@ -79,24 +79,24 @@ describe('Text', () => {
     expect(engine.getCellValue('C1')).toEqual('2018 2018')
   })
 
-  it('12 hours', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('12 hours',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "hh:mm AM/PM")',
     ]])
     expect(engine.getCellValue('B1')).toEqual('12:00 AM')
   })
 
-  it('24 hours', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('24 hours',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "HH:mm")',
     ]])
     expect(engine.getCellValue('B1')).toEqual('00:00')
   })
 
-  it('distinguishes between months and minutes', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('distinguishes between months and minutes',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "mm")',
       '=TEXT(A1, "HH:mm")',
@@ -109,8 +109,8 @@ describe('Text', () => {
     expect(engine.getCellValue('E1')).toEqual('12:0')
   })
 
-  it('works for number format', async () => {
-    const engine = await HandsOnEngine.buildFromArray([[
+  it('works for number format',  () => {
+    const engine =  HandsOnEngine.buildFromArray([[
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',

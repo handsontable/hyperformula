@@ -11,7 +11,7 @@ describe('Compute hash from ast', () => {
   const lexer = new FormulaLexer(buildLexerConfig(config))
   const parser = new ParserWithCaching(config, sheetMapping.fetch)
 
-  it('literals', async () => {
+  it('literals',  () => {
     const formula = '=CONCATENATE("foo", 42.34)'
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
@@ -23,7 +23,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('function call', async () => {
+  it('function call',  () => {
     const address = adr('A1')
     const formula = '=SUM(1,2,3)'
     const ast = parser.parse(formula, address).ast
@@ -34,7 +34,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('simple addreess', async () => {
+  it('simple addreess',  () => {
     const formula = '=$Sheet1.A1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
@@ -45,7 +45,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('absolute col', async () => {
+  it('absolute col',  () => {
     const formula = '=$Sheet1.$A1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
@@ -56,7 +56,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('absolute row addreess', async () => {
+  it('absolute row addreess',  () => {
     const formula = '=$Sheet1.A$1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
@@ -67,7 +67,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('absolute address', async () => {
+  it('absolute address',  () => {
     const formula = '=$Sheet1.$A$1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
@@ -78,7 +78,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('cell range', async () => {
+  it('cell range',  () => {
     const formula = '=$Sheet1.$A$1:B$2'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
@@ -89,7 +89,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
   })
 
-  it('ops', async () => {
+  it('ops',  () => {
     const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1'
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast

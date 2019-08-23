@@ -5,9 +5,9 @@ import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
 
 describe('Matrix plugin', () => {
-  it('matrix multiplication', async () => {
+  it('matrix multiplication', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -24,9 +24,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
   })
 
-  it('matrix multiplication wrong size', async () => {
+  it('matrix multiplication wrong size', () => {
     const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -40,9 +40,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B7')).toEqual(EmptyValue)
   })
 
-  it('matrix multiplication with string in data', async () => {
+  it('matrix multiplication with string in data', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '{=MMULT(A1:B2,A3:B4)}'],
       ['3', 'foo'],
       ['1', '2', '{=MMULT(A3:B4,A1:B2)}'],
@@ -59,9 +59,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('D4')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('nested matrix multiplication', async () => {
+  it('nested matrix multiplication', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['{=MMULT(A1:B2, MMULT(A1:B2,A1:B2))}'],
@@ -73,9 +73,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toEqual(118)
   })
 
-  it('mmult of other mmult', async () => {
+  it('mmult of other mmult', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
       ['3', '4', '{=MMULT(A1:B2, A1:B2)}', '{=MMULT(A1:B2, A1:B2)}'],
       ['{=MMULT(A1:B2, C1:D2)}'],
@@ -87,18 +87,18 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toEqual(118)
   })
 
-  it('mmult of a number', async () => {
+  it('mmult of a number', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['{=MMULT(3, 4)}'],
     ], config)
 
     expect(engine.getCellValue('A1')).toEqual(12)
   })
 
-  it('matrix transpose', async () => {
+  it('matrix transpose', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -113,9 +113,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
 
-  it('matrix multiplication by sumproduct', async () => {
+  it('matrix multiplication by sumproduct', () => {
     const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true })
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -134,9 +134,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B8')).toBeCloseTo(34)
   })
 
-  it('matrix maxpool', async () => {
+  it('matrix maxpool', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
@@ -147,9 +147,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B4')).toBeCloseTo(26)
   })
 
-  it('matrix maxpool, custom stride', async () => {
+  it('matrix maxpool, custom stride', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
       ['11', '12', '13', '14', '15', '16'],
       ['21', '22', '23', '24', '25', '26'],
@@ -167,9 +167,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('D6')).toBeCloseTo(33)
   })
 
-  it('matrix element-wise addition', async () => {
+  it('matrix element-wise addition', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '100', '200'],
       ['3', '4', '300', '400'],
       ['5', '6', '500', '600'],
@@ -186,9 +186,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('B8')).toBeCloseTo(634)
   })
 
-  it('matrix medianpool on even square', async () => {
+  it('matrix medianpool on even square', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '1', '2', '1', '5'],
       ['3', '4', '3', '7', '6', '7'],
       ['{=medianpool(A1:F2,2)}'],
@@ -199,9 +199,9 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('C3')).toBeCloseTo(5.5)
   })
 
-  it('matrix medianpool on odd square', async () => {
+  it('matrix medianpool on odd square', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '1', '1'], // right shot from the beginning
       ['1', '2', '3'],
       ['3', '3', '3'],

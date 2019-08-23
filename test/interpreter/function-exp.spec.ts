@@ -3,8 +3,8 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter', () => {
-  it('function EXP happy path', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('function EXP happy path',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=EXP(0)', '=EXP(2)'],
     ])
 
@@ -12,16 +12,16 @@ describe('Interpreter', () => {
     expect(engine.getCellValue('B1')).toBeCloseTo(7.38905609893065)
   })
 
-  it('function EXP given wrong argument type', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('function EXP given wrong argument type',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=EXP("foo")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('function EXP given wrong number of arguments', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('function EXP given wrong number of arguments',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=EXP()'],
       ['=EXP(1, 2)'],
     ])

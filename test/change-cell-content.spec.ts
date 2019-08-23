@@ -159,15 +159,15 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('A3')).toBe(7)
   })
 
-  it('#loadSheet - changing value inside range', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('#loadSheet - changing value inside range', () => {
+    const engine = HandsOnEngine.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['3', '=SUM(A1:A3)'],
     ])
     expect(engine.getCellValue('B3')).toEqual(6)
 
-    await engine.setCellContent({sheet: 0, col: 0, row: 0}, '3')
+    engine.setCellContent({sheet: 0, col: 0, row: 0}, '3')
     expect(engine.getCellValue('B3')).toEqual(8)
   })
 

@@ -3,8 +3,8 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter - function RAND', () => {
-  it('works', async () => {
-    const engine = await HandsOnEngine.buildFromArray([
+  it('works',  () => {
+    const engine =  HandsOnEngine.buildFromArray([
       ['=RAND()'],
     ])
 

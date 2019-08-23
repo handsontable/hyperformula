@@ -40,12 +40,12 @@ class SquarePlugin extends FunctionPlugin {
 }
 
 describe('Documentation example spec', () => {
-  it('works', async () => {
+  it('works', () => {
     const enGBextended = extendFunctions(enGB, {
       SQUARE: 'SQUARE',
     })
     const config = new Config({ functionPlugins: [SquarePlugin], language: enGBextended })
-    const engine = await HandsOnEngine.buildFromArray([
+    const engine = HandsOnEngine.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
