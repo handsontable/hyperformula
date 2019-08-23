@@ -31,6 +31,7 @@ export const plPL: TranslationPackage = {
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONUJ',
     TRUE: 'PRAWDA',
+    VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
   },
 }

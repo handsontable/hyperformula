@@ -13,6 +13,7 @@ import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
 import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
+import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -42,6 +43,7 @@ export class Config {
     MatrixPlugin,
     ExpPlugin,
     RandomPlugin,
+    VlookupPlugin,
   ]
 
   public static defaultConfig: ConfigParams = {

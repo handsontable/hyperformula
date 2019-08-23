@@ -31,6 +31,7 @@ export const enGB: TranslationPackage = {
     TEXT: 'TEXT',
     TRANSPOSE: 'TRANSPOSE',
     TRUE: 'TRUE',
+    VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
   },
 }
