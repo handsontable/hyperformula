@@ -16,36 +16,38 @@ export namespace RemoveColumnsDependencyTransformer {
 
   export function transform2(sheet: number, col: number, numberOfCols: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(sheet, col, numberOfCols, transformCellAddressFn))
     return [newAst, fixFormulaVertexColumn(nodeAddress, col, -numberOfCols)]
   }
 
-  export const transformCellRangeByReferences = (transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+  export const transformCellRangeByReferences2 = (sheet: number, col: number, numberOfCols: number, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+    const columnEnd = col + numberOfCols - 1
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
-      const newStart = transformCellAddressFn(dependencyRangeStart, address)
-      const newEnd = transformCellAddressFn(dependencyRangeEnd, address)
-      if (newStart === ErrorType.REF && newEnd === ErrorType.REF) {
+      const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
+      const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
+
+      if (col <= dependencyRangeStartSCA.col && columnEnd >= dependencyRangeEndSCA.col) {
         return ErrorType.REF
-      } else if (newStart === false && newEnd === false) {
-        return false
+      }
+
+      let actualStart = dependencyRangeStart
+      if (dependencyRangeStartSCA.col >= col && dependencyRangeStartSCA.col <= columnEnd) {
+        actualStart = dependencyRangeStart.shiftedByColumns(columnEnd - dependencyRangeStartSCA.col + 1)
+      }
+
+      let actualEnd = dependencyRangeEnd
+      if (dependencyRangeEndSCA.col >= col && dependencyRangeEndSCA.col <= columnEnd) {
+        actualEnd = dependencyRangeEnd.shiftedByColumns(-(dependencyRangeEndSCA.col - col + 1))
+      }
+
+      const newStart = transformCellAddressFn(actualStart, address)
+      const newEnd = transformCellAddressFn(actualEnd, address)
+      if (newStart === false && newEnd === false) {
+        return [actualStart, actualEnd]
+      } else if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
+        throw Error("Cannot happen")
       } else {
-        let realNewStart, realNewEnd
-
-        if (newStart === ErrorType.REF) {
-          const shifted = dependencyRangeStart.shiftedByColumns(1)
-          realNewStart = (transformCellAddressFn(shifted, address) || shifted) as CellAddress
-        } else {
-          realNewStart = newStart || dependencyRangeStart
-        }
-
-        if (newEnd === ErrorType.REF) {
-          const shifted = dependencyRangeEnd.shiftedByColumns(-1)
-          realNewEnd = (transformCellAddressFn(shifted, address) || shifted) as CellAddress
-        } else {
-          realNewEnd = newEnd || dependencyRangeEnd
-        }
-
-        return [realNewStart, realNewEnd]
+        return [newStart || actualStart, newEnd || actualEnd]
       }
     }
   }

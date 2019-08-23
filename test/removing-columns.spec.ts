@@ -312,7 +312,9 @@ describe('Removing columns - dependencies', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=SUM(B1:C1)', '1', '2'],
     ])
+
     engine.removeColumns(0, 1, 2)
+
     expect_function_to_have_ref_error(engine, adr('A1'))
   })
 
@@ -334,6 +336,72 @@ describe('Removing columns - dependencies', () => {
     engine.removeColumns(0, 1, 1)
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4'],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', '1', '2', '3', '4'],
+      ['=SUM(C1:F1)']
+    ])
+
+    engine.removeColumns(0, 1, 3)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range but may end on start', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', '1', '2', '3', '4'],
+      ['=SUM(C1:F1)']
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4'],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 3, 4)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4', ''],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 3, 5)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range but may start on end', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4', ''],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 4, 5)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
   })
 })
 
