@@ -4,7 +4,7 @@ import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
-import {adr, extractRange, extractReference, expectEngineToBeTheSameAs} from './testUtils'
+import {adr, extractRange, extractReference, expectEngineToBeTheSameAs, extractMatrixRange} from './testUtils'
 
 describe('Move cells', () => {
   it('should move static content', () => {
@@ -598,5 +598,18 @@ describe('overlapping areas', () => {
       ['', '2', '3', '1'],
       ['=SUM(A1:C1)']
     ]))
+  })
+
+  it('MatrixVertex#formula should be updated', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+    ])
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 2, 2, simpleCellAddress(0, 2, 0))
+
+    expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 })
