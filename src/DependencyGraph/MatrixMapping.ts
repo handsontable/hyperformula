@@ -30,7 +30,7 @@ export class MatrixMapping {
   }
 
   public isFormulaMatrixInColumns(span: ColumnsSpan) {
-    for (let col = span.columnStart; col <= span.columnEnd; ++col) {
+    for (const col of span.columns()) {
       for (const mtx of this.matrixMapping.values()) {
         if (mtx.spansThroughSheetColumn(span.sheet, col) && mtx.isFormula()) {
           return true

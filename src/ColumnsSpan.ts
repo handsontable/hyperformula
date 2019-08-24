@@ -13,4 +13,10 @@ export class ColumnsSpan {
   public get numberOfColumns() {
     return this.columnEnd - this.columnStart + 1
   }
+
+  public* columns(): IterableIterator<number> {
+    for (let col = this.columnStart; col <= this.columnEnd; ++col) {
+      yield col
+    }
+  }
 }
