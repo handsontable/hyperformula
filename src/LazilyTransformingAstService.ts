@@ -178,12 +178,12 @@ export class LazilyTransformingAstService {
         }
         case TransformationType.MOVE_CELLS: {
           const newAst = MoveCellsDependencyTransformer.transformDependentFormulas(
+              ast,
+              address,
               transformation.sourceRange,
               transformation.toRight,
               transformation.toBottom,
               transformation.toSheet,
-              ast,
-              address
           )
           ast = newAst
           break;
