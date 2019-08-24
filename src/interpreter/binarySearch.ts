@@ -16,11 +16,7 @@ export function binarySearch(values: CellValue[], key: any): number {
     }
   }
 
-  if (start >= values.length) {
-    return values.length - 1
-  }
-
-  return -1
+  return end
 }
 
 /*
