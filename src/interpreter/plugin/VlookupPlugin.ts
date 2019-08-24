@@ -51,7 +51,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.REF)
     }
 
-    return this.doVlookup(key, range, index, sorted)
+    return this.doVlookup(key, range, index - 1, sorted)
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
@@ -69,7 +69,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const address = range.getAddress(index - 1, rowIndex)
+    const address = range.getAddress(index, rowIndex)
     return this.dependencyGraph.getCellValue(address)
   }
 }
