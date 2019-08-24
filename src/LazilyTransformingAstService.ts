@@ -8,6 +8,7 @@ import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRo
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
 import {transformCellRangeByReferences} from "./dependencyTransformers/common";
+import {ColumnsSpan} from './ColumnsSpan'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -151,13 +152,10 @@ export class LazilyTransformingAstService {
           break;
         }
         case TransformationType.REMOVE_COLUMNS: {
-          const numberOfColumnsToDelete = transformation.columnEnd - transformation.columnStart + 1
           const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(
-              transformation.sheet,
-              transformation.columnStart,
-              numberOfColumnsToDelete,
-              ast,
-              address,
+            new ColumnsSpan(transformation.sheet, transformation.columnStart, transformation.columnEnd),
+            ast,
+            address,
           )
           ast = newAst
           address = newAddress
