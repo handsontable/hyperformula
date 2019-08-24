@@ -210,7 +210,7 @@ export class HandsOnEngine {
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveColumnsDependencyTransformer.transform(columnsSpan, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(sheet, columnStart, columnEnd)
+      this.lazilyTransformingAstService.addRemoveColumnsTransformation(columnsSpan)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
