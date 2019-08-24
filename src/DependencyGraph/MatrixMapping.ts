@@ -1,6 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {filterWith} from '../generatorUtils'
 import {MatrixVertex} from './'
+import {ColumnsSpan} from '../ColumnsSpan'
 
 export class MatrixMapping {
   private readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -28,10 +29,10 @@ export class MatrixMapping {
     return false
   }
 
-  public isFormulaMatrixInColumns(sheet: number, colStart: number, colEnd: number = colStart) {
-    for (let col = colStart; col <= colEnd; ++col) {
+  public isFormulaMatrixInColumns(span: ColumnsSpan) {
+    for (let col = span.columnStart; col <= span.columnEnd; ++col) {
       for (const mtx of this.matrixMapping.values()) {
-        if (mtx.spansThroughSheetColumn(sheet, col) && mtx.isFormula()) {
+        if (mtx.spansThroughSheetColumn(span.sheet, col) && mtx.isFormula()) {
           return true
         }
       }

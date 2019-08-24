@@ -9,4 +9,8 @@ export class ColumnsSpan {
     public readonly columnEnd: number,
   ) {
   }
+
+  public get numberOfColumns() {
+    return this.columnEnd - this.columnStart + 1
+  }
 }

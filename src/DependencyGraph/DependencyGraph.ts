@@ -15,6 +15,7 @@ import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
+import {ColumnsSpan} from '../ColumnsSpan'
 
 export class DependencyGraph {
   /*
@@ -189,14 +190,13 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(sheet, columnStart, columnEnd)) {
+  public removeColumns(columnsSpan: ColumnsSpan) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(columnsSpan)) {
       throw Error('It is not possible to remove column within matrix')
     }
-    const numberOfColumns = columnEnd - columnStart + 1
 
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, 0), numberOfColumns, this.addressMapping.getHeight(sheet))
+      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(columnsSpan.sheet, columnsSpan.columnStart, 0), columnsSpan.numberOfColumns, this.addressMapping.getHeight(columnsSpan.sheet))
       for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
@@ -209,15 +209,15 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.truncateMatricesAfterRemovingColumns(sheet, columnStart, columnEnd)
+      this.truncateMatricesAfterRemovingColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeColumns(sheet, columnStart, columnEnd)
+      this.addressMapping.removeColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingColumns(sheet, columnStart, columnEnd)
+      this.truncateRangesAfterRemovingColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -250,7 +250,7 @@ export class DependencyGraph {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(sheet, col)) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(new ColumnsSpan(sheet, col, col))) {
       throw Error('It is not possible to add column in column with matrix')
     }
 
