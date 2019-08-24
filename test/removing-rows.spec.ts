@@ -300,6 +300,23 @@ describe('Removing rows - dependencies', () => {
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
+
+  it('does not truncate any ranges if rows are removed from different sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['', '=SUM(A2:A3)'],
+        ['2'],
+        ['3'],
+      ],
+      Sheet2: [
+        ['1']
+      ],
+    })
+
+    engine.removeRows(1, 1, 1)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
 })
 
 describe('Removing rows - matrices', () => {

@@ -403,6 +403,21 @@ describe('Removing columns - dependencies', () => {
 
     expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
   })
+
+  it('does not truncate any ranges if columns are removed from different sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2', '=SUM(A1:B1)']
+      ],
+      Sheet2: [
+        ['1']
+      ],
+    })
+
+    engine.removeColumns(1, 0, 0)
+
+    expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
+  })
 })
 
 describe('Removing columns - ranges', function() {

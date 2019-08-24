@@ -23,21 +23,24 @@ export namespace RemoveColumnsDependencyTransformer {
   export const transformCellRangeByReferences2 = (sheet: number, col: number, numberOfCols: number, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
     const columnEnd = col + numberOfCols - 1
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
-      const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
-      const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
-
-      if (col <= dependencyRangeStartSCA.col && columnEnd >= dependencyRangeEndSCA.col) {
-        return ErrorType.REF
-      }
-
       let actualStart = dependencyRangeStart
-      if (dependencyRangeStartSCA.col >= col && dependencyRangeStartSCA.col <= columnEnd) {
-        actualStart = dependencyRangeStart.shiftedByColumns(columnEnd - dependencyRangeStartSCA.col + 1)
-      }
-
       let actualEnd = dependencyRangeEnd
-      if (dependencyRangeEndSCA.col >= col && dependencyRangeEndSCA.col <= columnEnd) {
-        actualEnd = dependencyRangeEnd.shiftedByColumns(-(dependencyRangeEndSCA.col - col + 1))
+
+      if (sheet === dependencyRangeStart.sheet) {
+        const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
+        const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
+
+        if (col <= dependencyRangeStartSCA.col && columnEnd >= dependencyRangeEndSCA.col) {
+          return ErrorType.REF
+        }
+
+        if (dependencyRangeStartSCA.col >= col && dependencyRangeStartSCA.col <= columnEnd) {
+          actualStart = dependencyRangeStart.shiftedByColumns(columnEnd - dependencyRangeStartSCA.col + 1)
+        }
+
+        if (dependencyRangeEndSCA.col >= col && dependencyRangeEndSCA.col <= columnEnd) {
+          actualEnd = dependencyRangeEnd.shiftedByColumns(-(dependencyRangeEndSCA.col - col + 1))
+        }
       }
 
       const newStart = transformCellAddressFn(actualStart, address)
