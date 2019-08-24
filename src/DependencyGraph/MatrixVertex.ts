@@ -128,13 +128,16 @@ export class MatrixVertex {
 
   public removeColumns(columnsSpan: ColumnsSpan): void {
     if (this.matrix instanceof Matrix) {
-      const start = Math.max(columnsSpan.columnStart, this.getAddress().col) - this.getAddress().col
-      const end = Math.min(columnsSpan.columnEnd, this.getAddress().col + this.width - 1) - this.getAddress().col
-      this.matrix.removeColumns(start, end)
+      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(columnsSpan)!
+      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.getAddress().col, removedColumnsFromMatrix.columnEnd - this.getAddress().col)
     }
   }
 
   public isComputed() {
     return (!(this.matrix instanceof NotComputedMatrix))
+  }
+
+  public columnsFromMatrix() {
+    return new ColumnsSpan(this.cellAddress.sheet, this.cellAddress.col, this.cellAddress.col + this.width - 1)
   }
 }
