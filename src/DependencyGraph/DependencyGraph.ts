@@ -615,7 +615,7 @@ export class DependencyGraph {
   }
 
   private expandMatricesAfterAddingColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-    for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(sheet, columnStart)) {
+    for (const [, matrix] of this.matrixMapping.numericMatricesInColumns(new ColumnsSpan(sheet, columnStart, columnStart))) {
       matrix.addColumns(sheet, columnStart, numberOfColumns)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, columnStart, matrix.getAddress().row), numberOfColumns, matrix.height)
       for (const address of addedRange.addresses()) {

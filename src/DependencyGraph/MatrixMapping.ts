@@ -61,9 +61,9 @@ export class MatrixMapping {
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
-  public* numericMatricesInColumns(sheet: number, startColumn: number, endColumn: number = startColumn): IterableIterator<[string, MatrixVertex]> {
+  public* numericMatricesInColumns(columnsSpan: ColumnsSpan): IterableIterator<[string, MatrixVertex]> {
     yield* filterWith(([, mtx]) => {
-      return mtx.spansThroughSheetColumn(sheet, startColumn, endColumn) && !mtx.isFormula()
+      return mtx.spansThroughSheetColumn(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd) && !mtx.isFormula()
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
@@ -81,7 +81,7 @@ export class MatrixMapping {
 
   public truncateMatricesByColumns(columnsSpan: ColumnsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
-    for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)) {
+    for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan)) {
       matrix.removeColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
       if (matrix.width === 0) {
         this.removeMatrix(key)
