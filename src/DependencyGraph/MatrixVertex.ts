@@ -3,6 +3,7 @@ import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
+import {ColumnsSpan} from '../ColumnsSpan'
 
 export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
@@ -125,10 +126,10 @@ export class MatrixVertex {
     }
   }
 
-  public removeColumns(sheet: number, leftColumn: number, rightColumn: number): void {
+  public removeColumns(columnsSpan: ColumnsSpan): void {
     if (this.matrix instanceof Matrix) {
-      const start = Math.max(leftColumn, this.getAddress().col) - this.getAddress().col
-      const end = Math.min(rightColumn, this.getAddress().col + this.width - 1) - this.getAddress().col
+      const start = Math.max(columnsSpan.columnStart, this.getAddress().col) - this.getAddress().col
+      const end = Math.min(columnsSpan.columnEnd, this.getAddress().col + this.width - 1) - this.getAddress().col
       this.matrix.removeColumns(start, end)
     }
   }

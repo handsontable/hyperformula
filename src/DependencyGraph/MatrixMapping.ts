@@ -82,7 +82,7 @@ export class MatrixMapping {
   public truncateMatricesByColumns(columnsSpan: ColumnsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
     for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan)) {
-      matrix.removeColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
+      matrix.removeColumns(columnsSpan)
       if (matrix.width === 0) {
         this.removeMatrix(key)
         verticesToRemove.push(matrix)
