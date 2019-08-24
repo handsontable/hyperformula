@@ -81,7 +81,7 @@ export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, row: number,
   }
 }
 
-export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, column: number, numberOfColumns: number) {
+export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, column: number, numberOfColumns: number): SimpleCellAddress {
   if (column <= nodeAddress.col) {
     return {
       ...nodeAddress,
