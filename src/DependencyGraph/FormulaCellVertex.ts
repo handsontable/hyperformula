@@ -1,6 +1,6 @@
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {Ast} from '../parser'
-import {LazilyTransformingAstService} from '../HandsOnEngine'
+import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 
 /**
  * Represents vertex which keeps formula

@@ -14,7 +14,7 @@ import {SheetMapping} from './SheetMapping'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {Config} from '../Config'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
-import {LazilyTransformingAstService} from '../HandsOnEngine'
+import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 
 export class DependencyGraph {
   /*

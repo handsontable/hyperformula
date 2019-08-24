@@ -6,7 +6,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {collectDependencies} from '../parser'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {CellDependency} from '../CellDependency'
-import {LazilyTransformingAstService} from '../HandsOnEngine'
+import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
