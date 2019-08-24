@@ -2,12 +2,10 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {
-  AddressMapping,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
   MatrixVertex,
-  SheetMapping,
   ValueCellVertex,
   Vertex,
 } from './DependencyGraph'
@@ -16,12 +14,10 @@ import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
-import {transformAddressesInFormula, transformCellRangeByReferences} from './dependencyTransformers/common'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
-import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, Ast, ProcedureAst} from './parser'
+import {Ast, cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {CellAddress} from './parser/CellAddress'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
@@ -63,10 +59,10 @@ export interface RemoveColumnsTransformation {
 }
 
 export type Transformation =
-  AddRowsTransformation
-  | AddColumnsTransformation
-  | RemoveRowsTransformation
-  | RemoveColumnsTransformation
+    AddRowsTransformation
+    | AddColumnsTransformation
+    | RemoveRowsTransformation
+    | RemoveColumnsTransformation
 
 export class LazilyTransformingAstService {
   private transformations: Transformation[] = []
@@ -74,6 +70,7 @@ export class LazilyTransformingAstService {
   public parser?: ParserWithCaching
 
   constructor(
+      private readonly stats: Statistics
   ) {
   }
 
@@ -118,16 +115,18 @@ export class LazilyTransformingAstService {
   }
 
   public applyTransformations(ast: Ast, address: SimpleCellAddress, version: number): [Ast, SimpleCellAddress, number] {
+    this.stats.start(StatType.TRANSFORM_ASTS_POSTPONED)
+
     for (let v = version; v < this.transformations.length; v++) {
       const transformation = this.transformations[v]
       switch (transformation.type) {
         case TransformationType.ADD_COLUMNS: {
           const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(
-            transformation.sheet,
-            transformation.col,
-            transformation.numberOfCols,
-            ast,
-            address,
+              transformation.sheet,
+              transformation.col,
+              transformation.numberOfCols,
+              ast,
+              address,
           )
           ast = newAst
           address = newAddress
@@ -135,11 +134,11 @@ export class LazilyTransformingAstService {
         }
         case TransformationType.ADD_ROWS: {
           const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(
-            transformation.sheet,
-            transformation.row,
-            transformation.numberOfRowsToAdd,
-            ast,
-            address,
+              transformation.sheet,
+              transformation.row,
+              transformation.numberOfRowsToAdd,
+              ast,
+              address,
           )
           ast = newAst
           address = newAddress
@@ -148,11 +147,11 @@ export class LazilyTransformingAstService {
         case TransformationType.REMOVE_COLUMNS: {
           const numberOfColumnsToDelete = transformation.columnEnd - transformation.columnStart + 1
           const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(
-            transformation.sheet,
-            transformation.columnStart,
-            numberOfColumnsToDelete,
-            ast,
-            address,
+              transformation.sheet,
+              transformation.columnStart,
+              numberOfColumnsToDelete,
+              ast,
+              address,
           )
           ast = newAst
           address = newAddress
@@ -161,11 +160,11 @@ export class LazilyTransformingAstService {
         case TransformationType.REMOVE_ROWS: {
           const numberOfRows = transformation.rowEnd - transformation.rowStart + 1
           const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(
-            transformation.sheet,
-            transformation.rowStart,
-            numberOfRows,
-            ast,
-            address,
+              transformation.sheet,
+              transformation.rowStart,
+              numberOfRows,
+              ast,
+              address,
           )
           ast = newAst
           address = newAddress
@@ -174,6 +173,8 @@ export class LazilyTransformingAstService {
       }
     }
     const cachedAst = this.parser!.rememberNewAst(ast)
+
+    this.stats.end(StatType.TRANSFORM_ASTS_POSTPONED)
     return [cachedAst, address, this.transformations.length]
   }
 }
@@ -200,19 +201,14 @@ export class HandsOnEngine {
   }
 
   constructor(
-    public readonly config: Config,
-
-    /** Statistics module for benchmarking */
-    public readonly stats: Statistics,
-
-    public readonly dependencyGraph: DependencyGraph,
-
-    private readonly parser: ParserWithCaching,
-
-    /** Formula evaluator */
-    private readonly evaluator: Evaluator,
-
-    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+      public readonly config: Config,
+      /** Statistics module for benchmarking */
+      public readonly stats: Statistics,
+      public readonly dependencyGraph: DependencyGraph,
+      private readonly parser: ParserWithCaching,
+      /** Formula evaluator */
+      private readonly evaluator: Evaluator,
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 
