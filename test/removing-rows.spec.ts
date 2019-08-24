@@ -4,7 +4,7 @@ import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {extractRange, extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
 describe('Removing rows - reevaluation', () => {
   it('reevaluates cells', () => {
@@ -187,6 +187,118 @@ describe('Removing rows - dependencies', () => {
     ])
     engine.removeRows(0, 1, 2)
     expect_function_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('truncates range by one row from top if topmost row removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A3)'],
+      ['1'],
+      ['2'],
+    ])
+
+    engine.removeRows(0, 1, 1)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
+  })
+
+  it('truncates range by one row from bottom if last row removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A3)'],
+      ['1'],
+      ['2'],
+    ])
+
+    engine.removeRows(0, 2, 2)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
+  })
+
+  it('truncates range by rows from top if topmost rows removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A5)'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5']
+    ])
+
+    engine.removeRows(0, 1, 2)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
+
+  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A3:A6)'],
+      [''],
+      ['3'],
+      ['4'],
+      ['5'],
+      ['6'],
+    ])
+
+    engine.removeRows(0, 1, 3)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
+
+  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range but may end on start', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A3:A6)'],
+      [''],
+      ['3'],
+      ['4'],
+      ['5'],
+      ['6'],
+    ])
+
+    engine.removeRows(0, 1, 2)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
+  })
+
+  it('truncates range by rows from bottom if bottomest rows removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A5)'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
+    ])
+
+    engine.removeRows(0, 3, 4)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
+
+  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A5)'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
+      [''],
+    ])
+
+    engine.removeRows(0, 3, 5)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
+
+  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range but may start on end', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '=SUM(A2:A5)'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
+      [''],
+    ])
+
+    engine.removeRows(0, 4, 5)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
 })
 
