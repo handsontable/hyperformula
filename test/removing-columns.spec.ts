@@ -171,9 +171,9 @@ describe('Removing columns - matrices', () => {
         ['4', '5', '6'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
-        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
       ]
     })
 

@@ -5,7 +5,7 @@ import {fixFormulaVertexColumn, transformAddressesInFormula, transformCellRangeB
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(sheet: number, col: number, numberOfCols: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
+    for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = transform2(sheet, col, numberOfCols, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)

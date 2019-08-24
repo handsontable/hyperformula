@@ -6,7 +6,7 @@ import {TransformCellRangeFunction, fixFormulaVertexRow, transformCellRangeByRef
 export namespace RemoveRowsDependencyTransformer {
   export function transform(sheet: number, rowStart: number, rowEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
     const numberOfRows = rowEnd - rowStart + 1
-    for (const node of graph.matrixFormulaNodesFromSheet(sheet)) {
+    for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = transform2(sheet, rowStart, numberOfRows, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)

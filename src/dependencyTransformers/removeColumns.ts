@@ -6,7 +6,7 @@ import {ColumnsSpan} from '../ColumnsSpan'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(columnsSpan: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.matrixFormulaNodesFromSheet(columnsSpan.sheet)) {
+    for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = transform2(columnsSpan, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
