@@ -179,7 +179,9 @@ export class SparseStrategy implements IAddressMappingStrategy {
     tmpMapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
       this.mapping.set(colNumber, rowMapping)
     })
-    this.width = Math.max(0, this.width - columnsSpan.numberOfColumns)
+    const rightmostColumnRemoved = Math.min(this.width - 1, columnsSpan.columnEnd)
+    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - columnsSpan.columnStart + 1)
+    this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
@@ -306,7 +308,9 @@ export class DenseStrategy implements IAddressMappingStrategy {
     for (let i = 0; i < this.height; i++) {
       this.mapping[i].splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
     }
-    this.width = Math.max(0, this.width - columnsSpan.numberOfColumns)
+    const rightmostColumnRemoved = Math.min(this.width - 1, columnsSpan.columnEnd)
+    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - columnsSpan.columnStart + 1)
+    this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {

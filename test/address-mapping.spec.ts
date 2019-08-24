@@ -243,6 +243,34 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.has(adr('A1'))).toBe(false)
   })
 
+  it('removeColumns - remove more cols than size, but still something left', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+
+    mapping.removeColumns(new ColumnsSpan(0, 1, 5))
+
+    expect(mapping.getWidth(0)).toBe(1)
+    expect(mapping.has(adr('A1'))).toBe(true)
+    expect(mapping.has(adr('B1'))).toBe(false)
+  })
+
+  it('removeColumns - sometimes nothing is removed', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+
+    mapping.removeColumns(new ColumnsSpan(0, 2, 3))
+
+    expect(mapping.getWidth(0)).toBe(2)
+    expect(mapping.has(adr('A1'))).toBe(true)
+    expect(mapping.has(adr('B1'))).toBe(true)
+  })
+
   it ('should expand columns when adding cell', () => {
     const mapping = builder(2, 2)
     mapping.setCell(adr('C1'), new EmptyCellVertex())
