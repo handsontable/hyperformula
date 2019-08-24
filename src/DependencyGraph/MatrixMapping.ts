@@ -79,10 +79,10 @@ export class MatrixMapping {
     return verticesToRemove
   }
 
-  public truncateMatricesByColumns(sheet: number, startColumn: number, endColumn: number): MatrixVertex[] {
+  public truncateMatricesByColumns(columnsSpan: ColumnsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
-    for (const [key, matrix] of this.numericMatricesInColumns(sheet, startColumn, endColumn)) {
-      matrix.removeColumns(sheet, startColumn, endColumn)
+    for (const [key, matrix] of this.numericMatricesInColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)) {
+      matrix.removeColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
       if (matrix.width === 0) {
         this.removeMatrix(key)
         verticesToRemove.push(matrix)

@@ -209,7 +209,7 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.truncateMatricesAfterRemovingColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
+      this.truncateMatricesAfterRemovingColumns(columnsSpan)
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
@@ -590,8 +590,8 @@ export class DependencyGraph {
     })
   }
 
-  private truncateMatricesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {
-    const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(sheet, columnStart, columnEnd)
+  private truncateMatricesAfterRemovingColumns(columnsSpan: ColumnsSpan) {
+    const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(columnsSpan)
     verticesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
