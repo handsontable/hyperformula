@@ -3,6 +3,7 @@ import {CellValue, EmptyValue, SheetCellAddress, SimpleCellAddress, simpleCellAd
 import {Sheet} from '../GraphBuilder'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
+import {ColumnsSpan} from '../ColumnsSpan'
 
 /**
  * Interface for mapping from sheet addresses to vertices.
@@ -45,7 +46,7 @@ interface IAddressMappingStrategy {
   addRows(row: number, numberOfRows: number): void,
   removeRows(rowStart: number, rowEnd: number): void,
   addColumns(column: number, numberOfColumns: number): void,
-  removeColumns(columnStart: number, columnEnd: number): void,
+  removeColumns(columnsSpan: ColumnsSpan): void,
   getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
   verticesFromRow(row: number): IterableIterator<CellVertex>,
@@ -165,21 +166,20 @@ export class SparseStrategy implements IAddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRows)
   }
 
-  public removeColumns(columnStart: number, columnEnd: number): void {
-    const numberOfColumns = columnEnd - columnStart + 1
+  public removeColumns(columnsSpan: ColumnsSpan): void {
     const tmpMapping = new Map()
     this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
-      if (colNumber >= columnStart) {
+      if (colNumber >= columnsSpan.columnStart) {
         this.mapping.delete(colNumber)
-        if (colNumber > columnEnd) {
-          tmpMapping.set(colNumber - numberOfColumns, rowMapping)
+        if (colNumber > columnsSpan.columnEnd) {
+          tmpMapping.set(colNumber - columnsSpan.numberOfColumns, rowMapping)
         }
       }
     })
     tmpMapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
       this.mapping.set(colNumber, rowMapping)
     })
-    this.width = Math.max(0, this.width - numberOfColumns)
+    this.width = Math.max(0, this.width - columnsSpan.numberOfColumns)
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
@@ -302,12 +302,11 @@ export class DenseStrategy implements IAddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRows)
   }
 
-  public removeColumns(columnStart: number, columnEnd: number): void {
-    const numberOfColumns = columnEnd - columnStart + 1
+  public removeColumns(columnsSpan: ColumnsSpan): void {
     for (let i = 0; i < this.height; i++) {
-      this.mapping[i].splice(columnStart, numberOfColumns)
+      this.mapping[i].splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
     }
-    this.width = Math.max(0, this.width - numberOfColumns)
+    this.width = Math.max(0, this.width - columnsSpan.numberOfColumns)
   }
 
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
@@ -512,12 +511,12 @@ export class AddressMapping {
     sheetMapping.addColumns(column, numberOfColumns)
   }
 
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number) {
-    const sheetMapping = this.mapping.get(sheet)
+  public removeColumns(columnsSpan: ColumnsSpan) {
+    const sheetMapping = this.mapping.get(columnsSpan.sheet)
     if (!sheetMapping) {
       throw Error('Sheet does not exist')
     }
-    sheetMapping.removeColumns(columnStart, columnEnd)
+    sheetMapping.removeColumns(columnsSpan)
   }
 
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {

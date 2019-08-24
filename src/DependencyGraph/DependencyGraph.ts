@@ -213,7 +213,7 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
+      this.addressMapping.removeColumns(columnsSpan)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
