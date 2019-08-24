@@ -217,7 +217,7 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingColumns(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd)
+      this.truncateRangesAfterRemovingColumns(columnsSpan)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -597,8 +597,8 @@ export class DependencyGraph {
     })
   }
 
-  private truncateRangesAfterRemovingColumns(sheet: number, columnStart: number, columnEnd: number) {
-    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(sheet, columnStart, columnEnd)
+  private truncateRangesAfterRemovingColumns(columnsSpan: ColumnsSpan) {
+    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(columnsSpan)
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
