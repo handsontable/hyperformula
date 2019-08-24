@@ -9,6 +9,7 @@ import {
   ValueCellVertex,
   Vertex,
 } from './DependencyGraph'
+import {ColumnsSpan} from './ColumnsSpan'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -202,6 +203,8 @@ export class HandsOnEngine {
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     this.stats.reset()
+
+    const columnsSpan = new ColumnsSpan(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(sheet, columnStart, columnEnd)
 
