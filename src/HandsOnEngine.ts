@@ -227,8 +227,11 @@ export class HandsOnEngine {
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
-    MoveCellsDependencyTransformer.transformDependentFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
-    MoveCellsDependencyTransformer.transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS,  () => {
+      MoveCellsDependencyTransformer.transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
+    })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
 

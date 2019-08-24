@@ -5,12 +5,16 @@ import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColum
 import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
 import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
 import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
+import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
+import {transformCellRangeByReferences} from "./dependencyTransformers/common";
 
 export enum TransformationType {
   ADD_ROWS,
   ADD_COLUMNS,
   REMOVE_ROWS,
   REMOVE_COLUMNS,
+  MOVE_CELLS,
 }
 
 export interface AddColumnsTransformation {
@@ -41,11 +45,20 @@ export interface RemoveColumnsTransformation {
   columnEnd: number,
 }
 
+export interface MoveCellsTransformation {
+  type: TransformationType.MOVE_CELLS,
+  sourceRange: AbsoluteCellRange,
+  toRight: number,
+  toBottom: number,
+  toSheet: number
+}
+
 export type Transformation =
     AddRowsTransformation
     | AddColumnsTransformation
     | RemoveRowsTransformation
     | RemoveColumnsTransformation
+    | MoveCellsTransformation
 
 export class LazilyTransformingAstService {
   private transformations: Transformation[] = []
@@ -94,6 +107,16 @@ export class LazilyTransformingAstService {
       sheet,
       columnStart,
       columnEnd,
+    })
+  }
+
+  public addMoveCellsTransformation(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
+    this.transformations.push({
+      type: TransformationType.MOVE_CELLS,
+      sourceRange,
+      toRight,
+      toBottom,
+      toSheet
     })
   }
 
@@ -151,6 +174,18 @@ export class LazilyTransformingAstService {
           )
           ast = newAst
           address = newAddress
+          break;
+        }
+        case TransformationType.MOVE_CELLS: {
+          const newAst = MoveCellsDependencyTransformer.transformDependentFormulas(
+              transformation.sourceRange,
+              transformation.toRight,
+              transformation.toBottom,
+              transformation.toSheet,
+              ast,
+              address
+          )
+          ast = newAst
           break;
         }
       }

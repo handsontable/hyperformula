@@ -5,19 +5,15 @@ import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
 import {transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 
 export namespace MoveCellsDependencyTransformer {
-  export function transformDependentFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.formulaNodesFromSheet(sourceRange.start.sheet)) {
-      const newAst = transformAddressesInMovedFormula(
-          node.getFormula(graph.lazilyTransformingAstService),
-          node.getAddress(graph.lazilyTransformingAstService),
+  export function transformDependentFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, ast: Ast, nodeAddress: SimpleCellAddress) {
+      return transformAddressesInMovedFormula(
+          ast,
+          nodeAddress,
           sourceRange,
           toRight,
           toBottom,
           toSheet,
       )
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-    }
   }
 
   export function transformMovedFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
