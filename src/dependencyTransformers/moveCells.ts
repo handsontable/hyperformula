@@ -5,7 +5,21 @@ import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
 import {transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 
 export namespace MoveCellsDependencyTransformer {
-  export function transformMovedFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
+  export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
+    transformMatrices(sourceRange, toRight, toBottom, toSheet, graph, parser)
+    transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, graph, parser)
+  }
+
+  function transformMatrices(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
+    for (const node of graph.matrixFormulaNodes()) {
+      node.getFormula()
+      const newAst = transformDependentFormulas(node.getFormula()!, node.getAddress(), sourceRange, toRight, toBottom, toSheet)
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+    }
+  }
+
+  function transformMovedFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.formulaVerticesInRange(sourceRange)) {
       const newAst = transformAddressesInFormula(
           node.getFormula(graph.lazilyTransformingAstService),

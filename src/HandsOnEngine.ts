@@ -229,7 +229,7 @@ export class HandsOnEngine {
 
 
     this.stats.measure(StatType.TRANSFORM_ASTS,  () => {
-      MoveCellsDependencyTransformer.transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
     })
 

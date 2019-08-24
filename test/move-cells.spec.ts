@@ -600,7 +600,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  xit('MatrixVertex#formula should be updated', () => {
+  it('MatrixVertex#formula should be updated', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -610,6 +610,25 @@ describe('overlapping areas', () => {
 
     engine.moveCells(simpleCellAddress(0, 0, 0), 2, 2, simpleCellAddress(0, 2, 0))
 
-    expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
+    expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
+  })
+
+  it('MatrixVertex#formula should be updated when different sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2'],
+        ['3', '4'],
+      ],
+      Sheet2: [
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+      ]
+    })
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
+
+    engine.moveCells(simpleCellAddress(0, 0, 0), 2, 2, simpleCellAddress(0, 2, 0))
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 })
