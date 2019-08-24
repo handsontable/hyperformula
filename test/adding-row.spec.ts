@@ -85,6 +85,23 @@ describe('Adding row', () => {
     expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
 
+  it('MatrixVertex#formula should be updated when different sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2'],
+        ['3', '4']
+      ],
+      Sheet2: [
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+      ]
+    })
+
+    engine.addRows(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
+  })
+
   it('MatrixVertex#address should be updated', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
@@ -117,7 +134,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
 describe('Adding row - matrices adjustments', () => {
   it('add row inside numeric matrix, expand matrix', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -278,8 +295,8 @@ describe('Adding row, fixing dependencies', () => {
 
   it('same sheet, same row', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['42'],
-        ['43', '=A2'],
+      ['42'],
+      ['43', '=A2'],
     ])
 
     engine.addRows(0, 1, 1)
@@ -348,7 +365,7 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
   })
 
-  it ('it should insert new cell with edge to only one range below, shifted by 1', () => {
+  it('it should insert new cell with edge to only one range below, shifted by 1', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       ['2', '=SUM(A1:A1)'],
@@ -363,7 +380,7 @@ describe('Adding row, ranges', () => {
     expect(a4).toBe(null)
   })
 
-  it ('range start in row', () => {
+  it('range start in row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -378,7 +395,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBe(null)
   })
 
-  it ('range start above row', () => {
+  it('range start above row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -395,7 +412,7 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
 
-  it ('range start below row', () => {
+  it('range start below row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -410,7 +427,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBe(null)
   })
 
-  it ('range end above row', () => {
+  it('range end above row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -425,7 +442,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBe(null)
   })
 
-  it ('range end in a row', () => {
+  it('range end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -443,7 +460,7 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
 
-  it ('range end below row', () => {
+  it('range end below row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //
@@ -461,7 +478,7 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
   })
 
-  it ('range start and end in a row', () => {
+  it('range start and end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
       //

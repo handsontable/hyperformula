@@ -600,7 +600,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('MatrixVertex#formula should be updated', () => {
+  xit('MatrixVertex#formula should be updated', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],

@@ -143,6 +143,7 @@ describe('Removing columns - matrices', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
       ['4', '5', '6', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+      ['', '', '',    '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
     ])
 
     engine.removeColumns(0, 1, 1)
@@ -154,12 +155,31 @@ describe('Removing columns - matrices', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
       ['4', '5', '6', '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+      ['', '', '',    '{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
     ])
 
     engine.removeColumns(0, 1, 1)
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('C1')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('C1'))
+  })
+
+  it('MatrixVertex#formula should be updated when different sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2', '3'],
+        ['4', '5', '6'],
+      ],
+      Sheet2: [
+        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+        ['{=TRANSPOSE(A1:C2)}', '{=TRANSPOSE(A1:C2)}'],
+      ]
+    })
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 })
 

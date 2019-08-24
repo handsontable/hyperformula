@@ -414,8 +414,8 @@ describe('Removing rows - matrices', () => {
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
     ])
 
     engine.removeRows(0, 1, 1)
@@ -428,14 +428,32 @@ describe('Removing rows - matrices', () => {
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
-      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
+      ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
     ])
 
     engine.removeRows(0, 1, 1)
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('A3'))
+  })
+
+  it('MatrixVertex#formula should be updated when different sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '4'],
+        ['2', '5'],
+        ['3', '6'],
+      ],
+      Sheet2: [
+        ['{=TRANSPOSE($Sheet1.A1:B3)}', '{=TRANSPOSE($Sheet1.A1:B3)}'],
+        ['{=TRANSPOSE($Sheet1.A1:B3)}', '{=TRANSPOSE($Sheet1.A1:B3)}'],
+      ]
+    })
+
+    engine.removeRows(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 })
 

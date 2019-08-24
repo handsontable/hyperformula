@@ -105,6 +105,23 @@ describe('Adding column', () => {
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('D1'))
   })
+
+  it('MatrixVertex#formula should be updated when different sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '2'],
+        ['3', '4']
+      ],
+      Sheet2: [
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+      ]
+    })
+
+    engine.addColumns(0, 1, 1)
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
+  })
 })
 
 describe('Adding column', () => {
