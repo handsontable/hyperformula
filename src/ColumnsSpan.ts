@@ -1,7 +1,9 @@
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {simpleCellAddress} from './Cell'
+
 /*
  * A class representing a set of columns in specific sheet
  */
-
 export class ColumnsSpan {
   constructor(
     public readonly sheet: number,
@@ -18,5 +20,9 @@ export class ColumnsSpan {
     for (let col = this.columnStart; col <= this.columnEnd; ++col) {
       yield col
     }
+  }
+
+  public rangeFromTopTo(endRow: number) {
+    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.columnStart, 0), this.numberOfColumns, endRow)
   }
 }

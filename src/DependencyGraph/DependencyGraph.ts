@@ -196,7 +196,7 @@ export class DependencyGraph {
     }
 
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(columnsSpan.sheet, columnsSpan.columnStart, 0), columnsSpan.numberOfColumns, this.addressMapping.getHeight(columnsSpan.sheet))
+      const removedRange = columnsSpan.rangeFromTopTo(this.addressMapping.getHeight(columnsSpan.sheet))
       for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
