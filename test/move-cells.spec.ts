@@ -514,7 +514,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  xit('overlapped rows with ranges', () => {
+  it('overlapped rows with ranges', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -528,11 +528,11 @@ describe('overlapping areas', () => {
       ['', ''],
       ['1', '2'],
       ['3', '4'],
-      ['=SUM(A2:B3)', '=SUM(A2:B3)', '=SUM(A3:B3)'],
+      ['=SUM(A2:B3)', '=SUM(A1:B3)', '=SUM(A3:B3)'],
     ]))
   })
 
-  xit('overlapped columns with ranges', () => {
+  it('overlapped columns with ranges', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
@@ -544,7 +544,7 @@ describe('overlapping areas', () => {
     expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '1', '2'],
       ['', '4', '5'],
-      ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
+      ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(C1:C2)'],
     ]))
   })
 
@@ -566,25 +566,6 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  /* excel works like this*/
-  xit('expecting range to be shorten when moving part of a range inside this range', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['2'],
-      ['3'],
-      ['=SUM(A1:A3)']
-    ])
-
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
-
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
-      [''],
-      ['1'],
-      ['3'],
-      ['=SUM(A2:A3)']
-    ]))
-  })
-
   it('expecting range to be same when moving part of a range outside of this range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
@@ -602,21 +583,6 @@ describe('overlapping areas', () => {
       ['3'],
       ['1'],
       ['=SUM(A1:A3)']
-    ]))
-  })
-
-  /* excel works like this */
-  xit('expecting range to be shorten when moving part of a range inside this range - row', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '3'],
-      ['=SUM(A1:C1)']
-    ])
-
-    engine.moveCells(adr('A1'), 1, 1, adr('B1'))
-
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
-      ['', '1', '3'],
-      ['=SUM(B1:C1)']
     ]))
   })
 
