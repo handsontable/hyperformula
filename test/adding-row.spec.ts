@@ -522,4 +522,30 @@ describe("different sheet", () => {
       ]
     }))
   })
+
+  xit("add row at very top", () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        // new row
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A1']
+      ]
+    })
+
+    engine.addRows(0, 0, 1)
+
+    expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 1))
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        [''],
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A2']
+      ]
+    }))
+  })
 })
