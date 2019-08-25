@@ -523,7 +523,7 @@ describe("different sheet", () => {
     }))
   })
 
-  xit("add row at very top", () => {
+  xit("adding row in different sheet but same row as formula should update dependency in formula", () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         // new row
@@ -537,6 +537,27 @@ describe("different sheet", () => {
     engine.addRows(0, 0, 1)
 
     expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 1))
+  })
+
+
+  xit("adding row in different sheet but same row as formula should not update formula address", () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        // new row
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A1']
+      ]
+    })
+
+    engine.addRows(0, 0, 1)
+
+    const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
+
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
 
     expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
       Sheet1: [
