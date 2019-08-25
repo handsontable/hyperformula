@@ -64,7 +64,6 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
 }
 
 export const expectEngineToBeTheSameAs = (actual: HandsOnEngine, expected: HandsOnEngine) => {
-  const sheetId = 0
   const comparator = new EngineComparator(expected, actual)
-  comparator.compare(sheetId)
+  comparator.compare()
 }

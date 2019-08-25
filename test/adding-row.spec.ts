@@ -5,7 +5,7 @@ import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig.ts'
-import {extractReference, adr, extractMatrixRange} from "./testUtils";
+import {extractReference, adr, extractMatrixRange, expectEngineToBeTheSameAs} from "./testUtils";
 
 describe('Adding row - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {

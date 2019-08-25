@@ -17,7 +17,20 @@ export class EngineComparator {
               private actual: HandsOnEngine) {
   }
 
-  public compare(sheet: number = 0) {
+  public compare() {
+    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets()
+    const numberOfSheets = this.actual.sheetMapping.numberOfSheets()
+
+    if (expectedNumberOfSheets !== numberOfSheets) {
+      throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)
+    }
+
+    for (let sheet=0; sheet<numberOfSheets; ++sheet) {
+      this.compareSheets(sheet)
+    }
+  }
+
+  private compareSheets(sheet: number = 0) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
@@ -73,7 +86,7 @@ export class EngineComparator {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }
-    for (const [address, v] of engine.addressMapping.entriesFromSheet(sheet)) {
+    for (const [address, v] of engine.addressMapping.entries()) {
       if (v === vertex) {
         return address
       }
