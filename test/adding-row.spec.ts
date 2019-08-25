@@ -71,7 +71,7 @@ describe('Adding row - reevaluation', () => {
   })
 })
 
-describe('Adding row', () => {
+describe('Adding row - MatrixVertex', () => {
   it('MatrixVertex#formula should be updated', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
@@ -491,5 +491,35 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
+  })
+})
+
+describe("different sheet", () => {
+  it("different sheet", () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['foo'],
+        // new row
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A2']
+      ]
+    })
+
+    engine.addRows(0, 1, 1)
+
+    expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 2))
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['foo'],
+        [''],
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A3']
+      ]
+    }))
   })
 })
