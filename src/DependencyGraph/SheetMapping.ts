@@ -33,4 +33,8 @@ export class SheetMapping {
   public names(): IterableIterator<string> {
     return this.mapping.keys()
   }
+
+  public numberOfSheets(): number {
+    return this.mapping.size
+  }
 }
