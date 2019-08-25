@@ -544,10 +544,6 @@ export class AddressMapping {
     }
   }
 
-  public* entriesFromSheet(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
-    yield* this.mapping.get(sheet)!.getEntries(sheet)
-  }
-
   public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)
