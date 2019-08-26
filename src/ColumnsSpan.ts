@@ -10,6 +10,12 @@ export class ColumnsSpan {
     public readonly columnStart: number,
     public readonly columnEnd: number,
   ) {
+    if (columnStart < 0) {
+      throw Error("Starting column cant be less than 0")
+    }
+    if (columnEnd < columnStart) {
+      throw Error("Column span cant end before start")
+    }
   }
 
   public get numberOfColumns() {
