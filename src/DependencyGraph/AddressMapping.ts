@@ -50,6 +50,7 @@ interface IAddressMappingStrategy {
   getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
   verticesFromRow(row: number): IterableIterator<CellVertex>,
+  verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex>,
 }
 
 /**
@@ -210,6 +211,18 @@ export class SparseStrategy implements IAddressMappingStrategy {
       }
     }
   }
+
+  public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
+    for (const column of columnsSpan.columns()) {
+      const colMapping = this.mapping.get(column)
+      if (!colMapping) {
+        continue
+      }
+      for (const [rowNumber, vertex] of colMapping) {
+        yield vertex
+      }
+    }
+  }
 }
 
 /**
@@ -335,6 +348,17 @@ export class DenseStrategy implements IAddressMappingStrategy {
       const vertex = this.mapping[row][x]
       if (vertex) {
         yield vertex
+      }
+    }
+  }
+
+  public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
+    for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
+      for (let y = 0; y < this.height; ++y) {
+        const vertex = this.mapping[y][x]
+        if (vertex) {
+          yield vertex
+        }
       }
     }
   }
@@ -530,6 +554,10 @@ export class AddressMapping {
         yield vertex
       }
     }
+  }
+
+  public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
+    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan)
   }
 
   public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<CellValue> {

@@ -28,10 +28,6 @@ export class ColumnsSpan {
     }
   }
 
-  public rangeFromTopTo(endRow: number) {
-    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.columnStart, 0), this.numberOfColumns, endRow)
-  }
-
   public intersect(otherSpan: ColumnsSpan): ColumnsSpan | null {
     if (this.sheet !== otherSpan.sheet) {
       throw Error("Can't intersect spans from different sheets")
