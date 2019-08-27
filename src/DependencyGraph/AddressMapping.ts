@@ -165,7 +165,9 @@ export class SparseStrategy implements IAddressMappingStrategy {
         rowMapping.set(rowNumber, vertex)
       })
     })
-    this.height = Math.max(0, this.height - removedRows.numberOfRows)
+    const rightmostRowRemoved = Math.min(this.height - 1, removedRows.rowEnd)
+    const numberOfRowsRemoved = Math.max(0, rightmostRowRemoved - removedRows.rowStart + 1)
+    this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
   public removeColumns(columnsSpan: ColumnsSpan): void {
@@ -325,7 +327,9 @@ export class DenseStrategy implements IAddressMappingStrategy {
 
   public removeRows(removedRows: RowsSpan): void {
     this.mapping.splice(removedRows.rowStart, removedRows.numberOfRows)
-    this.height = Math.max(0, this.height - removedRows.numberOfRows)
+    const rightmostRowRemoved = Math.min(this.height - 1, removedRows.rowEnd)
+    const numberOfRowsRemoved = Math.max(0, rightmostRowRemoved - removedRows.rowStart + 1)
+    this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
   public removeColumns(columnsSpan: ColumnsSpan): void {

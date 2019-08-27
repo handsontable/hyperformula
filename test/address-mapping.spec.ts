@@ -213,6 +213,34 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.has(adr('A1'))).toBe(false)
   })
 
+  it('removeRows - remove more cols than size, but still something left', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+
+    mapping.removeRows(new RowsSpan(0, 1, 5))
+
+    expect(mapping.getHeight(0)).toBe(1)
+    expect(mapping.has(adr('A1'))).toBe(true)
+    expect(mapping.has(adr('A2'))).toBe(false)
+  })
+
+  it('removeRows - sometimes nothing is removed', () => {
+    const mapping = builder(2, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(11))
+    mapping.setCell(adr('B1'), new ValueCellVertex(12))
+    mapping.setCell(adr('A2'), new ValueCellVertex(21))
+    mapping.setCell(adr('B2'), new ValueCellVertex(22))
+
+    mapping.removeRows(new RowsSpan(0, 2, 3))
+
+    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.has(adr('A1'))).toBe(true)
+    expect(mapping.has(adr('A2'))).toBe(true)
+  })
+
   it('removeColumns - more than one col', () => {
     const mapping = builder(4, 2)
     mapping.setCell(adr('A1'), new ValueCellVertex(11))
