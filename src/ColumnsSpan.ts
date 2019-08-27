@@ -43,4 +43,8 @@ export class ColumnsSpan {
     }
     return new ColumnsSpan(this.sheet, start, end)
   }
+
+  public firstColumn(): ColumnsSpan {
+    return new ColumnsSpan(this.sheet, this.columnStart, this.columnStart)
+  }
 }

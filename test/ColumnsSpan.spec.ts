@@ -87,4 +87,16 @@ describe("ColumnsSpan", () => {
 
     expect(span1.intersect(span2)).toEqual(span1)
   })
+
+  it("#firstColumn when one column", () => {
+    const span1 = new ColumnsSpan(0, 42, 42)
+
+    expect(span1.firstColumn()).toEqual(span1)
+  })
+
+  it("#firstColumn when more columns", () => {
+    const span1 = new ColumnsSpan(0, 42, 44)
+
+    expect(span1.firstColumn()).toEqual(new ColumnsSpan(0, 42, 42))
+  })
 })

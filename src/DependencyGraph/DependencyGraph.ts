@@ -249,7 +249,7 @@ export class DependencyGraph {
   }
 
   public addColumns(addedColumns: ColumnsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(new ColumnsSpan(addedColumns.sheet, addedColumns.columnStart, addedColumns.columnStart))) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(addedColumns.firstColumn())) {
       throw Error('It is not possible to add column in column with matrix')
     }
 
