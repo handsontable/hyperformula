@@ -401,3 +401,24 @@ describe('Adding column, fixing ranges', () => {
     expect(b1).toBe(null)
   })
 })
+
+describe("different sheet", () => {
+  it("adding row in different sheet but same row as formula should not update formula address", () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A1']
+      ]
+    })
+
+    engine.addColumns(0, 0, 1)
+
+    const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
+
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+  })
+})
