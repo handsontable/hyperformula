@@ -16,6 +16,7 @@ import {Config} from '../Config'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 import {ColumnsSpan} from '../ColumnsSpan'
+import {RowsSpan} from '../RowsSpan'
 
 export class DependencyGraph {
   /*
@@ -156,14 +157,13 @@ export class DependencyGraph {
     return vertex
   }
 
-  public removeRows(sheet: number, rowStart: number, rowEnd: number) {
-    if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart, rowEnd)) {
+  public removeRows(removedRows: RowsSpan) {
+    if (this.matrixMapping.isFormulaMatrixInRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)) {
       throw Error('It is not possible to remove row with matrix')
     }
-    const numberOfRows = rowEnd - rowStart + 1
 
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, rowStart), this.addressMapping.getWidth(sheet), numberOfRows)
+      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(removedRows.sheet, 0, removedRows.rowStart), this.addressMapping.getWidth(removedRows.sheet), removedRows.numberOfRows)
       for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
@@ -176,15 +176,15 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.truncateMatricesAfterRemovingRows(sheet, rowStart, rowEnd)
+      this.truncateMatricesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeRows(sheet, rowStart, rowEnd)
+      this.addressMapping.removeRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingRows(sheet, rowStart, rowEnd)
+      this.truncateRangesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
     })
 
     this.addStructuralNodesToChangeSet()

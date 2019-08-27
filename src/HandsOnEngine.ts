@@ -10,6 +10,7 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {ColumnsSpan} from './ColumnsSpan'
+import {RowsSpan} from './RowsSpan'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -178,11 +179,13 @@ export class HandsOnEngine {
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     this.stats.reset()
 
-    this.dependencyGraph.removeRows(sheet, rowStart, rowEnd)
+    const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
+
+    this.dependencyGraph.removeRows(removedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(sheet, rowStart, rowEnd, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(sheet, rowStart, rowEnd)
+      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()

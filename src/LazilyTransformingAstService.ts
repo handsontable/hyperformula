@@ -9,6 +9,7 @@ import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
 import {transformCellRangeByReferences} from "./dependencyTransformers/common";
 import {ColumnsSpan} from './ColumnsSpan'
+import {RowsSpan} from './RowsSpan'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -32,9 +33,7 @@ export interface AddRowsTransformation {
 
 export interface RemoveRowsTransformation {
   type: TransformationType.REMOVE_ROWS,
-  sheet: number,
-  rowStart: number,
-  rowEnd: number,
+  removedRows: RowsSpan,
 }
 
 export interface RemoveColumnsTransformation {
@@ -84,13 +83,8 @@ export class LazilyTransformingAstService {
     })
   }
 
-  public addRemoveRowsTransformation(sheet: number, rowStart: number, rowEnd: number) {
-    this.transformations.push({
-      type: TransformationType.REMOVE_ROWS,
-      sheet,
-      rowStart,
-      rowEnd,
-    })
+  public addRemoveRowsTransformation(removedRows: RowsSpan) {
+    this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows })
   }
 
   public addRemoveColumnsTransformation(columnsSpan: ColumnsSpan) {
@@ -138,14 +132,7 @@ export class LazilyTransformingAstService {
           break;
         }
         case TransformationType.REMOVE_ROWS: {
-          const numberOfRows = transformation.rowEnd - transformation.rowStart + 1
-          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(
-              transformation.sheet,
-              transformation.rowStart,
-              numberOfRows,
-              ast,
-              address,
-          )
+          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(transformation.removedRows, ast, address)
           ast = newAst
           address = newAddress
           break;

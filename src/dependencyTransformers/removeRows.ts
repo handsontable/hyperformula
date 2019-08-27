@@ -2,44 +2,43 @@ import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching, Ast} from '../parser'
 import {TransformCellRangeFunction, fixFormulaVertexRow, transformCellRangeByReferences, transformAddressesInFormula, TransformCellAddressFunction} from './common'
+import {RowsSpan} from '../RowsSpan'
 
 export namespace RemoveRowsDependencyTransformer {
-  export function transform(sheet: number, rowStart: number, rowEnd: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    const numberOfRows = rowEnd - rowStart + 1
+  export function transform(removedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(sheet, rowStart, numberOfRows, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transform2(removedRows, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(sheet: number, row: number, numberOfRows: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const transformCellAddressFn = transformDependencies(sheet, row, numberOfRows)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(sheet, row, numberOfRows, transformCellAddressFn))
-    return [newAst, fixFormulaVertexRow(nodeAddress, sheet, row, -numberOfRows)]
+  export function transform2(removedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = transformDependencies(removedRows)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(removedRows, transformCellAddressFn))
+    return [newAst, fixFormulaVertexRow(nodeAddress, removedRows.sheet, removedRows.rowStart, -removedRows.numberOfRows)]
   }
 
-  export const transformCellRangeByReferences2 = (sheet: number, row: number, numberOfRows: number, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
-    const rowEnd = row + numberOfRows - 1
+  export const transformCellRangeByReferences2 = (removedRows: RowsSpan, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
 
-      if (sheet === dependencyRangeStart.sheet) {
+      if (removedRows.sheet === dependencyRangeStart.sheet) {
         const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
         const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
 
-        if (row <= dependencyRangeStartSCA.row && rowEnd >= dependencyRangeEndSCA.row) {
+        if (removedRows.rowStart <= dependencyRangeStartSCA.row && removedRows.rowEnd >= dependencyRangeEndSCA.row) {
           return ErrorType.REF
         }
 
-        if (dependencyRangeStartSCA.row >= row && dependencyRangeStartSCA.row <= rowEnd) {
-          actualStart = dependencyRangeStart.shiftedByRows(rowEnd - dependencyRangeStartSCA.row + 1)
+        if (dependencyRangeStartSCA.row >= removedRows.rowStart && dependencyRangeStartSCA.row <= removedRows.rowEnd) {
+          actualStart = dependencyRangeStart.shiftedByRows(removedRows.rowEnd - dependencyRangeStartSCA.row + 1)
         }
 
-        if (dependencyRangeEndSCA.row >= row && dependencyRangeEndSCA.row <= rowEnd) {
-          actualEnd = dependencyRangeEnd.shiftedByRows(-(dependencyRangeEndSCA.row - row + 1))
+        if (dependencyRangeEndSCA.row >= removedRows.rowStart && dependencyRangeEndSCA.row <= removedRows.rowEnd) {
+          actualEnd = dependencyRangeEnd.shiftedByRows(-(dependencyRangeEndSCA.row - removedRows.rowStart + 1))
         }
       }
 
@@ -55,35 +54,35 @@ export namespace RemoveRowsDependencyTransformer {
     }
   }
 
-  export function transformDependencies(sheetInWhichWeRemoveRows: number, topRow: number, numberOfRows: number): TransformCellAddressFunction {
+  export function transformDependencies(removedRows: RowsSpan): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       if ((dependencyAddress.sheet === formulaAddress.sheet)
-          && (formulaAddress.sheet !== sheetInWhichWeRemoveRows)) {
+          && (formulaAddress.sheet !== removedRows.sheet)) {
         return false
       }
 
       if (dependencyAddress.isRowAbsolute()) {
-        if (sheetInWhichWeRemoveRows !== dependencyAddress.sheet) {
+        if (removedRows.sheet !== dependencyAddress.sheet) {
           return false
         }
 
-        if (dependencyAddress.row < topRow) { // Aa
+        if (dependencyAddress.row < removedRows.rowStart) { // Aa
           return false
-        } else if (dependencyAddress.row >= topRow + numberOfRows) { // Ab
-          return dependencyAddress.shiftedByRows(-numberOfRows)
+        } else if (dependencyAddress.row >= removedRows.rowStart + removedRows.numberOfRows) { // Ab
+          return dependencyAddress.shiftedByRows(-removedRows.numberOfRows)
         }
       } else {
         const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-        if (absolutizedDependencyAddress.row < topRow) {
-          if (formulaAddress.row < topRow) {  // Raa
+        if (absolutizedDependencyAddress.row < removedRows.rowStart) {
+          if (formulaAddress.row < removedRows.rowStart) {  // Raa
             return false
-          } else if (formulaAddress.row >= topRow + numberOfRows) { // Rab
-            return dependencyAddress.shiftedByRows(numberOfRows)
+          } else if (formulaAddress.row >= removedRows.rowStart + removedRows.numberOfRows) { // Rab
+            return dependencyAddress.shiftedByRows(removedRows.numberOfRows)
           }
-        } else if (absolutizedDependencyAddress.row >= topRow + numberOfRows) {
-          if (formulaAddress.row < topRow) {  // Rba
-            return dependencyAddress.shiftedByRows(-numberOfRows)
-          } else if (formulaAddress.row >= topRow + numberOfRows) { // Rbb
+        } else if (absolutizedDependencyAddress.row >= removedRows.rowStart + removedRows.numberOfRows) {
+          if (formulaAddress.row < removedRows.rowStart) {  // Rba
+            return dependencyAddress.shiftedByRows(-removedRows.numberOfRows)
+          } else if (formulaAddress.row >= removedRows.rowStart + removedRows.numberOfRows) { // Rbb
             return false
           }
         }
