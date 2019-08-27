@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {RangeVertex} from './'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {RowsSpan} from '../RowsSpan'
 
 /**
  * Mapping from address ranges to range vertices
@@ -48,17 +49,17 @@ export class RangeMapping {
     return maybeRange
   }
 
-  public truncateRangesByRows(sheet: number, rowStart: number, rowEnd: number): RangeVertex[] {
+  public truncateRangesByRows(rowsSpan: RowsSpan): RangeVertex[] {
     const rangesToRemove = Array<RangeVertex>()
 
-    this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
-      if (rowStart <= vertex.range.end.row) {
-        vertex.range.removeRows(rowStart, rowEnd)
+    this.updateVerticesFromSheet(rowsSpan.sheet, (key: string, vertex: RangeVertex): RangeVertex | void => {
+      if (rowsSpan.rowStart <= vertex.range.end.row) {
+        vertex.range.removeRows(rowsSpan.rowStart, rowsSpan.rowEnd)
         if (vertex.range.height() > 0) {
           return vertex
         } else {
           rangesToRemove.push(vertex)
-          this.removeByKey(sheet, key)
+          this.removeByKey(rowsSpan.sheet, key)
         }
       }
     })

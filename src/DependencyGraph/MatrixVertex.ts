@@ -4,6 +4,7 @@ import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 import {ColumnsSpan} from '../ColumnsSpan'
+import {RowsSpan} from '../RowsSpan'
 
 export class MatrixVertex {
   public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
@@ -118,11 +119,10 @@ export class MatrixVertex {
     }
   }
 
-  public removeRows(sheet: number, topRow: number, bottomRow: number): void {
+  public removeRows(removedRows: RowsSpan): void {
     if (this.matrix instanceof Matrix) {
-      const start = Math.max(topRow, this.getAddress().row) - this.getAddress().row
-      const end = Math.min(bottomRow, this.getAddress().row + this.height - 1) - this.getAddress().row
-      this.matrix.removeRows(start, end)
+      const removedRowsFromMatrix = this.rowsFromMatrix().intersect(removedRows)!
+      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.getAddress().row, removedRowsFromMatrix.rowEnd - this.getAddress().row)
     }
   }
 
@@ -139,5 +139,9 @@ export class MatrixVertex {
 
   public columnsFromMatrix() {
     return new ColumnsSpan(this.cellAddress.sheet, this.cellAddress.col, this.cellAddress.col + this.width - 1)
+  }
+
+  public rowsFromMatrix() {
+    return new RowsSpan(this.cellAddress.sheet, this.cellAddress.row, this.cellAddress.row + this.height - 1)
   }
 }

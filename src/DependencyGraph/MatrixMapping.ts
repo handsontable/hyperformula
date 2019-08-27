@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {filterWith} from '../generatorUtils'
 import {MatrixVertex} from './'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {RowsSpan} from '../RowsSpan'
 
 export class MatrixMapping {
   private readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -18,10 +19,10 @@ export class MatrixMapping {
     this.matrixMapping.delete(range.toString())
   }
 
-  public isFormulaMatrixInRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-    for (let row = rowStart; row <= rowEnd; ++row) {
+  public isFormulaMatrixInRows(span: RowsSpan) {
+    for (const row of span.rows()) {
       for (const mtx of this.matrixMapping.values()) {
-        if (mtx.spansThroughSheetRows(sheet, row) && mtx.isFormula()) {
+        if (mtx.spansThroughSheetRows(span.sheet, row) && mtx.isFormula()) {
           return true
         }
       }
@@ -55,9 +56,9 @@ export class MatrixMapping {
     }, this.matrixMapping.entries())[Symbol.iterator]()
   }
 
-  public* numericMatricesInRows(sheet: number, startRow: number, endRow: number = startRow): IterableIterator<[string, MatrixVertex]> {
+  public* numericMatricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, MatrixVertex]> {
     yield* filterWith(([, mtx]) => {
-      return mtx.spansThroughSheetRows(sheet, startRow, endRow) && !mtx.isFormula()
+      return mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd) && !mtx.isFormula()
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
@@ -67,10 +68,10 @@ export class MatrixMapping {
     }, this.matrixMapping.entries()[Symbol.iterator]())
   }
 
-  public truncateMatricesByRows(sheet: number, startRow: number, endRow: number): MatrixVertex[] {
+  public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
-    for (const [key, matrix] of this.numericMatricesInRows(sheet, startRow, endRow)) {
-      matrix.removeRows(sheet, startRow, endRow)
+    for (const [key, matrix] of this.numericMatricesInRows(rowsSpan)) {
+      matrix.removeRows(rowsSpan)
       if (matrix.height === 0) {
         this.removeMatrix(key)
         verticesToRemove.push(matrix)

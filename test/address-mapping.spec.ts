@@ -2,6 +2,7 @@ import {simpleCellAddress} from '../src/Cell'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
 import {adr} from "./testUtils";
 import {ColumnsSpan} from '../src/ColumnsSpan'
+import {RowsSpan} from '../src/RowsSpan'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -175,7 +176,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('B2'), new ValueCellVertex(22))
 
     expect(mapping.getHeight(0)).toBe(2)
-    mapping.removeRows(0, 0, 0)
+    mapping.removeRows(new RowsSpan(0, 0, 0))
     expect(mapping.getHeight(0)).toBe(1)
     expect(mapping.getCellValue(adr('A1'))).toBe(21)
     expect(mapping.getCellValue(adr('B1'))).toBe(22)
@@ -193,7 +194,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('B4'), new ValueCellVertex(42))
 
     expect(mapping.getHeight(0)).toBe(4)
-    mapping.removeRows(0, 1, 2)
+    mapping.removeRows(new RowsSpan(0, 1, 2))
     expect(mapping.getHeight(0)).toBe(2)
     expect(mapping.getCellValue(adr('A1'))).toBe(11)
     expect(mapping.getCellValue(adr('A2'))).toBe(41)
@@ -207,7 +208,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('B2'), new ValueCellVertex(22))
 
     expect(mapping.getHeight(0)).toBe(2)
-    mapping.removeRows(0, 0, 5)
+    mapping.removeRows(new RowsSpan(0, 0, 5))
     expect(mapping.getHeight(0)).toBe(0)
     expect(mapping.has(adr('A1'))).toBe(false)
   })

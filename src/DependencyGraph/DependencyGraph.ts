@@ -158,13 +158,12 @@ export class DependencyGraph {
   }
 
   public removeRows(removedRows: RowsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)) {
+    if (this.matrixMapping.isFormulaMatrixInRows(removedRows)) {
       throw Error('It is not possible to remove row with matrix')
     }
 
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      const removedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(removedRows.sheet, 0, removedRows.rowStart), this.addressMapping.getWidth(removedRows.sheet), removedRows.numberOfRows)
-      for (const vertex of this.addressMapping.verticesFromRange(removedRange)) {
+      for (const vertex of this.addressMapping.verticesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
@@ -176,15 +175,15 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.truncateMatricesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
+      this.truncateMatricesAfterRemovingRows(removedRows)
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
+      this.addressMapping.removeRows(removedRows)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingRows(removedRows.sheet, removedRows.rowStart, removedRows.rowEnd)
+      this.truncateRangesAfterRemovingRows(removedRows)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -223,7 +222,7 @@ export class DependencyGraph {
   }
 
   public addRows(sheet: number, rowStart: number, numberOfRows: number) {
-    if (this.matrixMapping.isFormulaMatrixInRows(sheet, rowStart)) {
+    if (this.matrixMapping.isFormulaMatrixInRows(new RowsSpan(sheet, rowStart, rowStart))) {
       throw Error('It is not possible to add row in row with matrix')
     }
 
@@ -575,15 +574,15 @@ export class DependencyGraph {
     }
   }
 
-  private truncateMatricesAfterRemovingRows(sheet: number, rowStart: number, rowEnd: number) {
-    const verticesToRemove = this.matrixMapping.truncateMatricesByRows(sheet, rowStart, rowEnd)
+  private truncateMatricesAfterRemovingRows(removedRows: RowsSpan) {
+    const verticesToRemove = this.matrixMapping.truncateMatricesByRows(removedRows)
     verticesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
   }
 
-  private truncateRangesAfterRemovingRows(sheet: number, rowStart: number, rowEnd: number) {
-    const rangesToRemove = this.rangeMapping.truncateRangesByRows(sheet, rowStart, rowEnd)
+  private truncateRangesAfterRemovingRows(removedRows: RowsSpan) {
+    const rangesToRemove = this.rangeMapping.truncateRangesByRows(removedRows)
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
@@ -604,7 +603,7 @@ export class DependencyGraph {
   }
 
   private expandMatricesAfterAddingRows(sheet: number, rowStart: number, numberOfRows: number) {
-    for (const [, matrix] of this.matrixMapping.numericMatricesInRows(sheet, rowStart)) {
+    for (const [, matrix] of this.matrixMapping.numericMatricesInRows(new RowsSpan(sheet, rowStart, rowStart))) {
       matrix.addRows(sheet, rowStart, numberOfRows)
       const addedRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, matrix.getAddress().col, rowStart), matrix.width, numberOfRows)
       for (const address of addedRange.addresses()) {
