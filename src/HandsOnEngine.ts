@@ -193,7 +193,7 @@ export class HandsOnEngine {
 
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
 
-    this.dependencyGraph.addColumns(sheet, col, numberOfCols)
+    this.dependencyGraph.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)

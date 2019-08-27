@@ -248,26 +248,26 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public addColumns(sheet: number, col: number, numberOfCols: number) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(new ColumnsSpan(sheet, col, col))) {
+  public addColumns(addedColumns: ColumnsSpan) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(new ColumnsSpan(addedColumns.sheet, addedColumns.columnStart, addedColumns.columnStart))) {
       throw Error('It is not possible to add column in column with matrix')
     }
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.addColumns(sheet, col, numberOfCols)
+      this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.expandMatricesAfterAddingColumns(sheet, col, numberOfCols)
+      this.expandMatricesAfterAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.fixRangesWhenAddingColumns(sheet, col, numberOfCols)
+      this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
 
-      this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(sheet, col, numberOfCols)
+      this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
-    for (const vertex of this.addressMapping.verticesFromColumn(sheet, col)) {
+    for (const vertex of this.addressMapping.verticesFromColumn(addedColumns.sheet, addedColumns.columnStart)) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
 
