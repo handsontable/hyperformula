@@ -2,50 +2,51 @@ import {SimpleCellAddress} from '../Cell'
 import {FormulaCellVertex, MatrixVertex, DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {fixFormulaVertexColumn, transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
+import {ColumnsSpan} from '../ColumnsSpan'
 
 export namespace AddColumnsDependencyTransformer {
-  export function transform(sheet: number, col: number, numberOfCols: number, graph: DependencyGraph, parser: ParserWithCaching) {
+  export function transform(addedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(sheet, col, numberOfCols, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transform2(addedColumns, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(sheet: number, col: number, numberOfCols: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
+  export function transform2(addedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = transformDependencies(addedColumns)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
-    return [newAst, fixFormulaVertexColumn(nodeAddress, sheet, col, numberOfCols)]
+    return [newAst, fixFormulaVertexColumn(nodeAddress, addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)]
   }
 
-  export function transformDependencies(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
+  export function transformDependencies(addedColumns: ColumnsSpan): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-      if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== sheetInWhichWeAddColumns)) {
+      if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== addedColumns.sheet)) {
         return false
       }
 
       if (dependencyAddress.isColumnAbsolute()) {
-        if (sheetInWhichWeAddColumns !== dependencyAddress.sheet) {
+        if (addedColumns.sheet !== dependencyAddress.sheet) {
           return false
         }
 
-        if (dependencyAddress.col < column) { // Case Aa
+        if (dependencyAddress.col < addedColumns.columnStart) { // Case Aa
           return false
         } else { // Case Ab
-          return dependencyAddress.shiftedByColumns(numberOfColumns)
+          return dependencyAddress.shiftedByColumns(addedColumns.numberOfColumns)
         }
       } else {
         const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-        if (absolutizedDependencyAddress.col < column) {
-          if (formulaAddress.col < column) { // Case Raa
+        if (absolutizedDependencyAddress.col < addedColumns.columnStart) {
+          if (formulaAddress.col < addedColumns.columnStart) { // Case Raa
             return false
           } else { // Case Rab
-            return dependencyAddress.shiftedByColumns(-numberOfColumns)
+            return dependencyAddress.shiftedByColumns(-addedColumns.numberOfColumns)
           }
         } else {
-          if (formulaAddress.col < column) { // Case Rba
-            return dependencyAddress.shiftedByColumns(numberOfColumns)
+          if (formulaAddress.col < addedColumns.columnStart) { // Case Rba
+            return dependencyAddress.shiftedByColumns(addedColumns.numberOfColumns)
           } else { // Case Rbb
             return false
           }

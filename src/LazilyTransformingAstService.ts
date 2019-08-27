@@ -20,9 +20,7 @@ export enum TransformationType {
 
 export interface AddColumnsTransformation {
   type: TransformationType.ADD_COLUMNS,
-  sheet: number,
-  col: number,
-  numberOfCols: number,
+  addedColumns: ColumnsSpan,
 }
 
 export interface AddRowsTransformation {
@@ -73,13 +71,8 @@ export class LazilyTransformingAstService {
     return this.transformations.length
   }
 
-  public addAddColumnsTransformation(sheet: number, col: number, numberOfCols: number) {
-    this.transformations.push({
-      type: TransformationType.ADD_COLUMNS,
-      sheet,
-      col,
-      numberOfCols
-    })
+  public addAddColumnsTransformation(addedColumns: ColumnsSpan) {
+    this.transformations.push({ type: TransformationType.ADD_COLUMNS, addedColumns })
   }
 
   public addAddRowsTransformation(sheet: number, row: number, numberOfRowsToAdd: number) {
@@ -121,13 +114,7 @@ export class LazilyTransformingAstService {
       const transformation = this.transformations[v]
       switch (transformation.type) {
         case TransformationType.ADD_COLUMNS: {
-          const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(
-              transformation.sheet,
-              transformation.col,
-              transformation.numberOfCols,
-              ast,
-              address,
-          )
+          const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(transformation.addedColumns, ast, address)
           ast = newAst
           address = newAddress
           break;

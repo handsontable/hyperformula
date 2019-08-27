@@ -196,8 +196,8 @@ export class HandsOnEngine {
     this.dependencyGraph.addColumns(sheet, col, numberOfCols)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(sheet, col, numberOfCols, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(sheet, col, numberOfCols)
+      AddColumnsDependencyTransformer.transform(columnsSpan, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddColumnsTransformation(columnsSpan)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
