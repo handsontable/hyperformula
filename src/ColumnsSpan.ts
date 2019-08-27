@@ -18,6 +18,10 @@ export class ColumnsSpan {
     }
   }
 
+  public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
+  }
+
   public get numberOfColumns() {
     return this.columnEnd - this.columnStart + 1
   }

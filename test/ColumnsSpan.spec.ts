@@ -13,6 +13,12 @@ describe("ColumnsSpan", () => {
     }).toThrow("Column span cant end before start")
   })
 
+  it("#fromNumberOfColumns", () => {
+    const span = ColumnsSpan.fromNumberOfColumns(0, 42, 2)
+
+    expect(span).toEqual(new ColumnsSpan(0, 42, 43))
+  })
+
   it("#numberOfColumns for one column", () => {
     const span = new ColumnsSpan(0, 42, 42)
 
