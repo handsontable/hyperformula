@@ -17,7 +17,7 @@ export namespace RemoveRowsDependencyTransformer {
   export function transform2(sheet: number, row: number, numberOfRows: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(sheet, row, numberOfRows)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(sheet, row, numberOfRows, transformCellAddressFn))
-    return [newAst, fixFormulaVertexRow(nodeAddress, row, -numberOfRows)]
+    return [newAst, fixFormulaVertexRow(nodeAddress, sheet, row, -numberOfRows)]
   }
 
   export const transformCellRangeByReferences2 = (sheet: number, row: number, numberOfRows: number, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {

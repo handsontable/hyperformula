@@ -17,7 +17,7 @@ export namespace RemoveColumnsDependencyTransformer {
   export function transform2(columnsSpan: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(columnsSpan)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(columnsSpan, transformCellAddressFn))
-    return [newAst, fixFormulaVertexColumn(nodeAddress, columnsSpan.columnStart, -columnsSpan.numberOfColumns)]
+    return [newAst, fixFormulaVertexColumn(nodeAddress, columnsSpan.sheet, columnsSpan.columnStart, -columnsSpan.numberOfColumns)]
   }
 
   export const transformCellRangeByReferences2 = (columnsSpan: ColumnsSpan, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {

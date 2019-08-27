@@ -70,7 +70,10 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
   }
 }
 
-export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, row: number, numberOfRows: number): SimpleCellAddress {
+export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, sheet: number, row: number, numberOfRows: number): SimpleCellAddress {
+  if (sheet !== nodeAddress.sheet) {
+    return nodeAddress
+  }
   if (row <= nodeAddress.row) {
     return {
       ...nodeAddress,
@@ -81,7 +84,10 @@ export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, row: number,
   }
 }
 
-export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, column: number, numberOfColumns: number): SimpleCellAddress {
+export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, sheet: number, column: number, numberOfColumns: number): SimpleCellAddress {
+  if (sheet !== nodeAddress.sheet) {
+    return nodeAddress
+  }
   if (column <= nodeAddress.col) {
     return {
       ...nodeAddress,

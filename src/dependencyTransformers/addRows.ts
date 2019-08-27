@@ -16,7 +16,7 @@ export namespace AddRowsDependencyTransformer {
   export function transform2(sheet: number, row: number, numberOfRows: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(sheet, row, numberOfRows)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
-    return [newAst, fixFormulaVertexRow(nodeAddress, row, numberOfRows)]
+    return [newAst, fixFormulaVertexRow(nodeAddress, sheet, row, numberOfRows)]
   }
 
   export function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {

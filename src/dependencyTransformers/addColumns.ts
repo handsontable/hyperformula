@@ -16,7 +16,7 @@ export namespace AddColumnsDependencyTransformer {
   export function transform2(sheet: number, col: number, numberOfCols: number, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(sheet, col, numberOfCols)
     const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
-    return [newAst, fixFormulaVertexColumn(nodeAddress, col, numberOfCols)]
+    return [newAst, fixFormulaVertexColumn(nodeAddress, sheet, col, numberOfCols)]
   }
 
   export function transformDependencies(sheetInWhichWeAddColumns: number, column: number, numberOfColumns: number): TransformCellAddressFunction {
