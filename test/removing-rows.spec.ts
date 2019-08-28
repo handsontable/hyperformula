@@ -6,69 +6,7 @@ import './testConfig.ts'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {extractRange, extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
-describe('Removing rows - reevaluation', () => {
-  it('reevaluates cells', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '=COUNTBLANK(A1:A3)'],
-      [''], // deleted
-      ['3'],
-    ])
-
-    expect(engine.getCellValue('B1')).toEqual(1)
-    engine.removeRows(0, 1, 1)
-    expect(engine.getCellValue('B1')).toEqual(0)
-  })
-
-  it('dont reevaluate everything', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
-      [''], // deleted
-      ['3'],
-    ])
-    const b1 = engine.addressMapping.getCell(adr('B1'))
-    const c1 = engine.addressMapping.getCell(adr('C1'))
-    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
-
-    engine.removeRows(0, 1, 1)
-
-    expect(b1setCellValueSpy).toHaveBeenCalled()
-    expect(c1setCellValueSpy).not.toHaveBeenCalled()
-  })
-
-  it('reevaluates cells which are dependent on structure changes', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=COLUMNS(A1:B1)'],
-      ['1'],
-    ])
-    const c1 = engine.addressMapping.getCell(adr('C1'))
-    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
-
-    engine.removeRows(0, 1, 1)
-
-    expect(c1setCellValueSpy).toHaveBeenCalled()
-  })
-})
-
-describe('Removing rows - dependencies', () => {
-  it('should not affect absolute dependencies to other sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['1'], // rows to delete
-        ['2'], //
-        ['=$Sheet2.A$1'],
-      ],
-      Sheet2: [
-        ['3'],
-        ['4'],
-      ],
-    })
-
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
-    engine.removeRows(0, 0, 1)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
-  })
-
+describe('Removing rows - address dependencies, same sheet', () => {
   it('same sheet, case Aa', () => {
     const engine = HandsOnEngine.buildFromArray([
       [''],
@@ -182,13 +120,157 @@ describe('Removing rows - dependencies', () => {
   it('same sheet, case Rca, range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=SUM(A2:A3)'],
-      ['1'], // 
+      ['1'], //
       ['2'], //
     ])
     engine.removeRows(0, 1, 2)
     expect_function_to_have_ref_error(engine, adr('A1'))
   })
+})
 
+describe('Removing rows - address dependencies, formula in sheet where we make crud with dependency to other sheet', () => {
+  it('should not affect absolute dependencies', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'], // row to delete
+        ['=$Sheet2.A$1'],
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    engine.removeRows(0, 0, 0)
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+  })
+
+  it('removing row below formula should not affect dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1'],
+        ['1'], // row to delete
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    engine.removeRows(0, 1, 1)
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+  })
+
+  xit('removing row above formula should shift dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'], // row to delete
+        ['=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, -1))
+    engine.removeRows(0, 0, 0)
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+  })
+})
+
+describe('Removing rows - formula in different sheet', () => {
+  it('removing row to which the dependency is returns REF, absolute dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A$1'],
+      ],
+      Sheet2: [
+        ['1'], // row to delete
+        ['2'],
+      ],
+    })
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    engine.removeRows(1, 0, 0)
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('removing row to which the dependency is returns REF, relative dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['1'], // row to delete
+        ['2']
+      ],
+    })
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    engine.removeRows(1, 0, 0)
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
+
+  xit('removing row below dependency should not affect relative address', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1'],
+        ['=$Sheet2.A1'],
+        ['=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['0'],
+        ['1'],  // row to delete
+      ],
+    })
+
+    engine.removeRows(1, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, -1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -2))
+  })
+
+  xit('removing row above dependency should shift relative address', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A3'],
+        ['=$Sheet2.A3'],
+        ['=$Sheet2.A3'],
+      ],
+      Sheet2: [
+        ['1'],
+        ['2'], // row to delete
+        ['3']
+      ],
+    })
+
+    engine.removeRows(1, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -1))
+  })
+
+  it('does not truncate any ranges if rows are removed from different sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['', '=SUM(A2:A3)'],
+        ['2'],
+        ['3'],
+      ],
+      Sheet2: [
+        ['1']
+      ],
+    })
+
+    engine.removeRows(1, 1, 1)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  })
+})
+
+describe('Removing rows - range dependencies, same sheet', () => {
   it('truncates range by one row from top if topmost row removed', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '=SUM(A2:A3)'],
@@ -300,22 +382,49 @@ describe('Removing rows - dependencies', () => {
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
+})
 
-  it('does not truncate any ranges if rows are removed from different sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['', '=SUM(A2:A3)'],
-        ['2'],
-        ['3'],
-      ],
-      Sheet2: [
-        ['1']
-      ],
-    })
+describe('Removing rows - reevaluation', () => {
+  it('reevaluates cells', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A3)'],
+      [''], // deleted
+      ['3'],
+    ])
 
-    engine.removeRows(1, 1, 1)
+    expect(engine.getCellValue('B1')).toEqual(1)
+    engine.removeRows(0, 1, 1)
+    expect(engine.getCellValue('B1')).toEqual(0)
+  })
 
-    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
+  it('dont reevaluate everything', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
+      [''], // deleted
+      ['3'],
+    ])
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.removeRows(0, 1, 1)
+
+    expect(b1setCellValueSpy).toHaveBeenCalled()
+    expect(c1setCellValueSpy).not.toHaveBeenCalled()
+  })
+
+  it('reevaluates cells which are dependent on structure changes', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=COLUMNS(A1:B1)'],
+      ['1'],
+    ])
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
+
+    engine.removeRows(0, 1, 1)
+
+    expect(c1setCellValueSpy).toHaveBeenCalled()
   })
 })
 
@@ -493,7 +602,7 @@ describe('Removing rows - graph', function() {
   })
 })
 
-describe('Removing rows - ranges', function() {
+describe('Removing rows - range mapping', function() {
   it('shift ranges in range mapping, range start below removed rows', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
