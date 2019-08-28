@@ -523,7 +523,7 @@ describe("different sheet", () => {
     }))
   })
 
-  xit("adding row in different sheet but same row as formula should update dependency in formula", () => {
+  it("adding row in different sheet but same row as formula should update dependency in formula", () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         // new row
