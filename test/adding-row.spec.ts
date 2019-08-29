@@ -167,141 +167,212 @@ describe('Adding row - address mapping', () => {
   })
 })
 
-describe('Adding row, fixing dependencies', () => {
-  it('local dependency does not change if we add rows in other sheets', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['42'],
+describe('Adding row - fixing dependencies', () => {
+  describe('all in same sheet (case 1)', () => {
+    it('same sheet, case Aa, absolute row', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['1'],
         // new row
-        ['13'],
-      ],
-      Sheet2: [
+        ['=A$1'],
+      ])
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 0))
+    })
+
+    it('same sheet, case Aa, absolute row and col', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['1'],
+        // new row
+        ['=$A$1'],
+      ])
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute(0, 0, 0))
+    })
+
+    it('same sheet, case Ab', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['=A$2'],
+        // new row
+        ['42'],
+      ])
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 2))
+    })
+
+    it('same sheet, case Raa', () => {
+      const engine = HandsOnEngine.buildFromArray([
         ['=A2'],
-        ['=B1'],
-      ],
-    })
-
-    engine.addRows(0, 1, 1)
-
-    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 1))
-    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 1, -1))
-  })
-
-  it('absolute dependency does not change if dependency is in other sheet than we add rows', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['=$Sheet2.A$2'],
-        // new row
         ['13'],
-      ],
-      Sheet2: [
+        // new row
         ['42'],
-        ['78'],
-      ],
+      ])
+
+      engine.addRows(0, 2, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
     })
 
-    engine.addRows(0, 1, 1)
+    it('same sheet, case Rab', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['42'],
+        ['13'],
+        // new row
+        ['=A2'],
+      ])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+      engine.addRows(0, 2, 1)
+
+      expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(0, 0, -2))
+    })
+
+    it('same sheet, case Rba', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['=A3'],
+        ['13'],
+        // new row
+        ['42'],
+      ])
+
+      engine.addRows(0, 2, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 3))
+    })
+
+    it('same sheet, case Rbb', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['42'],
+        // new row
+        ['=A3'],
+        ['13'],
+      ])
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(0, 0, 1))
+    })
+
+    it('same sheet, same row', () => {
+      const engine = HandsOnEngine.buildFromArray([
+        ['42'],
+        ['43', '=A2'],
+      ])
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(0, -1, 0))
+    })
   })
 
-  it('same sheet, case Aa, absolute row', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      // new row
-      ['=A$1'],
-    ])
+  describe('sheet where we add rows different than dependency address and formula address (case 4)', () => {
+    it('absolute address', () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=$Sheet2.A$2'],
+          // new row
+          ['13'],
+        ],
+        Sheet2: [
+          ['42'],
+          ['78'],
+        ],
+      })
 
-    engine.addRows(0, 1, 1)
+      engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+    })
+
+    it('relative address', () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['42'],
+          // new row
+          ['13'],
+        ],
+        Sheet2: [
+          ['=A2'],
+          ['=B1'],
+        ],
+      })
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 1))
+      expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 1, -1))
+    })
   })
 
-  it('same sheet, case Aa, absolute row and col', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      // new row
-      ['=$A$1'],
-    ])
+  describe("different sheet", () => {
+    it("different sheet", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['foo'],
+          // new row
+          ['1']
+        ],
+        Sheet2: [
+          ['=$Sheet1.A2']
+        ]
+      })
 
-    engine.addRows(0, 1, 1)
+      engine.addRows(0, 1, 1)
 
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute(0, 0, 0))
-  })
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 2))
 
-  it('same sheet, case Ab', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=A$2'],
-      // new row
-      ['42'],
-    ])
+      expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['foo'],
+          [''],
+          ['1']
+        ],
+        Sheet2: [
+          ['=$Sheet1.A3']
+        ]
+      }))
+    })
 
-    engine.addRows(0, 1, 1)
+    it("adding row in different sheet but same row as formula should update dependency in formula", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['1']
+        ],
+        Sheet2: [
+          ['=$Sheet1.A1']
+        ]
+      })
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 2))
-  })
+      engine.addRows(0, 0, 1)
 
-  it('same sheet, case Raa', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=A2'],
-      ['13'],
-      // new row
-      ['42'],
-    ])
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 1))
+    })
 
-    engine.addRows(0, 2, 1)
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
-  })
+    it("adding row in different sheet but same row as formula should not update formula address", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['1']
+        ],
+        Sheet2: [
+          ['=$Sheet1.A1']
+        ]
+      })
 
-  it('same sheet, case Rab', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['42'],
-      ['13'],
-      // new row
-      ['=A2'],
-    ])
+      engine.addRows(0, 0, 1)
 
-    engine.addRows(0, 2, 1)
+      const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
 
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(0, 0, -2))
-  })
-
-  it('same sheet, case Rba', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=A3'],
-      ['13'],
-      // new row
-      ['42'],
-    ])
-
-    engine.addRows(0, 2, 1)
-
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 3))
-  })
-
-  it('same sheet, case Rbb', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['42'],
-      // new row
-      ['=A3'],
-      ['13'],
-    ])
-
-    engine.addRows(0, 1, 1)
-
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(0, 0, 1))
-  })
-
-  it('same sheet, same row', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['42'],
-      ['43', '=A2'],
-    ])
-
-    engine.addRows(0, 1, 1)
-
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(0, -1, 0))
+      expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+      formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
+      expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    })
   })
 })
 
@@ -491,72 +562,5 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
-  })
-})
-
-describe("different sheet", () => {
-  it("different sheet", () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['foo'],
-        // new row
-        ['1']
-      ],
-      Sheet2: [
-        ['=$Sheet1.A2']
-      ]
-    })
-
-    engine.addRows(0, 1, 1)
-
-    expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 2))
-
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['foo'],
-        [''],
-        ['1']
-      ],
-      Sheet2: [
-        ['=$Sheet1.A3']
-      ]
-    }))
-  })
-
-  it("adding row in different sheet but same row as formula should update dependency in formula", () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        // new row
-        ['1']
-      ],
-      Sheet2: [
-        ['=$Sheet1.A1']
-      ]
-    })
-
-    engine.addRows(0, 0, 1)
-
-    expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 1))
-  })
-
-
-  it("adding row in different sheet but same row as formula should not update formula address", () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        // new row
-        ['1']
-      ],
-      Sheet2: [
-        ['=$Sheet1.A1']
-      ]
-    })
-
-    engine.addRows(0, 0, 1)
-
-    const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
-
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
-    formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
   })
 })

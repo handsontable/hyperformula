@@ -45,7 +45,7 @@ export namespace AddRowsDependencyTransformer {
             return dependencyAddress.shiftedByRows(-numberOfRows)
           }
         } else {
-          if (formulaAddress.sheet !== sheetInWhichWeAddRows) {
+          if (formulaAddress.sheet !== sheetInWhichWeAddRows) { // Case sheet3
             return dependencyAddress.shiftedByRows(numberOfRows)
           } else if (formulaAddress.row < row) { // Case Rba
             return dependencyAddress.shiftedByRows(numberOfRows)
