@@ -289,6 +289,177 @@ describe('Adding row - fixing dependencies', () => {
     })
   })
 
+  xdescribe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
+    it("n < R < r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [''],
+          // new row
+          [''],
+          ['=$Sheet2.A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(0, 0, -3))
+    })
+
+    it("n < R = r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [''],
+          // new row
+          ['=$Sheet2.A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -2))
+    })
+
+    it("n = R < r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          [''],
+          ['=$Sheet2.A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -2))
+    })
+
+    it("n = R = r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['=$Sheet2.A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(0, 0, -1))
+    })
+
+
+    it("R < n < r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          [''],
+          [''],
+          ['=$Sheet2.A2'],
+        ],
+        Sheet2: [
+          [''],
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(0, 0, -2))
+    })
+
+    it("R < n = r", () => { // also R 
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          [''],
+          ['=$Sheet2.A2'],
+        ],
+        Sheet2: [
+          [''],
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -1))
+    })
+
+    // "R = n < r" already above as "n = R < r"
+    
+    // "R = n = r" already above
+
+
+    it("R < r < n", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          [''],
+          ['=$Sheet2.A3'],
+        ],
+        Sheet2: [
+          [''],
+          [''],
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, 0))
+    })
+
+    // "R < r = n" already above as "R < n = r"
+
+    it("R = r < n", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['=$Sheet2.A2'],
+        ],
+        Sheet2: [
+          [''],
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(0, 0, 0))
+    })
+
+    // "R = n = r" already above
+
+
+    // Actually "r ? R ? n", "r ? n ? R", "n ? r ? R" could be written
+    it("r < R", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=$Sheet2.A1'],
+          // new row
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr("A1"))).toEqual(CellAddress.relative(0, 0, 0))
+    })
+  })
+
   describe('formula address sheet different than dependency address sheet and sheet in which we add rows (case 3)', () => {
     it("dependency address before added row", () => {
       const engine = HandsOnEngine.buildFromSheets({
