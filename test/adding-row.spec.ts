@@ -130,6 +130,26 @@ describe('Adding row - FormulaCellVertex#address update', () => {
     vertex = engine.addressMapping.fetchCell(adr('A2')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A2'))
   })
+
+  it("adding row in different sheet but same row as formula should not update formula address", () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        // new row
+        ['1']
+      ],
+      Sheet2: [
+        ['=$Sheet1.A1']
+      ]
+    })
+
+    engine.addRows(0, 0, 1)
+
+    const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
+
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
+    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+  })
 })
 
 describe('Adding row - matrices adjustments', () => {
@@ -323,56 +343,6 @@ describe('Adding row - fixing dependencies', () => {
 
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 1))
       expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 1, -1))
-    })
-  })
-
-  describe("different sheet", () => {
-    it("different sheet", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          ['foo'],
-          // new row
-          ['1']
-        ],
-        Sheet2: [
-          ['=$Sheet1.A2']
-        ]
-      })
-
-      engine.addRows(0, 1, 1)
-
-      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 2))
-
-      expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          ['foo'],
-          [''],
-          ['1']
-        ],
-        Sheet2: [
-          ['=$Sheet1.A3']
-        ]
-      }))
-    })
-
-    it("adding row in different sheet but same row as formula should not update formula address", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          // new row
-          ['1']
-        ],
-        Sheet2: [
-          ['=$Sheet1.A1']
-        ]
-      })
-
-      engine.addRows(0, 0, 1)
-
-      const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
-
-      expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
-      formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-      expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
     })
   })
 })
