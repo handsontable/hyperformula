@@ -53,6 +53,7 @@ export namespace AddRowsDependencyTransformer {
         return dependencyAddress.shiftedByRows(-numberOfRows)
       }
 
+      // Case 1
       if (dependencyAddress.isRowAbsolute()) {
         if (dependencyAddress.row < row) { // Case Aa
           return false
