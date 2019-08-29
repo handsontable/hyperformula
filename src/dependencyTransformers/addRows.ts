@@ -54,10 +54,6 @@ export namespace AddRowsDependencyTransformer {
       }
 
       if (dependencyAddress.isRowAbsolute()) {
-        if (sheetInWhichWeAddRows !== dependencyAddress.sheet) {
-          return false
-        }
-
         if (dependencyAddress.row < row) { // Case Aa
           return false
         } else { // Case Ab
