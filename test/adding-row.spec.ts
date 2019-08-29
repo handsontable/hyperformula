@@ -305,7 +305,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 1, 1)
 
-      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(0, 0, -3))
+      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(1, 0, -3))
     })
 
     it("n < R = r", () => {
@@ -322,7 +322,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 1, 1)
 
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -2))
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -2))
     })
 
     it("n = R < r", () => {
@@ -339,7 +339,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -2))
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -2))
     })
 
     it("n = R = r", () => {
@@ -355,7 +355,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(0, 0, -1))
+      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(1, 0, -1))
     })
 
 
@@ -375,7 +375,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(0, 0, -2))
+      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(1, 0, -2))
     })
 
     it("R < n = r", () => { // also R 
@@ -393,7 +393,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, -1))
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -1))
     })
 
     // "R = n < r" already above as "n = R < r"
@@ -417,7 +417,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(0, 0, 0))
+      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, 0))
     })
 
     // "R < r = n" already above as "R < n = r"
@@ -436,7 +436,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 0, 1)
 
-      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(0, 0, 0))
+      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(1, 0, 0))
     })
 
     // "R = n = r" already above
@@ -456,7 +456,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, 1, 1)
 
-      expect(extractReference(engine, adr("A1"))).toEqual(CellAddress.relative(0, 0, 0))
+      expect(extractReference(engine, adr("A1"))).toEqual(CellAddress.relative(1, 0, 0))
     })
   })
 
