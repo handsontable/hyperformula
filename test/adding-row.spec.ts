@@ -512,41 +512,22 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('sheet where we add rows different than dependency address and formula address (case 4)', () => {
-    it('absolute address', () => {
+    it('works', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A$2'],
-          // new row
+          ['=A2'],
           ['13'],
         ],
         Sheet2: [
-          ['42'],
+          [''],
+          // new row
           ['78'],
         ],
       })
 
-      engine.addRows(0, 1, 1)
+      engine.addRows(1, 1, 1)
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
-    })
-
-    it('relative address', () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          ['42'],
-          // new row
-          ['13'],
-        ],
-        Sheet2: [
-          ['=A2'],
-          ['=B1'],
-        ],
-      })
-
-      engine.addRows(0, 1, 1)
-
-      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 1))
-      expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 1, -1))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
     })
   })
 })
