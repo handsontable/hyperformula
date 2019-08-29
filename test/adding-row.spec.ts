@@ -289,7 +289,7 @@ describe('Adding row - fixing dependencies', () => {
     })
   })
 
-  xdescribe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
+  describe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
     it("n < R < r", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
