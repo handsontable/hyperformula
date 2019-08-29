@@ -289,8 +289,25 @@ describe('Adding row - fixing dependencies', () => {
     })
   })
 
-  describe('formula address sheet different than dependency address sheet and sheet in which we add rows', () => {
-    it("adding row in different sheet but same row as formula should update dependency in formula", () => {
+  describe('formula address sheet different than dependency address sheet and sheet in which we add rows (case 3)', () => {
+    it("dependency address before added row", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['1'],
+          ['2'],
+        ],
+        Sheet2: [
+          ['=$Sheet1.A2']
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 2))
+    })
+
+    it("dependency address at added row", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           // new row
@@ -304,6 +321,22 @@ describe('Adding row - fixing dependencies', () => {
       engine.addRows(0, 0, 1)
 
       expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 1))
+    })
+
+    it("dependency address after added row", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['1'],
+          // new row
+        ],
+        Sheet2: [
+          ['=$Sheet1.A1']
+        ]
+      })
+
+      engine.addRows(0, 1, 1)
+
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 0))
     })
   })
 

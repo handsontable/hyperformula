@@ -21,9 +21,22 @@ export namespace AddRowsDependencyTransformer {
 
   export function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+      // Case 4
       if ((dependencyAddress.sheet === formulaAddress.sheet)
           && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
         return false
+      }
+
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+
+      // Case 3
+      if ((dependencyAddress.sheet === sheetInWhichWeAddRows)
+          && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
+        if (row <= absolutizedDependencyAddress.row) {
+          return dependencyAddress.shiftedByRows(numberOfRows)
+        } else {
+          return false
+        }
       }
 
       if (dependencyAddress.isRowAbsolute()) {
@@ -37,7 +50,6 @@ export namespace AddRowsDependencyTransformer {
           return dependencyAddress.shiftedByRows(numberOfRows)
         }
       } else {
-        const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
         if (absolutizedDependencyAddress.row < row) {
           if (formulaAddress.row < row) { // Case Raa
             return false
@@ -45,9 +57,7 @@ export namespace AddRowsDependencyTransformer {
             return dependencyAddress.shiftedByRows(-numberOfRows)
           }
         } else {
-          if (formulaAddress.sheet !== sheetInWhichWeAddRows) { // Case sheet3
-            return dependencyAddress.shiftedByRows(numberOfRows)
-          } else if (formulaAddress.row < row) { // Case Rba
+          if (formulaAddress.row < row) { // Case Rba
             return dependencyAddress.shiftedByRows(numberOfRows)
           } else { // Case Rbb
             return false
