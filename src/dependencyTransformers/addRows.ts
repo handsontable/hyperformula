@@ -42,6 +42,10 @@ export namespace AddRowsDependencyTransformer {
       // Case 2
       if ((formulaAddress.sheet === sheetInWhichWeAddRows)
           && (dependencyAddress.sheet !== sheetInWhichWeAddRows)) {
+        if (dependencyAddress.isRowAbsolute()) {
+          return false
+        }
+
         if (formulaAddress.row < row) {
           return false
         }

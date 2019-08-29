@@ -290,6 +290,22 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
+    it("absolute case", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          // new row
+          ['=$Sheet2.A$1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addRows(0, 0, 1)
+
+      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+    })
+
     it("n < R < r", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
