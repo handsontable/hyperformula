@@ -4,33 +4,17 @@ import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
-import {adr, extractRange, extractReference, expectEngineToBeTheSameAs, extractMatrixRange} from './testUtils'
+import {
+  adr,
+  extractRange,
+  extractReference,
+  expectEngineToBeTheSameAs,
+  extractMatrixRange,
+  expect_reference_to_have_ref_error
+} from './testUtils'
 
-describe('Move cells', () => {
-  it('should move static content', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['foo'],
-      [''],
-    ])
-
-    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
-
-    expect(engine.getCellValue('A2')).toEqual('foo')
-  })
-
-  it('should update reference of moved formula', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['foo' /* =A1 */],
-      ['=A1'],
-    ])
-
-    engine.moveCells(adr('A2'), 1, 1, adr('B1'))
-
-    const reference = extractReference(engine, adr('B1'))
-    expect(reference).toEqual(CellAddress.relative(0, -1, 0))
-  })
-
-  it('should update reference of moved formula - different types of reference', () => {
+describe('Address dependencies, moved formulas', () => {
+  it('case RAaa: should update dependency to external cell when not overriding it', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo'],
       ['=A1'],
@@ -45,6 +29,78 @@ describe('Move cells', () => {
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(0, 0, -1))
     expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(0, -1, 0))
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(0, 0, 0))
+  })
+
+  xit('case RAab: should return #REF when overriding referred dependency to external cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B1', '1'],
+      ['=$B2', '2'],
+      ['=B$3', '3'],
+      ['=$B$4', '4'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 4, adr('B1'))
+
+    expect_reference_to_have_ref_error(engine, adr('B1'))
+    expect_reference_to_have_ref_error(engine, adr('B2'))
+    expect_reference_to_have_ref_error(engine, adr('B3'))
+    expect_reference_to_have_ref_error(engine, adr('B4'))
+  })
+
+  xit('case RAab: should return #REF when any of moved cells overrides external dependency', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B2', '1'],
+      ['3', '2'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 2, adr('B1'))
+
+    expect_reference_to_have_ref_error(engine, adr('B1'))
+  })
+
+  it('case RAba: should update absolute coordinates to internal dependency', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', "=A1"],
+      ['2', "=$A2"],
+      ['3', "=A$3"],
+      ['4', "=$A$4"]
+    ])
+
+    engine.moveCells(adr('A1'), 2, 4, adr('B2'))
+
+    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(0, -1, 3))
+    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
+  })
+
+  xit('case RAba: should return REF when internal dependency goes beyond sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', '=A1'],
+      ['', '', '=$A1'],
+      ['', '', '=A$1'],
+      ['', '', '=$A$1'],
+    ])
+
+    engine.moveCells(adr("B1"), 2, 4, adr("A1"))
+
+    expect_reference_to_have_ref_error(engine, adr('B1'))
+    expect_reference_to_have_ref_error(engine, adr('B2'))
+    expect_reference_to_have_ref_error(engine, adr('B3'))
+    expect_reference_to_have_ref_error(engine, adr('B4'))
+  })
+})
+
+describe('Move cells', () => {
+  it('should move static content', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo'],
+      [''],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('A2'))
+
+    expect(engine.getCellValue('A2')).toEqual('foo')
   })
 
   it('should update reference of moved formula when moving to other sheet', () => {
