@@ -284,6 +284,13 @@ describe('Adding row, ranges', () => {
     engine.addRows(0, 1, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '=SUM(A1:A4)'],
+      ['', ''],
+      ['2', ''],
+      ['3', ''],
+    ]))
   })
 
   it('insert row above range', () => {
@@ -298,6 +305,13 @@ describe('Adding row, ranges', () => {
     engine.addRows(0, 0, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['', ''],
+      ['1', '=SUM(A2:A4)'],
+      ['2', ''],
+      ['3', ''],
+    ]))
   })
 
   it('insert row below range', () => {
@@ -311,13 +325,20 @@ describe('Adding row, ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
     engine.addRows(0, 3, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '=SUM(A1:A3)'],
+      ['2', ''],
+      ['3', ''],
+      ['', ''],
+    ]))
   })
 
   it('it should insert new cell with edge to only one range below', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
-      //
+      // new row
       ['3', '=SUM(A1:A3)'],
       ['4', '=SUM(A1:A4)'],
     ])
@@ -336,7 +357,7 @@ describe('Adding row, ranges', () => {
       ['1', ''],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
-      //
+      // new row
       ['4', '=SUM(A1:A3)'],
     ])
 
@@ -344,12 +365,20 @@ describe('Adding row, ranges', () => {
 
     const a4 = engine.addressMapping.getCell(adr('A4'))
     expect(a4).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['2', '=SUM(A1:A1)'],
+      ['3', '=SUM(A1:A2)'],
+      ['', ''],
+      ['4', '=SUM(A1:A3)'],
+    ]))
   })
 
   it('range start in row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A2:A4)'],
       ['3', ''],
       ['4', ''],
@@ -359,12 +388,20 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A3:A5)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range start above row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A1:A4)'],
       ['3', ''],
       ['4', ''],
@@ -376,12 +413,20 @@ describe('Adding row, ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A5'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A1:A5)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range start below row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A3:A4)'],
       ['3', ''],
       ['4', ''],
@@ -391,12 +436,20 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A4:A5)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range end above row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A1:A1)'],
       ['3', ''],
       ['4', ''],
@@ -406,12 +459,20 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A1:A1)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A1:A2)'],
       ['3', ''],
       ['4', ''],
@@ -424,12 +485,20 @@ describe('Adding row, ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A1:A3)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range end below row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A1:A3)'],
       ['3', ''],
       ['4', ''],
@@ -442,12 +511,20 @@ describe('Adding row, ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A4'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A1:A4)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 
   it('range start and end in a row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', ''],
-      //
+      // new row
       ['2', '=SUM(A2:A2)'],
       ['3', ''],
       ['4', ''],
@@ -457,5 +534,13 @@ describe('Adding row, ranges', () => {
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', ''],
+      ['', ''],
+      ['2', '=SUM(A3:A3)'],
+      ['3', ''],
+      ['4', ''],
+    ]))
   })
 })

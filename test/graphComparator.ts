@@ -1,7 +1,7 @@
 import {deepStrictEqual, strictEqual} from 'assert'
 import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {SimpleCellAddress, simpleCellAddress, sheetCellAddressToString} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
@@ -80,7 +80,8 @@ export class EngineComparator {
         for (const adjacentNode of actualGraph.adjacentNodes(actualVertex)) {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, 'Dependent vertices are not same')
+        const sheetMapping = this.expected.sheetMapping
+        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${sheetCellAddressToString(address)} (Sheet '${sheetMapping.name(address.sheet)}') are not same`)
       }
     }
   }
