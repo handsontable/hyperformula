@@ -21,8 +21,8 @@ export namespace AddRowsDependencyTransformer {
 
   export function transformDependencies(sheetInWhichWeAddRows: number, row: number, numberOfRows: number): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-      // Case 4
-      if ((dependencyAddress.sheet === formulaAddress.sheet)
+      // Case 4 and 5
+      if ((dependencyAddress.sheet !== sheetInWhichWeAddRows)
           && (formulaAddress.sheet !== sheetInWhichWeAddRows)) {
         return false
       }

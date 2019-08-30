@@ -364,6 +364,30 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
     })
   })
+
+  describe('each sheet different (case 5)', () => {
+    it('works', () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=$Sheet2.A2'],
+          ['13'],
+        ],
+        Sheet2: [
+          [''],
+          ['78'],
+        ],
+        Sheet3: [
+          [''],
+          // new row
+          [''],
+        ]
+      })
+
+      engine.addRows(2, 1, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
+    })
+  })
 })
 
 describe('Adding row, ranges', () => {
