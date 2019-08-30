@@ -256,6 +256,43 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   })
 })
 
+describe('Address dependencies, Case 4: remove rows in sheet different than formula or dependency sheet', () => {
+  it('should not affect dependency when removing rows in not relevant sheet', function () {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'], // to remove
+      ],
+      Sheet2: [
+        ['1'],
+        ['=A1']
+      ],
+    })
+
+    engine.removeRows(0, 0, 0)
+
+    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 0, -1))
+  });
+
+  it('should not affect dependency when removing rows in not relevant sheet, more sheets', function () {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'], // to remove
+      ],
+      Sheet2: [
+        ['foo'],
+      ],
+      Sheet3: [
+        ['1'],
+        ['=$Sheet2.A1']
+      ],
+    })
+
+    engine.removeRows(0, 0, 0)
+
+    expect(extractReference(engine, adr('A2', 2))).toEqual(CellAddress.relative(1, 0, -1))
+  });
+})
+
 describe('Removing rows - range dependencies, same sheet', () => {
   it('truncates range by one row from top if topmost row removed', () => {
     const engine = HandsOnEngine.buildFromArray([
