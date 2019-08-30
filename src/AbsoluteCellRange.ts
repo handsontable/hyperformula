@@ -200,6 +200,11 @@ export class AbsoluteCellRange {
     this.end.col += numberOfColumns
   }
 
+  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, this.start.row + byRows), this.width(), this.height())
+  }
+
+
   public expandByColumns(numberOfColumns: number) {
     this.end.col += numberOfColumns
   }

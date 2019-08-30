@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
-import {transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
+import {transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -24,8 +24,8 @@ export namespace MoveCellsDependencyTransformer {
       const newAst = transformAddressesInFormula(
           node.getFormula(graph.lazilyTransformingAstService),
           node.getAddress(graph.lazilyTransformingAstService),
-          fixDependenciesInMovedCells(-toRight, -toBottom),
-          transformCellRangeByReferences(fixDependenciesInMovedCells(-toRight, -toBottom))
+          fixDependenciesInMovedCells(sourceRange, toRight, toBottom),
+          transformCellRangeByReferences(fixDependenciesInMovedCells(sourceRange, toRight, toBottom))
       )
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
@@ -37,9 +37,24 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesInMovedCells(toRight: number, toBottom: number): TransformCellAddressFunction {
-    return (dependencyAddress: CellAddress, _) => {
-      return dependencyAddress.shiftRelativeDimensions(toRight, toBottom)
+  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): TransformCellAddressFunction {
+    return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+      const targetRange = sourceRange.shifted(toRight, toBottom)
+
+      /* If dependency is external and moved range overrides it return REF */
+      const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      if (!sourceRange.addressInRange(absoluteDependencyAddress) && targetRange.addressInRange(absoluteDependencyAddress)) {
+        return ErrorType.REF
+      }
+
+      const shiftedAddress = dependencyAddress.shiftRelativeDimensions(-toRight, -toBottom)
+      const targetFormulaAddress = simpleCellAddress(formulaAddress.sheet, formulaAddress.col + toRight, formulaAddress.row + toBottom)
+      const newAbsoluteDependencyAddress = shiftedAddress.toSimpleCellAddress(targetFormulaAddress)
+      if (newAbsoluteDependencyAddress.row < 0 || newAbsoluteDependencyAddress.col < 0) { // If new address is out of bound, return REF
+        return ErrorType.REF
+      }
+
+      return shiftedAddress
     }
   }
 
