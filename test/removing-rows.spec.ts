@@ -161,7 +161,7 @@ describe('Removing rows - address dependencies, formula in sheet where we make c
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
   })
 
-  xit('removing row above formula should shift dependency', () => {
+  it('removing row above formula should shift dependency', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
@@ -211,7 +211,7 @@ describe('Removing rows - formula in different sheet', () => {
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
-  xit('removing row below dependency should not affect relative address', () => {
+  it('removing row below dependency should not affect relative address', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
@@ -231,7 +231,7 @@ describe('Removing rows - formula in different sheet', () => {
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -2))
   })
 
-  xit('removing row above dependency should shift relative address', () => {
+  it('removing row above dependency should shift relative address', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A3'],
