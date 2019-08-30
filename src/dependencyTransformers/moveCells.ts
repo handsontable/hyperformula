@@ -8,7 +8,12 @@ import {RowsSpan} from "../RowsSpan";
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    transformMatrices(sourceRange, toRight, toBottom, toSheet, graph, parser)
+    for (const node of graph.matrixFormulaNodes()) {
+      node.getFormula()
+      const newAst = transformDependentFormulas(node.getFormula()!, node.getAddress(), sourceRange, toRight, toBottom, toSheet)
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
+    }
   }
 
   export function transform2(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
@@ -28,15 +33,6 @@ export namespace MoveCellsDependencyTransformer {
     } else {
       const newAst = transformDependentFormulas(ast, nodeAddress, transformation.sourceRange, transformation.toRight, transformation.toBottom, transformation.toSheet)
       return [newAst, nodeAddress]
-    }
-  }
-
-  function transformMatrices(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.matrixFormulaNodes()) {
-      node.getFormula()
-      const newAst = transformDependentFormulas(node.getFormula()!, node.getAddress(), sourceRange, toRight, toBottom, toSheet)
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
     }
   }
 
