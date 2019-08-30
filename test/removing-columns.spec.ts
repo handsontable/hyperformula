@@ -6,6 +6,344 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig.ts'
 import {extractMatrixRange, extractRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
+describe('Address dependencies, Case 1: same sheet', () => {
+  it('case Aa: absolute dependency before removed column should not be affected', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['', '1', '', '=$B1']
+    ])
+
+    engine.removeColumns(0, 2)
+
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+  })
+
+  it('case Ab: absolute dependency after removed column should be shifted', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=$C1', '', '42'],
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+  })
+
+  it('case Ac: absolute dependency in removed column range should be replaced by #REF', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=$B1', ''],
+    ])
+
+    engine.removeColumns(0, 1)
+
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('case Raa: relative dependency and formula before removed columns should not be affected', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '=A1', '2'],
+    ])
+
+    engine.removeColumns(0, 2, 2)
+
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
+  it('case Rab: relative address should be shifted when only formula is moving', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '1', '2', '=A1'],
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+  })
+
+  it('case Rba: relative address should be shifted when only dependency is moving', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=D1', '1', '2', '42'],
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=D1', '42'],
+    ])
+
+    engine.removeColumns(0, 0, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+  })
+
+  it('case Rca: relative dependency in deleted column range should be replaced by #REF', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=C1', '1', '2', '3'],
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('case Rcb: relative dependency in deleted column range should be replaced by #REF', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '3', '=B1'],
+    ])
+
+    engine.removeColumns(0, 0, 1)
+
+    expect_reference_to_have_ref_error(engine, adr('B1'))
+  })
+
+  it('case Rca, range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=SUM(B1:C1)', '1' , '2'],
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect_function_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('truncates range by one column from left if first column removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B1)']
+    ])
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
+  })
+
+  it('truncates range by one column from right if last column removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B1)']
+    ])
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4'],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', '1', '2', '3', '4'],
+      ['=SUM(C1:F1)']
+    ])
+
+    engine.removeColumns(0, 1, 3)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range but may end on start', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '', '1', '2', '3', '4'],
+      ['=SUM(C1:F1)']
+    ])
+
+    engine.removeColumns(0, 1, 2)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4'],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 3, 4)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4', ''],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 3, 5)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+
+  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range but may start on end', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3', '4', ''],
+      ['=SUM(B1:E1)']
+    ])
+
+    engine.removeColumns(0, 4, 5)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
+  })
+})
+
+describe('Address dependencies, Case 2: formula in sheet where we make crud with dependency to other sheet', () => {
+  it('case A: should not affect absolute dependencies', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '=$Sheet2.$A1'],
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+  })
+
+  it('case Ra: removing column before formula should shift dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1', '=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+  })
+
+  it('case Rb: removing column after formula should not affect dependency', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1', '1'],
+      ],
+      Sheet2: [
+        ['2'],
+      ],
+    })
+
+    engine.removeColumns(0, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+  })
+})
+
+describe('Address dependencies, Case 3: formula in different sheet', () => {
+  it('case ARa: relative/absolute dependency after removed column should be shifted ', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.C1', '=$Sheet2.C1', '=$Sheet2.C1', '=$Sheet2.$C1'],
+      ],
+      Sheet2: [
+        ['1', '2', '3'],
+      ],
+    })
+
+    engine.removeColumns(1, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(1, -1, 0))
+    expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.absoluteCol(1, 1, 0))
+  })
+
+  it('case ARb: relative/absolute dependency before removed column should not be affected', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1', '=$Sheet2.$A1'],
+      ],
+      Sheet2: [
+        ['0', '1'],
+      ],
+    })
+
+    engine.removeColumns(1, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+  })
+
+  it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.$A1', '=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['1', '2']
+      ],
+    })
+
+    engine.removeColumns(1, 0, 0)
+
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expect_reference_to_have_ref_error(engine, adr('B1'))
+  })
+
+  it('does not truncate any ranges if columns are removed from different sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['', '2', '3'],
+        ['=SUM(B1:C1)']
+      ],
+      Sheet2: [
+        ['1']
+      ],
+    })
+
+    engine.removeColumns(1, 1, 1)
+
+    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
+  })
+})
+
+describe('Address dependencies, Case 4: remove columns in sheet different than formula or dependency sheet', () => {
+  it('should not affect dependency when removing columns in not relevant sheet', function () {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'],
+      ],
+      Sheet2: [
+        ['1', '=A1'],
+      ],
+    })
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 0))
+  });
+
+  it('should not affect dependency when removing columns in not relevant sheet, more sheets', function () {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['1'],
+      ],
+      Sheet2: [
+        ['foo'],
+      ],
+      Sheet3: [
+        ['1', '=$Sheet2.A1'],
+      ],
+    })
+
+    engine.removeColumns(0, 0, 0)
+
+    expect(extractReference(engine, adr('B1', 2))).toEqual(CellAddress.relative(1, -1, 0))
+  });
+})
+
 describe('Removing columns - reevaluation', () => {
   it('reevaluates', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -233,211 +571,6 @@ describe('Removing columns - dependencies', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
   })
 
-  it('same sheet, case Aa', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '1', '', '=$B1'],
-               /**/
-    ])
-
-    engine.removeColumns(0, 2)
-
-    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
-  })
-
-  it('same sheet, case Ab', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=$C1', '', '42'],
-              /**/
-    ])
-
-    engine.removeColumns(0, 1)
-
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
-  })
-
-  it('same sheet, case Ac', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=$B1', ''],
-              /**/
-    ])
-
-    engine.removeColumns(0, 1)
-
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('same sheet, case Raa', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['42', '=A1', '2'],
-                    /**/
-    ])
-
-    engine.removeColumns(0, 2, 2)
-
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
-  })
-
-  it('same sheet, case Rab', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['42', '1', '=A1'],
-            /**/
-    ])
-
-    engine.removeColumns(0, 1)
-
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
-  })
-
-  it('same sheet, case Rba', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=C1', '1', '42'],
-              /**/
-    ])
-
-    engine.removeColumns(0, 1)
-
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
-  })
-
-  it('same sheet, case Rbb', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '=C1', '42'],
-      /**/
-    ])
-
-    engine.removeColumns(0, 0)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
-  })
-
-  it('same sheet, case Rca', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=B1', '1'],
-             /**/
-    ])
-
-    engine.removeColumns(0, 1)
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('same sheet, case Rcb', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '=A1'],
-    ])
-
-    engine.removeColumns(0, 0)
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('same sheet, case Rca, range', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['=SUM(B1:C1)', '1', '2'],
-    ])
-
-    engine.removeColumns(0, 1, 2)
-
-    expect_function_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('truncates range by one column from left if first column removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=SUM(A1:B1)']
-    ])
-
-    engine.removeColumns(0, 0, 0)
-
-    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
-  })
-
-  it('truncates range by one column from right if last column removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=SUM(A1:B1)']
-    ])
-
-    engine.removeColumns(0, 1, 1)
-
-    expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('A1')))
-  })
-
-  it('truncates range by columns from left if leftmost columns removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '1', '2', '3', '4'],
-      ['=SUM(B1:E1)']
-    ])
-
-    engine.removeColumns(0, 1, 2)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
-  })
-
-  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '', '1', '2', '3', '4'],
-      ['=SUM(C1:F1)']
-    ])
-
-    engine.removeColumns(0, 1, 3)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
-  })
-
-  it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range but may end on start', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '', '1', '2', '3', '4'],
-      ['=SUM(C1:F1)']
-    ])
-
-    engine.removeColumns(0, 1, 2)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
-  })
-
-  it('truncates range by columns from right if rightmost columns removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '1', '2', '3', '4'],
-      ['=SUM(B1:E1)']
-    ])
-
-    engine.removeColumns(0, 3, 4)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
-  })
-
-  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '1', '2', '3', '4', ''],
-      ['=SUM(B1:E1)']
-    ])
-
-    engine.removeColumns(0, 3, 5)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('C1')))
-  })
-
-  it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range but may start on end', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '1', '2', '3', '4', ''],
-      ['=SUM(B1:E1)']
-    ])
-
-    engine.removeColumns(0, 4, 5)
-
-    expect(extractRange(engine, adr('A2'))).toEqual(new AbsoluteCellRange(adr('B1'), adr('D1')))
-  })
-
-  it('does not truncate any ranges if columns are removed from different sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['1', '2', '=SUM(A1:B1)']
-      ],
-      Sheet2: [
-        ['1']
-      ],
-    })
-
-    engine.removeColumns(1, 0, 0)
-
-    expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
-  })
 })
 
 describe('Removing columns - ranges', function() {
@@ -482,4 +615,19 @@ describe('Removing columns - ranges', function() {
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
+})
+
+it('does not truncate any ranges if columns are removed from different sheet', () => {
+  const engine = HandsOnEngine.buildFromSheets({
+    Sheet1: [
+      ['1', '2', '=SUM(A1:B1)']
+    ],
+    Sheet2: [
+      ['1']
+    ],
+  })
+
+  engine.removeColumns(1, 0, 0)
+
+  expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
 })
