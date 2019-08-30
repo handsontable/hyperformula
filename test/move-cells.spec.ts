@@ -14,7 +14,7 @@ import {
 } from './testUtils'
 
 describe('Address dependencies, moved formulas', () => {
-  it('case RAaa: should update dependency to external cell when not overriding it', () => {
+  it('should update dependency to external cell when not overriding it', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['foo'],
       ['=A1'],
@@ -31,7 +31,7 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(0, 0, 0))
   })
 
-  xit('case RAab: should return #REF when overriding referred dependency to external cell', () => {
+  it('should return #REF when overriding referred dependency to external cell', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=B1', '1'],
       ['=$B2', '2'],
@@ -47,7 +47,7 @@ describe('Address dependencies, moved formulas', () => {
     expect_reference_to_have_ref_error(engine, adr('B4'))
   })
 
-  xit('case RAab: should return #REF when any of moved cells overrides external dependency', () => {
+  it('should return #REF when any of moved cells overrides external dependency', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],
@@ -58,7 +58,18 @@ describe('Address dependencies, moved formulas', () => {
     expect_reference_to_have_ref_error(engine, adr('B1'))
   })
 
-  it('case RAba: should update absolute coordinates to internal dependency', () => {
+  it("should update internal dependency when overriding dependent cell", () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=B$2', ''],
+      ['', ''],
+    ])
+
+    engine.moveCells(adr("A1"), 2, 2, adr("B2"))
+
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(0, 1, 2))
+  })
+
+  it('should update coordinates to internal dependency', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', "=A1"],
       ['2', "=$A2"],
@@ -74,7 +85,7 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
   })
 
-  xit('case RAba: should return REF when internal dependency goes beyond sheet', () => {
+  it('should return REF when internal dependency goes beyond sheet', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '', '=A1'],
       ['', '', '=$A1'],
