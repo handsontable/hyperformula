@@ -500,6 +500,14 @@ export class DependencyGraph {
     }, vertices) as IterableIterator<FormulaCellVertex>
   }
 
+  public forceApplyPostponedTransformations() {
+    for (const vertex of this.graph.nodes.values()) {
+      if (vertex !== null && vertex instanceof FormulaCellVertex) {
+        vertex.ensureRecentData(this.lazilyTransformingAstService)
+      }
+    }
+  }
+
   public volatileVertices() {
     return this.graph.specialNodes
   }

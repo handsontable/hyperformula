@@ -31,7 +31,7 @@ export class FormulaCellVertex {
     return this.formula
   }
 
-  private ensureRecentData(updatingService: LazilyTransformingAstService) {
+  public ensureRecentData(updatingService: LazilyTransformingAstService) {
     if (this.version != updatingService.version()) {
       const [newAst, newAddress, newVersion] = updatingService.applyTransformations(this.formula, this.address, this.version)
       this.formula = newAst

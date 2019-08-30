@@ -243,6 +243,10 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public forceApplyPostponedTransformations() {
+    this.dependencyGraph.forceApplyPostponedTransformations()
+  }
+
   public disableNumericMatrices() {
     this.dependencyGraph.disableNumericMatrices()
   }
