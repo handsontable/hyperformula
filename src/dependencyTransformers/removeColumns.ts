@@ -54,40 +54,63 @@ export namespace RemoveColumnsDependencyTransformer {
     }
   }
 
-  export function transformDependencies(columnsSpan: ColumnsSpan): TransformCellAddressFunction {
+  export function transformDependencies(removedColumns: ColumnsSpan): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-      if ((dependencyAddress.sheet === formulaAddress.sheet)
-          && (formulaAddress.sheet !== columnsSpan.sheet)) {
+      // Case 4
+      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet !== dependencyAddress.sheet) {
         return false
       }
 
-      if (dependencyAddress.isColumnAbsolute()) {
-        if (columnsSpan.sheet !== dependencyAddress.sheet) {
+      // Case 3 -- removed column in same sheet where dependency is but formula in different
+      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet === dependencyAddress.sheet) {
+        const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+        if (absoluteDependencyAddress.col < removedColumns.columnStart) { // 3.ARa
           return false
+        } else if (absoluteDependencyAddress.col > removedColumns.columnEnd) { // 3.ARb
+          return dependencyAddress.shiftedByColumns(-removedColumns.numberOfColumns)
         }
+      }
 
-        if (dependencyAddress.col < columnsSpan.columnStart) { // Aa
+      // Case 2 -- removed column in same sheet where formula but dependency in different sheet
+      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet !== dependencyAddress.sheet) {
+        if (dependencyAddress.isColumnAbsolute()) { // 2.A
           return false
-        } else if (dependencyAddress.col >= columnsSpan.columnStart + columnsSpan.numberOfColumns) { // Ab
-          return dependencyAddress.shiftedByColumns(-columnsSpan.numberOfColumns)
-        }
-      } else {
-        const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-        if (absolutizedDependencyAddress.col < columnsSpan.columnStart) {
-          if (formulaAddress.col < columnsSpan.columnStart) {  // Raa
+        } else {
+          if (formulaAddress.col < removedColumns.columnStart) { // 2.Ra
             return false
-          } else if (formulaAddress.col >= columnsSpan.columnStart + columnsSpan.numberOfColumns) { // Rab
-            return dependencyAddress.shiftedByColumns(columnsSpan.numberOfColumns)
-          }
-        } else if (absolutizedDependencyAddress.col >= columnsSpan.columnStart + columnsSpan.numberOfColumns) {
-          if (formulaAddress.col < columnsSpan.columnStart) {  // Rba
-            return dependencyAddress.shiftedByColumns(-columnsSpan.numberOfColumns)
-          } else if (formulaAddress.col >= columnsSpan.columnStart + columnsSpan.numberOfColumns) { // Rbb
-            return false
+          } else if (formulaAddress.col > removedColumns.columnEnd) { // 2.Rb
+            return dependencyAddress.shiftedByColumns(removedColumns.numberOfColumns)
           }
         }
       }
 
+      // Case 1 -- same sheet
+      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet === dependencyAddress.sheet) {
+        if (dependencyAddress.isColumnAbsolute()) {
+          if (dependencyAddress.col < removedColumns.columnStart) { // 1.Aa
+            return false
+          } else if (dependencyAddress.col > removedColumns.columnEnd) { // 1.Ab
+            return dependencyAddress.shiftedByColumns(-removedColumns.numberOfColumns)
+          }
+        } else {
+          const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+          if (absoluteDependencyAddress.col < removedColumns.columnStart) {
+            if (formulaAddress.col < removedColumns.columnStart) { // 1.Raa
+              return false
+            } else if (formulaAddress.col > removedColumns.columnEnd) { // 1.Rab
+              return dependencyAddress.shiftedByColumns(removedColumns.numberOfColumns)
+            }
+          } else if (absoluteDependencyAddress.col > removedColumns.columnEnd) {
+            if (formulaAddress.col < removedColumns.columnStart) { // 1.Rba
+              return dependencyAddress.shiftedByColumns(-removedColumns.numberOfColumns)
+            } else if (formulaAddress.col > removedColumns.columnEnd) { //1.Rbb
+              return false
+            }
+          }
+        }
+      }
+
+      // 1.Ac, 1.Rca, 1.Rcb, 3.Ac, 3.Rca, 3.Rcb
       return ErrorType.REF
     }
   }
