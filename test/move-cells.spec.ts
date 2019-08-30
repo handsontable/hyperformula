@@ -176,7 +176,7 @@ describe('Move cells', () => {
     expect(reference).toEqual(CellAddress.relative(1, 1, -1))
   })
 
-  xit('should override and remove formula', () => {
+  it('should override and remove formula', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
       ['=A1'],

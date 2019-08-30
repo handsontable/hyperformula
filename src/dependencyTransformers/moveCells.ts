@@ -3,11 +3,32 @@ import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cel
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
 import {transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
+import {MoveCellsTransformation} from "../LazilyTransformingAstService";
+import {RowsSpan} from "../RowsSpan";
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
     transformMatrices(sourceRange, toRight, toBottom, toSheet, graph, parser)
-    transformMovedFormulas(sourceRange, toRight, toBottom, toSheet, graph, parser)
+  }
+
+  export function transform2(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    if (transformation.sourceRange.addressInRange(nodeAddress)) {
+      const newAst = transformAddressesInFormula(
+          ast,
+          nodeAddress,
+          fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
+          transformCellRangeByReferences(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom))
+      )
+
+      return [newAst, {
+        sheet: nodeAddress.sheet,
+        col: nodeAddress.col + transformation.toRight,
+        row: nodeAddress.row + transformation.toBottom,
+      }]
+    } else {
+      const newAst = transformDependentFormulas(ast, nodeAddress, transformation.sourceRange, transformation.toRight, transformation.toBottom, transformation.toSheet)
+      return [newAst, nodeAddress]
+    }
   }
 
   function transformMatrices(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -16,24 +37,6 @@ export namespace MoveCellsDependencyTransformer {
       const newAst = transformDependentFormulas(node.getFormula()!, node.getAddress(), sourceRange, toRight, toBottom, toSheet)
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
-    }
-  }
-
-  function transformMovedFormulas(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
-    for (const node of graph.formulaVerticesInRange(sourceRange)) {
-      const newAst = transformAddressesInFormula(
-          node.getFormula(graph.lazilyTransformingAstService),
-          node.getAddress(graph.lazilyTransformingAstService),
-          fixDependenciesInMovedCells(sourceRange, toRight, toBottom),
-          transformCellRangeByReferences(fixDependenciesInMovedCells(sourceRange, toRight, toBottom))
-      )
-      const cachedAst = parser.rememberNewAst(newAst)
-      node.setFormula(cachedAst)
-      node.setAddress({
-        sheet: node.address.sheet,
-        col: node.address.col + toRight,
-        row: node.address.row + toBottom,
-      })
     }
   }
 
@@ -62,10 +65,7 @@ export namespace MoveCellsDependencyTransformer {
   }
 
   function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    /* We don't want to modify formulas in moved range second time */
-    /* Formulas that are in moved range have already changed their address so we need to check targetRange */
-    const targetRange = sourceRange.shifted(toRight, toBottom)
-    if (!targetRange.addressInRange(formulaAddress) && sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
+    if (sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
       return dependencyAddress.moved(toSheet, toRight, toBottom)
     }
     return false
