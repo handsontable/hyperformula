@@ -90,4 +90,10 @@ export class CellAddress {
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
     return new CellAddress(this.sheet, col, row, this.type)
   }
+
+  public shiftAbsoluteDimensions(toRight: number, toBottom: number): CellAddress {
+    const col = this.isColumnRelative() ? this.col : this.col + toRight
+    const row = this.isRowRelative() ? this.row : this.row + toBottom
+    return new CellAddress(this.sheet, col, row, this.type)
+  }
 }

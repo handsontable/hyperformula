@@ -43,7 +43,10 @@ export namespace MoveCellsDependencyTransformer {
 
       /* If dependency is external and moved range overrides it return REF */
       const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-      if (!sourceRange.addressInRange(absoluteDependencyAddress) && targetRange.addressInRange(absoluteDependencyAddress)) {
+
+      if (sourceRange.addressInRange(absoluteDependencyAddress)) {
+        return dependencyAddress.shiftAbsoluteDimensions(toRight, toBottom)
+      } else if (targetRange.addressInRange(absoluteDependencyAddress)) {
         return ErrorType.REF
       }
 
@@ -59,7 +62,10 @@ export namespace MoveCellsDependencyTransformer {
   }
 
   function fixDependenciesWhenMovingCells(dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
-    if (sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
+    /* We don't want to modify formulas in moved range second time */
+    /* Formulas that are in moved range have already changed their address so we need to check targetRange */
+    const targetRange = sourceRange.shifted(toRight, toBottom)
+    if (!targetRange.addressInRange(formulaAddress) && sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
       return dependencyAddress.moved(toSheet, toRight, toBottom)
     }
     return false
