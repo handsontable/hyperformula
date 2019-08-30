@@ -124,42 +124,7 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.absoluteRow(1, 0, 0))
     })
 
-    it("n < R < r", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          [''],
-          // new row
-          [''],
-          ['=$Sheet2.A1'],
-        ],
-        Sheet2: [
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 1, 1)
-
-      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(1, 0, -3))
-    })
-
-    it("n < R = r", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          [''],
-          // new row
-          ['=$Sheet2.A1'],
-        ],
-        Sheet2: [
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 1, 1)
-
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -2))
-    })
-
-    it("n = R < r", () => {
+    it("R < r", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           // new row
@@ -176,87 +141,7 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -2))
     })
 
-    it("n = R = r", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          // new row
-          ['=$Sheet2.A1'],
-        ],
-        Sheet2: [
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 0, 1)
-
-      expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(1, 0, -1))
-    })
-
-
-    it("R < n < r", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          // new row
-          [''],
-          [''],
-          ['=$Sheet2.A2'],
-        ],
-        Sheet2: [
-          [''],
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 0, 1)
-
-      expect(extractReference(engine, adr("A4"))).toEqual(CellAddress.relative(1, 0, -2))
-    })
-
-    it("R < n = r", () => { // also R 
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          // new row
-          [''],
-          ['=$Sheet2.A2'],
-        ],
-        Sheet2: [
-          [''],
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 0, 1)
-
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, -1))
-    })
-
-    // "R = n < r" already above as "n = R < r"
-
-    // "R = n = r" already above
-
-
-    it("R < r < n", () => {
-      const engine = HandsOnEngine.buildFromSheets({
-        Sheet1: [
-          // new row
-          [''],
-          ['=$Sheet2.A3'],
-        ],
-        Sheet2: [
-          [''],
-          [''],
-          ['1'],
-        ]
-      })
-
-      engine.addRows(0, 0, 1)
-
-      expect(extractReference(engine, adr("A3"))).toEqual(CellAddress.relative(1, 0, 0))
-    })
-
-    // "R < r = n" already above as "R < n = r"
-
-    it("R = r < n", () => {
+    it("r = R", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           // new row
@@ -273,10 +158,6 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr("A2"))).toEqual(CellAddress.relative(1, 0, 0))
     })
 
-    // "R = n = r" already above
-
-
-    // Actually "r ? R ? n", "r ? n ? R", "n ? r ? R" could be written
     it("r < R", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
