@@ -6,8 +6,8 @@ import './testConfig.ts'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {extractRange, extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
 
-describe('Removing rows - address dependencies, same sheet', () => {
-  it('same sheet, case Aa', () => {
+describe('Address dependencies, Case 1: same sheet', () => {
+  it('case Aa: absolute dependency above removed row should not be affected', () => {
     const engine = HandsOnEngine.buildFromArray([
       [''],
       ['1'],
@@ -20,7 +20,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
 
-  it('same sheet, case Ab', () => {
+  it('case Ab: absolute dependency below removed row should be shifted', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=A$3'],
       [''], // row to delete
@@ -32,7 +32,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
 
-  it('same sheet, case Ac', () => {
+  it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=A$2'],
       [''], // row to delete
@@ -43,7 +43,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
-  it('same sheet, case Raa', () => {
+  it('case Raa: relative dependency and formula above removed rows should not be affected', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['42'],
       ['=A1'],
@@ -55,7 +55,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
   })
 
-  it('same sheet, case Rab', () => {
+  it('case Rab: relative address should be shifted when only formula is moving', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['42'],
       ['1'],
@@ -68,7 +68,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
   })
 
-  it('same sheet, case Rba', () => {
+  it('case Rba: relative address should be shifted when only dependency is moving', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=A4'],
       ['1'],
@@ -81,7 +81,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
-  it('same sheet, case Rbb', () => {
+  it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
       ['2'],
@@ -93,7 +93,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
-  it('same sheet, case Rca', () => {
+  it('case Rca: relative dependency in deleted row range should be replaced by #REF', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=A3'],
       ['1'],
@@ -105,7 +105,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
-  it('same sheet, case Rcb', () => {
+  it('case Rcb: relative dependency in deleted row range should be replaced by #REF', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
       ['2'],
@@ -117,7 +117,7 @@ describe('Removing rows - address dependencies, same sheet', () => {
     expect_reference_to_have_ref_error(engine, adr('A2'))
   })
 
-  it('same sheet, case Rca, range', () => {
+  it('case Rca, range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=SUM(A2:A3)'],
       ['1'], //
@@ -128,8 +128,8 @@ describe('Removing rows - address dependencies, same sheet', () => {
   })
 })
 
-describe('Removing rows - address dependencies, formula in sheet where we make crud with dependency to other sheet', () => {
-  it('should not affect absolute dependencies', () => {
+describe('Address dependencies, Case 2: formula in sheet where we make crud with dependency to other sheet', () => {
+  it('case A: should not affect absolute dependencies', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
@@ -145,23 +145,7 @@ describe('Removing rows - address dependencies, formula in sheet where we make c
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
   })
 
-  it('removing row below formula should not affect dependency', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['=$Sheet2.A1'],
-        ['1'], // row to delete
-      ],
-      Sheet2: [
-        ['2'],
-      ],
-    })
-
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-    engine.removeRows(0, 1, 1)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-  })
-
-  it('removing row above formula should shift dependency', () => {
+  it('case Ra: removing row above formula should shift dependency', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
@@ -176,67 +160,32 @@ describe('Removing rows - address dependencies, formula in sheet where we make c
     engine.removeRows(0, 0, 0)
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
   })
-})
 
-describe('Removing rows - formula in different sheet', () => {
-  it('removing row to which the dependency is returns REF, absolute dependency', () => {
+  it('case Rb: removing row below formula should not affect dependency', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A$1'],
+        ['=$Sheet2.A1'],
+        ['1'], // row to delete
       ],
       Sheet2: [
-        ['1'], // row to delete
         ['2'],
       ],
     })
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
-    engine.removeRows(1, 0, 0)
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('removing row to which the dependency is returns REF, relative dependency', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['=$Sheet2.A1'],
-      ],
-      Sheet2: [
-        ['1'], // row to delete
-        ['2']
-      ],
-    })
-
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-    engine.removeRows(1, 0, 0)
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-  })
-
-  it('removing row below dependency should not affect relative address', () => {
-    const engine = HandsOnEngine.buildFromSheets({
-      Sheet1: [
-        ['=$Sheet2.A1'],
-        ['=$Sheet2.A1'],
-        ['=$Sheet2.A1'],
-      ],
-      Sheet2: [
-        ['0'],
-        ['1'],  // row to delete
-      ],
-    })
-
-    engine.removeRows(1, 1, 1)
-
+    engine.removeRows(0, 1, 1)
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, -1))
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -2))
   })
+})
 
-  it('removing row above dependency should shift relative address', () => {
+describe('Address dependencies, Case 3: formula in different sheet', () => {
+  it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A3'],
         ['=$Sheet2.A3'],
         ['=$Sheet2.A3'],
+        ['=$Sheet2.A$3'],
       ],
       Sheet2: [
         ['1'],
@@ -250,6 +199,43 @@ describe('Removing rows - formula in different sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, 0))
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0, -1))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(1, 0, 1))
+  })
+
+  it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1'],
+        ['=$Sheet2.A$1'],
+      ],
+      Sheet2: [
+        ['0'],
+        ['1'],  // row to delete
+      ],
+    })
+
+    engine.removeRows(1, 1, 1)
+
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
+  })
+
+  it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A$1'],
+        ['=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['1'], // row to delete
+        ['2'],
+      ],
+    })
+
+    engine.removeRows(1, 0, 0)
+
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expect_reference_to_have_ref_error(engine, adr('A2'))
   })
 
   it('does not truncate any ranges if rows are removed from different sheet', () => {
