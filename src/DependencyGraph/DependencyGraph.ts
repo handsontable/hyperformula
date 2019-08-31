@@ -17,8 +17,10 @@ import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
+import {ColumnIndex} from "../ColumnIndex";
 
 export class DependencyGraph {
+  private columnIndex: Map<number, ColumnIndex>
   /*
    * Invariants:
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
@@ -46,7 +48,9 @@ export class DependencyGraph {
       public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
       public readonly lazilyTransformingAstService: LazilyTransformingAstService
-  ) {}
+  ) {
+    this.columnIndex = new Map<number, ColumnIndex>()
+  }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
@@ -510,6 +514,15 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
+  }
+
+  public buildColumnIndex() {
+    this.columnIndex.clear()
+    for (let i=0; i< this.sheetMapping.numberOfSheets(); ++i) {
+      const index = new ColumnIndex(this.getSheetWidth(i), this.getSheetHeight(i), i)
+      index.buildIndex(this.addressMapping.valuesFromSheet(i))
+      this.columnIndex.set(i, index)
+    }
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {

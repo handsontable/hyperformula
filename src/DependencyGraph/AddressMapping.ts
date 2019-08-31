@@ -590,9 +590,19 @@ export class AddressMapping {
     yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan)
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<CellValue> {
+  public* valuesFromSheet(sheet: number): IterableIterator<[CellValue, SimpleCellAddress]> {
+    const sheetMapping = this.mapping.get(sheet)
+    if (sheetMapping) {
+      yield* this.valuesFromRange(AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, 0), sheetMapping.getWidth(), sheetMapping.getHeight()))
+    }
+  }
+
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[CellValue, SimpleCellAddress]> {
     for (const address of range.addresses()) {
-      yield this.getCellValue(address)
+      const value = this.getCellValue(address)
+      if (value !== EmptyValue) {
+        yield [value, address]
+      }
     }
   }
 

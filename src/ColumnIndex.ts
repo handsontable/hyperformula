@@ -1,9 +1,6 @@
-import {CellValue, SimpleCellAddress, simpleCellAddress} from "../Cell";
-import {DependencyGraph} from "../DependencyGraph";
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
-import {add} from "./scalar";
+import {CellValue, SimpleCellAddress} from "./Cell";
 
-class ColumnIndex {
+export class ColumnIndex {
   private readonly index: Array<Map<CellValue, Array<number>>>
 
   constructor(

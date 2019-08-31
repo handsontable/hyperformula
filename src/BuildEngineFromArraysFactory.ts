@@ -1,5 +1,5 @@
 import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
-import {Sheet, Sheets, GraphBuilder} from './GraphBuilder'
+import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {Statistics, StatType} from './statistics/Statistics'
 import {DependencyGraph} from './DependencyGraph'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
@@ -32,6 +32,10 @@ export class BuildEngineFromArraysFactory {
     const evaluator = new SingleThreadEvaluator(dependencyGraph, config, stats)
     evaluator.run()
 
+    stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
+      dependencyGraph.buildColumnIndex()
+    })
+
     stats.end(StatType.OVERALL)
 
     const engine = new HandsOnEngine(
@@ -42,6 +46,7 @@ export class BuildEngineFromArraysFactory {
       evaluator,
       lazilyTransformingAstService
     )
+
     return engine
   }
 
