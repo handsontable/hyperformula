@@ -166,11 +166,13 @@ export class HandsOnEngine {
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     this.stats.reset()
 
-    this.dependencyGraph.addRows(sheet, row, numberOfRowsToAdd)
+    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+
+    this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(sheet, row, numberOfRowsToAdd, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(sheet, row, numberOfRowsToAdd)
+      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()

@@ -26,9 +26,7 @@ export interface AddColumnsTransformation {
 
 export interface AddRowsTransformation {
   type: TransformationType.ADD_ROWS,
-  sheet: number,
-  row: number,
-  numberOfRowsToAdd: number,
+  addedRows: RowsSpan,
 }
 
 export interface RemoveRowsTransformation {
@@ -74,13 +72,8 @@ export class LazilyTransformingAstService {
     this.transformations.push({ type: TransformationType.ADD_COLUMNS, addedColumns })
   }
 
-  public addAddRowsTransformation(sheet: number, row: number, numberOfRowsToAdd: number) {
-    this.transformations.push({
-      type: TransformationType.ADD_ROWS,
-      sheet,
-      row,
-      numberOfRowsToAdd,
-    })
+  public addAddRowsTransformation(addedRows: RowsSpan) {
+    this.transformations.push({ type: TransformationType.ADD_ROWS, addedRows })
   }
 
   public addRemoveRowsTransformation(removedRows: RowsSpan) {
@@ -114,13 +107,7 @@ export class LazilyTransformingAstService {
           break;
         }
         case TransformationType.ADD_ROWS: {
-          const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(
-              transformation.sheet,
-              transformation.row,
-              transformation.numberOfRowsToAdd,
-              ast,
-              address,
-          )
+          const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(transformation.addedRows, ast, address)
           ast = newAst
           address = newAddress
           break;

@@ -221,26 +221,26 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public addRows(sheet: number, rowStart: number, numberOfRows: number) {
-    if (this.matrixMapping.isFormulaMatrixInRows(new RowsSpan(sheet, rowStart, rowStart))) {
+  public addRows(addedRows: RowsSpan) {
+    if (this.matrixMapping.isFormulaMatrixInRows(addedRows.firstRow())) {
       throw Error('It is not possible to add row in row with matrix')
     }
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.addRows(sheet, rowStart, numberOfRows)
+      this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.expandMatricesAfterAddingRows(sheet, rowStart, numberOfRows)
+      this.expandMatricesAfterAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.fixRanges(sheet, rowStart, numberOfRows)
+      this.fixRanges(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
 
-      this.rangeMapping.moveAllRangesInSheetAfterRowByRows(sheet, rowStart, numberOfRows)
+      this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
-    for (const vertex of this.addressMapping.verticesFromRow(sheet, rowStart)) {
+    for (const vertex of this.addressMapping.verticesFromRow(addedRows.sheet, addedRows.rowStart)) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
 
