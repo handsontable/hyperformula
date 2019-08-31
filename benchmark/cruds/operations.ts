@@ -1,69 +1,75 @@
 import {HandsOnEngine} from '../../src'
+import {Statistics, StatType} from "../../src/statistics/Statistics";
 
-export function addColumns(engine: HandsOnEngine) {
+export function addColumns(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
-  measure(engine, 'Add column at the beginning', () => engine.addColumns(0, 0, 1))
+  measure(engine, stats, 'Add column at the beginning', () => engine.addColumns(0, 0, 1))
   dimensions = getDimensions(engine)
-  measure(engine, 'Add column in the middle   ', () => engine.addColumns(0, half(dimensions.width), 1))
+  measure(engine, stats, 'Add column in the middle   ', () => engine.addColumns(0, half(dimensions.width), 1))
   dimensions = getDimensions(engine)
-  measure(engine, 'Add column at the end      ', () => engine.addColumns(0, dimensions.width - 1, 1))
+  measure(engine, stats, 'Add column at the end      ', () => engine.addColumns(0, dimensions.width - 1, 1))
 }
 
-export function addRows(engine: HandsOnEngine) {
+export function addRows(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
-  measure(engine, 'Add row at the beginning', () => engine.addRows(0, 0, 1))
+  measure(engine, stats, 'Add row at the beginning', () => engine.addRows(0, 0, 1))
   dimensions = getDimensions(engine)
-  measure(engine, 'Add row in the middle   ', () => engine.addRows(0, half(dimensions.height), 1))
+  measure(engine, stats, 'Add row in the middle   ', () => engine.addRows(0, half(dimensions.height), 1))
   dimensions = getDimensions(engine)
-  measure(engine, 'Add row at the end      ', () => engine.addRows(0, dimensions.height - 1, 1))
+  measure(engine, stats, 'Add row at the end      ', () => engine.addRows(0, dimensions.height - 1, 1))
 }
 
-export function removeColumns(engine: HandsOnEngine) {
+export function removeColumns(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
-  measure(engine, 'Remove column at the beginning', () => engine.removeColumns(0, 0, 0))
+  measure(engine, stats, 'Remove column at the beginning', () => engine.removeColumns(0, 0, 0))
   dimensions = getDimensions(engine)
-  measure(engine, 'Remove column in the middle   ', () => engine.removeColumns(0, half(dimensions.width), half(dimensions.width)))
+  measure(engine, stats, 'Remove column in the middle   ', () => engine.removeColumns(0, half(dimensions.width), half(dimensions.width)))
   dimensions = getDimensions(engine)
-  measure(engine, 'Remove column at the end      ', () => engine.removeColumns(0, dimensions.width - 1, dimensions.width - 1))
+  measure(engine, stats, 'Remove column at the end      ', () => engine.removeColumns(0, dimensions.width - 1, dimensions.width - 1))
 }
 
-export function removeRows(engine: HandsOnEngine) {
+export function removeRows(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
-  measure(engine, 'Remove row at the beginning', () => engine.removeRows(0, 0, 0))
+  measure(engine, stats, 'Remove row at the beginning', () => engine.removeRows(0, 0, 0))
   dimensions = getDimensions(engine)
-  measure(engine, 'Remove row in the middle   ', () => engine.removeRows(0, half(dimensions.height), half(dimensions.height)))
+  measure(engine, stats, 'Remove row in the middle   ', () => engine.removeRows(0, half(dimensions.height), half(dimensions.height)))
   dimensions = getDimensions(engine)
-  measure(engine, 'Remove row at the end      ', () => engine.removeRows(0, dimensions.height - 1, dimensions.height - 1))
+  measure(engine, stats, 'Remove row at the end      ', () => engine.removeRows(0, dimensions.height - 1, dimensions.height - 1))
 }
 
 export function batch(engine: HandsOnEngine) {
-  addRows(engine)
-  addColumns(engine)
-  removeRows(engine)
-  removeColumns(engine)
+  const stats: any[] = []
+  addRows(engine, stats)
+  addColumns(engine, stats)
+  removeRows(engine, stats)
+  removeColumns(engine, stats)
+  logStats(stats)
 }
 
-function half(num: number) {
+
+export function half(num: number) {
   return Math.floor(num / 2)
 }
 
-function getDimensions(engine: HandsOnEngine) {
+export function getDimensions(engine: HandsOnEngine) {
   return engine.getSheetsDimensions().get('Sheet1')!
 }
 
-function measure<T>(engine: HandsOnEngine, name: String, func: () => T): { time: number, result: T } {
+export function measure<T>(engine: HandsOnEngine, stats: any[], name: String, func: () => T) {
   const start = Date.now()
-  const result = func()
+  func()
   const end = Date.now()
   const time = end - start
-  console.log(`${name}: ${time} ms (${serializeStats(engine.getStats())})`)
-  return { time, result}
+  const actualStats = engine.getStats() as Map<string, any>
+  actualStats.set("TOTAL", time)
+  actualStats.set("NAME", name)
+  stats.push(statsToObject(actualStats))
 }
 
-function serializeStats(statsSnapshot: Map<string, number>): string {
-  let elems = []
-  for (const [statType, val] of statsSnapshot.entries()) {
-    elems.push(`${statType}: ${val}ms`)
-  }
-  return `(${elems.join("; ")})`
+export function statsToObject(stats: Map<string, any>) {
+  return Object.assign({}, ...[...stats.entries()].map(([k, v]) => ({[k]: v})))
+}
+
+export function logStats(stats: any[]) {
+  console.table(stats, ['NAME', 'TOTAL', ...Object.keys(StatType)])
 }

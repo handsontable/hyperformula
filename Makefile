@@ -26,6 +26,10 @@ benchmark: ## Run benchmarks
 benchmark-cruds:
 	@yarn ts-node benchmark/cruds/1-cruds.ts
 	@yarn ts-node benchmark/cruds/2-matrix.ts
+	@yarn ts-node benchmark/cruds/3-lazy-cruds.ts
+
+benchmark-lazy-cruds:
+	@yarn ts-node benchmark/cruds/3-lazy-cruds.ts
 
 check: typecheck test ## Check whether code is working correctly (types + specs)
 
