@@ -90,6 +90,152 @@ describe('Adding column, fixing dependency', () => {
       expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, 0, -1))
     })
   })
+
+  describe('dependency address sheet different than formula address sheet and sheet in which we add columns (case 2)', () => {
+    it("absolute case", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [ /* new col */          '=$Sheet2.$A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addColumns(0, 0, 1)
+
+      expect(extractReference(engine, adr("B1"))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+    })
+
+    it("R < r", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [/* new col */          '',          '=$Sheet2.A1'],
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addColumns(0, 0, 1)
+
+      expect(extractReference(engine, adr("C1"))).toEqual(CellAddress.relative(1, -2, 0))
+    })
+
+    it("r = R", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [/* new col */          '=$Sheet2.B1'],
+        ],
+        Sheet2: [
+          ['',          '1'],
+        ]
+      })
+
+      engine.addColumns(0, 0, 1)
+
+      expect(extractReference(engine, adr("B1"))).toEqual(CellAddress.relative(1, 0, 0))
+    })
+
+    it("r < R", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=$Sheet2.A1'          /* new col */ ]
+        ],
+        Sheet2: [
+          ['1'],
+        ]
+      })
+
+      engine.addColumns(0, 1, 1)
+
+      expect(extractReference(engine, adr("A1"))).toEqual(CellAddress.relative(1, 0, 0))
+    })
+  })
+
+  describe('formula address sheet different than dependency address sheet and sheet in which we add columns (case 3)', () => {
+    it("dependency address before added column", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [/* new col */          '1',          '2'],
+        ],
+        Sheet2: [
+          ['=$Sheet1.B1']
+        ]
+      })
+
+      engine.addColumns(0, 0, 1)
+
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 2, 0))
+    })
+
+    it("dependency address at added column", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          [/* new col */          '1']
+        ],
+        Sheet2: [
+          ['=$Sheet1.A1']
+        ]
+      })
+
+      engine.addColumns(0, 0, 1)
+
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 1, 0))
+    })
+
+    it("dependency address after added column", () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['1'          /* new col */ ]
+        ],
+        Sheet2: [
+          ['=$Sheet1.A1']
+        ]
+      })
+
+      engine.addColumns(0, 1, 1)
+
+      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 0))
+    })
+  })
+
+  describe('sheet where we add columns different than dependency address and formula address (case 4)', () => {
+    it('works', () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=B1',          '13'],
+        ],
+        Sheet2: [
+          ['',          /* new col */          '78'],
+        ],
+      })
+
+      engine.addColumns(1, 1, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+    })
+  })
+
+  describe('each sheet different (case 5)', () => {
+    it('works', () => {
+      const engine = HandsOnEngine.buildFromSheets({
+        Sheet1: [
+          ['=$Sheet2.B1',          '13'],
+        ],
+        Sheet2: [
+          ['',          '78'],
+        ],
+        Sheet3: [
+          ['',          /* new col */          ''],
+        ]
+      })
+
+      engine.addColumns(2, 1, 1)
+
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 1, 0))
+    })
+  })
 })
 
 describe('Adding column, fixing ranges', () => {

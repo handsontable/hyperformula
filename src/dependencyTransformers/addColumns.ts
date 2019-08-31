@@ -22,10 +22,39 @@ export namespace AddColumnsDependencyTransformer {
 
   export function transformDependencies(addedColumns: ColumnsSpan): TransformCellAddressFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
-      if ((dependencyAddress.sheet === formulaAddress.sheet) && (formulaAddress.sheet !== addedColumns.sheet)) {
+      // Case 4 and 5
+      if ((dependencyAddress.sheet !== addedColumns.sheet)
+        && (formulaAddress.sheet !== addedColumns.sheet)) {
         return false
       }
 
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+
+      // Case 3
+      if ((dependencyAddress.sheet === addedColumns.sheet)
+        && (formulaAddress.sheet !== addedColumns.sheet)) {
+        if (addedColumns.columnStart <= absolutizedDependencyAddress.col) {
+          return dependencyAddress.shiftedByColumns(addedColumns.numberOfColumns)
+        } else {
+          return false
+        }
+      }
+
+      // Case 2
+      if ((formulaAddress.sheet === addedColumns.sheet)
+          && (dependencyAddress.sheet !== addedColumns.sheet)) {
+        if (dependencyAddress.isColumnAbsolute()) {
+          return false
+        }
+
+        if (formulaAddress.col < addedColumns.columnStart) {
+          return false
+        }
+
+        return dependencyAddress.shiftedByColumns(-addedColumns.numberOfColumns)
+      }
+
+      // Case 1
       if (dependencyAddress.isColumnAbsolute()) {
         if (addedColumns.sheet !== dependencyAddress.sheet) {
           return false
