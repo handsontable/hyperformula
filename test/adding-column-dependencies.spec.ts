@@ -95,7 +95,7 @@ describe('Adding column, fixing dependency', () => {
     it("absolute case", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [ /* new col */          '=$Sheet2.$A1'],
+          [ /* new col */ '=$Sheet2.$A1'],
         ],
         Sheet2: [
           ['1'],
@@ -110,7 +110,7 @@ describe('Adding column, fixing dependency', () => {
     it("R < r", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [/* new col */          '',          '=$Sheet2.A1'],
+          [/* new col */ '', '=$Sheet2.A1'],
         ],
         Sheet2: [
           ['1'],
@@ -125,10 +125,10 @@ describe('Adding column, fixing dependency', () => {
     it("r = R", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [/* new col */          '=$Sheet2.B1'],
+          [/* new col */ '=$Sheet2.B1'],
         ],
         Sheet2: [
-          ['',          '1'],
+          ['', '1'],
         ]
       })
 
@@ -140,7 +140,7 @@ describe('Adding column, fixing dependency', () => {
     it("r < R", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A1'          /* new col */ ]
+          ['=$Sheet2.A1' /* new col */ ]
         ],
         Sheet2: [
           ['1'],
@@ -157,7 +157,7 @@ describe('Adding column, fixing dependency', () => {
     it("dependency address before added column", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [/* new col */          '1',          '2'],
+          [/* new col */ '1', '2'],
         ],
         Sheet2: [
           ['=$Sheet1.B1']
@@ -172,7 +172,7 @@ describe('Adding column, fixing dependency', () => {
     it("dependency address at added column", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [/* new col */          '1']
+          [/* new col */ '1']
         ],
         Sheet2: [
           ['=$Sheet1.A1']
@@ -187,7 +187,7 @@ describe('Adding column, fixing dependency', () => {
     it("dependency address after added column", () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['1'          /* new col */ ]
+          ['1' /* new col */ ]
         ],
         Sheet2: [
           ['=$Sheet1.A1']
@@ -204,10 +204,10 @@ describe('Adding column, fixing dependency', () => {
     it('works', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['=B1',          '13'],
+          ['=B1', '13'],
         ],
         Sheet2: [
-          ['',          /* new col */          '78'],
+          ['', /* new col */ '78'],
         ],
       })
 
@@ -221,13 +221,13 @@ describe('Adding column, fixing dependency', () => {
     it('works', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.B1',          '13'],
+          ['=$Sheet2.B1', '13'],
         ],
         Sheet2: [
-          ['',          '78'],
+          ['', '78'],
         ],
         Sheet3: [
-          ['',          /* new col */          ''],
+          ['', /* new col */ ''],
         ]
       })
 
