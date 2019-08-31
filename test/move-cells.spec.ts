@@ -86,22 +86,6 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(0, -1, 3))
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
   })
-
-  it('should return REF when internal dependency goes beyond sheet', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['', '', '=A1'],
-      ['', '', '=$A1'],
-      ['', '', '=A$1'],
-      ['', '', '=$A$1'],
-    ])
-
-    engine.moveCells(adr("B1"), 2, 4, adr("A1"))
-
-    expect_reference_to_have_ref_error(engine, adr('B1'))
-    expect_reference_to_have_ref_error(engine, adr('B2'))
-    expect_reference_to_have_ref_error(engine, adr('B3'))
-    expect_reference_to_have_ref_error(engine, adr('B4'))
-  })
 })
 
 describe('Move cells', () => {
