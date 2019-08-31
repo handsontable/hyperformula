@@ -1,4 +1,5 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
+import {binarySearch, compare} from "./interpreter/binarySearch";
 
 export class ColumnIndex {
   private readonly index: Array<Map<CellValue, Array<number>>>
@@ -12,11 +13,9 @@ export class ColumnIndex {
   }
 
   public buildIndex(values: IterableIterator<[CellValue, SimpleCellAddress]>) {
-    for (let column = 0; column < this.width; ++column) {
       for (const [value, address] of values) {
         this.addToIndex(value, address)
       }
-    }
   }
 
   public addToIndex(value: CellValue, address: SimpleCellAddress) {
@@ -31,5 +30,25 @@ export class ColumnIndex {
       columnMap.set(value, valueIndex)
     }
     valueIndex.push(address.row)
+  }
+
+  public find(key: any, column: number, startRow: number, endRow: number): number {
+    const columnMap = this.index[column]
+    if (!columnMap) {
+      return -1
+    }
+
+    const valueIndex = columnMap.get(key)
+    if (!valueIndex) {
+      return -1
+    }
+
+    /* assuming that valueIndex is sorted already */
+    const index = this.binSearch(valueIndex, startRow)
+    return index <= endRow ? index : -1
+  }
+
+  private binSearch(values: number[], key: number): number {
+    return -1 // this should return upper bound
   }
 }

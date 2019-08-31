@@ -54,16 +54,16 @@ export class VlookupPlugin extends FunctionPlugin {
     return this.doVlookup(key, range, index - 1, sorted)
   }
 
+  private indexSearch(key: any, range: AbsoluteCellRange): number {
+    const index = this.dependencyGraph.getColumnIndex(range.sheet)
+    return index.find(key, range.start.col, range.start.row, range.end.row)
+  }
+
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
     const values = this.computeListOfValuesInRange(searchedRange)
 
-    let rowIndex = -1
-    if (values.length < this.config.vlookupThreshold || !sorted) {
-      rowIndex = values.indexOf(key)
-    } else {
-      rowIndex = binarySearch(values, key)
-    }
+    const rowIndex = this.indexSearch(values, key)
 
     if (rowIndex === -1) {
       return new CellError(ErrorType.NA)

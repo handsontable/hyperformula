@@ -525,6 +525,14 @@ export class DependencyGraph {
     }
   }
 
+  public getColumnIndex(sheet: number): ColumnIndex {
+    const index = this.columnIndex.get(sheet)
+    if (!index) {
+      throw Error("No index for sheet found")
+    }
+    return index
+  }
+
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
