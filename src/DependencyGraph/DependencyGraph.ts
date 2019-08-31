@@ -240,7 +240,7 @@ export class DependencyGraph {
       this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
 
-    for (const vertex of this.addressMapping.verticesFromRow(addedRows.sheet, addedRows.rowStart)) {
+    for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
 
@@ -266,7 +266,7 @@ export class DependencyGraph {
       this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })
 
-    for (const vertex of this.addressMapping.verticesFromColumn(addedColumns.sheet, addedColumns.columnStart)) {
+    for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
       this.graph.markNodeAsSpecialRecentlyChanged(vertex)
     }
 
