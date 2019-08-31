@@ -5,40 +5,40 @@ import {TransformCellRangeFunction, fixFormulaVertexColumn, transformCellRangeBy
 import {ColumnsSpan} from '../ColumnsSpan'
 
 export namespace RemoveColumnsDependencyTransformer {
-  export function transform(columnsSpan: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
+  export function transform(removedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(columnsSpan, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transform2(removedColumns, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(columnsSpan: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const transformCellAddressFn = transformDependencies(columnsSpan)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(columnsSpan, transformCellAddressFn))
-    return [newAst, fixFormulaVertexColumn(nodeAddress, columnsSpan.sheet, columnsSpan.columnStart, -columnsSpan.numberOfColumns)]
+  export function transform2(removedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = transformDependencies(removedColumns)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(removedColumns, transformCellAddressFn))
+    return [newAst, fixFormulaVertexColumn(nodeAddress, removedColumns.sheet, removedColumns.columnStart, -removedColumns.numberOfColumns)]
   }
 
-  export const transformCellRangeByReferences2 = (columnsSpan: ColumnsSpan, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+  export const transformCellRangeByReferences2 = (removedColumns: ColumnsSpan, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
 
-      if (columnsSpan.sheet === dependencyRangeStart.sheet) {
+      if (removedColumns.sheet === dependencyRangeStart.sheet) {
         const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
         const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
 
-        if (columnsSpan.columnStart <= dependencyRangeStartSCA.col && columnsSpan.columnEnd >= dependencyRangeEndSCA.col) {
+        if (removedColumns.columnStart <= dependencyRangeStartSCA.col && removedColumns.columnEnd >= dependencyRangeEndSCA.col) {
           return ErrorType.REF
         }
 
-        if (dependencyRangeStartSCA.col >= columnsSpan.columnStart && dependencyRangeStartSCA.col <= columnsSpan.columnEnd) {
-          actualStart = dependencyRangeStart.shiftedByColumns(columnsSpan.columnEnd - dependencyRangeStartSCA.col + 1)
+        if (dependencyRangeStartSCA.col >= removedColumns.columnStart && dependencyRangeStartSCA.col <= removedColumns.columnEnd) {
+          actualStart = dependencyRangeStart.shiftedByColumns(removedColumns.columnEnd - dependencyRangeStartSCA.col + 1)
         }
 
-        if (dependencyRangeEndSCA.col >= columnsSpan.columnStart && dependencyRangeEndSCA.col <= columnsSpan.columnEnd) {
-          actualEnd = dependencyRangeEnd.shiftedByColumns(-(dependencyRangeEndSCA.col - columnsSpan.columnStart + 1))
+        if (dependencyRangeEndSCA.col >= removedColumns.columnStart && dependencyRangeEndSCA.col <= removedColumns.columnEnd) {
+          actualEnd = dependencyRangeEnd.shiftedByColumns(-(dependencyRangeEndSCA.col - removedColumns.columnStart + 1))
         }
       }
 

@@ -47,7 +47,7 @@ interface IAddressMappingStrategy {
   addRows(row: number, numberOfRows: number): void,
   removeRows(removedRows: RowsSpan): void,
   addColumns(column: number, numberOfColumns: number): void,
-  removeColumns(columnsSpan: ColumnsSpan): void,
+  removeColumns(removedColumns: ColumnsSpan): void,
   getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
   verticesFromRow(row: number): IterableIterator<CellVertex>,
@@ -170,21 +170,21 @@ export class SparseStrategy implements IAddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
-  public removeColumns(columnsSpan: ColumnsSpan): void {
+  public removeColumns(removedColumns: ColumnsSpan): void {
     const tmpMapping = new Map()
     this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
-      if (colNumber >= columnsSpan.columnStart) {
+      if (colNumber >= removedColumns.columnStart) {
         this.mapping.delete(colNumber)
-        if (colNumber > columnsSpan.columnEnd) {
-          tmpMapping.set(colNumber - columnsSpan.numberOfColumns, rowMapping)
+        if (colNumber > removedColumns.columnEnd) {
+          tmpMapping.set(colNumber - removedColumns.numberOfColumns, rowMapping)
         }
       }
     })
     tmpMapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
       this.mapping.set(colNumber, rowMapping)
     })
-    const rightmostColumnRemoved = Math.min(this.width - 1, columnsSpan.columnEnd)
-    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - columnsSpan.columnStart + 1)
+    const rightmostColumnRemoved = Math.min(this.width - 1, removedColumns.columnEnd)
+    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - removedColumns.columnStart + 1)
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
@@ -332,12 +332,12 @@ export class DenseStrategy implements IAddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
-  public removeColumns(columnsSpan: ColumnsSpan): void {
+  public removeColumns(removedColumns: ColumnsSpan): void {
     for (let i = 0; i < this.height; i++) {
-      this.mapping[i].splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
+      this.mapping[i].splice(removedColumns.columnStart, removedColumns.numberOfColumns)
     }
-    const rightmostColumnRemoved = Math.min(this.width - 1, columnsSpan.columnEnd)
-    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - columnsSpan.columnStart + 1)
+    const rightmostColumnRemoved = Math.min(this.width - 1, removedColumns.columnEnd)
+    const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - removedColumns.columnStart + 1)
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
@@ -565,12 +565,12 @@ export class AddressMapping {
     sheetMapping.addColumns(column, numberOfColumns)
   }
 
-  public removeColumns(columnsSpan: ColumnsSpan) {
-    const sheetMapping = this.mapping.get(columnsSpan.sheet)
+  public removeColumns(removedColumns: ColumnsSpan) {
+    const sheetMapping = this.mapping.get(removedColumns.sheet)
     if (!sheetMapping) {
       throw Error('Sheet does not exist')
     }
-    sheetMapping.removeColumns(columnsSpan)
+    sheetMapping.removeColumns(removedColumns)
   }
 
   public* verticesFromRange(range: AbsoluteCellRange): IterableIterator<CellVertex> {

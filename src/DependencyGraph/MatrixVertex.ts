@@ -126,9 +126,9 @@ export class MatrixVertex {
     }
   }
 
-  public removeColumns(columnsSpan: ColumnsSpan): void {
+  public removeColumns(removedColumns: ColumnsSpan): void {
     if (this.matrix instanceof Matrix) {
-      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(columnsSpan)!
+      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(removedColumns)!
       this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.getAddress().col, removedColumnsFromMatrix.columnEnd - this.getAddress().col)
     }
   }

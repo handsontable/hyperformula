@@ -189,13 +189,13 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
-  public removeColumns(columnsSpan: ColumnsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(columnsSpan)) {
+  public removeColumns(removedColumns: ColumnsSpan) {
+    if (this.matrixMapping.isFormulaMatrixInColumns(removedColumns)) {
       throw Error('It is not possible to remove column within matrix')
     }
 
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
-      for (const vertex of this.addressMapping.verticesFromColumnsSpan(columnsSpan)) {
+      for (const vertex of this.addressMapping.verticesFromColumnsSpan(removedColumns)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
         }
@@ -207,15 +207,15 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
-      this.truncateMatricesAfterRemovingColumns(columnsSpan)
+      this.truncateMatricesAfterRemovingColumns(removedColumns)
     })
 
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-      this.addressMapping.removeColumns(columnsSpan)
+      this.addressMapping.removeColumns(removedColumns)
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.truncateRangesAfterRemovingColumns(columnsSpan)
+      this.truncateRangesAfterRemovingColumns(removedColumns)
     })
 
     this.addStructuralNodesToChangeSet()
@@ -596,15 +596,15 @@ export class DependencyGraph {
     })
   }
 
-  private truncateMatricesAfterRemovingColumns(columnsSpan: ColumnsSpan) {
-    const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(columnsSpan)
+  private truncateMatricesAfterRemovingColumns(removedColumns: ColumnsSpan) {
+    const verticesToRemove = this.matrixMapping.truncateMatricesByColumns(removedColumns)
     verticesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })
   }
 
-  private truncateRangesAfterRemovingColumns(columnsSpan: ColumnsSpan) {
-    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(columnsSpan)
+  private truncateRangesAfterRemovingColumns(removedColumns: ColumnsSpan) {
+    const rangesToRemove = this.rangeMapping.truncateRangesByColumns(removedColumns)
     rangesToRemove.forEach((vertex) => {
       this.graph.removeNode(vertex)
     })

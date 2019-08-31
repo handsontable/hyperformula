@@ -38,7 +38,7 @@ export interface RemoveRowsTransformation {
 
 export interface RemoveColumnsTransformation {
   type: TransformationType.REMOVE_COLUMNS,
-  columnsSpan: ColumnsSpan,
+  removedColumns: ColumnsSpan,
 }
 
 export interface MoveCellsTransformation {
@@ -87,8 +87,8 @@ export class LazilyTransformingAstService {
     this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows })
   }
 
-  public addRemoveColumnsTransformation(columnsSpan: ColumnsSpan) {
-    this.transformations.push({ type: TransformationType.REMOVE_COLUMNS, columnsSpan })
+  public addRemoveColumnsTransformation(removedColumns: ColumnsSpan) {
+    this.transformations.push({ type: TransformationType.REMOVE_COLUMNS, removedColumns })
   }
 
   public addMoveCellsTransformation(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
@@ -126,7 +126,7 @@ export class LazilyTransformingAstService {
           break;
         }
         case TransformationType.REMOVE_COLUMNS: {
-          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(transformation.columnsSpan, ast, address)
+          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(transformation.removedColumns, ast, address)
           ast = newAst
           address = newAddress
           break;

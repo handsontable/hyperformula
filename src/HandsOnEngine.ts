@@ -209,13 +209,13 @@ export class HandsOnEngine {
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     this.stats.reset()
 
-    const columnsSpan = new ColumnsSpan(sheet, columnStart, columnEnd)
+    const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
 
-    this.dependencyGraph.removeColumns(columnsSpan)
+    this.dependencyGraph.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(columnsSpan, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(columnsSpan)
+      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
     })
 
     this.recomputeIfDependencyGraphNeedsIt()
