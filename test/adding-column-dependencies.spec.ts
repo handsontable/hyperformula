@@ -4,7 +4,7 @@ import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/Dependenc
 import {CellReferenceAst} from '../src/parser/Ast'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {extractRange, adr, extractReference, extractMatrixRange} from "./testUtils";
+import {expectEngineToBeTheSameAs, extractRange, adr, extractReference, extractMatrixRange} from "./testUtils";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
 
 describe('Adding column, fixing dependency', () => {
@@ -251,6 +251,11 @@ describe('Adding column, fixing ranges', () => {
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['', '', '', ''],
+      ['=SUM(A1:D1)'],
+    ]))
   })
 
   it('insert column in middle of range', () => {
@@ -265,6 +270,11 @@ describe('Adding column, fixing ranges', () => {
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3'],
+      ['=SUM(A1:D1)'],
+    ]))
   })
 
   it('insert column above range', () => {
@@ -277,6 +287,11 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, 0, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('B1'), adr('D1'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['', '1', '2', '3'],
+      ['', '=SUM(B1:D1)'],
+    ]))
   })
 
   it('insert column below range', () => {
@@ -288,6 +303,11 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(null)
     engine.addColumns(0, 3, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '2', '3', ''],
+      ['=SUM(A1:C1)'],
+    ]))
   })
 
   it('it should insert new cell with edge to only one range at right', () => {
@@ -317,6 +337,11 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(C1:E1)'],
+    ]))
   })
 
   it('range start before added column', () => {
@@ -331,6 +356,11 @@ describe('Adding column, fixing ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('E1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(A1:E1)'],
+    ]))
   })
 
   it ('range start after added column', () => {
@@ -343,6 +373,11 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(D1:E1)'],
+    ]))
   })
 
   it ('range end before added column', () => {
@@ -355,6 +390,11 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(A1:A1)'],
+    ]))
   })
 
   it ('range end in a added column', () => {
@@ -370,6 +410,11 @@ describe('Adding column, fixing ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('C1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(A1:C1)'],
+    ]))
   })
 
   it ('range end after added column', () => {
@@ -385,6 +430,11 @@ describe('Adding column, fixing ranges', () => {
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('D1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(A1:D1)'],
+    ]))
   })
 
   it ('range start and end in an added column', () => {
@@ -397,5 +447,10 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+      ['1', '', '2', '3', '4'],
+      ['', '', '=SUM(C1:C1)'],
+    ]))
   })
 })
