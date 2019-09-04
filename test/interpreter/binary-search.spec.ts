@@ -47,4 +47,8 @@ describe("Binary search", () => {
     expect(binarySearch(values, 10)).toBe(2)
     expect(binarySearch(values, "xyz")).toBe(5)
   })
+
+  it('should return first occurence', () => {
+    expect(binarySearch([1, 2, 2, 2, 2, 2, 3, 3, 3], 2)).toBe(1)
+  })
 })

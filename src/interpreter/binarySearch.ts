@@ -11,6 +11,8 @@ export function binarySearch(values: CellValue[], key: any): number {
       start = center + 1
     } else if (cmp < 0) {
       end = center - 1
+    } else if (start != center) {
+      end = center
     } else {
       return center
     }
