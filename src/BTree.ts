@@ -4,6 +4,7 @@ class BNode {
     public keys: number[],
     public values: number[],
     public children: BNode[] | null,
+    public shift: number = 0,
   ) {
   }
 
@@ -36,13 +37,59 @@ class BNode {
     }
   }
 
-  public getKey(key: number): number | null {
+  public add2Key(newKey: number, newValue: number) {
+    let indexForNewKey = this.keys.length
     for (let i = 0; i < this.keys.length; i++) {
-      if (this.keys[i] === key) {
-        return this.values[i]
+      if (this.keys[i] >= newKey) {
+        indexForNewKey = i
+        break
       }
     }
-    return null
+
+    if (this.children !== null) {
+      const childNode = this.children[indexForNewKey]
+      if (childNode.keys.length === 2 * this.span - 1) {
+        splitNode(this, indexForNewKey)
+        if (newKey > this.keys[indexForNewKey]) {
+          indexForNewKey++
+        }
+      }
+      for (let i = this.keys.length - 1; i >= indexForNewKey; i--) {
+        this.keys[i]++
+      }
+      for (let i = indexForNewKey + 1; i < this.children.length; i++) {
+        this.children[i].shift++
+      }
+      this.children[indexForNewKey].add2Key(newKey, newValue)
+    } else {
+      for (let i = this.keys.length - 1; i >= indexForNewKey; i--) {
+        this.keys[i+1] = this.keys[i] + 1
+        this.values[i+1] = this.values[i]
+      }
+
+      this.keys[indexForNewKey] = newKey
+      this.values[indexForNewKey] = newValue
+    }
+  }
+
+  public getKey(key: number): number | null {
+    const skey = key - this.shift
+    for (let i = 0; i < this.keys.length; i++) {
+      if (this.keys[i] === skey) {
+        return this.values[i]
+      } else if (this.keys[i] > skey) {
+        if (this.children !== null) {
+          return this.children[i].getKey(skey)
+        } else {
+          return null
+        }
+      }
+    }
+    if (this.children !== null) {
+      return this.children[this.children.length - 1].getKey(skey)
+    } else {
+      return null
+    }
   }
 }
 
@@ -78,6 +125,16 @@ export class BTree {
       this.root = newRoot
     }
     this.root.addKey(key, val)
+  }
+
+  public add2Key(key: number, val: number) {
+    if (this.root.keys.length === 2 * this.span - 1) {
+      const newRoot = new BNode(this.span, [], [], [])
+      newRoot.children!.push(this.root)
+      splitNode(newRoot, 0)
+      this.root = newRoot
+    }
+    this.root.add2Key(key, val)
   }
 
   public getKey(key: number): number | null {
