@@ -55,8 +55,24 @@ describe('BTree', () => {
     btree.addKey(3, 10)
     btree.addKey(4, 10)
 
-    console.warn(btree._root.keys)
-    console.warn(btree._root.children![0].keys)
-    console.warn(btree._root.children![1].keys)
+    expect(btree._root.keys).toEqual([2])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![1].keys).toEqual([3,4])
+  })
+
+  it('adding key so tree has to split child', () => {
+    const btree = new BTree(2)
+
+    btree.addKey(1, 10)
+    btree.addKey(2, 10)
+    btree.addKey(3, 10)
+    btree.addKey(4, 10)
+    btree.addKey(5, 10)
+    btree.addKey(6, 10)
+
+    expect(btree._root.keys).toEqual([2,4])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![2].keys).toEqual([5,6])
   })
 })

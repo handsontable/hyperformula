@@ -24,7 +24,7 @@ class BNode {
           indexForNewKey++
         }
       }
-      childNode.addKey(newKey, newValue)
+      this.children[indexForNewKey].addKey(newKey, newValue)
     } else {
       for (let i = this.keys.length - 1; i >= indexForNewKey; i--) {
         this.keys[i+1] = this.keys[i]
