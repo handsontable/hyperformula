@@ -42,9 +42,10 @@ export class BTree {
   }
 
   private addKeyRecursive(node: BNode, newKey: number, newValue: number) {
+    let sNewKey = newKey - node.shift
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] > newKey) {
+      if (node.keys[i] > sNewKey) {
         indexForNewKey = i
         break
       }
@@ -54,26 +55,27 @@ export class BTree {
       const childNode = node.children[indexForNewKey]
       if (childNode.keys.length === this.maxSize) {
         this.splitNode(node, indexForNewKey)
-        if (newKey > node.keys[indexForNewKey]) {
+        if (sNewKey > node.keys[indexForNewKey]) {
           indexForNewKey++
         }
       }
-      this.addKeyRecursive(node.children[indexForNewKey], newKey, newValue)
+      this.addKeyRecursive(node.children[indexForNewKey], sNewKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
         node.keys[i+1] = node.keys[i]
         node.values[i+1] = node.values[i]
       }
 
-      node.keys[indexForNewKey] = newKey
+      node.keys[indexForNewKey] = sNewKey
       node.values[indexForNewKey] = newValue
     }
   }
 
   private addKeyWithShiftRecursive(node: BNode, newKey: number, newValue: number) {
+    let sNewKey = newKey - node.shift
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] >= newKey) {
+      if (node.keys[i] >= sNewKey) {
         indexForNewKey = i
         break
       }
@@ -83,7 +85,7 @@ export class BTree {
       const childNode = node.children[indexForNewKey]
       if (childNode.keys.length === this.maxSize) {
         this.splitNode(node, indexForNewKey)
-        if (newKey > node.keys[indexForNewKey]) {
+        if (sNewKey > node.keys[indexForNewKey]) {
           indexForNewKey++
         }
       }
@@ -93,14 +95,14 @@ export class BTree {
       for (let i = indexForNewKey + 1; i < node.children.length; i++) {
         node.children[i].shift++
       }
-      this.addKeyWithShiftRecursive(node.children[indexForNewKey], newKey, newValue)
+      this.addKeyWithShiftRecursive(node.children[indexForNewKey], sNewKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
         node.keys[i+1] = node.keys[i] + 1
         node.values[i+1] = node.values[i]
       }
 
-      node.keys[indexForNewKey] = newKey
+      node.keys[indexForNewKey] = sNewKey
       node.values[indexForNewKey] = newValue
     }
   }
