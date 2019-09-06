@@ -1,7 +1,7 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
-import {add} from "./interpreter/scalar";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {binarySearch as lowerBound} from "./interpreter/binarySearch";
+import {Statistics, StatType} from "./statistics/Statistics";
 
 type ValueIndex = Array<number>
 type SheetIndex = Array<Map<CellValue, ValueIndex>>
@@ -9,14 +9,19 @@ type SheetIndex = Array<Map<CellValue, ValueIndex>>
 export class ColumnIndex {
   private readonly index: Map<number, SheetIndex> = new Map()
 
+  constructor(private readonly stats: Statistics) {}
+
   public add(value: CellValue, address: SimpleCellAddress) {
-    const columnMap = this.getColumnMap(address.sheet, address.col)
-    let valueIndex = columnMap.get(value)
-    if (!valueIndex) {
-      valueIndex = []
-      columnMap.set(value, valueIndex)
-    }
-    this.addValue(valueIndex, address.row)
+    this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
+      const columnMap = this.getColumnMap(address.sheet, address.col)
+      let valueIndex = columnMap.get(value)
+      if (!valueIndex) {
+        valueIndex = []
+        columnMap.set(value, valueIndex)
+      }
+      this.addValue(valueIndex, address.row)
+    })
+
   }
 
   public find(key: any, range: AbsoluteCellRange): number {

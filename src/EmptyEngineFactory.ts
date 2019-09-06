@@ -7,8 +7,8 @@ import {ColumnIndex} from "./ColumnIndex";
 
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HandsOnEngine {
-    const columnIndex = new ColumnIndex()
     const stats = new Statistics()
+    const columnIndex = new ColumnIndex(stats)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
