@@ -1,5 +1,4 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
-import {binarySearch, compare} from "./interpreter/binarySearch";
 
 export class ColumnIndex {
   private readonly index: Array<Map<CellValue, Array<number>>>
@@ -44,11 +43,26 @@ export class ColumnIndex {
     }
 
     /* assuming that valueIndex is sorted already */
-    const index = this.binSearch(valueIndex, startRow)
-    return index <= endRow ? index : -1
+    const index = binarySearch(valueIndex, startRow)
+    const rowNumber = valueIndex[index]
+    return rowNumber <= endRow ? rowNumber : -1
+  }
+}
+
+export function binarySearch(values: number[], key: number): number {
+  let start = 0
+  let end = values.length - 1
+
+  while (start <= end) {
+    let center = Math.floor((start + end) / 2)
+    if (key > values[center]) {
+      start = center + 1
+    } else if (key < values[center]) {
+      end = center - 1
+    } else {
+      return center
+    }
   }
 
-  private binSearch(values: number[], key: number): number {
-    return -1 // this should return upper bound
-  }
+  return start
 }
