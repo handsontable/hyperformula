@@ -143,4 +143,28 @@ describe('BTree', () => {
     expect(btree.getKey(8)).toEqual(18)
     expect(btree.getKey(9)).toEqual(null)
   })
+
+  it('deleteKeyWithShift from leaf node', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+
+    btree.deleteKeyWithShift(2)
+
+    expect(btree._root.keys).toEqual([1, 3])
+    expect(btree._root.values).toEqual([11, 13])
+  })
+
+  it('deleteKeyWithShift from leaf node does nothing if no key present', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(4, 14)
+
+    btree.deleteKeyWithShift(3)
+
+    expect(btree._root.keys).toEqual([1, 2, 4])
+    expect(btree._root.values).toEqual([11, 12, 14])
+  })
 })

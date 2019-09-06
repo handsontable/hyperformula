@@ -37,6 +37,10 @@ export class BTree {
     return result[0].values[result[1]]
   }
 
+  public deleteKeyWithShift(key: number) {
+    this.deleteKeyWithShiftRecursive(this.root, key)
+  }
+
   public get _root(): BNode {
     return this.root
   }
@@ -104,6 +108,24 @@ export class BTree {
 
       node.keys[indexForNewKey] = sNewKey
       node.values[indexForNewKey] = newValue
+    }
+  }
+
+  private deleteKeyWithShiftRecursive(node: BNode, key: number) {
+    if (node.children === null) {
+      let indexWithKey = null
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] === key) {
+          indexWithKey = i
+          break
+        }
+      }
+      if (indexWithKey === null) {
+        return
+      } else {
+        node.keys.splice(indexWithKey, 1)
+        node.values.splice(indexWithKey, 1)
+      }
     }
   }
 
