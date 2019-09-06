@@ -21,12 +21,12 @@ export class BTree {
 
   public addKey(key: number, val: number) {
     this.ensureThatRootNotFull()
-    this.addKeyToNode(this.root, key, val)
+    this.addKeyRecursive(this.root, key, val)
   }
 
-  public add2Key(key: number, val: number) {
+  public addKeyWithShift(key: number, val: number) {
     this.ensureThatRootNotFull()
-    this.add2KeyToNode(this.root, key, val)
+    this.addKeyWithShiftRecursive(this.root, key, val)
   }
 
   public getKey(key: number): number | null {
@@ -41,7 +41,7 @@ export class BTree {
     return this.root
   }
 
-  private addKeyToNode(node: BNode, newKey: number, newValue: number) {
+  private addKeyRecursive(node: BNode, newKey: number, newValue: number) {
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] > newKey) {
@@ -58,7 +58,7 @@ export class BTree {
           indexForNewKey++
         }
       }
-      this.addKeyToNode(node.children[indexForNewKey], newKey, newValue)
+      this.addKeyRecursive(node.children[indexForNewKey], newKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
         node.keys[i+1] = node.keys[i]
@@ -70,7 +70,7 @@ export class BTree {
     }
   }
 
-  private add2KeyToNode(node: BNode, newKey: number, newValue: number) {
+  private addKeyWithShiftRecursive(node: BNode, newKey: number, newValue: number) {
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] >= newKey) {
@@ -93,7 +93,7 @@ export class BTree {
       for (let i = indexForNewKey + 1; i < node.children.length; i++) {
         node.children[i].shift++
       }
-      this.add2KeyToNode(node.children[indexForNewKey], newKey, newValue)
+      this.addKeyWithShiftRecursive(node.children[indexForNewKey], newKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
         node.keys[i+1] = node.keys[i] + 1

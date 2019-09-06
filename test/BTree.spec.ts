@@ -77,7 +77,7 @@ describe('BTree', () => {
     expect(btree.getKey(6)).toEqual(16)
   })
 
-  it('add2Key', () => {
+  it('addKeyWithShift', () => {
     const btree = new BTree(2)
     btree.addKey(1, 11)
     btree.addKey(2, 12)
@@ -86,7 +86,7 @@ describe('BTree', () => {
     btree.addKey(5, 15)
     btree.addKey(6, 16)
 
-    btree.add2Key(4, 99)
+    btree.addKeyWithShift(4, 99)
 
     expect(btree.getKey(1)).toEqual(11)
     expect(btree.getKey(2)).toEqual(12)
