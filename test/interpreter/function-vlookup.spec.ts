@@ -74,32 +74,6 @@ describe('VLOOKUP', () => {
     expect(engine.getCellValue('A6')).toEqual('b')
   })
 
-  it('should not find proper value using binary search', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['5', 'a'],
-      ['4', 'b'],
-      ['3', 'c'],
-      ['2', 'd'],
-      ['1', 'e'],
-      ['=VLOOKUP(4, A1:B5, 2, TRUE())'],
-    ], new Config({ vlookupThreshold: 1}))
-
-    expect(engine.getCellValue('A6')).not.toEqual('b')
-  })
-
-  it('should make use of 4th argument and use linear search', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['5', 'a'],
-      ['4', 'b'],
-      ['3', 'c'],
-      ['2', 'd'],
-      ['1', 'e'],
-      ['=VLOOKUP(4, A1:B5, 2, FALSE())'],
-    ], new Config({ vlookupThreshold: 1}))
-
-    expect(engine.getCellValue('A6')).toEqual('b')
-  })
-
   it('should find value in sorted range using linearSearch', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', 'a'],
