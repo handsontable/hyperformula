@@ -10,15 +10,17 @@ class BNode {
 
 export class BTree {
   private root: BNode
+  private readonly maxSize: number
 
   constructor(
     private readonly span: number
   ) {
     this.root = new BNode([], [], null)
+    this.maxSize = 2 * this.span - 1
   }
 
   public addKey(key: number, val: number) {
-    if (this.root.keys.length === 2 * this.span - 1) {
+    if (this.root.keys.length === this.maxSize) {
       const newRoot = new BNode([], [], [])
       newRoot.children!.push(this.root)
       this.splitNode(newRoot, 0)
@@ -28,7 +30,7 @@ export class BTree {
   }
 
   public add2Key(key: number, val: number) {
-    if (this.root.keys.length === 2 * this.span - 1) {
+    if (this.root.keys.length === this.maxSize) {
       const newRoot = new BNode([], [], [])
       newRoot.children!.push(this.root)
       this.splitNode(newRoot, 0)
@@ -76,7 +78,7 @@ export class BTree {
 
     if (node.children !== null) {
       const childNode = node.children[indexForNewKey]
-      if (childNode.keys.length === 2 * this.span - 1) {
+      if (childNode.keys.length === this.maxSize) {
         this.splitNode(node, indexForNewKey)
         if (newKey > node.keys[indexForNewKey]) {
           indexForNewKey++
@@ -105,7 +107,7 @@ export class BTree {
 
     if (node.children !== null) {
       const childNode = node.children[indexForNewKey]
-      if (childNode.keys.length === 2 * this.span - 1) {
+      if (childNode.keys.length === this.maxSize) {
         this.splitNode(node, indexForNewKey)
         if (newKey > node.keys[indexForNewKey]) {
           indexForNewKey++
