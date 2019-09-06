@@ -111,21 +111,35 @@ export class BTree {
     }
   }
 
-  private deleteKeyWithShiftRecursive(node: BNode, key: number) {
+  private deleteKeyWithShiftRecursive(node: BNode, key: number): boolean {
     if (node.children === null) {
-      let indexWithKey = null
       for (let i = 0; i < node.keys.length; i++) {
         if (node.keys[i] === key) {
+          node.keys.splice(i, 1)
+          node.values.splice(i, 1)
+          for (let j = i; j < node.keys.length; j++) {
+            node.keys[j]--
+          }
+          return true
+        }
+      }
+      return false
+    } else {
+      let indexWithKey = node.keys.length
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] > key) {
           indexWithKey = i
           break
         }
       }
-      if (indexWithKey === null) {
-        return
-      } else {
-        node.keys.splice(indexWithKey, 1)
-        node.values.splice(indexWithKey, 1)
+      const childNode = node.children![indexWithKey]
+      const didRemoveInChild = this.deleteKeyWithShiftRecursive(node.children![indexWithKey], key)
+      if (didRemoveInChild) {
+        for (let i = indexWithKey + 1; i < node.children.length; i++) {
+          node.children![i].shift--
+        }
       }
+      return didRemoveInChild
     }
   }
 
