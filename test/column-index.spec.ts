@@ -12,4 +12,30 @@ describe("Column index", () => {
     expect(columnMap.size).toBe(1)
     expect(columnMap.get(1)![0]).toBe(4)
   });
+
+  it('should keep values in sorted order', function () {
+    const index = new ColumnIndex()
+    index.add(1, adr("A3"))
+    index.add(1, adr("A5"))
+    index.add(1, adr("A1"))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    expect(columnMap.size).toBe(1)
+    expect(columnMap.get(1)![0]).toBe(0)
+  });
+
+  it('should not store duplicates', function () {
+    const index = new ColumnIndex()
+    index.add(1, adr("A1"))
+    index.add(1, adr("A5"))
+    index.add(1, adr("A5"))
+    index.add(1, adr("A1"))
+    index.add(1, adr("A1"))
+
+    const columnMap = index.getColumnMap(0, 0)
+
+    expect(columnMap.size).toBe(1)
+    expect(columnMap.get(1)!.length).toBe(2)
+  });
 })

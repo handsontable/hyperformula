@@ -1,6 +1,7 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
 import {add} from "./interpreter/scalar";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {binarySearch as lowerBound} from "./interpreter/binarySearch";
 
 type ValueIndex = Array<number>
 type SheetIndex = Array<Map<CellValue, ValueIndex>>
@@ -15,7 +16,7 @@ export class ColumnIndex {
       valueIndex = []
       columnMap.set(value, valueIndex)
     }
-    valueIndex.push(address.row)
+    this.addValue(valueIndex, address.row)
   }
 
   public find(key: any, range: AbsoluteCellRange): number {
@@ -48,6 +49,21 @@ export class ColumnIndex {
     }
 
     return columnMap
+  }
+
+  private addValue(valueIndex: ValueIndex, rowNumber: number) {
+    const index = lowerBound(valueIndex, rowNumber)
+    const value = valueIndex[index]
+    if (value === rowNumber) {
+      /* do not add same row twice */
+      return
+    }
+
+    if (index === valueIndex.length - 1) {
+      valueIndex.push(rowNumber)
+    } else {
+      valueIndex.splice(index + 1, 0, rowNumber)
+    }
   }
 }
 
