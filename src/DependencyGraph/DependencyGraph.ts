@@ -48,9 +48,7 @@ export class DependencyGraph {
       public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
       public readonly lazilyTransformingAstService: LazilyTransformingAstService
-  ) {
-    this.columnIndex = new Map<number, ColumnIndex>()
-  }
+  ) {}
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
