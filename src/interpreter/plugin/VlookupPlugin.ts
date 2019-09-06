@@ -56,7 +56,7 @@ export class VlookupPlugin extends FunctionPlugin {
 
   private indexSearch(key: any, range: AbsoluteCellRange): number {
     const index = this.dependencyGraph.getColumnIndex(range.sheet)
-    return index.find(key, range.start.col, range.start.row, range.end.row)
+    return index.find(key, range)
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {

@@ -1,28 +1,15 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
+import {add} from "./interpreter/scalar";
+import {AbsoluteCellRange} from "./AbsoluteCellRange";
+
+type ValueIndex = Array<number>
+type SheetIndex = Array<Map<CellValue, ValueIndex>>
 
 export class ColumnIndex {
-  private readonly index: Array<Map<CellValue, Array<number>>>
+  private readonly index: Map<number, SheetIndex> = new Map()
 
-  constructor(
-      private width: number,
-      private height: number,
-      private sheet: number
-  ) {
-    this.index = new Array(width)
-  }
-
-  public buildIndex(values: IterableIterator<[CellValue, SimpleCellAddress]>) {
-      for (const [value, address] of values) {
-        this.addToIndex(value, address)
-      }
-  }
-
-  public addToIndex(value: CellValue, address: SimpleCellAddress) {
-    let columnMap = this.index[address.col]
-    if (!columnMap) {
-      columnMap = new Map()
-      this.index[address.col] = columnMap
-    }
+  public add(value: CellValue, address: SimpleCellAddress) {
+    const columnMap = this.getColumnMap(address.sheet, address.col)
     let valueIndex = columnMap.get(value)
     if (!valueIndex) {
       valueIndex = []
@@ -31,8 +18,8 @@ export class ColumnIndex {
     valueIndex.push(address.row)
   }
 
-  public find(key: any, column: number, startRow: number, endRow: number): number {
-    const columnMap = this.index[column]
+  public find(key: any, range: AbsoluteCellRange): number {
+    const columnMap = this.getColumnMap(range.sheet, range.start.col)
     if (!columnMap) {
       return -1
     }
@@ -43,9 +30,24 @@ export class ColumnIndex {
     }
 
     /* assuming that valueIndex is sorted already */
-    const index = binarySearch(valueIndex, startRow)
+    const index = binarySearch(valueIndex, range.start.row)
     const rowNumber = valueIndex[index]
-    return rowNumber <= endRow ? rowNumber : -1
+    return rowNumber <= range.end.row ? rowNumber : -1
+  }
+
+  public getColumnMap(sheet: number, col: number) {
+    if (!this.index.has(sheet)) {
+      this.index.set(sheet, [])
+    }
+    let sheetMap = this.index.get(sheet)!
+    let columnMap = sheetMap![col]
+
+    if (!columnMap) {
+      columnMap = new Map()
+      sheetMap[col] = columnMap
+    }
+
+    return columnMap
   }
 }
 
