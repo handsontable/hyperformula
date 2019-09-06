@@ -1,6 +1,6 @@
 import {BTree} from '../src/BTree'
 
-const initialSize = 100000
+const initialSize = 1000000
 const adds = 100
 const reads = 10000
 
