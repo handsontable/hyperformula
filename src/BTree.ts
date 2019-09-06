@@ -20,22 +20,12 @@ export class BTree {
   }
 
   public addKey(key: number, val: number) {
-    if (this.root.keys.length === this.maxSize) {
-      const newRoot = new BNode([], [], [])
-      newRoot.children!.push(this.root)
-      this.splitNode(newRoot, 0)
-      this.root = newRoot
-    }
+    this.ensureThatRootNotFull()
     this.addKeyToNode(this.root, key, val)
   }
 
   public add2Key(key: number, val: number) {
-    if (this.root.keys.length === this.maxSize) {
-      const newRoot = new BNode([], [], [])
-      newRoot.children!.push(this.root)
-      this.splitNode(newRoot, 0)
-      this.root = newRoot
-    }
+    this.ensureThatRootNotFull()
     this.add2KeyToNode(this.root, key, val)
   }
 
@@ -146,6 +136,15 @@ export class BTree {
       return this.findNodeWithKey(node.children[node.children.length - 1], skey)
     } else {
       return null
+    }
+  }
+
+  private ensureThatRootNotFull() {
+    if (this.root.keys.length === this.maxSize) {
+      const newRoot = new BNode([], [], [])
+      newRoot.children!.push(this.root)
+      this.splitNode(newRoot, 0)
+      this.root = newRoot
     }
   }
 }
