@@ -40,31 +40,15 @@ export class BTree {
   }
 
   public getKey(key: number): number | null {
-    return this.getKeyFromNode(this.root, key)
+    const result = this.findNodeWithKey(this.root, key)
+    if (result === null) {
+      return null
+    }
+    return result[0].values[result[1]]
   }
 
   public get _root(): BNode {
     return this.root
-  }
-
-  private getKeyFromNode(node: BNode, key: number): number | null {
-    const skey = key - node.shift
-    for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] === skey) {
-        return node.values[i]
-      } else if (node.keys[i] > skey) {
-        if (node.children !== null) {
-          return this.getKeyFromNode(node.children[i], skey)
-        } else {
-          return null
-        }
-      }
-    }
-    if (node.children !== null) {
-      return this.getKeyFromNode(node.children[node.children.length - 1], skey)
-    } else {
-      return null
-    }
   }
 
   private addKeyToNode(node: BNode, newKey: number, newValue: number) {
@@ -143,5 +127,25 @@ export class BTree {
     parentNode.keys.splice(indexOfSplittedChild + 1, 0, ...childNode.keys.splice(this.span - 1, 1))
     parentNode.values.splice(indexOfSplittedChild + 1, 0, ...childNode.values.splice(this.span - 1, 1))
     parentNode.children!.splice(indexOfSplittedChild + 2, 0, newNode)
+  }
+
+  private findNodeWithKey(node: BNode, key: number): [BNode, number] | null {
+    const skey = key - node.shift
+    for (let i = 0; i < node.keys.length; i++) {
+      if (node.keys[i] === skey) {
+        return [node, i]
+      } else if (node.keys[i] > skey) {
+        if (node.children !== null) {
+          return this.findNodeWithKey(node.children[i], skey)
+        } else {
+          return null
+        }
+      }
+    }
+    if (node.children !== null) {
+      return this.findNodeWithKey(node.children[node.children.length - 1], skey)
+    } else {
+      return null
+    }
   }
 }
