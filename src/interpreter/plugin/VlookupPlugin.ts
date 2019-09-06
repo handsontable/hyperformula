@@ -56,7 +56,6 @@ export class VlookupPlugin extends FunctionPlugin {
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    const values = this.computeListOfValuesInRange(searchedRange)
 
     const rowIndex = this.columnIndex.find(key, range)
 
