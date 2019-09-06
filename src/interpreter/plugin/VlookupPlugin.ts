@@ -38,9 +38,9 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted = true
+    let sorted: CellValue = true
     if (ast.args.length === 4) {
-      const sorted = this.evaluateAst(ast.args[3], formulaAddress)
+      sorted = this.evaluateAst(ast.args[3], formulaAddress)
       if (typeof sorted !== 'boolean') {
         return new CellError(ErrorType.VALUE)
       }
