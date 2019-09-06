@@ -25,6 +25,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
+import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Engine for one sheet

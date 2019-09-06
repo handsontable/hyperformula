@@ -4,6 +4,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {DependencyGraph} from './DependencyGraph'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParserWithCaching} from './parser'
+import {ColumnIndex} from "./ColumnIndex";
 
 export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
@@ -11,6 +12,7 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.OVERALL)
 
+    const columnIndex = new ColumnIndex()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
@@ -23,18 +25,14 @@ export class BuildEngineFromArraysFactory {
     const parser = new ParserWithCaching(config, sheetMapping.fetch)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, parser, config, stats)
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, config, stats)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats)
     evaluator.run()
-
-    stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      dependencyGraph.buildColumnIndex()
-    })
 
     stats.end(StatType.OVERALL)
 

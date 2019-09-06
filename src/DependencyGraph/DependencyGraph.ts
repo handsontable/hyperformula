@@ -20,7 +20,6 @@ import {RowsSpan} from '../RowsSpan'
 import {ColumnIndex} from "../ColumnIndex";
 
 export class DependencyGraph {
-  private columnIndex: Map<number, ColumnIndex>
   /*
    * Invariants:
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
@@ -512,14 +511,6 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
-  }
-
-  public getColumnIndex(sheet: number): ColumnIndex {
-    const index = this.columnIndex.get(sheet)
-    if (!index) {
-      throw Error("No index for sheet found")
-    }
-    return index
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {

@@ -7,6 +7,7 @@ import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -34,14 +35,15 @@ export class GraphBuilder {
    */
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly config: Config = new Config(),
       private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.parser, this.stats, config.matrixDetectionThreshold)
+      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
-      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.parser, this.stats)
+      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats)
     }
   }
 
@@ -69,6 +71,7 @@ export interface GraphBuilderStrategy {
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
   ) {
@@ -128,6 +131,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,

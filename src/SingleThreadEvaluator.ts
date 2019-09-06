@@ -5,16 +5,18 @@ import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {ColumnIndex} from "./ColumnIndex";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
+    private readonly columnIndex: ColumnIndex,
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.config, this.stats)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnIndex, this.config, this.stats)
   }
 
   public run() {
