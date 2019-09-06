@@ -165,7 +165,7 @@ describe('VLOOKUP', () => {
     expect(engine.getCellValue('A6')).toEqual('d')
   })
 
-  it('should return lower bound for sorted values', () => {
+  xit('should return lower bound for sorted values', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', 'a'],
       ['2', 'b'],
