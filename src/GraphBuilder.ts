@@ -115,9 +115,11 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
             vertex = new ValueCellVertex(Number(cellContent))
+            this.columnIndex.add(Number(cellContent), address)
             this.dependencyGraph.addVertex(address, vertex)
           } else {
             vertex = new ValueCellVertex(cellContent)
+            this.columnIndex.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -177,6 +179,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             matrixHeuristic.add(address)
           } else {
             const vertex = new ValueCellVertex(cellContent)
+            this.columnIndex.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -191,6 +194,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       for (const address of elem.cells.reverse()) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
         const vertex = new ValueCellVertex(Number(value))
+        this.columnIndex.add(Number(value), address)
         this.dependencyGraph.addVertex(address, vertex)
       }
     }
