@@ -480,4 +480,23 @@ describe('BTree', () => {
 
     expect(btree._root.children![2]).toBeUndefined()
   })
+
+  xit('deleteKeyShift when theres too small children in root', () => {
+    // same with some shifts
+    const btree = new BTree(3)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.deleteKeyWithShift(6)
+
+    btree.deleteKeyWithShift(4)
+
+    expect(btree._root.shift).toEqual(0)
+    expect(btree._root.keys).toEqual([1,2,3,4])
+    expect(btree._root.values).toEqual([11,12,13,15])
+    expect(btree._root.children).toBeNull()
+  })
 })
