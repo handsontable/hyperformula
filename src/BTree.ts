@@ -144,11 +144,14 @@ export class BTree {
       if (childNode.keys.length === this.minSize) {
         const childRightNode = node.children![indexWithKey + 1]
         const childLeftNode = node.children![indexWithKey - 1]
-        if (childRightNode) { // && childRightNode.keys.length > this.minSize
+        if (childRightNode && childRightNode.keys.length > this.minSize) { // && childRightNode.keys.length > this.minSize
           this.rotateLeft(node, indexWithKey)
           return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
-        } else if (childLeftNode) {
+        } else if (childLeftNode && childLeftNode.keys.length > this.minSize) {
           this.rotateRight(node, indexWithKey - 1)
+          return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+        } else if (childRightNode) {
+          this.merge(node, indexWithKey)
           return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
         } else {
           throw Error("Not implemented yet")
@@ -157,6 +160,17 @@ export class BTree {
         return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
       }
     }
+  }
+
+  private merge(parentNode: BNode, index: number) {
+    const rightNode = parentNode.children![index + 1]
+    const leftNode = parentNode.children![index]
+    console.warn(rightNode.keys)
+    console.warn(rightNode.keys.map((k) => k - (rightNode.shift - leftNode.shift)))
+    leftNode.keys = leftNode.keys.concat(parentNode.keys.splice(index, 1)[0] - leftNode.shift, rightNode.keys.map((k) => k - (leftNode.shift - rightNode.shift)))
+    leftNode.values = leftNode.values.concat(parentNode.values.splice(index, 1), rightNode.values)
+    parentNode.children!.splice(index + 1, 1)
+    // leftNode.children = leftNode.children.concat(rightNode.children)
   }
 
   private deleteFromChildNodeAtIndex(parentNode: BNode, indexWithKey: number, skey: number): boolean {
