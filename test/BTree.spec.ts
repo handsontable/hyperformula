@@ -324,4 +324,89 @@ describe('BTree', () => {
     expect(btree._root.children![2].keys).toEqual([6])
     expect(btree._root.children![2].values).toEqual([16])
   })
+
+  it('deleteKeyWithShift from the leaf, which has only t-1 nodes, and has only left sibling with t nodes, h = 1', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.addKey(4, 14)
+    btree.deleteKeyWithShift(7)
+
+    btree.deleteKeyWithShift(6)
+
+    expect(btree._root.keys).toEqual([2,4])
+    expect(btree._root.values).toEqual([12,14])
+
+    expect(btree._root.children![0].shift).toEqual(0)
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+
+    expect(btree._root.children![1].shift).toEqual(0)
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([13])
+
+    expect(btree._root.children![2].shift).toEqual(0)
+    expect(btree._root.children![2].keys).toEqual([5])
+    expect(btree._root.children![2].values).toEqual([15])
+  })
+
+  it('deleteKeyWithShift from the leaf, which has only t-1 nodes, and has only left sibling with t nodes, h = 1', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.addKey(4, 14)
+    btree.addKeyWithShift(1, 110)
+    btree.deleteKeyWithShift(8)
+
+    btree.deleteKeyWithShift(7)
+
+    expect(btree._root.keys).toEqual([3,5])
+    expect(btree._root.values).toEqual([12,14])
+
+    expect(btree._root.children![0].shift).toEqual(0)
+    expect(btree._root.children![0].keys).toEqual([1,2])
+    expect(btree._root.children![0].values).toEqual([110, 11])
+
+    expect(btree._root.children![1].shift).toEqual(1)
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([13])
+
+    expect(btree._root.children![2].shift).toEqual(1)
+    expect(btree._root.children![2].keys).toEqual([5])
+    expect(btree._root.children![2].values).toEqual([15])
+  })
+
+  xit('deleteKeyWithShift from the leaf, which has only t-1 nodes, and has only left sibling with t nodes, h = 1', () => {
+    const btree = new BTree(3)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.addKey(8, 18)
+    btree.addKey(9, 19)
+    btree.deleteKeyWithShift(9)
+
+    btree.deleteKeyWithShift(8)
+
+    expect(btree._root.keys).toEqual([3,4])
+    expect(btree._root.values).toEqual([12,15])
+
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([14])
+
+    expect(btree._root.children![2].shift).toEqual(-1)
+    expect(btree._root.children![2].keys).toEqual([6])
+    expect(btree._root.children![2].values).toEqual([16])
+  })
 })

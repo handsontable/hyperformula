@@ -141,9 +141,18 @@ export class BTree {
         }
       }
       const childNode = node.children![indexWithKey]
-      if (childNode.keys.length === this.minSize && node.children![indexWithKey + 1].keys.length > this.minSize) {
-        this.rotateLeft(node, indexWithKey)
-        return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+      if (childNode.keys.length === this.minSize) {
+        const childRightNode = node.children![indexWithKey + 1]
+        const childLeftNode = node.children![indexWithKey - 1]
+        if (childRightNode) { // && childRightNode.keys.length > this.minSize
+          this.rotateLeft(node, indexWithKey)
+          return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+        } else if (childLeftNode) {
+          this.rotateRight(node, indexWithKey - 1)
+          return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+        } else {
+          throw Error("Not implemented yet")
+        }
       } else {
         return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
       }
@@ -168,9 +177,22 @@ export class BTree {
     const leftNode = parentNode.children![index]
     leftNode.keys.push(parentNode.keys[index] - leftNode.shift)
     leftNode.values.push(parentNode.values[index])
+    // and we may need to change values of keys, because maybe rightNode.shift != leftNode.shift
     // leftNode.children.push(rightNode.children.splice(0, 1)[0])
     parentNode.keys[index] = rightNode.keys.splice(0, 1)[0] + rightNode.shift
     parentNode.values[index] = rightNode.values.splice(0, 1)[0]
+  }
+
+  private rotateRight(parentNode: BNode, index: number) {
+    // add cases for shifting
+    const rightNode = parentNode.children![index + 1]
+    const leftNode = parentNode.children![index]
+    rightNode.keys.unshift(parentNode.keys[index] - rightNode.shift) // shifting
+    rightNode.values.unshift(parentNode.values[index])
+    // and we may need to change values of keys, because maybe rightNode.shift != leftNode.shift
+    // rightNode.children.unshift(leftNode.children.pop())
+    parentNode.keys[index] = leftNode.keys.pop()! + leftNode.shift // shifting
+    parentNode.values[index] = leftNode.values.pop()!
   }
 
   private splitNode(parentNode: BNode, indexOfSplittedChild: number) {
