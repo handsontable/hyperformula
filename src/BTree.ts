@@ -11,11 +11,13 @@ class BNode {
 export class BTree {
   private root: BNode
   private readonly maxSize: number
+  private readonly minSize: number
 
   constructor(
     private readonly span: number
   ) {
     this.root = new BNode([], [], null)
+    this.minSize = this.span - 1
     this.maxSize = 2 * this.span - 1
   }
 
@@ -112,9 +114,10 @@ export class BTree {
   }
 
   private deleteKeyWithShiftRecursive(node: BNode, key: number): boolean {
+    let skey = key - node.shift
     if (node.children === null) {
       for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] === key) {
+        if (node.keys[i] === skey) {
           node.keys.splice(i, 1)
           node.values.splice(i, 1)
           for (let j = i; j < node.keys.length; j++) {
@@ -127,20 +130,47 @@ export class BTree {
     } else {
       let indexWithKey = node.keys.length
       for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] > key) {
+        // if (node.keys[i] === key) {
+        //   // we have key in the internal node
+        //   indexWithKey = i
+        //   break
+        // } else if (node.keys[i] > key) {
+        if (node.keys[i] > skey) {
           indexWithKey = i
           break
         }
       }
       const childNode = node.children![indexWithKey]
-      const didRemoveInChild = this.deleteKeyWithShiftRecursive(node.children![indexWithKey], key)
-      if (didRemoveInChild) {
-        for (let i = indexWithKey + 1; i < node.children.length; i++) {
-          node.children![i].shift--
-        }
+      if (childNode.keys.length === this.minSize && node.children![indexWithKey + 1].keys.length > this.minSize) {
+        this.rotateLeft(node, indexWithKey)
+        return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+      } else {
+        return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
       }
-      return didRemoveInChild
     }
+  }
+
+  private deleteFromChildNodeAtIndex(parentNode: BNode, indexWithKey: number, skey: number): boolean {
+    const didRemoveInChild = this.deleteKeyWithShiftRecursive(parentNode.children![indexWithKey], skey)
+    if (didRemoveInChild) {
+      for (let i = indexWithKey + 1; i < parentNode.children!.length; i++) {
+        parentNode.children![i].shift--
+      }
+      for (let i = indexWithKey; i < parentNode.keys.length; i++) {
+        parentNode.keys[i]--
+      }
+    }
+    return didRemoveInChild
+  }
+
+  private rotateLeft(parentNode: BNode, index: number) {
+    const rightNode = parentNode.children![index + 1]
+    const leftNode = parentNode.children![index]
+    leftNode.keys.push(parentNode.keys[index] - leftNode.shift)
+    leftNode.values.push(parentNode.values[index])
+    // leftNode.children.push(rightNode.children.splice(0, 1)[0])
+    parentNode.keys[index] = rightNode.keys.splice(0, 1)[0] + rightNode.shift
+    parentNode.values[index] = rightNode.values.splice(0, 1)[0]
   }
 
   private splitNode(parentNode: BNode, indexOfSplittedChild: number) {
