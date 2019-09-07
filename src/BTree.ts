@@ -153,6 +153,9 @@ export class BTree {
         } else if (childRightNode) {
           this.merge(node, indexWithKey)
           return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
+        } else if (childLeftNode) {
+          this.merge(node, indexWithKey - 1)
+          return this.deleteFromChildNodeAtIndex(node, indexWithKey - 1, skey)
         } else {
           throw Error("Not implemented yet")
         }
@@ -165,8 +168,6 @@ export class BTree {
   private merge(parentNode: BNode, index: number) {
     const rightNode = parentNode.children![index + 1]
     const leftNode = parentNode.children![index]
-    console.warn(rightNode.keys)
-    console.warn(rightNode.keys.map((k) => k - (rightNode.shift - leftNode.shift)))
     leftNode.keys = leftNode.keys.concat(parentNode.keys.splice(index, 1)[0] - leftNode.shift, rightNode.keys.map((k) => k - (leftNode.shift - rightNode.shift)))
     leftNode.values = leftNode.values.concat(parentNode.values.splice(index, 1), rightNode.values)
     parentNode.children!.splice(index + 1, 1)

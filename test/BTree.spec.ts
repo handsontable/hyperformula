@@ -445,4 +445,39 @@ describe('BTree', () => {
 
     expect(btree._root.children![2]).toBeUndefined()
   })
+
+  it('deleteKeyWithShift from the leaf, which has only t-1 nodes, and has only left sibling with t-1 nodes, and nodes are shifted, h = 1', () => {
+    const btree = new BTree(3)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(8, 18)
+    btree.addKey(9, 19)
+    btree.addKey(10, 20)
+    btree.addKey(11, 21)
+    btree.addKey(3, 13)
+    btree.addKey(7, 17)
+    btree.deleteKeyWithShift(11)
+    btree.deleteKeyWithShift(7)
+    btree.deleteKeyWithShift(3)
+
+    expect(btree._root.children![1].shift).toEqual(-1)
+    expect(btree._root.children![2].shift).toEqual(-2)
+
+    btree.deleteKeyWithShift(7)
+
+    expect(btree._root.keys).toEqual([3])
+    expect(btree._root.values).toEqual([14])
+
+    expect(btree._root.children![0].keys).toEqual([1,2])
+    expect(btree._root.children![0].values).toEqual([11,12])
+
+    expect(btree._root.children![1].shift).toEqual(-1)
+    expect(btree._root.children![1].keys).toEqual([5,6,7,8])
+    expect(btree._root.children![1].values).toEqual([15,16,18,20])
+
+    expect(btree._root.children![2]).toBeUndefined()
+  })
 })
