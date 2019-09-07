@@ -69,14 +69,14 @@ const benchmarkBTree = (btreeSpan: number) => {
 
   startAt = Date.now()
   for (let i = 0; i < adds; i++) {
-    btree.add2Key(0, 42)
+    btree.addKeyWithShift(0, 42)
   }
   result[`adding ${adds} in beginning`] = Date.now() - startAt
 
   startAt = Date.now()
   const middle = Math.ceil(initialSize / 2)
   for (let i = 0; i < adds; i++) {
-    btree.add2Key(middle, 42)
+    btree.addKeyWithShift(middle, 42)
   }
   result[`adding ${adds} in middle`] = Date.now() - startAt
 
