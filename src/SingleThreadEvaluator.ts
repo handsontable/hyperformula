@@ -44,7 +44,7 @@ export class SingleThreadEvaluator implements Evaluator {
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
           const newCellValue = this.interpreter.evaluateAst(formula, address)
           vertex.setCellValue(newCellValue)
-          this.columnIndex.add(newCellValue, address)
+          this.columnIndex.change(currentValue, newCellValue, address)
           return (currentValue !== newCellValue)
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
