@@ -38,6 +38,9 @@ export class ColumnIndex {
     valueIndex.splice(index, 1)
   }
 
+  public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
+    this.remove(oldValue, address)
+    this.add(newValue, address)
   }
 
   public find(key: any, range: AbsoluteCellRange): number {
