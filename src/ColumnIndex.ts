@@ -21,6 +21,22 @@ export class ColumnIndex {
       }
       this.addValue(valueIndex, address.row)
     })
+  }
+
+  public remove(value: CellValue | null, address: SimpleCellAddress) {
+    if (!value) {
+      return
+    }
+
+    const columnMap = this.getColumnMap(address.sheet, address.col)
+    let valueIndex = columnMap.get(value)
+    if (!valueIndex) {
+      return
+    }
+
+    const index = binarySearch(valueIndex, address.row)
+    valueIndex.splice(index, 1)
+  }
 
   }
 
