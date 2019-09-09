@@ -53,6 +53,7 @@ export class HandsOnEngine {
       /** Statistics module for benchmarking */
       public readonly stats: Statistics,
       public readonly dependencyGraph: DependencyGraph,
+      public readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
       private readonly evaluator: Evaluator,

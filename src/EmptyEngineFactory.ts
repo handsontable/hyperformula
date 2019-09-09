@@ -18,6 +18,7 @@ export class EmptyEngineFactory {
       config,
       stats,
       dependencyGraph,
+      columnIndex,
       parser,
       evaluator,
       lazilyTransformingAstService

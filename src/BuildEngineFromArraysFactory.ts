@@ -40,6 +40,7 @@ export class BuildEngineFromArraysFactory {
       config,
       stats,
       dependencyGraph,
+      columnIndex,
       parser,
       evaluator,
       lazilyTransformingAstService
