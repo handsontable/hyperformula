@@ -171,6 +171,7 @@ export class HandsOnEngine {
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
     this.dependencyGraph.addRows(addedRows)
+    this.columnIndex.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)

@@ -2,6 +2,7 @@ import {CellValue, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {binarySearch as lowerBound} from "./interpreter/binarySearch";
 import {Statistics, StatType} from "./statistics/Statistics";
+import {RowsSpan} from "./RowsSpan";
 
 type ValueIndex = Array<number>
 type ColumnMap = Map<CellValue, ValueIndex>
@@ -84,6 +85,14 @@ export class ColumnIndex {
     return columnMap
   }
 
+  public getValueIndex(sheet: number, col: number, value: CellValue): ValueIndex {
+    const index = this.getColumnMap(sheet, col).get(value)
+    if (!index) {
+      throw Error()
+    }
+    return index
+  }
+
   private addValue(valueIndex: ValueIndex, rowNumber: number): void {
     const index = lowerBound(valueIndex, rowNumber)
     const value = valueIndex[index]
@@ -97,6 +106,22 @@ export class ColumnIndex {
     } else {
       valueIndex.splice(index + 1, 0, rowNumber)
     }
+  }
+
+  public addRows(rowsSpan: RowsSpan) {
+    const sheetIndex = this.index.get(rowsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    sheetIndex.forEach(column => {
+      for (const rows of column.values()) {
+        const index = lowerBound(rows, rowsSpan.rowStart)
+        for (let i=index; i<rows.length; ++i) {
+          rows[i] += rowsSpan.numberOfRows
+        }
+      }
+    })
   }
 }
 
