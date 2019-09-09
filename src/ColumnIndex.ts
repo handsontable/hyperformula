@@ -4,7 +4,8 @@ import {binarySearch as lowerBound} from "./interpreter/binarySearch";
 import {Statistics, StatType} from "./statistics/Statistics";
 
 type ValueIndex = Array<number>
-type SheetIndex = Array<Map<CellValue, ValueIndex>>
+type ColumnMap = Map<CellValue, ValueIndex>
+type SheetIndex = Array<ColumnMap>
 
 export class ColumnIndex {
   private readonly index: Map<number, SheetIndex> = new Map()
@@ -36,6 +37,14 @@ export class ColumnIndex {
 
     const index = binarySearch(valueIndex, address.row)
     valueIndex.splice(index, 1)
+
+    if (valueIndex.length === 0) {
+      columnMap.delete(value)
+    }
+
+    if (columnMap.size === 0) {
+      delete this.index.get(address.sheet)![address.col]
+    }
   }
 
   public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
@@ -60,7 +69,7 @@ export class ColumnIndex {
     return rowNumber <= range.end.row ? rowNumber : -1
   }
 
-  public getColumnMap(sheet: number, col: number) {
+  public getColumnMap(sheet: number, col: number): ColumnMap {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
     }
@@ -75,7 +84,7 @@ export class ColumnIndex {
     return columnMap
   }
 
-  private addValue(valueIndex: ValueIndex, rowNumber: number) {
+  private addValue(valueIndex: ValueIndex, rowNumber: number): void {
     const index = lowerBound(valueIndex, rowNumber)
     const value = valueIndex[index]
     if (value === rowNumber) {
