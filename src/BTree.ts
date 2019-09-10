@@ -140,10 +140,15 @@ export class BTree {
       if (childNode.keys.length === this.minSize) {
         const rightSibling = node.children![childIndex+1]
         const leftSibling = node.children![childIndex-1]
-        if (rightSibling.keys.length > this.minSize) {
+        if (rightSibling && rightSibling.keys.length > this.minSize) {
           this.rotateLeft(node, childIndex)
-        } else if (leftSibling.keys.length > this.minSize) {
+        } else if (leftSibling && leftSibling.keys.length > this.minSize) {
           this.rotateRight(node, childIndex - 1)
+        } else if (rightSibling) {
+          this.merge(node, childIndex)
+        } else if (leftSibling) {
+          this.merge(node, childIndex - 1)
+          return this.deleteKeyRecursive(leftSibling, skey)
         }
       }
       return this.deleteKeyRecursive(childNode, skey)
