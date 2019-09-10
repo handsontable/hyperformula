@@ -136,7 +136,17 @@ export class BTree {
           break
         }
       }
-      return this.deleteKeyRecursive(node.children![childIndex], skey)
+      const childNode = node.children![childIndex]
+      if (childNode.keys.length === this.minSize) {
+        const rightSibling = node.children![childIndex+1]
+        const leftSibling = node.children![childIndex-1]
+        if (rightSibling.keys.length > this.minSize) {
+          this.rotateLeft(node, childIndex)
+        } else if (leftSibling.keys.length > this.minSize) {
+          this.rotateRight(node, childIndex - 1)
+        }
+      }
+      return this.deleteKeyRecursive(childNode, skey)
     }
   }
 

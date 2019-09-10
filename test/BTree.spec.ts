@@ -228,6 +228,45 @@ describe('BTree', () => {
     expect(btree._root.children![1].values).toEqual([14])
   })
 
+  it('#deleteKey from node which is t-1 and has right >=t sibling', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+
+    btree.deleteKey(1)
+
+    expect(btree._root.keys).toEqual([3])
+    expect(btree._root.values).toEqual([13])
+    expect(btree._root.children![0].keys).toEqual([2])
+    expect(btree._root.children![0].values).toEqual([12])
+    expect(btree._root.children![1].shift).toEqual(0)
+    expect(btree._root.children![1].keys).toEqual([4])
+    expect(btree._root.children![1].values).toEqual([14])
+  })
+
+  it('#deleteKey from node which is t-1, has right t-1 sibling and left >=t sibling', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(3, 13)
+    btree.addKey(4, 15)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.addKey(2, 12)
+    btree.deleteKey(7)
+
+    btree.deleteKey(4)
+
+    expect(btree._root.keys).toEqual([2,5])
+    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([13])
+  })
+
   it('deleteKeyWithShift from root node', () => {
     const btree = new BTree(2)
     btree.addKey(1, 11)
