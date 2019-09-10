@@ -144,6 +144,90 @@ describe('BTree', () => {
     expect(btree.getKey(9)).toEqual(null)
   })
 
+  it('#deleteKey from root node', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+
+    const result = btree.deleteKey(2)
+    
+    expect(result).toBe(true)
+    expect(btree._root.keys).toEqual([1,3])
+    expect(btree._root.values).toEqual([11,13])
+  })
+
+  it('#deleteKey from root node, return false if nothing found', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(3, 13)
+
+    const result = btree.deleteKey(2)
+
+    expect(result).toBe(false)
+    expect(btree._root.keys).toEqual([1,3])
+    expect(btree._root.values).toEqual([11,13])
+  })
+
+  it('#deleteKey from empty tree', () => {
+    const btree = new BTree(2)
+
+    expect(() => {
+      btree.deleteKey(2)
+    }).not.toThrow()
+  })
+
+  it('#deleteKey from last leaf, h = 1', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+
+    btree.deleteKey(3)
+
+    expect(btree._root.keys).toEqual([2])
+    expect(btree._root.values).toEqual([12])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+    expect(btree._root.children![1].keys).toEqual([4])
+    expect(btree._root.children![1].values).toEqual([14])
+  })
+
+  it('#deleteKey from not-last leaf, h = 1', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 14)
+    btree.addKey(2, 12)
+
+    btree.deleteKey(2)
+
+    expect(btree._root.keys).toEqual([3])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![1].keys).toEqual([4,5])
+  })
+
+  it('#deleteKey from node with shift', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKeyWithShift(1, 110)
+
+    btree.deleteKey(4)
+
+    expect(btree._root.keys).toEqual([3])
+    expect(btree._root.values).toEqual([12])
+    expect(btree._root.children![0].keys).toEqual([1,2])
+    expect(btree._root.children![0].values).toEqual([110,11])
+    expect(btree._root.children![1].shift).toEqual(1)
+    expect(btree._root.children![1].keys).toEqual([4])
+    expect(btree._root.children![1].values).toEqual([14])
+  })
+
   it('deleteKeyWithShift from root node', () => {
     const btree = new BTree(2)
     btree.addKey(1, 11)
