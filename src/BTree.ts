@@ -130,12 +130,19 @@ export class BTree {
     } else {
       let indexWithKey = node.keys.length
       for (let i = 0; i < node.keys.length; i++) {
-        // if (node.keys[i] === key) {
-        //   // we have key in the internal node
-        //   indexWithKey = i
-        //   break
-        // } else if (node.keys[i] > key) {
-        if (node.keys[i] > skey) {
+        if (node.keys[i] === key) {
+          indexWithKey = i
+          const rightNode = node.children![indexWithKey + 1]
+          if (rightNode) { // && rightNode.keys.size > this.minSize
+            const minimalKeyInRightNode = rightNode.keys[0] // shifting
+            node.keys[i] = rightNode.keys[0]
+            node.values[i] = rightNode.values[0]
+            // it's not that simple. I guess we would like to do this.deleteKeyRecursive, and do the shift globally on that node
+            this.deleteKeyWithShiftRecursive(rightNode, minimalKeyInRightNode)
+            return true
+          }
+          break
+        } else if (node.keys[i] > key) {
           indexWithKey = i
           break
         }
@@ -144,7 +151,7 @@ export class BTree {
       if (childNode.keys.length === this.minSize) {
         const childRightNode = node.children![indexWithKey + 1]
         const childLeftNode = node.children![indexWithKey - 1]
-        if (childRightNode && childRightNode.keys.length > this.minSize) { // && childRightNode.keys.length > this.minSize
+        if (childRightNode && childRightNode.keys.length > this.minSize) {
           this.rotateLeft(node, indexWithKey)
           return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)
         } else if (childLeftNode && childLeftNode.keys.length > this.minSize) {
@@ -199,14 +206,13 @@ export class BTree {
   }
 
   private rotateRight(parentNode: BNode, index: number) {
-    // add cases for shifting
     const rightNode = parentNode.children![index + 1]
     const leftNode = parentNode.children![index]
-    rightNode.keys.unshift(parentNode.keys[index] - rightNode.shift) // shifting
+    rightNode.keys.unshift(parentNode.keys[index] - rightNode.shift)
     rightNode.values.unshift(parentNode.values[index])
     // and we may need to change values of keys, because maybe rightNode.shift != leftNode.shift
     // rightNode.children.unshift(leftNode.children.pop())
-    parentNode.keys[index] = leftNode.keys.pop()! + leftNode.shift // shifting
+    parentNode.keys[index] = leftNode.keys.pop()! + leftNode.shift
     parentNode.values[index] = leftNode.values.pop()!
   }
 
