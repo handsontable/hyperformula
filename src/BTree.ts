@@ -131,6 +131,28 @@ export class BTree {
     } else {
       let childIndex = node.keys.length
       for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] === skey) {
+          const rightChildNode = node.children![i + 1]
+          const leftChildNode = node.children![i]
+          if (rightChildNode.keys.length > this.minSize) { // case when there's no right child
+            const leftmostKey = rightChildNode.keys[0] + rightChildNode.shift
+            const valueOfLeftmostKey = rightChildNode.values[0]
+            this.deleteKeyRecursive(rightChildNode, leftmostKey)
+            node.keys[i] = leftmostKey
+            node.values[i] = valueOfLeftmostKey
+            return true
+          } else if (leftChildNode.keys.length > this.minSize) { // case when there's no left child
+            const rightmostKey = leftChildNode.keys[leftChildNode.keys.length - 1] + leftChildNode.shift
+            const valueOfRightmostKey = leftChildNode.values[leftChildNode.keys.length - 1]
+            this.deleteKeyRecursive(leftChildNode, rightmostKey)
+            node.keys[i] = rightmostKey
+            node.values[i] = valueOfRightmostKey
+            return true
+          } else {
+            this.mergeWithoutParentKey(node, i)
+            return true
+          }
+        }
         if (node.keys[i] > skey) {
           childIndex = i
           break
@@ -219,6 +241,17 @@ export class BTree {
     const leftNode = parentNode.children![index]
     leftNode.keys = leftNode.keys.concat(parentNode.keys.splice(index, 1)[0] - leftNode.shift, rightNode.keys.map((k) => k - (leftNode.shift - rightNode.shift)))
     leftNode.values = leftNode.values.concat(parentNode.values.splice(index, 1), rightNode.values)
+    parentNode.children!.splice(index + 1, 1)
+    // leftNode.children = leftNode.children.concat(rightNode.children)
+  }
+
+  private mergeWithoutParentKey(parentNode: BNode, index: number) {
+    const rightNode = parentNode.children![index + 1]
+    const leftNode = parentNode.children![index]
+    parentNode.keys.splice(index, 1)
+    parentNode.values.splice(index, 1)
+    leftNode.keys = leftNode.keys.concat(rightNode.keys.map((k) => k - (leftNode.shift - rightNode.shift))) // case for shifts
+    leftNode.values = leftNode.values.concat(rightNode.values)
     parentNode.children!.splice(index + 1, 1)
     // leftNode.children = leftNode.children.concat(rightNode.children)
   }

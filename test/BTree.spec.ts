@@ -327,6 +327,116 @@ describe('BTree', () => {
     expect(btree._root.children![2]).toBeUndefined()
   })
 
+  it('#deleteKey from internal node, which has right child with >=t keys', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+
+    btree.deleteKey(4)
+
+    expect(btree._root.keys).toEqual([2,5])
+    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([13])
+    expect(btree._root.children![2].keys).toEqual([6])
+    expect(btree._root.children![2].values).toEqual([16])
+  })
+
+  it('#deleteKey from internal node, which has right child with >=t keys and right child is shifted', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKeyWithShift(3, 130)
+
+    btree.deleteKey(5)
+
+    expect(btree._root.keys).toEqual([2,6])
+    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+    expect(btree._root.children![1].keys).toEqual([3,4])
+    expect(btree._root.children![1].values).toEqual([130,13])
+    expect(btree._root.children![2].keys).toEqual([6])
+    expect(btree._root.children![2].values).toEqual([16])
+  })
+
+  it('#deleteKey from internal node, which has right child with t-1 keys and left child with >=t keys', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.addKey(2, 12)
+
+    btree.deleteKey(3)
+
+    expect(btree._root.keys).toEqual([2,5])
+    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.children![0].keys).toEqual([1])
+    expect(btree._root.children![0].values).toEqual([11])
+    expect(btree._root.children![1].keys).toEqual([4])
+    expect(btree._root.children![1].values).toEqual([14])
+    expect(btree._root.children![2].keys).toEqual([6,7])
+    expect(btree._root.children![2].values).toEqual([16,17])
+  })
+
+  it('#deleteKey from internal node, which has right child with t-1 keys and left child with >=t keys, and left child is shifted', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+    btree.addKey(7, 17)
+    btree.deleteKey(7)
+    btree.addKey(4, 14)
+    btree.addKeyWithShift(1, 110)
+
+    btree.deleteKey(6)
+
+    expect(btree._root.keys).toEqual([3,5])
+    expect(btree._root.values).toEqual([12,14])
+    expect(btree._root.children![0].keys).toEqual([1,2])
+    expect(btree._root.children![0].values).toEqual([110,11])
+    expect(btree._root.children![1].shift).toEqual(1)
+    expect(btree._root.children![1].keys).toEqual([3])
+    expect(btree._root.children![1].values).toEqual([13])
+    expect(btree._root.children![2].keys).toEqual([6])
+    expect(btree._root.children![2].values).toEqual([16])
+  })
+
+  it('#deleteKey from internal node, which both left and right child are t-1', () => {
+    const btree = new BTree(2)
+    btree.addKey(1, 11)
+    btree.addKey(2, 12)
+    btree.addKey(3, 13)
+    btree.addKey(4, 14)
+    btree.addKey(5, 15)
+    btree.addKey(6, 16)
+
+    btree.deleteKey(2)
+
+    expect(btree._root.keys).toEqual([4])
+    expect(btree._root.values).toEqual([14])
+    expect(btree._root.children![0].keys).toEqual([1,3])
+    expect(btree._root.children![0].values).toEqual([11,13])
+    expect(btree._root.children![1].keys).toEqual([5,6])
+    expect(btree._root.children![1].values).toEqual([15,16])
+    expect(btree._root.children![2]).toBeUndefined()
+  })
+
   it('deleteKeyWithShift from root node', () => {
     const btree = new BTree(2)
     btree.addKey(1, 11)
