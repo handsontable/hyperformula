@@ -1,11 +1,10 @@
 import {ColumnIndex} from "../src/ColumnIndex";
 import {adr} from "./testUtils";
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 import {Statistics} from "../src/statistics/Statistics";
 import {simpleCellAddress} from "../src/Cell";
 import {RowsSpan} from "../src/RowsSpan";
 
-describe("Column index", () => {
+describe("Column index build", () => {
   it('should add value to empty index', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("B5"))
@@ -84,15 +83,52 @@ describe('ColumnIndex cruds', () => {
     expect(valueIndex).toContain(0)
   })
 
-  it('should shift rows', () => {
+  it('should shift rows when adding rows', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
+    index.add(1, adr("A3"))
+    index.add(1, adr("A4"))
+
+    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0, 3, 4, 5])
+  })
+
+  it('should shift rows when removing rows', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(1, adr("A2"))
+    index.add(1, adr("A3"))
+    index.add(1, adr("A4"))
+    index.add(1, adr("A5"))
+
+    index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1, 2])
+  })
+
+  it('should only shift rows', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
     index.add(2, adr("A2"))
+    index.add(1, adr("A3"))
+    index.add(1, adr("A4"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 1))
+    index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 2))
 
-    expect(index.getValueIndex(0, 0, 1)).toEqual(expect.arrayContaining([0, 2]))
-    expect(index.getValueIndex(0, 0, 2)).toEqual(expect.arrayContaining([2]))
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
+  })
+
+  it('should only shift rows 2', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(2, adr("A2"))
+    index.add(2, adr("A3"))
+    index.add(1, adr("A4"))
+
+    index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
   })
 })

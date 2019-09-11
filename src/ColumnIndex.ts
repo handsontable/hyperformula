@@ -1,8 +1,10 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {binarySearch as lowerBound} from "./interpreter/binarySearch";
+import {lowerBound as lowerBound} from "./interpreter/binarySearch";
 import {Statistics, StatType} from "./statistics/Statistics";
 import {RowsSpan} from "./RowsSpan";
+import {upperBound} from "./interpreter/binarySearch";
+import {ColumnsSpan} from "./ColumnsSpan";
 
 type ValueIndex = Array<number>
 type ColumnMap = Map<CellValue, ValueIndex>
@@ -36,7 +38,7 @@ export class ColumnIndex {
       return
     }
 
-    const index = binarySearch(valueIndex, address.row)
+    const index = upperBound(valueIndex, address.row)
     valueIndex.splice(index, 1)
 
     if (valueIndex.length === 0) {
@@ -65,7 +67,7 @@ export class ColumnIndex {
     }
 
     /* assuming that valueIndex is sorted already */
-    const index = binarySearch(valueIndex, range.start.row)
+    const index = upperBound(valueIndex, range.start.row)
     const rowNumber = valueIndex[index]
     return rowNumber <= range.end.row ? rowNumber : -1
   }
@@ -114,31 +116,39 @@ export class ColumnIndex {
       return
     }
 
+    this.shiftRows(sheetIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
+  }
+
+  public removeRows(rowsSpan: RowsSpan) {
+    const sheetIndex = this.index.get(rowsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    this.removeRowsFromValues(sheetIndex, rowsSpan)
+    this.shiftRows(sheetIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
+  }
+
+  private removeRowsFromValues(sheetIndex: SheetIndex, rowsSpan: RowsSpan) {
     sheetIndex.forEach(column => {
       for (const rows of column.values()) {
-        const index = lowerBound(rows, rowsSpan.rowStart)
-        for (let i=index; i<rows.length; ++i) {
-          rows[i] += rowsSpan.numberOfRows
+        const start = upperBound(rows, rowsSpan.rowStart)
+        const end = upperBound(rows, rowsSpan.rowEnd)
+        if (rows[start] <= rowsSpan.rowEnd) {
+          rows.splice(start, end - start + 1)
         }
       }
     })
   }
-}
 
-export function binarySearch(values: number[], key: number): number {
-  let start = 0
-  let end = values.length - 1
-
-  while (start <= end) {
-    let center = Math.floor((start + end) / 2)
-    if (key > values[center]) {
-      start = center + 1
-    } else if (key < values[center]) {
-      end = center - 1
-    } else {
-      return center
-    }
+  private shiftRows(sheetIndex: SheetIndex, afterRow: number, numberOfRows: number) {
+    sheetIndex.forEach(column => {
+      for (const rows of column.values()) {
+        const index = lowerBound(rows, afterRow)
+        for (let i=index; i<rows.length; ++i) {
+          rows[i] += numberOfRows
+        }
+      }
+    })
   }
-
-  return start
 }

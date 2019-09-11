@@ -1,6 +1,34 @@
 import {CellValue} from "../Cell";
 
-export function binarySearch(values: CellValue[], key: any): number {
+/*
+* If key exists returns index of key
+* Otherwise returns index of smallest element greater than key
+* assuming no repetitions
+* */
+export function upperBound(values: number[], key: number): number {
+  let start = 0
+  let end = values.length - 1
+
+  while (start <= end) {
+    let center = Math.floor((start + end) / 2)
+    if (key > values[center]) {
+      start = center + 1
+    } else if (key < values[center]) {
+      end = center - 1
+    } else {
+      return center
+    }
+  }
+
+  return start
+}
+
+
+/*
+* If key exists returns first index of key element in sorted array
+* Otherwise returns first index of greatest element smaller than key
+* */
+export function lowerBound(values: CellValue[], key: any): number {
   let start = 0
   let end = values.length - 1
 

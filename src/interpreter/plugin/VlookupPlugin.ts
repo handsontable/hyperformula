@@ -2,7 +2,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 import {AbsoluteCellRange} from "../../AbsoluteCellRange";
-import {binarySearch} from "../binarySearch";
+import {lowerBound} from "../binarySearch";
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {

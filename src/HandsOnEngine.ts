@@ -187,6 +187,7 @@ export class HandsOnEngine {
     const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
 
     this.dependencyGraph.removeRows(removedRows)
+    this.columnIndex.removeRows(removedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
