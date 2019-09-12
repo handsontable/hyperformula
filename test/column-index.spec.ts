@@ -145,4 +145,17 @@ describe('ColumnIndex cruds', () => {
     expect(index.getValueIndex(0, 3, 1)).toEqual([0])
     expect(index.getValueIndex(0, 4, 1)).toEqual([0])
   })
+
+  it('should do nothing when changing to the same value', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+
+    const spyRemove = spyOn(index, "remove")
+    const spyAdd = spyOn(index, "add")
+
+    index.change(1, 1, simpleCellAddress(0, 0, 0))
+
+    expect(spyRemove).not.toHaveBeenCalled()
+    expect(spyAdd).not.toHaveBeenCalled()
+  })
 })

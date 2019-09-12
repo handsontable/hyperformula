@@ -51,6 +51,9 @@ export class ColumnIndex {
   }
 
   public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
+    if (oldValue === newValue) {
+      return
+    }
     this.remove(oldValue, address)
     this.add(newValue, address)
   }
