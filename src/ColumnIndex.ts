@@ -129,6 +129,15 @@ export class ColumnIndex {
     this.shiftRows(sheetIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
+  public addColumns(columnsSpan: ColumnsSpan) {
+    const sheetIndex = this.index.get(columnsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    sheetIndex.splice(columnsSpan.columnStart, 0, ...Array(columnsSpan.numberOfColumns))
+  }
+
   private removeRowsFromValues(sheetIndex: SheetIndex, rowsSpan: RowsSpan) {
     sheetIndex.forEach(column => {
       for (const rows of column.values()) {

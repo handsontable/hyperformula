@@ -3,6 +3,7 @@ import {adr} from "./testUtils";
 import {Statistics} from "../src/statistics/Statistics";
 import {simpleCellAddress} from "../src/Cell";
 import {RowsSpan} from "../src/RowsSpan";
+import {ColumnsSpan} from "../src/ColumnsSpan";
 
 describe("Column index build", () => {
   it('should add value to empty index', () => {
@@ -130,5 +131,18 @@ describe('ColumnIndex cruds', () => {
     index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 2))
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
+  })
+
+  it('should shift columns', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(1, adr("B1"))
+    index.add(1, adr("C1"))
+
+    index.addColumns(ColumnsSpan.fromNumberOfColumns(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0])
+    expect(index.getValueIndex(0, 3, 1)).toEqual([0])
+    expect(index.getValueIndex(0, 4, 1)).toEqual([0])
   })
 })
