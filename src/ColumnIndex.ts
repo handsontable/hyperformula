@@ -93,7 +93,7 @@ export class ColumnIndex {
   public getValueIndex(sheet: number, col: number, value: CellValue): ValueIndex {
     const index = this.getColumnMap(sheet, col).get(value)
     if (!index) {
-      throw Error()
+      return []
     }
     return index
   }
@@ -139,6 +139,15 @@ export class ColumnIndex {
     }
 
     sheetIndex.splice(columnsSpan.columnStart, 0, ...Array(columnsSpan.numberOfColumns))
+  }
+
+  public removeColumns(columnsSpan: ColumnsSpan) {
+    const sheetIndex = this.index.get(columnsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    sheetIndex.splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
   }
 
   private removeRowsFromValues(sheetIndex: SheetIndex, rowsSpan: RowsSpan) {

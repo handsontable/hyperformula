@@ -133,7 +133,7 @@ describe('ColumnIndex cruds', () => {
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
   })
 
-  it('should shift columns', () => {
+  it('should shift columns when adding columns', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
     index.add(1, adr("B1"))
@@ -145,6 +145,22 @@ describe('ColumnIndex cruds', () => {
     expect(index.getValueIndex(0, 3, 1)).toEqual([0])
     expect(index.getValueIndex(0, 4, 1)).toEqual([0])
   })
+
+  it('should remove columns', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(2, adr("B1"))
+    index.add(3, adr("C1"))
+    index.add(4, adr("D1"))
+
+    index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0])
+    expect(index.getValueIndex(0, 1, 4)).toEqual([0])
+    expect(index.getValueIndex(0, 2, 3)).toEqual([])
+    expect(index.getValueIndex(0, 3, 4)).toEqual([])
+  })
+
 
   it('should do nothing when changing to the same value', () => {
     const index = new ColumnIndex(new Statistics())
