@@ -17,11 +17,14 @@ export class ColumnIndex {
   private readonly index: Map<number, SheetIndex> = new Map()
 
   constructor(
-      private readonly stats: Statistics
+      private readonly stats: Statistics,
+      private readonly transformingService: LazilyTransformingAstService
   ) {
   }
 
   public add(value: CellValue, address: SimpleCellAddress) {
+    this.ensureRecentData(address.sheet, address.col)
+
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       const columnMap = this.getColumnMap(address.sheet, address.col)
       let valueIndex = columnMap.index.get(value)
@@ -37,6 +40,8 @@ export class ColumnIndex {
     if (!value) {
       return
     }
+
+    this.ensureRecentData(address.sheet, address.col)
 
     const columnMap = this.getColumnMap(address.sheet, address.col)
     let valueIndex = columnMap.index.get(value)
@@ -64,8 +69,8 @@ export class ColumnIndex {
     this.add(newValue, address)
   }
 
-  public find(key: any, range: AbsoluteCellRange, transformService: LazilyTransformingAstService): number {
-    this.ensureRecentData(range.sheet, range.start.col, transformService)
+  public find(key: any, range: AbsoluteCellRange): number {
+    this.ensureRecentData(range.sheet, range.start.col)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
     if (!columnMap) {
@@ -140,13 +145,13 @@ export class ColumnIndex {
     return index
   }
 
-  public ensureRecentData(sheet: number, col: number, transformingService: LazilyTransformingAstService) {
+  public ensureRecentData(sheet: number, col: number) {
     const columnMap = this.getColumnMap(sheet, col)
-    const actualVersion = transformingService.version()
+    const actualVersion = this.transformingService.version()
     if (columnMap.version === actualVersion) {
       return
     }
-    const relevantTransformations = transformingService.getTransformationsFrom(columnMap.version, (transformation: Transformation) => {
+    const relevantTransformations = this.transformingService.getTransformationsFrom(columnMap.version, (transformation: Transformation) => {
       return transformation.sheet === sheet && (transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS)
     })
     for (const transformation of relevantTransformations) {

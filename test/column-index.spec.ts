@@ -9,7 +9,9 @@ import {LazilyTransformingAstService} from "../src";
 
 describe("ColumnIndex#add", () => {
   it('should add value to empty index', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("B5"))
 
     const columnMap = index.getColumnMap(0, 1)
@@ -19,7 +21,9 @@ describe("ColumnIndex#add", () => {
   });
 
   it('should keep values in sorted order', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A3"))
     index.add(1, adr("A5"))
     index.add(1, adr("A1"))
@@ -31,7 +35,9 @@ describe("ColumnIndex#add", () => {
   });
 
   it('should not store duplicates', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A5"))
     index.add(1, adr("A5"))
@@ -47,7 +53,9 @@ describe("ColumnIndex#add", () => {
 
 describe('ColumnIndex change/remove', () => {
   it('should remove value from index', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
     index.add(1, adr("A3"))
@@ -61,7 +69,9 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should do nothing if passed value is null', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
     index.add(1, adr("A3"))
@@ -76,7 +86,9 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should change value in index', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     index.change(1, 2, simpleCellAddress(0, 0, 0))
@@ -87,7 +99,9 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should do nothing when changing to the same value', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     const spyRemove = spyOn(index, "remove")
@@ -102,7 +116,9 @@ describe('ColumnIndex change/remove', () => {
 
 describe('ColumnIndex#addRows', () => {
   it('should add row', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(2, adr("B3"))
 
@@ -114,7 +130,9 @@ describe('ColumnIndex#addRows', () => {
   })
 
   it('should not shift row', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     index.addRows(0, RowsSpan.fromNumberOfRows(0, 1, 1), 0)
@@ -123,7 +141,9 @@ describe('ColumnIndex#addRows', () => {
   })
 
   it('should add rows in the middle', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
     index.add(1, adr("A3"))
@@ -135,7 +155,9 @@ describe('ColumnIndex#addRows', () => {
   })
 
   it('should add rows for all columns', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A2"))
     index.add(1, adr("B2"))
     index.add(2, adr("C2"))
@@ -150,7 +172,9 @@ describe('ColumnIndex#addRows', () => {
   })
 
   it('should add rows for different values', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(2, adr("A2"))
     index.add(3, adr("A3"))
@@ -169,7 +193,9 @@ describe('ColumnIndex#addRows', () => {
 
 describe('ColumnIndex#removeRows', () => {
   it('should remove rows', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     index.removeRows(0, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
@@ -178,7 +204,9 @@ describe('ColumnIndex#removeRows', () => {
   })
 
   it('should remove rows in the middle ', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
     index.add(1, adr("A3"))
@@ -190,7 +218,9 @@ describe('ColumnIndex#removeRows', () => {
   })
 
   it('should remove rows in every column', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A2"))
     index.add(1, adr("B2"))
     index.add(1, adr("C2"))
@@ -205,7 +235,9 @@ describe('ColumnIndex#removeRows', () => {
   })
 
   it('should remove rows for different values', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A2"))
     index.add(2, adr("A3"))
     index.add(3, adr("A4"))
@@ -221,7 +253,9 @@ describe('ColumnIndex#removeRows', () => {
   })
 
   it('should remove rows only in one sheet', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A2"))
     index.add(1, adr("A2", 1))
 
@@ -232,7 +266,9 @@ describe('ColumnIndex#removeRows', () => {
   })
 
   it('should remove proper rows', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("A3"))
     index.add(1, adr("A4"))
@@ -246,7 +282,9 @@ describe('ColumnIndex#removeRows', () => {
 
 describe('ColumnIndex#addColumns', () => {
   it('should add column to index', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     index.addColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
@@ -256,7 +294,9 @@ describe('ColumnIndex#addColumns', () => {
   })
 
   it('should add columns in the middle', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(1, adr("B1"))
     index.add(1, adr("C1"))
@@ -269,7 +309,9 @@ describe('ColumnIndex#addColumns', () => {
   })
 
   it('should add columns only in one sheet', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("B1"))
     index.add(1, adr("B1", 1))
 
@@ -283,7 +325,9 @@ describe('ColumnIndex#addColumns', () => {
 
 describe('ColumnIndex#removeColumns', () => {
   it('should remove column', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
 
     index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
@@ -292,7 +336,9 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should work when empty index', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
 
     index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
 
@@ -300,7 +346,9 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should remove multiple columns in the middle ', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1"))
     index.add(2, adr("B1"))
     index.add(3, adr("C1"))
@@ -315,7 +363,9 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should remove columns only in one sheet ', () => {
-    const index = new ColumnIndex(new Statistics())
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
     index.add(1, adr("A1", 0))
     index.add(1, adr("A1", 1))
 
@@ -330,64 +380,64 @@ describe('ColumnIndex#find', () => {
   const stats = new Statistics()
   const transformService = new LazilyTransformingAstService(stats)
   it('should find row number', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
 
     index.add(1, adr("A2"))
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A3")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A3")))
 
     expect(row).toBe(1)
   })
 
   it('should find smallest row number for value', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
 
     index.add(1, adr("A4"))
     index.add(1, adr("A10"))
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
 
     expect(row).toBe(3)
   });
 
   it('should not find anything in empty index', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything in empty column', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
     index.add(1, adr("B2"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value occurs before range', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
     index.add(1, adr("A1"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A5")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A5")))
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value occurs after range', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
     index.add(1, adr("A10"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A9")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A9")))
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value in different sheet', function () {
-    const index = new ColumnIndex(stats)
+    const index = new ColumnIndex(stats, transformService)
     index.add(1, adr("A5", 1))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A10")), transformService)
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A10")))
 
     expect(row).toBe(-1)
   });
