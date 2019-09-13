@@ -1,9 +1,7 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {lowerBound as lowerBound} from "./interpreter/binarySearch";
 import {Statistics, StatType} from "./statistics/Statistics";
 import {RowsSpan} from "./RowsSpan";
-import {upperBound} from "./interpreter/binarySearch";
 import {ColumnsSpan} from "./ColumnsSpan";
 
 type ValueIndex = Array<number>
@@ -75,6 +73,43 @@ export class ColumnIndex {
     return rowNumber <= range.end.row ? rowNumber : -1
   }
 
+  public addRows(rowsSpan: RowsSpan) {
+    const sheetIndex = this.index.get(rowsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    this.shiftRows(sheetIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
+  }
+
+  public removeRows(rowsSpan: RowsSpan) {
+    const sheetIndex = this.index.get(rowsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    this.removeRowsFromValues(sheetIndex, rowsSpan)
+    this.shiftRows(sheetIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
+  }
+
+  public addColumns(columnsSpan: ColumnsSpan) {
+    const sheetIndex = this.index.get(columnsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    sheetIndex.splice(columnsSpan.columnStart, 0, ...Array(columnsSpan.numberOfColumns))
+  }
+
+  public removeColumns(columnsSpan: ColumnsSpan) {
+    const sheetIndex = this.index.get(columnsSpan.sheet)
+    if (!sheetIndex) {
+      return
+    }
+
+    sheetIndex.splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
+  }
+
   public getColumnMap(sheet: number, col: number): ColumnMap {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
@@ -113,43 +148,6 @@ export class ColumnIndex {
     }
   }
 
-  public addRows(rowsSpan: RowsSpan) {
-    const sheetIndex = this.index.get(rowsSpan.sheet)
-    if (!sheetIndex) {
-      return
-    }
-
-    this.shiftRows(sheetIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
-  }
-
-  public removeRows(rowsSpan: RowsSpan) {
-    const sheetIndex = this.index.get(rowsSpan.sheet)
-    if (!sheetIndex) {
-      return
-    }
-
-    this.removeRowsFromValues(sheetIndex, rowsSpan)
-    this.shiftRows(sheetIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
-  }
-
-  public addColumns(columnsSpan: ColumnsSpan) {
-    const sheetIndex = this.index.get(columnsSpan.sheet)
-    if (!sheetIndex) {
-      return
-    }
-
-    sheetIndex.splice(columnsSpan.columnStart, 0, ...Array(columnsSpan.numberOfColumns))
-  }
-
-  public removeColumns(columnsSpan: ColumnsSpan) {
-    const sheetIndex = this.index.get(columnsSpan.sheet)
-    if (!sheetIndex) {
-      return
-    }
-
-    sheetIndex.splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
-  }
-
   private removeRowsFromValues(sheetIndex: SheetIndex, rowsSpan: RowsSpan) {
     sheetIndex.forEach(column => {
       for (const rows of column.values()) {
@@ -172,4 +170,52 @@ export class ColumnIndex {
       }
     })
   }
+}
+
+
+/*
+* If key exists returns index of key
+* Otherwise returns index of smallest element greater than key
+* assuming sorted array and no repetitions
+* */
+export function upperBound(values: number[], key: number): number {
+  let start = 0
+  let end = values.length - 1
+
+  while (start <= end) {
+    let center = Math.floor((start + end) / 2)
+    if (key > values[center]) {
+      start = center + 1
+    } else if (key < values[center]) {
+      end = center - 1
+    } else {
+      return center
+    }
+  }
+
+  return start
+}
+
+
+/*
+* If key exists returns index of key
+* Otherwise returns index of greatest element smaller than key
+* assuming sorted array and no repetitions
+* */
+export function lowerBound(values: number[], key: number): number {
+  let start = 0
+  let end = values.length - 1
+
+  while (start <= end) {
+    let center = Math.floor((start + end) / 2)
+    if (key > values[center]) {
+      start = center + 1
+    } else if (key < values[center]) {
+      end = center - 1
+    } else {
+      return center
+    }
+  }
+
+  return end
 }
