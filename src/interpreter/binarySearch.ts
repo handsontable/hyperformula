@@ -1,6 +1,11 @@
 import {CellValue} from "../Cell";
 
-export function binarySearch(values: CellValue[], key: any): number {
+/*
+* If key exists returns first index of key element in sorted array
+* Otherwise returns first index of greatest element smaller than key
+* assuming sorted array
+* */
+export function lowerBound(values: CellValue[], key: any): number {
   let start = 0
   let end = values.length - 1
 

@@ -25,6 +25,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
+import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Engine for one sheet
@@ -52,6 +53,7 @@ export class HandsOnEngine {
       /** Statistics module for benchmarking */
       public readonly stats: Statistics,
       public readonly dependencyGraph: DependencyGraph,
+      public readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
       private readonly evaluator: Evaluator,
@@ -169,6 +171,7 @@ export class HandsOnEngine {
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
     this.dependencyGraph.addRows(addedRows)
+    this.columnIndex.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
@@ -184,6 +187,7 @@ export class HandsOnEngine {
     const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
 
     this.dependencyGraph.removeRows(removedRows)
+    this.columnIndex.removeRows(removedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
@@ -199,6 +203,7 @@ export class HandsOnEngine {
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
 
     this.dependencyGraph.addColumns(addedColumns)
+    this.columnIndex.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
@@ -214,6 +219,7 @@ export class HandsOnEngine {
     const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(removedColumns)
+    this.columnIndex.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)

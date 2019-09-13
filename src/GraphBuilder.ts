@@ -7,6 +7,7 @@ import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Two-dimenstional array representation of sheet
@@ -34,14 +35,15 @@ export class GraphBuilder {
    */
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly config: Config = new Config(),
       private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.parser, this.stats, config.matrixDetectionThreshold)
+      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
-      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.parser, this.stats)
+      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats)
     }
   }
 
@@ -69,6 +71,7 @@ export interface GraphBuilderStrategy {
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
   ) {
@@ -112,9 +115,11 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
             vertex = new ValueCellVertex(Number(cellContent))
+            this.columnIndex.add(Number(cellContent), address)
             this.dependencyGraph.addVertex(address, vertex)
           } else {
             vertex = new ValueCellVertex(cellContent)
+            this.columnIndex.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -128,6 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnIndex: ColumnIndex,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,
@@ -173,6 +179,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             matrixHeuristic.add(address)
           } else {
             const vertex = new ValueCellVertex(cellContent)
+            this.columnIndex.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -187,6 +194,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       for (const address of elem.cells.reverse()) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
         const vertex = new ValueCellVertex(Number(value))
+        this.columnIndex.add(Number(value), address)
         this.dependencyGraph.addVertex(address, vertex)
       }
     }

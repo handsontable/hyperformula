@@ -174,7 +174,7 @@ describe('Adding row - address mapping', () => {
   it('verify sheet dimensions', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
-      // new col
+      // new row
       ['2']
     ])
 

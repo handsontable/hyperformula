@@ -2,7 +2,6 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
 import {AbsoluteCellRange} from "../../AbsoluteCellRange";
-import {binarySearch} from "../binarySearch";
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -56,14 +55,8 @@ export class VlookupPlugin extends FunctionPlugin {
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    const values = this.computeListOfValuesInRange(searchedRange)
 
-    let rowIndex = -1
-    if (values.length < this.config.vlookupThreshold || !sorted) {
-      rowIndex = values.indexOf(key)
-    } else {
-      rowIndex = binarySearch(values, key)
-    }
+    const rowIndex = this.columnIndex.find(key, range)
 
     if (rowIndex === -1) {
       return new CellError(ErrorType.NA)

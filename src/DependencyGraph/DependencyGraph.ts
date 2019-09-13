@@ -17,6 +17,7 @@ import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
+import {ColumnIndex} from "../ColumnIndex";
 
 export class DependencyGraph {
   /*
