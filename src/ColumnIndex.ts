@@ -154,7 +154,7 @@ export class ColumnIndex {
     sheetIndex.forEach(column => {
       for (const rows of column.values()) {
         const start = upperBound(rows, rowsSpan.rowStart)
-        const end = upperBound(rows, rowsSpan.rowEnd)
+        const end = lowerBound(rows, rowsSpan.rowEnd)
         if (rows[start] <= rowsSpan.rowEnd) {
           rows.splice(start, end - start + 1)
         }
