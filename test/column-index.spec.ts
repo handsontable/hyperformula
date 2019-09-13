@@ -99,7 +99,27 @@ describe('ColumnIndex change/remove', () => {
 })
 
 describe('ColumnIndex#addRows', () => {
-  it('should shift rows when adding rows', () => {
+  it('should add row', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(2, adr("B3"))
+
+    index.addRows(RowsSpan.fromNumberOfRows(0, 0, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([1])
+    expect(index.getValueIndex(0, 1, 2)).toEqual([3])
+  })
+
+  it('should not shift row', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+
+    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0])
+  })
+
+  it('should add rows in the middle', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
     index.add(1, adr("A2"))
@@ -111,7 +131,34 @@ describe('ColumnIndex#addRows', () => {
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 3, 4, 5])
   })
 
+  it('should add rows for all columns', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A2"))
+    index.add(1, adr("B2"))
+    index.add(2, adr("C2"))
 
+    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([3])
+    expect(index.getValueIndex(0, 1, 1)).toEqual([3])
+    expect(index.getValueIndex(0, 2, 2)).toEqual([3])
+  })
+
+  it('should add rows for different values', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+    index.add(2, adr("A2"))
+    index.add(3, adr("A3"))
+    index.add(4, adr("B1"))
+    index.add(4, adr("B5"))
+
+    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([0])
+    expect(index.getValueIndex(0, 0, 2)).toEqual([3])
+    expect(index.getValueIndex(0, 0, 3)).toEqual([4])
+    expect(index.getValueIndex(0, 1, 4)).toEqual([0, 6])
+  })
 })
 
 describe('ColumnIndex#removeRows', () => {
