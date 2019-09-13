@@ -5,7 +5,7 @@ import '../testConfig'
 describe('Function SUMIFS', () => {
   it('error when 1st arg is not a range or reference',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(42, ">0", B1:B2)'],
+      ['=SUMIFS(42, B1:B2, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -13,7 +13,7 @@ describe('Function SUMIFS', () => {
 
   it('error when 2nd arg is not a string',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, 78, B1:B2)'],
+      ['=SUMIFS(C1:C2, B1:B2, 78)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -21,7 +21,7 @@ describe('Function SUMIFS', () => {
 
   it('error when 3rd arg is not a range or reference',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, ">0", 42)'],
+      ['=SUMIFS(C1:C2, 42, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -29,7 +29,7 @@ describe('Function SUMIFS', () => {
 
   it('error when criterion unparsable',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(B1:B2, "%", C1:C2)'],
+      ['=SUMIFS(B1:B2, C1:C2, "%")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -37,9 +37,9 @@ describe('Function SUMIFS', () => {
 
   it('error when different width dimension of arguments',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(B1:C1, ">0", B2:D2)'],
-      ['=SUMIFS(B1, ">0", B2:D2)'],
-      ['=SUMIFS(B1:D1, ">0", B2)'],
+      ['=SUMIFS(B1:C1, B2:D2, ">0")'],
+      ['=SUMIFS(B1, B2:D2, ">0")'],
+      ['=SUMIFS(B1:D1, B2, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -49,9 +49,9 @@ describe('Function SUMIFS', () => {
 
   it('error when different height dimension of arguments',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(B1:B2, ">0", C1:C3)'],
-      ['=SUMIFS(B1, ">0", C1:C2)'],
-      ['=SUMIFS(B1:B2, ">0", C1)'],
+      ['=SUMIFS(B1:B2, C1:C3, ">0")'],
+      ['=SUMIFS(B1, C1:C2, ">0")'],
+      ['=SUMIFS(B1:B2, C1, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -64,7 +64,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, ">1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, ">1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(7)
@@ -75,7 +75,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, ">=1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, ">=1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(12)
@@ -86,7 +86,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B2, "<1", A1:A2)'],
+      ['=SUMIFS(B1:B2, A1:A2, "<1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(3)
@@ -97,7 +97,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, "<=1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, "<=1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(8)
@@ -108,7 +108,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, "=1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(5)
@@ -119,7 +119,7 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, "<>1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, "<>1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(10)
@@ -128,7 +128,7 @@ describe('Function SUMIFS', () => {
   it('works when arguments are just references',  () => {
     const engine =  HandsOnEngine.buildFromArray([
       ['2', '3'],
-      ['=SUMIFS(B1, ">1", A1)'],
+      ['=SUMIFS(B1, A1, ">1")'],
     ])
 
     expect(engine.getCellValue('A2')).toEqual(3)
@@ -136,11 +136,11 @@ describe('Function SUMIFS', () => {
 
   it('works for subranges with different conditions',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1,"="&A1,A1:A1)'],
-      ['2', '1', '=SUMIFS(B1:B2,"="&A2,A1:A2)'],
-      ['1', '1', '=SUMIFS(B1:B3,"="&A3,A1:A3)'],
-      ['3', '1', '=SUMIFS(B1:B4,"="&A4,A1:A4)'],
-      ['1', '1', '=SUMIFS(B1:B5,"="&A5,A1:A5)'],
+      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&A1)'],
+      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&A2)'],
+      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&A3)'],
+      ['3', '1', '=SUMIFS(B1:B4, A1:A4, "="&A4)'],
+      ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&A5)'],
     ])
 
     expect(engine.getCellValue('C1')).toEqual(1)
@@ -152,10 +152,10 @@ describe('Function SUMIFS', () => {
 
   it('works for subranges with inequality',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, ">2", A1:A1)'],
-      ['2', '1', '=SUMIFS(B1:B2, ">2", A1:A2)'],
-      ['3', '1', '=SUMIFS(B1:B3, ">2", A1:A3)'],
-      ['4', '1', '=SUMIFS(B1:B4, ">2", A1:A4)'],
+      ['1', '1', '=SUMIFS(B1:B1, A1:A1, ">2")'],
+      ['2', '1', '=SUMIFS(B1:B2, A1:A2, ">2")'],
+      ['3', '1', '=SUMIFS(B1:B3, A1:A3, ">2")'],
+      ['4', '1', '=SUMIFS(B1:B4, A1:A4, ">2")'],
     ])
 
     expect(engine.getCellValue('C1')).toEqual(0)
@@ -166,10 +166,10 @@ describe('Function SUMIFS', () => {
 
   it('works for subranges with more interesting criterions',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, "=1", A1:A1)'],
-      ['2', '1', '=SUMIFS(B1:B2, "<=2", A1:A2)'],
-      ['1', '1', '=SUMIFS(B1:B3, "<2", A1:A3)'],
-      ['1', '1', '=SUMIFS(B1:B4, ">4", A1:A4)'],
+      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "=1")'],
+      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "<=2")'],
+      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "<2")'],
+      ['1', '1', '=SUMIFS(B1:B4, A1:A4, ">4")'],
     ])
 
     expect(engine.getCellValue('C1')).toEqual(1)
@@ -180,11 +180,11 @@ describe('Function SUMIFS', () => {
 
   it('discontinuous sumif range',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1,"="&B1,A1:A1)'],
-      ['2', '1', '=SUMIFS(B1:B2,"="&B2,A1:A2)'],
-      ['1', '1', '=SUMIFS(B1:B3,"="&B3,A1:A3)'],
+      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&B1)'],
+      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&B2)'],
+      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&B3)'],
       ['0', '0', '0'],
-      ['1', '1', '=SUMIFS(B1:B5,"="&B5,A1:A5)'],
+      ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&B5)'],
     ])
 
     expect(engine.getCellValue('C1')).toEqual(1)
@@ -198,8 +198,8 @@ describe('Function SUMIFS', () => {
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
-      ['=SUMIFS(B1:B3, "=1", A1:A3)'],
-      ['=SUMIFS(B1:B3, "=1", A1:A3)'],
+      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
+      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
     ])
 
     expect(engine.getCellValue('A4')).toEqual(5)
@@ -207,4 +207,3 @@ describe('Function SUMIFS', () => {
     expect(engine.stats.sumifFullCacheUsed).toEqual(1)
   })
 })
-

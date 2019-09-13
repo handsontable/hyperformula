@@ -103,7 +103,7 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+    const criterionString = this.evaluateAst(ast.args[2], formulaAddress)
     if (typeof criterionString !== 'string') {
       return new CellError(ErrorType.VALUE)
     }
@@ -113,7 +113,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const conditionRangeArg = ast.args[2]
+    const conditionRangeArg = ast.args[1]
     const valuesRangeArg = ast.args[0]
 
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
@@ -189,7 +189,7 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private evaluateCellSumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
-    const conditionReferenceArg = ast.args[2] as CellReferenceAst
+    const conditionReferenceArg = ast.args[1] as CellReferenceAst
     const valuesReferenceArg = ast.args[0] as CellReferenceAst
 
     const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
