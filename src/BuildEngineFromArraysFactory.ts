@@ -12,8 +12,8 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.OVERALL)
 
-    const columnIndex = new ColumnIndex(stats)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const columnIndex = new ColumnIndex(stats, lazilyTransformingAstService)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping

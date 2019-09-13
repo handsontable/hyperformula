@@ -137,4 +137,13 @@ export class LazilyTransformingAstService {
     this.stats.end(StatType.TRANSFORM_ASTS_POSTPONED)
     return [cachedAst, address, this.transformations.length]
   }
+
+  public* getTransformationsFrom(version: number, filter?: (transformation: Transformation) => boolean): IterableIterator<Transformation> {
+    for (let v = version; v < this.transformations.length; v++) {
+      const transformation = this.transformations[v]
+      if (!filter || filter(transformation)) {
+        yield transformation
+      }
+    }
+  }
 }

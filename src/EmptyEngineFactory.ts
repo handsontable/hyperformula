@@ -8,8 +8,8 @@ import {ColumnIndex} from "./ColumnIndex";
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HandsOnEngine {
     const stats = new Statistics()
-    const columnIndex = new ColumnIndex(stats)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const columnIndex = new ColumnIndex(stats, lazilyTransformingAstService)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats)

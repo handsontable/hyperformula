@@ -5,6 +5,7 @@ import {simpleCellAddress} from "../src/Cell";
 import {RowsSpan} from "../src/RowsSpan";
 import {ColumnsSpan} from "../src/ColumnsSpan";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
+import {LazilyTransformingAstService} from "../src";
 
 describe("ColumnIndex#add", () => {
   it('should add value to empty index', () => {
@@ -13,8 +14,8 @@ describe("ColumnIndex#add", () => {
 
     const columnMap = index.getColumnMap(0, 1)
 
-    expect(columnMap.size).toBe(1)
-    expect(columnMap.get(1)![0]).toBe(4)
+    expect(columnMap.index.size).toBe(1)
+    expect(columnMap.index.get(1)![0]).toBe(4)
   });
 
   it('should keep values in sorted order', () => {
@@ -25,8 +26,8 @@ describe("ColumnIndex#add", () => {
 
     const columnMap = index.getColumnMap(0, 0)
 
-    expect(columnMap.size).toBe(1)
-    expect(columnMap.get(1)![0]).toBe(0)
+    expect(columnMap.index.size).toBe(1)
+    expect(columnMap.index.get(1)![0]).toBe(0)
   });
 
   it('should not store duplicates', () => {
@@ -39,8 +40,8 @@ describe("ColumnIndex#add", () => {
 
     const columnMap = index.getColumnMap(0, 0)
 
-    expect(columnMap.size).toBe(1)
-    expect(columnMap.get(1)!.length).toBe(2)
+    expect(columnMap.index.size).toBe(1)
+    expect(columnMap.index.get(1)!.length).toBe(2)
   });
 })
 
@@ -53,7 +54,7 @@ describe('ColumnIndex change/remove', () => {
 
     index.remove(1, simpleCellAddress(0, 0, 1))
 
-    const valueIndex = index.getColumnMap(0, 0).get(1)!
+    const valueIndex = index.getColumnMap(0, 0).index.get(1)!
     expect(valueIndex.length).toBe(2)
     expect(valueIndex).toContain(0)
     expect(valueIndex).toContain(2)
@@ -67,7 +68,7 @@ describe('ColumnIndex change/remove', () => {
 
     index.remove(null, simpleCellAddress(0, 0, 1))
 
-    const valueIndex = index.getColumnMap(0, 0).get(1)!
+    const valueIndex = index.getColumnMap(0, 0).index.get(1)!
     expect(valueIndex.length).toBe(3)
     expect(valueIndex).toContain(0)
     expect(valueIndex).toContain(1)
@@ -80,8 +81,8 @@ describe('ColumnIndex change/remove', () => {
 
     index.change(1, 2, simpleCellAddress(0, 0, 0))
 
-    expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
-    const valueIndex = index.getColumnMap(0, 0).get(2)!
+    expect(index.getColumnMap(0, 0).index.keys()).not.toContain(1)
+    const valueIndex = index.getColumnMap(0, 0).index.get(2)!
     expect(valueIndex).toContain(0)
   })
 
@@ -105,7 +106,8 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr("A1"))
     index.add(2, adr("B3"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 0, 1))
+    index.addRows(0, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
+    index.addRows(1, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([1])
     expect(index.getValueIndex(0, 1, 2)).toEqual([3])
@@ -115,7 +117,7 @@ describe('ColumnIndex#addRows', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 1))
+    index.addRows(0, RowsSpan.fromNumberOfRows(0, 1, 1), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0])
   })
@@ -127,7 +129,7 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr("A3"))
     index.add(1, adr("A4"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+    index.addRows(0, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 3, 4, 5])
   })
@@ -138,7 +140,9 @@ describe('ColumnIndex#addRows', () => {
     index.add(1, adr("B2"))
     index.add(2, adr("C2"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+    index.addRows(0, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
+    index.addRows(1, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
+    index.addRows(2, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([3])
     expect(index.getValueIndex(0, 1, 1)).toEqual([3])
@@ -153,7 +157,8 @@ describe('ColumnIndex#addRows', () => {
     index.add(4, adr("B1"))
     index.add(4, adr("B5"))
 
-    index.addRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+    index.addRows(0, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
+    index.addRows(1, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0])
     expect(index.getValueIndex(0, 0, 2)).toEqual([3])
@@ -167,7 +172,7 @@ describe('ColumnIndex#removeRows', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 0, 1))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([])
   })
@@ -179,7 +184,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr("A3"))
     index.add(1, adr("A4"))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 2))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 1, 2), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
   })
@@ -190,7 +195,9 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr("B2"))
     index.add(1, adr("C2"))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 0, 1))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
+    index.removeRows(1, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
+    index.removeRows(2, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0])
     expect(index.getValueIndex(0, 1, 1)).toEqual([0])
@@ -204,7 +211,8 @@ describe('ColumnIndex#removeRows', () => {
     index.add(3, adr("A4"))
     index.add(4, adr("B3"))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 0, 2))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 0, 2), 0)
+    index.removeRows(1, RowsSpan.fromNumberOfRows(0, 0, 2), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([])
     expect(index.getValueIndex(0, 0, 2)).toEqual([0])
@@ -217,7 +225,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr("A2"))
     index.add(1, adr("A2", 1))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 0, 1))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 0, 1), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0])
     expect(index.getValueIndex(1, 0, 1)).toEqual([1])
@@ -230,7 +238,7 @@ describe('ColumnIndex#removeRows', () => {
     index.add(1, adr("A4"))
     index.add(1, adr("A6"))
 
-    index.removeRows(RowsSpan.fromNumberOfRows(0, 1, 4))
+    index.removeRows(0, RowsSpan.fromNumberOfRows(0, 1, 4), 0)
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
   })
@@ -319,65 +327,67 @@ describe('ColumnIndex#removeColumns', () => {
 })
 
 describe('ColumnIndex#find', () => {
+  const stats = new Statistics()
+  const transformService = new LazilyTransformingAstService(stats)
   it('should find row number', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
 
     index.add(1, adr("A2"))
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A3")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A3")), transformService)
 
     expect(row).toBe(1)
   })
 
   it('should find smallest row number for value', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
 
     index.add(1, adr("A4"))
     index.add(1, adr("A10"))
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
 
     expect(row).toBe(3)
   });
 
   it('should not find anything in empty index', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything in empty column', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
     index.add(1, adr("B2"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")), transformService)
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value occurs before range', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
     index.add(1, adr("A1"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A5")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A5")), transformService)
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value occurs after range', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
     index.add(1, adr("A10"))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A9")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A9")), transformService)
 
     expect(row).toBe(-1)
   });
 
   it('should not find anything if value in different sheet', function () {
-    const index = new ColumnIndex(new Statistics())
+    const index = new ColumnIndex(stats)
     index.add(1, adr("A5", 1))
 
-    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A10")))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A10")), transformService)
 
     expect(row).toBe(-1)
   });
