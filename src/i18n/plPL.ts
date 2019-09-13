@@ -27,6 +27,7 @@ export const plPL: TranslationPackage = {
     SPLIT: 'PODZIELTEKST',
     SUM: 'SUMA',
     SUMIF: 'SUMAJEZELI',
+    SUMIFS: 'SUMYJEZELI',
     SUMPRODUCT: 'SUMA.ILOCZYNOW',
     TEXT: 'TEKST',
     TRANSPOSE: 'TRANSPONUJ',

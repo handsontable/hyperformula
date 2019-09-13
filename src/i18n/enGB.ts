@@ -27,6 +27,7 @@ export const enGB: TranslationPackage = {
     SPLIT: 'SPLIT',
     SUM: 'SUM',
     SUMIF: 'SUMIF',
+    SUMIFS: 'SUMIFS',
     SUMPRODUCT: 'SUMPRODUCT',
     TEXT: 'TEXT',
     TRANSPOSE: 'TRANSPOSE',

@@ -52,6 +52,9 @@ export class SumifPlugin extends FunctionPlugin {
     countif: {
       translationKey: 'COUNTIF',
     },
+    sumifs: {
+      translationKey: 'SUMIFS',
+    },
   }
 
   /**
@@ -89,6 +92,36 @@ export class SumifPlugin extends FunctionPlugin {
       return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
+  }
+
+  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
+    if (typeof criterionString !== 'string') {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const criterion = parseCriterion(criterionString)
+    if (criterion === null) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const conditionRangeArg = ast.args[2]
+    const valuesRangeArg = ast.args[0]
+
+    if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
+      const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
+      const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
+
+      if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
+    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
+      return this.evaluateCellSumifs(ast, formulaAddress, criterion)
     } else {
       return new CellError(ErrorType.VALUE)
     }
@@ -146,6 +179,17 @@ export class SumifPlugin extends FunctionPlugin {
   private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
     const conditionReferenceArg = ast.args[0] as CellReferenceAst
     const valuesReferenceArg = ast.args[2] as CellReferenceAst
+
+    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
+    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
+    const criterionLambda = buildCriterionLambda(criterion)
+    const filteredValues = ifFilter(criterionLambda, conditionValues, computableValues)
+    return reduceSum(filteredValues)
+  }
+
+  private evaluateCellSumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
+    const conditionReferenceArg = ast.args[2] as CellReferenceAst
+    const valuesReferenceArg = ast.args[0] as CellReferenceAst
 
     const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
     const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
