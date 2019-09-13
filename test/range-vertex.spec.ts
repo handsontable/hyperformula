@@ -22,8 +22,8 @@ describe('RangeVertex with cache', () => {
 
     const criterionCache: CriterionCache = new Map()
 
-    criterionCache.set(criterionString1, [10, criterion1])
-    criterionCache.set(criterionString2, [20, criterion2])
+    criterionCache.set(criterionString1, [10, [criterion1]])
+    criterionCache.set(criterionString2, [20, [criterion2]])
 
     rangeVertex.setCriterionFunctionValues('SUMIF,1,1', criterionCache)
 

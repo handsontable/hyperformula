@@ -11,17 +11,17 @@ describe('Function SUMIFS', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('error when 2nd arg is not a string',  () => {
+  it('error when 2nd arg is not a range or reference',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, 78)'],
+      ['=SUMIFS(C1:C2, 42, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('error when 3rd arg is not a range or reference',  () => {
+  it('error when 3rd arg is not a string',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, 42, ">0")'],
+      ['=SUMIFS(C1:C2, B1:B2, 78)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -205,5 +205,16 @@ describe('Function SUMIFS', () => {
     expect(engine.getCellValue('A4')).toEqual(5)
     expect(engine.getCellValue('A5')).toEqual(5)
     expect(engine.stats.sumifFullCacheUsed).toEqual(1)
+  })
+
+  it('works for more than one criterion/range pair', () => {
+    const engine =  HandsOnEngine.buildFromArray([
+      ['0', '100', '3'],
+      ['1', '101', '5'],
+      ['2', '102', '7'],
+      ['=SUMIFS(C1:C3, A1:A3, ">=1", B1:B3, "<102")'],
+    ])
+
+    expect(engine.getCellValue('A4')).toEqual(5)
   })
 })
