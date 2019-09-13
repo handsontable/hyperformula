@@ -42,6 +42,15 @@ export const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRang
   }
 }
 
+class Condition {
+  constructor(
+    public readonly conditionRange: AbsoluteCellRange,
+    public readonly criterionString: string,
+    public readonly criterion: Criterion,
+  ) {
+  }
+}
+
 type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
 
 export class SumifPlugin extends FunctionPlugin {
@@ -85,7 +94,7 @@ export class SumifPlugin extends FunctionPlugin {
       const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
 
-      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
+      return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
     } else {
@@ -111,7 +120,7 @@ export class SumifPlugin extends FunctionPlugin {
       const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
 
-      return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
+      return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumifs(ast, formulaAddress, criterion)
     } else {
@@ -198,36 +207,36 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeSumif(simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
+  private evaluateRangeSumif(simpleValuesRange: AbsoluteCellRange, conditions: Condition[]): CellValue {
+    if (!conditions[0].conditionRange.sameDimensionsAs(simpleValuesRange)) {
       return new CellError(ErrorType.VALUE)
     }
 
     const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     assert.ok(valuesRangeVertex, 'Range does not exists in graph')
 
-    const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(simpleConditionRange), criterionString)
+    const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions[0].conditionRange), conditions[0].criterionString)
     if (cachedResult) {
       this.interpreter.stats.sumifFullCacheUsed++
       return cachedResult
     }
 
-    const cache = this.buildNewCriterionCache(sumifCacheKey(simpleConditionRange), simpleConditionRange, simpleValuesRange,
+    const cache = this.buildNewCriterionCache(sumifCacheKey(conditions[0].conditionRange), conditions[0].conditionRange, simpleValuesRange,
       (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
         return add(cacheCurrentValue, reduceSum(newFilteredValues))
       })
 
-    if (!cache.has(criterionString)) {
-      const resultValue = this.computeCriterionValue(criterion, simpleConditionRange, simpleValuesRange,
+    if (!cache.has(conditions[0].criterionString)) {
+      const resultValue = this.computeCriterionValue(conditions[0].criterion, conditions[0].conditionRange, simpleValuesRange,
         (filteredValues: IterableIterator<CellValue>) => {
           return reduceSum(filteredValues)
         })
-      cache.set(criterionString, [resultValue, buildCriterionLambda(criterion)])
+      cache.set(conditions[0].criterionString, [resultValue, buildCriterionLambda(conditions[0].criterion)])
     }
 
-    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(simpleConditionRange), cache)
+    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions[0].conditionRange), cache)
 
-    return cache.get(criterionString)![0]
+    return cache.get(conditions[0].criterionString)![0]
   }
 
   /**
