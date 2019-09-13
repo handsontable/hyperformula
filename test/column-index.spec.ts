@@ -154,8 +154,17 @@ describe('ColumnIndex#removeRows', () => {
 })
 
 describe('ColumnIndex#addColumns', () => {
+  it('should add column to index', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
 
-  it('should shift columns when adding columns', () => {
+    index.addColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([])
+    expect(index.getValueIndex(0, 1, 1)).toEqual([0])
+  })
+
+  it('should add columns in the middle', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
     index.add(1, adr("B1"))
@@ -166,6 +175,18 @@ describe('ColumnIndex#addColumns', () => {
     expect(index.getValueIndex(0, 0, 1)).toEqual([0])
     expect(index.getValueIndex(0, 3, 1)).toEqual([0])
     expect(index.getValueIndex(0, 4, 1)).toEqual([0])
+  })
+
+  it('should add columns only in one sheet', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("B1"))
+    index.add(1, adr("B1", 1))
+
+    index.addColumns(ColumnsSpan.fromNumberOfColumns(0, 1, 2))
+
+    expect(index.getValueIndex(0, 1, 1)).toEqual([])
+    expect(index.getValueIndex(0, 3, 1)).toEqual([0])
+    expect(index.getValueIndex(1, 1, 1)).toEqual([0])
   })
 })
 
