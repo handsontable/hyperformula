@@ -5,7 +5,7 @@ import {simpleCellAddress} from "../src/Cell";
 import {RowsSpan} from "../src/RowsSpan";
 import {ColumnsSpan} from "../src/ColumnsSpan";
 
-describe("Column index build", () => {
+describe("ColumnIndex#add", () => {
   it('should add value to empty index', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("B5"))
@@ -43,7 +43,7 @@ describe("Column index build", () => {
   });
 })
 
-describe('ColumnIndex cruds', () => {
+describe('ColumnIndex change/remove', () => {
   it('should remove value from index', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
@@ -84,6 +84,21 @@ describe('ColumnIndex cruds', () => {
     expect(valueIndex).toContain(0)
   })
 
+  it('should do nothing when changing to the same value', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+
+    const spyRemove = spyOn(index, "remove")
+    const spyAdd = spyOn(index, "add")
+
+    index.change(1, 1, simpleCellAddress(0, 0, 0))
+
+    expect(spyRemove).not.toHaveBeenCalled()
+    expect(spyAdd).not.toHaveBeenCalled()
+  })
+})
+
+describe('ColumnIndex#addRows', () => {
   it('should shift rows when adding rows', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
@@ -95,7 +110,9 @@ describe('ColumnIndex cruds', () => {
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 3, 4, 5])
   })
+})
 
+describe('ColumnIndex#removeRows', () => {
   it('should shift rows when removing rows', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
@@ -132,6 +149,9 @@ describe('ColumnIndex cruds', () => {
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 1])
   })
+})
+
+describe('ColumnIndex#addColumns', () => {
 
   it('should shift columns when adding columns', () => {
     const index = new ColumnIndex(new Statistics())
@@ -145,7 +165,9 @@ describe('ColumnIndex cruds', () => {
     expect(index.getValueIndex(0, 3, 1)).toEqual([0])
     expect(index.getValueIndex(0, 4, 1)).toEqual([0])
   })
+})
 
+describe('ColumnIndex#removeColumns', () => {
   it('should remove columns', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
@@ -159,19 +181,5 @@ describe('ColumnIndex cruds', () => {
     expect(index.getValueIndex(0, 1, 4)).toEqual([0])
     expect(index.getValueIndex(0, 2, 3)).toEqual([])
     expect(index.getValueIndex(0, 3, 4)).toEqual([])
-  })
-
-
-  it('should do nothing when changing to the same value', () => {
-    const index = new ColumnIndex(new Statistics())
-    index.add(1, adr("A1"))
-
-    const spyRemove = spyOn(index, "remove")
-    const spyAdd = spyOn(index, "add")
-
-    index.change(1, 1, simpleCellAddress(0, 0, 0))
-
-    expect(spyRemove).not.toHaveBeenCalled()
-    expect(spyAdd).not.toHaveBeenCalled()
   })
 })
