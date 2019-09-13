@@ -20,31 +20,36 @@ export enum TransformationType {
 }
 
 export interface AddColumnsTransformation {
-  type: TransformationType.ADD_COLUMNS,
-  addedColumns: ColumnsSpan,
+  type: TransformationType.ADD_COLUMNS
+  addedColumns: ColumnsSpan
+  sheet: number
 }
 
 export interface AddRowsTransformation {
-  type: TransformationType.ADD_ROWS,
-  addedRows: RowsSpan,
+  type: TransformationType.ADD_ROWS
+  addedRows: RowsSpan
+  sheet: number
 }
 
 export interface RemoveRowsTransformation {
-  type: TransformationType.REMOVE_ROWS,
-  removedRows: RowsSpan,
+  type: TransformationType.REMOVE_ROWS
+  removedRows: RowsSpan
+  sheet: number
 }
 
 export interface RemoveColumnsTransformation {
-  type: TransformationType.REMOVE_COLUMNS,
-  removedColumns: ColumnsSpan,
+  type: TransformationType.REMOVE_COLUMNS
+  removedColumns: ColumnsSpan
+  sheet: number
 }
 
 export interface MoveCellsTransformation {
-  type: TransformationType.MOVE_CELLS,
-  sourceRange: AbsoluteCellRange,
-  toRight: number,
-  toBottom: number,
+  type: TransformationType.MOVE_CELLS
+  sourceRange: AbsoluteCellRange
+  toRight: number
+  toBottom: number
   toSheet: number
+  sheet: number
 }
 
 export type Transformation =
@@ -69,19 +74,19 @@ export class LazilyTransformingAstService {
   }
 
   public addAddColumnsTransformation(addedColumns: ColumnsSpan) {
-    this.transformations.push({ type: TransformationType.ADD_COLUMNS, addedColumns })
+    this.transformations.push({ type: TransformationType.ADD_COLUMNS, addedColumns, sheet: addedColumns.sheet })
   }
 
   public addAddRowsTransformation(addedRows: RowsSpan) {
-    this.transformations.push({ type: TransformationType.ADD_ROWS, addedRows })
+    this.transformations.push({ type: TransformationType.ADD_ROWS, addedRows, sheet: addedRows.sheet })
   }
 
   public addRemoveRowsTransformation(removedRows: RowsSpan) {
-    this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows })
+    this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows, sheet: removedRows.sheet })
   }
 
   public addRemoveColumnsTransformation(removedColumns: ColumnsSpan) {
-    this.transformations.push({ type: TransformationType.REMOVE_COLUMNS, removedColumns })
+    this.transformations.push({ type: TransformationType.REMOVE_COLUMNS, removedColumns, sheet: removedColumns.sheet })
   }
 
   public addMoveCellsTransformation(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
@@ -90,7 +95,8 @@ export class LazilyTransformingAstService {
       sourceRange,
       toRight,
       toBottom,
-      toSheet
+      toSheet,
+      sheet: sourceRange.sheet
     })
   }
 

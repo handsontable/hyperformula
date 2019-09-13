@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {Statistics, StatType} from "./statistics/Statistics";
 import {RowsSpan} from "./RowsSpan";
 import {ColumnsSpan} from "./ColumnsSpan";
-import {LazilyTransformingAstService, TransformationType} from "./LazilyTransformingAstService";
+import {LazilyTransformingAstService, Transformation, TransformationType} from "./LazilyTransformingAstService";
 
 interface ColumnMap {
   version: number,
@@ -140,16 +140,16 @@ export class ColumnIndex {
     return index
   }
 
-  public ensureRecentData(sheet: number, col: number, trasnformService: LazilyTransformingAstService) {
+  public ensureRecentData(sheet: number, col: number, transformingService: LazilyTransformingAstService) {
     const columnMap = this.getColumnMap(sheet, col)
-    const actualVersion = trasnformService.version()
+    const actualVersion = transformingService.version()
     if (columnMap.version === actualVersion) {
       return
     }
-    const relevantTransformatinos = trasnformService.getTransformationsFrom(columnMap.version, (transformation) => {
-      return transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS
+    const relevantTransformations = transformingService.getTransformationsFrom(columnMap.version, (transformation: Transformation) => {
+      return transformation.sheet === sheet && (transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS)
     })
-    for (const transformation of relevantTransformatinos) {
+    for (const transformation of relevantTransformations) {
       switch (transformation.type) {
         case TransformationType.ADD_ROWS:
           this.addRows(col, transformation.addedRows, actualVersion)
