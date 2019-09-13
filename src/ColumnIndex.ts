@@ -128,7 +128,7 @@ export class ColumnIndex {
 
     if (!columnMap) {
       columnMap = {
-        version: 0,
+        version: this.transformingService.version(),
         index: new Map()
       }
       sheetMap[col] = columnMap
