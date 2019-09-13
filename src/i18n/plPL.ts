@@ -10,6 +10,7 @@ export const plPL: TranslationPackage = {
     COUNTIF: 'LICZJEZELI',
     COUNTUNIQUE: 'COUNTUNIQUE',
     DATE: 'DATA',
+    EOMONTH: 'KONIECMIESIACA',
     EXP: 'EXP',
     FALSE: 'FALSZ',
     IF: 'JEZELI',

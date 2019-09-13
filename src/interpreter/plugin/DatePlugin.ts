@@ -1,5 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, toDateNumber} from '../../Date'
+import {dateNumberToMonthNumber, dateNumberToYearNumber, toDateNumber, dateNumberToMoment, momentToDateNumber} from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser/Ast'
@@ -22,6 +22,9 @@ export class DatePlugin extends FunctionPlugin {
     },
     text: {
       translationKey: 'TEXT',
+    },
+    eomonth: {
+      translationKey: 'EOMONTH',
     },
   }
 
@@ -47,6 +50,32 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     return toDateNumber(year, month, day)
+  }
+
+  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
+    if (dateNumber === null) {
+      return new CellError(ErrorType.VALUE)
+    }
+    
+    const numberOfMonthsToShift = this.evaluateAst(ast.args[1], formulaAddress)
+    if (typeof numberOfMonthsToShift !== 'number') {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const dateMoment = dateNumberToMoment(dateNumber)
+    if (numberOfMonthsToShift > 0) {
+      dateMoment.add(numberOfMonthsToShift, 'months')
+    } else {
+      dateMoment.subtract(-numberOfMonthsToShift, 'months')
+    }
+    dateMoment.endOf('month').startOf('date')
+    return momentToDateNumber(dateMoment)
   }
 
   /**
