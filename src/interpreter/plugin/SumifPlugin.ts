@@ -85,10 +85,6 @@ export class SumifPlugin extends FunctionPlugin {
       const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
 
-      if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
-      }
-
       return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
       return this.evaluateCellSumif(ast, formulaAddress, criterion)
@@ -114,10 +110,6 @@ export class SumifPlugin extends FunctionPlugin {
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
       const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
       const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
-
-      if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
-      }
 
       return this.evaluateRangeSumif(simpleConditionRange, simpleValuesRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
@@ -207,6 +199,10 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterion - already parsed criterion structure
    */
   private evaluateRangeSumif(simpleConditionRange: AbsoluteCellRange, simpleValuesRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
+    if (!simpleConditionRange.sameDimensionsAs(simpleValuesRange)) {
+      return new CellError(ErrorType.VALUE)
+    }
+
     const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     assert.ok(valuesRangeVertex, 'Range does not exists in graph')
 
