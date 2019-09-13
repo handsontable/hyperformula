@@ -110,6 +110,8 @@ describe('ColumnIndex#addRows', () => {
 
     expect(index.getValueIndex(0, 0, 1)).toEqual([0, 3, 4, 5])
   })
+
+
 })
 
 describe('ColumnIndex#removeRows', () => {
@@ -168,7 +170,24 @@ describe('ColumnIndex#addColumns', () => {
 })
 
 describe('ColumnIndex#removeColumns', () => {
-  it('should remove columns', () => {
+  it('should remove column', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+
+    index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([])
+  })
+
+  it('should work when empty index', () => {
+    const index = new ColumnIndex(new Statistics())
+
+    index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([])
+  })
+
+  it('should remove multiple columns in the middle ', () => {
     const index = new ColumnIndex(new Statistics())
     index.add(1, adr("A1"))
     index.add(2, adr("B1"))
@@ -181,5 +200,16 @@ describe('ColumnIndex#removeColumns', () => {
     expect(index.getValueIndex(0, 1, 4)).toEqual([0])
     expect(index.getValueIndex(0, 2, 3)).toEqual([])
     expect(index.getValueIndex(0, 3, 4)).toEqual([])
+  })
+
+  it('should remove columns only in one sheet ', () => {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1", 0))
+    index.add(1, adr("A1", 1))
+
+    index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
+
+    expect(index.getValueIndex(0, 0, 1)).toEqual([])
+    expect(index.getValueIndex(1, 0, 1)).toEqual([0])
   })
 })
