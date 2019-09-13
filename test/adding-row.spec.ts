@@ -186,18 +186,3 @@ describe('Adding row - address mapping', () => {
     })
   })
 })
-
-describe('Column index', () => {
-  it('should shift column index by row', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', ''],
-      // new row
-      ['1', '2']
-    ])
-
-    engine.addRows(0, 1, 1)
-
-    expect(engine.columnIndex.getValueIndex(0, 0, 1)).toEqual(expect.arrayContaining([0, 2]))
-    expect(engine.columnIndex.getValueIndex(0, 1, 2)).toEqual(expect.arrayContaining([2]))
-  })
-})

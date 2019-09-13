@@ -4,6 +4,7 @@ import {Statistics} from "../src/statistics/Statistics";
 import {simpleCellAddress} from "../src/Cell";
 import {RowsSpan} from "../src/RowsSpan";
 import {ColumnsSpan} from "../src/ColumnsSpan";
+import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 
 describe("ColumnIndex#add", () => {
   it('should add value to empty index', () => {
@@ -315,4 +316,69 @@ describe('ColumnIndex#removeColumns', () => {
     expect(index.getValueIndex(0, 0, 1)).toEqual([])
     expect(index.getValueIndex(1, 0, 1)).toEqual([0])
   })
+})
+
+describe('ColumnIndex#find', () => {
+  it('should find row number', function () {
+    const index = new ColumnIndex(new Statistics())
+
+    index.add(1, adr("A2"))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A3")))
+
+    expect(row).toBe(1)
+  })
+
+  it('should find smallest row number for value', function () {
+    const index = new ColumnIndex(new Statistics())
+
+    index.add(1, adr("A4"))
+    index.add(1, adr("A10"))
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+
+    expect(row).toBe(3)
+  });
+
+  it('should not find anything in empty index', function () {
+    const index = new ColumnIndex(new Statistics())
+
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+
+    expect(row).toBe(-1)
+  });
+
+  it('should not find anything in empty column', function () {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("B2"))
+
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A20")))
+
+    expect(row).toBe(-1)
+  });
+
+  it('should not find anything if value occurs before range', function () {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A1"))
+
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A5")))
+
+    expect(row).toBe(-1)
+  });
+
+  it('should not find anything if value occurs after range', function () {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A10"))
+
+    const row = index.find(1, new AbsoluteCellRange(adr("A2"), adr("A9")))
+
+    expect(row).toBe(-1)
+  });
+
+  it('should not find anything if value in different sheet', function () {
+    const index = new ColumnIndex(new Statistics())
+    index.add(1, adr("A5", 1))
+
+    const row = index.find(1, new AbsoluteCellRange(adr("A1"), adr("A10")))
+
+    expect(row).toBe(-1)
+  });
 })
