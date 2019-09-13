@@ -165,7 +165,7 @@ export class ColumnIndex {
   private shiftRows(sheetIndex: SheetIndex, afterRow: number, numberOfRows: number) {
     sheetIndex.forEach(column => {
       for (const rows of column.values()) {
-        const index = lowerBound(rows, afterRow)
+        const index = upperBound(rows, afterRow)
         for (let i=index; i<rows.length; ++i) {
           rows[i] += numberOfRows
         }
