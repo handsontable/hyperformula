@@ -5,12 +5,11 @@ import {RowsSpan} from "./RowsSpan";
 import {ColumnsSpan} from "./ColumnsSpan";
 import {LazilyTransformingAstService, Transformation, TransformationType} from "./LazilyTransformingAstService";
 
-interface ColumnMap {
-  version: number,
-  index: Map<CellValue, ValueIndex>
+type ColumnMap = Map<CellValue, ValueIndex>
+interface ValueIndex {
+  version: number
+  index: Array<number>
 }
-
-type ValueIndex = Array<number>
 type SheetIndex = Array<ColumnMap>
 
 export class ColumnIndex {
@@ -23,15 +22,10 @@ export class ColumnIndex {
   }
 
   public add(value: CellValue, address: SimpleCellAddress) {
-    this.ensureRecentData(address.sheet, address.col)
+    this.ensureRecentData(address.sheet, address.col, value)
 
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      const columnMap = this.getColumnMap(address.sheet, address.col)
-      let valueIndex = columnMap.index.get(value)
-      if (!valueIndex) {
-        valueIndex = []
-        columnMap.index.set(value, valueIndex)
-      }
+      const valueIndex = this.getValueIndex(address.sheet, address.col, value)
       this.addValue(valueIndex, address.row)
     })
   }
@@ -41,22 +35,22 @@ export class ColumnIndex {
       return
     }
 
-    this.ensureRecentData(address.sheet, address.col)
+    this.ensureRecentData(address.sheet, address.col, value)
 
     const columnMap = this.getColumnMap(address.sheet, address.col)
-    let valueIndex = columnMap.index.get(value)
+    let valueIndex = columnMap.get(value)
     if (!valueIndex) {
       return
     }
 
-    const index = upperBound(valueIndex, address.row)
-    valueIndex.splice(index, 1)
+    const index = upperBound(valueIndex.index, address.row)
+    valueIndex.index.splice(index, 1)
 
-    if (valueIndex.length === 0) {
-      columnMap.index.delete(value)
+    if (valueIndex.index.length === 0) {
+      columnMap.delete(value)
     }
 
-    if (columnMap.index.size === 0) {
+    if (columnMap.size === 0) {
       delete this.index.get(address.sheet)![address.col]
     }
   }
@@ -70,35 +64,33 @@ export class ColumnIndex {
   }
 
   public find(key: any, range: AbsoluteCellRange): number {
-    this.ensureRecentData(range.sheet, range.start.col)
+    this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
     if (!columnMap) {
       return -1
     }
 
-    const valueIndex = columnMap.index.get(key)
+    const valueIndex = columnMap.get(key)
     if (!valueIndex) {
       return -1
     }
 
     /* assuming that valueIndex is sorted already */
-    const index = upperBound(valueIndex, range.start.row)
-    const rowNumber = valueIndex[index]
+    const index = upperBound(valueIndex.index, range.start.row)
+    const rowNumber = valueIndex.index[index]
     return rowNumber <= range.end.row ? rowNumber : -1
   }
 
-  public addRows(col: number, rowsSpan: RowsSpan, actualVersion: number) {
-    const columnMap = this.getColumnMap(rowsSpan.sheet, col)
-    this.shiftRows(columnMap, rowsSpan.rowStart, rowsSpan.numberOfRows)
-    columnMap.version = actualVersion
+  private addRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
+    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
+    this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
   }
 
-  public removeRows(col: number, rowsSpan: RowsSpan, actualVersion: number) {
-    const columnMap = this.getColumnMap(rowsSpan.sheet, col)
-    this.removeRowsFromValues(columnMap, rowsSpan)
-    this.shiftRows(columnMap, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
-    columnMap.version = actualVersion
+  private removeRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
+    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
+    this.removeRowsFromValues(valueIndex, rowsSpan)
+    this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {
@@ -127,10 +119,7 @@ export class ColumnIndex {
     let columnMap = sheetMap![col]
 
     if (!columnMap) {
-      columnMap = {
-        version: this.transformingService.version(),
-        index: new Map()
-      }
+      columnMap = new Map()
       sheetMap[col] = columnMap
     }
 
@@ -138,64 +127,66 @@ export class ColumnIndex {
   }
 
   public getValueIndex(sheet: number, col: number, value: CellValue): ValueIndex {
-    const index = this.getColumnMap(sheet, col).index.get(value)
+    const columnMap = this.getColumnMap(sheet, col)
+    let index = this.getColumnMap(sheet, col).get(value)
     if (!index) {
-      return []
+      index = {
+        version: this.transformingService.version(),
+        index: []
+      }
+      columnMap.set(value, index)
     }
     return index
   }
 
-  public ensureRecentData(sheet: number, col: number) {
-    const columnMap = this.getColumnMap(sheet, col)
+  public ensureRecentData(sheet: number, col: number, value: CellValue) {
+    const valueIndex = this.getValueIndex(sheet, col, value)
     const actualVersion = this.transformingService.version()
-    if (columnMap.version === actualVersion) {
+    if (valueIndex.version === actualVersion) {
       return
     }
-    const relevantTransformations = this.transformingService.getTransformationsFrom(columnMap.version, (transformation: Transformation) => {
+    const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: Transformation) => {
       return transformation.sheet === sheet && (transformation.type === TransformationType.ADD_ROWS || transformation.type === TransformationType.REMOVE_ROWS)
     })
     for (const transformation of relevantTransformations) {
       switch (transformation.type) {
         case TransformationType.ADD_ROWS:
-          this.addRows(col, transformation.addedRows, actualVersion)
+          this.addRows(col, transformation.addedRows, value)
           break
         case TransformationType.REMOVE_ROWS:
-          this.removeRows(col, transformation.removedRows, actualVersion)
+          this.removeRows(col, transformation.removedRows, value)
       }
     }
+    valueIndex.version = actualVersion
   }
 
   private addValue(valueIndex: ValueIndex, rowNumber: number): void {
-    const index = lowerBound(valueIndex, rowNumber)
-    const value = valueIndex[index]
+    const rowIndex = lowerBound(valueIndex.index, rowNumber)
+    const value = valueIndex.index[rowIndex]
     if (value === rowNumber) {
       /* do not add same row twice */
       return
     }
 
-    if (index === valueIndex.length - 1) {
-      valueIndex.push(rowNumber)
+    if (rowIndex === valueIndex.index.length - 1) {
+      valueIndex.index.push(rowNumber)
     } else {
-      valueIndex.splice(index + 1, 0, rowNumber)
+      valueIndex.index.splice(rowIndex + 1, 0, rowNumber)
     }
   }
 
-  private removeRowsFromValues(columnMap: ColumnMap, rowsSpan: RowsSpan) {
-    for (const rows of columnMap.index.values()) {
-      const start = upperBound(rows, rowsSpan.rowStart)
-      const end = lowerBound(rows, rowsSpan.rowEnd)
-      if (rows[start] <= rowsSpan.rowEnd) {
-        rows.splice(start, end - start + 1)
-      }
+  private removeRowsFromValues(rows: ValueIndex, rowsSpan: RowsSpan) {
+    const start = upperBound(rows.index, rowsSpan.rowStart)
+    const end = lowerBound(rows.index, rowsSpan.rowEnd)
+    if (rows.index[start] <= rowsSpan.rowEnd) {
+      rows.index.splice(start, end - start + 1)
     }
   }
 
-  private shiftRows(columnMap: ColumnMap, afterRow: number, numberOfRows: number) {
-    for (const rows of columnMap.index.values()) {
-      const index = upperBound(rows, afterRow)
-      for (let i = index; i < rows.length; ++i) {
-        rows[i] += numberOfRows
-      }
+  private shiftRows(rows: ValueIndex, afterRow: number, numberOfRows: number) {
+    const index = upperBound(rows.index, afterRow)
+    for (let i = index; i < rows.index.length; ++i) {
+      rows.index[i] += numberOfRows
     }
   }
 }
