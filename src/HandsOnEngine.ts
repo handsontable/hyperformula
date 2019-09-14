@@ -148,11 +148,18 @@ export class HandsOnEngine {
         const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (newCellContent === '') {
+        const oldValue = this.dependencyGraph.getCellValue(address)
+        this.columnIndex.remove(oldValue, address)
         this.dependencyGraph.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {
-        this.dependencyGraph.setValueToCell(address, Number(newCellContent))
+        const newValue = Number(newCellContent)
+        const oldValue = this.dependencyGraph.getCellValue(address)
+        this.dependencyGraph.setValueToCell(address, newValue)
+        this.columnIndex.change(oldValue, newValue, address)
       } else {
+        const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newCellContent)
+        this.columnIndex.change(oldValue, newCellContent, address)
       }
       verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
