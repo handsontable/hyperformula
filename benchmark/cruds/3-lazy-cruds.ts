@@ -2,27 +2,30 @@ import {HandsOnEngine} from "../../src";
 import {Sheet} from "../../src/GraphBuilder";
 import {logStats, measure} from "./operations";
 import {sheet as Sb} from "../sheets/01-simple-big";
-import {StatType} from "../../src/statistics/Statistics";
 import {sheet as Bs} from "../sheets/06-big-sum";
 
 
 function addRow(sheet: Sheet, row: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)
-  return measure(engine, stats, `Add row: ${row}`, () => engine.addRows(0, row, 1))
+  engine.stats.reset()
+  return measure(engine, stats, `Add row: ${row}`, () => { engine.addRows(0, row, 1) })
 }
 
 function addColumn(sheet: Sheet, column: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)
+  engine.stats.reset()
   return measure(engine, stats, `Add column: ${column}`, () => engine.addColumns(0, column, 1))
 }
 
 function removeRow(sheet: Sheet, row: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)
+  engine.stats.reset()
   return measure(engine, stats, `Remove row: ${row}`, () => engine.removeRows(0, row, row))
 }
 
 function removeColumn(sheet: Sheet, column: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)
+  engine.stats.reset()
   return measure(engine, stats, `Remove column: ${column}`, () => engine.removeRows(0, column, column))
 }
 

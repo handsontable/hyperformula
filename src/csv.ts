@@ -19,6 +19,10 @@ export class CsvExporter {
     public readonly csvDelimiter: string = ',',
   ) {
   }
+  public static export(engine: HandsOnEngine, csvDelimiter = ',', sheetName = 'Sheet1'): string {
+    const exporter = new CsvExporter(csvDelimiter)
+    return exporter.exportSheetByName(engine, sheetName)
+  }
 
   /**
    * Creates CSV string out of sheet content
