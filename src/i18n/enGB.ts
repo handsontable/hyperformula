@@ -16,6 +16,7 @@ export const enGB: TranslationPackage = {
     IF: 'IF',
     ISBLANK: 'ISBLANK',
     ISERROR: 'ISERROR',
+    MATCH: 'MATCH',
     MAX: 'MAX',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIAN',

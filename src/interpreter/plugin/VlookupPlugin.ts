@@ -8,6 +8,9 @@ export class VlookupPlugin extends FunctionPlugin {
     vlookup: {
       translationKey: 'VLOOKUP',
     },
+    match: {
+      translationKey: 'MATCH',
+    },
   }
 
   /**
@@ -51,6 +54,31 @@ export class VlookupPlugin extends FunctionPlugin {
     }
 
     return this.doVlookup(key, range, index - 1, sorted)
+  }
+
+  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const key = this.evaluateAst(ast.args[0], formulaAddress)
+    if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'boolean') {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const rangeArg = ast.args[1]
+    if (rangeArg.type !== AstNodeType.CELL_RANGE) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
+    const rowIndex = this.columnIndex.find(key, searchedRange)
+
+    if (rowIndex === -1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    return rowIndex
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
