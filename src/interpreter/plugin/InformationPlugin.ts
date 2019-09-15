@@ -1,6 +1,7 @@
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 
 /**
  * Interpreter plugin containing information functions
@@ -16,6 +17,9 @@ export class InformationPlugin extends FunctionPlugin {
     columns: {
       translationKey: 'COLUMNS',
       isDependentOnSheetStructureChange: true,
+    },
+    index: {
+      translationKey: 'INDEX',
     },
   }
 
@@ -71,5 +75,42 @@ export class InformationPlugin extends FunctionPlugin {
     } else {
       return new CellError(ErrorType.VALUE)
     }
+  }
+
+  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    const rangeArg = ast.args[0]
+    if (ast.args.length < 1 || ast.args.length > 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    let width, height
+    let range
+    if (rangeArg.type === AstNodeType.CELL_RANGE) {
+      range = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
+      width = range.width()
+      height = range.height()
+    } else {
+      width = 1
+      height = 1
+    }
+
+    const rowArg = ast.args[1]
+    const rowValue = this.evaluateAst(rowArg, formulaAddress)
+    if (typeof rowValue !== 'number' || rowValue < 0 || rowValue > height) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    const columnArg = ast.args[2]
+    const columnValue = this.evaluateAst(columnArg, formulaAddress)
+    if (typeof columnValue !== 'number' || columnValue < 0 || columnValue > width) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    if (columnValue === 0 || rowValue === 0 || range === undefined) {
+      throw Error("Not implemented yet")
+    }
+
+    const address = range.getAddress(columnValue - 1, rowValue - 1)
+    return this.dependencyGraph.getCellValue(address)
   }
 }

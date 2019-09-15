@@ -14,6 +14,7 @@ export const plPL: TranslationPackage = {
     EXP: 'EXP',
     FALSE: 'FALSZ',
     IF: 'JEZELI',
+    INDEX: 'INDEKS',
     ISBLANK: 'CZYPUSTA',
     ISERROR: 'CZYBLAD',
     MATCH: 'PODAJ.POZYCJE',

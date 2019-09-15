@@ -14,6 +14,7 @@ export const enGB: TranslationPackage = {
     EXP: 'EXP',
     FALSE: 'FALSE',
     IF: 'IF',
+    INDEX: 'INDEX',
     ISBLANK: 'ISBLANK',
     ISERROR: 'ISERROR',
     MATCH: 'MATCH',
