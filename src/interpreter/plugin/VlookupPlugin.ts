@@ -72,13 +72,25 @@ export class VlookupPlugin extends FunctionPlugin {
     }
 
     const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
-    const rowIndex = this.columnIndex.find(key, searchedRange)
 
-    if (rowIndex === -1) {
-      return new CellError(ErrorType.NA)
+    if (searchedRange.width() === 1) {
+      const rowIndex = this.columnIndex.find(key, searchedRange)
+
+      if (rowIndex === -1) {
+        return new CellError(ErrorType.NA)
+      }
+      
+      return rowIndex
+    } else {
+      const valuesInRange = this.computeListOfValuesInRange(searchedRange)
+      const columnIndex = valuesInRange.indexOf(key)
+
+      if (columnIndex === -1) {
+        return new CellError(ErrorType.NA)
+      }
+
+      return columnIndex + 1
     }
-
-    return rowIndex
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {

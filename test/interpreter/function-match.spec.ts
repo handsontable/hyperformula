@@ -21,7 +21,7 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('works when value is in first cell', () => {
+  it('column - works when value is in first cell', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(103, A2:A5)'],
       ['103'],
@@ -33,7 +33,7 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A1')).toEqual(1)
   })
 
-  it('works when value is in the last cell', () => {
+  it('column - works when value is in the last cell', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(103, A2:A5)'],
       ['200'],
@@ -45,7 +45,7 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A1')).toEqual(4)
   })
 
-  it('returns first result', () => {
+  it('column - returns first result', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(103, A2:A5)'],
       ['200'],
@@ -57,7 +57,7 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A1')).toEqual(2)
   })
 
-  it('doesnt return result if value after searched range', () => {
+  it('column - doesnt return result if value after searched range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(103, A2:A5)'],
       ['200'],
@@ -70,13 +70,58 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('doesnt return result if value before searched range', () => {
+  it('column - doesnt return result if value before searched range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(103, A3:A5)'],
       ['103'],
       ['200'],
       ['200'],
       ['200'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+  })
+
+  it('row - works when value is in first cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(103, A2:D2)'],
+      ['103', '200', '200', '200'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(1)
+  })
+
+  it('row - works when value is in the last cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(103, A2:D2)'],
+      ['200', '200', '200', '103'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(4)
+  })
+
+  it('row - returns first result', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(103, A2:D2)'],
+      ['200', '103', '103', '200'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(2)
+  })
+
+  it('row - doesnt return result if value after searched range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(103, A2:D2)'],
+      ['200', '200', '200', '200', '103'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+  })
+
+  it('row - doesnt return result if value before searched range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(103, B2:D2)'],
+      ['103', '200', '200', '200'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
