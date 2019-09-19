@@ -47,7 +47,11 @@ describe('Function MATCH', () => {
 
   it('column - returns the position in the range, not the row number', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=MATCH(102, A2:A5)'],
+      ['=MATCH(102, A6:A9)'],
+      [''],
+      [''],
+      [''],
+      [''],
       ['100'],
       ['101'],
       ['102'],
@@ -114,11 +118,11 @@ describe('Function MATCH', () => {
 
   it('row - returns the position in the range, not the column number', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['=MATCH(102, B2:D2)'],
-      ['100', '101', '102', '103'],
+      ['=MATCH(102, E2:H2)'],
+      ['', '', '', '', '100', '101', '102', '103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue('A1')).toEqual(3)
   })
 
   it('row - returns first result', () => {

@@ -80,7 +80,7 @@ export class VlookupPlugin extends FunctionPlugin {
         return new CellError(ErrorType.NA)
       }
       
-      return rowIndex
+      return rowIndex - searchedRange.start.row + 1
     } else {
       const valuesInRange = this.computeListOfValuesInRange(searchedRange)
       const columnIndex = valuesInRange.indexOf(key)
