@@ -15,9 +15,9 @@ async function start() {
   validateArguments(inputDir)
 
   const sheets = await load(inputDir, ",")
-  const config = new Config({ matrixDetection: false, gpuMode: 'cpu' })
+  const config = new Config({ gpuMode: 'cpu' })
   const engine = HandsOnEngine.buildFromSheets(sheets, config)
-  // printStats([engine.getStats()], defaultConfig)
+  printStats([engine.getStats()], defaultConfig)
   save(engine, outputDir)
 }
 
