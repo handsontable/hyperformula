@@ -95,7 +95,9 @@ export class GraphBuilderMatrixHeuristic {
   private findMatrices(): PossibleMatrix[] {
     let result: PossibleMatrix[] = []
     this.mapping.forEach((m, sheet) => {
-      result = result.concat(...findMatrices(sheet, m))
+      for (const possibleMatrix of findMatrices(sheet, m)) {
+        result.push(possibleMatrix)
+      }
     })
     return result
   }
