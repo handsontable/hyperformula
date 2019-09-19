@@ -41,6 +41,8 @@ export const parseCriterion = (criterion: CellValue): Criterion | null => {
           default: return null
         }
       }
+    } else {
+      return buildCriterion(CriterionType.EQUAL, criterion)
     }
   }
 

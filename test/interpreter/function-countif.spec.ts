@@ -67,7 +67,7 @@ describe('Function COUNTIF', () => {
 
   it('error when criterion unparsable',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=COUNTIF(B1:B2, "%")'],
+      ['=COUNTIF(B1:B2, "><foo")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))

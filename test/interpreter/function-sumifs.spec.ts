@@ -19,9 +19,9 @@ describe('Function SUMIFS', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('error when 3rd arg is not a string',  () => {
+  it('error when 3rd arg is not a string or number',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, 78)'],
+      ['=SUMIFS(C1:C2, B1:B2, 1/0)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
@@ -29,7 +29,7 @@ describe('Function SUMIFS', () => {
 
   it('error when criterion unparsable',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(B1:B2, C1:C2, "%")'],
+      ['=SUMIFS(B1:B2, C1:C2, "><foo")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))

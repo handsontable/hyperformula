@@ -29,7 +29,7 @@ describe('Function SUMIF', () => {
 
   it('error when criterion unparsable',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIF(B1:B2, "%", C1:C2)'],
+      ['=SUMIF(B1:B2, "><foo", C1:C2)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))

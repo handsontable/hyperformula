@@ -105,7 +105,7 @@ export class SumifPlugin extends FunctionPlugin {
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const criterionString = this.evaluateAst(ast.args[2], formulaAddress)
-    if (typeof criterionString !== 'string') {
+    if (typeof criterionString !== 'string' && typeof criterionString !== 'number') {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -351,16 +351,16 @@ function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteC
 }
 
 export function* ifFilter(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<CellValue>[], computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
-  const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
-  const computableSplit = split(computableIterable)
-  if (conditionalSplits.every((cs) => cs.hasOwnProperty('value')) && computableSplit.hasOwnProperty('value')) {
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as CellValue))
-    const computableFirst = computableSplit.value as CellValue
-    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst) as boolean)) {
-      yield computableFirst
+  for (const computable of computableIterable) {
+    const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
+    if (!conditionalSplits.every((cs) => cs.hasOwnProperty('value'))) {
+      return
     }
-
-    yield* ifFilter(criterionLambdas, conditionalSplits.map((cs) => cs.rest), computableSplit.rest)
+    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as CellValue))
+    if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst) as boolean)) {
+      yield computable
+    }
+    conditionalIterables = conditionalSplits.map(cs => cs.rest)
   }
 }
 
