@@ -105,7 +105,6 @@ function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: 
 
     if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
       console.error('Expected time exceeded')
-      process.exit(1)
     }
   }
 }
