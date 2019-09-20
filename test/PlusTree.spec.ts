@@ -107,5 +107,24 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 1).keys).toEqual([3,4,5])
       expect(getLeaf(tree, 1).values).toEqual([400,30,40])
     })
+
+    it('splitting non-root leaf node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(5, 50)
+
+      tree.addKeyWithShift(6, 60)
+
+      expect(tree._root.keys).toEqual([2,4])
+      expect(getLeaf(tree, 1).shift).toBe(0)
+      expect(getLeaf(tree, 1).keys).toEqual([3,4])
+      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 2).shift).toBe(0)
+      expect(getLeaf(tree, 2).keys).toEqual([5,6])
+      expect(getLeaf(tree, 2).values).toEqual([50,60])
+    })
   })
 })

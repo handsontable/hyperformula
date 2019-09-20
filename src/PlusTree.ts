@@ -95,6 +95,9 @@ export class PlusTree<T> {
         node.keys[i]++
         node.children[i+1].shift++
       }
+      if (childNode.keys.length > this.maxSize) {
+        this.splitNode(node, indexWhereToAddIt)
+      }
     }
   }
 
