@@ -6,6 +6,8 @@ import {ColumnsSpan} from "../src/ColumnsSpan";
 import {AbsoluteCellRange} from "../src/AbsoluteCellRange";
 import {LazilyTransformingAstService} from "../src";
 import {ColumnIndex} from "../src/ColumnSearch/ColumnIndex";
+import {Matrix} from "../src/Matrix";
+import {deepStrictEqual} from "assert";
 
 describe("ColumnIndex#add", () => {
   it('should add value to empty index', () => {
@@ -111,6 +113,39 @@ describe('ColumnIndex change/remove', () => {
 
     expect(spyRemove).not.toHaveBeenCalled()
     expect(spyAdd).not.toHaveBeenCalled()
+  })
+
+  it('should change matrix values', () => {
+    const stats = new Statistics()
+    const transformingService = new LazilyTransformingAstService(stats)
+    const index = new ColumnIndex(stats, transformingService)
+    const matrix = new Matrix([
+      [1, 2],
+      [3, 4],
+    ])
+    index.add(matrix, simpleCellAddress(0, 0, 0))
+    deepStrictEqual(index.getColumnMap(0, 0), new Map([
+      [1, {index: [0], version: 0}],
+      [3, {index: [1], version: 0}],
+    ]))
+    deepStrictEqual(index.getColumnMap(0, 1), new Map([
+      [2, {index: [0], version: 0}],
+      [4, {index: [1], version: 0}],
+    ]))
+
+    index.change(matrix, new Matrix([
+      [5, 6],
+      [7, 8],
+    ]), simpleCellAddress(0, 0, 0))
+
+    deepStrictEqual(index.getColumnMap(0, 0), new Map([
+      [5, {index: [0], version: 0}],
+      [7, {index: [1], version: 0}],
+    ]))
+    deepStrictEqual(index.getColumnMap(0, 1), new Map([
+      [6, {index: [0], version: 0}],
+      [8, {index: [1], version: 0}],
+    ]))
   })
 })
 
