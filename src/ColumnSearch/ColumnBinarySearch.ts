@@ -24,11 +24,13 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
 
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
     const values = this.computeListOfValuesInRange(range)
+    let index = -1
     if (values.length < this.config.vlookupThreshold || !sorted) {
-      return values.indexOf(key)
+      index =  values.indexOf(key)
     } else {
-      return lowerBound(values, key)
+      index = lowerBound(values, key)
     }
+    return index < 0 ? index : index + range.start.row
   }
 
   private computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
