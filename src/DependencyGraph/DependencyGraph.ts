@@ -44,7 +44,7 @@ export class DependencyGraph {
       public readonly graph: Graph<Vertex>,
       public readonly sheetMapping: SheetMapping,
       public readonly matrixMapping: MatrixMapping,
-      private readonly stats: Statistics = new Statistics(),
+      public readonly stats: Statistics = new Statistics(),
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {}
 

@@ -1,8 +1,8 @@
 import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
-import {ColumnIndex} from './ColumnIndex'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {ParserWithCaching} from './parser'
+import {buildColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
@@ -12,9 +12,9 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.OVERALL)
 
-    const columnIndex = new ColumnIndex(stats)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
+    const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
     for (const sheetName in sheets) {

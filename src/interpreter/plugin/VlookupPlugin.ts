@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
+import {StatType} from "../../statistics/Statistics"
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -74,7 +75,7 @@ export class VlookupPlugin extends FunctionPlugin {
     const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
 
     if (searchedRange.width() === 1) {
-      const rowIndex = this.columnIndex.find(key, searchedRange)
+      const rowIndex = this.columnSearch.find(key, searchedRange, true)
 
       if (rowIndex === -1) {
         return new CellError(ErrorType.NA)
@@ -94,15 +95,19 @@ export class VlookupPlugin extends FunctionPlugin {
   }
 
   private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
-    const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
+    this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
-    const rowIndex = this.columnIndex.find(key, range)
+    const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
+    const rowIndex = this.columnSearch.find(key, searchedRange, sorted)
+
+    this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
     if (rowIndex === -1) {
       return new CellError(ErrorType.NA)
     }
 
     const address = range.getAddress(index, rowIndex)
+
     return this.dependencyGraph.getCellValue(address)
   }
 }

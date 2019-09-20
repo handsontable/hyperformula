@@ -1,8 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {ColumnIndex} from './ColumnIndex'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
@@ -26,6 +23,9 @@ import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, Procedure
 import {CellAddress} from './parser/CellAddress'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
+import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy"
 
 /**
  * Engine for one sheet
@@ -53,7 +53,7 @@ export class HandsOnEngine {
       /** Statistics module for benchmarking */
       public readonly stats: Statistics,
       public readonly dependencyGraph: DependencyGraph,
-      public readonly columnIndex: ColumnIndex,
+      public readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
       private readonly evaluator: Evaluator,
@@ -149,17 +149,17 @@ export class HandsOnEngine {
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (newCellContent === '') {
         const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnIndex.remove(oldValue, address)
+        this.columnSearch.remove(oldValue, address)
         this.dependencyGraph.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {
         const newValue = Number(newCellContent)
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnIndex.change(oldValue, newValue, address)
+        this.columnSearch.change(oldValue, newValue, address)
       } else {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newCellContent)
-        this.columnIndex.change(oldValue, newCellContent, address)
+        this.columnSearch.change(oldValue, newCellContent, address)
       }
       verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
@@ -173,12 +173,9 @@ export class HandsOnEngine {
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
-    this.stats.reset()
-
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
     this.dependencyGraph.addRows(addedRows)
-    this.columnIndex.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
@@ -189,12 +186,9 @@ export class HandsOnEngine {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-    this.stats.reset()
-
     const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
 
     this.dependencyGraph.removeRows(removedRows)
-    this.columnIndex.removeRows(removedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
@@ -205,12 +199,10 @@ export class HandsOnEngine {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
-    this.stats.reset()
-
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
 
     this.dependencyGraph.addColumns(addedColumns)
-    this.columnIndex.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
@@ -221,12 +213,10 @@ export class HandsOnEngine {
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
-    this.stats.reset()
-
     const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(removedColumns)
-    this.columnIndex.removeColumns(removedColumns)
+    this.columnSearch.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)

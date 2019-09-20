@@ -1,13 +1,13 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
-import {ColumnIndex} from './ColumnIndex'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy"
 
 /**
  * Two-dimenstional array representation of sheet
@@ -35,15 +35,15 @@ export class GraphBuilder {
    */
   constructor(
       private readonly dependencyGraph: DependencyGraph,
-      private readonly columnIndex: ColumnIndex,
+      private readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       private readonly config: Config = new Config(),
       private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats, config.matrixDetectionThreshold)
+      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold)
     } else {
-      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnIndex, this.parser, this.stats)
+      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats)
     }
   }
 
@@ -71,7 +71,7 @@ export interface GraphBuilderStrategy {
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
-      private readonly columnIndex: ColumnIndex,
+      private readonly columnIndex: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
   ) {
@@ -133,7 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
-      private readonly columnIndex: ColumnIndex,
+      private readonly columnIndex: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,

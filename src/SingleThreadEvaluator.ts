@@ -1,22 +1,22 @@
 import {CellError, ErrorType} from './Cell'
-import {ColumnIndex} from './ColumnIndex'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnIndex: ColumnIndex,
+    private readonly columnSearch: IColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnIndex, this.config, this.stats)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats)
   }
 
   public run() {
@@ -44,7 +44,7 @@ export class SingleThreadEvaluator implements Evaluator {
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
           const newCellValue = this.interpreter.evaluateAst(formula, address)
           vertex.setCellValue(newCellValue)
-          this.columnIndex.change(currentValue, newCellValue, address)
+          this.columnSearch.change(currentValue, newCellValue, address)
           return (currentValue !== newCellValue)
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
@@ -78,7 +78,7 @@ export class SingleThreadEvaluator implements Evaluator {
         }
         const cellValue = this.interpreter.evaluateAst(formula, address)
         vertex.setCellValue(cellValue)
-        this.columnIndex.add(cellValue, address)
+        this.columnSearch.add(cellValue, address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }
