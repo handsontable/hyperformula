@@ -90,7 +90,7 @@ export class PlusTree<T> {
       node.values[indexWhereToAddIt] = value
     } else {
       const childNode = node.children[indexWhereToAddIt]
-      this.addKeyWithShiftRecursive(childNode, key, value) // should be sKey here
+      this.addKeyWithShiftRecursive(childNode, sKey, value)
       for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
         node.keys[i]++
         node.children[i+1].shift++
@@ -112,8 +112,8 @@ export class PlusTree<T> {
     } else {
       const keysForNewNode = currentNode.keys.splice(this.span + 1, this.span - 1)
       const childrenForNewNode = currentNode.children.splice(this.span + 1, this.span)
-      const newNode = new Internal(keysForNewNode, childrenForNewNode, 0) // shift should be different
-      parentNode.keys.splice(index, 0, currentNode.keys.pop()!) // and the value should be shifted too
+      const newNode = new Internal(keysForNewNode, childrenForNewNode, currentNode.shift)
+      parentNode.keys.splice(index, 0, currentNode.keys.pop()! + currentNode.shift)
       parentNode.children.splice(index + 1, 0, newNode)
     }
   }
