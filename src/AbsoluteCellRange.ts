@@ -28,6 +28,11 @@ export class AbsoluteCellRange {
     return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
   }
 
+  public static singleRangeFromCellAddress(cellAddress: CellAddress, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+    const simpleCellAddress = cellAddress.toSimpleCellAddress(baseAddress)
+    return new AbsoluteCellRange(simpleCellAddress, simpleCellAddress)
+  }
+
   constructor(
       public readonly start: SimpleCellAddress,
       public readonly end: SimpleCellAddress,

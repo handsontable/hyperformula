@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
-import {CellRangeAst, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
+import {Ast, CellRangeAst, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -124,8 +124,12 @@ export class SumifPlugin extends FunctionPlugin {
       for (let i = 1; i < ast.args.length; i += 2) {
         const criterionString = this.evaluateAst(ast.args[i+1], formulaAddress)
         const criterion = parseCriterion(criterionString)
+        const conditionRange = this.rangeFromAst(ast.args[i], formulaAddress)
+        if (conditionRange === null) {
+          return new CellError(ErrorType.VALUE)
+        }
         conditions.push(new Condition(
-          AbsoluteCellRange.fromCellRange(ast.args[i] as CellRangeAst, formulaAddress),
+          conditionRange,
           criterionString as string,
           criterion as Criterion
         ))
@@ -138,6 +142,17 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
   }
+
+  private rangeFromAst(ast: Ast, formulaAddress: SimpleCellAddress): AbsoluteCellRange | null {
+    if (ast.type === AstNodeType.CELL_RANGE) {
+      return AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+    } else if (ast.type === AstNodeType.CELL_REFERENCE) {
+      return AbsoluteCellRange.singleRangeFromCellAddress(ast.reference, formulaAddress)
+    } else {
+      return null
+    }
+  }
+
 
   /**
    * Corresponds to COUNTIF(Range, Criterion)
