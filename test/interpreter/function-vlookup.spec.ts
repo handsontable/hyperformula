@@ -197,6 +197,17 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue("A1")).toEqual(3)
     })
+
+    it('should work for detected matrices', () => {
+      const engine = builder([
+        ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
+        ["1"],
+        ["2"],
+        ["3"],
+      ], {matrixDetection: true, matrixDetectionThreshold: 1})
+
+      expect(engine.getCellValue("A1")).toEqual(3)
+    })
   })
 }
 
