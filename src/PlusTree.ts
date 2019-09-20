@@ -1,4 +1,4 @@
-class Leaf<T> {
+export class Leaf<T> {
   constructor(
     public keys: number[],
     public values: T[],
@@ -7,7 +7,16 @@ class Leaf<T> {
   }
 }
 
-type PNode<T> = Leaf<T>
+export class Internal<T> {
+  constructor(
+    public keys: number[],
+    public children: PNode<T>[],
+    public shift: number,
+  ) {
+  }
+}
+
+type PNode<T> = Leaf<T> | Internal<T>
 
 export class PlusTree<T> {
 
@@ -19,14 +28,14 @@ export class PlusTree<T> {
 
   constructor(
     private readonly span: number,
-    private root: PNode<T>,
+    public _root: PNode<T>,
   ) {
     this.minSize = this.span - 1
     this.maxSize = 2 * this.span - 1
   }
 
   public getKey(key: number): T | null {
-    return this.getKeyRecursive(this.root, key)
+    return this.getKeyRecursive(this._root, key)
   }
 
   public addKeyWithShift(key: number, value: T) {
@@ -34,15 +43,36 @@ export class PlusTree<T> {
   }
 
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
-    for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] === key) {
-        return node.values[i]
+    // shift should be considered here
+    if (node instanceof Leaf) {
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] === key) {
+          return node.values[i]
+        }
       }
+      return null
+    } else {
+      let indexOfBiggerKey = node.keys.length;
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] >= key) {
+          indexOfBiggerKey = i
+          break;
+        }
+      }
+      return this.getKeyRecursive(node.children[indexOfBiggerKey], key)
     }
-    return null
   }
 
-  private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
+  public addKeyWithShift(key: number, value: T) {
+    const indexWhereKeyWasAdded = this.addKeyWithShiftRecursive(this._root, key, value)
+    if (this._root.keys.length > this.maxSize) {
+      const newRoot = new Internal([], [this._root], 0)
+      this.splitNode(newRoot, 0)
+      this._root = newRoot
+    }
+  }
+
+  private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T): number {
     let indexWhereToAddIt = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] >= key) {
@@ -50,11 +80,27 @@ export class PlusTree<T> {
         break
       }
     }
-    for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
-      node.keys[i] = node.keys[i - 1]
-      node.values[i] = node.values[i - 1]
+    if (node instanceof Leaf) {
+      for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
+        node.keys[i] = node.keys[i - 1]
+        node.values[i] = node.values[i - 1]
+      }
+      node.keys[indexWhereToAddIt] = key
+      node.values[indexWhereToAddIt] = value
+      return indexWhereToAddIt
+    } else {
+      throw Error("Not implemented yet")
     }
-    node.keys[indexWhereToAddIt] = key
-    node.values[indexWhereToAddIt] = value
+  }
+
+  private splitNode(parentNode: Internal<T>, index: number) {
+    const currentNode = parentNode.children[index]
+    if (currentNode instanceof Leaf) {
+      const keysForNewNode = currentNode.keys.splice(this.span, this.span)
+      const valuesForNewNode = currentNode.values.splice(this.span, this.span)
+      const newNode = new Leaf(keysForNewNode, valuesForNewNode, 0) // shift should be different
+      parentNode.keys.splice(index, 0, currentNode.keys[currentNode.keys.length - 1])
+      parentNode.children.splice(index + 1, 0, newNode)
+    }
   }
 }
