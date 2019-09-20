@@ -143,7 +143,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue('A6')).toEqual('d')
     })
 
-    xit('should return lower bound for sorted values', () => {
+    it('should return lower bound for sorted values', () => {
       const engine = builder([
         ['1', 'a'],
         ['2', 'b'],
