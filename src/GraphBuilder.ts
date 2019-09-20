@@ -133,7 +133,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
       private readonly dependencyGraph: DependencyGraph,
-      private readonly columnIndex: IColumnSearchStrategy,
+      private readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,
@@ -142,7 +142,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, dependencies, this.threshold)
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, dependencies, this.threshold)
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -179,7 +179,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             matrixHeuristic.add(address)
           } else {
             const vertex = new ValueCellVertex(cellContent)
-            this.columnIndex.add(cellContent, address)
+            this.columnSearch.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -194,7 +194,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       for (const address of elem.cells.reverse()) {
         const value = sheets[this.dependencyGraph.getSheetName(address.sheet)][address.row][address.col]
         const vertex = new ValueCellVertex(Number(value))
-        this.columnIndex.add(Number(value), address)
+        this.columnSearch.add(Number(value), address)
         this.dependencyGraph.addVertex(address, vertex)
       }
     }

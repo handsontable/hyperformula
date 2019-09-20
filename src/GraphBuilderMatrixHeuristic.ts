@@ -4,6 +4,7 @@ import {CellDependency} from './CellDependency'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
 import {Size} from './Matrix'
+import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {
@@ -56,6 +57,7 @@ export class GraphBuilderMatrixHeuristic {
 
   constructor(
       private readonly dependencyGraph: DependencyGraph,
+      private readonly columnSearch: IColumnSearchStrategy,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
       private readonly threshold: number,
   ) {
@@ -84,8 +86,10 @@ export class GraphBuilderMatrixHeuristic {
       const possibleMatrix = elem.range
       const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
       const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
-      matrixVertex.setCellValue(possibleMatrix.matrixFromPlainValues(sheet))
+      const matrix = possibleMatrix.matrixFromPlainValues(sheet)
+      matrixVertex.setCellValue(matrix)
       this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
+      this.columnSearch.add(matrix, matrixVertex.getAddress())
     })
 
     this.mapping.clear()

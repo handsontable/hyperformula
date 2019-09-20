@@ -2,9 +2,10 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
-import {DependencyGraph} from '../DependencyGraph'
+import {DependencyGraph, MatrixVertex} from '../DependencyGraph'
 import {lowerBound} from '../interpreter/binarySearch'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
+import {Matrix} from "../Matrix";
 
 export class ColumnBinarySearch implements IColumnSearchStrategy {
   constructor(
