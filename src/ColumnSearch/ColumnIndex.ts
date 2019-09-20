@@ -33,6 +33,20 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
+  public remove(value: CellValue | null, address: SimpleCellAddress) {
+    if (!value) {
+      return
+    }
+
+    if (value instanceof Matrix) {
+      for (const [matrixValue, cellAddress] of value.generateValues(address)) {
+        this.removeSingleValue(matrixValue, cellAddress)
+      }
+    } else {
+      this.removeSingleValue(value, address)
+    }
+  }
+
   private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
     this.ensureRecentData(address.sheet, address.col, value)
 
@@ -42,11 +56,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     })
   }
 
-  public remove(value: CellValue | null, address: SimpleCellAddress) {
-    if (!value) {
-      return
-    }
-
+  private removeSingleValue(value: CellValue, address: SimpleCellAddress) {
     this.ensureRecentData(address.sheet, address.col, value)
 
     const columnMap = this.getColumnMap(address.sheet, address.col)
