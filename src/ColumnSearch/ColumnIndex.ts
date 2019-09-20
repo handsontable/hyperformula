@@ -1,9 +1,10 @@
-import {CellValue, SimpleCellAddress} from "./Cell";
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {Statistics, StatType} from "./statistics/Statistics";
-import {RowsSpan} from "./RowsSpan";
-import {ColumnsSpan} from "./ColumnsSpan";
-import {LazilyTransformingAstService, Transformation, TransformationType} from "./LazilyTransformingAstService";
+import {CellValue, SimpleCellAddress} from "../Cell";
+import {AbsoluteCellRange} from "../AbsoluteCellRange";
+import {Statistics, StatType} from "../statistics/Statistics";
+import {RowsSpan} from "../RowsSpan";
+import {ColumnsSpan} from "../ColumnsSpan";
+import {LazilyTransformingAstService, Transformation, TransformationType} from "../LazilyTransformingAstService";
+import {IColumnSearchStrategy} from "./ColumnSearchStrategy";
 
 type ColumnMap = Map<CellValue, ValueIndex>
 interface ValueIndex {
@@ -12,16 +13,15 @@ interface ValueIndex {
 }
 type SheetIndex = Array<ColumnMap>
 
-export class ColumnIndex {
+export class ColumnIndex implements IColumnSearchStrategy {
   private readonly index: Map<number, SheetIndex> = new Map()
 
   constructor(
       private readonly stats: Statistics,
       private readonly transformingService: LazilyTransformingAstService
-  ) {
-  }
+  ) {}
 
-  public add(value: CellValue, address: SimpleCellAddress) {
+  add(value: CellValue, address: SimpleCellAddress) {
     this.ensureRecentData(address.sheet, address.col, value)
 
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
@@ -30,7 +30,7 @@ export class ColumnIndex {
     })
   }
 
-  public remove(value: CellValue | null, address: SimpleCellAddress) {
+  remove(value: CellValue | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
@@ -55,7 +55,7 @@ export class ColumnIndex {
     }
   }
 
-  public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
+  change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -63,7 +63,7 @@ export class ColumnIndex {
     this.add(newValue, address)
   }
 
-  public find(key: any, range: AbsoluteCellRange): number {
+  find(key: any, range: AbsoluteCellRange): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)

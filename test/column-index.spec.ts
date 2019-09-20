@@ -1,4 +1,4 @@
-import {ColumnIndex} from "../src/ColumnIndex";
+import {ColumnIndex} from "../src/ColumnSearch/ColumnIndex";
 import {adr} from "./testUtils";
 import {Statistics} from "../src/statistics/Statistics";
 import {simpleCellAddress} from "../src/Cell";

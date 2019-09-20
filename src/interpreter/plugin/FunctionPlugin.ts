@@ -5,7 +5,7 @@ import {DependencyGraph} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {Interpreter} from '../Interpreter'
-import {ColumnIndex} from "../../ColumnIndex";
+import {IColumnSearchStrategy} from "../../ColumnSearch/ColumnSearchStrategy";
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -28,13 +28,13 @@ export abstract class FunctionPlugin {
   public static implementedFunctions: IImplementedFunctions
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
-  protected readonly columnIndex: ColumnIndex
+  protected readonly columnSearch: IColumnSearchStrategy
   protected readonly config: Config
 
   protected constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
-    this.columnIndex = interpreter.columnIndex
+    this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
   }
 

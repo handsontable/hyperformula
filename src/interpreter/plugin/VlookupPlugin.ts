@@ -58,7 +58,7 @@ export class VlookupPlugin extends FunctionPlugin {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())
-    const rowIndex = this.columnIndex.find(key, searchedRange)
+    const rowIndex = this.columnSearch.find(key, searchedRange)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 

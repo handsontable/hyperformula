@@ -3,7 +3,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {DependencyGraph} from './DependencyGraph'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParserWithCaching} from './parser'
-import {ColumnIndex} from "./ColumnIndex";
+import {ColumnIndex} from "./ColumnSearch/ColumnIndex";
 
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HandsOnEngine {

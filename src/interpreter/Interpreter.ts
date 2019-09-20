@@ -8,7 +8,7 @@ import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {ColumnIndex} from "../ColumnIndex";
+import {IColumnSearchStrategy} from "../ColumnSearch/ColumnSearchStrategy";
 
 export class Interpreter {
   public readonly gpu: GPU
@@ -16,7 +16,7 @@ export class Interpreter {
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,
-    public readonly columnIndex: ColumnIndex,
+    public readonly columnSearch: IColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
   ) {

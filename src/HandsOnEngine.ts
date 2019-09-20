@@ -25,7 +25,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {ColumnIndex} from "./ColumnIndex";
+import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 /**
  * Engine for one sheet
@@ -53,7 +53,7 @@ export class HandsOnEngine {
       /** Statistics module for benchmarking */
       public readonly stats: Statistics,
       public readonly dependencyGraph: DependencyGraph,
-      public readonly columnIndex: ColumnIndex,
+      public readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
       private readonly evaluator: Evaluator,
@@ -149,17 +149,17 @@ export class HandsOnEngine {
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (newCellContent === '') {
         const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnIndex.remove(oldValue, address)
+        this.columnSearch.remove(oldValue, address)
         this.dependencyGraph.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {
         const newValue = Number(newCellContent)
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnIndex.change(oldValue, newValue, address)
+        this.columnSearch.change(oldValue, newValue, address)
       } else {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newCellContent)
-        this.columnIndex.change(oldValue, newCellContent, address)
+        this.columnSearch.change(oldValue, newCellContent, address)
       }
       verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
@@ -202,7 +202,7 @@ export class HandsOnEngine {
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
 
     this.dependencyGraph.addColumns(addedColumns)
-    this.columnIndex.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
@@ -216,7 +216,7 @@ export class HandsOnEngine {
     const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(removedColumns)
-    this.columnIndex.removeColumns(removedColumns)
+    this.columnSearch.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
