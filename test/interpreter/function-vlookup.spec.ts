@@ -1,8 +1,9 @@
-import {CellError, Config, CsvExporter, HandsOnEngine} from '../../src'
+import {CellError, Config, HandsOnEngine} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
+import {adr} from "../testUtils";
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HandsOnEngine) => {
   describe('VLOOKUP - args validation', () => {
@@ -216,6 +217,21 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ["4", "5", "6"],
         ["{=TRANSPOSE(A2:C3)}"],
       ])
+
+      expect(engine.getCellValue("A1")).toEqual(6)
+    })
+
+    it('should work after updating standard matrix', () => {
+      const engine = builder([
+        ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["{=TRANSPOSE(A2:C3)}"],
+      ])
+
+      expect(engine.getCellValue("A1")).toEqual(new CellError(ErrorType.NA))
+
+      engine.setCellContent(adr("C2"), "4")
 
       expect(engine.getCellValue("A1")).toEqual(6)
     })
