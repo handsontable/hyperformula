@@ -24,7 +24,7 @@ export interface IColumnSearchStrategy {
 
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): IColumnSearchStrategy {
   if (config.useColumnIndex) {
-    return new ColumnIndex(statistics, dependencyGraph.lazilyTransformingAstService)
+    return new ColumnIndex(dependencyGraph, config, statistics)
   } else {
     return new ColumnBinarySearch(dependencyGraph, config)
   }

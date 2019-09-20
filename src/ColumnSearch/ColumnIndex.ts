@@ -5,8 +5,10 @@ import {LazilyTransformingAstService, Transformation, TransformationType} from '
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
-import {MatrixVertex} from "../DependencyGraph";
+import {DependencyGraph, MatrixVertex} from "../DependencyGraph";
 import {Matrix} from "../Matrix";
+import {ColumnBinarySearch} from "./ColumnBinarySearch";
+import {Config} from "../Config";
 
 type ColumnMap = Map<CellValue, ValueIndex>
 interface ValueIndex {
@@ -17,11 +19,22 @@ type SheetIndex = ColumnMap[]
 
 export class ColumnIndex implements IColumnSearchStrategy {
   private readonly index: Map<number, SheetIndex> = new Map()
+  private readonly transformingService: LazilyTransformingAstService
+  private readonly binarySearchStrategy: ColumnBinarySearch
 
   constructor(
+      private readonly dependencyGraph: DependencyGraph,
+      private readonly config: Config,
       private readonly stats: Statistics,
-      private readonly transformingService: LazilyTransformingAstService,
-  ) {}
+  ) {
+    this.transformingService = this.dependencyGraph.lazilyTransformingAstService
+    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
+  }
+
+  public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
+    const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
+    return new ColumnIndex(dependencyGraph, config, statistics)
+  }
 
   public add(value: CellValue, address: SimpleCellAddress) {
     if (value instanceof Matrix) {
@@ -85,7 +98,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     this.add(newValue, address)
   }
 
-  public find(key: any, range: AbsoluteCellRange): number {
+  public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -95,13 +108,13 @@ export class ColumnIndex implements IColumnSearchStrategy {
 
     const valueIndex = columnMap.get(key)
     if (!valueIndex) {
-      return -1
+      return this.binarySearchStrategy.find(key, range, sorted)
     }
 
-    /* assuming that valueIndex is sorted already */
+
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
-    return rowNumber <= range.end.row ? rowNumber : -1
+    return rowNumber <= range.end.row ? rowNumber : this.binarySearchStrategy.find(key, range, sorted)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {
