@@ -29,7 +29,7 @@ describe('Function SUMIFS', () => {
 
   it('error when 4th arg is not a range or reference',  () => {
     const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, ">0", 42)'],
+      ['=SUMIFS(C1:C2, B1:B2, ">0", 42, ">0")'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
