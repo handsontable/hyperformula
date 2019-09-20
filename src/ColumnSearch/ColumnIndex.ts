@@ -5,6 +5,8 @@ import {LazilyTransformingAstService, Transformation, TransformationType} from '
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
+import {MatrixVertex} from "../DependencyGraph";
+import {Matrix} from "../Matrix";
 
 type ColumnMap = Map<CellValue, ValueIndex>
 interface ValueIndex {
@@ -22,6 +24,16 @@ export class ColumnIndex implements IColumnSearchStrategy {
   ) {}
 
   public add(value: CellValue, address: SimpleCellAddress) {
+    if (value instanceof Matrix) {
+      for (const [matrixValue, cellAddress] of value.generateValues(address)) {
+        this.addSingleCellValue(matrixValue, cellAddress)
+      }
+    } else {
+      this.addSingleCellValue(value, address)
+    }
+  }
+
+  private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
     this.ensureRecentData(address.sheet, address.col, value)
 
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
