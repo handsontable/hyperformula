@@ -1,9 +1,17 @@
-import {Config, HandsOnEngine} from '../src'
+import {CellError, Config, HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {MatrixVertex} from '../src/DependencyGraph'
+import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractMatrixRange, extractRange, extractReference} from './testUtils'
+import {
+  adr,
+  expect_function_to_have_ref_error,
+  expect_reference_to_have_ref_error,
+  extractMatrixRange,
+  extractRange,
+  extractReference
+} from './testUtils'
+import {ErrorType} from "../src/Cell";
 
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency above removed row should not be affected', () => {
@@ -447,6 +455,22 @@ describe('Removing rows - reevaluation', () => {
     engine.removeRows(0, 1, 1)
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
+  })
+
+  it('should reevaluate formula when range reduced to zero', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(A1:A2)']
+    ])
+
+    const a3 = engine.addressMapping.getCell(adr('A3'))
+    const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
+
+    engine.removeRows(0, 0, 1)
+
+    expect(a3setCellValueSpy).toHaveBeenCalled()
+    expect_function_to_have_ref_error(engine, adr('A1'))
   })
 })
 

@@ -135,6 +135,9 @@ export class Graph<T> {
   }
 
   public removeNode(node: T) {
+    for (const adjacentNode of this.adjacentNodes(node).values()) {
+      this.markNodeAsSpecialRecentlyChanged(adjacentNode)
+    }
     this.edges.delete(node)
     this.nodes.delete(node)
     this.specialNodes.delete(node)
