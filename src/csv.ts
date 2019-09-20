@@ -15,13 +15,13 @@ function cellValueToCsvString(value: CellValue): string {
 }
 
 export class CsvExporter {
-  constructor(
-    public readonly csvDelimiter: string = ',',
-  ) {
-  }
   public static export(engine: HandsOnEngine, csvDelimiter = ',', sheetName = 'Sheet1'): string {
     const exporter = new CsvExporter(csvDelimiter)
     return exporter.exportSheetByName(engine, sheetName)
+  }
+  constructor(
+    public readonly csvDelimiter: string = ',',
+  ) {
   }
 
   /**

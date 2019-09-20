@@ -10,6 +10,10 @@ class Leaf<T> {
 type PNode<T> = Leaf<T>
 
 export class PlusTree<T> {
+
+  public static empty(span: number) {
+    return new PlusTree(span, new Leaf([], [], 0))
+  }
   private readonly minSize: number
   private readonly maxSize: number
 
@@ -21,12 +25,12 @@ export class PlusTree<T> {
     this.maxSize = 2 * this.span - 1
   }
 
-  public static empty(span: number) {
-    return new PlusTree(span, new Leaf([], [], 0))
-  }
-
   public getKey(key: number): T | null {
     return this.getKeyRecursive(this.root, key)
+  }
+
+  public addKeyWithShift(key: number, value: T) {
+    this.addKeyWithShiftRecursive(this.root, key, value)
   }
 
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
@@ -36,10 +40,6 @@ export class PlusTree<T> {
       }
     }
     return null
-  }
-
-  public addKeyWithShift(key: number, value: T) {
-    this.addKeyWithShiftRecursive(this.root, key, value)
   }
 
   private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {

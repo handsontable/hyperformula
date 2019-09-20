@@ -1,11 +1,11 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {Interpreter} from '../Interpreter'
-import {IColumnSearchStrategy} from "../../ColumnSearch/ColumnSearchStrategy";
 
 interface IImplementedFunctions {
   [functionName: string]: {

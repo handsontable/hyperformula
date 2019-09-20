@@ -1,6 +1,7 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
+import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix} from '../Matrix'
@@ -8,7 +9,6 @@ import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
-import {IColumnSearchStrategy} from "../ColumnSearch/ColumnSearchStrategy";
 
 export class Interpreter {
   public readonly gpu: GPU

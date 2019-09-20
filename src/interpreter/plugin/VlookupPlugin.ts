@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {StatType} from '../../statistics/Statistics'
 import {FunctionPlugin} from './FunctionPlugin'
-import {StatType} from "../../statistics/Statistics"
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {

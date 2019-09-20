@@ -1,9 +1,8 @@
 import {CellError, Config, HandsOnEngine} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ConfigParams} from '../../src/Config'
+import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
-import {AddressMapping} from "../../src/DependencyGraph";
-import {Sheet} from "../../src/GraphBuilder";
-import {ConfigParams} from "../../src/Config";
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HandsOnEngine) => {
   describe('VLOOKUP - args validation', () => {
@@ -193,7 +192,7 @@ describe('ColumnIndex strategy', () => {
   sharedExamples((sheet: Sheet, config: any = {}) => {
     return HandsOnEngine.buildFromArray(sheet, new Config({
       useColumnIndex: true,
-      ...config
+      ...config,
     }))
   })
 })
@@ -202,7 +201,7 @@ describe('BinarySearchStrategy', () => {
   sharedExamples((sheet: Sheet, config: any = {}) => {
     return HandsOnEngine.buildFromArray(sheet, new Config({
       useColumnIndex: false,
-      ...config
+      ...config,
     }))
   })
 })

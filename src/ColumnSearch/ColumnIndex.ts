@@ -1,27 +1,27 @@
-import {CellValue, SimpleCellAddress} from "../Cell";
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
-import {Statistics, StatType} from "../statistics/Statistics";
-import {RowsSpan} from "../RowsSpan";
-import {ColumnsSpan} from "../ColumnsSpan";
-import {LazilyTransformingAstService, Transformation, TransformationType} from "../LazilyTransformingAstService";
-import {IColumnSearchStrategy} from "./ColumnSearchStrategy";
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue, SimpleCellAddress} from '../Cell'
+import {ColumnsSpan} from '../ColumnsSpan'
+import {LazilyTransformingAstService, Transformation, TransformationType} from '../LazilyTransformingAstService'
+import {RowsSpan} from '../RowsSpan'
+import {Statistics, StatType} from '../statistics/Statistics'
+import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 
 type ColumnMap = Map<CellValue, ValueIndex>
 interface ValueIndex {
   version: number
-  index: Array<number>
+  index: number[]
 }
-type SheetIndex = Array<ColumnMap>
+type SheetIndex = ColumnMap[]
 
 export class ColumnIndex implements IColumnSearchStrategy {
   private readonly index: Map<number, SheetIndex> = new Map()
 
   constructor(
       private readonly stats: Statistics,
-      private readonly transformingService: LazilyTransformingAstService
+      private readonly transformingService: LazilyTransformingAstService,
   ) {}
 
-  add(value: CellValue, address: SimpleCellAddress) {
+  public add(value: CellValue, address: SimpleCellAddress) {
     this.ensureRecentData(address.sheet, address.col, value)
 
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
@@ -30,7 +30,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     })
   }
 
-  remove(value: CellValue | null, address: SimpleCellAddress) {
+  public remove(value: CellValue | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
@@ -38,7 +38,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     this.ensureRecentData(address.sheet, address.col, value)
 
     const columnMap = this.getColumnMap(address.sheet, address.col)
-    let valueIndex = columnMap.get(value)
+    const valueIndex = columnMap.get(value)
     if (!valueIndex) {
       return
     }
@@ -55,7 +55,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
+  public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
@@ -63,7 +63,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     this.add(newValue, address)
   }
 
-  find(key: any, range: AbsoluteCellRange): number {
+  public find(key: any, range: AbsoluteCellRange): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -80,17 +80,6 @@ export class ColumnIndex implements IColumnSearchStrategy {
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
     return rowNumber <= range.end.row ? rowNumber : -1
-  }
-
-  private addRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
-    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
-    this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
-  }
-
-  private removeRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
-    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
-    this.removeRowsFromValues(valueIndex, rowsSpan)
-    this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {
@@ -115,7 +104,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
     }
-    let sheetMap = this.index.get(sheet)!
+    const sheetMap = this.index.get(sheet)!
     let columnMap = sheetMap![col]
 
     if (!columnMap) {
@@ -132,7 +121,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (!index) {
       index = {
         version: this.transformingService.version(),
-        index: []
+        index: [],
       }
       columnMap.set(value, index)
     }
@@ -158,6 +147,17 @@ export class ColumnIndex implements IColumnSearchStrategy {
       }
     }
     valueIndex.version = actualVersion
+  }
+
+  private addRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
+    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
+    this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
+  }
+
+  private removeRows(col: number, rowsSpan: RowsSpan, value: CellValue) {
+    const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
+    this.removeRowsFromValues(valueIndex, rowsSpan)
+    this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
   private addValue(valueIndex: ValueIndex, rowNumber: number): void {
@@ -191,7 +191,6 @@ export class ColumnIndex implements IColumnSearchStrategy {
   }
 }
 
-
 /*
 * If key exists returns index of key
 * Otherwise returns index of smallest element greater than key
@@ -202,7 +201,7 @@ export function upperBound(values: number[], key: number): number {
   let end = values.length - 1
 
   while (start <= end) {
-    let center = Math.floor((start + end) / 2)
+    const center = Math.floor((start + end) / 2)
     if (key > values[center]) {
       start = center + 1
     } else if (key < values[center]) {
@@ -215,7 +214,6 @@ export function upperBound(values: number[], key: number): number {
   return start
 }
 
-
 /*
 * If key exists returns index of key
 * Otherwise returns index of greatest element smaller than key
@@ -226,7 +224,7 @@ export function lowerBound(values: number[], key: number): number {
   let end = values.length - 1
 
   while (start <= end) {
-    let center = Math.floor((start + end) / 2)
+    const center = Math.floor((start + end) / 2)
     if (key > values[center]) {
       start = center + 1
     } else if (key < values[center]) {

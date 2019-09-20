@@ -1,11 +1,11 @@
 import {CellError, ErrorType} from './Cell'
+import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter

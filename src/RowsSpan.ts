@@ -1,5 +1,4 @@
 
-
 /*
  * A class representing a set of rows in specific sheet
  */

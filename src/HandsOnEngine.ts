@@ -1,5 +1,8 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
@@ -23,9 +26,6 @@ import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, Procedure
 import {CellAddress} from './parser/CellAddress'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy"
 
 /**
  * Engine for one sheet

@@ -1,8 +1,8 @@
 import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
+import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {ParserWithCaching} from './parser'
-import {buildColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 

@@ -1,4 +1,4 @@
-import {half} from "../cruds/operations";
+import {half} from '../cruds/operations'
 
 export function simpleSorted(rows: number) {
   const sheet = []
@@ -22,7 +22,6 @@ export function topdown(rows: number, vlookupLines: number) {
     sheet.push([(rows - prev + 1).toString()])
     prev++
   }
-
 
   for (let i = 0; i < vlookupLines; ++i) {
     sheet.push([`=VLOOKUP(1, A1:B${rows}, 1, false())`])
@@ -53,7 +52,6 @@ export function randomVlookups(rows: number, cols: number, vlookupLines: number)
 
   return sheet
 }
-
 
 export function repeating2(rows: number, differentValues: number, vlookupLines: number) {
   const cols = 6
@@ -102,5 +100,5 @@ export function repeating(rows: number, differentValues: number, vlookupLines: n
 }
 
 function rand(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
