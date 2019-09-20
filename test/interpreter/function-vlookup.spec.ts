@@ -185,6 +185,18 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue('A4')).toEqual('a')
     })
+
+    it('should properly calculate absolute row index', () => {
+      const engine = builder([
+          ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
+          ["foo"],
+          ["1"],
+          ["2"],
+          ["3"],
+      ])
+
+      expect(engine.getCellValue("A1")).toEqual(3)
+    })
   })
 }
 

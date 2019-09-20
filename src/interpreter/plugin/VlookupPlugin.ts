@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {StatType} from '../../statistics/Statistics'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -106,7 +106,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const address = range.getAddress(index, rowIndex)
+    const address = simpleCellAddress(range.sheet, range.start.col + index, rowIndex)
 
     return this.dependencyGraph.getCellValue(address)
   }
