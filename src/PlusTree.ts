@@ -47,7 +47,12 @@ export class PlusTree<T> {
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] >= key) {
         indexWhereToAddIt = i
+        break
       }
+    }
+    for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
+      node.keys[i] = node.keys[i - 1]
+      node.values[i] = node.values[i - 1]
     }
     node.keys[indexWhereToAddIt] = key
     node.values[indexWhereToAddIt] = value
