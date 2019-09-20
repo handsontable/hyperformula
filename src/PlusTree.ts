@@ -19,7 +19,6 @@ export class Internal<T> {
 type PNode<T> = Leaf<T> | Internal<T>
 
 export class PlusTree<T> {
-
   public static empty(span: number) {
     return new PlusTree(span, new Leaf([], [], 0))
   }
@@ -36,10 +35,6 @@ export class PlusTree<T> {
 
   public getKey(key: number): T | null {
     return this.getKeyRecursive(this._root, key)
-  }
-
-  public addKeyWithShift(key: number, value: T) {
-    this.addKeyWithShiftRecursive(this.root, key, value)
   }
 
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
