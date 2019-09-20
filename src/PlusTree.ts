@@ -43,10 +43,10 @@ export class PlusTree<T> {
   }
 
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
-    // shift should be considered here
+    const sKey = key - node.shift
     if (node instanceof Leaf) {
       for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] === key) {
+        if (node.keys[i] === sKey) {
           return node.values[i]
         }
       }
@@ -54,17 +54,17 @@ export class PlusTree<T> {
     } else {
       let indexOfBiggerKey = node.keys.length;
       for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] >= key) {
+        if (node.keys[i] >= sKey) {
           indexOfBiggerKey = i
           break;
         }
       }
-      return this.getKeyRecursive(node.children[indexOfBiggerKey], key)
+      return this.getKeyRecursive(node.children[indexOfBiggerKey], sKey)
     }
   }
 
   public addKeyWithShift(key: number, value: T) {
-    const indexWhereKeyWasAdded = this.addKeyWithShiftRecursive(this._root, key, value)
+    this.addKeyWithShiftRecursive(this._root, key, value)
     if (this._root.keys.length > this.maxSize) {
       const newRoot = new Internal([], [this._root], 0)
       this.splitNode(newRoot, 0)
@@ -72,7 +72,8 @@ export class PlusTree<T> {
     }
   }
 
-  private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T): number {
+  private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
+    // shift should be considered here
     let indexWhereToAddIt = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] >= key) {
@@ -87,9 +88,13 @@ export class PlusTree<T> {
       }
       node.keys[indexWhereToAddIt] = key
       node.values[indexWhereToAddIt] = value
-      return indexWhereToAddIt
     } else {
-      throw Error("Not implemented yet")
+      const childNode = node.children[indexWhereToAddIt]
+      this.addKeyWithShiftRecursive(childNode, key, value)
+      for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
+        node.keys[i]++
+        node.children[i+1].shift++
+      }
     }
   }
 
