@@ -57,7 +57,7 @@ export class Config {
     gpuMode: 'gpu',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
-    useColumnIndex: true,
+    useColumnIndex: false,
     vlookupThreshold: 20
   }
 

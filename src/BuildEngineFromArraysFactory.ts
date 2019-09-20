@@ -5,6 +5,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParserWithCaching} from './parser'
 import {ColumnIndex} from "./ColumnSearch/ColumnIndex";
+import {buildColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
@@ -13,8 +14,8 @@ export class BuildEngineFromArraysFactory {
     stats.start(StatType.OVERALL)
 
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
-    const columnIndex = new ColumnIndex(stats, lazilyTransformingAstService)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
+    const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
     for (const sheetName in sheets) {
