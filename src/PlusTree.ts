@@ -73,10 +73,10 @@ export class PlusTree<T> {
   }
 
   private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
-    // shift should be considered here
+    const sKey = key - node.shift
     let indexWhereToAddIt = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] >= key) {
+      if (node.keys[i] >= sKey) {
         indexWhereToAddIt = i
         break
       }
@@ -86,7 +86,7 @@ export class PlusTree<T> {
         node.keys[i] = node.keys[i - 1] + 1
         node.values[i] = node.values[i - 1]
       }
-      node.keys[indexWhereToAddIt] = key
+      node.keys[indexWhereToAddIt] = sKey
       node.values[indexWhereToAddIt] = value
     } else {
       const childNode = node.children[indexWhereToAddIt]

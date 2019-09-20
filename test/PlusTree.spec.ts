@@ -91,5 +91,21 @@ describe('PlusTree', () => {
       expect(tree.getKey(3)).toEqual(20)
       expect(tree.getKey(4)).toEqual(30)
     })
+
+    it('adding to a shifted node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(2, 200)
+
+      tree.addKeyWithShift(4, 400)
+
+      expect(tree._root.keys).toEqual([3])
+      expect(getLeaf(tree, 1).shift).toBe(1)
+      expect(getLeaf(tree, 1).keys).toEqual([3,4,5])
+      expect(getLeaf(tree, 1).values).toEqual([400,30,40])
+    })
   })
 })
