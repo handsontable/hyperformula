@@ -1,6 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {SimpleCellAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
+import {add} from "./interpreter/scalar";
 
 export interface Size { width: number, height: number }
 export type MatrixSizeCheck = Size | false
@@ -201,6 +202,14 @@ export class Matrix implements IMatrix {
     for (let row = 0; row < this.size.height; ++row) {
       for (let col = 0; col < this.size.width; ++col) {
         yield this.matrix[row][col]
+      }
+    }
+  }
+
+  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[number, SimpleCellAddress]> {
+    for (let row = 0; row < this.size.height; ++row) {
+      for (let col = 0; col < this.size.width; ++col) {
+        yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
       }
     }
   }
