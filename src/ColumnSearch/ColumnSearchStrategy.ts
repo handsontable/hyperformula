@@ -14,5 +14,5 @@ export interface IColumnSearchStrategy {
 
   removeColumns(columnsSpan: ColumnsSpan): void;
 
-  find(key: any, range: AbsoluteCellRange): number;
+  find(key: any, range: AbsoluteCellRange, sorted: boolean): number;
 }
