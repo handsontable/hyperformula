@@ -1,7 +1,11 @@
 import {PlusTree, Leaf, Internal} from '../src/PlusTree'
 
-function getLeaf<T>(tree: PlusTree<T>, idx0: number): Leaf<T> {
-  return (tree._root as Internal<T>).children[idx0] as Leaf<T>
+function getLeaf<T>(tree: PlusTree<T>, idx0?: number): Leaf<T> {
+  let result = tree._root
+  if (idx0 !== undefined) {
+    result = (result as Internal<T>).children[idx0]
+  }
+  return result as Leaf<T>
 }
 
 describe('PlusTree', () => {
@@ -36,7 +40,7 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(42, 420)
 
       expect(tree.getKey(42)).toEqual(420)
-      expect(tree.getKey(43)).toEqual(430)
+      expect(tree.getKey(44)).toEqual(430)
     })
 
     it('leading to split of root node', () => {
@@ -54,6 +58,17 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 1).values).toEqual([30,40])
       expect(tree.getKey(2)).toEqual(20)
       expect(tree.getKey(3)).toEqual(30)
+    })
+
+    it('should shift other values', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+
+      tree.addKeyWithShift(2, 200)
+
+      expect(getLeaf(tree).keys).toEqual([1,2,3])
+      expect(getLeaf(tree).values).toEqual([10,200,20])
     })
   })
 })

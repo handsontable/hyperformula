@@ -82,7 +82,7 @@ export class PlusTree<T> {
     }
     if (node instanceof Leaf) {
       for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
-        node.keys[i] = node.keys[i - 1]
+        node.keys[i] = node.keys[i - 1] + 1
         node.values[i] = node.values[i - 1]
       }
       node.keys[indexWhereToAddIt] = key
