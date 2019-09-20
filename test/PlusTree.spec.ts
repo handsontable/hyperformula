@@ -1,9 +1,12 @@
 import {PlusTree, Leaf, Internal} from '../src/PlusTree'
 
-function getLeaf<T>(tree: PlusTree<T>, idx0?: number): Leaf<T> {
+function getLeaf<T>(tree: PlusTree<T>, idx0?: number, idx1?: number): Leaf<T> {
   let result = tree._root
   if (idx0 !== undefined) {
     result = (result as Internal<T>).children[idx0]
+  }
+  if (idx1 !== undefined) {
+    result = (result as Internal<T>).children[idx1]
   }
   return result as Leaf<T>
 }
@@ -145,6 +148,31 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 2).shift).toBe(1)
       expect(getLeaf(tree, 2).keys).toEqual([5,6])
       expect(getLeaf(tree, 2).values).toEqual([50,70])
+    })
+
+    it('splitting internal root node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(5, 50)
+      tree.addKeyWithShift(6, 60)
+      tree.addKeyWithShift(7, 70)
+      tree.addKeyWithShift(8, 80)
+      tree.addKeyWithShift(9, 90)
+
+      tree.addKeyWithShift(10, 100)
+
+      expect(tree._root.keys).toEqual([6])
+      expect(getLeaf(tree, 0).keys).toEqual([2,4])
+      expect(getLeaf(tree, 0, 0).keys).toEqual([1,2])
+      expect(getLeaf(tree, 0, 1).keys).toEqual([3,4])
+      expect(getLeaf(tree, 0, 2).keys).toEqual([5,6])
+      expect(getLeaf(tree, 1).keys).toEqual([8])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
+      expect(getLeaf(tree, 1, 2)).toBeUndefined()
     })
   })
 })

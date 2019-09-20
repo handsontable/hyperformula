@@ -109,6 +109,12 @@ export class PlusTree<T> {
       const newNode = new Leaf(keysForNewNode, valuesForNewNode, currentNode.shift)
       parentNode.keys.splice(index, 0, currentNode.keys[currentNode.keys.length - 1] + currentNode.shift)
       parentNode.children.splice(index + 1, 0, newNode)
+    } else {
+      const keysForNewNode = currentNode.keys.splice(this.span + 1, this.span - 1)
+      const childrenForNewNode = currentNode.children.splice(this.span + 1, this.span)
+      const newNode = new Internal(keysForNewNode, childrenForNewNode, 0) // shift should be different
+      parentNode.keys.splice(index, 0, currentNode.keys.pop()!) // and the value should be shifted too
+      parentNode.children.splice(index + 1, 0, newNode)
     }
   }
 }
