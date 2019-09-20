@@ -1,15 +1,14 @@
-import {Ast, ParserWithCaching} from "./parser";
-import {Statistics, StatType} from "./statistics/Statistics";
-import {SimpleCellAddress} from "./Cell";
-import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
-import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
-import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
-import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {transformCellRangeByReferences} from "./dependencyTransformers/common";
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {SimpleCellAddress} from './Cell'
 import {ColumnsSpan} from './ColumnsSpan'
+import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
+import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
+import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
+import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
+import {Statistics, StatType} from './statistics/Statistics'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -55,12 +54,12 @@ export type Transformation =
     | MoveCellsTransformation
 
 export class LazilyTransformingAstService {
-  private transformations: Transformation[] = []
 
   public parser?: ParserWithCaching
+  private transformations: Transformation[] = []
 
   constructor(
-      private readonly stats: Statistics
+      private readonly stats: Statistics,
   ) {
   }
 
@@ -90,7 +89,7 @@ export class LazilyTransformingAstService {
       sourceRange,
       toRight,
       toBottom,
-      toSheet
+      toSheet,
     })
   }
 
@@ -104,31 +103,31 @@ export class LazilyTransformingAstService {
           const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(transformation.addedColumns, ast, address)
           ast = newAst
           address = newAddress
-          break;
+          break
         }
         case TransformationType.ADD_ROWS: {
           const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(transformation.addedRows, ast, address)
           ast = newAst
           address = newAddress
-          break;
+          break
         }
         case TransformationType.REMOVE_COLUMNS: {
           const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(transformation.removedColumns, ast, address)
           ast = newAst
           address = newAddress
-          break;
+          break
         }
         case TransformationType.REMOVE_ROWS: {
           const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(transformation.removedRows, ast, address)
           ast = newAst
           address = newAddress
-          break;
+          break
         }
         case TransformationType.MOVE_CELLS: {
           const [newAst, newAddress] = MoveCellsDependencyTransformer.transform2(transformation, ast, address)
           ast = newAst
           address = newAddress
-          break;
+          break
         }
       }
     }

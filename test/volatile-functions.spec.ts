@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('Interpreter - function RAND', () => {
   it('works', () => {

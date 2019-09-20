@@ -1,8 +1,7 @@
 import {Config} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {adr} from "../testUtils";
+import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
   const config = new Config()

@@ -1,21 +1,21 @@
-import {benchmark} from "../benchmark";
-import {Config as EngineConfig, CsvExporter} from "../../src";
+import {Config as EngineConfig} from '../../src'
+import {benchmark} from '../benchmark'
 
 export function randomVlookups(rows: number, cols: number, vlookupLines: number) {
   const sheet = []
 
-  for (let i=0; i<rows; ++i) {
+  for (let i = 0; i < rows; ++i) {
     const row = []
-    for (let j=0; j<cols; ++j) {
+    for (let j = 0; j < cols; ++j) {
       row.push(rand(1, rows).toString())
     }
     sheet.push(row)
   }
 
-  for (let i=0; i<vlookupLines; ++i) {
+  for (let i = 0; i < vlookupLines; ++i) {
     const row = []
-    for (let j=0; j<cols; ++j) {
-      const columnLetter= String.fromCharCode(65+j).toUpperCase()
+    for (let j = 0; j < cols; ++j) {
+      const columnLetter = String.fromCharCode(65 + j).toUpperCase()
       row.push(`=VLOOKUP(${rand(1, rows).toString()}, ${columnLetter}1:${columnLetter}${rows}, 1, false())`)
     }
     sheet.push(row)
@@ -25,7 +25,7 @@ export function randomVlookups(rows: number, cols: number, vlookupLines: number)
 }
 
 function rand(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 function start() {

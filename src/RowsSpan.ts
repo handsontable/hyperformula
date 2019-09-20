@@ -1,29 +1,28 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {simpleCellAddress} from './Cell'
+
 
 /*
  * A class representing a set of rows in specific sheet
  */
 export class RowsSpan {
+
+  public get numberOfRows() {
+    return this.rowEnd - this.rowStart + 1
+  }
+
+  public static fromNumberOfRows(sheet: number, rowStart: number, numberOfRows: number) {
+    return new RowsSpan(sheet, rowStart, rowStart + numberOfRows - 1)
+  }
   constructor(
     public readonly sheet: number,
     public readonly rowStart: number,
     public readonly rowEnd: number,
   ) {
     if (rowStart < 0) {
-      throw Error("Starting row cant be less than 0")
+      throw Error('Starting row cant be less than 0')
     }
     if (rowEnd < rowStart) {
-      throw Error("Row span cant end before start")
+      throw Error('Row span cant end before start')
     }
-  }
-
-  public static fromNumberOfRows(sheet: number, rowStart: number, numberOfRows: number) {
-    return new RowsSpan(sheet, rowStart, rowStart + numberOfRows - 1)
-  }
-
-  public get numberOfRows() {
-    return this.rowEnd - this.rowStart + 1
   }
 
   public* rows(): IterableIterator<number> {

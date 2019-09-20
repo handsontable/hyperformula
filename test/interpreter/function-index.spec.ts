@@ -1,5 +1,5 @@
-import {CellError, Config, HandsOnEngine} from "../../src";
-import {ErrorType} from "../../src/Cell";
+import {CellError, HandsOnEngine} from '../../src'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig.ts'
 
 describe('Function INDEX', () => {

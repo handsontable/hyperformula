@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {Config} from '../src/Config'
-import {enGB, plPL, languages} from '../src/i18n'
+import {enGB, languages, plPL} from '../src/i18n'
 import './testConfig.ts'
 
 describe('i18n', () => {
@@ -29,7 +29,7 @@ describe('i18n', () => {
     const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
 
     for (const lang in languages) {
-      if (lang === "enGB") {
+      if (lang === 'enGB') {
         continue
       }
 

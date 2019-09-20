@@ -1,10 +1,9 @@
 import {Config} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser/CellAddress'
 import {Unparser} from '../../src/parser/Unparser'
-import {adr} from "../testUtils";
+import {adr} from '../testUtils'
 
 describe('Unparse', () => {
   const config = new Config()

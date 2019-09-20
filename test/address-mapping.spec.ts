@@ -1,8 +1,8 @@
-import {simpleCellAddress} from '../src/Cell'
-import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
-import {adr} from "./testUtils";
+
 import {ColumnsSpan} from '../src/ColumnsSpan'
+import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
 import {RowsSpan} from '../src/RowsSpan'
+import {adr} from './testUtils'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {

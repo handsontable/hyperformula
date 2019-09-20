@@ -1,18 +1,11 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {ColumnsSpan} from '../ColumnsSpan'
 import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
-import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
-import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
 
 export class MatrixVertex {
-  public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
-    return new MatrixVertex(range.start, range.width(), range.height(), formula)
-  }
-  private formula: Ast | null
-  public cellAddress: SimpleCellAddress
-  private matrix: IMatrix | CellError
 
   get width(): number {
     if (this.matrix instanceof CellError) {
@@ -31,6 +24,12 @@ export class MatrixVertex {
   get sheet(): number {
     return this.cellAddress.sheet
   }
+  public static fromRange(range: AbsoluteCellRange, formula?: Ast): MatrixVertex {
+    return new MatrixVertex(range.start, range.width(), range.height(), formula)
+  }
+  public cellAddress: SimpleCellAddress
+  private formula: Ast | null
+  private matrix: IMatrix | CellError
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress

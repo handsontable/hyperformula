@@ -1,12 +1,12 @@
-import {CellValue, SimpleCellAddress} from "./Cell";
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {Statistics, StatType} from "./statistics/Statistics";
-import {RowsSpan} from "./RowsSpan";
-import {ColumnsSpan} from "./ColumnsSpan";
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {CellValue, SimpleCellAddress} from './Cell'
+import {ColumnsSpan} from './ColumnsSpan'
+import {RowsSpan} from './RowsSpan'
+import {Statistics, StatType} from './statistics/Statistics'
 
-type ValueIndex = Array<number>
+type ValueIndex = number[]
 type ColumnMap = Map<CellValue, ValueIndex>
-type SheetIndex = Array<ColumnMap>
+type SheetIndex = ColumnMap[]
 
 export class ColumnIndex {
   private readonly index: Map<number, SheetIndex> = new Map()
@@ -31,7 +31,7 @@ export class ColumnIndex {
     }
 
     const columnMap = this.getColumnMap(address.sheet, address.col)
-    let valueIndex = columnMap.get(value)
+    const valueIndex = columnMap.get(value)
     if (!valueIndex) {
       return
     }
@@ -114,7 +114,7 @@ export class ColumnIndex {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
     }
-    let sheetMap = this.index.get(sheet)!
+    const sheetMap = this.index.get(sheet)!
     let columnMap = sheetMap![col]
 
     if (!columnMap) {
@@ -149,7 +149,7 @@ export class ColumnIndex {
   }
 
   private removeRowsFromValues(sheetIndex: SheetIndex, rowsSpan: RowsSpan) {
-    sheetIndex.forEach(column => {
+    sheetIndex.forEach((column) => {
       for (const rows of column.values()) {
         const start = upperBound(rows, rowsSpan.rowStart)
         const end = lowerBound(rows, rowsSpan.rowEnd)
@@ -161,17 +161,16 @@ export class ColumnIndex {
   }
 
   private shiftRows(sheetIndex: SheetIndex, afterRow: number, numberOfRows: number) {
-    sheetIndex.forEach(column => {
+    sheetIndex.forEach((column) => {
       for (const rows of column.values()) {
         const index = upperBound(rows, afterRow)
-        for (let i=index; i<rows.length; ++i) {
+        for (let i = index; i < rows.length; ++i) {
           rows[i] += numberOfRows
         }
       }
     })
   }
 }
-
 
 /*
 * If key exists returns index of key
@@ -183,7 +182,7 @@ export function upperBound(values: number[], key: number): number {
   let end = values.length - 1
 
   while (start <= end) {
-    let center = Math.floor((start + end) / 2)
+    const center = Math.floor((start + end) / 2)
     if (key > values[center]) {
       start = center + 1
     } else if (key < values[center]) {
@@ -196,7 +195,6 @@ export function upperBound(values: number[], key: number): number {
   return start
 }
 
-
 /*
 * If key exists returns index of key
 * Otherwise returns index of greatest element smaller than key
@@ -207,7 +205,7 @@ export function lowerBound(values: number[], key: number): number {
   let end = values.length - 1
 
   while (start <= end) {
-    let center = Math.floor((start + end) / 2)
+    const center = Math.floor((start + end) / 2)
     if (key > values[center]) {
       start = center + 1
     } else if (key < values[center]) {

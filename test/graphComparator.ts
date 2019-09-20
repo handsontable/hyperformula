@@ -1,7 +1,7 @@
 import {deepStrictEqual, strictEqual} from 'assert'
 import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {SimpleCellAddress, simpleCellAddress, sheetCellAddressToString} from '../src/Cell'
+import {sheetCellAddressToString, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
@@ -28,7 +28,7 @@ export class EngineComparator {
     this.expected.forceApplyPostponedTransformations()
     this.actual.forceApplyPostponedTransformations()
 
-    for (let sheet=0; sheet<numberOfSheets; ++sheet) {
+    for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
       this.compareSheets(sheet)
     }
   }

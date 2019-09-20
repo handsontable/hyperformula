@@ -1,8 +1,8 @@
 import {SimpleCellAddress} from '../Cell'
-import {FormulaCellVertex, MatrixVertex, DependencyGraph} from '../DependencyGraph'
+import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {fixFormulaVertexRow, transformAddressesInFormula, transformCellRangeByReferences, TransformCellAddressFunction} from './common'
 import {RowsSpan} from '../RowsSpan'
+import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
 
 export namespace AddRowsDependencyTransformer {
   export function transform(addedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {

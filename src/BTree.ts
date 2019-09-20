@@ -14,7 +14,7 @@ export class BTree {
   private readonly minSize: number
 
   constructor(
-    private readonly span: number
+    private readonly span: number,
   ) {
     this.root = new BNode([], [], null)
     this.minSize = this.span - 1
@@ -52,7 +52,7 @@ export class BTree {
   }
 
   private addKeyRecursive(node: BNode, newKey: number, newValue: number) {
-    let sNewKey = newKey - node.shift
+    const sNewKey = newKey - node.shift
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] > sNewKey) {
@@ -72,8 +72,8 @@ export class BTree {
       this.addKeyRecursive(node.children[indexForNewKey], sNewKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
-        node.keys[i+1] = node.keys[i]
-        node.values[i+1] = node.values[i]
+        node.keys[i + 1] = node.keys[i]
+        node.values[i + 1] = node.values[i]
       }
 
       node.keys[indexForNewKey] = sNewKey
@@ -82,7 +82,7 @@ export class BTree {
   }
 
   private addKeyWithShiftRecursive(node: BNode, newKey: number, newValue: number) {
-    let sNewKey = newKey - node.shift
+    const sNewKey = newKey - node.shift
     let indexForNewKey = node.keys.length
     for (let i = 0; i < node.keys.length; i++) {
       if (node.keys[i] >= sNewKey) {
@@ -108,8 +108,8 @@ export class BTree {
       this.addKeyWithShiftRecursive(node.children[indexForNewKey], sNewKey, newValue)
     } else {
       for (let i = node.keys.length - 1; i >= indexForNewKey; i--) {
-        node.keys[i+1] = node.keys[i] + 1
-        node.values[i+1] = node.values[i]
+        node.keys[i + 1] = node.keys[i] + 1
+        node.values[i + 1] = node.values[i]
       }
 
       node.keys[indexForNewKey] = sNewKey
@@ -118,9 +118,9 @@ export class BTree {
   }
 
   private deleteKeyRecursive(node: BNode, key: number): boolean {
-    let skey = key - node.shift
+    const skey = key - node.shift
     if (node.children === null) {
-      let index = node.keys.indexOf(skey)
+      const index = node.keys.indexOf(skey)
       if (index === -1) {
         return false
       } else {
@@ -160,8 +160,8 @@ export class BTree {
       }
       const childNode = node.children![childIndex]
       if (childNode.keys.length === this.minSize) {
-        const rightSibling = node.children![childIndex+1]
-        const leftSibling = node.children![childIndex-1]
+        const rightSibling = node.children![childIndex + 1]
+        const leftSibling = node.children![childIndex - 1]
         if (rightSibling && rightSibling.keys.length > this.minSize) {
           this.rotateLeft(node, childIndex)
         } else if (leftSibling && leftSibling.keys.length > this.minSize) {
@@ -178,7 +178,7 @@ export class BTree {
   }
 
   private deleteKeyWithShiftRecursive(node: BNode, key: number): boolean {
-    let skey = key - node.shift
+    const skey = key - node.shift
     if (node.children === null) {
       for (let i = 0; i < node.keys.length; i++) {
         if (node.keys[i] === skey) {
@@ -228,7 +228,7 @@ export class BTree {
           this.merge(node, indexWithKey - 1)
           return this.deleteFromChildNodeAtIndex(node, indexWithKey - 1, skey)
         } else {
-          throw Error("Not implemented yet")
+          throw Error('Not implemented yet')
         }
       } else {
         return this.deleteFromChildNodeAtIndex(node, indexWithKey, skey)

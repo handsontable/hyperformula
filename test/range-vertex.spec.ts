@@ -1,8 +1,7 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../src/Cell'
 import {CriterionCache, RangeVertex} from '../src/DependencyGraph'
 import {buildCriterionLambda, parseCriterion} from '../src/interpreter/Criterion'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('RangeVertex with cache', () => {
   it('cache for criterion fuctions empty', () => {

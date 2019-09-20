@@ -1,13 +1,13 @@
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
+import {ColumnIndex} from './ColumnIndex'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Two-dimenstional array representation of sheet

@@ -1,10 +1,10 @@
 import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {Statistics, StatType} from './statistics/Statistics'
+import {ColumnIndex} from './ColumnIndex'
 import {DependencyGraph} from './DependencyGraph'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {ParserWithCaching} from './parser'
-import {ColumnIndex} from "./ColumnIndex";
+import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Statistics, StatType} from './statistics/Statistics'
 
 export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
@@ -43,7 +43,7 @@ export class BuildEngineFromArraysFactory {
       columnIndex,
       parser,
       evaluator,
-      lazilyTransformingAstService
+      lazilyTransformingAstService,
     )
 
     return engine

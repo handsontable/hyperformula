@@ -1,18 +1,18 @@
-import {IGetDependenciesQuery} from './Graph'
-import {AddressMapping} from './AddressMapping'
-import {RangeMapping} from './RangeMapping'
-import {FormulaCellVertex, Vertex} from './'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {collectDependencies} from '../parser'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {CellDependency} from '../CellDependency'
-import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
+import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
+import {collectDependencies} from '../parser'
+import {FormulaCellVertex, Vertex} from './'
+import {AddressMapping} from './AddressMapping'
+import {IGetDependenciesQuery} from './Graph'
+import {RangeMapping} from './RangeMapping'
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping,
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 

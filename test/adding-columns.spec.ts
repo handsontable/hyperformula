@@ -1,11 +1,9 @@
 import {Config, HandsOnEngine} from '../src'
-import {simpleCellAddress, SimpleCellAddress, CellError, ErrorType} from '../src/Cell'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {CellReferenceAst} from '../src/parser/Ast'
-import {CellAddress} from '../src/parser/CellAddress'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import { simpleCellAddress} from '../src/Cell'
+import { FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {extractRange, adr, extractReference, extractMatrixRange} from "./testUtils";
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
+import {adr, extractMatrixRange, extractRange} from './testUtils'
 
 describe('Adding column - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
@@ -110,12 +108,12 @@ describe('Adding column', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1', '2'],
-        ['3', '4']
+        ['3', '4'],
       ],
       Sheet2: [
         ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
         ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
-      ]
+      ],
     })
 
     engine.addColumns(0, 1, 1)
@@ -157,20 +155,20 @@ describe('Adding column - address mapping', () => {
   })
 })
 
-describe("different sheet", () => {
-  it("adding row in different sheet but same row as formula should not update formula address", () => {
+describe('different sheet', () => {
+  it('adding row in different sheet but same row as formula should not update formula address', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
-        ['1']
+        ['1'],
       ],
       Sheet2: [
-        ['=$Sheet1.A1']
-      ]
+        ['=$Sheet1.A1'],
+      ],
     })
 
     engine.addColumns(0, 0, 1)
 
-    const formulaVertex = engine.addressMapping.fetchCell(adr("A1", 1)) as FormulaCellVertex
+    const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
     expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied

@@ -164,7 +164,6 @@ export class AbsoluteCellRange {
     }
   }
 
-
   public getAddress(col: number, row: number): SimpleCellAddress {
     if (col < 0 || row < 0 || row > this.height() - 1 || col > this.width() - 1) {
       throw Error('Index out of bound')
@@ -208,7 +207,6 @@ export class AbsoluteCellRange {
   public shifted(byCols: number, byRows: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, this.start.row + byRows), this.width(), this.height())
   }
-
 
   public expandByColumns(numberOfColumns: number) {
     this.end.col += numberOfColumns

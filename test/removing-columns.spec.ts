@@ -1,15 +1,14 @@
 import {Config, HandsOnEngine} from '../src'
-import {simpleCellAddress} from '../src/Cell'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig.ts'
-import {extractMatrixRange, extractRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractMatrixRange, extractRange, extractReference} from './testUtils'
 
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency before removed column should not be affected', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['', '1', '', '=$B1']
+        ['', '1', '', '=$B1'],
     ])
 
     engine.removeColumns(0, 2)
@@ -109,7 +108,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
   it('truncates range by one column from left if first column removed', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=SUM(A1:B1)']
+      ['1', '2', '=SUM(A1:B1)'],
     ])
 
     engine.removeColumns(0, 0, 0)
@@ -119,7 +118,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
   it('truncates range by one column from right if last column removed', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=SUM(A1:B1)']
+      ['1', '2', '=SUM(A1:B1)'],
     ])
 
     engine.removeColumns(0, 1, 1)
@@ -130,7 +129,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from left if leftmost columns removed', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '1', '2', '3', '4'],
-      ['=SUM(B1:E1)']
+      ['=SUM(B1:E1)'],
     ])
 
     engine.removeColumns(0, 1, 2)
@@ -141,7 +140,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '', '1', '2', '3', '4'],
-      ['=SUM(C1:F1)']
+      ['=SUM(C1:F1)'],
     ])
 
     engine.removeColumns(0, 1, 3)
@@ -152,7 +151,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from left if leftmost columns removed - removing does not have to start with range but may end on start', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '', '1', '2', '3', '4'],
-      ['=SUM(C1:F1)']
+      ['=SUM(C1:F1)'],
     ])
 
     engine.removeColumns(0, 1, 2)
@@ -163,7 +162,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from right if rightmost columns removed', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '1', '2', '3', '4'],
-      ['=SUM(B1:E1)']
+      ['=SUM(B1:E1)'],
     ])
 
     engine.removeColumns(0, 3, 4)
@@ -174,7 +173,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '1', '2', '3', '4', ''],
-      ['=SUM(B1:E1)']
+      ['=SUM(B1:E1)'],
     ])
 
     engine.removeColumns(0, 3, 5)
@@ -185,7 +184,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('truncates range by columns from right if rightmost columns removed - removing does not have to end with range but may start on end', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['', '1', '2', '3', '4', ''],
-      ['=SUM(B1:E1)']
+      ['=SUM(B1:E1)'],
     ])
 
     engine.removeColumns(0, 4, 5)
@@ -282,7 +281,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
         ['=$Sheet2.$A1', '=$Sheet2.A1'],
       ],
       Sheet2: [
-        ['1', '2']
+        ['1', '2'],
       ],
     })
 
@@ -296,10 +295,10 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['', '2', '3'],
-        ['=SUM(B1:C1)']
+        ['=SUM(B1:C1)'],
       ],
       Sheet2: [
-        ['1']
+        ['1'],
       ],
     })
 
@@ -310,7 +309,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 })
 
 describe('Address dependencies, Case 4: remove columns in sheet different than formula or dependency sheet', () => {
-  it('should not affect dependency when removing columns in not relevant sheet', function () {
+  it('should not affect dependency when removing columns in not relevant sheet', function() {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'],
@@ -323,9 +322,9 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
     engine.removeColumns(0, 0, 0)
 
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 0))
-  });
+  })
 
-  it('should not affect dependency when removing columns in not relevant sheet, more sheets', function () {
+  it('should not affect dependency when removing columns in not relevant sheet, more sheets', function() {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'],
@@ -341,7 +340,7 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
     engine.removeColumns(0, 0, 0)
 
     expect(extractReference(engine, adr('B1', 2))).toEqual(CellAddress.relative(1, -1, 0))
-  });
+  })
 })
 
 describe('Removing columns - reevaluation', () => {
@@ -467,7 +466,7 @@ describe('Removing columns - matrices', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '1', '1'],
       ['2', '2', '2'],
-      ['=SUM(A1:C2)']
+      ['=SUM(A1:C2)'],
     ], config)
 
     expect(engine.getCellValue('A3')).toEqual(9)
@@ -512,7 +511,7 @@ describe('Removing columns - matrices', () => {
         ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
         ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
         ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
-      ]
+      ],
     })
 
     engine.removeColumns(0, 1, 1)
@@ -620,10 +619,10 @@ describe('Removing columns - ranges', function() {
 it('does not truncate any ranges if columns are removed from different sheet', () => {
   const engine = HandsOnEngine.buildFromSheets({
     Sheet1: [
-      ['1', '2', '=SUM(A1:B1)']
+      ['1', '2', '=SUM(A1:B1)'],
     ],
     Sheet2: [
-      ['1']
+      ['1'],
     ],
   })
 

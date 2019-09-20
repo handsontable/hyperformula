@@ -1,11 +1,8 @@
-import {Config, HandsOnEngine} from '../src'
-import {simpleCellAddress, SimpleCellAddress, CellError, ErrorType} from '../src/Cell'
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {CellReferenceAst} from '../src/parser/Ast'
+import { HandsOnEngine} from '../src'
+import {EmptyCellVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {expectEngineToBeTheSameAs, extractRange, adr, extractReference, extractMatrixRange} from "./testUtils";
-import {AbsoluteCellRange} from "../src/AbsoluteCellRange"
+import {adr, expectEngineToBeTheSameAs, extractReference} from './testUtils'
 
 describe('Adding column, fixing dependency', () => {
   describe('all in same sheet (case 1)', () => {
@@ -92,111 +89,111 @@ describe('Adding column, fixing dependency', () => {
   })
 
   describe('dependency address sheet different than formula address sheet and sheet in which we add columns (case 2)', () => {
-    it("absolute case", () => {
+    it('absolute case', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           [ /* new col */ '=$Sheet2.$A1'],
         ],
         Sheet2: [
           ['1'],
-        ]
+        ],
       })
 
       engine.addColumns(0, 0, 1)
 
-      expect(extractReference(engine, adr("B1"))).toEqual(CellAddress.absoluteCol(1, 0, 0))
+      expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol(1, 0, 0))
     })
 
-    it("R < r", () => {
+    it('R < r', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           [/* new col */ '', '=$Sheet2.A1'],
         ],
         Sheet2: [
           ['1'],
-        ]
+        ],
       })
 
       engine.addColumns(0, 0, 1)
 
-      expect(extractReference(engine, adr("C1"))).toEqual(CellAddress.relative(1, -2, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(1, -2, 0))
     })
 
-    it("r = R", () => {
+    it('r = R', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           [/* new col */ '=$Sheet2.B1'],
         ],
         Sheet2: [
           ['', '1'],
-        ]
+        ],
       })
 
       engine.addColumns(0, 0, 1)
 
-      expect(extractReference(engine, adr("B1"))).toEqual(CellAddress.relative(1, 0, 0))
+      expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(1, 0, 0))
     })
 
-    it("r < R", () => {
+    it('r < R', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A1' /* new col */ ]
+          ['=$Sheet2.A1' /* new col */ ],
         ],
         Sheet2: [
           ['1'],
-        ]
+        ],
       })
 
       engine.addColumns(0, 1, 1)
 
-      expect(extractReference(engine, adr("A1"))).toEqual(CellAddress.relative(1, 0, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
     })
   })
 
   describe('formula address sheet different than dependency address sheet and sheet in which we add columns (case 3)', () => {
-    it("dependency address before added column", () => {
+    it('dependency address before added column', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
           [/* new col */ '1', '2'],
         ],
         Sheet2: [
-          ['=$Sheet1.B1']
-        ]
+          ['=$Sheet1.B1'],
+        ],
       })
 
       engine.addColumns(0, 0, 1)
 
-      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 2, 0))
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 2, 0))
     })
 
-    it("dependency address at added column", () => {
+    it('dependency address at added column', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          [/* new col */ '1']
+          [/* new col */ '1'],
         ],
         Sheet2: [
-          ['=$Sheet1.A1']
-        ]
+          ['=$Sheet1.A1'],
+        ],
       })
 
       engine.addColumns(0, 0, 1)
 
-      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 1, 0))
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 1, 0))
     })
 
-    it("dependency address after added column", () => {
+    it('dependency address after added column', () => {
       const engine = HandsOnEngine.buildFromSheets({
         Sheet1: [
-          ['1' /* new col */ ]
+          ['1' /* new col */ ],
         ],
         Sheet2: [
-          ['=$Sheet1.A1']
-        ]
+          ['=$Sheet1.A1'],
+        ],
       })
 
       engine.addColumns(0, 1, 1)
 
-      expect(extractReference(engine, adr("A1", 1))).toEqual(CellAddress.relative(0, 0, 0))
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 0, 0))
     })
   })
 
@@ -228,7 +225,7 @@ describe('Adding column, fixing dependency', () => {
         ],
         Sheet3: [
           ['', /* new col */ ''],
-        ]
+        ],
       })
 
       engine.addColumns(2, 1, 1)

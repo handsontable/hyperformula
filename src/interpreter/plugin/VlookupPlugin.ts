@@ -1,7 +1,7 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
-import {AbsoluteCellRange} from "../../AbsoluteCellRange";
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -79,7 +79,7 @@ export class VlookupPlugin extends FunctionPlugin {
       if (rowIndex === -1) {
         return new CellError(ErrorType.NA)
       }
-      
+
       return rowIndex - searchedRange.start.row + 1
     } else {
       const valuesInRange = this.computeListOfValuesInRange(searchedRange)

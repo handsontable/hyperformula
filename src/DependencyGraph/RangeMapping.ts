@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
-import {RangeVertex} from './'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
+import {RangeVertex} from './'
 
 /**
  * Mapping from address ranges to range vertices
@@ -44,7 +44,7 @@ export class RangeMapping {
   public fetchRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {
     const maybeRange = this.getRange(start, end)
     if (!maybeRange) {
-      throw Error("Range does not exist")
+      throw Error('Range does not exist')
     }
     return maybeRange
   }

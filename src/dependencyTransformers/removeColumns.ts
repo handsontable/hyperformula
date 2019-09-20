@@ -1,8 +1,8 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {DependencyGraph} from '../DependencyGraph'
-import {CellAddress, ParserWithCaching, Ast} from '../parser'
-import {TransformCellRangeFunction, fixFormulaVertexColumn, transformCellRangeByReferences, transformAddressesInFormula, TransformCellAddressFunction} from './common'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {DependencyGraph} from '../DependencyGraph'
+import {Ast, CellAddress, ParserWithCaching} from '../parser'
+import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddressFunction, TransformCellRangeFunction} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(removedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -47,7 +47,7 @@ export namespace RemoveColumnsDependencyTransformer {
       if (newStart === false && newEnd === false) {
         return [actualStart, actualEnd]
       } else if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
-        throw Error("Cannot happen")
+        throw Error('Cannot happen')
       } else {
         return [newStart || actualStart, newEnd || actualEnd]
       }
@@ -103,7 +103,7 @@ export namespace RemoveColumnsDependencyTransformer {
           } else if (absoluteDependencyAddress.col > removedColumns.columnEnd) {
             if (formulaAddress.col < removedColumns.columnStart) { // 1.Rba
               return dependencyAddress.shiftedByColumns(-removedColumns.numberOfColumns)
-            } else if (formulaAddress.col > removedColumns.columnEnd) { //1.Rbb
+            } else if (formulaAddress.col > removedColumns.columnEnd) { // 1.Rbb
               return false
             }
           }

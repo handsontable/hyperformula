@@ -1,9 +1,9 @@
-import {CellError, Config, HandsOnEngine} from "../../src";
-import {ErrorType} from "../../src/Cell";
+import {CellError, Config, HandsOnEngine} from '../../src'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig.ts'
 
 describe('VLOOKUP - args validation', () => {
-  it('not enough parameters', function () {
+  it('not enough parameters', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, A2:B3)'],
     ])
@@ -11,7 +11,7 @@ describe('VLOOKUP - args validation', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('to many parameters', function () {
+  it('to many parameters', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
     ])
@@ -19,7 +19,7 @@ describe('VLOOKUP - args validation', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('wrong type of first argument', function () {
+  it('wrong type of first argument', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
     ])
@@ -27,7 +27,7 @@ describe('VLOOKUP - args validation', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('wrong type of second argument', function () {
+  it('wrong type of second argument', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, "foo", 2, TRUE())'],
     ])
@@ -35,7 +35,7 @@ describe('VLOOKUP - args validation', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('wrong type of third argument', function () {
+  it('wrong type of third argument', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
     ])
@@ -43,7 +43,7 @@ describe('VLOOKUP - args validation', () => {
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('wrong type of fourth argument', function () {
+  it('wrong type of fourth argument', function() {
     const engine = HandsOnEngine.buildFromArray([
       ['=VLOOKUP(1, A2:B3, 2, "bar")'],
     ])
@@ -177,7 +177,7 @@ describe('VLOOKUP', () => {
       ['=A2', 'a'],
       ['1', 'b'],
       ['2', 'c'],
-      ['=VLOOKUP(1, A1:B3, 2, TRUE())']
+      ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
     ], new Config({vlookupThreshold: 1}))
 
     expect(engine.getCellValue('A4')).toEqual('a')

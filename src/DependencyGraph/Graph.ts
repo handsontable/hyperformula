@@ -25,7 +25,7 @@ export class Graph<T> {
   private edges: Map<T, Set<T>> = new Map()
 
   constructor(
-    private readonly getDependenciesQuery: IGetDependenciesQuery<T>
+    private readonly getDependenciesQuery: IGetDependenciesQuery<T>,
   ) {
   }
 
@@ -159,15 +159,6 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged = new Set()
   }
 
-  private removeDependencies(node: T) {
-    const dependentNodes = this.getDependenciesQuery.call(node)
-    if (!dependentNodes)
-      return
-    for (const dependentNode of dependentNodes) {
-      this.softRemoveEdge(dependentNode, node)
-    }
-  }
-
   /**
    * Checks whether exists edge between nodes
    *
@@ -241,6 +232,26 @@ export class Graph<T> {
     return cycled
   }
 
+  public getDependencies(vertex: T): T[] {
+    const result: T[] = []
+    this.edges.forEach((adjacentNodes, sourceNode) => {
+      if (adjacentNodes.has(vertex)) {
+        result.push(sourceNode)
+      }
+    })
+    return result
+  }
+
+  private removeDependencies(node: T) {
+    const dependentNodes = this.getDependenciesQuery.call(node)
+    if (!dependentNodes) {
+      return
+    }
+    for (const dependentNode of dependentNodes) {
+      this.softRemoveEdge(dependentNode, node)
+    }
+  }
+
   private findCycles(nodes: Set<T>, nodesWithNoIncomingEdge: T[], incomingEdges: Map<T, number>): T[] {
     if (nodesWithNoIncomingEdge.length !== nodes.size) {
       const nodesOnCycle: T[] = []
@@ -260,16 +271,6 @@ export class Graph<T> {
     incomingEdges.forEach((currentCount, targetNode) => {
       if (currentCount === 0) {
         result.push(targetNode)
-      }
-    })
-    return result
-  }
-
-  public getDependencies(vertex: T): T[] {
-    const result: T[] = []
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      if (adjacentNodes.has(vertex)) {
-        result.push(sourceNode)
       }
     })
     return result

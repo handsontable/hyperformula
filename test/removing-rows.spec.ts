@@ -1,10 +1,9 @@
 import {Config, HandsOnEngine} from '../src'
-import {simpleCellAddress} from '../src/Cell'
-import {MatrixVertex, RangeVertex} from '../src/DependencyGraph'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {MatrixVertex} from '../src/DependencyGraph'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {extractRange, extractMatrixRange, adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractReference} from './testUtils'
+import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractMatrixRange, extractRange, extractReference} from './testUtils'
 
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency above removed row should not be affected', () => {
@@ -190,7 +189,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
       Sheet2: [
         ['1'],
         ['2'], // row to delete
-        ['3']
+        ['3'],
       ],
     })
 
@@ -246,7 +245,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
         ['3'],
       ],
       Sheet2: [
-        ['1']
+        ['1'],
       ],
     })
 
@@ -257,23 +256,23 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 })
 
 describe('Address dependencies, Case 4: remove rows in sheet different than formula or dependency sheet', () => {
-  it('should not affect dependency when removing rows in not relevant sheet', function () {
+  it('should not affect dependency when removing rows in not relevant sheet', function() {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
       ],
       Sheet2: [
         ['1'],
-        ['=A1']
+        ['=A1'],
       ],
     })
 
     engine.removeRows(0, 0, 0)
 
     expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 0, -1))
-  });
+  })
 
-  it('should not affect dependency when removing rows in not relevant sheet, more sheets', function () {
+  it('should not affect dependency when removing rows in not relevant sheet, more sheets', function() {
     const engine = HandsOnEngine.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
@@ -283,14 +282,14 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
       ],
       Sheet3: [
         ['1'],
-        ['=$Sheet2.A1']
+        ['=$Sheet2.A1'],
       ],
     })
 
     engine.removeRows(0, 0, 0)
 
     expect(extractReference(engine, adr('A2', 2))).toEqual(CellAddress.relative(1, 0, -1))
-  });
+  })
 })
 
 describe('Removing rows - range dependencies, same sheet', () => {
@@ -324,7 +323,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['2'],
       ['3'],
       ['4'],
-      ['5']
+      ['5'],
     ])
 
     engine.removeRows(0, 1, 2)
@@ -580,7 +579,7 @@ describe('Removing rows - matrices', () => {
       Sheet2: [
         ['{=TRANSPOSE($Sheet1.A1:B3)}', '{=TRANSPOSE($Sheet1.A1:B3)}'],
         ['{=TRANSPOSE($Sheet1.A1:B3)}', '{=TRANSPOSE($Sheet1.A1:B3)}'],
-      ]
+      ],
     })
 
     engine.removeRows(0, 1, 1)

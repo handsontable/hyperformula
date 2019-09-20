@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {Statistics, StatType} from "../../src/statistics/Statistics";
+import { StatType} from '../../src/statistics/Statistics'
 
 export function addColumns(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
@@ -46,7 +46,6 @@ export function batch(engine: HandsOnEngine) {
   logStats(stats)
 }
 
-
 export function half(num: number) {
   return Math.floor(num / 2)
 }
@@ -61,8 +60,8 @@ export function measure<T>(engine: HandsOnEngine, stats: any[], name: String, fu
   const end = Date.now()
   const time = end - start
   const actualStats = engine.getStats() as Map<string, any>
-  actualStats.set("TOTAL", time)
-  actualStats.set("NAME", name)
+  actualStats.set('TOTAL', time)
+  actualStats.set('NAME', name)
   stats.push(statsToObject(actualStats))
 }
 

@@ -1,8 +1,8 @@
 export type TranslationSet = Record<string, string>
 export {plPL} from './plPL'
 export {enGB} from './enGB'
-import {plPL} from './plPL'
 import {enGB} from './enGB'
+import {plPL} from './plPL'
 
 export interface TranslationPackage {
   functions: TranslationSet,

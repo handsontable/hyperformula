@@ -3,4 +3,4 @@ export {Config} from './Config'
 export {HandsOnEngine} from './HandsOnEngine'
 export {CellValue, EmptyValue, CellError} from './Cell'
 export {CsvImporter, CsvExporter} from './csv'
-export {LazilyTransformingAstService} from "./LazilyTransformingAstService";
+export {LazilyTransformingAstService} from './LazilyTransformingAstService'

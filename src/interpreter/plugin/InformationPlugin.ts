@@ -1,7 +1,7 @@
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser/Ast'
 import {FunctionPlugin} from './FunctionPlugin'
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 
 /**
  * Interpreter plugin containing information functions
@@ -107,7 +107,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
 
     if (columnValue === 0 || rowValue === 0 || range === undefined) {
-      throw Error("Not implemented yet")
+      throw Error('Not implemented yet')
     }
 
     const address = range.getAddress(columnValue - 1, rowValue - 1)

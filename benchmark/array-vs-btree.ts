@@ -16,7 +16,7 @@ for (let i = 0; i < reads; i++) {
 const results: any[] = []
 
 const benchmarkArray = () => {
-  const result: any = { name: "Array" }
+  const result: any = { name: 'Array' }
   let startAt
 
   const arr = new Array()

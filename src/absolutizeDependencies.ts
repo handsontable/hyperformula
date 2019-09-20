@@ -1,7 +1,7 @@
-import {RelativeDependency} from './parser'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
-import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {RelativeDependency} from './parser'
 
 /**
  * Converts dependencies from maybe relative addressing to absolute addressing.

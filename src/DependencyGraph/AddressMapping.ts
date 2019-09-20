@@ -1,10 +1,10 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, EmptyValue, SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
+import {ColumnsSpan} from '../ColumnsSpan'
 import {Sheet} from '../GraphBuilder'
+import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
-import {ColumnsSpan} from '../ColumnsSpan'
-import {RowsSpan} from '../RowsSpan'
 
 /**
  * Interface for mapping from sheet addresses to vertices.

@@ -1,5 +1,4 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {FormulaCellVertex, MatrixVertex} from '../DependencyGraph'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false

@@ -1,13 +1,13 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
+import {RowsSpan} from '../RowsSpan'
 import {
   fixFormulaVertexRow,
   transformAddressesInFormula,
   TransformCellAddressFunction,
-  TransformCellRangeFunction
+  TransformCellRangeFunction,
 } from './common'
-import {RowsSpan} from '../RowsSpan'
 
 export namespace RemoveRowsDependencyTransformer {
   export function transform(removedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -52,7 +52,7 @@ export namespace RemoveRowsDependencyTransformer {
       if (newStart === false && newEnd === false) {
         return [actualStart, actualEnd]
       } else if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
-        throw Error("Cannot happen")
+        throw Error('Cannot happen')
       } else {
         return [newStart || actualStart, newEnd || actualEnd]
       }
@@ -108,7 +108,7 @@ export namespace RemoveRowsDependencyTransformer {
           } else if (absoluteDependencyAddress.row > removedRows.rowEnd) {
             if (formulaAddress.row < removedRows.rowStart) { // 1.Rba
               return dependencyAddress.shiftedByRows(-removedRows.numberOfRows)
-            } else if (formulaAddress.row > removedRows.rowEnd) { //1.Rbb
+            } else if (formulaAddress.row > removedRows.rowEnd) { // 1.Rbb
               return false
             }
           }

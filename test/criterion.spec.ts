@@ -51,12 +51,12 @@ describe('Criterion', () => {
   })
 
   it('defaults to equal when unparsable string', () => {
-    expect(parseCriterion('$fdsa')).toEqual(buildCriterion(CriterionType.EQUAL, "$fdsa"))
+    expect(parseCriterion('$fdsa')).toEqual(buildCriterion(CriterionType.EQUAL, '$fdsa'))
   })
 
   xit('defaults to equal when string with weirdly used operators', () => {
     // not sure what should happen here
-    expect(parseCriterion('><fdsa')).toEqual(buildCriterion(CriterionType.EQUAL, "><fdsa"))
+    expect(parseCriterion('><fdsa')).toEqual(buildCriterion(CriterionType.EQUAL, '><fdsa'))
   })
 
   it('null when criterion being error', () => {

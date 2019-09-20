@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {filterWith} from '../generatorUtils'
-import {MatrixVertex} from './'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {filterWith} from '../generatorUtils'
 import {RowsSpan} from '../RowsSpan'
+import {MatrixVertex} from './'
 
 export class MatrixMapping {
   private readonly matrixMapping: Map<string, MatrixVertex> = new Map()

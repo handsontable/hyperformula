@@ -1,9 +1,8 @@
 import {Config, HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../src/Cell'
-import {EmptyCellVertex, MatrixVertex, RangeVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('Disable matrix optimizatoins', () => {
   it('should split matrix into value cell vertices', () => {

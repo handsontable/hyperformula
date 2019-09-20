@@ -6,7 +6,7 @@ describe('Interpreter', () => {
   it('function ISBLANK should return true for references to empty cells',  () => {
     const engine =  HandsOnEngine.buildFromArray([
       ['', '=ISBLANK(A1)', '=ISBLANK($A1)', '=ISBLANK(OFFSET(C1,0,-2))', '=ISBLANK(A2)'],
-      ['=A1']
+      ['=A1'],
     ])
     expect(engine.getCellValue('B1')).toEqual(true)
     expect(engine.getCellValue('C1')).toEqual(true)

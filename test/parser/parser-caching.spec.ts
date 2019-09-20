@@ -1,8 +1,8 @@
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {
-  ParserWithCaching,
   CellAddress,
+  ParserWithCaching,
 } from '../../src/parser'
 
 describe('ParserWithCaching - caching', () => {

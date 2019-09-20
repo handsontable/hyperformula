@@ -1,6 +1,6 @@
 import {CellValue, SimpleCellAddress} from '../Cell'
+import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
-import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
 
 /**
  * Represents vertex which keeps formula
@@ -16,7 +16,7 @@ export class FormulaCellVertex {
     /** Address which this vertex represents */
     public cellAddress: SimpleCellAddress,
 
-    public version: number
+    public version: number,
   ) {
     this.formula = formula
     this.cellAddress = cellAddress

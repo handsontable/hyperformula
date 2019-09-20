@@ -1,8 +1,7 @@
-import assert from 'assert'
+
 import {IToken, tokenMatcher} from 'chevrotain'
 import {SimpleCellAddress} from '../Cell'
-import {CellDependency} from '../CellDependency'
-import {ParserConfig} from './ParserConfig'
+import {RelativeDependency} from './'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
@@ -10,7 +9,7 @@ import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
-import {RelativeDependency} from './'
+import {ParserConfig} from './ParserConfig'
 
 export interface ParsingResult {
   ast: Ast,

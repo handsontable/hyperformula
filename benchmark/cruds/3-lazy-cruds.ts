@@ -1,10 +1,8 @@
-import {HandsOnEngine} from "../../src";
-import {Sheet} from "../../src/GraphBuilder";
-import {logStats, measure} from "./operations";
-import {sheet as Sb} from "../sheets/01-simple-big";
-import {StatType} from "../../src/statistics/Statistics";
-import {sheet as Bs} from "../sheets/06-big-sum";
-
+import {HandsOnEngine} from '../../src'
+import {Sheet} from '../../src/GraphBuilder'
+import {sheet as Sb} from '../sheets/01-simple-big'
+import {sheet as Bs} from '../sheets/06-big-sum'
+import {logStats, measure} from './operations'
 
 function addRow(sheet: Sheet, row: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)
@@ -52,5 +50,5 @@ function start(sheet: Sheet, title: string) {
   logStats(stats)
 }
 
-start(Sb(10000), "=== Simple Big ===")
-start(Bs(10000), "=== Big Sum ===")
+start(Sb(10000), '=== Simple Big ===')
+start(Bs(10000), '=== Big Sum ===')

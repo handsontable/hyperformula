@@ -1,11 +1,11 @@
-import {simpleCellAddress} from '../src/Cell'
+
 import {Config} from '../src/Config'
 import {SheetMapping} from '../src/DependencyGraph'
 import {checkMatrixSize, Size} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
 import {CellAddress} from '../src/parser/CellAddress'
 import './testConfig.ts'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {
   it('check', () => {

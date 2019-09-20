@@ -1,5 +1,5 @@
-import {CellError, Config, HandsOnEngine} from "../../src";
-import {ErrorType} from "../../src/Cell";
+import {CellError, HandsOnEngine} from '../../src'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig.ts'
 
 describe('Function MATCH', () => {
@@ -80,7 +80,7 @@ describe('Function MATCH', () => {
       ['200'],
       ['200'],
       ['200'],
-      ['103']
+      ['103'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))

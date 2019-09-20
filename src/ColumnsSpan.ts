@@ -1,29 +1,28 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {simpleCellAddress} from './Cell'
+
 
 /*
  * A class representing a set of columns in specific sheet
  */
 export class ColumnsSpan {
+
+  public get numberOfColumns() {
+    return this.columnEnd - this.columnStart + 1
+  }
+
+  public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
+  }
   constructor(
     public readonly sheet: number,
     public readonly columnStart: number,
     public readonly columnEnd: number,
   ) {
     if (columnStart < 0) {
-      throw Error("Starting column cant be less than 0")
+      throw Error('Starting column cant be less than 0')
     }
     if (columnEnd < columnStart) {
-      throw Error("Column span cant end before start")
+      throw Error('Column span cant end before start')
     }
-  }
-
-  public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-    return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
-  }
-
-  public get numberOfColumns() {
-    return this.columnEnd - this.columnStart + 1
   }
 
   public* columns(): IterableIterator<number> {

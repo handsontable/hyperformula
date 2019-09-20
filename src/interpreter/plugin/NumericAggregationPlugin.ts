@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress, EmptyValue} from '../../Cell'
+import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'

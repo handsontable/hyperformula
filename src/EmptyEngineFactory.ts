@@ -1,9 +1,9 @@
 import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
-import {Statistics, StatType} from './statistics/Statistics'
+import {ColumnIndex} from './ColumnIndex'
 import {DependencyGraph} from './DependencyGraph'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {ParserWithCaching} from './parser'
-import {ColumnIndex} from "./ColumnIndex";
+import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Statistics} from './statistics/Statistics'
 
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HandsOnEngine {
@@ -21,7 +21,7 @@ export class EmptyEngineFactory {
       columnIndex,
       parser,
       evaluator,
-      lazilyTransformingAstService
+      lazilyTransformingAstService,
     )
     return engine
   }

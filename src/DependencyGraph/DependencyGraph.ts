@@ -2,22 +2,21 @@ import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
+import {ColumnsSpan} from '../ColumnsSpan'
+import {Config} from '../Config'
 import {filterWith, map} from '../generatorUtils'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
+import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType} from '../parser'
+import {RowsSpan} from '../RowsSpan'
+import {Statistics, StatType} from '../statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping'
+import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {Statistics, StatType} from '../statistics/Statistics'
-import {Config} from '../Config'
-import {GetDependenciesQuery} from './GetDependenciesQuery'
-import {LazilyTransformingAstService} from "../LazilyTransformingAstService";
-import {ColumnsSpan} from '../ColumnsSpan'
-import {RowsSpan} from '../RowsSpan'
-import {ColumnIndex} from "../ColumnIndex";
 
 export class DependencyGraph {
   /*
@@ -35,7 +34,7 @@ export class DependencyGraph {
       new SheetMapping(),
       new MatrixMapping(),
       stats,
-      lazilyTransformingAstService
+      lazilyTransformingAstService,
     )
   }
 
@@ -46,7 +45,7 @@ export class DependencyGraph {
       public readonly sheetMapping: SheetMapping,
       public readonly matrixMapping: MatrixMapping,
       private readonly stats: Statistics = new Statistics(),
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {}
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
@@ -272,12 +271,6 @@ export class DependencyGraph {
     }
 
     this.addStructuralNodesToChangeSet()
-  }
-
-  private addStructuralNodesToChangeSet() {
-    for (const vertex of this.graph.specialNodesStructuralChanges) {
-      this.graph.markNodeAsSpecialRecentlyChanged(vertex)
-    }
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
@@ -511,6 +504,12 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
+  }
+
+  private addStructuralNodesToChangeSet() {
+    for (const vertex of this.graph.specialNodesStructuralChanges) {
+      this.graph.markNodeAsSpecialRecentlyChanged(vertex)
+    }
   }
 
   private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {

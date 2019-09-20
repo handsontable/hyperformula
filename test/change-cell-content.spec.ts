@@ -1,8 +1,7 @@
 import {Config, EmptyValue, HandsOnEngine} from '../src'
-import {simpleCellAddress} from '../src/Cell'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('changing cell content', () => {
   it('update formula vertex', () => {
@@ -55,7 +54,6 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('B1')).toBe('foo')
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
-
 
   it('set vertex with edge to empty cell', () => {
     const engine = HandsOnEngine.buildFromArray([

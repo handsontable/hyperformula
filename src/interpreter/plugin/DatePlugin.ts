@@ -1,5 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {dateNumberToMonthNumber, dateNumberToYearNumber, toDateNumber, dateNumberToMoment, momentToDateNumber} from '../../Date'
+import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, momentToDateNumber, toDateNumber} from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser/Ast'
@@ -62,7 +62,7 @@ export class DatePlugin extends FunctionPlugin {
     if (dateNumber === null) {
       return new CellError(ErrorType.VALUE)
     }
-    
+
     const numberOfMonthsToShift = this.evaluateAst(ast.args[1], formulaAddress)
     if (typeof numberOfMonthsToShift !== 'number') {
       return new CellError(ErrorType.VALUE)

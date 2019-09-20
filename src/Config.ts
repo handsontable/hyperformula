@@ -30,6 +30,18 @@ export interface ConfigParams {
 }
 
 export class Config {
+
+  public static defaultConfig: ConfigParams = {
+    addressMappingFillThreshold: 1,
+    dateFormat: 'MM/DD/YYYY',
+    functionArgSeparator: ',',
+    language: enGB,
+    functionPlugins: [],
+    gpuMode: 'gpu',
+    matrixDetection: true,
+    matrixDetectionThreshold: 100,
+    vlookupThreshold: 20,
+  }
   private static defaultPlugins: any[] = [
     SumifPlugin,
     TextPlugin,
@@ -46,18 +58,6 @@ export class Config {
     RandomPlugin,
     VlookupPlugin,
   ]
-
-  public static defaultConfig: ConfigParams = {
-    addressMappingFillThreshold: 1,
-    dateFormat: 'MM/DD/YYYY',
-    functionArgSeparator: ',',
-    language: enGB,
-    functionPlugins: [],
-    gpuMode: 'gpu',
-    matrixDetection: true,
-    matrixDetectionThreshold: 100,
-    vlookupThreshold: 20
-  }
 
   public readonly addressMappingFillThreshold: number
   public readonly dateFormat: string
@@ -79,7 +79,7 @@ export class Config {
         gpuMode,
         matrixDetection,
         matrixDetectionThreshold,
-        vlookupThreshold
+        vlookupThreshold,
       }: Partial<ConfigParams> = {},
   ) {
     this.addressMappingFillThreshold = typeof addressMappingFillThreshold === 'number' ? addressMappingFillThreshold : Config.defaultConfig.addressMappingFillThreshold

@@ -1,6 +1,5 @@
+import {collectDependencies, RelativeDependency} from './'
 import {Ast, AstNodeType} from './Ast'
-import {CellAddress} from './CellAddress'
-import {RelativeDependency, collectDependencies} from './'
 
 export interface CacheEntry {
   ast: Ast,

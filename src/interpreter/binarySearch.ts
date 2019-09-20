@@ -1,4 +1,4 @@
-import {CellValue} from "../Cell";
+import {CellValue} from '../Cell'
 
 /*
 * If key exists returns first index of key element in sorted array
@@ -10,8 +10,8 @@ export function lowerBound(values: CellValue[], key: any): number {
   let end = values.length - 1
 
   while (start <= end) {
-    let center = Math.floor((start + end) / 2)
-    let cmp = compare(key, values[center])
+    const center = Math.floor((start + end) / 2)
+    const cmp = compare(key, values[center])
     if (cmp > 0) {
       start = center + 1
     } else if (cmp < 0) {

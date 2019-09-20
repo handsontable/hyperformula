@@ -1,10 +1,9 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import { ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {MoveCellsTransformation} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
 import {transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
-import {MoveCellsTransformation} from "../LazilyTransformingAstService";
-import {RowsSpan} from "../RowsSpan";
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -22,7 +21,7 @@ export namespace MoveCellsDependencyTransformer {
           ast,
           nodeAddress,
           fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
-          transformCellRangeByReferences(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom))
+          transformCellRangeByReferences(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
       )
 
       return [newAst, {

@@ -3,7 +3,7 @@ import {BTree} from '../src/BTree'
 describe('BTree', () => {
   it('initialization works', () => {
     const btree = new BTree(2)
-    
+
     expect(btree.getKey(42)).toEqual(null)
   })
 
@@ -44,7 +44,7 @@ describe('BTree', () => {
 
     btree.addKey(3, 10)
 
-    expect(btree._root.keys).toEqual([1,2,3])
+    expect(btree._root.keys).toEqual([1, 2, 3])
   })
 
   it('adding one more key than the span of the node', () => {
@@ -57,7 +57,7 @@ describe('BTree', () => {
 
     expect(btree._root.keys).toEqual([2])
     expect(btree._root.children![0].keys).toEqual([1])
-    expect(btree._root.children![1].keys).toEqual([3,4])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
   })
 
   it('adding key so tree has to split child', () => {
@@ -70,10 +70,10 @@ describe('BTree', () => {
     btree.addKey(5, 10)
     btree.addKey(6, 16)
 
-    expect(btree._root.keys).toEqual([2,4])
+    expect(btree._root.keys).toEqual([2, 4])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![1].keys).toEqual([3])
-    expect(btree._root.children![2].keys).toEqual([5,6])
+    expect(btree._root.children![2].keys).toEqual([5, 6])
     expect(btree.getKey(6)).toEqual(16)
   })
 
@@ -151,10 +151,10 @@ describe('BTree', () => {
     btree.addKey(3, 13)
 
     const result = btree.deleteKey(2)
-    
+
     expect(result).toBe(true)
-    expect(btree._root.keys).toEqual([1,3])
-    expect(btree._root.values).toEqual([11,13])
+    expect(btree._root.keys).toEqual([1, 3])
+    expect(btree._root.values).toEqual([11, 13])
   })
 
   it('#deleteKey from root node, return false if nothing found', () => {
@@ -165,8 +165,8 @@ describe('BTree', () => {
     const result = btree.deleteKey(2)
 
     expect(result).toBe(false)
-    expect(btree._root.keys).toEqual([1,3])
-    expect(btree._root.values).toEqual([11,13])
+    expect(btree._root.keys).toEqual([1, 3])
+    expect(btree._root.values).toEqual([11, 13])
   })
 
   it('#deleteKey from empty tree', () => {
@@ -206,7 +206,7 @@ describe('BTree', () => {
 
     expect(btree._root.keys).toEqual([3])
     expect(btree._root.children![0].keys).toEqual([1])
-    expect(btree._root.children![1].keys).toEqual([4,5])
+    expect(btree._root.children![1].keys).toEqual([4, 5])
   })
 
   it('#deleteKey from node with shift', () => {
@@ -221,8 +221,8 @@ describe('BTree', () => {
 
     expect(btree._root.keys).toEqual([3])
     expect(btree._root.values).toEqual([12])
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([110,11])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([110, 11])
     expect(btree._root.children![1].shift).toEqual(1)
     expect(btree._root.children![1].keys).toEqual([4])
     expect(btree._root.children![1].values).toEqual([14])
@@ -259,8 +259,8 @@ describe('BTree', () => {
 
     btree.deleteKey(4)
 
-    expect(btree._root.keys).toEqual([2,5])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 5])
+    expect(btree._root.values).toEqual([12, 15])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
     expect(btree._root.children![1].keys).toEqual([3])
@@ -296,13 +296,13 @@ describe('BTree', () => {
     btree.addKey(6, 16)
 
     btree.deleteKey(1)
-    
+
     expect(btree._root.keys).toEqual([4])
     expect(btree._root.values).toEqual([14])
-    expect(btree._root.children![0].keys).toEqual([2,3])
-    expect(btree._root.children![0].values).toEqual([12,13])
-    expect(btree._root.children![1].keys).toEqual([5,6])
-    expect(btree._root.children![1].values).toEqual([15,16])
+    expect(btree._root.children![0].keys).toEqual([2, 3])
+    expect(btree._root.children![0].values).toEqual([12, 13])
+    expect(btree._root.children![1].keys).toEqual([5, 6])
+    expect(btree._root.children![1].values).toEqual([15, 16])
     expect(btree._root.children![2]).toBeUndefined()
   })
 
@@ -322,8 +322,8 @@ describe('BTree', () => {
     expect(btree._root.values).toEqual([12])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
-    expect(btree._root.children![1].keys).toEqual([3,4])
-    expect(btree._root.children![1].values).toEqual([13,14])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
+    expect(btree._root.children![1].values).toEqual([13, 14])
     expect(btree._root.children![2]).toBeUndefined()
   })
 
@@ -338,8 +338,8 @@ describe('BTree', () => {
 
     btree.deleteKey(4)
 
-    expect(btree._root.keys).toEqual([2,5])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 5])
+    expect(btree._root.values).toEqual([12, 15])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
     expect(btree._root.children![1].keys).toEqual([3])
@@ -360,12 +360,12 @@ describe('BTree', () => {
 
     btree.deleteKey(5)
 
-    expect(btree._root.keys).toEqual([2,6])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 6])
+    expect(btree._root.values).toEqual([12, 15])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
-    expect(btree._root.children![1].keys).toEqual([3,4])
-    expect(btree._root.children![1].values).toEqual([130,13])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
+    expect(btree._root.children![1].values).toEqual([130, 13])
     expect(btree._root.children![2].keys).toEqual([6])
     expect(btree._root.children![2].values).toEqual([16])
   })
@@ -382,14 +382,14 @@ describe('BTree', () => {
 
     btree.deleteKey(3)
 
-    expect(btree._root.keys).toEqual([2,5])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 5])
+    expect(btree._root.values).toEqual([12, 15])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
     expect(btree._root.children![1].keys).toEqual([4])
     expect(btree._root.children![1].values).toEqual([14])
-    expect(btree._root.children![2].keys).toEqual([6,7])
-    expect(btree._root.children![2].values).toEqual([16,17])
+    expect(btree._root.children![2].keys).toEqual([6, 7])
+    expect(btree._root.children![2].values).toEqual([16, 17])
   })
 
   it('#deleteKey from internal node, which has right child with t-1 keys and left child with >=t keys, and left child is shifted', () => {
@@ -406,10 +406,10 @@ describe('BTree', () => {
 
     btree.deleteKey(6)
 
-    expect(btree._root.keys).toEqual([3,5])
-    expect(btree._root.values).toEqual([12,14])
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([110,11])
+    expect(btree._root.keys).toEqual([3, 5])
+    expect(btree._root.values).toEqual([12, 14])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([110, 11])
     expect(btree._root.children![1].shift).toEqual(1)
     expect(btree._root.children![1].keys).toEqual([3])
     expect(btree._root.children![1].values).toEqual([13])
@@ -430,10 +430,10 @@ describe('BTree', () => {
 
     expect(btree._root.keys).toEqual([4])
     expect(btree._root.values).toEqual([14])
-    expect(btree._root.children![0].keys).toEqual([1,3])
-    expect(btree._root.children![0].values).toEqual([11,13])
-    expect(btree._root.children![1].keys).toEqual([5,6])
-    expect(btree._root.children![1].values).toEqual([15,16])
+    expect(btree._root.children![0].keys).toEqual([1, 3])
+    expect(btree._root.children![0].values).toEqual([11, 13])
+    expect(btree._root.children![1].keys).toEqual([5, 6])
+    expect(btree._root.children![1].values).toEqual([15, 16])
     expect(btree._root.children![2]).toBeUndefined()
   })
 
@@ -475,8 +475,8 @@ describe('BTree', () => {
     expect(btree._root.values).toEqual([12])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
-    expect(btree._root.children![1].keys).toEqual([3,4])
-    expect(btree._root.children![1].values).toEqual([13,14])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
+    expect(btree._root.children![1].values).toEqual([13, 14])
   })
 
   it('deleteKeyWithShift from last leaf node, not last element, h = 1', () => {
@@ -493,8 +493,8 @@ describe('BTree', () => {
     expect(btree._root.values).toEqual([12])
     expect(btree._root.children![0].keys).toEqual([1])
     expect(btree._root.children![0].values).toEqual([11])
-    expect(btree._root.children![1].keys).toEqual([3,4])
-    expect(btree._root.children![1].values).toEqual([13,15])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
+    expect(btree._root.children![1].values).toEqual([13, 15])
   })
 
   it('deleteKeyWithShift from not last leaf node, h = 1', () => {
@@ -509,16 +509,16 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(4)
 
-    expect(btree._root.keys).toEqual([2,4])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 4])
+    expect(btree._root.values).toEqual([12, 15])
 
     expect(btree._root.children![1].shift).toEqual(0)
     expect(btree._root.children![1].keys).toEqual([3])
     expect(btree._root.children![1].values).toEqual([13])
 
     expect(btree._root.children![2].shift).toEqual(-1)
-    expect(btree._root.children![2].keys).toEqual([6,7])
-    expect(btree._root.children![2].values).toEqual([16,17])
+    expect(btree._root.children![2].keys).toEqual([6, 7])
+    expect(btree._root.children![2].values).toEqual([16, 17])
   })
 
   it('deleteKeyWithShift from not last leaf node, when not found the element, h = 1', () => {
@@ -533,16 +533,16 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(4)
 
-    expect(btree._root.keys).toEqual([2,6])
-    expect(btree._root.values).toEqual([12,16])
+    expect(btree._root.keys).toEqual([2, 6])
+    expect(btree._root.values).toEqual([12, 16])
 
     expect(btree._root.children![1].shift).toEqual(0)
-    expect(btree._root.children![1].keys).toEqual([3,5])
-    expect(btree._root.children![1].values).toEqual([13,15])
+    expect(btree._root.children![1].keys).toEqual([3, 5])
+    expect(btree._root.children![1].values).toEqual([13, 15])
 
     expect(btree._root.children![2].shift).toEqual(0)
-    expect(btree._root.children![2].keys).toEqual([7,8])
-    expect(btree._root.children![2].values).toEqual([17,18])
+    expect(btree._root.children![2].keys).toEqual([7, 8])
+    expect(btree._root.children![2].values).toEqual([17, 18])
   })
 
   it('deleteKeyWithShift from the leaf which is shifted, h = 1', () => {
@@ -557,11 +557,11 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(7)
 
-    expect(btree._root.keys).toEqual([2,5])
-    expect(btree._root.values).toEqual([12,14])
+    expect(btree._root.keys).toEqual([2, 5])
+    expect(btree._root.values).toEqual([12, 14])
 
-    expect(btree._root.children![1].keys).toEqual([3,4])
-    expect(btree._root.children![1].values).toEqual([130,13])
+    expect(btree._root.children![1].keys).toEqual([3, 4])
+    expect(btree._root.children![1].values).toEqual([130, 13])
 
     expect(btree._root.children![2].shift).toEqual(1)
     expect(btree._root.children![2].keys).toEqual([5])
@@ -579,8 +579,8 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(3)
 
-    expect(btree._root.keys).toEqual([2,4])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([2, 4])
+    expect(btree._root.values).toEqual([12, 15])
 
     expect(btree._root.children![1].keys).toEqual([3])
     expect(btree._root.children![1].values).toEqual([14])
@@ -602,12 +602,12 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(4)
 
-    expect(btree._root.keys).toEqual([3,5])
-    expect(btree._root.values).toEqual([12,15])
+    expect(btree._root.keys).toEqual([3, 5])
+    expect(btree._root.values).toEqual([12, 15])
 
     expect(btree._root.children![0].shift).toEqual(0)
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([110,11])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([110, 11])
 
     expect(btree._root.children![1].shift).toEqual(1)
     expect(btree._root.children![1].keys).toEqual([3])
@@ -631,8 +631,8 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(6)
 
-    expect(btree._root.keys).toEqual([2,4])
-    expect(btree._root.values).toEqual([12,14])
+    expect(btree._root.keys).toEqual([2, 4])
+    expect(btree._root.values).toEqual([12, 14])
 
     expect(btree._root.children![0].shift).toEqual(0)
     expect(btree._root.children![0].keys).toEqual([1])
@@ -661,11 +661,11 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(7)
 
-    expect(btree._root.keys).toEqual([3,5])
-    expect(btree._root.values).toEqual([12,14])
+    expect(btree._root.keys).toEqual([3, 5])
+    expect(btree._root.values).toEqual([12, 14])
 
     expect(btree._root.children![0].shift).toEqual(0)
-    expect(btree._root.children![0].keys).toEqual([1,2])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
     expect(btree._root.children![0].values).toEqual([110, 11])
 
     expect(btree._root.children![1].shift).toEqual(1)
@@ -695,11 +695,11 @@ describe('BTree', () => {
     expect(btree._root.keys).toEqual([3])
     expect(btree._root.values).toEqual([13])
 
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([11,12])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([11, 12])
 
-    expect(btree._root.children![1].keys).toEqual([4,5,6,7])
-    expect(btree._root.children![1].values).toEqual([14,16,17,18])
+    expect(btree._root.children![1].keys).toEqual([4, 5, 6, 7])
+    expect(btree._root.children![1].values).toEqual([14, 16, 17, 18])
 
     expect(btree._root.children![2]).toBeUndefined()
   })
@@ -729,12 +729,12 @@ describe('BTree', () => {
     expect(btree._root.keys).toEqual([3])
     expect(btree._root.values).toEqual([14])
 
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([11,12])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([11, 12])
 
     expect(btree._root.children![1].shift).toEqual(-1)
-    expect(btree._root.children![1].keys).toEqual([5,6,7,8])
-    expect(btree._root.children![1].values).toEqual([15,18,19,20])
+    expect(btree._root.children![1].keys).toEqual([5, 6, 7, 8])
+    expect(btree._root.children![1].values).toEqual([15, 18, 19, 20])
 
     expect(btree._root.children![2]).toBeUndefined()
   })
@@ -764,12 +764,12 @@ describe('BTree', () => {
     expect(btree._root.keys).toEqual([3])
     expect(btree._root.values).toEqual([14])
 
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([11,12])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([11, 12])
 
     expect(btree._root.children![1].shift).toEqual(-1)
-    expect(btree._root.children![1].keys).toEqual([5,6,7,8])
-    expect(btree._root.children![1].values).toEqual([15,16,18,20])
+    expect(btree._root.children![1].keys).toEqual([5, 6, 7, 8])
+    expect(btree._root.children![1].values).toEqual([15, 16, 18, 20])
 
     expect(btree._root.children![2]).toBeUndefined()
   })
@@ -788,19 +788,19 @@ describe('BTree', () => {
 
     btree.deleteKeyWithShift(6)
 
-    expect(btree._root.keys).toEqual([3,6])
-    expect(btree._root.values).toEqual([13,17])
+    expect(btree._root.keys).toEqual([3, 6])
+    expect(btree._root.values).toEqual([13, 17])
 
-    expect(btree._root.children![0].keys).toEqual([1,2])
-    expect(btree._root.children![0].values).toEqual([11,12])
+    expect(btree._root.children![0].keys).toEqual([1, 2])
+    expect(btree._root.children![0].values).toEqual([11, 12])
 
     expect(btree._root.children![1].shift).toEqual(0)
-    expect(btree._root.children![1].keys).toEqual([4,5])
-    expect(btree._root.children![1].values).toEqual([14,15])
+    expect(btree._root.children![1].keys).toEqual([4, 5])
+    expect(btree._root.children![1].values).toEqual([14, 15])
 
     expect(btree._root.children![1].shift).toEqual(-1)
-    expect(btree._root.children![1].keys).toEqual([8,9])
-    expect(btree._root.children![1].values).toEqual([18,19])
+    expect(btree._root.children![1].keys).toEqual([8, 9])
+    expect(btree._root.children![1].values).toEqual([18, 19])
   })
 
   xit('deleteKeyShift when theres too small children in root', () => {
@@ -817,8 +817,8 @@ describe('BTree', () => {
     btree.deleteKeyWithShift(4)
 
     expect(btree._root.shift).toEqual(0)
-    expect(btree._root.keys).toEqual([1,2,3,4])
-    expect(btree._root.values).toEqual([11,12,13,15])
+    expect(btree._root.keys).toEqual([1, 2, 3, 4])
+    expect(btree._root.values).toEqual([11, 12, 13, 15])
     expect(btree._root.children).toBeNull()
   })
 })

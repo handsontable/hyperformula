@@ -1,5 +1,9 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {ColumnIndex} from './ColumnIndex'
+import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
   DependencyGraph,
@@ -9,23 +13,19 @@ import {
   ValueCellVertex,
   Vertex,
 } from './DependencyGraph'
-import {ColumnsSpan} from './ColumnsSpan'
-import {RowsSpan} from './RowsSpan'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {CellAddress} from './parser/CellAddress'
+import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {EmptyEngineFactory} from './EmptyEngineFactory'
-import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {ColumnIndex} from "./ColumnIndex";
 
 /**
  * Engine for one sheet
@@ -246,7 +246,6 @@ export class HandsOnEngine {
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
-
 
     this.stats.measure(StatType.TRANSFORM_ASTS,  () => {
       MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)

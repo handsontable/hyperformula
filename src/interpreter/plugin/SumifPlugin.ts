@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
-import {Ast, CellRangeAst, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
+import {Ast, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser/Ast'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -11,7 +11,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.start.col},${c.conditionRange.start.row}`)
-  return ['SUMIF', ...conditionsStrings].join(",")
+  return ['SUMIF', ...conditionsStrings].join(',')
 }
 
 /** COUNTIF key for criterion function cache */
@@ -120,9 +120,9 @@ export class SumifPlugin extends FunctionPlugin {
     if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
       const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
 
-      let conditions: Condition[] = []
+      const conditions: Condition[] = []
       for (let i = 1; i < ast.args.length; i += 2) {
-        const criterionString = this.evaluateAst(ast.args[i+1], formulaAddress)
+        const criterionString = this.evaluateAst(ast.args[i + 1], formulaAddress)
         const criterion = parseCriterion(criterionString)
         const conditionRange = this.rangeFromAst(ast.args[i], formulaAddress)
         if (conditionRange === null) {
@@ -131,7 +131,7 @@ export class SumifPlugin extends FunctionPlugin {
         conditions.push(new Condition(
           conditionRange,
           criterionString as string,
-          criterion as Criterion
+          criterion as Criterion,
         ))
       }
 
@@ -142,17 +142,6 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
   }
-
-  private rangeFromAst(ast: Ast, formulaAddress: SimpleCellAddress): AbsoluteCellRange | null {
-    if (ast.type === AstNodeType.CELL_RANGE) {
-      return AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-    } else if (ast.type === AstNodeType.CELL_REFERENCE) {
-      return AbsoluteCellRange.singleRangeFromCellAddress(ast.reference, formulaAddress)
-    } else {
-      return null
-    }
-  }
-
 
   /**
    * Corresponds to COUNTIF(Range, Criterion)
@@ -193,6 +182,16 @@ export class SumifPlugin extends FunctionPlugin {
       }
     } else {
       return new CellError(ErrorType.VALUE)
+    }
+  }
+
+  private rangeFromAst(ast: Ast, formulaAddress: SimpleCellAddress): AbsoluteCellRange | null {
+    if (ast.type === AstNodeType.CELL_RANGE) {
+      return AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+    } else if (ast.type === AstNodeType.CELL_REFERENCE) {
+      return AbsoluteCellRange.singleRangeFromCellAddress(ast.reference, formulaAddress)
+    } else {
+      return null
     }
   }
 
@@ -241,7 +240,7 @@ export class SumifPlugin extends FunctionPlugin {
     const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     assert.ok(valuesRangeVertex, 'Range does not exists in graph')
 
-    const fullCriterionString = conditions.map((c) => c.criterionString).join(",")
+    const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
     const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
     if (cachedResult) {
       this.interpreter.stats.sumifFullCacheUsed++
@@ -254,11 +253,11 @@ export class SumifPlugin extends FunctionPlugin {
       })
 
     if (!cache.has(fullCriterionString)) {
-      const resultValue = this.computeCriterionValue(conditions.map(c => c.criterion), conditions.map(c => c.conditionRange), simpleValuesRange,
+      const resultValue = this.computeCriterionValue(conditions.map((c) => c.criterion), conditions.map((c) => c.conditionRange), simpleValuesRange,
         (filteredValues: IterableIterator<CellValue>) => {
           return reduceSum(filteredValues)
         })
-      cache.set(fullCriterionString, [resultValue, conditions.map(condition => buildCriterionLambda(condition.criterion))])
+      cache.set(fullCriterionString, [resultValue, conditions.map((condition) => buildCriterionLambda(condition.criterion))])
     }
 
     valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
@@ -365,7 +364,7 @@ function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteC
   }
 }
 
-export function* ifFilter(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<CellValue>[], computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
+export function* ifFilter(criterionLambdas: CriterionLambda[], conditionalIterables: Array<IterableIterator<CellValue>>, computableIterable: IterableIterator<CellValue>): IterableIterator<CellValue> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
     if (!conditionalSplits.every((cs) => cs.hasOwnProperty('value'))) {
@@ -375,7 +374,7 @@ export function* ifFilter(criterionLambdas: CriterionLambda[], conditionalIterab
     if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst) as boolean)) {
       yield computable
     }
-    conditionalIterables = conditionalSplits.map(cs => cs.rest)
+    conditionalIterables = conditionalSplits.map((cs) => cs.rest)
   }
 }
 
@@ -388,7 +387,7 @@ export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
 }
 
 export function zip<T, U>(arr1: T[], arr2: U[]): Array<[T, U]> {
-  let result: Array<[T, U]> = []
+  const result: Array<[T, U]> = []
   for (let i = 0; i < Math.min(arr1.length, arr2.length); i++) {
     result.push([arr1[i], arr2[i]])
   }

@@ -1,4 +1,4 @@
-import {Graph, IGetDependenciesQuery} from '../src/DependencyGraph'
+import {Graph} from '../src/DependencyGraph'
 import {DummyGetDependenciesQuery} from './DummyGetDependenciesQuery'
 
 const identifiableString = (id: number, str: string) => ({ id, str })

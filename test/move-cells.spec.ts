@@ -6,11 +6,11 @@ import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {
   adr,
-  extractRange,
-  extractReference,
+  expect_reference_to_have_ref_error,
   expectEngineToBeTheSameAs,
   extractMatrixRange,
-  expect_reference_to_have_ref_error
+  extractRange,
+  extractReference,
 } from './testUtils'
 
 describe('Address dependencies, moved formulas', () => {
@@ -58,23 +58,23 @@ describe('Address dependencies, moved formulas', () => {
     expect_reference_to_have_ref_error(engine, adr('B1'))
   })
 
-  it("should update internal dependency when overriding dependent cell", () => {
+  it('should update internal dependency when overriding dependent cell', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=B$2', ''],
       ['', ''],
     ])
 
-    engine.moveCells(adr("A1"), 2, 2, adr("B2"))
+    engine.moveCells(adr('A1'), 2, 2, adr('B2'))
 
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(0, 1, 2))
   })
 
   it('should update coordinates to internal dependency', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', "=A1"],
-      ['2', "=$A2"],
-      ['3', "=A$3"],
-      ['4', "=$A$4"]
+      ['1', '=A1'],
+      ['2', '=$A2'],
+      ['3', '=A$3'],
+      ['4', '=$A$4'],
     ])
 
     expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(0, -1, 2))
@@ -606,7 +606,7 @@ describe('overlapping areas', () => {
       ['1'],
       ['2'],
       ['3'],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ])
 
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
@@ -615,7 +615,7 @@ describe('overlapping areas', () => {
       [''],
       ['1'],
       ['3'],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ]))
   })
 
@@ -625,7 +625,7 @@ describe('overlapping areas', () => {
       ['2'],
       ['3'],
       [''],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ])
 
     engine.moveCells(adr('A1'), 1, 1, adr('A4'))
@@ -635,21 +635,21 @@ describe('overlapping areas', () => {
       ['2'],
       ['3'],
       ['1'],
-      ['=SUM(A1:A3)']
+      ['=SUM(A1:A3)'],
     ]))
   })
 
   it('expecting range to be same when moving part of a range outside of this range - row', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3', ''],
-      ['=SUM(A1:C1)']
+      ['=SUM(A1:C1)'],
     ])
 
     engine.moveCells(adr('A1'), 1, 1, adr('D1'))
 
     expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
       ['', '2', '3', '1'],
-      ['=SUM(A1:C1)']
+      ['=SUM(A1:C1)'],
     ]))
   })
 
@@ -675,7 +675,7 @@ describe('overlapping areas', () => {
       Sheet2: [
         ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
         ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
-      ]
+      ],
     })
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))

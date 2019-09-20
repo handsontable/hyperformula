@@ -1,17 +1,16 @@
-import {benchmark} from "../benchmark";
-import {Config as EngineConfig} from "../../src";
+import {Config as EngineConfig} from '../../src'
+import {benchmark} from '../benchmark'
 
 export function topdown(rows: number, vlookupLines: number) {
   const sheet = []
 
   let prev = 1
   while (prev <= rows) {
-    sheet.push([(rows-prev+1).toString()])
+    sheet.push([(rows - prev + 1).toString()])
     prev++
   }
 
-
-  for (let i=0; i<vlookupLines; ++i) {
+  for (let i = 0; i < vlookupLines; ++i) {
     sheet.push([`=VLOOKUP(1, A1:B${rows}, 1, false())`])
   }
 

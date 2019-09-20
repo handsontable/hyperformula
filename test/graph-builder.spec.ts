@@ -1,28 +1,17 @@
-import {simpleCellAddress} from '../src/Cell'
-import {Config} from '../src/Config'
 import {HandsOnEngine} from '../src'
+import {Config} from '../src/Config'
 import {
-  AddressMapping,
-  DependencyGraph,
   EmptyCellVertex,
-  Graph,
   MatrixVertex,
-  RangeMapping,
-  SheetMapping,
   ValueCellVertex,
-  Vertex,
 } from '../src/DependencyGraph'
-import {MatrixMapping} from '../src/DependencyGraph/MatrixMapping'
-import {GraphBuilder} from '../src/GraphBuilder'
-import {ParserWithCaching} from '../src/parser'
-import {DummyGetDependenciesQuery} from './DummyGetDependenciesQuery'
 import './testConfig.ts'
-import {adr} from "./testUtils";
+import {adr} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['42']
+      ['42'],
     ])
 
     const vertex = engine.addressMapping.fetchCell(adr('A1'))
@@ -32,7 +21,7 @@ describe('GraphBuilder', () => {
 
   it('build sheet with simple string cell', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['foo']
+      ['foo'],
     ])
 
     const vertex = engine.addressMapping.fetchCell(adr('A1'))
@@ -42,7 +31,7 @@ describe('GraphBuilder', () => {
 
   it('building for cell with empty string should give empty vertex', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['', '=A1']
+      ['', '=A1'],
     ])
 
     const vertex = engine.addressMapping.fetchCell(adr('A1'))
