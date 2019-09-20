@@ -26,6 +26,7 @@ export interface ConfigParams {
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
+  useColumnIndex: boolean,
   vlookupThreshold: number
 }
 
@@ -56,6 +57,7 @@ export class Config {
     gpuMode: 'gpu',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    useColumnIndex: true,
     vlookupThreshold: 20
   }
 
@@ -67,6 +69,7 @@ export class Config {
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
+  public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
 
   constructor(
@@ -79,6 +82,7 @@ export class Config {
         gpuMode,
         matrixDetection,
         matrixDetectionThreshold,
+        useColumnIndex,
         vlookupThreshold
       }: Partial<ConfigParams> = {},
   ) {
@@ -90,6 +94,7 @@ export class Config {
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
+    this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
   }
 
