@@ -1,4 +1,4 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import {CellError, Config, CsvExporter, HandsOnEngine} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
@@ -207,6 +207,17 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
       expect(engine.getCellValue("A1")).toEqual(3)
+    })
+
+    it('should work for standard matrices', () => {
+      const engine = builder([
+        ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["{=TRANSPOSE(A2:C3)}"],
+      ])
+
+      expect(engine.getCellValue("A1")).toEqual(6)
     })
   })
 }
