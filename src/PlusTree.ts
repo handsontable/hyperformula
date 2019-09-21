@@ -111,11 +111,11 @@ export class PlusTree<T> {
   }
 
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
-    // shift should be taken into account
+    const sKey = key - node.shift
     if (node instanceof Leaf) {
-      const foundIndex = node.keys.findIndex(k => k >= key) // shift
+      const foundIndex = node.keys.findIndex(k => k >= sKey)
       if (foundIndex !== -1) {
-        if (node.keys[foundIndex] === key) { // shift
+        if (node.keys[foundIndex] === sKey) {
           node.keys.splice(foundIndex, 1)
           node.values.splice(foundIndex, 1)
         }

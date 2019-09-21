@@ -341,5 +341,24 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 1).keys).toEqual([3])
       expect(getLeaf(tree, 1).values).toEqual([40])
     })
+
+    it('delete key from shifted node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(2, 200)
+
+      tree.deleteKeyWithShift(4)
+
+      expect(getLeaf(tree).keys).toEqual([3])
+      expect(getLeaf(tree, 0).shift).toEqual(0)
+      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
+      expect(getLeaf(tree, 0).values).toEqual([10,200,20])
+      expect(getLeaf(tree, 1).shift).toEqual(1)
+      expect(getLeaf(tree, 1).keys).toEqual([3])
+      expect(getLeaf(tree, 1).values).toEqual([40])
+    })
   })
 })
