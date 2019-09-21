@@ -40,19 +40,16 @@ export class PlusTree<T> {
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
     const sKey = key - node.shift
     if (node instanceof Leaf) {
-      for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] === sKey) {
-          return node.values[i]
-        }
+      const index = node.keys.indexOf(sKey)
+      if (index === -1) {
+        return null
+      } else {
+        return node.values[index]
       }
-      return null
     } else {
-      let indexOfBiggerKey = node.keys.length;
-      for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] >= sKey) {
-          indexOfBiggerKey = i
-          break;
-        }
+      let indexOfBiggerKey = node.keys.findIndex(k => k >= sKey)
+      if (indexOfBiggerKey === -1) {
+        indexOfBiggerKey = node.keys.length;
       }
       return this.getKeyRecursive(node.children[indexOfBiggerKey], sKey)
     }
@@ -69,12 +66,9 @@ export class PlusTree<T> {
 
   private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
     const sKey = key - node.shift
-    let indexWhereToAddIt = node.keys.length
-    for (let i = 0; i < node.keys.length; i++) {
-      if (node.keys[i] >= sKey) {
-        indexWhereToAddIt = i
-        break
-      }
+    let indexWhereToAddIt = node.keys.findIndex(k => k >= sKey)
+    if (indexWhereToAddIt === -1) {
+      indexWhereToAddIt = node.keys.length;
     }
     if (node instanceof Leaf) {
       for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
@@ -120,15 +114,8 @@ export class PlusTree<T> {
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
     // shift should be taken into account
     if (node instanceof Leaf) {
-      let foundIndex
-      // doable with find?
-      for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] >= key) {
-          foundIndex = i
-          break
-        }
-      }
-      if (foundIndex !== undefined) {
+      const foundIndex = node.keys.findIndex(k => k >= key)
+      if (foundIndex !== -1) {
         if (node.keys[foundIndex] === key) {
           node.keys.splice(foundIndex, 1)
           node.values.splice(foundIndex, 1)
