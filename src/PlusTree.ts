@@ -158,8 +158,18 @@ export class PlusTree<T> {
       childNode.values = childNode.values.concat(rightSibling.values)
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
+    } else if (childNode instanceof Internal && rightSibling instanceof Internal ) {
+      const lastChildOfChildNode = childNode.children[childNode.children.length - 1]
+      childNode.keys.push(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1]) // shift
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
+      for (const childOfRightSibling of rightSibling.children) {
+        childOfRightSibling.shift = this.adjustKeyWhenMovingFromSiblingToSibling(childOfRightSibling.shift, rightSibling, childNode)
+      }
+      childNode.children = childNode.children.concat(rightSibling.children)
+      parentNode.keys.splice(index, 1)
+      parentNode.children.splice(index + 1, 1)
     } else {
-      throw Error("Not implemented yet")
+      throw Error("Cant happen")
     }
   }
 
