@@ -124,12 +124,12 @@ export class PlusTree<T> {
         }
       }
     } else {
-      let foundIndex = node.keys.findIndex(k => k >= key) // shift
+      let foundIndex = node.keys.findIndex(k => k >= sKey)
       if (foundIndex === -1) {
         foundIndex = node.keys.length
       }
       const childNode = node.children[foundIndex]
-      this.deleteKeyWithShiftRecursive(childNode, key) // shift
+      this.deleteKeyWithShiftRecursive(childNode, sKey)
       for (let i = foundIndex; i < node.keys.length; i++) {
         node.keys[i]--
         node.children[i+1].shift--
