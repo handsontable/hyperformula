@@ -156,7 +156,7 @@ export class PlusTree<T> {
     const childNode = parentNode.children[index]
     const rightSibling = parentNode.children[index + 1]
     if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
-      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => k + rightSibling.shift - childNode.shift))
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
       childNode.values = childNode.values.concat(rightSibling.values)
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
@@ -169,11 +169,15 @@ export class PlusTree<T> {
     const childNode = parentNode.children[index]
     const rightSibling = parentNode.children[index + 1]
     if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
-      childNode.keys.push(rightSibling.keys.shift()! + rightSibling.shift - childNode.shift) // extract that calculation
+      childNode.keys.push(this.adjustKeyWhenMovingFromSiblingToSibling(rightSibling.keys.shift()!, rightSibling, childNode))
       childNode.values.push(rightSibling.values.shift()!)
       parentNode.keys[index] = childNode.keys[childNode.keys.length - 1] + childNode.shift
     } else {
       throw Error("Not implemented yet")
     }
+  }
+
+  private adjustKeyWhenMovingFromSiblingToSibling(key: number, fromNode: PNode<T>, toNode: PNode<T>): number {
+    return key + fromNode.shift - toNode.shift;
   }
 }
