@@ -180,8 +180,15 @@ export class PlusTree<T> {
       childNode.keys.push(this.adjustKeyWhenMovingFromSiblingToSibling(rightSibling.keys.shift()!, rightSibling, childNode))
       childNode.values.push(rightSibling.values.shift()!)
       parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(childNode.keys[childNode.keys.length - 1], childNode)
+    } else if (childNode instanceof Internal && rightSibling instanceof Internal) {
+      const lastChildOfChildNode = childNode.children[childNode.children.length - 1]
+      childNode.keys.push(this.adjustKeyWhenMovingFromChildToParent(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1], lastChildOfChildNode))
+      const movedChild = rightSibling.children.shift()!
+      movedChild.shift = this.adjustKeyWhenMovingFromSiblingToSibling(movedChild.shift, rightSibling, childNode)
+      childNode.children.push(movedChild)
+      parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(rightSibling.keys.shift()!, rightSibling)
     } else {
-      throw Error("Not implemented yet")
+      throw Error("Cant happen")
     }
   }
 
