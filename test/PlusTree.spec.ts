@@ -801,5 +801,19 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 2, 1).shift).toEqual(0)
       expect(getLeaf(tree, 2, 1).keys).toEqual([13])
     })
+
+    it('root node collapses', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.deleteKeyWithShift(4)
+      tree.deleteKeyWithShift(3)
+      tree.deleteKeyWithShift(2)
+
+      expect(getLeaf(tree).keys).toEqual([1])
+      expect(getLeaf(tree).values).toEqual([10])
+    })
   })
 })

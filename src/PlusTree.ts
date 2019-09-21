@@ -102,6 +102,10 @@ export class PlusTree<T> {
 
   public deleteKeyWithShift(key: number) {
     this.deleteKeyWithShiftRecursive(this._root, key)
+    if (this._root.keys.length === 0 && this._root instanceof Internal) {
+      const onlyChild = this._root.children[0]
+      this._root = onlyChild
+    }
   }
 
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
