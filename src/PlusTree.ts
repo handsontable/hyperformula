@@ -92,13 +92,13 @@ export class PlusTree<T> {
       const keysForNewNode = currentNode.keys.splice(this.span, this.span)
       const valuesForNewNode = currentNode.values.splice(this.span, this.span)
       const newNode = new Leaf(keysForNewNode, valuesForNewNode, currentNode.shift)
-      parentNode.keys.splice(index, 0, currentNode.keys[currentNode.keys.length - 1] + currentNode.shift)
+      parentNode.keys.splice(index, 0, this.adjustKeyWhenMovingFromChildToParent(currentNode.keys[currentNode.keys.length - 1], currentNode))
       parentNode.children.splice(index + 1, 0, newNode)
     } else {
       const keysForNewNode = currentNode.keys.splice(this.span + 1, this.span - 1)
       const childrenForNewNode = currentNode.children.splice(this.span + 1, this.span)
       const newNode = new Internal(keysForNewNode, childrenForNewNode, currentNode.shift)
-      parentNode.keys.splice(index, 0, currentNode.keys.pop()! + currentNode.shift)
+      parentNode.keys.splice(index, 0, this.adjustKeyWhenMovingFromChildToParent(currentNode.keys.pop()!, currentNode))
       parentNode.children.splice(index + 1, 0, newNode)
     }
   }
@@ -171,7 +171,7 @@ export class PlusTree<T> {
     if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
       childNode.keys.push(this.adjustKeyWhenMovingFromSiblingToSibling(rightSibling.keys.shift()!, rightSibling, childNode))
       childNode.values.push(rightSibling.values.shift()!)
-      parentNode.keys[index] = childNode.keys[childNode.keys.length - 1] + childNode.shift
+      parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(childNode.keys[childNode.keys.length - 1], childNode)
     } else {
       throw Error("Not implemented yet")
     }
@@ -179,5 +179,9 @@ export class PlusTree<T> {
 
   private adjustKeyWhenMovingFromSiblingToSibling(key: number, fromNode: PNode<T>, toNode: PNode<T>): number {
     return key + fromNode.shift - toNode.shift;
+  }
+
+  private adjustKeyWhenMovingFromChildToParent(key: number, childNode: PNode<T>): number {
+    return key + childNode.shift;
   }
 }
