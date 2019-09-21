@@ -130,8 +130,11 @@ export class PlusTree<T> {
       }
       if (childNode.keys.length < this.minSize) {
         const rightSibling = node.children[foundIndex + 1]
+        const leftSibling = node.children[foundIndex - 1]
         if (rightSibling && rightSibling.keys.length === this.minSize) {
           this.mergeNode(node, foundIndex)
+        } else if (leftSibling && leftSibling.keys.length === this.minSize) {
+          this.mergeNode(node, foundIndex - 1)
         }
       }
       // merging/redistribution of keys
