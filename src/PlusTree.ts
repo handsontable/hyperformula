@@ -120,10 +120,19 @@ export class PlusTree<T> {
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
     // shift should be taken into account
     if (node instanceof Leaf) {
+      let foundIndex
+      // doable with find?
       for (let i = 0; i < node.keys.length; i++) {
         if (node.keys[i] === key) {
-          node.keys.splice(i, 1)
-          node.values.splice(i, 1)
+          foundIndex = i
+          break
+        }
+      }
+      if (foundIndex !== undefined) {
+        node.keys.splice(foundIndex, 1)
+        node.values.splice(foundIndex, 1)
+        for (let i = foundIndex; i < node.keys.length; i++) {
+          node.keys[i]--;
         }
       }
     }

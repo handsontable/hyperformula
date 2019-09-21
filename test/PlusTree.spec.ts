@@ -284,5 +284,16 @@ describe('PlusTree', () => {
       expect(getLeaf(tree).keys).toEqual([])
       expect(getLeaf(tree).values).toEqual([])
     })
+
+    it('deleting decrements other keys', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+
+      tree.deleteKeyWithShift(1)
+
+      expect(getLeaf(tree).keys).toEqual([1])
+      expect(getLeaf(tree).values).toEqual([20])
+    })
   })
 })
