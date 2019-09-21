@@ -295,5 +295,16 @@ describe('PlusTree', () => {
       expect(getLeaf(tree).keys).toEqual([1])
       expect(getLeaf(tree).values).toEqual([20])
     })
+
+    it('even if theres no key, we decrement', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(3, 30)
+
+      tree.deleteKeyWithShift(2)
+
+      expect(getLeaf(tree).keys).toEqual([1,2])
+      expect(getLeaf(tree).values).toEqual([10,30])
+    })
   })
 })

@@ -123,14 +123,16 @@ export class PlusTree<T> {
       let foundIndex
       // doable with find?
       for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] === key) {
+        if (node.keys[i] >= key) {
           foundIndex = i
           break
         }
       }
       if (foundIndex !== undefined) {
-        node.keys.splice(foundIndex, 1)
-        node.values.splice(foundIndex, 1)
+        if (node.keys[foundIndex] === key) {
+          node.keys.splice(foundIndex, 1)
+          node.values.splice(foundIndex, 1)
+        }
         for (let i = foundIndex; i < node.keys.length; i++) {
           node.keys[i]--;
         }
