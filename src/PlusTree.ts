@@ -160,7 +160,7 @@ export class PlusTree<T> {
       parentNode.children.splice(index + 1, 1)
     } else if (childNode instanceof Internal && rightSibling instanceof Internal ) {
       const lastChildOfChildNode = childNode.children[childNode.children.length - 1]
-      childNode.keys.push(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1]) // shift
+      childNode.keys.push(this.adjustKeyWhenMovingFromChildToParent(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1], lastChildOfChildNode))
       childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
       for (const childOfRightSibling of rightSibling.children) {
         childOfRightSibling.shift = this.adjustKeyWhenMovingFromSiblingToSibling(childOfRightSibling.shift, rightSibling, childNode)

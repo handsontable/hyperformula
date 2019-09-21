@@ -274,6 +274,61 @@ describe('PlusTree', () => {
   })
 
   describe('#deleteKeyWithShift', () => {
+
+    it('merging internal node with right sibling, leaf nodes are shifted', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(5, 50)
+      tree.addKeyWithShift(6, 60)
+      tree.addKeyWithShift(7, 70)
+      tree.addKeyWithShift(8, 80)
+      tree.addKeyWithShift(1, 100)
+      tree.addKeyWithShift(10, 100)
+      tree.addKeyWithShift(11, 110)
+      tree.addKeyWithShift(12, 120)
+      tree.addKeyWithShift(13, 130)
+      tree.addKeyWithShift(14, 140)
+      tree.addKeyWithShift(15, 150)
+      tree.addKeyWithShift(16, 160)
+      tree.addKeyWithShift(17, 170)
+      //                    7                                     13
+      //      3       5                   9         11                  15
+      //1,2,3 | 3,4^1 | 5,6^1       7,8^1 | 9,10^1 | 11,12^1     13,14^1 | 15,16^1
+      tree.deleteKeyWithShift(13)
+      tree.deleteKeyWithShift(12)
+      tree.deleteKeyWithShift(11)
+      tree.deleteKeyWithShift(10)
+      //                    7                       9
+      //      3       5                 8                 15^-4
+      //1,2,3 | 3,4^1 | 5,6^1       7^1 | 8^1      13,14^1 | 15,16^1
+
+      tree.deleteKeyWithShift(9)
+
+      //                    7
+      //      3       5                 8         10
+      //1,2,3 | 3,4^1 | 5,6^1       7^1 | 13,14^-4 | 15,16^-4
+      expect(tree._root.keys).toEqual([7])
+      expect(getLeaf(tree, 0).shift).toEqual(0)
+      expect(getLeaf(tree, 0).keys).toEqual([3,5])
+      expect(getLeaf(tree, 0, 0).shift).toEqual(0)
+      expect(getLeaf(tree, 0, 0).keys).toEqual([1,2,3])
+      expect(getLeaf(tree, 0, 1).shift).toEqual(1)
+      expect(getLeaf(tree, 0, 1).keys).toEqual([3,4])
+      expect(getLeaf(tree, 0, 2).shift).toEqual(1)
+      expect(getLeaf(tree, 0, 2).keys).toEqual([5,6])
+      expect(getLeaf(tree, 1).shift).toEqual(0)
+      expect(getLeaf(tree, 1).keys).toEqual([8,10])
+      expect(getLeaf(tree, 1, 0).shift).toEqual(1)
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7])
+      expect(getLeaf(tree, 1, 1).shift).toEqual(-4)
+      expect(getLeaf(tree, 1, 1).keys).toEqual([13,14])
+      expect(getLeaf(tree, 1, 2).shift).toEqual(-4)
+      expect(getLeaf(tree, 1, 2).keys).toEqual([15,16])
+      expect(getLeaf(tree, 2)).toBeUndefined()
+    })
     it('delete from single root node', () => {
       const tree: PlusTree<number> = PlusTree.empty(2)
       tree.addKeyWithShift(42, 78)
