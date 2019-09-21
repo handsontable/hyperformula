@@ -47,10 +47,7 @@ export class PlusTree<T> {
         return node.values[index]
       }
     } else {
-      let indexOfBiggerKey = node.keys.findIndex(k => k >= sKey)
-      if (indexOfBiggerKey === -1) {
-        indexOfBiggerKey = node.keys.length;
-      }
+      const indexOfBiggerKey = this.findChildIndex(node, sKey)
       return this.getKeyRecursive(node.children[indexOfBiggerKey], sKey)
     }
   }
