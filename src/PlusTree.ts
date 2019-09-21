@@ -112,4 +112,20 @@ export class PlusTree<T> {
       parentNode.children.splice(index + 1, 0, newNode)
     }
   }
+
+  public deleteKeyWithShift(key: number) {
+    this.deleteKeyWithShiftRecursive(this._root, key)
+  }
+
+  private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
+    // shift should be taken into account
+    if (node instanceof Leaf) {
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] === key) {
+          node.keys.splice(i, 1)
+          node.values.splice(i, 1)
+        }
+      }
+    }
+  }
 }

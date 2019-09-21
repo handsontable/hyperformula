@@ -272,4 +272,17 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 1, 2)).toBeUndefined()
     })
   })
+
+  describe('#deleteKeyWithShift', () => {
+    it('delete from single root node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(42, 78)
+
+      tree.deleteKeyWithShift(42)
+
+      expect(tree.getKey(42)).toEqual(null)
+      expect(getLeaf(tree).keys).toEqual([])
+      expect(getLeaf(tree).values).toEqual([])
+    })
+  })
 })
