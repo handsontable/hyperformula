@@ -754,5 +754,52 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 2, 1).shift).toEqual(0)
       expect(getLeaf(tree, 2, 1).keys).toEqual([17,18])
     })
+
+    it('pulling from left internal node', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+      tree.addKeyWithShift(4, 40)
+      tree.addKeyWithShift(5, 50)
+      tree.addKeyWithShift(6, 60)
+      tree.addKeyWithShift(7, 70)
+      tree.addKeyWithShift(8, 80)
+      tree.addKeyWithShift(9, 90)
+      tree.addKeyWithShift(10, 100)
+      tree.addKeyWithShift(11, 110)
+      tree.addKeyWithShift(12, 120)
+      tree.addKeyWithShift(13, 130)
+      tree.addKeyWithShift(14, 140)
+      tree.addKeyWithShift(15, 150)
+      tree.addKeyWithShift(16, 160)
+      // tree.addKeyWithShift(17, 170)
+      // tree.addKeyWithShift(18, 180)
+      //             6                       12
+      //   [2     4]          [8     10]                [14]
+      //1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16
+      tree.deleteKeyWithShift(16)
+      tree.deleteKeyWithShift(15)
+      tree.deleteKeyWithShift(14)
+      // tree.deleteKeyWithShift(9)
+      // tree.deleteKeyWithShift(8)
+
+      //             6                10
+      //   [2     4]          [8]             [12]
+      //1,2 | 3,4 | 5,6    7,8 | 9,10     11,12 | 13
+      expect(tree._root.keys).toEqual([6,10])
+      expect(getLeaf(tree, 1).shift).toEqual(0)
+      expect(getLeaf(tree, 1).keys).toEqual([8])
+      expect(getLeaf(tree, 1, 0).shift).toEqual(0)
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
+      expect(getLeaf(tree, 1, 1).shift).toEqual(0)
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
+      expect(getLeaf(tree, 2).shift).toEqual(0)
+      expect(getLeaf(tree, 2).keys).toEqual([12])
+      expect(getLeaf(tree, 2, 0).shift).toEqual(0)
+      expect(getLeaf(tree, 2, 0).keys).toEqual([11,12])
+      expect(getLeaf(tree, 2, 1).shift).toEqual(0)
+      expect(getLeaf(tree, 2, 1).keys).toEqual([13])
+    })
   })
 })
