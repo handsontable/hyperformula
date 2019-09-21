@@ -134,9 +134,10 @@ export class PlusTree<T> {
           this.mergeNode(node, foundIndex - 1)
         } else if (rightSibling) {
           this.pullOneElementFromRight(node, foundIndex)
+        } else if (leftSibling) {
+          this.pullOneElementFromLeft(node, foundIndex)
         }
       }
-      // merging/redistribution of keys
     }
   }
 
@@ -169,6 +170,18 @@ export class PlusTree<T> {
       childNode.keys.push(this.adjustKeyWhenMovingFromSiblingToSibling(rightSibling.keys.shift()!, rightSibling, childNode))
       childNode.values.push(rightSibling.values.shift()!)
       parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(childNode.keys[childNode.keys.length - 1], childNode)
+    } else {
+      throw Error("Not implemented yet")
+    }
+  }
+
+  private pullOneElementFromLeft(parentNode: Internal<T>, index: number) {
+    const childNode = parentNode.children[index]
+    const leftSibling = parentNode.children[index - 1]
+    if (childNode instanceof Leaf && leftSibling instanceof Leaf) {
+      childNode.keys.unshift(this.adjustKeyWhenMovingFromSiblingToSibling(leftSibling.keys.pop()!, leftSibling, childNode))
+      childNode.values.unshift(leftSibling.values.pop()!)
+      parentNode.keys[index - 1] = this.adjustKeyWhenMovingFromChildToParent(leftSibling.keys[leftSibling.keys.length - 1], leftSibling)
     } else {
       throw Error("Not implemented yet")
     }
