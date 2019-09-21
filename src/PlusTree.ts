@@ -66,10 +66,7 @@ export class PlusTree<T> {
 
   private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
     const sKey = key - node.shift
-    let indexWhereToAddIt = node.keys.findIndex(k => k >= sKey)
-    if (indexWhereToAddIt === -1) {
-      indexWhereToAddIt = node.keys.length;
-    }
+    const indexWhereToAddIt = this.findChildIndex(node, sKey)
     if (node instanceof Leaf) {
       for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
         node.keys[i]++
@@ -124,10 +121,7 @@ export class PlusTree<T> {
         }
       }
     } else {
-      let foundIndex = node.keys.findIndex(k => k >= sKey)
-      if (foundIndex === -1) {
-        foundIndex = node.keys.length
-      }
+      const foundIndex = this.findChildIndex(node, sKey)
       const childNode = node.children[foundIndex]
       this.deleteKeyWithShiftRecursive(childNode, sKey)
       for (let i = foundIndex; i < node.keys.length; i++) {
@@ -135,6 +129,15 @@ export class PlusTree<T> {
         node.children[i+1].shift--
       }
       // merging/redistribution of keys
+    }
+  }
+
+  private findChildIndex(node: PNode<T>, sKey: number): number {
+    const foundIndex = node.keys.findIndex(k => k >= sKey)
+    if (foundIndex === -1) {
+      return node.keys.length
+    } else {
+      return foundIndex
     }
   }
 }
