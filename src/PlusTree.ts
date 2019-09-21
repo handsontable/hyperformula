@@ -113,9 +113,9 @@ export class PlusTree<T> {
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
     // shift should be taken into account
     if (node instanceof Leaf) {
-      const foundIndex = node.keys.findIndex(k => k >= key)
+      const foundIndex = node.keys.findIndex(k => k >= key) // shift
       if (foundIndex !== -1) {
-        if (node.keys[foundIndex] === key) {
+        if (node.keys[foundIndex] === key) { // shift
           node.keys.splice(foundIndex, 1)
           node.values.splice(foundIndex, 1)
         }
@@ -123,6 +123,16 @@ export class PlusTree<T> {
           node.keys[i]--;
         }
       }
+    } else {
+      const foundIndex = node.keys.findIndex(k => k >= key) // shift
+      // fallback if -1
+      const childNode = node.children[foundIndex]
+      this.deleteKeyWithShiftRecursive(childNode, key) // shift
+      for (let i = foundIndex; i < node.keys.length; i++) {
+        node.keys[i]--
+        node.children[i+1].shift--
+      }
+      // merging/redistribution of keys
     }
   }
 }
