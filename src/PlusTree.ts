@@ -128,6 +128,12 @@ export class PlusTree<T> {
         node.keys[i]--
         node.children[i+1].shift--
       }
+      if (childNode.keys.length < this.minSize) {
+        const rightSibling = node.children[foundIndex + 1]
+        if (rightSibling && rightSibling.keys.length === this.minSize) {
+          this.mergeNode(node, foundIndex)
+        }
+      }
       // merging/redistribution of keys
     }
   }
@@ -138,6 +144,19 @@ export class PlusTree<T> {
       return node.keys.length
     } else {
       return foundIndex
+    }
+  }
+
+  private mergeNode(parentNode: Internal<T>, index: number) {
+    const childNode = parentNode.children[index]
+    const rightSibling = parentNode.children[index + 1]
+    if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => k + rightSibling.shift)) // - childNode.shift
+      childNode.values = childNode.values.concat(rightSibling.values)
+      parentNode.keys.splice(index, 1)
+      parentNode.children.splice(index + 1, 1)
+    } else {
+      throw Error("Not implemented yet")
     }
   }
 }
