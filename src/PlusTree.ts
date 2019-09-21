@@ -159,8 +159,7 @@ export class PlusTree<T> {
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
     } else if (childNode instanceof Internal && rightSibling instanceof Internal ) {
-      const lastChildOfChildNode = childNode.children[childNode.children.length - 1]
-      childNode.keys.push(this.adjustKeyWhenMovingFromChildToParent(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1], lastChildOfChildNode))
+      childNode.keys.push(this.getRightmostKey(childNode.children[childNode.children.length - 1]))
       childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
       for (const childOfRightSibling of rightSibling.children) {
         childOfRightSibling.shift = this.adjustKeyWhenMovingFromSiblingToSibling(childOfRightSibling.shift, rightSibling, childNode)
@@ -181,14 +180,21 @@ export class PlusTree<T> {
       childNode.values.push(rightSibling.values.shift()!)
       parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(childNode.keys[childNode.keys.length - 1], childNode)
     } else if (childNode instanceof Internal && rightSibling instanceof Internal) {
-      const lastChildOfChildNode = childNode.children[childNode.children.length - 1]
-      childNode.keys.push(this.adjustKeyWhenMovingFromChildToParent(lastChildOfChildNode.keys[lastChildOfChildNode.keys.length - 1], lastChildOfChildNode))
+      childNode.keys.push(this.getRightmostKey(childNode.children[childNode.children.length - 1]))
       const movedChild = rightSibling.children.shift()!
       movedChild.shift = this.adjustKeyWhenMovingFromSiblingToSibling(movedChild.shift, rightSibling, childNode)
       childNode.children.push(movedChild)
       parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(rightSibling.keys.shift()!, rightSibling)
     } else {
       throw Error("Cant happen")
+    }
+  }
+
+  private getRightmostKey(node: PNode<T>): number {
+    if (node instanceof Leaf) {
+      return node.keys[node.keys.length - 1] + node.shift
+    } else {
+      return this.getRightmostKey(node.children[node.children.length - 1]) + node.shift
     }
   }
 
