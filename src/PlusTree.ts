@@ -71,12 +71,11 @@ export class PlusTree<T> {
       indexWhereToAddIt = node.keys.length;
     }
     if (node instanceof Leaf) {
-      for (let i = node.keys.length; i > indexWhereToAddIt; i--) {
-        node.keys[i] = node.keys[i - 1] + 1
-        node.values[i] = node.values[i - 1]
+      for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
+        node.keys[i]++
       }
-      node.keys[indexWhereToAddIt] = sKey
-      node.values[indexWhereToAddIt] = value
+      node.keys.splice(indexWhereToAddIt, 0, sKey)
+      node.values.splice(indexWhereToAddIt, 0, value)
     } else {
       const childNode = node.children[indexWhereToAddIt]
       this.addKeyWithShiftRecursive(childNode, sKey, value)
