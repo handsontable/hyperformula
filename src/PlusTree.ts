@@ -151,7 +151,7 @@ export class PlusTree<T> {
     const childNode = parentNode.children[index]
     const rightSibling = parentNode.children[index + 1]
     if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
-      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => k + rightSibling.shift)) // - childNode.shift
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => k + rightSibling.shift - childNode.shift))
       childNode.values = childNode.values.concat(rightSibling.values)
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
