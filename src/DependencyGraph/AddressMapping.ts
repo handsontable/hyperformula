@@ -5,21 +5,7 @@ import {Sheet} from '../GraphBuilder'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
-
-class DenseSparseChooseBasedOnThreshold {
-  constructor(
-    private readonly threshold: number
-  ) {
-  }
-
-  public call(fill: number): IAddressMappingStrategyConstructor {
-    if (fill > this.threshold) {
-      return DenseStrategy
-    } else {
-      return SparseStrategy
-    }
-  }
-}
+import {DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 
