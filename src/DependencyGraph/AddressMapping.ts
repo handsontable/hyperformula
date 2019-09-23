@@ -6,10 +6,27 @@ import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
 
+class DenseSparseChooseBasedOnThreshold {
+  constructor(
+    private readonly threshold: number
+  ) {
+  }
+
+  public call(fill: number): IAddressMappingStrategyConstructor {
+    if (fill > this.threshold) {
+      return DenseStrategy
+    } else {
+      return SparseStrategy
+    }
+  }
+}
+
+export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
+
 /**
  * Interface for mapping from sheet addresses to vertices.
  */
-interface IAddressMappingStrategy {
+export interface IAddressMappingStrategy {
   /**
    * Returns cell content
    *
@@ -476,13 +493,9 @@ export class AddressMapping {
 
   public autoAddSheet(sheetId: number, sheet: Sheet) {
     const {height, width, fill} = findBoundaries(sheet)
-    let strategy
-    if (fill > this.threshold) {
-      strategy = new DenseStrategy(width, height)
-    } else {
-      strategy = new SparseStrategy(width, height)
-    }
-    this.addSheet(sheetId, strategy)
+    const chooseAddressMappingPolicy = new DenseSparseChooseBasedOnThreshold(this.threshold)
+    const strategyConstructor = chooseAddressMappingPolicy.call(fill)
+    this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
