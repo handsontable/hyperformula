@@ -2,7 +2,7 @@ import {ColumnsSpan} from '../src/ColumnsSpan'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
-import {ChooseAddressMappingPolicy, AlwaysSparseStrategy, AlwaysDenseStrategy, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {ChooseAddressMappingPolicy, AlwaysSparse, AlwaysDense, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -315,13 +315,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
-    const mapping = new AddressMapping(new AlwaysSparseStrategy())
+    const mapping = new AddressMapping(new AlwaysSparse())
     mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping(new AlwaysSparseStrategy())
+    const mapping = new AddressMapping(new AlwaysSparse())
     mapping.addSheet(0, new SparseStrategy(4, 16))
 
     mapping.setCell(adr('D16'), new ValueCellVertex(42))
@@ -333,13 +333,13 @@ describe('SparseStrategy', () => {
 
 describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
-    const mapping = new AddressMapping(new AlwaysDenseStrategy())
+    const mapping = new AddressMapping(new AlwaysDense())
     mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping(new AlwaysDenseStrategy())
+    const mapping = new AddressMapping(new AlwaysDense())
     mapping.addSheet(0, new DenseStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)

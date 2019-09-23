@@ -1,9 +1,9 @@
 import {Config} from '../src/Config'
 import {enGB} from '../src/i18n'
-import {AlwaysSparseStrategy} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {AlwaysSparse} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
-  chooseAddressMappingPolicy: new AlwaysSparseStrategy(),
+  chooseAddressMappingPolicy: new AlwaysSparse(),
   dateFormat: 'MM/DD/YYYY',
   functionArgSeparator: ',',
   language: enGB,

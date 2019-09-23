@@ -19,13 +19,13 @@ export class DenseSparseChooseBasedOnThreshold implements ChooseAddressMappingPo
   }
 }
 
-export class AlwaysSparseStrategy implements ChooseAddressMappingPolicy {
+export class AlwaysSparse implements ChooseAddressMappingPolicy {
   public call() {
     return SparseStrategy
   }
 }
 
-export class AlwaysDenseStrategy implements ChooseAddressMappingPolicy {
+export class AlwaysDense implements ChooseAddressMappingPolicy {
   public call() {
     return SparseStrategy
   }
