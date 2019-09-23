@@ -14,11 +14,12 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ChooseAddressMappingPolicy, AlwaysSparseStrategy} from './DependencyGraph/ChooseAddressMappingPolicy'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
-  addressMappingFillThreshold: number,
+  chooseAddressMappingPolicy: ChooseAddressMappingPolicy,
   dateFormat: string,
   functionArgSeparator: string,
   language: TranslationPackage,
@@ -33,7 +34,7 @@ export interface ConfigParams {
 export class Config {
 
   public static defaultConfig: ConfigParams = {
-    addressMappingFillThreshold: 1,
+    chooseAddressMappingPolicy: new AlwaysSparseStrategy(),
     dateFormat: 'MM/DD/YYYY',
     functionArgSeparator: ',',
     language: enGB,
@@ -62,7 +63,7 @@ export class Config {
     VlookupPlugin,
   ]
 
-  public readonly addressMappingFillThreshold: number
+  public readonly chooseAddressMappingPolicy: ChooseAddressMappingPolicy
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
   public readonly language: TranslationPackage
@@ -75,7 +76,7 @@ export class Config {
 
   constructor(
       {
-        addressMappingFillThreshold,
+        chooseAddressMappingPolicy,
         dateFormat,
         functionArgSeparator,
         language,
@@ -87,7 +88,7 @@ export class Config {
         vlookupThreshold,
       }: Partial<ConfigParams> = {},
   ) {
-    this.addressMappingFillThreshold = typeof addressMappingFillThreshold === 'number' ? addressMappingFillThreshold : Config.defaultConfig.addressMappingFillThreshold
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language

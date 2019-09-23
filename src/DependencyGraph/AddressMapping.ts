@@ -5,7 +5,7 @@ import {Sheet} from '../GraphBuilder'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
-import {DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
+import {ChooseAddressMappingPolicy, DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 
@@ -423,19 +423,10 @@ export function findBoundaries(sheet: Sheet): ({ width: number, height: number, 
 }
 
 export class AddressMapping {
-  /**
-   * Creates right address mapping implementation based on fill ratio of a sheet
-   *
-   * @param sheet - two-dimmensional array sheet representation
-   */
-  public static build(threshold: number): AddressMapping {
-    return new AddressMapping(threshold)
-  }
-
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-      private readonly threshold: number,
+    private readonly policy: ChooseAddressMappingPolicy,
   ) {
   }
 
@@ -479,8 +470,7 @@ export class AddressMapping {
 
   public autoAddSheet(sheetId: number, sheet: Sheet) {
     const {height, width, fill} = findBoundaries(sheet)
-    const chooseAddressMappingPolicy = new DenseSparseChooseBasedOnThreshold(this.threshold)
-    const strategyConstructor = chooseAddressMappingPolicy.call(fill)
+    const strategyConstructor = this.policy.call(fill)
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 

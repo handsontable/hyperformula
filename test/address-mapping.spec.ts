@@ -1,8 +1,8 @@
-
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
+import {ChooseAddressMappingPolicy, AlwaysSparseStrategy, AlwaysDenseStrategy, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -315,13 +315,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
-    const mapping = new AddressMapping(1.0)
+    const mapping = new AddressMapping(new AlwaysSparseStrategy())
     mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping(1.0)
+    const mapping = new AddressMapping(new AlwaysSparseStrategy())
     mapping.addSheet(0, new SparseStrategy(4, 16))
 
     mapping.setCell(adr('D16'), new ValueCellVertex(42))
@@ -333,13 +333,13 @@ describe('SparseStrategy', () => {
 
 describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
-    const mapping = new AddressMapping(1.0)
+    const mapping = new AddressMapping(new AlwaysDenseStrategy())
     mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
-    const mapping = new AddressMapping(1.0)
+    const mapping = new AddressMapping(new AlwaysDenseStrategy())
     mapping.addSheet(0, new DenseStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)
@@ -349,7 +349,7 @@ describe('DenseStrategy', () => {
 
 describe('AddressMapping', () => {
   it('#buildAddresMapping - when sparse matrix', () => {
-    const addressMapping = AddressMapping.build(0.8)
+    const addressMapping = new AddressMapping(new DenseSparseChooseBasedOnThreshold(0.8))
     addressMapping.autoAddSheet(0, [
       ['', '', ''],
       ['', '', '1'],
@@ -359,7 +359,7 @@ describe('AddressMapping', () => {
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
-    const addressMapping = AddressMapping.build(0.8)
+    const addressMapping = new AddressMapping(new DenseSparseChooseBasedOnThreshold(0.8))
     addressMapping.autoAddSheet(0, [
       ['1', '1'],
       ['1', '1'],

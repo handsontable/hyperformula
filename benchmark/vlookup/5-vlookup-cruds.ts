@@ -6,7 +6,7 @@ import { repeating2} from './sheets'
 (() => {
   const stats = []
   const sheet = repeating2(10000, 100, 100)
-  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, addressMappingFillThreshold: 100 }))
+  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1 }))
 
   console.log(CsvExporter.export(engine))
 

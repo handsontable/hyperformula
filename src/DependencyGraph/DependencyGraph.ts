@@ -25,7 +25,7 @@ export class DependencyGraph {
    */
 
   public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, stats: Statistics) {
-    const addressMapping = AddressMapping.build(config.addressMappingFillThreshold)
+    const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
       addressMapping,
