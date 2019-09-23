@@ -14,12 +14,12 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {ChooseAddressMappingPolicy, AlwaysSparse} from './DependencyGraph/ChooseAddressMappingPolicy'
+import {IChooseAddressMapping, AlwaysSparse} from './DependencyGraph/ChooseAddressMappingPolicy'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
-  chooseAddressMappingPolicy: ChooseAddressMappingPolicy,
+  chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormat: string,
   functionArgSeparator: string,
   language: TranslationPackage,
@@ -63,7 +63,7 @@ export class Config {
     VlookupPlugin,
   ]
 
-  public readonly chooseAddressMappingPolicy: ChooseAddressMappingPolicy
+  public readonly chooseAddressMappingPolicy: IChooseAddressMapping
   public readonly dateFormat: string
   public readonly functionArgSeparator: string
   public readonly language: TranslationPackage

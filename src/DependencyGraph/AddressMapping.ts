@@ -5,7 +5,7 @@ import {Sheet} from '../GraphBuilder'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {CellVertex} from './Vertex'
-import {ChooseAddressMappingPolicy, DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
+import {IChooseAddressMapping, DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 
@@ -426,7 +426,7 @@ export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly policy: ChooseAddressMappingPolicy,
+    private readonly policy: IChooseAddressMapping,
   ) {
   }
 
