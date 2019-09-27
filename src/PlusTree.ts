@@ -39,6 +39,21 @@ export class PlusTree<T> {
     return this.getKeyRecursive(this._root, key)
   }
 
+  private getKeyRecursive(node: PNode<T>, key: number): T | null {
+    const sKey = key - node.shift
+    if (node instanceof Leaf) {
+      const index = node.keys.indexOf(sKey)
+      if (index === -1) {
+        return null
+      } else {
+        return node.values[index]
+      }
+    } else {
+      const indexOfBiggerKey = this.findChildIndex(node, sKey)
+      return this.getKeyRecursive(node.children[indexOfBiggerKey], sKey)
+    }
+  }
+
   public* values(): IterableIterator<T> {
     yield* this.valuesRecursive(this._root)
   }
@@ -88,21 +103,6 @@ export class PlusTree<T> {
       for (let i = 0; i < node.children.length; i++) {
         yield* this.entriesFromKeyRangeRecursive(sMinKey, sMaxKey, node.children[i], shiftForThatNode)
       }
-    }
-  }
-
-  private getKeyRecursive(node: PNode<T>, key: number): T | null {
-    const sKey = key - node.shift
-    if (node instanceof Leaf) {
-      const index = node.keys.indexOf(sKey)
-      if (index === -1) {
-        return null
-      } else {
-        return node.values[index]
-      }
-    } else {
-      const indexOfBiggerKey = this.findChildIndex(node, sKey)
-      return this.getKeyRecursive(node.children[indexOfBiggerKey], sKey)
     }
   }
 
