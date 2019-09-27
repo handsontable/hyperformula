@@ -51,6 +51,23 @@ export class PlusTree<T> {
     }
   }
   
+  public* entries(): IterableIterator<[number, T]> {
+    yield* this.entriesRecursive(this._root, 0)
+  }
+
+  private* entriesRecursive(node: PNode<T>, currentShift: number): IterableIterator<[number, T]> {
+    const shiftForThatNode = currentShift + node.shift
+    if (node instanceof Leaf) {
+      for (let i = 0; i < node.keys.length; i++) {
+        yield [node.keys[i] + shiftForThatNode, node.values[i]]
+      }
+    } else {
+      for (let i = 0; i < node.children.length; i++) {
+        yield* this.entriesRecursive(node.children[i], shiftForThatNode)
+      }
+    }
+  }
+
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
     const sKey = key - node.shift
     if (node instanceof Leaf) {

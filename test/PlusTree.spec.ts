@@ -851,4 +851,74 @@ describe('PlusTree', () => {
       expect(Array.from(tree.values())).toEqual([100,11,12,13,14])
     })
   })
+
+  describe('#entries', () => {
+    it('empty tree', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+
+      expect(Array.from(tree.entries())).toEqual([])
+    })
+
+    it('with two keys', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(42, 78)
+      tree.addKeyWithShift(43, 79)
+
+      expect(Array.from(tree.entries())).toEqual([[42, 78], [43, 79]])
+    })
+
+    it('order of insertion does not matter', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(43, 79)
+      tree.addKeyWithShift(42, 78)
+
+      expect(Array.from(tree.entries())).toEqual([[42, 78], [44, 79]])
+    })
+
+    it('with 2 levels, one leaf is shifted', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+      tree.addKeyWithShift(1, 100)
+
+      expect(Array.from(tree.entries())).toEqual([
+        [1, 100],
+        [2, 11],
+        [3, 12],
+        [4, 13],
+        [5, 14],
+      ])
+    })
+
+    it('with 3 levels, with some internal node having shift', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+      tree.addKeyWithShift(5, 15)
+      tree.addKeyWithShift(6, 16)
+      tree.addKeyWithShift(7, 17)
+      tree.addKeyWithShift(8, 18)
+      tree.addKeyWithShift(9, 19)
+      tree.addKeyWithShift(10, 20)
+      tree.addKeyWithShift(1, 100)
+
+      expect(Array.from(tree.entries())).toEqual([
+        [1, 100],
+        [2, 11],
+        [3, 12],
+        [4, 13],
+        [5, 14],
+        [6, 15],
+        [7, 16],
+        [8, 17],
+        [9, 18],
+        [10, 19],
+        [11, 20],
+      ])
+    })
+  })
 })
