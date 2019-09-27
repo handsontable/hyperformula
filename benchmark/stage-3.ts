@@ -82,8 +82,9 @@ export function averageStats(stats: Map<string, number>[]): any {
 
   return averages
 }
-(() => {
+
+export function start() {
   vlookup()
   sheetA()
   sheetB()
-})()
+}

@@ -5,6 +5,7 @@ import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
 import {sheet as C} from '../sheets/12-test-c'
 import {sheets as D} from '../sheets/13-sheet-d'
+import {start as stage3} from '../stage-3'
 
 let working = false
 
@@ -12,17 +13,25 @@ interface IExtendedConsole extends Console {
     olog?: any
 }
 
-function runBenchmark(fun: any, benchmarkName: string, millisecondsPerThousandRows: number = 100, optionalConfig: Config = new Config()) {
+function run(func: () => any) {
     if (working) {
         return
     }
-
-    const numberOfRuns = parseInt((document.getElementById('numberOfRuns')! as HTMLInputElement).value, 10)
     clear()
     toggle()
 
     setTimeout(() => {
         working = true
+        func()
+        working = false
+        toggle()
+    }, 500)
+}
+
+function runBenchmark(fun: any, benchmarkName: string, millisecondsPerThousandRows: number = 100, optionalConfig: Config = new Config()) {
+    const numberOfRuns = parseInt((document.getElementById('numberOfRuns')! as HTMLInputElement).value, 10)
+
+    run(() => {
         console.info(`=== ${benchmarkName} ===`)
         const sheetOrSheets = fun()
         if (Array.isArray(sheetOrSheets)) {
@@ -30,9 +39,7 @@ function runBenchmark(fun: any, benchmarkName: string, millisecondsPerThousandRo
         } else {
             benchmarkCsvSheets(sheetOrSheets, [], { millisecondsPerThousandRows, numberOfRuns, engineConfig: optionalConfig})
         }
-        working = false
-        toggle()
-    }, 500)
+    })
 }
 
 function toggle() {
@@ -77,6 +84,7 @@ function init() {
     const btn_sheetCcpu = document.getElementById('btn_sheetCcpu')!
     const btn_sheetDgpu = document.getElementById('btn_sheetDgpu')!
     const btn_sheetDcpu = document.getElementById('btn_sheetDcpu')!
+    const btn_stage3 = document.getElementById('btn_stage3')!
 
     btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
     btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
@@ -85,6 +93,7 @@ function init() {
     btn_sheetCcpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
     btn_sheetDgpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
     btn_sheetDcpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
+    btn_stage3.addEventListener('click', () => run(stage3))
 }
 
 init()
