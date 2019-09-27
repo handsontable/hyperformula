@@ -84,7 +84,15 @@ export class PlusTree<T> {
   }
 
   public addKeyWithShift(key: number, value: T) {
-    this.addKeyWithShiftRecursive(this._root, key, value)
+    this.addKeyWithRootHandling(true, key, value)
+  }
+
+  public addKeyWithoutShift(key: number, value: T) {
+    this.addKeyWithRootHandling(false, key, value)
+  }
+
+  private addKeyWithRootHandling(doShift: boolean, key: number, value: T) {
+    this.addKeyWithShiftRecursive(doShift, this._root, key, value)
     if (this._root.keys.length > this.maxSize) {
       const newRoot = new Internal([], [this._root], 0)
       this.splitNode(newRoot, 0)
@@ -92,10 +100,13 @@ export class PlusTree<T> {
     }
   }
 
-  private addKeyWithShiftRecursive(node: PNode<T>, key: number, value: T) {
+  private addKeyWithShiftRecursive(doShift: boolean, node: PNode<T>, key: number, value: T) {
     const sKey = key - node.shift
     const indexWhereToAddIt = this.findChildIndex(node, sKey)
     if (node instanceof Leaf) {
+      if (!doShift && node.keys[indexWhereToAddIt] === sKey) {
+        throw Error("Cant add without shift if key already exists")
+      }
       for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
         node.keys[i]++
       }
@@ -103,7 +114,7 @@ export class PlusTree<T> {
       node.values.splice(indexWhereToAddIt, 0, value)
     } else {
       const childNode = node.children[indexWhereToAddIt]
-      this.addKeyWithShiftRecursive(childNode, sKey, value)
+      this.addKeyWithShiftRecursive(doShift, childNode, sKey, value)
       for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
         node.keys[i]++
         node.children[i+1].shift++
