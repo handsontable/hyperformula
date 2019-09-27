@@ -30,7 +30,7 @@ import { repeating2} from './sheets'
   logStats(stats)
 })()
 
-function statsSnapshot(name: string, engine: HandsOnEngine) {
+export function statsSnapshot(name: string, engine: HandsOnEngine) {
   const stats = engine.getStats() as Map<string, any>
   stats.set('NAME', name)
   return statsToObject(stats)

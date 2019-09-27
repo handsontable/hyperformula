@@ -134,7 +134,7 @@ function validate(engine: HandsOnEngine, expectedValues: ExpectedValue[]) {
   return valid
 }
 
-function average(values: number[]): number {
+export function average(values: number[]): number {
   const sum = values.reduce((sum, value) => {
     return sum + value
   }, 0)
