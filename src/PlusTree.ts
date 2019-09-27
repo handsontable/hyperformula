@@ -37,6 +37,20 @@ export class PlusTree<T> {
     return this.getKeyRecursive(this._root, key)
   }
 
+  public* values(): IterableIterator<T> {
+    yield* this.valuesRecursive(this._root)
+  }
+
+  private* valuesRecursive(node: PNode<T>): IterableIterator<T> {
+    if (node instanceof Leaf) {
+      yield* node.values[Symbol.iterator]()
+    } else {
+      for (let i = 0; i < node.children.length; i++) {
+        yield* this.valuesRecursive(node.children[i])
+      }
+    }
+  }
+  
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
     const sKey = key - node.shift
     if (node instanceof Leaf) {

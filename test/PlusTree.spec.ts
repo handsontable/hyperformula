@@ -816,4 +816,39 @@ describe('PlusTree', () => {
       expect(getLeaf(tree).values).toEqual([10])
     })
   })
+
+  describe('#values', () => {
+    it('empty tree', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+
+      expect(Array.from(tree.values())).toEqual([])
+    })
+
+    it('with two keys', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(42, 78)
+      tree.addKeyWithShift(43, 79)
+
+      expect(Array.from(tree.values())).toEqual([78, 79])
+    })
+
+    it('order of insertion does not matter', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(43, 79)
+      tree.addKeyWithShift(42, 78)
+
+      expect(Array.from(tree.values())).toEqual([78, 79])
+    })
+
+    it('with 2 levels', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+      tree.addKeyWithShift(1, 100)
+
+      expect(Array.from(tree.values())).toEqual([100,11,12,13,14])
+    })
+  })
 })
