@@ -1,4 +1,5 @@
 import {half} from '../cruds/operations'
+import {Sheet} from "../../src/GraphBuilder";
 
 export function simpleSorted(rows: number) {
   const sheet = []
@@ -97,6 +98,43 @@ export function repeating(rows: number, differentValues: number, vlookupLines: n
   }
 
   return sheet
+}
+
+export function milestone(rows: number, vlookups: number, shuffled: boolean) {
+  const sheet: Sheet = []
+  const numbers: number[] = sequence(rows)
+  const toFind: number[] = shuffle(sequence(rows))
+  const optimized: string = shuffled ? 'FALSE()' : 'TRUE()'
+
+  if (shuffled) {
+    shuffle(numbers)
+  }
+
+  for (let i = 0; i < rows; ++i) {
+    const row = [`${numbers[i]}`]
+    if (i < vlookups) {
+      row.push(`=VLOOKUP(${toFind[i]}, A1:A${rows}, 1, ${optimized})`)
+    }
+    sheet.push(row)
+  }
+
+  return sheet
+}
+
+function sequence(length: number): number[] {
+  const values = []
+  for (let i = 0; i < length; ++i) {
+    values.push(i)
+  }
+  return values
+}
+
+function shuffle(values: any[]): any[] {
+  for (let i = values.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [values[i], values[j]] = [values[j], values[i]];
+  }
+  return values;
 }
 
 function rand(min: number, max: number) {
