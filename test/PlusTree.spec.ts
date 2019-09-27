@@ -966,6 +966,13 @@ describe('PlusTree', () => {
       expect(Array.from(tree.entriesFromKeyRange(10, 20))).toEqual([])
     })
 
+    it('theres no key bigger than smallest key in leaf', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(10, 100)
+
+      expect(Array.from(tree.entriesFromKeyRange(20, 30))).toEqual([])
+    })
+
     it('includes key bigger or equal than minKey', () => {
       const tree: PlusTree<number> = PlusTree.empty(2)
       tree.addKeyWithShift(40, 400)
@@ -982,6 +989,44 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(43, 430)
 
       expect(Array.from(tree.entriesFromKeyRange(0, 42))).toEqual([[40, 400], [42, 420]])
+    })
+
+    it('ensure that it does not go deep into unnecessary child from beginning', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+      tree.addKeyWithShift(5, 15)
+      tree.addKeyWithShift(6, 16)
+
+      const entriesFromKeyRangeRecursiveSpy = jest.spyOn(tree as any, 'entriesFromKeyRangeRecursive')
+      expect(Array.from(tree.entriesFromKeyRange(3, 100))).toEqual([[3, 13], [4, 14], [5, 15], [6, 16]])
+      expect(entriesFromKeyRangeRecursiveSpy).toHaveBeenCalledTimes(3)
+    })
+
+    it('ensure that it does not go deep into unnecessary child from beginning, when theres no key in root with bigger value', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+
+      const entriesFromKeyRangeRecursiveSpy = jest.spyOn(tree as any, 'entriesFromKeyRangeRecursive')
+      expect(Array.from(tree.entriesFromKeyRange(3, 100))).toEqual([[3, 13], [4, 14]])
+      expect(entriesFromKeyRangeRecursiveSpy).toHaveBeenCalledTimes(2)
+    })
+
+    it('ensure that it does not go deep into unnecessary child from the end', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+
+      const entriesFromKeyRangeRecursiveSpy = jest.spyOn(tree as any, 'entriesFromKeyRangeRecursive')
+      expect(Array.from(tree.entriesFromKeyRange(0, 2))).toEqual([[1, 11], [2, 12]])
+      expect(entriesFromKeyRangeRecursiveSpy).toHaveBeenCalledTimes(2)
     })
 
     it('includes key bigger or equal than minKey, when node is shifted', () => {

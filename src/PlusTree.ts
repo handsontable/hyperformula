@@ -93,14 +93,23 @@ export class PlusTree<T> {
     const shiftForThatNode = currentShift + node.shift
     const sMinKey = minKey - shiftForThatNode
     const sMaxKey = maxKey - shiftForThatNode
+    let smallestIndex = node.keys.findIndex(k => k >= sMinKey)
+    if (smallestIndex === -1) {
+      smallestIndex = node.keys.length
+    }
     if (node instanceof Leaf) {
-      for (let i = 0; i < node.keys.length; i++) {
-        if (node.keys[i] >= sMinKey && node.keys[i] <= sMaxKey) {
+      for (let i = smallestIndex; i < node.keys.length; i++) {
+        if (node.keys[i] <= sMaxKey) {
           yield [node.keys[i] + shiftForThatNode, node.values[i]]
+        } else {
+          break
         }
       }
     } else {
-      for (let i = 0; i < node.children.length; i++) {
+      for (let i = smallestIndex; i < node.children.length; i++) {
+        if (node.keys[i - 1] >= sMaxKey) {
+          break;
+        }
         yield* this.entriesFromKeyRangeRecursive(sMinKey, sMaxKey, node.children[i], shiftForThatNode)
       }
     }
