@@ -233,7 +233,7 @@ export class HandsOnEngine {
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
-    this.stats.measure(StatType.TRANSFORM_ASTS,  () => {
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
     })
@@ -249,7 +249,10 @@ export class HandsOnEngine {
   }
 
   public removeSheet(sheetId: number) {
-
+    const sheetHeight = this.addressMapping.getHeight(sheetId)
+    this.removeRows(sheetId, 0, sheetHeight - 1)
+    this.addressMapping.removeSheet(sheetId)
+    this.sheetMapping.removeSheet(sheetId)
   }
 
   public forceApplyPostponedTransformations() {

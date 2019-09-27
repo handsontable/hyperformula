@@ -1,7 +1,7 @@
 import {HandsOnEngine} from "../src";
 
 describe('remove sheet from engine', () => {
-  xit('should remove sheet by id', () => {
+  it('should remove sheet by id', () => {
     const engine = HandsOnEngine.buildFromArray([['foo']])
 
     engine.removeSheet(0)

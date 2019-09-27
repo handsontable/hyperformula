@@ -14,10 +14,19 @@ export class SheetMapping {
     return this.lastSheetId
   }
 
+  public removeSheet(sheetId: number) {
+    const sheetName = this.reversedMapping.get(sheetId)
+    if (sheetName === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    this.mapping.delete(sheetName)
+    this.reversedMapping.delete(sheetId)
+  }
+
   public fetch = (sheetName: string): number => {
     const sheetId = this.mapping.get(sheetName)
     if (sheetId === undefined) {
-      throw new Error(`Sheet ${sheetName} doesnt exist`)
+      throw new Error(`Sheet ${sheetName} doesn't exist`)
     }
     return sheetId
   }
@@ -25,7 +34,7 @@ export class SheetMapping {
   public name = (sheetId: number): string => {
     const name = this.reversedMapping.get(sheetId)
     if (name === undefined) {
-      throw new Error(`Sheet ${name} doesnt exist`)
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
     return name
   }

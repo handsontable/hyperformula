@@ -546,6 +546,10 @@ export class AddressMapping {
     sheetMapping.removeRows(removedRows)
   }
 
+  public removeSheet(sheetId: number) {
+    this.mapping.delete(sheetId)
+  }
+
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (!sheetMapping) {
