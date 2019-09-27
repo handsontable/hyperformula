@@ -30,7 +30,7 @@ export class PlusStrategy implements IAddressMappingStrategy {
     let rowMapping = this.mapping.getKey(address.row)
     if (rowMapping === null) {
       rowMapping = []
-      this.mapping.addKeyWithShift(address.row, rowMapping) // should be just addKey
+      this.mapping.addKeyWithoutShift(address.row, rowMapping)
     }
     rowMapping[address.col] = newVertex
   }
