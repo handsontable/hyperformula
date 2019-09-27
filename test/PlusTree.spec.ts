@@ -273,7 +273,7 @@ describe('PlusTree', () => {
     })
   })
 
-  describe('#addKey but without shift', () => {
+  describe('#addKeyWithoutShift', () => {
     it('raise error when key exists', () => {
       const tree: PlusTree<number> = PlusTree.empty(2)
       tree.addKeyWithShift(1, 10)
@@ -281,6 +281,17 @@ describe('PlusTree', () => {
       expect(() => {
         tree.addKeyWithoutShift(1, 100)
       }).toThrow("Cant add without shift if key already exists")
+    })
+
+    it('do not shift other values', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(3, 30)
+
+      tree.addKeyWithoutShift(1, 10)
+
+      expect(getLeaf(tree).keys).toEqual([1,2,3])
+      expect(getLeaf(tree).values).toEqual([10,20,30])
     })
   })
 

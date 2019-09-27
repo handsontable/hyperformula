@@ -107,8 +107,10 @@ export class PlusTree<T> {
       if (!doShift && node.keys[indexWhereToAddIt] === sKey) {
         throw Error("Cant add without shift if key already exists")
       }
-      for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
-        node.keys[i]++
+      if (doShift) {
+        for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
+          node.keys[i]++
+        }
       }
       node.keys.splice(indexWhereToAddIt, 0, sKey)
       node.values.splice(indexWhereToAddIt, 0, value)
