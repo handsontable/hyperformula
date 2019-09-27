@@ -89,7 +89,6 @@ export class SimpleStrategy implements GraphBuilderStrategy {
         for (let j = 0; j < row.length; ++j) {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
-          let vertex = null
 
           if (isMatrix(cellContent)) {
             if (this.dependencyGraph.existsVertex(address)) {
@@ -97,12 +96,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             }
             const matrixFormula = cellContent.substr(1, cellContent.length - 2)
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
-            vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address).vertex
+            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (isFormula(cellContent)) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
-            vertex = new FormulaCellVertex(parseResult.ast, address, 0)
+            const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
             if (parseResult.hasVolatileFunction) {
@@ -114,11 +113,11 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (cellContent === '') {
             /* we don't care about empty cells here */
           } else if (!isNaN(Number(cellContent))) {
-            vertex = new ValueCellVertex(Number(cellContent))
+            const vertex = new ValueCellVertex(Number(cellContent))
             this.columnIndex.add(Number(cellContent), address)
             this.dependencyGraph.addVertex(address, vertex)
           } else {
-            vertex = new ValueCellVertex(cellContent)
+            const vertex = new ValueCellVertex(cellContent)
             this.columnIndex.add(cellContent, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
