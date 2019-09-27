@@ -248,6 +248,10 @@ export class HandsOnEngine {
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
+  public removeSheet(sheetId: number) {
+
+  }
+
   public forceApplyPostponedTransformations() {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
