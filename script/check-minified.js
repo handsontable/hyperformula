@@ -10,7 +10,7 @@
   var valueA1 = engine.getCellValue('A1')
   var valueB1 = engine.getCellValue('B1')
 
-  assert(valueA1 == 42)
-  assert(valueB1 == 44)
+  assert(valueA1 === 42)
+  assert(valueB1 === 44)
   console.log("OK")
 })()

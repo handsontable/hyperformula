@@ -1,4 +1,4 @@
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {dateNumberToMonthNumber, dateNumberToString, toDateNumber} from '../src/Date'
 
 describe('Date helpers', () => {

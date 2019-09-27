@@ -1,4 +1,4 @@
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {plPL} from '../src/i18n'
 
 describe('Config', () => {

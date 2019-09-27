@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {
   EmptyCellVertex,
   MatrixVertex,

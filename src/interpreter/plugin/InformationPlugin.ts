@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**

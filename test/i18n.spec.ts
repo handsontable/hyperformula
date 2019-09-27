@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
 import './testConfig.ts'
 

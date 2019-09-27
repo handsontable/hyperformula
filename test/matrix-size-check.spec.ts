@@ -1,9 +1,9 @@
 
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {SheetMapping} from '../src/DependencyGraph'
 import {checkMatrixSize, Size} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
-import {CellAddress} from '../src/parser/CellAddress'
+import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr} from './testUtils'
 

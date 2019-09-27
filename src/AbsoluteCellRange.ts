@@ -1,6 +1,6 @@
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Matrix} from './Matrix'
-import {CellAddress} from './parser/CellAddress'
+import {CellAddress} from './parser'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 

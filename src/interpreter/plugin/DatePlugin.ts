@@ -2,7 +2,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, momentToDateNumber, toDateNumber} from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
-import {ProcedureAst} from '../../parser/Ast'
+import {ProcedureAst} from '../../parser'
 import {dateNumberRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 

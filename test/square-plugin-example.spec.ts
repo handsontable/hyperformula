@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'

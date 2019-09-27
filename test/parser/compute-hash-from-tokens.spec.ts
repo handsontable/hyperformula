@@ -1,7 +1,7 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser/CellAddress'
+import {CellAddress} from '../../src/parser'
 
 describe('computeHashFromTokens', () => {
   const computeFunc = (code: string, address: CellAddress): string => {

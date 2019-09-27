@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../src'
-import {CellValue, EmptyValue} from '../src/Cell'
+import {CellValue, EmptyValue} from '../src'
 import {Config as EngineConfig} from '../src/Config'
 import {CsvImporter, CsvSheets} from '../src/csv'
 import {Sheet, Sheets} from '../src/GraphBuilder'

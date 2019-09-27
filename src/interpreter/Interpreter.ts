@@ -5,6 +5,7 @@ import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix} from '../Matrix'
+// noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {addStrict} from './scalar'
@@ -188,7 +189,7 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          if (rightResult == 0) {
+          if (rightResult === 0) {
             return new CellError(ErrorType.DIV_BY_ZERO)
           }
           return leftResult / rightResult

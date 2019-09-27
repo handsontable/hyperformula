@@ -1,7 +1,7 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser/Ast'
+import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'

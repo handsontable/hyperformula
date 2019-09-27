@@ -1,4 +1,4 @@
-import {CsvExporter, CsvImporter} from '../../src/csv'
+import {CsvExporter, CsvImporter} from '../../src'
 import '../testConfig.ts'
 
 describe('Exporting CSV', () => {

@@ -1,6 +1,6 @@
 import {EmptyValue, HandsOnEngine} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
 

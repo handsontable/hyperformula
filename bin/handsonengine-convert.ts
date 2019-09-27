@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import {CsvExporter, CsvImporter} from '../src/csv'
+import {CsvExporter, CsvImporter} from '../src'
 
 async function start() {
   if (process.argv.length < 4) {

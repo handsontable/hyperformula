@@ -23,7 +23,7 @@ import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
-import {CellAddress} from './parser/CellAddress'
+import {CellAddress} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 

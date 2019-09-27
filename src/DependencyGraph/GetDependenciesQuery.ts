@@ -23,13 +23,12 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
 
     const deps = collectDependencies(vertex.getFormula(this.lazilyTransformingAstService))
     const absoluteDeps = absolutizeDependencies(deps, vertex.getAddress(this.lazilyTransformingAstService))
-    const verticesForDeps = new Set(absoluteDeps.map((dep: CellDependency) => {
+    return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         return this.rangeMapping.fetchRange(dep.start, dep.end)
       } else {
         return this.addressMapping.fetchCell(dep)
       }
     }))
-    return verticesForDeps
   }
 }

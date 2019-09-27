@@ -37,7 +37,7 @@ function matchDateFormat(str: string): RegExpExecArray[] {
 
   do {
     m = dateFormatRegex.exec(str)
-    if (m != null) {
+    if (m !== null) {
       tokens.push(m)
     }
   } while (m)

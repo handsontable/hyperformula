@@ -1,6 +1,6 @@
 import {HandsOnEngine} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {dateNumberToString} from '../../src/Date'
 import '../testConfig'
 

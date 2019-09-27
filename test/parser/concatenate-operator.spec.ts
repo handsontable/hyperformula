@@ -1,7 +1,7 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {AstNodeType, ConcatenateOpAst, ParserWithCaching, ProcedureAst} from '../../src/parser'
-import {CellAddress} from '../../src/parser/CellAddress'
+import {CellAddress} from '../../src/parser'
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {

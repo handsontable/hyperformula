@@ -4,7 +4,7 @@ import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 
 interface IImplementedFunctions {

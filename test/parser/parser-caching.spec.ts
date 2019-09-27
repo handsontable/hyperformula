@@ -1,4 +1,4 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {
   CellAddress,

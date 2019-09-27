@@ -1,6 +1,6 @@
 import { HandsOnEngine} from '../src'
 import {EmptyCellVertex} from '../src/DependencyGraph'
-import {CellAddress} from '../src/parser/CellAddress'
+import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, expectEngineToBeTheSameAs, extractReference} from './testUtils'
 

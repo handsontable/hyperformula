@@ -1,4 +1,4 @@
-import {CsvImporter} from '../../src/csv'
+import {CsvImporter} from '../../src'
 import '../testConfig.ts'
 
 describe('Loading CSV', () => {

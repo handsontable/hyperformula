@@ -1,4 +1,4 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {benchmark, benchmarkCsvSheets} from '../benchmark'
 import {sheet as T} from '../sheets/05-sheet-t'
 import {sheet as A} from '../sheets/09-sheet-a'

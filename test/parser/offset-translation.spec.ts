@@ -1,7 +1,7 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {AstNodeType, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser/CellAddress'
+import {CellAddress} from '../../src/parser'
 
 describe('Parser - OFFSET to reference translation', () => {
   it('OFFSET parsing into cell reference', () => {

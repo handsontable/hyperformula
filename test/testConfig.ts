@@ -1,4 +1,4 @@
-import {Config} from '../src/Config'
+import {Config} from '../src'
 import {enGB} from '../src/i18n'
 import {AlwaysSparse} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
 

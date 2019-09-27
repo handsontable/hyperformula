@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
-import {AstNodeType, ProcedureAst} from '../../parser/Ast'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin {

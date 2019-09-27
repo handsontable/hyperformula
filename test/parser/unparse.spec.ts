@@ -1,8 +1,8 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser/CellAddress'
-import {Unparser} from '../../src/parser/Unparser'
+import {CellAddress} from '../../src/parser'
+import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Unparse', () => {

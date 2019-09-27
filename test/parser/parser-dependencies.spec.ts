@@ -1,9 +1,9 @@
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {absolutizeDependencies} from '../../src/absolutizeDependencies'
-import {Config} from '../../src/Config'
+import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser/CellAddress'
+import {CellAddress} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Parsing collecting dependencies', () => {
