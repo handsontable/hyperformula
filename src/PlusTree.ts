@@ -18,6 +18,8 @@ export class Internal<T> {
 
 type PNode<T> = Leaf<T> | Internal<T>
 
+type Entry<T> = [number, T]
+
 export class PlusTree<T> {
   public static empty(span: number) {
     return new PlusTree(span, new Leaf([], [], 0))
@@ -51,11 +53,11 @@ export class PlusTree<T> {
     }
   }
   
-  public* entries(): IterableIterator<[number, T]> {
+  public* entries(): IterableIterator<Entry<T>> {
     yield* this.entriesRecursive(this._root, 0)
   }
 
-  private* entriesRecursive(node: PNode<T>, currentShift: number): IterableIterator<[number, T]> {
+  private* entriesRecursive(node: PNode<T>, currentShift: number): IterableIterator<Entry<T>> {
     const shiftForThatNode = currentShift + node.shift
     if (node instanceof Leaf) {
       for (let i = 0; i < node.keys.length; i++) {
