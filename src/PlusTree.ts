@@ -117,9 +117,11 @@ export class PlusTree<T> {
     } else {
       const childNode = node.children[indexWhereToAddIt]
       this.addKeyWithShiftRecursive(doShift, childNode, sKey, value)
-      for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
-        node.keys[i]++
-        node.children[i+1].shift++
+      if (doShift) {
+        for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
+          node.keys[i]++
+          node.children[i+1].shift++
+        }
       }
       if (childNode.keys.length > this.maxSize) {
         this.splitNode(node, indexWhereToAddIt)
