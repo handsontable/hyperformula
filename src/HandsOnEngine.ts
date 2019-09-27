@@ -244,7 +244,8 @@ export class HandsOnEngine {
   }
 
   public addSheet() {
-
+    const sheetId = this.sheetMapping.addSheet()
+    this.addressMapping.autoAddSheet(sheetId, [])
   }
 
   public forceApplyPostponedTransformations() {

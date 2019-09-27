@@ -3,7 +3,7 @@ export class SheetMapping {
   private readonly reversedMapping: Map<number, string> = new Map()
   private lastSheetId = -1
 
-  public addSheet(sheetName: string): number {
+  public addSheet(sheetName: string = `Sheet${this.lastSheetId + 2}`): number {
     if (this.mapping.has(sheetName)) {
       throw new Error(`Sheet ${sheetName} already exists`)
     }

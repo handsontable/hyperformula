@@ -7,7 +7,7 @@ describe("add sheet to engine", () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(engine.sheetMapping.names()).toEqual(["Sheet1"])
+    expect(Array.from(engine.sheetMapping.names())).toEqual(["Sheet1"])
   });
 
   it('should add sheet to engine with one sheet', function () {
@@ -18,7 +18,7 @@ describe("add sheet to engine", () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(2)
-    expect(engine.sheetMapping.names()).toEqual(["Sheet1", "Sheet2"])
+    expect(Array.from(engine.sheetMapping.names())).toEqual(["Sheet1", "Sheet2"])
   });
 
   it('should be possible to fetch empty cell from newly added sheet', function () {
