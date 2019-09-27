@@ -243,6 +243,10 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public addSheet() {
+
+  }
+
   public forceApplyPostponedTransformations() {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
