@@ -1,10 +1,47 @@
 import {milestone} from "./vlookup/sheets";
 import {Config, HandsOnEngine} from "../src";
-import {statsToObject} from "./cruds/operations";
+import {measure, statsToObject} from "./cruds/operations";
 import {Sheet} from "../src/GraphBuilder";
 import {StatType} from "../src/statistics/Statistics";
 import {average} from "./benchmark";
+import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
+import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
+import {simpleCellAddress} from "../src/Cell";
 
+function sheetA() {
+  const sheet = sheetAGenerator(10000)
+  const stats: any[] = []
+
+  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false}))
+  measure(engine, stats, 'Sheet A:  change value, add/remove row/column', () => {
+    engine.setCellContent(simpleCellAddress(0, 0, 0), "123")
+    engine.addRows(0, 5000, 1)
+    engine.removeRows(0, 8000, 8000)
+    engine.addColumns(0, 0, 1)
+    engine.removeColumns(0, 0, 0)
+    // engine.forceApplyPostponedTransformations()
+  })
+
+  console.table(stats)
+}
+
+function sheetB() {
+  const sheet = sheetBGenerator(5000)
+  const stats: any[] = []
+
+  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false}))
+  measure(engine, stats, 'Sheet B: change value, add/remove row/column', () => {
+    engine.setCellContent(simpleCellAddress(0, 0, 0), "123")
+    engine.addRows(0, 2000, 1)
+    engine.removeRows(0, 3000, 3000)
+    engine.addColumns(0, 0, 1)
+    engine.removeColumns(0, 0, 0)
+    // engine.forceApplyPostponedTransformations()
+  })
+
+  console.assert(engine.getCellValue("E50") === 1347)
+  console.table(stats)
+}
 
 function vlookup() {
   const stats: any[] = []
@@ -47,4 +84,6 @@ export function averageStats(stats: Map<string, number>[]): any {
 }
 (() => {
   vlookup()
+  sheetA()
+  sheetB()
 })()

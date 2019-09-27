@@ -60,7 +60,7 @@ export function measure<T>(engine: HandsOnEngine, stats: any[], name: String, fu
   const end = Date.now()
   const time = end - start
   const actualStats = engine.getStats() as Map<string, any>
-  actualStats.set('TOTAL', time)
+  actualStats.set('TOTAL CRUD', time)
   actualStats.set('NAME', name)
   stats.push(statsToObject(actualStats))
 }
@@ -70,5 +70,5 @@ export function statsToObject(stats: Map<string, any>) {
 }
 
 export function logStats(stats: any[]) {
-  console.table(stats, ['NAME', 'TOTAL', ...Object.keys(StatType)])
+  console.table(stats, ['NAME', 'TOTAL CRUD', ...Object.keys(StatType)])
 }

@@ -3,9 +3,9 @@ import {AbsoluteCellRange} from "../AbsoluteCellRange";
 import {DependencyGraph} from "../DependencyGraph";
 
 /*
-* If key exists returns first index of key element in sorted array
+* If key exists returns first index of key element in range of sorted values
 * Otherwise returns first index of greatest element smaller than key
-* assuming sorted array
+* assuming sorted values in range
 * */
 export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGraph: DependencyGraph): number {
   let start = range.start.row
