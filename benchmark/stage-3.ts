@@ -12,11 +12,11 @@ function vlookup() {
   const sorted = milestone(10000, 100, false)
   const shuffled = milestone(10000, 100, false)
 
-  run("Sorted, naive         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 100000, useColumnIndex: false }), stats)
-  run("Sorted, binary search ", 10, sorted, new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false}), stats)
-  run("Sorted, index         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 100000, useColumnIndex: true }), stats)
-  run("Shuffled, naive       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false }), stats)
-  run("Shuffled, index       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 100000, useColumnIndex: true }), stats)
+  run("Sorted, naive         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
+  run("Sorted, binary search ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false }), stats)
+  run("Sorted, index         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
+  run("Shuffled, naive       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
+  run("Shuffled, index       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
 
   console.table(stats)
 }

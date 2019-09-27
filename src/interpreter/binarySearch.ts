@@ -1,4 +1,32 @@
-import {CellValue} from '../Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {AbsoluteCellRange} from "../AbsoluteCellRange";
+import {DependencyGraph} from "../DependencyGraph";
+
+/*
+* If key exists returns first index of key element in sorted array
+* Otherwise returns first index of greatest element smaller than key
+* assuming sorted array
+* */
+export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGraph: DependencyGraph): number {
+  let start = range.start.row
+  let end = range.end.row
+
+  while (start <= end) {
+    const center = Math.floor((start + end) / 2)
+    const cmp = compare(key, dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
+    if (cmp > 0) {
+      start = center + 1
+    } else if (cmp < 0) {
+      end = center - 1
+    } else if (start != center) {
+      end = center
+    } else {
+      return center
+    }
+  }
+
+  return end
+}
 
 /*
 * If key exists returns first index of key element in sorted array

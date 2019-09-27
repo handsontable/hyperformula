@@ -2,10 +2,9 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
-import {DependencyGraph, MatrixVertex} from '../DependencyGraph'
-import {lowerBound} from '../interpreter/binarySearch'
+import {DependencyGraph} from '../DependencyGraph'
+import {rangeLowerBound} from '../interpreter/binarySearch'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
-import {Matrix} from "../Matrix";
 
 export class ColumnBinarySearch implements IColumnSearchStrategy {
   constructor(
@@ -24,12 +23,12 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
   public removeColumns(columnsSpan: ColumnsSpan): void {}
 
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
-    const values = this.computeListOfValuesInRange(range)
     let index = -1
-    if (values.length < this.config.vlookupThreshold || !sorted) {
+    if (range.height() < this.config.vlookupThreshold || !sorted) {
+      const values = this.computeListOfValuesInRange(range)
       index =  values.indexOf(key)
     } else {
-      index = lowerBound(values, key)
+      index = rangeLowerBound(range, key, this.dependencyGraph)
     }
     return index < 0 ? index : index + range.start.row
   }
