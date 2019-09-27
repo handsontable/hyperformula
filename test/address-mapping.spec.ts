@@ -2,7 +2,8 @@ import {ColumnsSpan} from '../src/ColumnsSpan'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
-import {IChooseAddressMapping, AlwaysSparse, AlwaysDense, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {IChooseAddressMapping, AlwaysSparse, AlwaysDense, AlwaysPlusTree, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {PlusStrategy} from '../src/DependencyGraph/PlusTreeAddressMapping'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {
@@ -341,6 +342,22 @@ describe('DenseStrategy', () => {
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     mapping.addSheet(0, new DenseStrategy(1, 2))
+
+    expect(mapping.getHeight(0)).toEqual(2)
+    expect(mapping.getWidth(0)).toEqual(1)
+  })
+})
+
+describe('PlusTreeStrategy', () => {
+  sharedExamples((maxCol, maxRow) => {
+    const mapping = new AddressMapping(new AlwaysPlusTree())
+    mapping.addSheet(0, new PlusStrategy(maxCol, maxRow))
+    return mapping
+  })
+
+  it('returns maximum row/col for simplest case', () => {
+    const mapping = new AddressMapping(new AlwaysPlusTree())
+    mapping.addSheet(0, new PlusStrategy(1, 2))
 
     expect(mapping.getHeight(0)).toEqual(2)
     expect(mapping.getWidth(0)).toEqual(1)

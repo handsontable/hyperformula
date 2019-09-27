@@ -1,4 +1,5 @@
 import {IAddressMappingStrategyConstructor, DenseStrategy, SparseStrategy} from './AddressMapping'
+import {PlusStrategy} from './PlusTreeAddressMapping'
 
 export interface IChooseAddressMapping {
   call(fill: number): IAddressMappingStrategyConstructor
@@ -28,5 +29,11 @@ export class AlwaysSparse implements IChooseAddressMapping {
 export class AlwaysDense implements IChooseAddressMapping {
   public call() {
     return SparseStrategy
+  }
+}
+
+export class AlwaysPlusTree implements IChooseAddressMapping {
+  public call() {
+    return PlusStrategy
   }
 }
