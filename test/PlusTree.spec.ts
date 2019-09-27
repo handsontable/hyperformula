@@ -958,4 +958,54 @@ describe('PlusTree', () => {
       ])
     })
   })
+
+  describe('#entriesFromKeyRange', () => {
+    it('empty tree', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+
+      expect(Array.from(tree.entriesFromKeyRange(10, 20))).toEqual([])
+    })
+
+    it('includes key bigger or equal than minKey', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(40, 400)
+      tree.addKeyWithShift(42, 420)
+      tree.addKeyWithShift(43, 430)
+
+      expect(Array.from(tree.entriesFromKeyRange(42, 50))).toEqual([[42, 420], [43, 430]])
+    })
+
+    it('includes key smaller or equal than maxKey', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(40, 400)
+      tree.addKeyWithShift(42, 420)
+      tree.addKeyWithShift(43, 430)
+
+      expect(Array.from(tree.entriesFromKeyRange(0, 42))).toEqual([[40, 400], [42, 420]])
+    })
+
+    it('includes key bigger or equal than minKey, when node is shifted', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(40, 400)
+      tree.addKeyWithShift(42, 420)
+      tree.addKeyWithShift(43, 430)
+      tree.addKeyWithShift(1, 1000)
+
+      expect(Array.from(tree.entriesFromKeyRange(43, 50))).toEqual([[43, 420], [44, 430]])
+    })
+
+    it('includes key smaller or equal than maxKey, when node is shifted', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 10)
+      tree.addKeyWithShift(2, 20)
+      tree.addKeyWithShift(40, 400)
+      tree.addKeyWithShift(42, 420)
+      tree.addKeyWithShift(43, 430)
+      tree.addKeyWithShift(1, 1000)
+
+      expect(Array.from(tree.entriesFromKeyRange(20, 43))).toEqual([[41, 400], [43, 420]])
+    })
+  })
 })

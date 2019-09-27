@@ -70,6 +70,27 @@ export class PlusTree<T> {
     }
   }
 
+  public* entriesFromKeyRange(minKey: number, maxKey: number): IterableIterator<Entry<T>> {
+    yield* this.entriesFromKeyRangeRecursive(minKey, maxKey, this._root, 0)
+  }
+
+  private* entriesFromKeyRangeRecursive(minKey: number, maxKey: number, node: PNode<T>, currentShift: number): IterableIterator<Entry<T>> {
+    const shiftForThatNode = currentShift + node.shift
+    const sMinKey = minKey - shiftForThatNode
+    const sMaxKey = maxKey - shiftForThatNode
+    if (node instanceof Leaf) {
+      for (let i = 0; i < node.keys.length; i++) {
+        if (node.keys[i] >= sMinKey && node.keys[i] <= sMaxKey) {
+          yield [node.keys[i] + shiftForThatNode, node.values[i]]
+        }
+      }
+    } else {
+      for (let i = 0; i < node.children.length; i++) {
+        yield* this.entriesFromKeyRangeRecursive(sMinKey, sMaxKey, node.children[i], shiftForThatNode)
+      }
+    }
+  }
+
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
     const sKey = key - node.shift
     if (node instanceof Leaf) {

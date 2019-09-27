@@ -133,11 +133,8 @@ export class PlusStrategy implements IAddressMappingStrategy {
   }
 
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
-    // this needs to be optimized
-    for (const [rowNumber, row] of this.mapping.entries()) {
-      if (rowsSpan.include(rowNumber)) {
-        yield* row[Symbol.iterator]()
-      }
+    for (const [rowNumber, row] of this.mapping.entriesFromKeyRange(rowsSpan.rowStart, rowsSpan.rowEnd)) {
+      yield* row[Symbol.iterator]()
     }
   }
 }
