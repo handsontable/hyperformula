@@ -72,7 +72,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted: CellValue = 0
+    let sorted: CellValue = 1
     if (ast.args.length === 3) {
       sorted = this.evaluateAst(ast.args[2], formulaAddress)
       if (typeof sorted !== 'number') {
