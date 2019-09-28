@@ -28,7 +28,7 @@ export class AlwaysSparse implements IChooseAddressMapping {
 
 export class AlwaysDense implements IChooseAddressMapping {
   public call() {
-    return SparseStrategy
+    return DenseStrategy
   }
 }
 
