@@ -134,7 +134,11 @@ export class PlusStrategy implements IAddressMappingStrategy {
 
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     for (const [rowNumber, row] of this.mapping.entriesFromKeyRange(rowsSpan.rowStart, rowsSpan.rowEnd)) {
-      yield* row[Symbol.iterator]()
+      for (const maybeVertex of row) {
+        if (maybeVertex !== undefined) {
+          yield maybeVertex
+        }
+      }
     }
   }
 }
