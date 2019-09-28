@@ -72,10 +72,18 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
+    let sorted: CellValue = 0
+    if (ast.args.length === 3) {
+      sorted = this.evaluateAst(ast.args[2], formulaAddress)
+      if (typeof sorted !== 'number') {
+        return new CellError(ErrorType.VALUE)
+      }
+    }
+
     const searchedRange = AbsoluteCellRange.fromCellRange(rangeArg, formulaAddress)
 
     if (searchedRange.width() === 1) {
-      const rowIndex = this.columnSearch.find(key, searchedRange, true)
+      const rowIndex = this.columnSearch.find(key, searchedRange, sorted !== 0)
 
       if (rowIndex === -1) {
         return new CellError(ErrorType.NA)
