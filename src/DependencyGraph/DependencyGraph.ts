@@ -496,7 +496,7 @@ export class DependencyGraph {
 
   public forceApplyPostponedTransformations() {
     for (const vertex of this.graph.nodes.values()) {
-      if (vertex !== null && vertex instanceof FormulaCellVertex) {
+      if (vertex instanceof FormulaCellVertex) {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
       }
     }
