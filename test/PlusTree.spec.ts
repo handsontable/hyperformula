@@ -1052,5 +1052,22 @@ describe('PlusTree', () => {
 
       expect(Array.from(tree.entriesFromKeyRange(20, 43))).toEqual([[41, 400], [43, 420]])
     })
+
+    it('works with three levels', () => {
+      const tree: PlusTree<number> = PlusTree.empty(2)
+      tree.addKeyWithShift(1, 11)
+      tree.addKeyWithShift(2, 12)
+      tree.addKeyWithShift(3, 13)
+      tree.addKeyWithShift(4, 14)
+      tree.addKeyWithShift(5, 15)
+      tree.addKeyWithShift(6, 16)
+      tree.addKeyWithShift(7, 17)
+      tree.addKeyWithShift(8, 18)
+      tree.addKeyWithShift(9, 19)
+      tree.addKeyWithShift(10, 20)
+      tree.addKeyWithShift(1, 1000)
+
+      expect(Array.from(tree.entriesFromKeyRange(10, 11))).toEqual([[10, 19], [11, 20]])
+    })
   })
 })

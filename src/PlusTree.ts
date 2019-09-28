@@ -91,8 +91,8 @@ export class PlusTree<T> {
 
   private* entriesFromKeyRangeRecursive(minKey: number, maxKey: number, node: PNode<T>, currentShift: number): IterableIterator<Entry<T>> {
     const shiftForThatNode = currentShift + node.shift
-    const sMinKey = minKey - shiftForThatNode
-    const sMaxKey = maxKey - shiftForThatNode
+    const sMinKey = minKey - node.shift
+    const sMaxKey = maxKey - node.shift
     let smallestIndex = node.keys.findIndex(k => k >= sMinKey)
     if (smallestIndex === -1) {
       smallestIndex = node.keys.length
