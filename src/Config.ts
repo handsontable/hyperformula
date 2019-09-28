@@ -14,7 +14,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {IChooseAddressMapping, AlwaysSparse} from './DependencyGraph/ChooseAddressMappingPolicy'
+import {IChooseAddressMapping, AlwaysSparse, AlwaysPlusTree, AlwaysDense} from './DependencyGraph/ChooseAddressMappingPolicy'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -34,7 +34,7 @@ export interface ConfigParams {
 export class Config {
 
   public static defaultConfig: ConfigParams = {
-    chooseAddressMappingPolicy: new AlwaysSparse(),
+    chooseAddressMappingPolicy: new AlwaysPlusTree(),
     dateFormat: 'MM/DD/YYYY',
     functionArgSeparator: ',',
     language: enGB,
