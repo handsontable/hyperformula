@@ -254,4 +254,36 @@ describe('BinarySearchStrategy', () => {
       ...config,
     }))
   })
+
+  it('should calculate indexes properly when using binary search', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
+        [],
+        [],
+        [],
+        ['1'],
+        ['2'],
+        ['3'],
+        ['4'],
+        ['5'],
+    ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
+
+    expect(engine.getCellValue("A1")).toEqual(4)
+  });
+
+  it('should calculate indexes properly when using naitve approach', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=VLOOKUP(4, A5:A10, 1, FALSE())'],
+      [],
+      [],
+      [],
+      ['1'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
+    ], new Config({ useColumnIndex: false }))
+
+    expect(engine.getCellValue("A1")).toEqual(4)
+  });
 })

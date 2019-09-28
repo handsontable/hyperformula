@@ -23,14 +23,13 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
   public removeColumns(columnsSpan: ColumnsSpan): void {}
 
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
-    let index = -1
     if (range.height() < this.config.vlookupThreshold || !sorted) {
       const values = this.computeListOfValuesInRange(range)
-      index =  values.indexOf(key)
+      const index =  values.indexOf(key)
+      return index < 0 ? index : index + range.start.row
     } else {
-      index = rangeLowerBound(range, key, this.dependencyGraph)
+      return rangeLowerBound(range, key, this.dependencyGraph)
     }
-    return index < 0 ? index : index + range.start.row
   }
 
   private computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
