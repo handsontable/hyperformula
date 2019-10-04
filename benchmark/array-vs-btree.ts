@@ -1,4 +1,5 @@
 import {BTree} from '../src/BTree'
+import {PlusTree} from '../src/PlusTree'
 
 const initialSize = 1000000
 const adds = 100
@@ -95,11 +96,53 @@ const benchmarkBTree = (btreeSpan: number) => {
   results.push(result)
 }
 
+const benchmarkPlusTree = (btreeSpan: number) => {
+  const result: any = { name: `PlusTree(${btreeSpan})` }
+  let startAt
+
+  const btree: PlusTree<number> = PlusTree.empty(btreeSpan)
+
+  startAt = Date.now()
+  for (let i = 0; i < initialSize; i++) {
+    btree.addKeyWithShift(i, 42)
+  }
+  result[`building with ${initialSize}`] = Date.now() - startAt
+
+  startAt = Date.now()
+  for (let i = 0; i < adds; i++) {
+    btree.addKeyWithShift(0, 42)
+  }
+  result[`adding ${adds} in beginning`] = Date.now() - startAt
+
+  startAt = Date.now()
+  const middle = Math.ceil(initialSize / 2)
+  for (let i = 0; i < adds; i++) {
+    btree.addKeyWithShift(middle, 42)
+  }
+  result[`adding ${adds} in middle`] = Date.now() - startAt
+
+  startAt = Date.now()
+  for (let i = 0; i < adds; i++) {
+    btree.addKeyWithShift(initialSize + adds, 42)
+  }
+  result[`adding ${adds} in end`] = Date.now() - startAt
+
+  startAt = Date.now()
+  for (let i = 0; i < reads; i++) {
+    btree.getKey(readsArray[i])
+  }
+  result[`reading ${reads} at random`] = Date.now() - startAt
+
+  results.push(result)
+}
+
 benchmarkArray()
 benchmarkBTree(8)
 benchmarkBTree(16)
 benchmarkBTree(32)
 benchmarkBTree(64)
 benchmarkBTree(128)
+benchmarkPlusTree(64)
+benchmarkPlusTree(128)
 
 console.table(results)
