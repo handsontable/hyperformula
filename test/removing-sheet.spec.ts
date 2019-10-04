@@ -22,15 +22,6 @@ describe('remove sheet', () => {
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   });
 
-  it('should remove sheet by id', () => {
-    const engine = HandsOnEngine.buildFromArray([['foo']])
-
-    engine.removeSheet(0)
-
-    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
-    expect(Array.from(engine.addressMapping.entries())).toEqual([])
-  });
-
   it('should decrease last sheet id when removing last sheet', () => {
     const engine = HandsOnEngine.buildFromSheets({
       'Sheet1': [],
