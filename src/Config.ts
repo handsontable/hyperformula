@@ -34,7 +34,7 @@ export interface ConfigParams {
 export class Config {
 
   public static defaultConfig: ConfigParams = {
-    chooseAddressMappingPolicy: new AlwaysPlusTree(),
+    chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormat: 'MM/DD/YYYY',
     functionArgSeparator: ',',
     language: enGB,
