@@ -329,3 +329,15 @@ describe('changing cell content', () => {
     }).toThrow('You cannot modify only part of an array')
   })
 })
+
+describe("change multiple cells contents", () => {
+  it('works for one', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    engine.setMultipleCellContents(adr('B1'), [['3']])
+    expect(engine.getCellValue('B1')).toBe(3)
+  })
+})

@@ -168,6 +168,10 @@ export class HandsOnEngine {
     this.dependencyGraph.clearRecentlyChangedVertices()
   }
 
+  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]) {
+    this.setCellContent(topLeftCornerAddress, cellContents[0][0])
+  }
+
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
