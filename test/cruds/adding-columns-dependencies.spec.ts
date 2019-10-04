@@ -1,7 +1,7 @@
 import { HandsOnEngine} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig.js'
+import '../testConfig'
 import {adr, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
 
 describe('Adding column, fixing dependency', () => {

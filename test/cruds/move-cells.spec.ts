@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig.js'
+import '../testConfig'
 import {
   adr,
   expect_reference_to_have_ref_error,

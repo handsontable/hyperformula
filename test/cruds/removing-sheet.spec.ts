@@ -1,5 +1,5 @@
 import {HandsOnEngine} from "../../src";
-import '../testConfig.js'
+import '../testConfig'
 import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from "../testUtils";
 import {CellAddress} from "../../src/parser";
 

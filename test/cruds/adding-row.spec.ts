@@ -2,7 +2,7 @@ import {Config, HandsOnEngine} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
-import '../testConfig.js'
+import '../testConfig'
 import {adr, extractMatrixRange} from '../testUtils'
 
 describe('Adding row - matrix check', () => {

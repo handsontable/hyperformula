@@ -2,7 +2,7 @@ import {CellError, Config, HandsOnEngine} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
-import '../testConfig.js'
+import '../testConfig'
 import {
   adr,
   expect_function_to_have_ref_error,
