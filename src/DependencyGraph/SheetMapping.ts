@@ -34,6 +34,10 @@ export class SheetMapping {
     return sheetId
   }
 
+  public get = (sheetName: string): number | undefined => {
+    return this.mapping.get(sheetName)
+  }
+
   public name = (sheetId: number): string => {
     const name = this.reversedMapping.get(sheetId)
     if (name === undefined) {
