@@ -1,6 +1,6 @@
 import {HandsOnEngine} from "../src";
 import './testConfig.ts'
-import {adr, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
+import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from "./testUtils";
 import {CellAddress} from "../src/parser";
 
 describe('remove sheet', () => {
@@ -105,6 +105,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const reference = extractReference(engine, adr("B1"))
 
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['1', '=A1']]))
   });
 
   it('should be #REF after removing sheet', () => {
@@ -120,5 +121,6 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet(1)
 
     expect_reference_to_have_ref_error(engine, adr("A1"))
+    // expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
   });
 });
