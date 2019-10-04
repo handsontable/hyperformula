@@ -49,4 +49,8 @@ export class SheetMapping {
   public numberOfSheets(): number {
     return this.mapping.size
   }
+
+  public hasSheetWithId(sheetId: number): boolean {
+    return this.reversedMapping.has(sheetId)
+  }
 }

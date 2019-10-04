@@ -27,6 +27,12 @@ import {CellAddress} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 
+export class NoSuchSheetError extends Error {
+  constructor(sheetId: number) {
+    super(`There's no sheet with id = ${sheetId}`)
+  }
+}
+
 /**
  * Engine for one sheet
  */
@@ -124,6 +130,8 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true) {
+    this.ensureThatSheetExists(address.sheet)
+
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
@@ -167,6 +175,12 @@ export class HandsOnEngine {
     if (recompute) {
       this.evaluator.partialRun(Array.from(this.dependencyGraph.verticesToRecompute()))
       this.dependencyGraph.clearRecentlyChangedVertices()
+    }
+  }
+
+  private ensureThatSheetExists(sheetId: number) {
+    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
+      throw new NoSuchSheetError(sheetId)
     }
   }
 

@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HandsOnEngine} from '../src'
+import {Config, EmptyValue, HandsOnEngine, NoSuchSheetError} from '../src'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
 import {adr} from './testUtils'
@@ -337,6 +337,17 @@ describe('changing cell content', () => {
     engine.setCellContent(adr('B1'), '3', false)
 
     expect(engine.getCellValue('C1')).toBe(2)
+  })
+
+  it('it not possible to set cell content in sheet which does not exist', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    expect(() => {
+      engine.setCellContent(adr('B1', 1), '3')
+    }).toThrow(new NoSuchSheetError(1))
   })
 })
 
