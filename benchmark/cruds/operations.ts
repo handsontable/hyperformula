@@ -60,6 +60,7 @@ export function measure<T>(engine: HandsOnEngine, stats: any[], name: String, fu
   const end = Date.now()
   const time = end - start
   const actualStats = engine.getStats() as Map<string, any>
+  engine.stats.reset()
   actualStats.set('TOTAL CRUD', time)
   actualStats.set('NAME', name)
   stats.push(statsToObject(actualStats))
