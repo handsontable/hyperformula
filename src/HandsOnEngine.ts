@@ -169,7 +169,15 @@ export class HandsOnEngine {
   }
 
   public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]) {
-    this.setCellContent(topLeftCornerAddress, cellContents[0][0])
+    for (let i = 0; i < cellContents.length; i++) {
+      for (let j = 0; j < cellContents[i].length; j++) {
+        this.setCellContent({
+          sheet: topLeftCornerAddress.sheet,
+          row: topLeftCornerAddress.row + i,
+          col: topLeftCornerAddress.col + j,
+        }, cellContents[i][j])
+      }
+    }
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
