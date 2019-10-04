@@ -1,5 +1,8 @@
 import {HandsOnEngine} from "../src";
 import './testConfig.ts'
+import {adr, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
+import {CellVertex, FormulaCellVertex} from "../src/DependencyGraph";
+import {CellAddress} from "../src/parser";
 
 describe('remove sheet from engine', () => {
   it('should remove sheet by id', () => {
@@ -11,3 +14,76 @@ describe('remove sheet from engine', () => {
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   });
 })
+
+describe('remove sheet - adjust edges', () => {
+  it('should not affect dependencies to sheet other than removed', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+          ['1', '=A1']
+      ],
+      'Sheet2': [
+          ['1']
+      ]
+    })
+
+    engine.removeSheet(1)
+
+    const a1 = engine.addressMapping.fetchCell(adr("A1"))
+    const b1 = engine.addressMapping.fetchCell(adr("B1"))
+
+    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+  });
+
+  it('should remove edge between sheets', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+        ['=$Sheet2.A1']
+      ],
+      'Sheet2': [
+        ['1']
+      ]
+    })
+
+    const a1_1 = engine.addressMapping.fetchCell(adr("A1"))
+    const a1_2 = engine.addressMapping.fetchCell(adr("A1", 1))
+    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(true)
+
+    engine.removeSheet(1)
+
+    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(false)
+  });
+})
+
+describe('remove sheet - adjust formula dependencies', () => {
+  it('should not affect formula with dependency to sheet other than removed', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+        ['1', '=A1']
+      ],
+      'Sheet2': [
+        ['1']
+      ]
+    })
+
+    engine.removeSheet(1)
+
+    const reference = extractReference(engine, adr("B1"))
+
+    expect(reference).toEqual(CellAddress.relative(0, -1, 0))
+  });
+
+  it('should be #REF after removing sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+        ['=$Sheet2.A1']
+      ],
+      'Sheet2': [
+        ['1']
+      ]
+    })
+
+    engine.removeSheet(1)
+
+    expect_reference_to_have_ref_error(engine, adr("A1"))
+  });
+});
