@@ -1,4 +1,5 @@
 import {HandsOnEngine} from "../src";
+import './testConfig.ts'
 
 describe('remove sheet from engine', () => {
   it('should remove sheet by id', () => {
