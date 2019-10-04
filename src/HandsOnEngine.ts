@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress, invalidSimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -30,6 +30,12 @@ import {Statistics, StatType} from './statistics/Statistics'
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
     super(`There's no sheet with id = ${sheetId}`)
+  }
+}
+
+export class InvalidAddressError extends Error {
+  constructor(address: SimpleCellAddress) {
+    super(`Address (row = ${address.row}, col = ${address.col}) is invalid`)
   }
 }
 
@@ -130,7 +136,7 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true) {
-    this.ensureThatSheetExists(address.sheet)
+    this.ensureThatAddressIsCorrect(address)
 
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -178,9 +184,13 @@ export class HandsOnEngine {
     }
   }
 
-  private ensureThatSheetExists(sheetId: number) {
-    if (!this.sheetMapping.hasSheetWithId(sheetId)) {
-      throw new NoSuchSheetError(sheetId)
+  private ensureThatAddressIsCorrect(address: SimpleCellAddress) {
+    if (invalidSimpleCellAddress(address)) {
+      throw new InvalidAddressError(address)
+    }
+
+    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
+      throw new NoSuchSheetError(address.sheet)
     }
   }
 

@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HandsOnEngine, NoSuchSheetError} from '../src'
+import {Config, EmptyValue, HandsOnEngine, NoSuchSheetError, InvalidAddressError} from '../src'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
 import {adr} from './testUtils'
@@ -348,6 +348,18 @@ describe('changing cell content', () => {
     expect(() => {
       engine.setCellContent(adr('B1', 1), '3')
     }).toThrow(new NoSuchSheetError(1))
+  })
+
+  it('it not possible to set cell content with invalid address', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    const address = { row: -1, col: 0, sheet: 0 }
+    expect(() => {
+      engine.setCellContent(address, '3')
+    }).toThrow(new InvalidAddressError(address))
   })
 })
 
