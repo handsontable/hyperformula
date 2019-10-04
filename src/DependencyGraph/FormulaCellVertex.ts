@@ -40,20 +40,12 @@ export class FormulaCellVertex {
     }
   }
 
-  public setFormula(formula: Ast) {
-    this.formula = formula
-  }
-
   /**
    * Returns address of the cell associated with vertex
    */
   public getAddress(updatingService: LazilyTransformingAstService): SimpleCellAddress {
     this.ensureRecentData(updatingService)
     return this.cellAddress
-  }
-
-  public setAddress(address: SimpleCellAddress) {
-    this.cellAddress = address
   }
 
   public get address() {

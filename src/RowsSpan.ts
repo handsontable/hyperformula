@@ -45,8 +45,4 @@ export class RowsSpan {
   public firstRow(): RowsSpan {
     return new RowsSpan(this.sheet, this.rowStart, this.rowStart)
   }
-
-  public include(row: number): boolean {
-    return (row >= this.rowStart) && (row <= this.rowEnd);
-  }
 }
