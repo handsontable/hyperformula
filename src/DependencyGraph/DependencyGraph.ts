@@ -4,7 +4,6 @@ import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
-import {filterWith, map} from '../generatorUtils'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType} from '../parser'
@@ -482,16 +481,6 @@ export class DependencyGraph {
 
   public markAsDependentOnStructureChange(vertex: Vertex) {
     this.graph.markNodeAsChangingWithStructure(vertex)
-  }
-
-  public* formulaVerticesInRange(range: AbsoluteCellRange): IterableIterator<FormulaCellVertex> {
-    const vertices = map((address) => {
-      return this.addressMapping.getCell(address)
-    }, range.addresses())
-
-    yield* filterWith((vertex) => {
-      return vertex !== null && vertex instanceof FormulaCellVertex
-    }, vertices) as IterableIterator<FormulaCellVertex>
   }
 
   public forceApplyPostponedTransformations() {
