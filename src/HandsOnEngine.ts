@@ -164,11 +164,8 @@ export class HandsOnEngine {
       throw new Error('Illegal operation')
     }
 
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-    if (verticesToRecomputeFrom !== []) {
-      this.dependencyGraph.clearRecentlyChangedVertices()
-      this.evaluator.partialRun(verticesToRecomputeFrom)
-    }
+    this.evaluator.partialRun(Array.from(this.dependencyGraph.verticesToRecompute()))
+    this.dependencyGraph.clearRecentlyChangedVertices()
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
