@@ -14,9 +14,25 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.NA))
   })
 
+  it('validates that 1st argument is number, string or boolean', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(1/0, B1:B1)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+  })
+
   it('validates that 2nd argument is range', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(1, 42)'],
+    ])
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('validates that 3rd argument is number', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=MATCH(0, B1:B1, 1/0)'],
     ])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
