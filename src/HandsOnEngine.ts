@@ -123,13 +123,12 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true) {
     const vertex = this.dependencyGraph.getCell(address)
-    let verticesToRecomputeFrom: Vertex[]
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       vertex.setMatrixCellValue(address, Number(newCellContent))
-      verticesToRecomputeFrom = [vertex]
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
     } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
@@ -142,7 +141,7 @@ export class HandsOnEngine {
 
       this.dependencyGraph.addNewMatrixVertex(newVertex)
       this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
-      verticesToRecomputeFrom = [newVertex]
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (isFormula(newCellContent)) {
         const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
@@ -161,13 +160,13 @@ export class HandsOnEngine {
         this.dependencyGraph.setValueToCell(address, newCellContent)
         this.columnSearch.change(oldValue, newCellContent, address)
       }
-      verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-      this.dependencyGraph.clearRecentlyChangedVertices()
     } else {
       throw new Error('Illegal operation')
     }
 
-    if (verticesToRecomputeFrom) {
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+    if (verticesToRecomputeFrom !== []) {
+      this.dependencyGraph.clearRecentlyChangedVertices()
       this.evaluator.partialRun(verticesToRecomputeFrom)
     }
   }
