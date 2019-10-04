@@ -56,7 +56,7 @@ export class HandsOnEngine {
       public readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
-      private readonly evaluator: Evaluator,
+      public readonly evaluator: Evaluator,
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
@@ -177,9 +177,11 @@ export class HandsOnEngine {
           sheet: topLeftCornerAddress.sheet,
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
-        }, cellContents[i][j])
+        }, cellContents[i][j], false)
       }
     }
+
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {

@@ -370,4 +370,21 @@ describe("change multiple cells contents", () => {
     expect(engine.getCellValue('B3')).toBe(18)
     expect(engine.getCellValue('C3')).toBe(19)
   })
+
+  it('recompute only once', () => {
+    const sheet = [
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+    const evaluatorCallSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+
+    engine.setMultipleCellContents(adr('B1'), [
+      ['12', '13'],
+      ['15', '16'],
+      ['18', '19'],
+    ])
+
+    expect(evaluatorCallSpy).toHaveBeenCalledTimes(1)
+  })
 })
