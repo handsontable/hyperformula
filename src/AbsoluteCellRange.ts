@@ -92,16 +92,8 @@ export class AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }
 
-  public withEnd(newEnd: SimpleCellAddress): AbsoluteCellRange {
-    return new AbsoluteCellRange(this.start, newEnd)
-  }
-
   public sameDimensionsAs(other: AbsoluteCellRange) {
     return this.width() === other.width() && this.height() === other.height()
-  }
-
-  public sameSizeAs(other: AbsoluteCellRange) {
-    return (this.width() * this.height()) === (other.width() * other.height())
   }
 
   public* addresses(): IterableIterator<SimpleCellAddress> {
