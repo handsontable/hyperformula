@@ -1,4 +1,4 @@
-import {lowerBound} from '../../src/interpreter/binarySearch'
+import {compare, lowerBound} from '../../src/interpreter/binarySearch'
 
 describe('Binary search', () => {
   it('should return -1 when empty array', () => {
@@ -50,5 +50,44 @@ describe('Binary search', () => {
 
   it('should return first occurence', () => {
     expect(lowerBound([1, 2, 2, 2, 2, 2, 3, 3, 3], 2)).toBe(1)
+  })
+})
+
+describe('compare', () => {
+  it('number < string', () => {
+    expect(compare(42, 'foobar')).toBe(-1)
+    expect(compare('foobar', 42)).toBe(1)
+  })
+
+  it('number < boolean', () => {
+    expect(compare(42, false)).toBe(-1)
+    expect(compare(false, 42)).toBe(1)
+  })
+
+  it('string < boolean', () => {
+    expect(compare('foobar', false)).toBe(-1)
+    expect(compare(false, 'foobar')).toBe(1)
+  })
+
+  it('numbers', () => {
+    expect(compare(1, 2)).toBe(-1)
+    expect(compare(2, 2)).toBe(0)
+    expect(compare(3, 2)).toBe(1)
+  })
+
+  it('bool', () => {
+    expect(compare(false, true)).toBe(-1)
+    expect(compare(true, true)).toBe(0)
+    expect(compare(true, false)).toBe(1)
+  })
+
+  it('string', () => {
+    expect(compare('a', 'b')).toBe(-1)
+    expect(compare('a', 'a')).toBe(0)
+    expect(compare('b', 'a')).toBe(1)
+  })
+
+  it('string length', () => {
+    expect(compare('a', 'aa')).toBe(-1)
   })
 })
