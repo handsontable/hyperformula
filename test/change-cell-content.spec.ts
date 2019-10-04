@@ -328,6 +328,16 @@ describe('changing cell content', () => {
       engine.setCellContent(adr('A2'), '{=TRANSPOSE(C1:C2)}')
     }).toThrow('You cannot modify only part of an array')
   })
+
+  it('is not recomputed if user doesnt want it', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=B1'],
+    ])
+
+    engine.setCellContent(adr('B1'), '3', false)
+
+    expect(engine.getCellValue('C1')).toBe(2)
+  })
 })
 
 describe("change multiple cells contents", () => {

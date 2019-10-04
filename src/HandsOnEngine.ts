@@ -164,8 +164,10 @@ export class HandsOnEngine {
       throw new Error('Illegal operation')
     }
 
-    this.evaluator.partialRun(Array.from(this.dependencyGraph.verticesToRecompute()))
-    this.dependencyGraph.clearRecentlyChangedVertices()
+    if (recompute) {
+      this.evaluator.partialRun(Array.from(this.dependencyGraph.verticesToRecompute()))
+      this.dependencyGraph.clearRecentlyChangedVertices()
+    }
   }
 
   public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]) {
