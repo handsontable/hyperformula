@@ -398,7 +398,12 @@ export class FormulaParser extends Parser {
    */
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
-    return buildCellReferenceAst(cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet))
+    const address = cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet)
+    if (address === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return buildCellReferenceAst(address)
+    }
   })
 
   /**

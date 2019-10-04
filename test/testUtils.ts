@@ -41,9 +41,9 @@ export const expect_function_to_have_ref_error = (engine: HandsOnEngine, address
 
 export const expect_cell_to_have_formula = (engine: HandsOnEngine, addressString: string, expectedFormula: string) => {
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
+  const formula = (engine.addressMapping.fetchCell(address!) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
   const unparser = new Unparser(engine.config, engine.sheetMapping.name)
-  expect(unparser.unparse(formula, address)).toEqual(expectedFormula)
+  expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {

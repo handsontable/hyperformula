@@ -1,6 +1,6 @@
 
 import {IToken, tokenMatcher} from 'chevrotain'
-import {SimpleCellAddress} from '../Cell'
+import {CellError, SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -79,7 +79,11 @@ export class ParserWithCaching {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
         const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
-        hash = hash.concat(cellHashFromToken(cellAddress))
+        if (cellAddress === undefined) {
+          hash = hash.concat('!REF')
+        } else {
+          hash = hash.concat(cellHashFromToken(cellAddress))
+        }
         idx++
       } else {
         hash = hash.concat(token.image)

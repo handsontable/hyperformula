@@ -1,7 +1,7 @@
-import {SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {CellAddress} from './CellAddress'
 
-export type SheetMappingFn = (sheetName: string) => number
+export type SheetMappingFn = (sheetName: string) => number | undefined
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -9,7 +9,7 @@ export type SheetMappingFn = (sheetName: string) => number
  * @param stringAddress - string representation of cell address, e.g. 'C64'
  * @param baseAddress - base address for R0C0 conversion
  */
-export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress => {
+export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress | undefined => {
   const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 
   let col
@@ -28,6 +28,10 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     sheet = overrideSheet
   } else {
     sheet = baseAddress.sheet
+  }
+
+  if (sheet === undefined) {
+    return undefined
   }
 
   const row = Number(result[6] as string) - 1

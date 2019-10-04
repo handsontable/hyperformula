@@ -82,7 +82,7 @@ describe('Integration', () => {
     expect(engine.getCellValue('A2')).toBe(3)
   })
 
-  xit('should be possible to build graph with reference to not existing sheet', () => {
+  it('should be possible to build graph with reference to not existing sheet', () => {
     const engine = HandsOnEngine.buildFromArray([['=$Sheet2.A2']])
 
     expect_reference_to_have_ref_error(engine, adr("A1"))

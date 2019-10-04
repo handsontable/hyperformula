@@ -22,7 +22,7 @@ export class BuildEngineFromArraysFactory {
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
     }
 
-    const parser = new ParserWithCaching(config, sheetMapping.fetch)
+    const parser = new ParserWithCaching(config, sheetMapping.get)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, config, stats)

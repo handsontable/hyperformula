@@ -1,18 +1,11 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, simpleCellAddress, SimpleCellAddress, invalidSimpleCellAddress} from './Cell'
+import {CellValue, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import {
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-  Vertex,
-} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -22,8 +15,7 @@ import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
-import {CellAddress} from './parser'
+import {CellAddress, cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 
@@ -80,6 +72,9 @@ export class HandsOnEngine {
    */
   public getCellValue(stringAddress: string): CellValue {
     const address = cellAddressFromString(this.sheetMapping.fetch, stringAddress, CellAddress.absolute(0, 0, 0))
+    if (address === undefined) {
+      return EmptyValue
+    }
     return this.dependencyGraph.getCellValue(address)
   }
 
