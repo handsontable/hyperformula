@@ -1,8 +1,8 @@
-import { HandsOnEngine} from '../src'
-import {EmptyCellVertex} from '../src/DependencyGraph'
-import {CellAddress} from '../src/parser'
-import './testConfig.ts'
-import {adr, expectEngineToBeTheSameAs, extractReference} from './testUtils'
+import { HandsOnEngine} from '../../src'
+import {EmptyCellVertex} from '../../src/DependencyGraph'
+import {CellAddress} from '../../src/parser'
+import '../testConfig.js'
+import {adr, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
 
 describe('Adding column, fixing dependency', () => {
   describe('all in same sheet (case 1)', () => {

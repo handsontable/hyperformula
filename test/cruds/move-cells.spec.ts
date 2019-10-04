@@ -1,9 +1,9 @@
-import {EmptyValue, HandsOnEngine} from '../src'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../src/Cell'
-import {EmptyCellVertex} from '../src/DependencyGraph'
-import {CellAddress} from '../src/parser'
-import './testConfig.ts'
+import {EmptyValue, HandsOnEngine} from '../../src'
+import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {simpleCellAddress} from '../../src/Cell'
+import {EmptyCellVertex} from '../../src/DependencyGraph'
+import {CellAddress} from '../../src/parser'
+import '../testConfig.js'
 import {
   adr,
   expect_reference_to_have_ref_error,
@@ -11,7 +11,7 @@ import {
   extractMatrixRange,
   extractRange,
   extractReference,
-} from './testUtils'
+} from '../testUtils'
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {

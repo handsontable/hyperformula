@@ -1,9 +1,9 @@
-import {Config, HandsOnEngine} from '../src'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import { simpleCellAddress} from '../src/Cell'
-import { FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import './testConfig.ts'
-import {adr, extractMatrixRange, extractRange} from './testUtils'
+import {Config, HandsOnEngine} from '../../src'
+import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import { simpleCellAddress} from '../../src/Cell'
+import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import '../testConfig.js'
+import {adr, extractMatrixRange, extractRange} from '../testUtils'
 
 describe('Adding column - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {

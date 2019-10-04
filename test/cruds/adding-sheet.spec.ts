@@ -1,5 +1,5 @@
-import {EmptyValue, HandsOnEngine} from "../src";
-import './testConfig.ts'
+import {EmptyValue, HandsOnEngine} from "../../src";
+import '../testConfig.js'
 
 describe("add sheet to engine", () => {
   it('should add sheet to empty engine', function () {

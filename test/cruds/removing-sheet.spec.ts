@@ -1,7 +1,7 @@
-import {HandsOnEngine} from "../src";
-import './testConfig.ts'
-import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from "./testUtils";
-import {CellAddress} from "../src/parser";
+import {HandsOnEngine} from "../../src";
+import '../testConfig.js'
+import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from "../testUtils";
+import {CellAddress} from "../../src/parser";
 
 describe('remove sheet', () => {
   it('should remove sheet by id', () => {
