@@ -1,10 +1,9 @@
 import {HandsOnEngine} from "../src";
 import './testConfig.ts'
 import {adr, expect_reference_to_have_ref_error, extractReference} from "./testUtils";
-import {CellVertex, FormulaCellVertex} from "../src/DependencyGraph";
 import {CellAddress} from "../src/parser";
 
-describe('remove sheet from engine', () => {
+describe('remove sheet', () => {
   it('should remove sheet by id', () => {
     const engine = HandsOnEngine.buildFromArray([['foo']])
 
@@ -13,16 +12,61 @@ describe('remove sheet from engine', () => {
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   });
+
+  it('should remove empty sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([])
+
+    engine.removeSheet(0)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  });
+
+  it('should remove sheet by id', () => {
+    const engine = HandsOnEngine.buildFromArray([['foo']])
+
+    engine.removeSheet(0)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  });
+
+  it('should decrease last sheet id when removing last sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': [],
+    })
+
+    engine.removeSheet(1)
+
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1'])
+    engine.addSheet()
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet2'])
+  })
+
+  it('should not decrease last sheet id when removing sheet other than last', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [],
+      'Sheet2': [],
+      'Sheet3': [],
+    })
+
+    engine.removeSheet(1)
+
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet3'])
+    engine.addSheet()
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet3', 'Sheet4'])
+  })
 })
 
 describe('remove sheet - adjust edges', () => {
   it('should not affect dependencies to sheet other than removed', () => {
     const engine = HandsOnEngine.buildFromSheets({
       'Sheet1': [
-          ['1', '=A1']
+        ['1', '=A1']
       ],
       'Sheet2': [
-          ['1']
+        ['1']
       ]
     })
 
