@@ -8,7 +8,7 @@ describe('Compute hash from ast', () => {
   const sheetMapping = new SheetMapping()
   sheetMapping.addSheet('Sheet1')
   const lexer = new FormulaLexer(buildLexerConfig(config))
-  const parser = new ParserWithCaching(config, sheetMapping.fetch)
+  const parser = new ParserWithCaching(config, sheetMapping.get)
 
   it('literals',  () => {
     const formula = '=CONCATENATE("foo", 42.34)'

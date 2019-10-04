@@ -5,7 +5,7 @@ import {CellAddress} from '../../src/parser'
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('="a"&"b"', CellAddress.absolute(0, 0, 0)).ast as ConcatenateOpAst
     expect(ast.type).toBe(AstNodeType.CONCATENATE_OP)
@@ -14,7 +14,7 @@ describe('Parser - Concatenate operators', () => {
   })
 
   it('Greater than operator as function parameter', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=CONCATENATE("="&A6,"foo")', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)

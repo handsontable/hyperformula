@@ -10,7 +10,7 @@ describe('Unparse', () => {
   const sheetMapping = new SheetMapping()
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
-  const parser = new ParserWithCaching(config, sheetMapping.fetch)
+  const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, sheetMapping.name)
 
   it('#unparse',  () => {

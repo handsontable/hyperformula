@@ -14,7 +14,7 @@ import {CellAddress} from '../../src/parser'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1=2', CellAddress.absolute(0, 0, 0)).ast as EqualsOpAst
 
@@ -22,7 +22,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Not equal operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1<>2', CellAddress.absolute(0, 0, 0)).ast as NotEqualOpAst
 
@@ -30,7 +30,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1>2', CellAddress.absolute(0, 0, 0)).ast as GreaterThanOpAst
 
@@ -38,7 +38,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1<2', CellAddress.absolute(0, 0, 0)).ast as LessThanOpAst
 
@@ -46,7 +46,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than or equal operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1>=2', CellAddress.absolute(0, 0, 0)).ast as GreaterThanOrEqualOpAst
 
@@ -54,7 +54,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than or equal operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1<=2', CellAddress.absolute(0, 0, 0)).ast as LessThanOrEqualOpAst
 
@@ -62,7 +62,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Boolean operator with more complex childs', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
 
     const ast = parser.parse('=1+2=1+2*6', CellAddress.absolute(0, 0, 0)).ast as EqualsOpAst
 
