@@ -410,4 +410,16 @@ describe("change multiple cells contents", () => {
 
     expect(evaluatorCallSpy).toHaveBeenCalledTimes(1)
   })
+
+  it('it not possible to change matrices', () => {
+    const sheet = [
+      ['1', '2'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    expect(() => {
+      engine.setMultipleCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
+    }).toThrow("Cant change matrices in batch operation")
+    expect(engine.getCellValue('A1')).toBe(1)
+  })
 })
