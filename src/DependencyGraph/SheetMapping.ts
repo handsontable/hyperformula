@@ -19,6 +19,9 @@ export class SheetMapping {
     if (sheetName === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
+    if (sheetId == this.lastSheetId) {
+      --this.lastSheetId
+    }
     this.mapping.delete(sheetName)
     this.reversedMapping.delete(sheetId)
   }
