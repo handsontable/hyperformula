@@ -121,7 +121,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet(1)
 
     expect_reference_to_have_ref_error(engine, adr("A1"))
-    // expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
+    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
   });
 });
 
