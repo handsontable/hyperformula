@@ -250,7 +250,9 @@ export class HandsOnEngine {
 
   public removeSheet(sheetId: number) {
     const sheetHeight = this.addressMapping.getHeight(sheetId)
-    this.removeRows(sheetId, 0, sheetHeight - 1)
+    if (sheetHeight > 0) {
+      this.removeRows(sheetId, 0, sheetHeight - 1)
+    }
     this.addressMapping.removeSheet(sheetId)
     this.sheetMapping.removeSheet(sheetId)
   }
