@@ -56,10 +56,6 @@ export namespace AddColumnsDependencyTransformer {
 
       // Case 1
       if (dependencyAddress.isColumnAbsolute()) {
-        if (addedColumns.sheet !== dependencyAddress.sheet) {
-          return false
-        }
-
         if (dependencyAddress.col < addedColumns.columnStart) { // Case Aa
           return false
         } else { // Case Ab
