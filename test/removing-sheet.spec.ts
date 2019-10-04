@@ -124,3 +124,14 @@ describe('remove sheet - adjust formula dependencies', () => {
     // expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
   });
 });
+
+
+describe('remove sheet - adjust address mapping', () => {
+  it('should remove sheet from address mapping', () => {
+    const engine = HandsOnEngine.buildFromArray([])
+
+    engine.removeSheet(0)
+
+    expect(() => engine.addressMapping.strategyFor(0)).toThrow(new Error("Unknown sheet id"))
+  })
+})
