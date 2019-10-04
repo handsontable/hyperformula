@@ -395,18 +395,6 @@ export class DependencyGraph {
     }
   }
 
-  public nodes(): IterableIterator<Vertex> {
-    return this.graph.nodes.values()
-  }
-
-  public* formulaNodesFromSheet(sheet: number): IterableIterator<FormulaCellVertex> {
-    for (const vertex of this.graph.nodes) {
-      if (vertex instanceof FormulaCellVertex && vertex.address.sheet === sheet) {
-        yield vertex
-      }
-    }
-  }
-
   public* matrixFormulaNodes(): IterableIterator<MatrixVertex> {
     for (const vertex of this.graph.nodes) {
       if (vertex instanceof MatrixVertex && vertex.isFormula()) {
@@ -469,10 +457,6 @@ export class DependencyGraph {
 
   public topologicalSort(): TopSortResult<Vertex> {
     return this.graph.topologicalSort()
-  }
-
-  public getTopologicallySortedSubgraphFrom(vertices: Vertex[], operatingFunction: (node: Vertex) => boolean): Vertex[] {
-    return this.graph.getTopologicallySortedSubgraphFrom(vertices, operatingFunction)
   }
 
   public markAsVolatile(vertex: Vertex) {
