@@ -8,11 +8,13 @@ import {sheets as D} from '../sheets/13-sheet-d'
 import {vlookup as stage3_vlookup} from '../stage-3'
 import {sheetA as stage3_sheetA} from '../stage-3'
 import {sheetB as stage3_sheetB} from '../stage-3'
-
+import {concatenate} from "../../src/interpreter/text";
+const {table} = require('table');
 let working = false
 
 interface IExtendedConsole extends Console {
     olog?: any
+    otable?: any
 }
 
 function run(func: (_?: number) => any) {
@@ -69,6 +71,11 @@ function logInit() {
         } else {
             eConsole.olog = () => {}
         }
+        if (typeof eConsole.table !== 'undefined') {
+            eConsole.otable = eConsole.table
+        } else {
+            eConsole.otable = () => {}
+        }
     }
 
     eConsole.log = function(message: string) {
@@ -76,6 +83,19 @@ function logInit() {
         log.innerHTML += '<p>' + message + '</p>'
     }
     eConsole.error = eConsole.debug = eConsole.info =  eConsole.log
+    eConsole.table = function(message: any[], columns: string[]) {
+        columns = columns || Object.keys(message[0])
+        const uniqueColumns: string[] = []
+        columns.forEach(column => {
+            if (uniqueColumns.indexOf(column) === -1) {
+                uniqueColumns.push(column)
+            }
+        })
+        const array: string[][] = [uniqueColumns].concat(message.map(row => uniqueColumns.map(column => row[column] || null)))
+        const asciiTable = table(array)
+        eConsole.otable(message)
+        log.innerHTML += '<p>' + asciiTable + '</p>'
+    }
 }
 
 function init() {
