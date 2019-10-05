@@ -1,19 +1,28 @@
 import {milestone} from "./vlookup/sheets";
 import {Config, HandsOnEngine} from "../src";
 import {Sheet} from "../src/GraphBuilder";
-import {StatType} from "../src/statistics/Statistics";
-import {average} from "./benchmark";
 import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
 import {simpleCellAddress} from "../src/Cell";
-import {averageStats, enrichStatistics, measure, statsToObject, statsTreePrint} from "./stats";
+import {
+  AdditionalStatTypes,
+  averageStats,
+  enrichStatistics,
+  measureCruds,
+  statsToObject,
+  statsTreePrint
+} from "./stats";
 
 export function sheetA() {
+  const name = 'Sheet A:  change value, add/remove row/column'
   const sheet = sheetAGenerator(10000)
   const stats: any[] = []
 
   const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false}))
-  measure(engine, stats, 'Sheet A:  change value, add/remove row/column', () => {
+  const buildStats = engine.getStats() as Map<string, any>
+  buildStats.set(AdditionalStatTypes.NAME, name)
+  statsTreePrint(enrichStatistics(buildStats))
+  measureCruds(engine, stats, name, () => {
     engine.setCellContent(simpleCellAddress(0, 0, 0), "123")
     engine.addRows(0, 5000, 1)
     engine.removeRows(0, 8000, 8000)
@@ -26,11 +35,15 @@ export function sheetA() {
 }
 
 export function sheetB() {
+  const name = 'Sheet B: change value, add/remove row/column'
   const sheet = sheetBGenerator(5000)
   const stats: any[] = []
 
   const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false}))
-  measure(engine, stats, 'Sheet B: change value, add/remove row/column', () => {
+  const buildStats = engine.getStats() as Map<string, any>
+  buildStats.set(AdditionalStatTypes.NAME, name)
+  statsTreePrint(enrichStatistics(buildStats))
+  measureCruds(engine, stats, name, () => {
     engine.setCellContent(simpleCellAddress(0, 0, 0), "123")
     engine.addRows(0, 2000, 1)
     engine.removeRows(0, 3000, 3000)

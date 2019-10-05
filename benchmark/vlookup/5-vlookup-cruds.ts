@@ -6,9 +6,7 @@ import {logStats, statsToObject} from "../stats";
 (() => {
   const stats = []
   const sheet = repeating2(10000, 100, 100)
-  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1 }))
-
-  console.log(CsvExporter.export(engine))
+  const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true }))
 
   stats.push(statsSnapshot('build engine', engine))
   engine.setCellContent(simpleCellAddress(0, 0, 8000), '42')
