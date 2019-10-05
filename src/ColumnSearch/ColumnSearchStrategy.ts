@@ -2,11 +2,10 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
-import {DependencyGraph, MatrixVertex} from '../DependencyGraph'
+import {DependencyGraph} from '../DependencyGraph'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
-import {Matrix} from "../Matrix";
 
 export interface IColumnSearchStrategy {
   add(value: CellValue, address: SimpleCellAddress): void

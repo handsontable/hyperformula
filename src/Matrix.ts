@@ -1,7 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
-import {add} from "./interpreter/scalar";
 
 export interface Size { width: number, height: number }
 export type MatrixSizeCheck = Size | false

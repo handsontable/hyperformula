@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HandsOnEngine, NoSuchSheetError, InvalidAddressError} from '../src'
+import {Config, EmptyValue, HandsOnEngine, InvalidAddressError, NoSuchSheetError} from '../src'
 import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
 import {adr} from './testUtils'
@@ -377,7 +377,7 @@ describe('changing cell content', () => {
   })
 })
 
-describe("change multiple cells contents", () => {
+describe('change multiple cells contents', () => {
   it('works for one', () => {
     const sheet = [
       ['1', '2'],
@@ -433,7 +433,7 @@ describe("change multiple cells contents", () => {
 
     expect(() => {
       engine.setMultipleCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
-    }).toThrow("Cant change matrices in batch operation")
+    }).toThrow('Cant change matrices in batch operation')
     expect(engine.getCellValue('A1')).toBe(1)
   })
 })

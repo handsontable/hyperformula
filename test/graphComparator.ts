@@ -1,4 +1,4 @@
-import {deepStrictEqual, strictEqual} from 'assert'
+import {deepStrictEqual} from 'assert'
 import {HandsOnEngine} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {sheetCellAddressToString, SimpleCellAddress, simpleCellAddress} from '../src/Cell'

@@ -1,4 +1,5 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
@@ -14,7 +15,6 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {IChooseAddressMapping, AlwaysSparse, AlwaysPlusTree, AlwaysDense} from './DependencyGraph/ChooseAddressMappingPolicy'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -93,7 +93,7 @@ export class Config {
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = 'cpu' //gpuMode || Config.defaultConfig.gpuMode
+    this.gpuMode = 'cpu' // gpuMode || Config.defaultConfig.gpuMode
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex

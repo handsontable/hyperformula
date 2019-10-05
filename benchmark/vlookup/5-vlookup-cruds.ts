@@ -1,7 +1,7 @@
-import {Config, CsvExporter, HandsOnEngine} from '../../src'
+import {Config, HandsOnEngine} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {logStats, statsToObject} from '../stats'
 import { repeating2} from './sheets'
-import {logStats, statsToObject} from "../stats";
 
 (() => {
   const stats = []

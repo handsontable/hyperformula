@@ -1,10 +1,10 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
+import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
 import {Size} from './Matrix'
-import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {

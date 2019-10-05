@@ -1,6 +1,6 @@
 
 import {IToken, tokenMatcher} from 'chevrotain'
-import {CellError, SimpleCellAddress} from '../Cell'
+import { SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'

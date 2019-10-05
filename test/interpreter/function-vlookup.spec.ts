@@ -3,7 +3,7 @@ import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
-import {adr} from "../testUtils";
+import {adr} from '../testUtils'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HandsOnEngine) => {
   describe('VLOOKUP - args validation', () => {
@@ -190,50 +190,50 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
     it('should properly calculate absolute row index', () => {
       const engine = builder([
           ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-          ["foo"],
-          ["1"],
-          ["2"],
-          ["3"],
+          ['foo'],
+          ['1'],
+          ['2'],
+          ['3'],
       ])
 
-      expect(engine.getCellValue("A1")).toEqual(3)
+      expect(engine.getCellValue('A1')).toEqual(3)
     })
 
     it('should work for detected matrices', () => {
       const engine = builder([
         ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-        ["1"],
-        ["2"],
-        ["3"],
+        ['1'],
+        ['2'],
+        ['3'],
       ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
-      expect(engine.getCellValue("A1")).toEqual(3)
+      expect(engine.getCellValue('A1')).toEqual(3)
     })
 
     it('should work for standard matrices', () => {
       const engine = builder([
         ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["{=TRANSPOSE(A2:C3)}"],
+        ['1', '2', '3'],
+        ['4', '5', '6'],
+        ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue("A1")).toEqual(6)
+      expect(engine.getCellValue('A1')).toEqual(6)
     })
 
     it('should work after updating standard matrix', () => {
       const engine = builder([
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["{=TRANSPOSE(A2:C3)}"],
+        ['1', '2', '3'],
+        ['4', '5', '6'],
+        ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue("A1")).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
 
-      engine.setCellContent(adr("C2"), "4")
+      engine.setCellContent(adr('C2'), '4')
 
-      expect(engine.getCellValue("A1")).toEqual(6)
+      expect(engine.getCellValue('A1')).toEqual(6)
     })
   })
 }
@@ -268,8 +268,8 @@ describe('BinarySearchStrategy', () => {
         ['5'],
     ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
 
-    expect(engine.getCellValue("A1")).toEqual(4)
-  });
+    expect(engine.getCellValue('A1')).toEqual(4)
+  })
 
   it('should calculate indexes properly when using naitve approach', () => {
     const engine = HandsOnEngine.buildFromArray([
@@ -284,6 +284,6 @@ describe('BinarySearchStrategy', () => {
       ['5'],
     ], new Config({ useColumnIndex: false }))
 
-    expect(engine.getCellValue("A1")).toEqual(4)
-  });
+    expect(engine.getCellValue('A1')).toEqual(4)
+  })
 })

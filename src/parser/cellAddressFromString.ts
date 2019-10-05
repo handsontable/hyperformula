@@ -1,4 +1,4 @@
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import { SimpleCellAddress} from '../Cell'
 import {CellAddress} from './CellAddress'
 
 export type SheetMappingFn = (sheetName: string) => number | undefined

@@ -4,8 +4,8 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Sheet} from '../GraphBuilder'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
+import { IChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {CellVertex} from './Vertex'
-import {IChooseAddressMapping, DenseSparseChooseBasedOnThreshold} from './ChooseAddressMappingPolicy'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 

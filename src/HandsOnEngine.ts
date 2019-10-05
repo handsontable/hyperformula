@@ -5,7 +5,7 @@ import {CellValue, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, Simp
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -35,6 +35,26 @@ export class InvalidAddressError extends Error {
  * Engine for one sheet
  */
 export class HandsOnEngine {
+
+  public get graph() {
+    return this.dependencyGraph.graph
+  }
+
+  public get rangeMapping() {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  public get matrixMapping() {
+    return this.dependencyGraph.matrixMapping
+  }
+
+  public get sheetMapping() {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public get addressMapping() {
+    return this.dependencyGraph.addressMapping
+  }
   /**
    * Builds engine for sheet from two-dimmensional array representation
    *
@@ -179,21 +199,11 @@ export class HandsOnEngine {
     }
   }
 
-  private ensureThatAddressIsCorrect(address: SimpleCellAddress) {
-    if (invalidSimpleCellAddress(address)) {
-      throw new InvalidAddressError(address)
-    }
-
-    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
-    }
-  }
-
   public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]) {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
-          throw new Error("Cant change matrices in batch operation")
+          throw new Error('Cant change matrices in batch operation')
         }
       }
     }
@@ -317,23 +327,13 @@ export class HandsOnEngine {
     }
   }
 
-  public get graph() {
-    return this.dependencyGraph.graph
-  }
+  private ensureThatAddressIsCorrect(address: SimpleCellAddress) {
+    if (invalidSimpleCellAddress(address)) {
+      throw new InvalidAddressError(address)
+    }
 
-  public get rangeMapping() {
-    return this.dependencyGraph.rangeMapping
-  }
-
-  public get matrixMapping() {
-    return this.dependencyGraph.matrixMapping
-  }
-
-  public get sheetMapping() {
-    return this.dependencyGraph.sheetMapping
-  }
-
-  public get addressMapping() {
-    return this.dependencyGraph.addressMapping
+    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
+      throw new NoSuchSheetError(address.sheet)
+    }
   }
 }

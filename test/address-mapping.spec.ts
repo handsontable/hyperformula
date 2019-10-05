@@ -1,9 +1,9 @@
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
+import {AlwaysDense, AlwaysPlusTree, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {PlusStrategy} from '../src/DependencyGraph/PlusTreeAddressMapping'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
-import {IChooseAddressMapping, AlwaysSparse, AlwaysDense, AlwaysPlusTree, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
-import {PlusStrategy} from '../src/DependencyGraph/PlusTreeAddressMapping'
 
 const sharedExamples = (builder: (width: number, height: number) => AddressMapping) => {
   it('simple set', () => {

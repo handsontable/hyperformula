@@ -1,6 +1,6 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import { Config, HandsOnEngine} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import { MatrixVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
@@ -9,7 +9,7 @@ import {
   expect_reference_to_have_ref_error,
   extractMatrixRange,
   extractRange,
-  extractReference
+  extractReference,
 } from '../testUtils'
 
 describe('Address dependencies, Case 1: same sheet', () => {
@@ -460,7 +460,7 @@ describe('Removing rows - reevaluation', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1'],
       ['2'],
-      ['=SUM(A1:A2)']
+      ['=SUM(A1:A2)'],
     ])
 
     const a3 = engine.addressMapping.getCell(adr('A3'))

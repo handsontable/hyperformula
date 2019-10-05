@@ -1,6 +1,6 @@
-import {average} from "./benchmark";
-import {HandsOnEngine} from "../src";
-import {StatType} from "../src/statistics/Statistics";
+import {HandsOnEngine} from '../src'
+import {StatType} from '../src/statistics/Statistics'
+import {average} from './benchmark'
 
 export enum AdditionalStatTypes {
     INIT_DATASTRUCTURES = 'INIT_DATASTRUCTURES',
@@ -18,11 +18,11 @@ export function enrichStatistics(stats: Map<string, any>): Map<string, any> {
     return enriched
 }
 
-export function averageStats(stats: Map<string, number>[]): Map<string, any> {
+export function averageStats(stats: Array<Map<string, number>>): Map<string, any> {
     const averages = new Map<string, number>()
 
     for (const key of stats[0].keys()) {
-        averages.set(key, average(stats.map(stats => stats.get(key)!)))
+        averages.set(key, average(stats.map((stats) => stats.get(key)!)))
     }
 
     return averages
@@ -50,7 +50,7 @@ export function measureCruds<T>(engine: HandsOnEngine, stats: any[], name: Strin
 }
 
 export function statsTreePrint(stats: Map<string, number>): void {
-    let str =
+    const str =
 `${stats.get('NAME')}
 ________________________________________________
 |BUILD_ENGINE_TOTAL:                        ${stats.get(StatType.BUILD_ENGINE_TOTAL) || 0}

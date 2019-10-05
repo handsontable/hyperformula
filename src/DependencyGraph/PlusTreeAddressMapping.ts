@@ -1,14 +1,13 @@
-import {IAddressMappingStrategy} from './AddressMapping'
-import {CellValue, EmptyValue, SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {Sheet} from '../GraphBuilder'
-import {CellVertex} from './Vertex'
+
+import { SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
+import {ColumnsSpan} from '../ColumnsSpan'
 import {PlusTree} from '../PlusTree'
 import {RowsSpan} from '../RowsSpan'
-import {ColumnsSpan} from '../ColumnsSpan'
+import {IAddressMappingStrategy} from './AddressMapping'
+import {CellVertex} from './Vertex'
 
 export class PlusStrategy implements IAddressMappingStrategy {
-  private mapping: PlusTree<Array<CellVertex>> = PlusTree.empty(64)
+  private mapping: PlusTree<CellVertex[]> = PlusTree.empty(64)
 
   constructor(private width: number, private height: number) {
   }

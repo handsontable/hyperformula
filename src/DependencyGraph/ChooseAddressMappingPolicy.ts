@@ -1,4 +1,4 @@
-import {IAddressMappingStrategyConstructor, DenseStrategy, SparseStrategy} from './AddressMapping'
+import {DenseStrategy, IAddressMappingStrategyConstructor, SparseStrategy} from './AddressMapping'
 import {PlusStrategy} from './PlusTreeAddressMapping'
 
 export interface IChooseAddressMapping {
@@ -7,7 +7,7 @@ export interface IChooseAddressMapping {
 
 export class DenseSparseChooseBasedOnThreshold implements IChooseAddressMapping {
   constructor(
-    private readonly threshold: number
+    private readonly threshold: number,
   ) {
   }
 

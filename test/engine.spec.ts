@@ -1,7 +1,7 @@
 import {HandsOnEngine} from '../src'
 import {CellError, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
-import {adr, expect_reference_to_have_ref_error} from "./testUtils";
+import {adr, expect_reference_to_have_ref_error} from './testUtils'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -85,6 +85,6 @@ describe('Integration', () => {
   it('should be possible to build graph with reference to not existing sheet', () => {
     const engine = HandsOnEngine.buildFromArray([['=$Sheet2.A2']])
 
-    expect_reference_to_have_ref_error(engine, adr("A1"))
-  });
+    expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
 })

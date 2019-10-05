@@ -1,6 +1,6 @@
+import {Config} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {absolutizeDependencies} from '../../src/absolutizeDependencies'
-import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'

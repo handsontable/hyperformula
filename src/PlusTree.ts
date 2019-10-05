@@ -10,7 +10,7 @@ export class Leaf<T> {
 export class Internal<T> {
   constructor(
     public keys: number[],
-    public children: PNode<T>[],
+    public children: Array<PNode<T>>,
     public shift: number,
   ) {
   }
@@ -39,6 +39,34 @@ export class PlusTree<T> {
     return this.getKeyRecursive(this._root, key)
   }
 
+  public* values(): IterableIterator<T> {
+    yield* this.valuesRecursive(this._root)
+  }
+
+  public* entries(): IterableIterator<Entry<T>> {
+    yield* this.entriesRecursive(this._root, 0)
+  }
+
+  public* entriesFromKeyRange(minKey: number, maxKey: number): IterableIterator<Entry<T>> {
+    yield* this.entriesFromKeyRangeRecursive(minKey, maxKey, this._root, 0)
+  }
+
+  public addKeyWithShift(key: number, value: T) {
+    this.addKeyWithRootHandling(true, key, value)
+  }
+
+  public addKeyWithoutShift(key: number, value: T) {
+    this.addKeyWithRootHandling(false, key, value)
+  }
+
+  public deleteKeyWithShift(key: number) {
+    this.deleteKeyWithShiftRecursive(this._root, key)
+    if (this._root.keys.length === 0 && this._root instanceof Internal) {
+      const onlyChild = this._root.children[0]
+      this._root = onlyChild
+    }
+  }
+
   private getKeyRecursive(node: PNode<T>, key: number): T | null {
     const sKey = key - node.shift
     if (node instanceof Leaf) {
@@ -54,10 +82,6 @@ export class PlusTree<T> {
     }
   }
 
-  public* values(): IterableIterator<T> {
-    yield* this.valuesRecursive(this._root)
-  }
-
   private* valuesRecursive(node: PNode<T>): IterableIterator<T> {
     if (node instanceof Leaf) {
       yield* node.values[Symbol.iterator]()
@@ -66,10 +90,6 @@ export class PlusTree<T> {
         yield* this.valuesRecursive(node.children[i])
       }
     }
-  }
-  
-  public* entries(): IterableIterator<Entry<T>> {
-    yield* this.entriesRecursive(this._root, 0)
   }
 
   private* entriesRecursive(node: PNode<T>, currentShift: number): IterableIterator<Entry<T>> {
@@ -85,15 +105,11 @@ export class PlusTree<T> {
     }
   }
 
-  public* entriesFromKeyRange(minKey: number, maxKey: number): IterableIterator<Entry<T>> {
-    yield* this.entriesFromKeyRangeRecursive(minKey, maxKey, this._root, 0)
-  }
-
   private* entriesFromKeyRangeRecursive(minKey: number, maxKey: number, node: PNode<T>, currentShift: number): IterableIterator<Entry<T>> {
     const shiftForThatNode = currentShift + node.shift
     const sMinKey = minKey - node.shift
     const sMaxKey = maxKey - node.shift
-    let smallestIndex = node.keys.findIndex(k => k >= sMinKey)
+    let smallestIndex = node.keys.findIndex((k) => k >= sMinKey)
     if (smallestIndex === -1) {
       smallestIndex = node.keys.length
     }
@@ -108,19 +124,11 @@ export class PlusTree<T> {
     } else {
       for (let i = smallestIndex; i < node.children.length; i++) {
         if (node.keys[i - 1] >= sMaxKey) {
-          break;
+          break
         }
         yield* this.entriesFromKeyRangeRecursive(sMinKey, sMaxKey, node.children[i], shiftForThatNode)
       }
     }
-  }
-
-  public addKeyWithShift(key: number, value: T) {
-    this.addKeyWithRootHandling(true, key, value)
-  }
-
-  public addKeyWithoutShift(key: number, value: T) {
-    this.addKeyWithRootHandling(false, key, value)
   }
 
   private addKeyWithRootHandling(doShift: boolean, key: number, value: T) {
@@ -137,7 +145,7 @@ export class PlusTree<T> {
     const indexWhereToAddIt = this.findChildIndex(node, sKey)
     if (node instanceof Leaf) {
       if (!doShift && node.keys[indexWhereToAddIt] === sKey) {
-        throw Error("Cant add without shift if key already exists")
+        throw Error('Cant add without shift if key already exists')
       }
       if (doShift) {
         for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
@@ -152,7 +160,7 @@ export class PlusTree<T> {
       if (doShift) {
         for (let i = indexWhereToAddIt; i < node.keys.length; i++) {
           node.keys[i]++
-          node.children[i+1].shift++
+          node.children[i + 1].shift++
         }
       }
       if (childNode.keys.length > this.maxSize) {
@@ -178,25 +186,17 @@ export class PlusTree<T> {
     }
   }
 
-  public deleteKeyWithShift(key: number) {
-    this.deleteKeyWithShiftRecursive(this._root, key)
-    if (this._root.keys.length === 0 && this._root instanceof Internal) {
-      const onlyChild = this._root.children[0]
-      this._root = onlyChild
-    }
-  }
-
   private deleteKeyWithShiftRecursive(node: PNode<T>, key: number) {
     const sKey = key - node.shift
     if (node instanceof Leaf) {
-      const foundIndex = node.keys.findIndex(k => k >= sKey)
+      const foundIndex = node.keys.findIndex((k) => k >= sKey)
       if (foundIndex !== -1) {
         if (node.keys[foundIndex] === sKey) {
           node.keys.splice(foundIndex, 1)
           node.values.splice(foundIndex, 1)
         }
         for (let i = foundIndex; i < node.keys.length; i++) {
-          node.keys[i]--;
+          node.keys[i]--
         }
       }
     } else {
@@ -205,7 +205,7 @@ export class PlusTree<T> {
       this.deleteKeyWithShiftRecursive(childNode, sKey)
       for (let i = foundIndex; i < node.keys.length; i++) {
         node.keys[i]--
-        node.children[i+1].shift--
+        node.children[i + 1].shift--
       }
       if (childNode.keys.length < this.minSize) {
         const rightSibling = node.children[foundIndex + 1]
@@ -224,7 +224,7 @@ export class PlusTree<T> {
   }
 
   private findChildIndex(node: PNode<T>, sKey: number): number {
-    const foundIndex = node.keys.findIndex(k => k >= sKey)
+    const foundIndex = node.keys.findIndex((k) => k >= sKey)
     if (foundIndex === -1) {
       return node.keys.length
     } else {
@@ -236,13 +236,13 @@ export class PlusTree<T> {
     const childNode = parentNode.children[index]
     const rightSibling = parentNode.children[index + 1]
     if (childNode instanceof Leaf && rightSibling instanceof Leaf) {
-      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map((k) => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
       childNode.values = childNode.values.concat(rightSibling.values)
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
     } else if (childNode instanceof Internal && rightSibling instanceof Internal ) {
       childNode.keys.push(this.getRightmostKey(childNode.children[childNode.children.length - 1]))
-      childNode.keys = childNode.keys.concat(rightSibling.keys.map(k => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
+      childNode.keys = childNode.keys.concat(rightSibling.keys.map((k) => this.adjustKeyWhenMovingFromSiblingToSibling(k, rightSibling, childNode)))
       for (const childOfRightSibling of rightSibling.children) {
         childOfRightSibling.shift = this.adjustKeyWhenMovingFromSiblingToSibling(childOfRightSibling.shift, rightSibling, childNode)
       }
@@ -250,7 +250,7 @@ export class PlusTree<T> {
       parentNode.keys.splice(index, 1)
       parentNode.children.splice(index + 1, 1)
     } else {
-      throw Error("Cant happen")
+      throw Error('Cant happen')
     }
   }
 
@@ -268,7 +268,7 @@ export class PlusTree<T> {
       childNode.children.push(movedChild)
       parentNode.keys[index] = this.adjustKeyWhenMovingFromChildToParent(rightSibling.keys.shift()!, rightSibling)
     } else {
-      throw Error("Cant happen")
+      throw Error('Cant happen')
     }
   }
 
@@ -294,15 +294,15 @@ export class PlusTree<T> {
       childNode.children.unshift(movedChild)
       parentNode.keys[index - 1] = this.adjustKeyWhenMovingFromChildToParent(leftSibling.keys.pop()!, leftSibling)
     } else {
-      throw Error("Cant happen")
+      throw Error('Cant happen')
     }
   }
 
   private adjustKeyWhenMovingFromSiblingToSibling(key: number, fromNode: PNode<T>, toNode: PNode<T>): number {
-    return key + fromNode.shift - toNode.shift;
+    return key + fromNode.shift - toNode.shift
   }
 
   private adjustKeyWhenMovingFromChildToParent(key: number, childNode: PNode<T>): number {
-    return key + childNode.shift;
+    return key + childNode.shift
   }
 }

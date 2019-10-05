@@ -1,4 +1,4 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import { Config, HandsOnEngine} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
@@ -387,7 +387,7 @@ describe('Removing columns - reevaluation', () => {
 
   it('should reevaluate formula when range reduced to zero', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '=SUM(A1:B1)']
+      ['1', '2', '=SUM(A1:B1)'],
     ])
 
     const c1 = engine.addressMapping.getCell(adr('C1'))

@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import {logStats, measureCruds} from "../stats";
+import {logStats, measureCruds} from '../stats'
 
 export function addColumns(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
@@ -53,4 +53,3 @@ export function half(num: number) {
 export function getDimensions(engine: HandsOnEngine) {
   return engine.getSheetsDimensions().get('Sheet1')!
 }
-

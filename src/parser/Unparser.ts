@@ -1,7 +1,7 @@
 import {SimpleCellAddress} from '../Cell'
+import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {Ast, AstNodeType} from './Ast'
 import {ParserConfig} from './ParserConfig'
 
 export type SheetMappingFn = (sheetId: number) => string

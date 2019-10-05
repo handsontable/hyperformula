@@ -1,7 +1,7 @@
 import {CellError, Config, HandsOnEngine} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
 import '../testConfig.ts'
-import {ColumnBinarySearch} from "../../src/ColumnSearch/ColumnBinarySearch";
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
@@ -170,7 +170,7 @@ describe('Function MATCH', () => {
   })
 
   it('uses binsearch', () => {
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, "computeListOfValuesInRange")
+    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
@@ -186,7 +186,7 @@ describe('Function MATCH', () => {
   })
 
   it('uses indexOf', () => {
-    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, "computeListOfValuesInRange")
+    const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HandsOnEngine.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],

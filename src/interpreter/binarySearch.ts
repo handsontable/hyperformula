@@ -1,6 +1,6 @@
-import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {AbsoluteCellRange} from "../AbsoluteCellRange";
-import {DependencyGraph} from "../DependencyGraph";
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue, simpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
 
 /*
 * If key exists returns first index of key element in range of sorted values

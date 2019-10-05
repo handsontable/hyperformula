@@ -1,4 +1,4 @@
-import {PlusTree, Leaf, Internal} from '../src/PlusTree'
+import {Internal, Leaf, PlusTree} from '../src/PlusTree'
 
 function getLeaf<T>(tree: PlusTree<T>, idx0?: number, idx1?: number): Leaf<T> {
   let result = tree._root
@@ -55,10 +55,10 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(4, 40)
 
       expect(tree._root.keys).toEqual([2])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0).values).toEqual([10,20])
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
       expect(tree.getKey(2)).toEqual(20)
       expect(tree.getKey(3)).toEqual(30)
     })
@@ -70,8 +70,8 @@ describe('PlusTree', () => {
 
       tree.addKeyWithShift(2, 200)
 
-      expect(getLeaf(tree).keys).toEqual([1,2,3])
-      expect(getLeaf(tree).values).toEqual([10,200,20])
+      expect(getLeaf(tree).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree).values).toEqual([10, 200, 20])
     })
 
     it('adding increments shift of right sibling', () => {
@@ -85,11 +85,11 @@ describe('PlusTree', () => {
 
       expect(tree._root.keys).toEqual([3])
       expect(getLeaf(tree, 0).shift).toBe(0)
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,200,20])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 200, 20])
       expect(getLeaf(tree, 1).shift).toBe(1)
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
       expect(tree.getKey(2)).toEqual(200)
       expect(tree.getKey(3)).toEqual(20)
       expect(tree.getKey(4)).toEqual(30)
@@ -107,8 +107,8 @@ describe('PlusTree', () => {
 
       expect(tree._root.keys).toEqual([3])
       expect(getLeaf(tree, 1).shift).toBe(1)
-      expect(getLeaf(tree, 1).keys).toEqual([3,4,5])
-      expect(getLeaf(tree, 1).values).toEqual([400,30,40])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4, 5])
+      expect(getLeaf(tree, 1).values).toEqual([400, 30, 40])
     })
 
     it('splitting non-root leaf node', () => {
@@ -121,13 +121,13 @@ describe('PlusTree', () => {
 
       tree.addKeyWithShift(6, 60)
 
-      expect(tree._root.keys).toEqual([2,4])
+      expect(tree._root.keys).toEqual([2, 4])
       expect(getLeaf(tree, 1).shift).toBe(0)
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
       expect(getLeaf(tree, 2).shift).toBe(0)
-      expect(getLeaf(tree, 2).keys).toEqual([5,6])
-      expect(getLeaf(tree, 2).values).toEqual([50,60])
+      expect(getLeaf(tree, 2).keys).toEqual([5, 6])
+      expect(getLeaf(tree, 2).values).toEqual([50, 60])
     })
 
     it('splitting non-root leaf node (which is shifted)', () => {
@@ -141,13 +141,13 @@ describe('PlusTree', () => {
 
       tree.addKeyWithShift(7, 70)
 
-      expect(tree._root.keys).toEqual([3,5])
+      expect(tree._root.keys).toEqual([3, 5])
       expect(getLeaf(tree, 1).shift).toBe(1)
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
       expect(getLeaf(tree, 2).shift).toBe(1)
-      expect(getLeaf(tree, 2).keys).toEqual([5,6])
-      expect(getLeaf(tree, 2).values).toEqual([50,70])
+      expect(getLeaf(tree, 2).keys).toEqual([5, 6])
+      expect(getLeaf(tree, 2).values).toEqual([50, 70])
     })
 
     it('splitting internal root node', () => {
@@ -165,13 +165,13 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(10, 100)
 
       expect(tree._root.keys).toEqual([6])
-      expect(getLeaf(tree, 0).keys).toEqual([2,4])
-      expect(getLeaf(tree, 0, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 0, 2).keys).toEqual([5,6])
+      expect(getLeaf(tree, 0).keys).toEqual([2, 4])
+      expect(getLeaf(tree, 0, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 0, 2).keys).toEqual([5, 6])
       expect(getLeaf(tree, 1).keys).toEqual([8])
-      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
-      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7, 8])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9, 10])
       expect(getLeaf(tree, 1, 2)).toBeUndefined()
     })
 
@@ -196,15 +196,15 @@ describe('PlusTree', () => {
 
       //             6                       12
       //   [2     4]          [8     10]                [14]
-      //1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16
-      expect(tree._root.keys).toEqual([6,12])
-      expect(getLeaf(tree, 1).keys).toEqual([8,10])
-      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
-      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
-      expect(getLeaf(tree, 1, 2).keys).toEqual([11,12])
+      // 1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16
+      expect(tree._root.keys).toEqual([6, 12])
+      expect(getLeaf(tree, 1).keys).toEqual([8, 10])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7, 8])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9, 10])
+      expect(getLeaf(tree, 1, 2).keys).toEqual([11, 12])
       expect(getLeaf(tree, 2).keys).toEqual([14])
-      expect(getLeaf(tree, 2, 0).keys).toEqual([13,14])
-      expect(getLeaf(tree, 2, 1).keys).toEqual([15,16])
+      expect(getLeaf(tree, 2, 0).keys).toEqual([13, 14])
+      expect(getLeaf(tree, 2, 1).keys).toEqual([15, 16])
     })
 
     it('splitting internal node (which is shifted)', () => {
@@ -229,23 +229,23 @@ describe('PlusTree', () => {
 
       //             7                       13
       //   [2     4]          [8     10]                [14]
-      //1,2 | 3,4 | 5,6,7    7,8 | 9,10 | 11,12     13,14 | 15,16
-      expect(tree._root.keys).toEqual([7,13])
+      // 1,2 | 3,4 | 5,6,7    7,8 | 9,10 | 11,12     13,14 | 15,16
+      expect(tree._root.keys).toEqual([7, 13])
       expect(getLeaf(tree, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0).keys).toEqual([2,4])
-      expect(getLeaf(tree, 0, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 0, 2).keys).toEqual([5,6,7])
-      expect(getLeaf(tree, 0, 2).values).toEqual([50,600,60])
+      expect(getLeaf(tree, 0).keys).toEqual([2, 4])
+      expect(getLeaf(tree, 0, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 0, 2).keys).toEqual([5, 6, 7])
+      expect(getLeaf(tree, 0, 2).values).toEqual([50, 600, 60])
       expect(getLeaf(tree, 1).shift).toEqual(1)
-      expect(getLeaf(tree, 1).keys).toEqual([8,10])
-      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
-      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
-      expect(getLeaf(tree, 1, 2).keys).toEqual([11,12])
+      expect(getLeaf(tree, 1).keys).toEqual([8, 10])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7, 8])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9, 10])
+      expect(getLeaf(tree, 1, 2).keys).toEqual([11, 12])
       expect(getLeaf(tree, 2).shift).toEqual(1)
       expect(getLeaf(tree, 2).keys).toEqual([14])
-      expect(getLeaf(tree, 2, 0).keys).toEqual([13,14])
-      expect(getLeaf(tree, 2, 1).keys).toEqual([15,16])
+      expect(getLeaf(tree, 2, 0).keys).toEqual([13, 14])
+      expect(getLeaf(tree, 2, 1).keys).toEqual([15, 16])
     })
 
     it('adding key through internal node (shifted)', () => {
@@ -266,9 +266,9 @@ describe('PlusTree', () => {
 
       expect(tree._root.keys).toEqual([7])
       expect(getLeaf(tree, 1).shift).toEqual(1)
-      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8,9])
-      expect(getLeaf(tree, 1, 0).values).toEqual([70,900,80])
-      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7, 8, 9])
+      expect(getLeaf(tree, 1, 0).values).toEqual([70, 900, 80])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9, 10])
       expect(getLeaf(tree, 1, 2)).toBeUndefined()
     })
   })
@@ -280,7 +280,7 @@ describe('PlusTree', () => {
 
       expect(() => {
         tree.addKeyWithoutShift(1, 100)
-      }).toThrow("Cant add without shift if key already exists")
+      }).toThrow('Cant add without shift if key already exists')
     })
 
     it('do not shift other values', () => {
@@ -290,8 +290,8 @@ describe('PlusTree', () => {
 
       tree.addKeyWithoutShift(1, 10)
 
-      expect(getLeaf(tree).keys).toEqual([1,2,3])
-      expect(getLeaf(tree).values).toEqual([10,20,30])
+      expect(getLeaf(tree).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree).values).toEqual([10, 20, 30])
     })
 
     it('does not increase siblings shift', () => {
@@ -304,8 +304,8 @@ describe('PlusTree', () => {
       tree.addKeyWithoutShift(1, 10)
 
       expect(getLeaf(tree).keys).toEqual([3])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,20,30])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(0)
     })
   })
@@ -340,8 +340,8 @@ describe('PlusTree', () => {
 
       tree.deleteKeyWithShift(2)
 
-      expect(getLeaf(tree).keys).toEqual([1,2])
-      expect(getLeaf(tree).values).toEqual([10,30])
+      expect(getLeaf(tree).keys).toEqual([1, 2])
+      expect(getLeaf(tree).values).toEqual([10, 30])
     })
 
     it('delete key from leaf node', () => {
@@ -357,8 +357,8 @@ describe('PlusTree', () => {
       expect(getLeaf(tree, 0).keys).toEqual([1])
       expect(getLeaf(tree, 0).values).toEqual([10])
       expect(getLeaf(tree, 1).shift).toEqual(-1)
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
     })
 
     it('delete key from last leaf node', () => {
@@ -372,8 +372,8 @@ describe('PlusTree', () => {
 
       expect(getLeaf(tree).keys).toEqual([2])
       expect(getLeaf(tree, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0).values).toEqual([10,20])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20])
       expect(getLeaf(tree, 1).shift).toEqual(0)
       expect(getLeaf(tree, 1).keys).toEqual([3])
       expect(getLeaf(tree, 1).values).toEqual([40])
@@ -391,8 +391,8 @@ describe('PlusTree', () => {
 
       expect(getLeaf(tree).keys).toEqual([3])
       expect(getLeaf(tree, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,200,20])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 200, 20])
       expect(getLeaf(tree, 1).shift).toEqual(1)
       expect(getLeaf(tree, 1).keys).toEqual([3])
       expect(getLeaf(tree, 1).values).toEqual([40])
@@ -419,7 +419,7 @@ describe('PlusTree', () => {
 
       expect(getLeaf(tree).keys).toEqual([7])
       expect(getLeaf(tree, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0).keys).toEqual([2,5])
+      expect(getLeaf(tree, 0).keys).toEqual([2, 5])
       expect(getLeaf(tree, 1).shift).toEqual(1)
       expect(getLeaf(tree, 1).keys).toEqual([7])
       expect(getLeaf(tree, 1, 0).shift).toEqual(0)
@@ -444,11 +444,11 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(5)
 
       expect(getLeaf(tree).keys).toEqual([3])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,20,30])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5,6])
-      expect(getLeaf(tree, 1).values).toEqual([40,70,80])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5, 6])
+      expect(getLeaf(tree, 1).values).toEqual([40, 70, 80])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -470,11 +470,11 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(4)
 
       expect(getLeaf(tree).keys).toEqual([2])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0).values).toEqual([20,30])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0).values).toEqual([20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(-1)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5,6])
-      expect(getLeaf(tree, 1).values).toEqual([40,70,80])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5, 6])
+      expect(getLeaf(tree, 1).values).toEqual([40, 70, 80])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -495,11 +495,11 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(7)
 
       expect(getLeaf(tree).keys).toEqual([3])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,20,30])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5,6])
-      expect(getLeaf(tree, 1).values).toEqual([40,50,70])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5, 6])
+      expect(getLeaf(tree, 1).values).toEqual([40, 50, 70])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -518,15 +518,15 @@ describe('PlusTree', () => {
 
       tree.deleteKeyWithShift(5)
 
-      expect(getLeaf(tree).keys).toEqual([3,5])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3])
-      expect(getLeaf(tree, 0).values).toEqual([10,20,30])
+      expect(getLeaf(tree).keys).toEqual([3, 5])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5])
-      expect(getLeaf(tree, 1).values).toEqual([40,70])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5])
+      expect(getLeaf(tree, 1).values).toEqual([40, 70])
       expect(getLeaf(tree, 2).shift).toEqual(-2)
-      expect(getLeaf(tree, 2).keys).toEqual([8,9])
-      expect(getLeaf(tree, 2).values).toEqual([80,90])
+      expect(getLeaf(tree, 2).keys).toEqual([8, 9])
+      expect(getLeaf(tree, 2).values).toEqual([80, 90])
     })
 
     it('pulls one element from right sibling, child is shifted', () => {
@@ -545,15 +545,15 @@ describe('PlusTree', () => {
 
       tree.deleteKeyWithShift(6)
 
-      expect(getLeaf(tree).keys).toEqual([4,6])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2,3,4])
-      expect(getLeaf(tree, 0).values).toEqual([100,10,20,30])
+      expect(getLeaf(tree).keys).toEqual([4, 6])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2, 3, 4])
+      expect(getLeaf(tree, 0).values).toEqual([100, 10, 20, 30])
       expect(getLeaf(tree, 1).shift).toEqual(1)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5])
-      expect(getLeaf(tree, 1).values).toEqual([40,70])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5])
+      expect(getLeaf(tree, 1).values).toEqual([40, 70])
       expect(getLeaf(tree, 2).shift).toEqual(-1)
-      expect(getLeaf(tree, 2).keys).toEqual([8,9])
-      expect(getLeaf(tree, 2).values).toEqual([80,90])
+      expect(getLeaf(tree, 2).keys).toEqual([8, 9])
+      expect(getLeaf(tree, 2).values).toEqual([80, 90])
     })
 
     it('pulls one element from left sibling', () => {
@@ -569,10 +569,10 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(5)
 
       expect(getLeaf(tree).keys).toEqual([2])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0).values).toEqual([10,20])
-      expect(getLeaf(tree, 1).keys).toEqual([3,4])
-      expect(getLeaf(tree, 1).values).toEqual([30,40])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20])
+      expect(getLeaf(tree, 1).keys).toEqual([3, 4])
+      expect(getLeaf(tree, 1).values).toEqual([30, 40])
     })
 
     it('pulls one element from left sibling, child is shifted', () => {
@@ -592,15 +592,15 @@ describe('PlusTree', () => {
 
       tree.deleteKeyWithShift(8)
 
-      expect(getLeaf(tree).keys).toEqual([2,5])
-      expect(getLeaf(tree, 0).keys).toEqual([1,2])
-      expect(getLeaf(tree, 0).values).toEqual([10,20])
+      expect(getLeaf(tree).keys).toEqual([2, 5])
+      expect(getLeaf(tree, 0).keys).toEqual([1, 2])
+      expect(getLeaf(tree, 0).values).toEqual([10, 20])
       expect(getLeaf(tree, 1).shift).toEqual(-1)
-      expect(getLeaf(tree, 1).keys).toEqual([4,5,6])
-      expect(getLeaf(tree, 1).values).toEqual([300,40,50])
+      expect(getLeaf(tree, 1).keys).toEqual([4, 5, 6])
+      expect(getLeaf(tree, 1).values).toEqual([300, 40, 50])
       expect(getLeaf(tree, 2).shift).toEqual(0)
-      expect(getLeaf(tree, 2).keys).toEqual([6,7])
-      expect(getLeaf(tree, 2).values).toEqual([60,70])
+      expect(getLeaf(tree, 2).keys).toEqual([6, 7])
+      expect(getLeaf(tree, 2).values).toEqual([60, 70])
     })
 
     it('merging internal node (shifted) with right sibling', () => {
@@ -628,22 +628,22 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(6)
       //              5            7
       //   [2     4]      [7]^-1       [14]^(-5)
-      //1,2 | 3,4 | 5    7 | 8     13,14 | 15,16
+      // 1,2 | 3,4 | 5    7 | 8     13,14 | 15,16
 
       tree.deleteKeyWithShift(7)
 
       //             5
       //   [2     4]        [7      9]^-1
-      //1,2 | 3,4 | 5    7 | 13,14 | 15,16
+      // 1,2 | 3,4 | 5    7 | 13,14 | 15,16
       expect(tree._root.keys).toEqual([5])
       expect(getLeaf(tree, 1).shift).toEqual(-1)
-      expect(getLeaf(tree, 1).keys).toEqual([7,9])
+      expect(getLeaf(tree, 1).keys).toEqual([7, 9])
       expect(getLeaf(tree, 1, 0).shift).toEqual(0)
       expect(getLeaf(tree, 1, 0).keys).toEqual([7])
       expect(getLeaf(tree, 1, 1).shift).toEqual(-5)
-      expect(getLeaf(tree, 1, 1).keys).toEqual([13,14])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([13, 14])
       expect(getLeaf(tree, 1, 2).shift).toEqual(-5)
-      expect(getLeaf(tree, 1, 2).keys).toEqual([15,16])
+      expect(getLeaf(tree, 1, 2).keys).toEqual([15, 16])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -671,22 +671,22 @@ describe('PlusTree', () => {
       tree.deleteKeyWithShift(9)
       //             6            8
       //   [2     4]        [7]          [14]^(-4)
-      //1,2 | 3,4 | 5,6    7 | 8     13,14 | 15,16
+      // 1,2 | 3,4 | 5,6    7 | 8     13,14 | 15,16
 
       tree.deleteKeyWithShift(8)
 
       //             6
       //   [2     4]        [7      9]
-      //1,2 | 3,4 | 5,6    7 | 13,14 | 15,16
+      // 1,2 | 3,4 | 5,6    7 | 13,14 | 15,16
       expect(tree._root.keys).toEqual([6])
       expect(getLeaf(tree, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1).keys).toEqual([7,9])
+      expect(getLeaf(tree, 1).keys).toEqual([7, 9])
       expect(getLeaf(tree, 1, 0).shift).toEqual(0)
       expect(getLeaf(tree, 1, 0).keys).toEqual([7])
       expect(getLeaf(tree, 1, 1).shift).toEqual(-5)
-      expect(getLeaf(tree, 1, 1).keys).toEqual([13,14])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([13, 14])
       expect(getLeaf(tree, 1, 2).shift).toEqual(-5)
-      expect(getLeaf(tree, 1, 2).keys).toEqual([15,16])
+      expect(getLeaf(tree, 1, 2).keys).toEqual([15, 16])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -711,37 +711,37 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(17, 170)
       //                    7                                     13
       //      3       5                   9         11                  15
-      //1,2,3 | 3,4^1 | 5,6^1       7,8^1 | 9,10^1 | 11,12^1     13,14^1 | 15,16^1
+      // 1,2,3 | 3,4^1 | 5,6^1       7,8^1 | 9,10^1 | 11,12^1     13,14^1 | 15,16^1
       tree.deleteKeyWithShift(13)
       tree.deleteKeyWithShift(12)
       tree.deleteKeyWithShift(11)
       tree.deleteKeyWithShift(10)
       //                    7                       9
       //      3       5                 8                 15^-4
-      //1,2,3 | 3,4^1 | 5,6^1       7^1 | 8^1      13,14^1 | 15,16^1
+      // 1,2,3 | 3,4^1 | 5,6^1       7^1 | 8^1      13,14^1 | 15,16^1
 
       tree.deleteKeyWithShift(9)
 
       //                    7
       //      3       5                 8         10
-      //1,2,3 | 3,4^1 | 5,6^1       7^1 | 13,14^-4 | 15,16^-4
+      // 1,2,3 | 3,4^1 | 5,6^1       7^1 | 13,14^-4 | 15,16^-4
       expect(tree._root.keys).toEqual([7])
       expect(getLeaf(tree, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0).keys).toEqual([3,5])
+      expect(getLeaf(tree, 0).keys).toEqual([3, 5])
       expect(getLeaf(tree, 0, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 0, 0).keys).toEqual([1,2,3])
+      expect(getLeaf(tree, 0, 0).keys).toEqual([1, 2, 3])
       expect(getLeaf(tree, 0, 1).shift).toEqual(1)
-      expect(getLeaf(tree, 0, 1).keys).toEqual([3,4])
+      expect(getLeaf(tree, 0, 1).keys).toEqual([3, 4])
       expect(getLeaf(tree, 0, 2).shift).toEqual(1)
-      expect(getLeaf(tree, 0, 2).keys).toEqual([5,6])
+      expect(getLeaf(tree, 0, 2).keys).toEqual([5, 6])
       expect(getLeaf(tree, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1).keys).toEqual([8,10])
+      expect(getLeaf(tree, 1).keys).toEqual([8, 10])
       expect(getLeaf(tree, 1, 0).shift).toEqual(1)
       expect(getLeaf(tree, 1, 0).keys).toEqual([7])
       expect(getLeaf(tree, 1, 1).shift).toEqual(-4)
-      expect(getLeaf(tree, 1, 1).keys).toEqual([13,14])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([13, 14])
       expect(getLeaf(tree, 1, 2).shift).toEqual(-4)
-      expect(getLeaf(tree, 1, 2).keys).toEqual([15,16])
+      expect(getLeaf(tree, 1, 2).keys).toEqual([15, 16])
       expect(getLeaf(tree, 2)).toBeUndefined()
     })
 
@@ -767,7 +767,7 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(18, 180)
       //             6                       12
       //   [2     4]          [8     10]                [14     16]
-      //1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16 | 17,18
+      // 1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16 | 17,18
       tree.deleteKeyWithShift(12)
       tree.deleteKeyWithShift(11)
       tree.deleteKeyWithShift(10)
@@ -776,20 +776,20 @@ describe('PlusTree', () => {
 
       //             6                     9
       //   [2     4]        [7]                [16]^-5
-      //1,2 | 3,4 | 5,6    7 | 13,14^-5     15,16 | 17,18
-      expect(tree._root.keys).toEqual([6,9])
+      // 1,2 | 3,4 | 5,6    7 | 13,14^-5     15,16 | 17,18
+      expect(tree._root.keys).toEqual([6, 9])
       expect(getLeaf(tree, 1).shift).toEqual(0)
       expect(getLeaf(tree, 1).keys).toEqual([7])
       expect(getLeaf(tree, 1, 0).shift).toEqual(0)
       expect(getLeaf(tree, 1, 0).keys).toEqual([7])
       expect(getLeaf(tree, 1, 1).shift).toEqual(-5)
-      expect(getLeaf(tree, 1, 1).keys).toEqual([13,14])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([13, 14])
       expect(getLeaf(tree, 2).shift).toEqual(-5)
       expect(getLeaf(tree, 2).keys).toEqual([16])
       expect(getLeaf(tree, 2, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 2, 0).keys).toEqual([15,16])
+      expect(getLeaf(tree, 2, 0).keys).toEqual([15, 16])
       expect(getLeaf(tree, 2, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 2, 1).keys).toEqual([17,18])
+      expect(getLeaf(tree, 2, 1).keys).toEqual([17, 18])
     })
 
     it('pulling from left internal node', () => {
@@ -814,7 +814,7 @@ describe('PlusTree', () => {
       // tree.addKeyWithShift(18, 180)
       //             6                       12
       //   [2     4]          [8     10]                [14]
-      //1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16
+      // 1,2 | 3,4 | 5,6    7,8 | 9,10 | 11,12     13,14 | 15,16
       tree.deleteKeyWithShift(16)
       tree.deleteKeyWithShift(15)
       tree.deleteKeyWithShift(14)
@@ -823,18 +823,18 @@ describe('PlusTree', () => {
 
       //             6                10
       //   [2     4]          [8]             [12]
-      //1,2 | 3,4 | 5,6    7,8 | 9,10     11,12 | 13
-      expect(tree._root.keys).toEqual([6,10])
+      // 1,2 | 3,4 | 5,6    7,8 | 9,10     11,12 | 13
+      expect(tree._root.keys).toEqual([6, 10])
       expect(getLeaf(tree, 1).shift).toEqual(0)
       expect(getLeaf(tree, 1).keys).toEqual([8])
       expect(getLeaf(tree, 1, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 1, 0).keys).toEqual([7,8])
+      expect(getLeaf(tree, 1, 0).keys).toEqual([7, 8])
       expect(getLeaf(tree, 1, 1).shift).toEqual(0)
-      expect(getLeaf(tree, 1, 1).keys).toEqual([9,10])
+      expect(getLeaf(tree, 1, 1).keys).toEqual([9, 10])
       expect(getLeaf(tree, 2).shift).toEqual(0)
       expect(getLeaf(tree, 2).keys).toEqual([12])
       expect(getLeaf(tree, 2, 0).shift).toEqual(0)
-      expect(getLeaf(tree, 2, 0).keys).toEqual([11,12])
+      expect(getLeaf(tree, 2, 0).keys).toEqual([11, 12])
       expect(getLeaf(tree, 2, 1).shift).toEqual(0)
       expect(getLeaf(tree, 2, 1).keys).toEqual([13])
     })
@@ -885,7 +885,7 @@ describe('PlusTree', () => {
       tree.addKeyWithShift(4, 14)
       tree.addKeyWithShift(1, 100)
 
-      expect(Array.from(tree.values())).toEqual([100,11,12,13,14])
+      expect(Array.from(tree.values())).toEqual([100, 11, 12, 13, 14])
     })
   })
 

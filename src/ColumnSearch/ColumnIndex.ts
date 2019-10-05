@@ -1,14 +1,14 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {Config} from '../Config'
+import {DependencyGraph} from '../DependencyGraph'
 import {LazilyTransformingAstService, Transformation, TransformationType} from '../LazilyTransformingAstService'
+import {Matrix} from '../Matrix'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
+import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
-import {DependencyGraph, MatrixVertex} from "../DependencyGraph";
-import {Matrix} from "../Matrix";
-import {ColumnBinarySearch} from "./ColumnBinarySearch";
-import {Config} from "../Config";
 
 type ColumnMap = Map<CellValue, ValueIndex>
 
@@ -20,6 +20,11 @@ interface ValueIndex {
 type SheetIndex = ColumnMap[]
 
 export class ColumnIndex implements IColumnSearchStrategy {
+
+  public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
+    const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
+    return new ColumnIndex(dependencyGraph, config, statistics)
+  }
   private readonly index: Map<number, SheetIndex> = new Map()
   private readonly transformingService: LazilyTransformingAstService
   private readonly binarySearchStrategy: ColumnBinarySearch
@@ -31,11 +36,6 @@ export class ColumnIndex implements IColumnSearchStrategy {
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
-  }
-
-  public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
-    const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
-    return new ColumnIndex(dependencyGraph, config, statistics)
   }
 
   public add(value: CellValue, address: SimpleCellAddress) {
@@ -62,37 +62,6 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
-    this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      this.ensureRecentData(address.sheet, address.col, value)
-      const valueIndex = this.getValueIndex(address.sheet, address.col, value)
-      this.addValue(valueIndex, address.row)
-    })
-  }
-
-  private removeSingleValue(value: CellValue, address: SimpleCellAddress) {
-    this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      this.ensureRecentData(address.sheet, address.col, value)
-
-      const columnMap = this.getColumnMap(address.sheet, address.col)
-      const valueIndex = columnMap.get(value)
-      if (!valueIndex) {
-        return
-      }
-
-      const index = upperBound(valueIndex.index, address.row)
-      valueIndex.index.splice(index, 1)
-
-      if (valueIndex.index.length === 0) {
-        columnMap.delete(value)
-      }
-
-      if (columnMap.size === 0) {
-        delete this.index.get(address.sheet)![address.col]
-      }
-    })
-  }
-
   public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
@@ -113,7 +82,6 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (!valueIndex) {
       return this.binarySearchStrategy.find(key, range, sorted)
     }
-
 
     const index = upperBound(valueIndex.index, range.start.row)
     const rowNumber = valueIndex.index[index]
@@ -185,6 +153,37 @@ export class ColumnIndex implements IColumnSearchStrategy {
       }
     }
     valueIndex.version = actualVersion
+  }
+
+  private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
+    this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
+      this.ensureRecentData(address.sheet, address.col, value)
+      const valueIndex = this.getValueIndex(address.sheet, address.col, value)
+      this.addValue(valueIndex, address.row)
+    })
+  }
+
+  private removeSingleValue(value: CellValue, address: SimpleCellAddress) {
+    this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
+      this.ensureRecentData(address.sheet, address.col, value)
+
+      const columnMap = this.getColumnMap(address.sheet, address.col)
+      const valueIndex = columnMap.get(value)
+      if (!valueIndex) {
+        return
+      }
+
+      const index = upperBound(valueIndex.index, address.row)
+      valueIndex.index.splice(index, 1)
+
+      if (valueIndex.index.length === 0) {
+        columnMap.delete(value)
+      }
+
+      if (columnMap.size === 0) {
+        delete this.index.get(address.sheet)![address.col]
+      }
+    })
   }
 
   private addRows(col: number, rowsSpan: RowsSpan, value: CellValue) {

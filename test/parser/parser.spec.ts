@@ -1,5 +1,5 @@
-import {CellError, ErrorType} from '../../src/Cell'
 import {Config} from '../../src'
+import {CellError, ErrorType} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {
   AstNodeType,
