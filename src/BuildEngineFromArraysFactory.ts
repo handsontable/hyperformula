@@ -10,7 +10,7 @@ export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
     const stats = new Statistics()
 
-    stats.start(StatType.OVERALL)
+    stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
@@ -34,7 +34,7 @@ export class BuildEngineFromArraysFactory {
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats)
     evaluator.run()
 
-    stats.end(StatType.OVERALL)
+    stats.end(StatType.BUILD_ENGINE_TOTAL)
 
     const engine = new HandsOnEngine(
       config,

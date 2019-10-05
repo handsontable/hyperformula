@@ -2,7 +2,7 @@ import {HandsOnEngine} from '../../src'
 import {Sheet} from '../../src/GraphBuilder'
 import {sheet as Sb} from '../sheets/01-simple-big'
 import {sheet as Bs} from '../sheets/06-big-sum'
-import {logStats, measure} from './operations'
+import {logStats, measure} from "../stats";
 
 function addRow(sheet: Sheet, row: number, stats: any[]) {
   const engine = HandsOnEngine.buildFromArray(sheet)

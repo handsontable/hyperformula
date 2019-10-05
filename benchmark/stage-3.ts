@@ -1,12 +1,12 @@
 import {milestone} from "./vlookup/sheets";
 import {Config, HandsOnEngine} from "../src";
-import {measure, statsToObject} from "./cruds/operations";
 import {Sheet} from "../src/GraphBuilder";
 import {StatType} from "../src/statistics/Statistics";
 import {average} from "./benchmark";
 import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
 import {simpleCellAddress} from "../src/Cell";
+import {averageStats, enrichStatistics, measure, statsToObject, statsTreePrint} from "./stats";
 
 function sheetA() {
   const sheet = sheetAGenerator(10000)
@@ -45,46 +45,44 @@ function sheetB() {
 
 function vlookup() {
   const stats: any[] = []
+  const numberOfRuns = 10
 
   const sorted = milestone(10000, 100, false)
   const shuffled = milestone(10000, 100, true)
 
-  run("Sorted, naive         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
-  run("Sorted, binary search ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false }), stats)
-  run("Sorted, index         ", 10, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
-  run("Shuffled, naive       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
-  run("Shuffled, index       ", 10, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
+  console.log(`VLOOKUP, no. of runs: ${numberOfRuns}`)
 
-  console.table(stats)
+  run("Sorted, naive         ", numberOfRuns, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
+  run("Sorted, binary search ", numberOfRuns, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: false }), stats)
+  run("Sorted, index         ", numberOfRuns, sorted, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
+  run("Shuffled, naive       ", numberOfRuns, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: false }), stats)
+  run("Shuffled, index       ", numberOfRuns, shuffled, new Config({ matrixDetection: false, vlookupThreshold: 1000000, useColumnIndex: true }), stats)
+
+  console.table(stats, ['NAME', ...Object.keys(stats[0])])
 }
 
 function run(name: string, times: number, sheet: Sheet, config: Config, stats: any[]): any {
   const rawStats = []
   for (let i = 0; i < times; ++i) {
     const engine = HandsOnEngine.buildFromArray(sheet, config)
-    rawStats.push(engine.getStats())
+    rawStats.push(enrichStatistics(engine.getStats()))
   }
   const averages = averageStats(rawStats)
   averages.set('NAME', name)
-  averages.set('No. RUNS', times)
 
   const objectStats = statsToObject(averages)
   stats.push(objectStats)
+
+  statsTreePrint(averages)
+
   return objectStats
 }
 
-export function averageStats(stats: Map<string, number>[]): any {
-  const averages = new Map<string, number>()
-
-  for (const key of stats[0].keys()) {
-    averages.set(key, average(stats.map(stats => stats.get(key)!)))
-  }
-
-  return averages
-}
 
 export function start() {
   vlookup()
-  sheetA()
-  sheetB()
+  // sheetA()
+  // sheetB()
 }
+
+start()

@@ -71,7 +71,7 @@ function rowsFromSheetsDimensions(sheetsDimensions: Map<string, { width: number,
 }
 
 export function printStats(stats: Array<Map<StatType, number>>, config: Config, rows?: number) {
-  const overall = stats.map((s) => s.get(StatType.OVERALL)!).sort()
+  const overall = stats.map((s) => s.get(StatType.BUILD_ENGINE_TOTAL)!).sort()
   const evaluation = stats.map((s) => s.get(StatType.EVALUATION)!).sort()
   const medianRun = overall[Math.trunc(config.numberOfRuns / 2)]
   const parsing = stats.map((s) => s.get(StatType.PARSER)!).sort()

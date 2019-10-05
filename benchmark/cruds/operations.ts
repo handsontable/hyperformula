@@ -1,5 +1,5 @@
 import {HandsOnEngine} from '../../src'
-import { StatType} from '../../src/statistics/Statistics'
+import {logStats, measure} from "../stats";
 
 export function addColumns(engine: HandsOnEngine, stats: any[]) {
   let dimensions = getDimensions(engine)
@@ -54,22 +54,3 @@ export function getDimensions(engine: HandsOnEngine) {
   return engine.getSheetsDimensions().get('Sheet1')!
 }
 
-export function measure<T>(engine: HandsOnEngine, stats: any[], name: String, func: () => T) {
-  const start = Date.now()
-  func()
-  const end = Date.now()
-  const time = end - start
-  const actualStats = engine.getStats() as Map<string, any>
-  engine.stats.reset()
-  actualStats.set('TOTAL CRUD', time)
-  actualStats.set('NAME', name)
-  stats.push(statsToObject(actualStats))
-}
-
-export function statsToObject(stats: Map<string, any>) {
-  return Object.assign({}, ...[...stats.entries()].map(([k, v]) => ({[k]: v})))
-}
-
-export function logStats(stats: any[]) {
-  console.table(stats, ['NAME', 'TOTAL CRUD', ...Object.keys(StatType)])
-}
