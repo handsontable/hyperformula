@@ -111,10 +111,10 @@ const optimized_without_dependencies = libraryBundleConfiguration({
 })
 
 module.exports = [
-  unoptimized_full,
-  unoptimized_without_dependencies,
-  optimized_full,
-  optimized_without_dependencies,
+  // unoptimized_full,
+  // unoptimized_without_dependencies,
+  // optimized_full,
+  // optimized_without_dependencies,
   // circleBenchmark(),
   browserBenchmark(),
 ];

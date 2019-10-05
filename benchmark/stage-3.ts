@@ -8,7 +8,7 @@ import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
 import {simpleCellAddress} from "../src/Cell";
 import {averageStats, enrichStatistics, measure, statsToObject, statsTreePrint} from "./stats";
 
-function sheetA() {
+export function sheetA() {
   const sheet = sheetAGenerator(10000)
   const stats: any[] = []
 
@@ -25,7 +25,7 @@ function sheetA() {
   console.table(stats)
 }
 
-function sheetB() {
+export function sheetB() {
   const sheet = sheetBGenerator(5000)
   const stats: any[] = []
 
@@ -43,9 +43,8 @@ function sheetB() {
   console.table(stats)
 }
 
-function vlookup() {
+export function vlookup(numberOfRuns = 10) {
   const stats: any[] = []
-  const numberOfRuns = 10
 
   const sorted = milestone(10000, 100, false)
   const shuffled = milestone(10000, 100, true)
@@ -81,8 +80,6 @@ function run(name: string, times: number, sheet: Sheet, config: Config, stats: a
 
 export function start() {
   vlookup()
-  // sheetA()
-  // sheetB()
+  sheetA()
+  sheetB()
 }
-
-start()

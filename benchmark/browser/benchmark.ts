@@ -5,7 +5,9 @@ import {sheet as A} from '../sheets/09-sheet-a'
 import {sheet as B} from '../sheets/10-sheet-b'
 import {sheet as C} from '../sheets/12-test-c'
 import {sheets as D} from '../sheets/13-sheet-d'
-import {start as stage3} from '../stage-3'
+import {vlookup as stage3_vlookup} from '../stage-3'
+import {sheetA as stage3_sheetA} from '../stage-3'
+import {sheetB as stage3_sheetB} from '../stage-3'
 
 let working = false
 
@@ -13,7 +15,9 @@ interface IExtendedConsole extends Console {
     olog?: any
 }
 
-function run(func: () => any) {
+function run(func: (_?: number) => any) {
+    const numberOfRuns = parseInt((document.getElementById('numberOfRuns')! as HTMLInputElement).value, 10)
+
     if (working) {
         return
     }
@@ -22,7 +26,7 @@ function run(func: () => any) {
 
     setTimeout(() => {
         working = true
-        func()
+        func(numberOfRuns)
         working = false
         toggle()
     }, 500)
@@ -84,7 +88,9 @@ function init() {
     const btn_sheetCcpu = document.getElementById('btn_sheetCcpu')!
     const btn_sheetDgpu = document.getElementById('btn_sheetDgpu')!
     const btn_sheetDcpu = document.getElementById('btn_sheetDcpu')!
-    const btn_stage3 = document.getElementById('btn_stage3')!
+    const btn_stage3_vlookup = document.getElementById('btn_stage3_vlookup')!
+    const btn_stage3_sheetA = document.getElementById('btn_stage3_sheetA')!
+    const btn_stage3_sheetB = document.getElementById('btn_stage3_sheetB')!
 
     btn_sheetA.addEventListener('click', () => runBenchmark(A, 'Sheet A'))
     btn_sheetB.addEventListener('click', () => runBenchmark(B, 'Sheet B'))
@@ -93,7 +99,9 @@ function init() {
     btn_sheetCcpu.addEventListener('click', () => runBenchmark(C, 'Sheet C (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
     btn_sheetDgpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (GPU)', 3000, new Config({ gpuMode: 'gpu' })))
     btn_sheetDcpu.addEventListener('click', () => runBenchmark(D, 'Sheet D (CPU)', 6000, new Config({ gpuMode: 'cpu' })))
-    btn_stage3.addEventListener('click', () => run(stage3))
+    btn_stage3_vlookup.addEventListener('click', () => run(stage3_vlookup))
+    btn_stage3_sheetA.addEventListener('click', () => run(stage3_sheetA))
+    btn_stage3_sheetB.addEventListener('click', () => run(stage3_sheetB))
 }
 
 init()
