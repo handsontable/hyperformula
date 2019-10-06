@@ -11,9 +11,10 @@ export class RandomPlugin extends FunctionPlugin {
   }
 
   /**
-   * Corresponds to EXP(value)
+   * Corresponds to RAND()
    *
-   * Calculates the exponent for basis e
+   * Returns a pseudo-random floating-point random number
+   * in the range [0,1).
    *
    * @param ast
    * @param formulaAddress
