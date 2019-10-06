@@ -44,7 +44,6 @@ export function measureCruds<T>(engine: HandsOnEngine, stats: any[], name: Strin
     const time = end - start
     const actualStats = engine.getStats() as Map<string, any>
     actualStats.set(AdditionalStatTypes.CRUDS_TOTAL, time)
-    actualStats.set('NAME', name)
     statsTreePrintCruds(actualStats)
     stats.push(statsToObject(actualStats))
 }
