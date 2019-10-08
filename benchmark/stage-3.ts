@@ -31,7 +31,7 @@ export function sheetA() {
     // engine.forceApplyPostponedTransformations()
   })
 
-  console.table(stats)
+  console.table(stats, Object.keys(stats[0]).filter(col => col !== 'NAME'))
 }
 
 export function sheetB() {
@@ -53,8 +53,9 @@ export function sheetB() {
   })
 
   console.assert(engine.getCellValue('E50') === 1347)
-  console.table(stats)
+  console.table(stats, Object.keys(stats[0]).filter(col => col !== 'NAME'))
 }
+
 
 export function vlookup(numberOfRuns = 10) {
   const stats: any[] = []
