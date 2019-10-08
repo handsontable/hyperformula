@@ -35,18 +35,17 @@ export class SingleThreadEvaluator implements Evaluator {
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-          let address, formula
           if (vertex instanceof FormulaCellVertex) {
-            address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+            const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
             vertex.setCellValue(newCellValue)
             this.columnSearch.change(currentValue, newCellValue, address)
             return (currentValue !== newCellValue)
           } else {
-            address = vertex.getAddress()
-            formula = vertex.getFormula() as Ast
+            const address = vertex.getAddress()
+            const formula = vertex.getFormula() as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.interpreter.evaluateAst(formula, address)
             if (newCellValue instanceof SimpleRangeValue) {
@@ -55,8 +54,12 @@ export class SingleThreadEvaluator implements Evaluator {
               this.columnSearch.change(currentValue, newCellMatrix, address)
               // return (currentValue !== newCellValue)
               return true
+            } else if (newCellValue instanceof CellError) {
+              vertex.setCellValue(newCellValue)
+              this.columnSearch.change(currentValue, newCellValue, address)
+              return true
             } else {
-              throw "Not supported yet"
+              throw "Other types in evaluator not supported yet"
             }
           }
         } else if (vertex instanceof RangeVertex) {
@@ -96,12 +99,11 @@ export class SingleThreadEvaluator implements Evaluator {
             const cellMatrix = new Matrix(cellValue.raw())
             vertex.setCellValue(cellMatrix)
             this.columnSearch.add(cellMatrix, address)
-            // vertex.setCellValue(newCellMatrix)
-            // this.columnSearch.change(currentValue, newCellMatrix, address)
-            // return (currentValue !== newCellValue)
-            // return true
+          } else if (cellValue instanceof CellError) {
+            vertex.setCellValue(cellValue)
+            this.columnSearch.add(cellValue, address)
           } else {
-            throw "Not supported yet"
+            throw "Other types in evaluator not supported yet"
           }
         }
       } else if (vertex instanceof RangeVertex) {

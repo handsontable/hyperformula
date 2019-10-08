@@ -1,4 +1,4 @@
-import {CellValue} from '../'
+import {CellValue, ErrorType, CellError} from '../Cell'
 import {Size} from '../Matrix'
 import {DependencyGraph} from '../DependencyGraph/DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -9,7 +9,7 @@ export class SimpleRangeValue {
   constructor(
     public readonly size: Size,
     public readonly dependencyGraph: DependencyGraph,
-    public data?: ScalarValue[][],
+    public data?: ScalarValue[][] | CellError,
     public readonly range?: AbsoluteCellRange,
   ) {
   }
@@ -34,15 +34,27 @@ export class SimpleRangeValue {
     return this.size.height;
   }
 
+  public isErrorMatrix(): boolean {
+    if (this.data === undefined) {
+      this.data = this.computeDataFromDependencyGraph()
+    }
+
+    return (this.data instanceof CellError)
+  }
+
   public raw(): ScalarValue[][] {
     if (this.data === undefined) {
       this.data = this.computeDataFromDependencyGraph()
     }
 
+    if (this.data instanceof CellError) {
+      throw "Cant return array when theres an error"
+    }
+
     return this.data
   }
 
-  private computeDataFromDependencyGraph(): ScalarValue[][] {
+  private computeDataFromDependencyGraph(): ScalarValue[][] | CellError {
     const result = []
 
     let i = 0
@@ -53,8 +65,8 @@ export class SimpleRangeValue {
         row.push(value)
         ++i
       } else {
-        throw "Not supported yet"
-        // return new CellError(ErrorType.VALUE)
+        // throw "Not supported yet"
+        return new CellError(ErrorType.VALUE)
       }
 
       if (i % this.range!.width() === 0) {

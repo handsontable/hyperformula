@@ -33,13 +33,12 @@ export class MatrixPlugin extends FunctionPlugin {
 
     let leftMatrix = this.evaluateAst(left, formulaAddress)
     let rightMatrix = this.evaluateAst(right, formulaAddress)
-    debugger;
 
     if (leftMatrix instanceof CellError) {
       return leftMatrix
     } else if (typeof leftMatrix === 'number') {
       leftMatrix = SimpleRangeValue.fromScalar(leftMatrix, this.dependencyGraph)
-    } else if (!(leftMatrix instanceof SimpleRangeValue)) {
+    } else if (!(leftMatrix instanceof SimpleRangeValue) || leftMatrix.isErrorMatrix()) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -47,7 +46,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return rightMatrix
     } else if (typeof rightMatrix === 'number') {
       rightMatrix = SimpleRangeValue.fromScalar(rightMatrix, this.dependencyGraph)
-    } else if (!(rightMatrix instanceof SimpleRangeValue)) {
+    } else if (!(rightMatrix instanceof SimpleRangeValue) || rightMatrix.isErrorMatrix()) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -224,7 +223,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return value
     } else if (typeof value === 'number') {
       value = SimpleRangeValue.fromScalar(value, this.dependencyGraph)
-    } else if (!(value instanceof SimpleRangeValue)) {
+    } else if (!(value instanceof SimpleRangeValue) || value.isErrorMatrix()) {
       return new CellError(ErrorType.VALUE)
     }
 
