@@ -29,7 +29,7 @@ export class MatrixVertex {
   }
   public cellAddress: SimpleCellAddress
   private formula: Ast | null
-  private matrix: IMatrix | CellError
+  public matrix: IMatrix | CellError
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress

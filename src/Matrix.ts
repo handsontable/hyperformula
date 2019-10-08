@@ -120,7 +120,7 @@ export class NotComputedMatrix implements IMatrix {
 
 export class Matrix implements IMatrix {
   private readonly matrix: number[][]
-  private size: Size
+  public size: Size
 
   constructor(matrix: number[][]) {
     this.matrix = []

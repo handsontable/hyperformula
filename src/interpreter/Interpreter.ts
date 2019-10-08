@@ -4,7 +4,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {Matrix} from '../Matrix'
+import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
@@ -228,7 +228,17 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
-        return new CellError(ErrorType.VALUE)
+        const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+        const matrixVertex = this.dependencyGraph.getMatrix(range)
+        if (matrixVertex) {
+          const matrix = matrixVertex.matrix
+          if (matrix instanceof NotComputedMatrix) {
+            throw "Matrix should be computed already"
+          }
+          return SimpleRangeValue.withData((matrix as Matrix).raw(), (matrix as Matrix).size, range, this.dependencyGraph)
+        } else {
+          return SimpleRangeValue.fromRange(range, this.dependencyGraph)
+        }
       }
       case AstNodeType.ERROR: {
         if (ast.error !== undefined) {

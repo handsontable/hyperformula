@@ -6,6 +6,8 @@ import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {Matrix} from './Matrix'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
@@ -37,15 +39,26 @@ export class SingleThreadEvaluator implements Evaluator {
           if (vertex instanceof FormulaCellVertex) {
             address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
             formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+            vertex.setCellValue(newCellValue)
+            this.columnSearch.change(currentValue, newCellValue, address)
+            return (currentValue !== newCellValue)
           } else {
             address = vertex.getAddress()
             formula = vertex.getFormula() as Ast
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const newCellValue = this.interpreter.evaluateAst(formula, address)
+            if (newCellValue instanceof SimpleRangeValue) {
+              const newCellMatrix = new Matrix(newCellValue.raw())
+              vertex.setCellValue(newCellMatrix)
+              this.columnSearch.change(currentValue, newCellMatrix, address)
+              // return (currentValue !== newCellValue)
+              return true
+            } else {
+              throw "Not supported yet"
+            }
           }
-          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
-          vertex.setCellValue(newCellValue)
-          this.columnSearch.change(currentValue, newCellValue, address)
-          return (currentValue !== newCellValue)
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
           return true
@@ -72,13 +85,25 @@ export class SingleThreadEvaluator implements Evaluator {
         if (vertex instanceof FormulaCellVertex) {
           address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
           formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+          const cellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+          vertex.setCellValue(cellValue)
+          this.columnSearch.add(cellValue, address)
         } else {
           address = vertex.getAddress()
           formula = vertex.getFormula() as Ast
+          const cellValue = this.interpreter.evaluateAst(formula, address)
+          if (cellValue instanceof SimpleRangeValue) {
+            const cellMatrix = new Matrix(cellValue.raw())
+            vertex.setCellValue(cellMatrix)
+            this.columnSearch.add(cellMatrix, address)
+            // vertex.setCellValue(newCellMatrix)
+            // this.columnSearch.change(currentValue, newCellMatrix, address)
+            // return (currentValue !== newCellValue)
+            // return true
+          } else {
+            throw "Not supported yet"
+          }
         }
-        const cellValue = this.interpreter.evaluateAstToCellValue(formula, address)
-        vertex.setCellValue(cellValue)
-        this.columnSearch.add(cellValue, address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }
