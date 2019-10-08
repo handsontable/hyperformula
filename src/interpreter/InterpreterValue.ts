@@ -14,8 +14,16 @@ export class SimpleRangeValue {
   ) {
   }
 
-  public static withData(data: number[][], size: Size, range: AbsoluteCellRange | undefined, dependencyGraph: DependencyGraph): SimpleRangeValue {
+  public static withData(data: number[][], size: Size, range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(size, dependencyGraph, data, range)
+  }
+
+  public static onlyData(data: number[][], size: Size, dependencyGraph: DependencyGraph): SimpleRangeValue {
+    return new SimpleRangeValue(size, dependencyGraph, data, undefined)
+  }
+
+  public static onlyError(data: CellError, dependencyGraph: DependencyGraph): SimpleRangeValue {
+    return new SimpleRangeValue({ width: 0, height: 0}, dependencyGraph, data, undefined)
   }
 
   public static fromRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {

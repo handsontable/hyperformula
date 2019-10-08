@@ -48,15 +48,16 @@ export class SingleThreadEvaluator implements Evaluator {
             const formula = vertex.getFormula() as Ast
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.interpreter.evaluateAst(formula, address)
-            if (newCellValue instanceof SimpleRangeValue) {
+            if (newCellValue instanceof SimpleRangeValue && newCellValue.isErrorMatrix()) {
+              const error = newCellValue.data as CellError
+              vertex.setCellValue(error)
+              this.columnSearch.change(currentValue, error, address)
+              return true
+            } else if (newCellValue instanceof SimpleRangeValue) {
               const newCellMatrix = new Matrix(newCellValue.raw())
               vertex.setCellValue(newCellMatrix)
               this.columnSearch.change(currentValue, newCellMatrix, address)
               // return (currentValue !== newCellValue)
-              return true
-            } else if (newCellValue instanceof CellError) {
-              vertex.setCellValue(newCellValue)
-              this.columnSearch.change(currentValue, newCellValue, address)
               return true
             } else {
               throw "Other types in evaluator not supported yet"
@@ -95,13 +96,14 @@ export class SingleThreadEvaluator implements Evaluator {
           address = vertex.getAddress()
           formula = vertex.getFormula() as Ast
           const cellValue = this.interpreter.evaluateAst(formula, address)
-          if (cellValue instanceof SimpleRangeValue) {
+          if (cellValue instanceof SimpleRangeValue && cellValue.isErrorMatrix()) {
+            const error = cellValue.data as CellError
+            vertex.setCellValue(error)
+            this.columnSearch.add(error, address)
+          } else if (cellValue instanceof SimpleRangeValue) {
             const cellMatrix = new Matrix(cellValue.raw())
             vertex.setCellValue(cellMatrix)
             this.columnSearch.add(cellMatrix, address)
-          } else if (cellValue instanceof CellError) {
-            vertex.setCellValue(cellValue)
-            this.columnSearch.add(cellValue, address)
           } else {
             throw "Other types in evaluator not supported yet"
           }
