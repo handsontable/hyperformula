@@ -106,9 +106,9 @@ export abstract class FunctionPlugin {
         yield this.dependencyGraph.getCellValue(cellFromRange)
       }
     } else {
-       for (const value of range.generateFlatValues()) {
-         yield value
-       }
+      for (const value of range.generateFlatValues()) {
+        yield value
+      }
     }
   }
 }
