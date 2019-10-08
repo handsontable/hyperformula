@@ -35,23 +35,24 @@ export class SimpleRangeValue {
   }
 
   public isErrorMatrix(): boolean {
-    if (this.data === undefined) {
-      this.data = this.computeDataFromDependencyGraph()
-    }
-
+    this.ensureThatComputed()
     return (this.data instanceof CellError)
   }
 
   public raw(): ScalarValue[][] {
-    if (this.data === undefined) {
-      this.data = this.computeDataFromDependencyGraph()
-    }
+    this.ensureThatComputed()
 
     if (this.data instanceof CellError) {
       throw "Cant return array when theres an error"
+    } else {
+      return this.data!
     }
+  }
 
-    return this.data
+  private ensureThatComputed() {
+    if (this.data === undefined) {
+      this.data = this.computeDataFromDependencyGraph()
+    }
   }
 
   private computeDataFromDependencyGraph(): ScalarValue[][] | CellError {
@@ -65,7 +66,6 @@ export class SimpleRangeValue {
         row.push(value)
         ++i
       } else {
-        // throw "Not supported yet"
         return new CellError(ErrorType.VALUE)
       }
 
