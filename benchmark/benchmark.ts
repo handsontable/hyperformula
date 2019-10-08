@@ -106,6 +106,9 @@ export function printStats(stats: Array<Map<StatType, number>>, config: Config, 
 
     if (resultMillisecondsPerThousandRows > config.millisecondsPerThousandRows) {
       console.error('Expected time exceeded')
+      if (process.exit) {
+        process.exit(1)
+      }
     }
   }
 }
