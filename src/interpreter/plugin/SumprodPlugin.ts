@@ -4,6 +4,7 @@ import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue} from '../InterpreterValue'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -12,15 +13,14 @@ export class SumprodPlugin extends FunctionPlugin {
     },
   }
 
-  // SUMPORD(A1:A2; B1:B2, C1:C2);
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    const leftArg: CellValue | AbsoluteCellRange = left.type === AstNodeType.CELL_RANGE
+    const leftArg: InterpreterValue | AbsoluteCellRange = left.type === AstNodeType.CELL_RANGE
             ? AbsoluteCellRange.fromCellRange(left, formulaAddress)
             : this.evaluateAst(left, formulaAddress)
 
-    const rightArg: CellValue | AbsoluteCellRange = right.type === AstNodeType.CELL_RANGE
+    const rightArg: InterpreterValue | AbsoluteCellRange = right.type === AstNodeType.CELL_RANGE
         ? AbsoluteCellRange.fromCellRange(right, formulaAddress)
         : this.evaluateAst(right, formulaAddress)
 

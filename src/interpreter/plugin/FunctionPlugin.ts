@@ -6,6 +6,7 @@ import {DependencyGraph} from '../../DependencyGraph'
 import {Matrix} from '../../Matrix'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -38,7 +39,7 @@ export abstract class FunctionPlugin {
     this.config = interpreter.config
   }
 
-  protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
@@ -80,6 +81,9 @@ export abstract class FunctionPlugin {
         }
       } else {
         const value = this.evaluateAst(ast, formulaAddress)
+        if (value instanceof SimpleRangeValue) {
+          throw "Not yet supported"
+        }
         values.push(value)
       }
     }

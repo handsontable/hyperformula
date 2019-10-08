@@ -42,7 +42,7 @@ export class SingleThreadEvaluator implements Evaluator {
             formula = vertex.getFormula() as Ast
           }
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.interpreter.evaluateAst(formula, address)
+          const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
           vertex.setCellValue(newCellValue)
           this.columnSearch.change(currentValue, newCellValue, address)
           return (currentValue !== newCellValue)
@@ -76,7 +76,7 @@ export class SingleThreadEvaluator implements Evaluator {
           address = vertex.getAddress()
           formula = vertex.getFormula() as Ast
         }
-        const cellValue = this.interpreter.evaluateAst(formula, address)
+        const cellValue = this.interpreter.evaluateAstToCellValue(formula, address)
         vertex.setCellValue(cellValue)
         this.columnSearch.add(cellValue, address)
       } else if (vertex instanceof RangeVertex) {

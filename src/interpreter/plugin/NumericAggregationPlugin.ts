@@ -5,6 +5,7 @@ import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {add, max, min} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 
@@ -108,6 +109,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
+        if (value instanceof SimpleRangeValue) {
+          throw "Not implemented yet" // should be handled like above
+        }
       }
 
       return reducingFunction(acc, value)

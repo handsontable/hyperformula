@@ -10,6 +10,7 @@ import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
+import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
 
 export class Interpreter {
   public readonly gpu: GPU
@@ -26,13 +27,22 @@ export class Interpreter {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
 
+  public evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+    const interpreterValue = this.evaluateAst(ast, formulaAddress)
+    if (interpreterValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return interpreterValue
+    }
+  }
+
   /**
    * Calculates cell value from formula abstract syntax tree
    *
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
@@ -155,6 +165,9 @@ export class Interpreter {
 
             return new Matrix(kernel(leftResult.raw(), matrixValue.raw()) as number[][])
           }
+        }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          throw "Cant happen"
         }
         return addStrict(leftResult, rightResult)
       }

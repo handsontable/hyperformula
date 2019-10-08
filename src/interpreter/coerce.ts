@@ -1,5 +1,6 @@
 import {CellError, CellValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
+import {InterpreterValue} from './InterpreterValue'
 
 /**
  * Converts cell value to date number representation (days after 12th Dec 1899)
@@ -11,7 +12,7 @@ import {stringToDateNumber} from '../Date'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | null {
+export function dateNumberRepresentation(arg: InterpreterValue, dateFormat: string): number | null {
   if (typeof arg === 'number') {
     return arg
   } else if (typeof arg === 'string') {
@@ -29,7 +30,7 @@ export function dateNumberRepresentation(arg: CellValue, dateFormat: string): nu
  *
  * @param arg
  */
-export function booleanRepresentation(arg: CellValue): CellValue {
+export function booleanRepresentation(arg: InterpreterValue): boolean | CellError {
   if (typeof arg === 'number') {
     return arg !== 0
   } else if (typeof arg === 'boolean') {
