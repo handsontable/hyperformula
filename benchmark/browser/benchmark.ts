@@ -92,7 +92,7 @@ function logInit() {
         })
         const array: string[][] = [uniqueColumns].concat(message.map((row) => uniqueColumns.map((column) => row[column] || null)))
         const asciiTable = table(array)
-        eConsole.otable(message)
+        eConsole.otable(message, columns)
         log.innerHTML += '<p>' + asciiTable + '</p>'
     }
 }
