@@ -186,12 +186,16 @@ export class MatrixPlugin extends FunctionPlugin {
       throw new Error("Size of a transpose can't be computed")
     }
 
-    /* istanbul ignore next: gpu.js */
-    const kernel = this.interpreter.gpu.createKernel(function(a: number[][]) {
-      return a[this.thread.x as number][this.thread.y as number]
-    }).setOutput([matrixSize.width, matrixSize.height])
+    const input = value.raw()
+    const result: number[][] = []
+    for (let i=0; i<matrixSize.height; ++i) {
+      result[i] = [];
+      for (let j=0; j<matrixSize.width; ++j) {
+        result[i][j] = input[j][i]
+      }
+    }
 
-    return new Matrix(kernel(value.raw()) as number[][])
+    return new Matrix(result)
   }
 
   public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
