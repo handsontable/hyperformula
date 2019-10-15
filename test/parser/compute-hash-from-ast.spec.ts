@@ -2,10 +2,11 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
+import {enGB} from "../../src/i18n";
 
 describe('Compute hash from ast', () => {
   const config = new Config()
-  const sheetMapping = new SheetMapping()
+  const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   const lexer = new FormulaLexer(buildLexerConfig(config))
   const parser = new ParserWithCaching(config, sheetMapping.get)

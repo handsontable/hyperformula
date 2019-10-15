@@ -38,4 +38,7 @@ export const enGB: TranslationPackage = {
     VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
   },
+  interface: {
+    SHEET: 'Sheet'
+  }
 }

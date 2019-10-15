@@ -38,4 +38,7 @@ export const plPL: TranslationPackage = {
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
   },
+  interface: {
+    SHEET: 'Arkusz'
+  }
 }

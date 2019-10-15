@@ -2,6 +2,7 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import {ParserWithCaching} from '../../src/parser'
+import {enGB} from "../../src/i18n";
 
 const rows = 100000
 const millisecondsPerThousandRows = 160
@@ -26,7 +27,7 @@ const flattenSheet: string[] = ([] as string[]).concat([], ...sheet) // flatten
 const runsData = []
 let currentRun = 0
 while (currentRun < numberOfRuns) {
-  const parser = new ParserWithCaching(new Config(), new SheetMapping().fetch)
+  const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).fetch)
 
   const timestampBefore = Date.now()
   flattenSheet.forEach((formula) => {

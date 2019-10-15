@@ -6,11 +6,13 @@ import {plPL} from './plPL'
 
 export interface TranslationPackage {
   functions: TranslationSet,
+  interface: TranslationSet
 }
 
 export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTranslations: TranslationSet): TranslationPackage => {
   return {
     functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
+    interface: pkg.interface
   }
 }
 

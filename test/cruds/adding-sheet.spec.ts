@@ -1,5 +1,6 @@
-import {EmptyValue, HandsOnEngine} from '../../src'
+import {Config, EmptyValue, HandsOnEngine} from '../../src'
 import '../testConfig'
+import {plPL} from "../../src/i18n";
 
 describe('add sheet to engine', () => {
   it('should add sheet to empty engine', function() {
@@ -28,5 +29,14 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.getCellValue('$Sheet1.A1')).toBe(EmptyValue)
+  })
+
+  it('should add sheet with translated sheet name', function() {
+    const engine = HandsOnEngine.buildEmpty(new Config({ language: plPL }))
+
+    engine.addSheet()
+
+    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['Arkusz1'])
   })
 })

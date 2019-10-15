@@ -4,10 +4,11 @@ import {
   CellAddress,
   ParserWithCaching,
 } from '../../src/parser'
+import {enGB} from "../../src/i18n";
 
 describe('ParserWithCaching - caching', () => {
   it('it use cache for similar formulas', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast1 = parser.parse('=A1', CellAddress.absolute(0, 0, 0)).ast
     const ast2 = parser.parse('=A2', CellAddress.absolute(0, 0, 1)).ast
@@ -17,7 +18,7 @@ describe('ParserWithCaching - caching', () => {
   })
 
   it("doesn't count cache for different formulas", () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const bast1 = parser.parse('=A1', CellAddress.absolute(0, 0, 0)).ast
     const bast2 = parser.parse('=A2+A3', CellAddress.absolute(0, 0, 0)).ast

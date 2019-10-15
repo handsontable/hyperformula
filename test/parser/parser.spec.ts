@@ -17,10 +17,11 @@ import {
   StringAst,
 } from '../../src/parser'
 import {CellAddress} from '../../src/parser'
+import {enGB} from "../../src/i18n";
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=42', CellAddress.absolute(0, 0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
@@ -28,7 +29,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('negative integer literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=-42', CellAddress.absolute(0, 0, 0)).ast as MinusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
@@ -38,7 +39,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('string literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('="foobar"', CellAddress.absolute(0, 0, 0)).ast as StringAst
     expect(ast.type).toBe(AstNodeType.STRING)
@@ -46,7 +47,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('plus operator on different nodes', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1+A5', CellAddress.absolute(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
@@ -55,7 +56,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('minus operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1-3', CellAddress.absolute(0, 0, 0)).ast as MinusOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_OP)
@@ -64,7 +65,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('power operator', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=2^3', CellAddress.absolute(0, 0, 0)).ast as PowerOpAst
     expect(ast.type).toBe(AstNodeType.POWER_OP)
@@ -73,7 +74,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('power operator order', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=2*2^3', CellAddress.absolute(0, 0, 0)).ast as PowerOpAst
     expect(ast.type).toBe(AstNodeType.TIMES_OP)
@@ -82,7 +83,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=$B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
 
@@ -91,7 +92,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('relative cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
 
@@ -100,7 +101,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute column cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=$B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
 
@@ -109,7 +110,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('absolute row cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
 
@@ -118,7 +119,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function without args', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=SUM()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -126,7 +127,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with args', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=SUM(1, A1)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -135,7 +136,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('SUM function with expression arg', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args.length).toBe(1)
@@ -147,7 +148,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes without braces', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=1 + 2 + 3', CellAddress.absolute(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.PLUS_OP)
@@ -155,7 +156,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('joining nodes with braces', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=1 + (2 + 3)', CellAddress.absolute(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
@@ -163,14 +164,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('float literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=3.14', CellAddress.absolute(0, 0, 0)).ast as NumberAst
     expect(ast.type).toBe(AstNodeType.NUMBER)
     expect(ast.value).toBe(3.14)
   })
 
   it('leading zeros of number literals', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const int = parser.parse('=01234', CellAddress.absolute(0, 0, 0)).ast as NumberAst
     const float = parser.parse('=03.14', CellAddress.absolute(0, 0, 0)).ast as NumberAst
     expect(int.type).toBe(AstNodeType.NUMBER)
@@ -180,14 +181,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('simple cell range', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=A1:B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
   })
 
   it('parsing error - unexpected token', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=A', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -196,21 +197,21 @@ describe('ParserWithCaching', () => {
   })
 
   it('parsing error - unexpected token', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=SUM(A)', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('parsing error - not all input parsed', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('errors - lexing errors', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const input = ["='foo'", "=foo'bar", "=''''''", '=@']
 
@@ -222,14 +223,14 @@ describe('ParserWithCaching', () => {
   })
 
   it('functions should not be case sensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=sum(1)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
   })
 
   it('cell references should not be case sensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=d1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
@@ -238,7 +239,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('cell reference with sheet name', () => {
-    const sheetMapping = new SheetMapping()
+    const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
@@ -251,8 +252,8 @@ describe('ParserWithCaching', () => {
   })
 
   it('allow to accept different lexer configs', () => {
-    const parser1 = new ParserWithCaching(new Config(), new SheetMapping().get)
-    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping().get)
+    const parser1 = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(enGB).get)
 
     const ast1 = parser1.parse('=SUM(1, 2)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     const ast2 = parser2.parse('=SUM(1; 2)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
@@ -263,7 +264,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('error literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=#REF!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -271,7 +272,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('error literals are case insensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=#rEf!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
@@ -279,7 +280,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('unknown error literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping().get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=#FOO!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)

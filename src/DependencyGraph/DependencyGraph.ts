@@ -30,7 +30,7 @@ export class DependencyGraph {
       addressMapping,
       rangeMapping,
       new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
-      new SheetMapping(),
+      new SheetMapping(config.language),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,

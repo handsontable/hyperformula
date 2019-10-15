@@ -4,10 +4,11 @@ import {ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
+import {enGB} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()
-  const sheetMapping = new SheetMapping()
+  const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   const parser = new ParserWithCaching(config, sheetMapping.get)

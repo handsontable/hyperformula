@@ -1,9 +1,15 @@
+import {TranslationPackage} from "../i18n";
 export class SheetMapping {
   private readonly mapping: Map<string, number> = new Map()
   private readonly reversedMapping: Map<number, string> = new Map()
+  private readonly sheetNamePrefix: string = 'Sheet'
   private lastSheetId = -1
 
-  public addSheet(sheetName: string = `Sheet${this.lastSheetId + 2}`): number {
+  constructor(private languages: TranslationPackage) {
+    this.sheetNamePrefix = languages.interface['SHEET'] || this.sheetNamePrefix
+  }
+
+  public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
     if (this.mapping.has(sheetName)) {
       throw new Error(`Sheet ${sheetName} already exists`)
     }
