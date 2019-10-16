@@ -14,7 +14,6 @@ jobs:
       #       - node_modules
       - run: make typecheck
       - run: make test-ci
-      - run: make benchmark-ci
       - run: make bundle
       - run: make check-bundle
       - run: make verify-production-licenses

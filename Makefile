@@ -13,24 +13,6 @@ test: ## Run tests
 test-ci: ## Separate test configuration for CI environment
 	@yarn jest --maxWorkers=2
 
-benchmark-ci: ## Run CI benchmarks
-	@yarn ts-node --max-old-space-size=8192 benchmark/circle.ts
-	@yarn ts-node benchmark/instances/11-many-medians.ts
-	@yarn ts-node benchmark/instances/12-sheet-c-gpu.ts
-	@yarn ts-node benchmark/instances/12-sheet-c-cpu.ts
-	@yarn ts-node benchmark/instances/13-sheet-d-cpu.ts
-
-benchmark: ## Run benchmarks
-	@yarn ts-node benchmark/stage-1.ts
-
-benchmark-cruds:
-	@yarn ts-node benchmark/cruds/1-cruds.ts
-	@yarn ts-node benchmark/cruds/2-matrix.ts
-	@yarn ts-node benchmark/cruds/3-lazy-cruds.ts
-
-benchmark-lazy-cruds:
-	@yarn ts-node benchmark/cruds/3-lazy-cruds.ts
-
 check: typecheck test ## Check whether code is working correctly (types + specs)
 
 full: check lint-fix ## Check whether code is ready to commit (types + specs + lint)
