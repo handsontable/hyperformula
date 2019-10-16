@@ -49,7 +49,7 @@ export class SingleThreadEvaluator implements Evaluator {
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
             const newCellValue = this.interpreter.evaluateAst(formula, address)
             if (newCellValue instanceof SimpleRangeValue && newCellValue.isErrorMatrix()) {
-              const error = newCellValue.data as CellError
+              const error = newCellValue.data.data as CellError
               vertex.setCellValue(error)
               this.columnSearch.change(currentValue, error, address)
               return true
@@ -97,7 +97,7 @@ export class SingleThreadEvaluator implements Evaluator {
           formula = vertex.getFormula() as Ast
           const cellValue = this.interpreter.evaluateAst(formula, address)
           if (cellValue instanceof SimpleRangeValue && cellValue.isErrorMatrix()) {
-            const error = cellValue.data as CellError
+            const error = cellValue.data.data as CellError
             vertex.setCellValue(error)
             this.columnSearch.add(error, address)
           } else if (cellValue instanceof SimpleRangeValue) {
