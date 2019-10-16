@@ -55,6 +55,15 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A4')).toEqual(5)
   })
 
+  xit('it makes a coercion from other values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TRUE()', '42'],
+      ['=SUMPRODUCT(A1,B1)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(42)
+  })
+
   xit('works even if some string in data',  () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '1'],
