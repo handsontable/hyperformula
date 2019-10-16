@@ -39,6 +39,6 @@ export const enGB: TranslationPackage = {
     YEAR: 'YEAR',
   },
   interface: {
-    SHEET: 'Sheet'
+    NEW_SHEET_PREFIX: 'Sheet'
   }
 }

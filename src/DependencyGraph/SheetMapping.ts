@@ -6,7 +6,7 @@ export class SheetMapping {
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    this.sheetNamePrefix = languages.interface['SHEET'] || this.sheetNamePrefix
+    this.sheetNamePrefix = languages.interface['NEW_SHEET_PREFIX'] || this.sheetNamePrefix
   }
 
   public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {

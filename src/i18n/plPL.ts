@@ -39,6 +39,6 @@ export const plPL: TranslationPackage = {
     YEAR: 'ROK',
   },
   interface: {
-    SHEET: 'Arkusz'
+    NEW_SHEET_PREFIX: 'Arkusz'
   }
 }
