@@ -113,7 +113,7 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
 
-  xit('matrix multiplication by sumproduct', () => {
+  it('matrix multiplication by sumproduct', () => {
     const config = new Config({functionPlugins: [MatrixPlugin], matrixDetection: true })
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
