@@ -232,7 +232,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }
 
     return SimpleRangeValue.onlyData(
-      kernel(value.raw()) as number[][],
+      result,
       {
         width: matrixSize.width,
         height: matrixSize.height,
