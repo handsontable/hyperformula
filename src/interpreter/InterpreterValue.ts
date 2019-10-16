@@ -63,6 +63,20 @@ export class SimpleRangeValue {
     }
   }
 
+  public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
+    this.ensureThatComputed()
+
+    if (this.data instanceof CellError) {
+      throw "Cant return array when theres an error"
+    } else {
+      for (let i = 0; i < this.height(); i++) {
+        for (let j = 0; j < this.width(); j++) {
+          yield this.data![i][j]
+        }
+      }
+    }
+  }
+
   private computeDataFromDependencyGraph(): ScalarValue[][] | CellError {
     const result = []
 
