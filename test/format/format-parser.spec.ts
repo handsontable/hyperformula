@@ -1,14 +1,29 @@
 import {FormatExpressionType, parse, TokenType} from '../../src/format/parser'
 
 describe('FormatParser', () => {
-  it('works for single date token', () => {
-    const parseResult = parse('dd')
+  it('works for escaped characters', () => {
+    const parseResult = parse('\\ddd')
 
     expect(parseResult.type).toBe(FormatExpressionType.DATE)
-    expect(parseResult.tokens.length).toBe(1)
+    expect(parseResult.tokens.length).toBe(2)
     expect(parseResult.tokens[0]).toEqual({
+      type: TokenType.FREE_TEXT,
+      value: '\\d',
+    })
+    expect(parseResult.tokens[1]).toEqual({
       type: TokenType.FORMAT,
       value: 'dd',
+    })
+  })
+
+  it('works only for escaped characters', () => {
+    const parseResult = parse('\\d\\d')
+
+    expect(parseResult.type).toBe(FormatExpressionType.STRING)
+    expect(parseResult.tokens.length).toBe(1)
+    expect(parseResult.tokens[0]).toEqual({
+      type: TokenType.FREE_TEXT,
+      value: '\\d\\d',
     })
   })
 
@@ -66,5 +81,4 @@ describe('FormatParser', () => {
       value: ' #.###',
     })
   })
-
 })

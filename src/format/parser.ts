@@ -1,5 +1,5 @@
-const dateFormatRegex = /(?<!\\)(dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|H|hh|h|ss|AM\/PM)/g
-const numberFormatRegex = /(?<!\\)([#0]+(\.[#0]*)?)/g
+const dateFormatRegex = /(\\.|dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|H|hh|h|ss|AM\/PM)/g
+const numberFormatRegex = /(\\.|[#0]+(\.[#0]*)?)/g
 
 export enum TokenType {
   FORMAT = 'FORMAT',
@@ -67,7 +67,11 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
       const beforeToken = str.substr(start, token.index - start)
       tokens.push(formatToken(TokenType.FREE_TEXT, beforeToken))
     }
-    tokens.push(formatToken(TokenType.FORMAT, token[0]))
+    if (token[0].startsWith("\\")) {
+      tokens.push(formatToken(TokenType.FREE_TEXT, token[0]))
+    } else {
+      tokens.push(formatToken(TokenType.FORMAT, token[0]))
+    }
 
     start = token.index + token[0].length
   }
@@ -85,7 +89,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
 export function parse(str: string): FormatExpression {
   const dateFormatTokens = matchDateFormat(str)
 
-  if (dateFormatTokens.length > 0) {
+  if (dateFormatTokens.filter(elem => !isEscapeToken(elem)).length > 0) {
     return {
       type: FormatExpressionType.DATE,
       tokens: createTokens(dateFormatTokens, str),
@@ -93,7 +97,7 @@ export function parse(str: string): FormatExpression {
   }
 
   const numberFormatTokens = matchNumberFormat(str)
-  if (numberFormatTokens.length > 0) {
+  if (numberFormatTokens.filter(elem => !isEscapeToken(elem)).length > 0) {
     return {
       type: FormatExpressionType.NUMBER,
       tokens: createTokens(numberFormatTokens, str),
@@ -107,4 +111,8 @@ export function parse(str: string): FormatExpression {
       value: str,
     }],
   }
+}
+
+export function isEscapeToken(token: RegExpExecArray): boolean {
+  return token[0].startsWith('\\')
 }
