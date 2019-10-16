@@ -8,12 +8,20 @@ type ScalarValue = number
 export class ArrayData {
   constructor(
     public readonly size: Size,
-    public readonly data: ScalarValue[][] | CellError
+    public readonly data: ScalarValue[][] | CellError,
+    public _hasOnlyNumbers: boolean
   ) {
   }
 
   public isErrorMatrix(): boolean {
     return (this.data instanceof CellError)
+  }
+
+  public hasOnlyNumbers() {
+    if (this.data instanceof CellError) {
+      return false
+    }
+    return this._hasOnlyNumbers
   }
 
   public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
@@ -39,6 +47,7 @@ export class ArrayData {
 
 export class OnlyRangeData {
   public data: ScalarValue[][] | CellError | undefined
+  public _hasOnlyNumbers?: boolean;
 
   constructor(
     public readonly size: Size,
@@ -66,6 +75,24 @@ export class OnlyRangeData {
     if (this.data === undefined) {
       this.data = this.computeDataFromDependencyGraph()
     }
+  }
+
+  public hasOnlyNumbers() {
+    this.ensureThatComputed()
+    if (this.data instanceof CellError) {
+      return false
+    }
+    if (this._hasOnlyNumbers === undefined) {
+      for (const v of this.valuesFromTopLeftCorner()) {
+        if (typeof v !== 'number') {
+          this._hasOnlyNumbers = false
+          break
+        }
+      }
+      this._hasOnlyNumbers = true
+    }
+
+    return this._hasOnlyNumbers;
   }
 
   public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
@@ -116,15 +143,15 @@ export class SimpleRangeValue {
   }
 
   public static withData(data: number[][], size: Size, range: AbsoluteCellRange): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data))
+    return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
   public static onlyData(data: number[][], size: Size): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData(size, data))
+    return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
   public static onlyError(data: CellError): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, data))
+    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, data, false))
   }
 
   public static fromRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
@@ -132,7 +159,7 @@ export class SimpleRangeValue {
   }
 
   public static fromScalar(scalar: ScalarValue): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]]))
+    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], true))
   }
 
   public width(): number {
@@ -157,6 +184,10 @@ export class SimpleRangeValue {
 
   public numberOfElements(): number {
     return this.data.size.width * this.data.size.height
+  }
+
+  public hasOnlyNumbers(): boolean {
+    return this.data.hasOnlyNumbers()
   }
 }
 

@@ -34,7 +34,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return this.errorMatrix(leftMatrix.type)
     } else if (typeof leftMatrix === 'number') {
       leftMatrix = SimpleRangeValue.fromScalar(leftMatrix)
-    } else if (!(leftMatrix instanceof SimpleRangeValue) || leftMatrix.isErrorMatrix()) {
+    } else if (!(leftMatrix instanceof SimpleRangeValue) || !leftMatrix.hasOnlyNumbers()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
 
@@ -42,7 +42,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return this.errorMatrix(rightMatrix.type)
     } else if (typeof rightMatrix === 'number') {
       rightMatrix = SimpleRangeValue.fromScalar(rightMatrix)
-    } else if (!(rightMatrix instanceof SimpleRangeValue) || rightMatrix.isErrorMatrix()) {
+    } else if (!(rightMatrix instanceof SimpleRangeValue) || !rightMatrix.hasOnlyNumbers()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
 
@@ -210,7 +210,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return this.errorMatrix(value.type)
     } else if (typeof value === 'number') {
       value = SimpleRangeValue.fromScalar(value)
-    } else if (!(value instanceof SimpleRangeValue) || value.isErrorMatrix()) {
+    } else if (!(value instanceof SimpleRangeValue) || !value.hasOnlyNumbers()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
 
