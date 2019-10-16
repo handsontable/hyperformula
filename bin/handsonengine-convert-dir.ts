@@ -1,5 +1,4 @@
 import * as path from 'path'
-import {defaultConfig, printStats} from '../benchmark/benchmark'
 import {Config, HandsOnEngine} from '../src'
 import {load, save, validateArguments} from './handsonengine-multisheet'
 
@@ -17,7 +16,6 @@ async function start() {
   const sheets = await load(inputDir, ',')
   const config = new Config({ gpuMode: 'cpu' })
   const engine = HandsOnEngine.buildFromSheets(sheets, config)
-  printStats([engine.getStats()], defaultConfig)
   save(engine, outputDir)
 }
 
