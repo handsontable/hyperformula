@@ -2,7 +2,6 @@ const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const chevrotain = require('chevrotain');
 const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const WebpackBar = require('webpackbar');
 
 // We need to compute token names, these variables can't be mangled.
@@ -74,21 +73,6 @@ const circleBenchmark = () => {
   return config
 }
 
-const browserBenchmark = () => {
-  const config = buildConfiguration({
-    name: "browser",
-    mode: "development",
-    excludeDependencies: false,
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: "./benchmark/browser/index.html"
-      })
-    ]
-  })
-  config.entry = "./benchmark/browser/benchmark.ts"
-  return config
-}
-
 const unoptimized_full = libraryBundleConfiguration({
   name: "unoptimized-full",
   mode: "development",
@@ -116,5 +100,4 @@ module.exports = [
   optimized_full,
   optimized_without_dependencies,
   // circleBenchmark(),
-  browserBenchmark(),
 ];
