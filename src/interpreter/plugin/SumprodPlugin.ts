@@ -25,7 +25,7 @@ export class SumprodPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    if ((leftArgValue.width() * leftArgValue.height()) !== (rightArgValue.width() * rightArgValue.height())) {
+    if (leftArgValue.numberOfElements() !== rightArgValue.numberOfElements()) {
       return new CellError(ErrorType.VALUE)
     }
 

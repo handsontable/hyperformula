@@ -77,6 +77,10 @@ export class SimpleRangeValue {
     }
   }
 
+  public numberOfElements(): number {
+    return this.size.width * this.size.height
+  }
+
   private computeDataFromDependencyGraph(): ScalarValue[][] | CellError {
     const result = []
 
