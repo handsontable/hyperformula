@@ -8,8 +8,6 @@
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
-    "html-webpack-plugin": "^3.2.0",
-    "http-server": "^0.11.1",
     "jest": "^23.6.0",
     "license-checker": "^25.0.1",
     "ts-jest": "^23.10.1",
@@ -28,7 +26,6 @@
     "csv-parse": "^4.0.1",
     "csv-stringify": "^5.0.0",
     "gpu.js": "2.0.0-rc.13",
-    "moment": "^2.22.2",
-    "table": "^5.4.6"
+    "moment": "^2.22.2"
   }
 }
