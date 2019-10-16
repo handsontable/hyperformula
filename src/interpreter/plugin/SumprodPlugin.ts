@@ -20,10 +20,6 @@ export class SumprodPlugin extends FunctionPlugin {
     const leftArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(left, formulaAddress))
     const rightArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(right, formulaAddress))
 
-    if (leftArgValue.isErrorMatrix() || rightArgValue.isErrorMatrix()) {
-      return new CellError(ErrorType.VALUE)
-    }
-
     if (leftArgValue.numberOfElements() !== rightArgValue.numberOfElements()) {
       return new CellError(ErrorType.VALUE)
     }
@@ -31,7 +27,7 @@ export class SumprodPlugin extends FunctionPlugin {
     return this.reduceSumprod(leftArgValue, rightArgValue)
   }
 
-  private reduceSumprod(left: SimpleRangeValue, right: SimpleRangeValue): number {
+  private reduceSumprod(left: SimpleRangeValue, right: SimpleRangeValue): number | CellError {
     let result = 0
 
     let lit = left.valuesFromTopLeftCorner()
