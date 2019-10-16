@@ -5,6 +5,7 @@ import {Matrix} from '../../Matrix'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {coerceToRangeWithScalarAsSingular} from '../coerce'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -16,12 +17,10 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    const leftArgValue = this.evaluateAst(left, formulaAddress)
-    const rightArgValue = this.evaluateAst(right, formulaAddress)
+    const leftArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(left, formulaAddress))
+    const rightArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(right, formulaAddress))
 
-    if (typeof leftArgValue === 'number' && typeof rightArgValue === 'number') {
-      return leftArgValue * rightArgValue
-    } else if (!(leftArgValue instanceof SimpleRangeValue) || !(rightArgValue instanceof SimpleRangeValue)) {
+    if (leftArgValue.isErrorMatrix() || rightArgValue.isErrorMatrix()) {
       return new CellError(ErrorType.VALUE)
     }
 

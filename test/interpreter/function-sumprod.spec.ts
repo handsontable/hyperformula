@@ -89,7 +89,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  xit('works with matrices',  () => {
+  it('works with matrices',  () => {
     const engine =  HandsOnEngine.buildFromArray([
         ['1', '2'],
         ['3'],

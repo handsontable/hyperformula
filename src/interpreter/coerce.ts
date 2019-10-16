@@ -1,6 +1,6 @@
 import {CellError, CellValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
-import {InterpreterValue} from './InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
  * Converts cell value to date number representation (days after 12th Dec 1899)
@@ -37,5 +37,15 @@ export function booleanRepresentation(arg: InterpreterValue): boolean | CellErro
     return arg
   } else {
     return new CellError(ErrorType.VALUE)
+  }
+}
+
+export function coerceToRangeWithScalarAsSingular(arg: InterpreterValue): SimpleRangeValue {
+  if (arg instanceof SimpleRangeValue) {
+    return arg
+  } else if (typeof arg === 'number') {
+    return SimpleRangeValue.fromScalar(arg)
+  } else {
+    return SimpleRangeValue.onlyError(new CellError(ErrorType.VALUE))
   }
 }
