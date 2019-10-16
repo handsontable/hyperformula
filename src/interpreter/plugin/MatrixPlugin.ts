@@ -33,7 +33,7 @@ export class MatrixPlugin extends FunctionPlugin {
     if (leftMatrix instanceof CellError) {
       return this.errorMatrix(leftMatrix.type)
     } else if (typeof leftMatrix === 'number') {
-      leftMatrix = SimpleRangeValue.fromScalar(leftMatrix, this.dependencyGraph)
+      leftMatrix = SimpleRangeValue.fromScalar(leftMatrix)
     } else if (!(leftMatrix instanceof SimpleRangeValue) || leftMatrix.isErrorMatrix()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
@@ -41,7 +41,7 @@ export class MatrixPlugin extends FunctionPlugin {
     if (rightMatrix instanceof CellError) {
       return this.errorMatrix(rightMatrix.type)
     } else if (typeof rightMatrix === 'number') {
-      rightMatrix = SimpleRangeValue.fromScalar(rightMatrix, this.dependencyGraph)
+      rightMatrix = SimpleRangeValue.fromScalar(rightMatrix)
     } else if (!(rightMatrix instanceof SimpleRangeValue) || rightMatrix.isErrorMatrix()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
@@ -60,7 +60,6 @@ export class MatrixPlugin extends FunctionPlugin {
     return SimpleRangeValue.onlyData(
       kernel(leftMatrix.raw(), rightMatrix.raw(), leftMatrix.width()) as number[][],
       { width: vertex.width, height: vertex.height }, // that is incorrect, it should be one dimension from leftmatrix and one from rightmatrix
-      this.dependencyGraph
     )
   }
 
@@ -83,7 +82,7 @@ export class MatrixPlugin extends FunctionPlugin {
     if (rangeMatrix instanceof CellError) {
       return this.errorMatrix(rangeMatrix.type)
     } else if (typeof rangeMatrix === 'number') {
-      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix, this.dependencyGraph)
+      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix)
     } else if (!(rangeMatrix instanceof SimpleRangeValue)) {
       return this.errorMatrix(ErrorType.VALUE)
     }
@@ -110,7 +109,6 @@ export class MatrixPlugin extends FunctionPlugin {
         width: 1 + (rangeMatrix.width() - windowSize) / stride,
         height: 1 + (rangeMatrix.height() - windowSize) / stride,
       },
-      this.dependencyGraph
     )
   }
 
@@ -133,7 +131,7 @@ export class MatrixPlugin extends FunctionPlugin {
     if (rangeMatrix instanceof CellError) {
       return this.errorMatrix(rangeMatrix.type)
     } else if (typeof rangeMatrix === 'number') {
-      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix, this.dependencyGraph)
+      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix)
     } else if (!(rangeMatrix instanceof SimpleRangeValue)) {
       return this.errorMatrix(ErrorType.VALUE)
     }
@@ -202,7 +200,6 @@ export class MatrixPlugin extends FunctionPlugin {
         width: 1 + (rangeMatrix.width() - windowSize) / stride,
         height: 1 + (rangeMatrix.height() - windowSize) / stride,
       },
-      this.dependencyGraph
     )
   }
 
@@ -212,7 +209,7 @@ export class MatrixPlugin extends FunctionPlugin {
     if (value instanceof CellError) {
       return this.errorMatrix(value.type)
     } else if (typeof value === 'number') {
-      value = SimpleRangeValue.fromScalar(value, this.dependencyGraph)
+      value = SimpleRangeValue.fromScalar(value)
     } else if (!(value instanceof SimpleRangeValue) || value.isErrorMatrix()) {
       return this.errorMatrix(ErrorType.VALUE)
     }
@@ -237,11 +234,10 @@ export class MatrixPlugin extends FunctionPlugin {
         width: matrixSize.width,
         height: matrixSize.height,
       },
-      this.dependencyGraph
     )
   }
 
   private errorMatrix(errorType: ErrorType): SimpleRangeValue {
-    return SimpleRangeValue.onlyError(new CellError(errorType), this.dependencyGraph)
+    return SimpleRangeValue.onlyError(new CellError(errorType))
   }
 }

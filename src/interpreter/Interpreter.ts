@@ -235,7 +235,7 @@ export class Interpreter {
           if (matrix instanceof NotComputedMatrix) {
             throw "Matrix should be computed already"
           }
-          return SimpleRangeValue.withData((matrix as Matrix).raw(), (matrix as Matrix).size, range, this.dependencyGraph)
+          return SimpleRangeValue.withData((matrix as Matrix).raw(), (matrix as Matrix).size, range)
         } else {
           return SimpleRangeValue.fromRange(range, this.dependencyGraph)
         }
