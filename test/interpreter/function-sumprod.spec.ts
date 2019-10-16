@@ -83,7 +83,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A2')).toEqual(0)
   })
 
-  xit('error if error is anywhere',  () => {
+  xit('error if error is somewhere in right value',  () => {
     const engine = HandsOnEngine.buildFromArray([
       ['42', '78'],
       ['13', '=4/0'],
@@ -91,6 +91,26 @@ describe('Function SUMPRODUCT', () => {
     ])
 
     expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  xit('error if error is somewhere in left value',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '78'],
+      ['=3/0', '13'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  xit('error in left has precedence over error in right',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '78'],
+      ['=UNKNOWNFUNCTION()', '=3/0'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('error when different size',  () => {
