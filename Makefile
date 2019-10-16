@@ -5,7 +5,7 @@ setup: ## Setup project
 	@yarn install
 
 compile: ## Compile to javascript
-	@yarn tsc
+	@yarn tsc -d
 
 test: ## Run tests
 	@yarn jest
