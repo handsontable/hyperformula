@@ -1,6 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {MatrixVertex} from '../../DependencyGraph'
 import {checkMatrixSize, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
@@ -46,7 +45,8 @@ export class MatrixPlugin extends FunctionPlugin {
       return this.errorMatrix(ErrorType.VALUE)
     }
 
-    const vertex = this.dependencyGraph.fetchCell(formulaAddress) as MatrixVertex
+    const outputWidth = rightMatrix.width()
+    const outputHeight = leftMatrix.height()
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
@@ -55,11 +55,11 @@ export class MatrixPlugin extends FunctionPlugin {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setOutput([vertex.width, vertex.height])
+    }).setOutput([outputWidth, outputHeight])
 
     return SimpleRangeValue.onlyData(
       kernel(leftMatrix.raw(), rightMatrix.raw(), leftMatrix.width()) as number[][],
-      { width: vertex.width, height: vertex.height }, // that is incorrect, it should be one dimension from leftmatrix and one from rightmatrix
+      { width: outputWidth, height: outputHeight }
     )
   }
 
