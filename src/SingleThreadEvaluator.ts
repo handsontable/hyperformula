@@ -59,6 +59,10 @@ export class SingleThreadEvaluator implements Evaluator {
               this.columnSearch.change(currentValue, newCellMatrix, address)
               // return (currentValue !== newCellValue)
               return true
+            } else if (newCellValue instanceof CellError) {
+              vertex.setCellValue(newCellValue)
+              this.columnSearch.change(currentValue, newCellValue, address)
+              return true
             } else {
               throw "Other types in evaluator not supported yet"
             }
@@ -104,6 +108,9 @@ export class SingleThreadEvaluator implements Evaluator {
             const cellMatrix = new Matrix(cellValue.raw())
             vertex.setCellValue(cellMatrix)
             this.columnSearch.add(cellMatrix, address)
+          } else if (cellValue instanceof CellError) {
+            vertex.setCellValue(cellValue)
+            this.columnSearch.add(cellValue, address)
           } else {
             throw "Other types in evaluator not supported yet"
           }
