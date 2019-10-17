@@ -5,6 +5,7 @@ import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {coerceToRangeNumbersOrError} from '../coerce'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -23,25 +24,16 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    const left = ast.args[0]
-    const right = ast.args[1]
+    const [left, right] = ast.args
 
-    let leftMatrix = this.evaluateAst(left, formulaAddress)
-    let rightMatrix = this.evaluateAst(right, formulaAddress)
+    let leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
+    let rightMatrix = coerceToRangeNumbersOrError(this.evaluateAst(right, formulaAddress))
 
     if (leftMatrix instanceof CellError) {
       return leftMatrix
-    } else if (typeof leftMatrix === 'number') {
-      leftMatrix = SimpleRangeValue.fromScalar(leftMatrix)
-    } else if (!(leftMatrix instanceof SimpleRangeValue) || !leftMatrix.hasOnlyNumbers()) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    if (rightMatrix instanceof CellError) {
+    } else if (rightMatrix instanceof CellError) {
       return rightMatrix
-    } else if (typeof rightMatrix === 'number') {
-      rightMatrix = SimpleRangeValue.fromScalar(rightMatrix)
-    } else if (!(rightMatrix instanceof SimpleRangeValue) || !rightMatrix.hasOnlyNumbers()) {
+    } else if (leftMatrix === null || rightMatrix === null) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -68,7 +60,7 @@ export class MatrixPlugin extends FunctionPlugin {
   public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    let rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -83,9 +75,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
-    } else if (typeof rangeMatrix === 'number') {
-      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix)
-    } else if (!(rangeMatrix instanceof SimpleRangeValue)) {
+    } else if (rangeMatrix === null) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -116,7 +106,7 @@ export class MatrixPlugin extends FunctionPlugin {
   public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    let rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -131,9 +121,7 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
-    } else if (typeof rangeMatrix === 'number') {
-      rangeMatrix = SimpleRangeValue.fromScalar(rangeMatrix)
-    } else if (!(rangeMatrix instanceof SimpleRangeValue)) {
+    } else if (rangeMatrix === null) {
       return new CellError(ErrorType.VALUE)
     }
 
@@ -204,13 +192,11 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    let value = this.evaluateAst(ast.args[0], formulaAddress)
+    let value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {
       return value
-    } else if (typeof value === 'number') {
-      value = SimpleRangeValue.fromScalar(value)
-    } else if (!(value instanceof SimpleRangeValue) || !value.hasOnlyNumbers()) {
+    } else if (value === null) {
       return new CellError(ErrorType.VALUE)
     }
 

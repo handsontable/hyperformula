@@ -49,3 +49,13 @@ export function coerceToRangeWithScalarAsSingular(arg: InterpreterValue): Simple
     return SimpleRangeValue.onlyError(new CellError(ErrorType.VALUE))
   }
 }
+
+export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeValue | CellError | null {
+  if ((arg instanceof SimpleRangeValue && arg.hasOnlyNumbers()) || arg instanceof CellError) {
+    return arg
+  } else if (typeof arg === 'number') {
+    return SimpleRangeValue.fromScalar(arg)
+  } else {
+    return null
+  }
+}
