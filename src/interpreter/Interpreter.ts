@@ -233,7 +233,7 @@ export class Interpreter {
         if (matrixVertex) {
           const matrix = matrixVertex.matrix
           if (matrix instanceof NotComputedMatrix) {
-            throw "Matrix should be computed already"
+            throw "Matrix should be already computed"
           }
           return SimpleRangeValue.withData((matrix as Matrix).raw(), (matrix as Matrix).size, range)
         } else {
