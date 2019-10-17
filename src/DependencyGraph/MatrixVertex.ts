@@ -37,10 +37,7 @@ export class MatrixVertex {
     this.matrix = new NotComputedMatrix(width, height)
   }
 
-  public setCellValue(matrix: CellValue) {
-    if (!(matrix instanceof Matrix) && !(matrix instanceof CellError)) {
-      throw Error('Unsupported cell type')
-    }
+  public setCellValue(matrix: Matrix | CellError) {
     this.matrix = matrix
   }
 
