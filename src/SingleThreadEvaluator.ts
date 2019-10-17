@@ -54,7 +54,7 @@ export class SingleThreadEvaluator implements Evaluator {
               this.columnSearch.change(currentValue, error, address)
               return true
             } else if (newCellValue instanceof SimpleRangeValue) {
-              const newCellMatrix = new Matrix(newCellValue.raw())
+              const newCellMatrix = new Matrix(newCellValue.rawNumbers())
               vertex.setCellValue(newCellMatrix)
               this.columnSearch.change(currentValue, newCellMatrix, address)
               // return (currentValue !== newCellValue)
@@ -105,7 +105,7 @@ export class SingleThreadEvaluator implements Evaluator {
             vertex.setCellValue(error)
             this.columnSearch.add(error, address)
           } else if (cellValue instanceof SimpleRangeValue) {
-            const cellMatrix = new Matrix(cellValue.raw())
+            const cellMatrix = new Matrix(cellValue.rawNumbers())
             vertex.setCellValue(cellMatrix)
             this.columnSearch.add(cellMatrix, address)
           } else if (cellValue instanceof CellError) {

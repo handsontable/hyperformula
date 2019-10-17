@@ -52,7 +52,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }).setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyData(
-      kernel(leftMatrix.raw(), rightMatrix.raw(), leftMatrix.width()) as number[][],
+      kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
       outputSize
     )
   }
@@ -98,7 +98,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }).setOutput([ outputSize.width, outputSize.height ])
 
     return SimpleRangeValue.onlyData(
-      kernel(rangeMatrix.raw(), windowSize, stride) as number[][],
+      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
       outputSize
     )
   }
@@ -186,7 +186,7 @@ export class MatrixPlugin extends FunctionPlugin {
     }).setOutput([ outputSize.width, outputSize.height ])
 
     return SimpleRangeValue.onlyData(
-      kernel(rangeMatrix.raw(), windowSize, stride) as number[][],
+      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
       outputSize
     )
   }
@@ -205,7 +205,7 @@ export class MatrixPlugin extends FunctionPlugin {
       throw new Error("Size of a transpose can't be computed")
     }
 
-    const input = value.raw()
+    const input = value.rawNumbers()
     const result: number[][] = []
     for (let i=0; i<matrixSize.height; ++i) {
       result[i] = [];

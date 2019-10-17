@@ -234,8 +234,13 @@ export class Interpreter {
           const matrix = matrixVertex.matrix
           if (matrix instanceof NotComputedMatrix) {
             throw "Matrix should be already computed"
+          } else if (matrix instanceof CellError) {
+            return matrix
+          } else if (matrix instanceof Matrix) {
+            return SimpleRangeValue.withData(matrix.raw(), matrix.size, range)
+          } else {
+            throw "Unknown matrix"
           }
-          return SimpleRangeValue.withData((matrix as Matrix).raw(), (matrix as Matrix).size, range)
         } else {
           return SimpleRangeValue.fromRange(range, this.dependencyGraph)
         }

@@ -3,46 +3,43 @@ import {Size} from '../Matrix'
 import {DependencyGraph} from '../DependencyGraph/DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
-type ScalarValue = number
+type ScalarValue = number | CellError
 
 export class ArrayData {
   constructor(
     public readonly size: Size,
-    public readonly data: ScalarValue[][] | CellError,
+    public readonly data: ScalarValue[][],
     public _hasOnlyNumbers: boolean
   ) {
   }
 
   public hasOnlyNumbers() {
-    if (this.data instanceof CellError) {
-      return false
-    }
     return this._hasOnlyNumbers
   }
 
   public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
-    if (this.data instanceof CellError) {
-      throw "Cant return array when theres an error"
-    } else {
-      for (let i = 0; i < this.size.height; i++) {
-        for (let j = 0; j < this.size.width; j++) {
-          yield this.data[i][j]
-        }
+    for (let i = 0; i < this.size.height; i++) {
+      for (let j = 0; j < this.size.width; j++) {
+        yield this.data[i][j]
       }
     }
   }
 
   public raw(): ScalarValue[][] {
-    if (this.data instanceof CellError) {
-      throw "Cant return array when theres an error"
+    return this.data
+  }
+
+  public rawNumbers(): number[][] {
+    if (this.hasOnlyNumbers()) {
+      return this.data as number[][]
     } else {
-      return this.data
+      throw "Data is not only numbers"
     }
   }
 }
 
 export class OnlyRangeData {
-  public data: ScalarValue[][] | CellError | undefined
+  public data: ScalarValue[][] | undefined
   public _hasOnlyNumbers?: boolean;
 
   constructor(
@@ -55,10 +52,14 @@ export class OnlyRangeData {
   public raw(): ScalarValue[][] {
     this.ensureThatComputed()
 
-    if (this.data instanceof CellError) {
-      throw "Cant return array when theres an error"
+    return this.data!
+  }
+
+  public rawNumbers(): number[][] {
+    if (this.hasOnlyNumbers()) {
+      return this.data as number[][]
     } else {
-      return this.data!
+      throw "Data is not only numbers"
     }
   }
 
@@ -100,7 +101,7 @@ export class OnlyRangeData {
     }
   }
 
-  private computeDataFromDependencyGraph(): ScalarValue[][] | CellError {
+  private computeDataFromDependencyGraph(): ScalarValue[][] {
     const result = []
 
     let i = 0
@@ -109,10 +110,14 @@ export class OnlyRangeData {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
-        ++i
+      } else if (value instanceof CellError){
+        row.push(value)
+        this._hasOnlyNumbers = false
       } else {
-        return new CellError(ErrorType.VALUE)
+        row.push(new CellError(ErrorType.VALUE))
+        this._hasOnlyNumbers = false
       }
+      ++i
 
       if (i % this.range.width() === 0) {
         i = 0
@@ -142,7 +147,7 @@ export class SimpleRangeValue {
   }
 
   public static onlyError(data: CellError): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, data, false))
+    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[data]], false))
   }
 
   public static fromRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
@@ -175,6 +180,10 @@ export class SimpleRangeValue {
 
   public hasOnlyNumbers(): boolean {
     return this.data.hasOnlyNumbers()
+  }
+
+  public rawNumbers(): number[][] {
+    return this.data.rawNumbers()
   }
 }
 
