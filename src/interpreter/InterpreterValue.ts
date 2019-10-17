@@ -13,10 +13,6 @@ export class ArrayData {
   ) {
   }
 
-  public isErrorMatrix(): boolean {
-    return (this.data instanceof CellError)
-  }
-
   public hasOnlyNumbers() {
     if (this.data instanceof CellError) {
       return false
@@ -64,11 +60,6 @@ export class OnlyRangeData {
     } else {
       return this.data!
     }
-  }
-
-  public isErrorMatrix(): boolean {
-    this.ensureThatComputed()
-    return (this.data instanceof CellError)
   }
 
   private ensureThatComputed() {
@@ -168,10 +159,6 @@ export class SimpleRangeValue {
 
   public height(): number {
     return this.data.size.height;
-  }
-
-  public isErrorMatrix(): boolean {
-    return this.data.isErrorMatrix()
   }
 
   public raw(): ScalarValue[][] {
