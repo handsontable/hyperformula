@@ -197,14 +197,6 @@ export class Matrix implements IMatrix {
     return this.matrix
   }
 
-  public* generateFlatValues(): IterableIterator<number> {
-    for (let row = 0; row < this.size.height; ++row) {
-      for (let col = 0; col < this.size.width; ++col) {
-        yield this.matrix[row][col]
-      }
-    }
-  }
-
   public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[number, SimpleCellAddress]> {
     for (let row = 0; row < this.size.height; ++row) {
       for (let col = 0; col < this.size.width; ++col) {

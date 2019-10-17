@@ -99,16 +99,4 @@ export abstract class FunctionPlugin {
 
     return values
   }
-
-  protected* generateCellValues(range: AbsoluteCellRange | Matrix): IterableIterator<CellValue> {
-    if (range instanceof AbsoluteCellRange) {
-      for (const cellFromRange of range.addresses()) {
-        yield this.dependencyGraph.getCellValue(cellFromRange)
-      }
-    } else {
-      for (const value of range.generateFlatValues()) {
-        yield value
-      }
-    }
-  }
 }
