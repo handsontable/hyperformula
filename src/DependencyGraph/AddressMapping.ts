@@ -636,7 +636,7 @@ export class AddressMapping {
   public* sheetEntries(sheet: number) {
     const sheetMapping = this.mapping.get(sheet)
     if (sheetMapping) {
-      yield* sheetMapping.getEntries(sheet)
+      yield* sheetMapping.vertices()
     } else {
       throw new Error("Sheet does not exists")
     }

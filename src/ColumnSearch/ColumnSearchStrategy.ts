@@ -19,6 +19,8 @@ export interface IColumnSearchStrategy {
 
   removeColumns(columnsSpan: ColumnsSpan): void
 
+  removeSheet(sheetId: number): void
+
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number
 }
 

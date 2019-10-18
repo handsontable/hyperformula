@@ -23,6 +23,8 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
 
   public removeColumns(columnsSpan: ColumnsSpan): void {}
 
+  public removeSheet(sheetId: number): void {}
+
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.vlookupThreshold || !sorted) {
       const values = this.computeListOfValuesInRange(range)

@@ -132,10 +132,21 @@ export class PlusStrategy implements IAddressMappingStrategy {
   }
 
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
-    for (const [rowNumber, row] of this.mapping.entriesFromKeyRange(rowsSpan.rowStart, rowsSpan.rowEnd)) {
+    for (const [_, row] of this.mapping.entriesFromKeyRange(rowsSpan.rowStart, rowsSpan.rowEnd)) {
       for (const maybeVertex of row) {
         if (maybeVertex !== undefined) {
           yield maybeVertex
+        }
+      }
+    }
+  }
+
+  public* vertices(): IterableIterator<CellVertex> {
+    for (const [_, row] of this.mapping.entries()) {
+      for (let i = 0; i < row.length; i++) {
+        const vertex = row[i]
+        if (vertex) {
+          yield vertex
         }
       }
     }

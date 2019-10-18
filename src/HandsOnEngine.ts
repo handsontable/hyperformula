@@ -302,12 +302,15 @@ export class HandsOnEngine {
   }
 
   public removeSheet(sheetId: number) {
-    const sheetHeight = this.addressMapping.getHeight(sheetId)
-    if (sheetHeight > 0) {
-      this.removeRows(sheetId, 0, sheetHeight - 1)
-    }
-    this.addressMapping.removeSheet(sheetId)
+    this.dependencyGraph.removeSheet(sheetId)
+
+    // this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+    //   RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
+    //   this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
+    // })
+
     this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
   }
 
   public forceApplyPostponedTransformations() {
