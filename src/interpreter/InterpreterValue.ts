@@ -71,9 +71,7 @@ export class OnlyRangeData {
 
   public hasOnlyNumbers() {
     this.ensureThatComputed()
-    if (this.data instanceof CellError) {
-      return false
-    }
+
     if (this._hasOnlyNumbers === undefined) {
       for (const v of this.valuesFromTopLeftCorner()) {
         if (typeof v !== 'number') {
@@ -90,13 +88,9 @@ export class OnlyRangeData {
   public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
     this.ensureThatComputed()
 
-    if (this.data instanceof CellError) {
-      throw "Cant return array when theres an error"
-    } else {
-      for (let i = 0; i < this.size.height; i++) {
-        for (let j = 0; j < this.size.width; j++) {
-          yield this.data![i][j]
-        }
+    for (let i = 0; i < this.size.height; i++) {
+      for (let j = 0; j < this.size.width; j++) {
+        yield this.data![i][j]
       }
     }
   }
