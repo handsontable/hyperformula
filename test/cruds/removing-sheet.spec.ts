@@ -2,6 +2,8 @@ import {HandsOnEngine} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
+import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
+import {MatrixVertex} from "../../src/DependencyGraph";
 
 describe('remove sheet', () => {
   it('should remove sheet by id', () => {
@@ -147,4 +149,53 @@ describe('remove sheet - adjust address mapping', () => {
 
     expect(() => engine.addressMapping.strategyFor(0)).toThrow(new Error('Unknown sheet id'))
   })
+})
+
+describe('remove sheet - adjust range mapping', () => {
+  it('should remove ranges from range mapping when removing sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+          ['=SUM(B1:B2)'],
+          ['=SUM(C1:C2)'],
+      ],
+      'Sheet2': [
+        ['=SUM(B1:B2)'],
+        ['=SUM(C1:C2)'],
+      ]
+    })
+
+    expect(Array.from(engine.rangeMapping.rangesInSheet(0)).length).toBe(2)
+    expect(Array.from(engine.rangeMapping.rangesInSheet(1)).length).toBe(2)
+
+    engine.removeSheet(0)
+
+    expect(Array.from(engine.rangeMapping.rangesInSheet(0)).length).toBe(0)
+    expect(Array.from(engine.rangeMapping.rangesInSheet(1)).length).toBe(2)
+  });
+})
+
+describe('remove sheet - adjust matrix mapping', () => {
+  it('should remove matrices from matrix mapping when removing sheet', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      'Sheet1': [
+        ['1', '2'],
+        ['{=TRANSPOSE(A1:A1)}'],
+        ['{=TRANSPOSE(A2:A2)}']
+      ],
+      'Sheet2': [
+        ['1', '2'],
+        ['{=TRANSPOSE(A1:A1)}'],
+        ['{=TRANSPOSE(A2:A2)}']
+      ]
+    })
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A2"), 1, 1))).toBeInstanceOf(MatrixVertex)
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A3"), 1, 1))).toBeInstanceOf(MatrixVertex)
+
+    engine.removeSheet(0)
+
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A2"), 1, 1))).toBeUndefined()
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A3"), 1, 1))).toBeUndefined()
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A2", 1), 1, 1))).toBeInstanceOf(MatrixVertex)
+    expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A3", 1), 1, 1))).toBeInstanceOf(MatrixVertex)
+  });
 })
