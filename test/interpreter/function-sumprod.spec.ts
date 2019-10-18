@@ -64,7 +64,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A3')).toEqual(42)
   })
 
-  xit('works even if some string in data',  () => {
+  it('works even if some string in data',  () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '1'],
       ['asdf', 'fdsafdsa'],
@@ -74,7 +74,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A3')).toEqual(1)
   })
 
-  xit('works even if both strings passed',  () => {
+  it('works even if both strings passed',  () => {
     const engine = HandsOnEngine.buildFromArray([
       ['asdf', 'fdsafdsa'],
       ['=SUMPRODUCT(A1,B1)'],
@@ -83,7 +83,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A2')).toEqual(0)
   })
 
-  xit('works even if both booleans passed',  () => {
+  it('works even if both booleans passed',  () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=TRUE()', '=FALSE()'],
       ['=SUMPRODUCT(A1,B1)'],

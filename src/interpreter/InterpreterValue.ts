@@ -3,12 +3,10 @@ import {Size} from '../Matrix'
 import {DependencyGraph} from '../DependencyGraph/DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
-type ScalarValue = number | CellError
-
 export class ArrayData {
   constructor(
     public readonly size: Size,
-    public readonly data: ScalarValue[][],
+    public readonly data: CellValue[][],
     public _hasOnlyNumbers: boolean
   ) {
   }
@@ -17,7 +15,7 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data[i][j]
@@ -25,7 +23,7 @@ export class ArrayData {
     }
   }
 
-  public raw(): ScalarValue[][] {
+  public raw(): CellValue[][] {
     return this.data
   }
 
@@ -39,7 +37,7 @@ export class ArrayData {
 }
 
 export class OnlyRangeData {
-  public data: ScalarValue[][] | undefined
+  public data: CellValue[][] | undefined
   public _hasOnlyNumbers?: boolean;
 
   constructor(
@@ -49,7 +47,7 @@ export class OnlyRangeData {
   ) {
   }
 
-  public raw(): ScalarValue[][] {
+  public raw(): CellValue[][] {
     this.ensureThatComputed()
 
     return this.data!
@@ -85,7 +83,7 @@ export class OnlyRangeData {
     return this._hasOnlyNumbers;
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
     this.ensureThatComputed()
 
     for (let i = 0; i < this.size.height; i++) {
@@ -95,7 +93,7 @@ export class OnlyRangeData {
     }
   }
 
-  private computeDataFromDependencyGraph(): ScalarValue[][] {
+  private computeDataFromDependencyGraph(): CellValue[][] {
     const result = []
 
     let i = 0
@@ -148,8 +146,9 @@ export class SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({ width: range.width(), height: range.height() }, range, dependencyGraph))
   }
 
-  public static fromScalar(scalar: ScalarValue): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], true))
+  public static fromScalar(scalar: CellValue): SimpleRangeValue {
+    let hasOnlyNumbers = (typeof scalar === 'number')
+    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
 
   public width(): number {
@@ -160,11 +159,11 @@ export class SimpleRangeValue {
     return this.data.size.height;
   }
 
-  public raw(): ScalarValue[][] {
+  public raw(): CellValue[][] {
     return this.data.raw()
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<ScalarValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
     yield *this.data.valuesFromTopLeftCorner()
   }
 
