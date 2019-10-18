@@ -151,7 +151,9 @@ export class Graph<T> {
   }
 
   public markNodeAsSpecialRecentlyChanged(node: T) {
-    this.specialNodesRecentlyChanged.add(node)
+    if (this.nodes.has(node)) {
+      this.specialNodesRecentlyChanged.add(node)
+    }
   }
 
   public markNodeAsChangingWithStructure(node: T) {

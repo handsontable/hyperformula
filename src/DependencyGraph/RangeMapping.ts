@@ -120,8 +120,13 @@ export class RangeMapping {
     })
   }
 
-  public removeRangesInSheet(sheet: number): void {
-    this.rangeMapping.delete(sheet)
+  public removeRangesInSheet(sheet: number): IterableIterator<RangeVertex> {
+    if (this.rangeMapping.has(sheet)) {
+      const ranges = this.rangeMapping.get(sheet)!.values()
+      this.rangeMapping.delete(sheet)
+      return ranges
+    }
+    return [][Symbol.iterator]()
   }
 
   public* rangesInSheet(sheet: number): IterableIterator<RangeVertex> {

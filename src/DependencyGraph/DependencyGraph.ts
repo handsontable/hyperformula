@@ -211,7 +211,10 @@ export class DependencyGraph {
     })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      this.rangeMapping.removeRangesInSheet(removedSheetId)
+      const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
+      for (const range of rangesToRemove) {
+        this.graph.removeNode(range)
+      }
     })
 
     this.addStructuralNodesToChangeSet()
