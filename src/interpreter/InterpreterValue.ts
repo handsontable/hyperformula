@@ -135,10 +135,6 @@ export class SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
-  public static onlyError(data: CellError): SimpleRangeValue {
-    return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[data]], false))
-  }
-
   public static fromRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({ width: range.width(), height: range.height() }, range, dependencyGraph))
   }
