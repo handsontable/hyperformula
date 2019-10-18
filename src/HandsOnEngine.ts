@@ -18,6 +18,7 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {CellAddress, cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
+import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -301,16 +302,18 @@ export class HandsOnEngine {
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
-  public removeSheet(sheetId: number) {
-    this.dependencyGraph.removeSheet(sheetId)
+  public removeSheet(sheet: number) {
+    this.dependencyGraph.removeSheet(sheet)
 
-    // this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-    //   RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-    //   this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
-    // })
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
+      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
+    })
 
-    this.sheetMapping.removeSheet(sheetId)
-    this.columnSearch.removeSheet(sheetId)
+    this.sheetMapping.removeSheet(sheet)
+    this.columnSearch.removeSheet(sheet)
+
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   public forceApplyPostponedTransformations() {
