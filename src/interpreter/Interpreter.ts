@@ -134,40 +134,8 @@ export class Interpreter {
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof Matrix && ast.right.type === AstNodeType.CELL_RANGE) {
-          const rightRange = AbsoluteCellRange.fromCellRange(ast.right, formulaAddress)
-          const matrixVertex = this.dependencyGraph.getMatrix(rightRange)
-          if (matrixVertex === undefined) {
-            const resultMatrix: number[][] = []
-            let currentRow = 0
-            while (currentRow < leftResult.height()) {
-              const row: number[] = []
-              let currentColumn = 0
-              while (currentColumn < leftResult.width()) {
-                row.push(addStrict(
-                  leftResult.get(currentColumn, currentRow),
-                  this.dependencyGraph.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
-                ) as number)
-                currentColumn++
-              }
-              resultMatrix.push(row)
-              currentRow++
-            }
-            return new Matrix(resultMatrix)
-          } else {
-            const matrixValue = matrixVertex.getCellValue()
-            if (matrixValue instanceof CellError) {
-              return matrixValue
-            }
-            const kernel = this.gpu.createKernel(function(a: number[][], b: number[][]) {
-              return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
-            }).setOutput([matrixVertex.width, matrixVertex.height])
-
-            return new Matrix(kernel(leftResult.raw(), matrixValue.raw()) as number[][])
-          }
-        }
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
-          throw "Cant happen"
+          return new CellError(ErrorType.VALUE)
         }
         return addStrict(leftResult, rightResult)
       }
