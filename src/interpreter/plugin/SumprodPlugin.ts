@@ -5,7 +5,7 @@ import {Matrix} from '../../Matrix'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {coerceToRangeWithScalarAsSingular} from '../coerce'
+import {coerceToRange} from '../coerce'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -17,8 +17,15 @@ export class SumprodPlugin extends FunctionPlugin {
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     const [left, right] = ast.args
 
-    const leftArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(left, formulaAddress))
-    const rightArgValue = coerceToRangeWithScalarAsSingular(this.evaluateAst(right, formulaAddress))
+    const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))
+    const rightArgValue = coerceToRange(this.evaluateAst(right, formulaAddress))
+    if (leftArgValue instanceof CellError) {
+      return leftArgValue
+    } else if (rightArgValue instanceof CellError) {
+      return rightArgValue
+    } else if (leftArgValue === null || rightArgValue === null) {
+      return new CellError(ErrorType.VALUE)
+    }
 
     if (leftArgValue.numberOfElements() !== rightArgValue.numberOfElements()) {
       return new CellError(ErrorType.VALUE)
@@ -35,7 +42,11 @@ export class SumprodPlugin extends FunctionPlugin {
     let l,r
 
     while (l = lit.next(), r = rit.next(), !l.done && !r.done) {
-      if (typeof l.value === 'number' && typeof r.value === 'number') {
+      if (l.value instanceof CellError) {
+        return l.value
+      } else if (r.value instanceof CellError) {
+        return r.value
+      } else if (typeof l.value === 'number' && typeof r.value === 'number') {
         result += l.value * r.value
       }
     }

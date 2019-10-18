@@ -40,13 +40,11 @@ export function booleanRepresentation(arg: InterpreterValue): boolean | CellErro
   }
 }
 
-export function coerceToRangeWithScalarAsSingular(arg: InterpreterValue): SimpleRangeValue {
+export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg
-  } else if (typeof arg === 'number') {
-    return SimpleRangeValue.fromScalar(arg)
   } else {
-    return SimpleRangeValue.onlyError(new CellError(ErrorType.VALUE))
+    return SimpleRangeValue.fromScalar(arg)
   }
 }
 
