@@ -2,8 +2,14 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
-export interface Size { width: number, height: number }
-export type MatrixSizeCheck = Size | false
+export class MatrixSize {
+  constructor(
+    public width: number,
+    public height: number
+  ) {
+  }
+}
+export type MatrixSizeCheck = MatrixSize | false
 
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
@@ -88,22 +94,21 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 }
 
 export interface IMatrix {
-  width(): number
-  height(): number
+  width(): number,
+  height(): number,
   get(col: number, row: number): number,
 }
 
 export class NotComputedMatrix implements IMatrix {
-  constructor(private _width: number, private _height: number) {
-
+  constructor(public readonly size: MatrixSize) {
   }
 
   public width(): number {
-    return this._width
+    return this.size.width
   }
 
   public height(): number {
-    return this._height
+    return this.size.height
   }
 
   public get(col: number, row: number): number {
@@ -113,14 +118,10 @@ export class NotComputedMatrix implements IMatrix {
 
 export class Matrix implements IMatrix {
   private readonly matrix: number[][]
-  public size: Size
+  public size: MatrixSize
 
   constructor(matrix: number[][]) {
-    this.matrix = []
-    this.size = {
-      height: matrix.length,
-      width: matrix.length > 0 ? matrix[0].length : 0,
-    }
+    this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
   }
 

@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
+import {IMatrix, Matrix, NotComputedMatrix, MatrixSize} from '../Matrix'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 
@@ -34,7 +34,7 @@ export class MatrixVertex {
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
     this.formula = formula || null
-    this.matrix = new NotComputedMatrix(width, height)
+    this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
   public setCellValue(matrix: Matrix | CellError) {

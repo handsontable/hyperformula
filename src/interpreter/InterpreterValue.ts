@@ -1,11 +1,11 @@
 import {CellValue, ErrorType, CellError} from '../Cell'
-import {Size} from '../Matrix'
+import {MatrixSize} from '../Matrix'
 import {DependencyGraph} from '../DependencyGraph/DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 export class ArrayData {
   constructor(
-    public readonly size: Size,
+    public readonly size: MatrixSize,
     public readonly data: CellValue[][],
     public _hasOnlyNumbers: boolean
   ) {
@@ -41,7 +41,7 @@ export class OnlyRangeData {
   public _hasOnlyNumbers?: boolean;
 
   constructor(
-    public readonly size: Size,
+    public readonly size: MatrixSize,
     public readonly range: AbsoluteCellRange,
     public readonly dependencyGraph: DependencyGraph,
   ) {
@@ -127,11 +127,11 @@ export class SimpleRangeValue {
   ) {
   }
 
-  public static onlyNumbersDataWithRange(data: number[][], size: Size, range: AbsoluteCellRange): SimpleRangeValue {
+  public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
-  public static onlyNumbersDataWithoutRange(data: number[][], size: Size): SimpleRangeValue {
+  public static onlyNumbersDataWithoutRange(data: number[][], size: MatrixSize): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 

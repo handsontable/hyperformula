@@ -4,11 +4,11 @@ import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
-import {Size} from './Matrix'
+import {MatrixSize} from './Matrix'
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {
-    const size: Size = {width: input[0].length, height: input.length}
+    const size: MatrixSize = new MatrixSize(input[0].length, input.length)
     const array = new Array2d<T>(size)
     for (let i = 0; i < size.height; ++i) {
       for (let j = 0; j < size.width; ++j) {
@@ -18,10 +18,10 @@ export class Array2d<T> {
     return array
   }
 
-  private readonly _size: Size
+  private readonly _size: MatrixSize
   private readonly array: T[][]
 
-  constructor(size: Size) {
+  constructor(size: MatrixSize) {
     this._size = size
     this.array = new Array(size.height)
     for (let y = 0; y < size.height; ++y) {
@@ -63,7 +63,7 @@ export class GraphBuilderMatrixHeuristic {
   ) {
   }
 
-  public addSheet(id: number, size: Size) {
+  public addSheet(id: number, size: MatrixSize) {
     this.mapping.set(id, new Array2d<boolean>(size))
   }
 
