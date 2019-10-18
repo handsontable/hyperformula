@@ -127,15 +127,15 @@ export class SimpleRangeValue {
   ) {
   }
 
-  public static withData(data: number[][], size: Size, range: AbsoluteCellRange): SimpleRangeValue {
+  public static onlyNumbersDataWithRange(data: number[][], size: Size, range: AbsoluteCellRange): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
-  public static onlyData(data: number[][], size: Size): SimpleRangeValue {
+  public static onlyNumbersDataWithoutRange(data: number[][], size: Size): SimpleRangeValue {
     return new SimpleRangeValue(new ArrayData(size, data, true))
   }
 
-  public static fromRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
+  public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({ width: range.width(), height: range.height() }, range, dependencyGraph))
   }
 

@@ -205,12 +205,12 @@ export class Interpreter {
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.withData(matrix.raw(), matrix.size, range)
+            return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
           } else {
             throw "Unknown matrix"
           }
         } else {
-          return SimpleRangeValue.fromRange(range, this.dependencyGraph)
+          return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
       }
       case AstNodeType.ERROR: {

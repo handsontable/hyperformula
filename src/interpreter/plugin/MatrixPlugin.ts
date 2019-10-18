@@ -51,7 +51,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return sum
     }).setOutput([outputSize.width, outputSize.height])
 
-    return SimpleRangeValue.onlyData(
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
       outputSize
     )
@@ -97,7 +97,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return currentMax
     }).setOutput([ outputSize.width, outputSize.height ])
 
-    return SimpleRangeValue.onlyData(
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
       outputSize
     )
@@ -185,7 +185,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return result
     }).setOutput([ outputSize.width, outputSize.height ])
 
-    return SimpleRangeValue.onlyData(
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
       outputSize
     )
@@ -214,7 +214,7 @@ export class MatrixPlugin extends FunctionPlugin {
       }
     }
 
-    return SimpleRangeValue.onlyData(
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
       result,
       {
         width: matrixSize.width,
