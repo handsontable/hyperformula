@@ -94,7 +94,7 @@ export class OnlyRangeData {
   }
 
   private computeDataFromDependencyGraph(): CellValue[][] {
-    const result = []
+    const result: CellValue[][] = []
 
     let i = 0
     let row = []
@@ -102,11 +102,8 @@ export class OnlyRangeData {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
-      } else if (value instanceof CellError){
-        row.push(value)
-        this._hasOnlyNumbers = false
       } else {
-        row.push(new CellError(ErrorType.VALUE))
+        row.push(value)
         this._hasOnlyNumbers = false
       }
       ++i
