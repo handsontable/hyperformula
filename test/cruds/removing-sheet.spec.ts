@@ -48,6 +48,20 @@ describe('remove sheet', () => {
     engine.addSheet()
     expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet3', 'Sheet4'])
   })
+
+  it('should remove sheet with matrix', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+          ['1'],
+          ['{=TRANSPOSE(A1:A1)}']
+      ]
+    })
+
+    engine.removeSheet(0)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  })
 })
 
 describe('remove sheet - adjust edges', () => {
