@@ -41,7 +41,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies, plugins = [] }) =
       // https://github.com/webpack/webpack/issues/6784
       globalObject: 'typeof self !== \'undefined\' ? self : this',
     },
-    externals: (excludeDependencies ? ['moment', 'chevrotain', /csv-parse/, /csv-stringify/] : []),
+    externals: (excludeDependencies ? ['moment', 'chevrotain', /csv-parse/, /csv-stringify/, 'gpu.js'] : []),
     mode,
     optimization: (mode === 'production' ? optimization : undefined),
     performance: {
