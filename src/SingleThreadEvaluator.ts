@@ -34,38 +34,33 @@ export class SingleThreadEvaluator implements Evaluator {
   public partialRun(vertices: Vertex[]) {
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
-        if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-          if (vertex instanceof FormulaCellVertex) {
-            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+        if (vertex instanceof FormulaCellVertex) {
+          const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+          const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+          const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+          vertex.setCellValue(newCellValue)
+          this.columnSearch.change(currentValue, newCellValue, address)
+          return (currentValue !== newCellValue)
+        } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+          const address = vertex.getAddress()
+          const formula = vertex.getFormula() as Ast
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+          const newCellValue = this.interpreter.evaluateAst(formula, address)
+          if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+            const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+            vertex.setCellValue(newCellMatrix)
+            this.columnSearch.change(currentValue, newCellMatrix, address)
+            return true
+          } else if (newCellValue instanceof CellError) {
             vertex.setCellValue(newCellValue)
             this.columnSearch.change(currentValue, newCellValue, address)
-            return (currentValue !== newCellValue)
+            return true
           } else {
-            const address = vertex.getAddress()
-            const formula = vertex.getFormula() as Ast
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-            const newCellValue = this.interpreter.evaluateAst(formula, address)
-            if (newCellValue instanceof SimpleRangeValue && !newCellValue.hasOnlyNumbers()) {
-              const error = new CellError(ErrorType.VALUE)
-              vertex.setCellValue(error)
-              this.columnSearch.change(currentValue, error, address)
-              return true
-            } else if (newCellValue instanceof SimpleRangeValue) {
-              const newCellMatrix = new Matrix(newCellValue.rawNumbers())
-              vertex.setCellValue(newCellMatrix)
-              this.columnSearch.change(currentValue, newCellMatrix, address)
-              // return (currentValue !== newCellValue)
-              return true
-            } else if (newCellValue instanceof CellError) {
-              vertex.setCellValue(newCellValue)
-              this.columnSearch.change(currentValue, newCellValue, address)
-              return true
-            } else {
-              throw "Other types in evaluator not supported yet"
-            }
+            const error = new CellError(ErrorType.VALUE)
+            vertex.setCellValue(error)
+            this.columnSearch.change(currentValue, error, address)
+            return true
           }
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
@@ -88,32 +83,27 @@ export class SingleThreadEvaluator implements Evaluator {
       (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
     sorted.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        let address, formula
-        if (vertex instanceof FormulaCellVertex) {
-          address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-          formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
-          const cellValue = this.interpreter.evaluateAstToCellValue(formula, address)
-          vertex.setCellValue(cellValue)
-          this.columnSearch.add(cellValue, address)
+      if (vertex instanceof FormulaCellVertex) {
+        const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+        const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+        const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+        vertex.setCellValue(newCellValue)
+        this.columnSearch.add(newCellValue, address)
+      } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+        const address = vertex.getAddress()
+        const formula = vertex.getFormula() as Ast
+        const newCellValue = this.interpreter.evaluateAst(formula, address)
+        if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+          const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+          vertex.setCellValue(newCellMatrix)
+          this.columnSearch.add(newCellMatrix, address)
+        } else if (newCellValue instanceof CellError) {
+          vertex.setCellValue(newCellValue)
+          this.columnSearch.add(newCellValue, address)
         } else {
-          address = vertex.getAddress()
-          formula = vertex.getFormula() as Ast
-          const cellValue = this.interpreter.evaluateAst(formula, address)
-          if (cellValue instanceof SimpleRangeValue && !cellValue.hasOnlyNumbers()) {
-            const error = new CellError(ErrorType.VALUE)
-            vertex.setCellValue(error)
-            this.columnSearch.add(error, address)
-          } else if (cellValue instanceof SimpleRangeValue) {
-            const cellMatrix = new Matrix(cellValue.rawNumbers())
-            vertex.setCellValue(cellMatrix)
-            this.columnSearch.add(cellMatrix, address)
-          } else if (cellValue instanceof CellError) {
-            vertex.setCellValue(cellValue)
-            this.columnSearch.add(cellValue, address)
-          } else {
-            throw "Other types in evaluator not supported yet"
-          }
+          const error = new CellError(ErrorType.VALUE)
+          vertex.setCellValue(error)
+          this.columnSearch.add(error, address)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
