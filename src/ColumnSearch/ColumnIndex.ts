@@ -38,7 +38,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
 
-  public add(value: CellValue, address: SimpleCellAddress) {
+  public add(value: CellValue | Matrix, address: SimpleCellAddress) {
     if (value instanceof Matrix) {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
         this.addSingleCellValue(matrixValue, cellAddress)
@@ -48,7 +48,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  public remove(value: CellValue | null, address: SimpleCellAddress) {
+  public remove(value: CellValue | Matrix | null, address: SimpleCellAddress) {
     if (!value) {
       return
     }
@@ -62,7 +62,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress) {
+  public change(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
     }
