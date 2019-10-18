@@ -82,13 +82,6 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     return { width: range.width(), height: range.height() }
   } else if (ast.type === AstNodeType.NUMBER) {
     return { width: 1, height: 1 }
-  } else if (ast.type === AstNodeType.PLUS_OP) {
-    const leftSize = checkMatrixSize(ast.left, formulaAddress)
-    const rightSize = checkMatrixSize(ast.right, formulaAddress)
-    if (!leftSize || !rightSize || leftSize.width !== rightSize.width || leftSize.height !== rightSize.height) {
-      return false
-    }
-    return leftSize
   } else {
     return false
   }
