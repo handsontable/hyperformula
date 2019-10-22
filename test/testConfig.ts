@@ -1,5 +1,5 @@
 import {Config} from '../src'
-import {AlwaysPlusTree} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {AlwaysPlusTree} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../src/i18n'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {

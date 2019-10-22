@@ -1,5 +1,5 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
-import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/ChooseAddressMappingPolicy'
+import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'

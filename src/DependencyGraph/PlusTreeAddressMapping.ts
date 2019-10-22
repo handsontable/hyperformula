@@ -3,8 +3,8 @@ import { SheetCellAddress, SimpleCellAddress, simpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {PlusTree} from '../PlusTree'
 import {RowsSpan} from '../RowsSpan'
-import {IAddressMappingStrategy} from './AddressMapping'
 import {CellVertex} from './Vertex'
+import {IAddressMappingStrategy} from "./AddressMapping/IAddressMappingStrategy";
 
 export class PlusStrategy implements IAddressMappingStrategy {
   private mapping: PlusTree<CellVertex[]> = PlusTree.empty(64)

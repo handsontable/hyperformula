@@ -4,7 +4,7 @@ import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {collectDependencies} from '../parser'
 import {FormulaCellVertex, Vertex} from './'
-import {AddressMapping} from './AddressMapping'
+import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
 

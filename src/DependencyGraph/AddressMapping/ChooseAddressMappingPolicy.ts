@@ -1,5 +1,7 @@
-import {DenseStrategy, IAddressMappingStrategyConstructor, SparseStrategy} from './AddressMapping'
-import {PlusStrategy} from './PlusTreeAddressMapping'
+import {PlusStrategy} from '../PlusTreeAddressMapping'
+import {SparseStrategy} from "./SparseStrategy";
+import {DenseStrategy} from "./DenseStrategy";
+import {IAddressMappingStrategyConstructor} from "./IAddressMappingStrategy";
 
 export interface IChooseAddressMapping {
   call(fill: number): IAddressMappingStrategyConstructor

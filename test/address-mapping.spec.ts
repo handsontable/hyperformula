@@ -1,6 +1,6 @@
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {AddressMapping, DenseStrategy, EmptyCellVertex, SparseStrategy, ValueCellVertex} from '../src/DependencyGraph'
-import {AlwaysDense, AlwaysPlusTree, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/ChooseAddressMappingPolicy'
+import {AlwaysDense, AlwaysPlusTree, AlwaysSparse, DenseSparseChooseBasedOnThreshold} from '../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {PlusStrategy} from '../src/DependencyGraph/PlusTreeAddressMapping'
 import {RowsSpan} from '../src/RowsSpan'
 import {adr} from './testUtils'
