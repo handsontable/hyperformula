@@ -56,6 +56,7 @@ export interface IAddressMappingStrategy {
   verticesFromRow(row: number): IterableIterator<CellVertex>,
   verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex>,
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
+  vertices(): IterableIterator<CellVertex>
 }
 
 /**
@@ -240,6 +241,16 @@ export class SparseStrategy implements IAddressMappingStrategy {
       }
     }
   }
+
+  public* vertices(): IterableIterator<CellVertex> {
+    for (const [_, col] of this.mapping) {
+      for (const [_, value] of col) {
+        if (value) {
+          yield value
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -384,6 +395,17 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     for (let x = 0; x < this.width; ++x) {
       for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
+        const vertex = this.mapping[y][x]
+        if (vertex) {
+          yield vertex
+        }
+      }
+    }
+  }
+
+  public* vertices(): IterableIterator<CellVertex> {
+    for (let y = 0; y < this.height; ++y) {
+      for (let x = 0; x < this.width; ++x) {
         const vertex = this.mapping[y][x]
         if (vertex) {
           yield vertex
@@ -608,6 +630,15 @@ export class AddressMapping {
   public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)
+    }
+  }
+
+  public* sheetEntries(sheet: number) {
+    const sheetMapping = this.mapping.get(sheet)
+    if (sheetMapping) {
+      yield* sheetMapping.vertices()
+    } else {
+      throw new Error("Sheet does not exists")
     }
   }
 

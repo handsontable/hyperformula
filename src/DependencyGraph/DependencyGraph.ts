@@ -188,6 +188,38 @@ export class DependencyGraph {
     this.addStructuralNodesToChangeSet()
   }
 
+  public removeSheet(removedSheetId: number) {
+    const matrices: Set<MatrixVertex> = new Set()
+    for (const vertex of this.addressMapping.sheetEntries(removedSheetId)) {
+      for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
+        this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
+      }
+      if (vertex instanceof MatrixVertex) {
+        matrices.add(vertex)
+      }
+      this.graph.removeNode(vertex)
+    }
+
+    this.stats.measure(StatType.ADJUSTING_MATRIX_MAPPING, () => {
+      for (const matrix of matrices.values()) {
+        this.matrixMapping.removeMatrix(matrix.getRange())
+      }
+    })
+
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.addressMapping.removeSheet(removedSheetId)
+    })
+
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
+      for (const range of rangesToRemove) {
+        this.graph.removeNode(range)
+      }
+    })
+
+    this.addStructuralNodesToChangeSet()
+  }
+
   public removeColumns(removedColumns: ColumnsSpan) {
     if (this.matrixMapping.isFormulaMatrixInColumns(removedColumns)) {
       throw Error('It is not possible to remove column within matrix')

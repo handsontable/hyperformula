@@ -106,6 +106,10 @@ export class ColumnIndex implements IColumnSearchStrategy {
     sheetIndex.splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
   }
 
+  public removeSheet(sheetId: number): void {
+    this.index.delete(sheetId)
+  }
+
   public getColumnMap(sheet: number, col: number): ColumnMap {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
