@@ -192,7 +192,7 @@ describe('Adding row - sheet dimensions', () => {
       // new row
     ])
 
-    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
     engine.addRows(0, 1, 1)
     engine.addRows(0, 10, 15)
 

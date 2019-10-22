@@ -443,7 +443,7 @@ export class HandsOnEngine {
   /**
    * Runs recomputation starting from recently changed vertices.
    * */
-  public recomputeIfDependencyGraphNeedsIt(): void {
+  private recomputeIfDependencyGraphNeedsIt(): void {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 

@@ -713,7 +713,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
     engine.removeRows(0, 1, 1)
     engine.removeRows(0, 10, 15)
 
@@ -730,7 +730,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['2'],
     ])
 
-    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
     engine.removeRows(0, 1, 0)
 
     expect(recalcSpy).not.toHaveBeenCalled()

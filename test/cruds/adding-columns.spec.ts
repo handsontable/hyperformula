@@ -182,7 +182,7 @@ describe('Adding column - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
     engine.addColumns(0, 1, 1)
     engine.addColumns(0, 10, 15)
 
