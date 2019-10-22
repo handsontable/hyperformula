@@ -49,31 +49,48 @@ export class InvalidAddressError extends Error {
  */
 export class HandsOnEngine {
   constructor(
+      /** Engine config */
       public readonly config: Config,
       /** Statistics module for benchmarking */
       public readonly stats: Statistics,
+      /** Dependency graph storing sheets structure */
       public readonly dependencyGraph: DependencyGraph,
+      /** Column search strategy used by VLOOKUP plugin */
       public readonly columnSearch: IColumnSearchStrategy,
+      /** Parser with caching */
       private readonly parser: ParserWithCaching,
       /** Formula evaluator */
       public readonly evaluator: Evaluator,
+      /** Service handling postponed CRUD transformations */
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 
   /**
-   * Builds engine for sheet from two-dimmensional array representation
+   * Builds engine for sheet from two-dimensional array representation.
    *
-   * @param sheet - two-dimmensional array representation of sheet
+   * @param sheet - two-dimensional array representation of sheet
+   * @param maybeConfig - config
    */
   public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HandsOnEngine {
     return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
   }
 
+  /**
+   * Builds engine from object containing multiple sheets with names.
+   *
+   * @param sheets - object with sheets definition
+   * @param maybeConfig - config
+  * */
   public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HandsOnEngine {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
   }
 
+  /**
+   * Builds empty engine instance.
+   *
+   * @param maybeConfig - config
+   * */
   public static buildEmpty(maybeConfig?: Config): HandsOnEngine {
     return new EmptyEngineFactory().build(maybeConfig)
   }
@@ -99,7 +116,7 @@ export class HandsOnEngine {
   }
 
   /**
-   * Returns value of the cell with the given address
+   * Returns value of the cell with the given address.
    *
    * @param stringAddress - cell coordinates (e.g. 'A1')
    */
@@ -112,7 +129,9 @@ export class HandsOnEngine {
   }
 
   /**
-   * Returns array with values of all cells
+   * Returns array with values of all cells.
+   *
+   * @param sheet - sheet id number
    * */
   public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
@@ -131,6 +150,9 @@ export class HandsOnEngine {
     return arr
   }
 
+  /**
+   * Returns map containing dimensions of all sheets.
+  * */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
     for (const sheetName of this.sheetMapping.names()) {
@@ -143,25 +165,31 @@ export class HandsOnEngine {
     return sheetDimensions
   }
 
-  public getSheetDimensions(sheetId: number): { width: number, height: number } {
+  /**
+  * Returns dimensions of specific sheet.
+  *
+  * @param sheet - sheet id number
+  * */
+  public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
-      width: this.dependencyGraph.getSheetWidth(sheetId),
-      height: this.dependencyGraph.getSheetHeight(sheetId),
+      width: this.dependencyGraph.getSheetWidth(sheet),
+      height: this.dependencyGraph.getSheetHeight(sheet),
     }
   }
 
   /**
-   * Returns snapshot of a computation time statistics
+   * Returns snapshot of a computation time statistics.
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
   }
 
   /**
-   * Sets content of a cell with given address
+   * Sets content of a cell with given address.
    *
-   * @param stringAddress - cell coordinates (e.g. 'A1')
+   * @param address - cell coordinates
    * @param newCellContent - new cell content
+   * @param recompute - specifies if recomputation should be fired after change
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): void {
     this.ensureThatAddressIsCorrect(address)
@@ -212,6 +240,12 @@ export class HandsOnEngine {
     }
   }
 
+  /**
+   * Sets content of a block of cells.
+   *
+   * @param topLeftCornerAddress - top left corner of block of cells
+   * @param cellContents - array with content
+   */
   public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): void {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
@@ -234,6 +268,14 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Add multiple rows to sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param row - row number above which the rows will be added
+   * @param numberOfRowsToAdd - number of rows to add
+   * */
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return
@@ -251,6 +293,14 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Removes multiple rows from sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which rows will be removed
+   * @param rowStart - number of the first row to be deleted
+   * @param rowEnd - number of the last row to be deleted
+   * */
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
@@ -268,12 +318,20 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public addColumns(sheet: number, col: number, numberOfCols: number = 1): void {
-    if (this.columnEffectivelyNotInSheet(col, sheet)) {
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   * */
+  public addColumns(sheet: number, column: number, numberOfColumns: number = 1): void {
+    if (this.columnEffectivelyNotInSheet(column, sheet)) {
       return
     }
 
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
+    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
 
     this.dependencyGraph.addColumns(addedColumns)
     this.columnSearch.addColumns(addedColumns)
@@ -286,6 +344,14 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   * */
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
       return
@@ -304,6 +370,14 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Moves content of the cell block.
+   *
+   * @param sourceLeftCorner - address of the upper left corner of moved block
+   * @param width - width of the cell block being moved
+   * @param height - height of the cell block being moved
+   * @param destinationLeftCorner - upper left address of the target cell block
+   * */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -325,11 +399,19 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Adds new sheet to engine. Name of the new sheet will be autogenerated.
+   * */
   public addSheet(): void {
     const sheetId = this.sheetMapping.addSheet()
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
+  /**
+   * Removes sheet with given id
+   *
+   * @param sheet - sheet id number
+   * */
   public removeSheet(sheet: number): void {
     this.dependencyGraph.removeSheet(sheet)
 
@@ -344,14 +426,23 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Forces engine to recompute postponed transformations. Useful during testing.
+   * */
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
 
+  /**
+   * Disables numeric arrays detected during graph build phase replacing them with ordinary numeric cells.
+   * */
   public disableNumericMatrices(): void {
     this.dependencyGraph.disableNumericMatrices()
   }
 
+  /**
+   * Runs recomputation starting from recently changed vertices.
+   * */
   public recomputeIfDependencyGraphNeedsIt(): void {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
@@ -361,6 +452,9 @@ export class HandsOnEngine {
     }
   }
 
+  /**
+   * Throws error when given address is incorrect.
+  * */
   private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
@@ -371,11 +465,23 @@ export class HandsOnEngine {
     }
   }
 
+  /**
+   * Returns true if row number is outside of given sheet.
+   *
+   * @param row - row number
+   * @param sheet - sheet id number
+  * */
   private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.addressMapping.getHeight(sheet)
     return row >= height;
   }
 
+  /**
+   * Returns true if row number is outside of given sheet.
+   *
+   * @param column - row number
+   * @param sheet - sheet id number
+   * */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
     return column >= width;
