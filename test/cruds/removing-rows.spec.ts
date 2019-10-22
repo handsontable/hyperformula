@@ -706,3 +706,37 @@ describe('Removing rows - range mapping', function() {
     expect(engine.graph.getDependencies(a1a1).length).toBe(1)
   })
 })
+
+describe('Removing rows - sheet dimensions', () => {
+  it('should do nothing when removed row outside effective sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, 10, 15)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 1,
+    })
+  });
+
+  it('should do nothing when start row greater than end row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.removeRows(0, 1, 0)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 2,
+    })
+  });
+})

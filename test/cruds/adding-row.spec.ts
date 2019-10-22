@@ -184,3 +184,22 @@ describe('Adding row - address mapping', () => {
     })
   })
 })
+
+describe('Adding row - sheet dimensions', () => {
+  it('should do nothing when adding row outside effective sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      // new row
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.addRows(0, 1, 1)
+    engine.addRows(0, 10, 15)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 1,
+    })
+  });
+})

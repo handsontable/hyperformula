@@ -644,3 +644,36 @@ it('does not truncate any ranges if columns are removed from different sheet', (
 
   expect(extractRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B1')))
 })
+
+describe('Removing columns - sheet dimensions', () => {
+  it('should do nothing when removing column outside effective sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.removeColumns(0, 1, 1)
+    engine.removeColumns(0, 10, 15)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 1,
+    })
+  });
+
+  it('should do nothing when start col greater than end col', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.removeColumns(0, 1, 0)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 2,
+      height: 1,
+    })
+  });
+})
