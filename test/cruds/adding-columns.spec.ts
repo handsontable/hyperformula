@@ -175,3 +175,21 @@ describe('different sheet', () => {
     expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
   })
 })
+
+describe('Adding column - sheet dimensions', () => {
+  it('should do nothing when adding column outside effective sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+    ])
+
+    const recalcSpy = spyOn(engine, 'recomputeIfDependencyGraphNeedsIt')
+    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, 10, 15)
+
+    expect(recalcSpy).not.toHaveBeenCalled()
+    expect(engine.getSheetDimensions(0)).toEqual({
+      width: 1,
+      height: 1,
+    })
+  });
+})
