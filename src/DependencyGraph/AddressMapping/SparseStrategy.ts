@@ -150,7 +150,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
     if (!colMapping) {
       return
     }
-    for (const [rowNumber, vertex] of colMapping) {
+    for (const [_, vertex] of colMapping) {
       yield vertex
     }
   }
@@ -170,7 +170,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
       if (!colMapping) {
         continue
       }
-      for (const [rowNumber, vertex] of colMapping) {
+      for (const [_, vertex] of colMapping) {
         yield vertex
       }
     }

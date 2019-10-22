@@ -1,6 +1,6 @@
 import {CellValue, ErrorType, CellError} from '../Cell'
 import {MatrixSize} from '../Matrix'
-import {DependencyGraph} from '../DependencyGraph/DependencyGraph'
+import {DependencyGraph} from '../DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 export class ArrayData {

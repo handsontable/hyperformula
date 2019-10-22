@@ -5,7 +5,19 @@ import {CellValue, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, Simp
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {
+  AddressMapping,
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  Graph,
+  MatrixMapping,
+  MatrixVertex,
+  RangeMapping,
+  SheetMapping,
+  ValueCellVertex,
+  Vertex
+} from './DependencyGraph'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -36,26 +48,19 @@ export class InvalidAddressError extends Error {
  * Engine for one sheet
  */
 export class HandsOnEngine {
-
-  public get graph() {
-    return this.dependencyGraph.graph
+  constructor(
+      public readonly config: Config,
+      /** Statistics module for benchmarking */
+      public readonly stats: Statistics,
+      public readonly dependencyGraph: DependencyGraph,
+      public readonly columnSearch: IColumnSearchStrategy,
+      private readonly parser: ParserWithCaching,
+      /** Formula evaluator */
+      public readonly evaluator: Evaluator,
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+  ) {
   }
 
-  public get rangeMapping() {
-    return this.dependencyGraph.rangeMapping
-  }
-
-  public get matrixMapping() {
-    return this.dependencyGraph.matrixMapping
-  }
-
-  public get sheetMapping() {
-    return this.dependencyGraph.sheetMapping
-  }
-
-  public get addressMapping() {
-    return this.dependencyGraph.addressMapping
-  }
   /**
    * Builds engine for sheet from two-dimmensional array representation
    *
@@ -73,17 +78,24 @@ export class HandsOnEngine {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  constructor(
-      public readonly config: Config,
-      /** Statistics module for benchmarking */
-      public readonly stats: Statistics,
-      public readonly dependencyGraph: DependencyGraph,
-      public readonly columnSearch: IColumnSearchStrategy,
-      private readonly parser: ParserWithCaching,
-      /** Formula evaluator */
-      public readonly evaluator: Evaluator,
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-  ) {
+  public get graph(): Graph<Vertex> {
+    return this.dependencyGraph.graph
+  }
+
+  public get rangeMapping(): RangeMapping {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  public get matrixMapping(): MatrixMapping {
+    return this.dependencyGraph.matrixMapping
+  }
+
+  public get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public get addressMapping(): AddressMapping {
+    return this.dependencyGraph.addressMapping
   }
 
   /**
@@ -141,7 +153,7 @@ export class HandsOnEngine {
   /**
    * Returns snapshot of a computation time statistics
    */
-  public getStats() {
+  public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
   }
 
@@ -151,7 +163,7 @@ export class HandsOnEngine {
    * @param stringAddress - cell coordinates (e.g. 'A1')
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true) {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): void {
     this.ensureThatAddressIsCorrect(address)
 
     const vertex = this.dependencyGraph.getCell(address)
@@ -200,7 +212,7 @@ export class HandsOnEngine {
     }
   }
 
-  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]) {
+  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): void {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
@@ -222,7 +234,7 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return
     }
@@ -239,7 +251,7 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
@@ -256,7 +268,7 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
+  public addColumns(sheet: number, col: number, numberOfCols: number = 1): void {
     if (this.columnEffectivelyNotInSheet(col, sheet)) {
       return
     }
@@ -274,7 +286,7 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
       return
     }
@@ -292,7 +304,7 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
@@ -313,12 +325,12 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public addSheet() {
+  public addSheet(): void {
     const sheetId = this.sheetMapping.addSheet()
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
-  public removeSheet(sheet: number) {
+  public removeSheet(sheet: number): void {
     this.dependencyGraph.removeSheet(sheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -332,15 +344,15 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
-  public forceApplyPostponedTransformations() {
+  public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
 
-  public disableNumericMatrices() {
+  public disableNumericMatrices(): void {
     this.dependencyGraph.disableNumericMatrices()
   }
 
-  public recomputeIfDependencyGraphNeedsIt() {
+  public recomputeIfDependencyGraphNeedsIt(): void {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
@@ -349,7 +361,7 @@ export class HandsOnEngine {
     }
   }
 
-  private ensureThatAddressIsCorrect(address: SimpleCellAddress) {
+  private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
     }
@@ -359,12 +371,12 @@ export class HandsOnEngine {
     }
   }
 
-  private rowEffectivelyNotInSheet(row: number, sheet: number) {
+  private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.addressMapping.getHeight(sheet)
     return row >= height;
   }
 
-  private columnEffectivelyNotInSheet(column: number, sheet: number) {
+  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
     return column >= width;
   }
