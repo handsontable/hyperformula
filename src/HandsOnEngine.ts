@@ -223,6 +223,10 @@ export class HandsOnEngine {
   }
 
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+    if (this.rowEffectivelyNotInSheet(row, sheet)) {
+      return
+    }
+
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
     this.dependencyGraph.addRows(addedRows)
@@ -236,6 +240,10 @@ export class HandsOnEngine {
   }
 
   public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
+      return
+    }
+
     const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
 
     this.dependencyGraph.removeRows(removedRows)
@@ -249,6 +257,10 @@ export class HandsOnEngine {
   }
 
   public addColumns(sheet: number, col: number, numberOfCols: number = 1) {
+    if (this.columnEffectivelyNotInSheet(col, sheet)) {
+      return
+    }
+
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, col, numberOfCols)
 
     this.dependencyGraph.addColumns(addedColumns)
@@ -263,6 +275,10 @@ export class HandsOnEngine {
   }
 
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
+      return
+    }
+
     const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(removedColumns)
@@ -341,5 +357,15 @@ export class HandsOnEngine {
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
       throw new NoSuchSheetError(address.sheet)
     }
+  }
+
+  private rowEffectivelyNotInSheet(row: number, sheet: number) {
+    const height = this.addressMapping.getHeight(sheet)
+    return row >= height;
+  }
+
+  private columnEffectivelyNotInSheet(column: number, sheet: number) {
+    const width = this.addressMapping.getWidth(sheet)
+    return column >= width;
   }
 }
