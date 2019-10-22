@@ -1,5 +1,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
+import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -8,11 +9,11 @@ import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
 export interface IColumnSearchStrategy {
-  add(value: CellValue, address: SimpleCellAddress): void
+  add(value: CellValue | Matrix, address: SimpleCellAddress): void
 
-  remove(value: CellValue | null, address: SimpleCellAddress): void
+  remove(value: CellValue | Matrix | null, address: SimpleCellAddress): void
 
-  change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress): void
+  change(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress): void
 
   addColumns(columnsSpan: ColumnsSpan): void
 

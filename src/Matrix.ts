@@ -2,8 +2,14 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
-export interface Size { width: number, height: number }
-export type MatrixSizeCheck = Size | false
+export class MatrixSize {
+  constructor(
+    public width: number,
+    public height: number
+  ) {
+  }
+}
+export type MatrixSizeCheck = MatrixSize | false
 
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
@@ -82,35 +88,27 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
     return { width: range.width(), height: range.height() }
   } else if (ast.type === AstNodeType.NUMBER) {
     return { width: 1, height: 1 }
-  } else if (ast.type === AstNodeType.PLUS_OP) {
-    const leftSize = checkMatrixSize(ast.left, formulaAddress)
-    const rightSize = checkMatrixSize(ast.right, formulaAddress)
-    if (!leftSize || !rightSize || leftSize.width !== rightSize.width || leftSize.height !== rightSize.height) {
-      return false
-    }
-    return leftSize
   } else {
     return false
   }
 }
 
 export interface IMatrix {
-  width(): number
-  height(): number
+  width(): number,
+  height(): number,
   get(col: number, row: number): number,
 }
 
 export class NotComputedMatrix implements IMatrix {
-  constructor(private _width: number, private _height: number) {
-
+  constructor(public readonly size: MatrixSize) {
   }
 
   public width(): number {
-    return this._width
+    return this.size.width
   }
 
   public height(): number {
-    return this._height
+    return this.size.height
   }
 
   public get(col: number, row: number): number {
@@ -120,14 +118,10 @@ export class NotComputedMatrix implements IMatrix {
 
 export class Matrix implements IMatrix {
   private readonly matrix: number[][]
-  private size: Size
+  public size: MatrixSize
 
   constructor(matrix: number[][]) {
-    this.matrix = []
-    this.size = {
-      height: matrix.length,
-      width: matrix.length > 0 ? matrix[0].length : 0,
-    }
+    this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
     this.matrix = matrix
   }
 
@@ -195,14 +189,6 @@ export class Matrix implements IMatrix {
 
   public raw(): number[][] {
     return this.matrix
-  }
-
-  public* generateFlatValues(): IterableIterator<number> {
-    for (let row = 0; row < this.size.height; ++row) {
-      for (let col = 0; col < this.size.width; ++col) {
-        yield this.matrix[row][col]
-      }
-    }
   }
 
   public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[number, SimpleCellAddress]> {

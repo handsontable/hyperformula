@@ -1,10 +1,11 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {MatrixVertex} from '../../DependencyGraph'
 import {checkMatrixSize, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {coerceToRangeNumbersOrError} from '../coerce'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -22,25 +23,24 @@ export class MatrixPlugin extends FunctionPlugin {
     },
   }
 
-  constructor(protected readonly interpreter: Interpreter) {
-    super(interpreter)
-  }
+  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    const [left, right] = ast.args
 
-  public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const left = ast.args[0]
-    const right = ast.args[1]
-
-    const leftMatrix = this.evaluateAst(left, formulaAddress)
-    const rightMatrix = this.evaluateAst(right, formulaAddress)
+    let leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
+    let rightMatrix = coerceToRangeNumbersOrError(this.evaluateAst(right, formulaAddress))
 
     if (leftMatrix instanceof CellError) {
       return leftMatrix
-    }
-    if (rightMatrix instanceof CellError) {
+    } else if (rightMatrix instanceof CellError) {
       return rightMatrix
+    } else if (leftMatrix === null || rightMatrix === null) {
+      return new CellError(ErrorType.VALUE)
     }
 
-    const vertex = this.dependencyGraph.fetchCell(formulaAddress) as MatrixVertex
+    const outputSize = {
+      width: rightMatrix.width(),
+      height: leftMatrix.height(),
+    }
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
@@ -49,15 +49,18 @@ export class MatrixPlugin extends FunctionPlugin {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setOutput([vertex.width, vertex.height])
+    }).setOutput([outputSize.width, outputSize.height])
 
-    return new Matrix(kernel(leftMatrix.raw(), rightMatrix.raw(), leftMatrix.width()) as number[][])
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
+      kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
+      outputSize
+    )
   }
 
-  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
+  public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -72,6 +75,13 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
+    } else if (rangeMatrix === null) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const outputSize = {
+      width: 1 + (rangeMatrix.width() - windowSize) / stride,
+      height: 1 + (rangeMatrix.height() - windowSize) / stride,
     }
 
     /* istanbul ignore next: gpu.js */
@@ -85,18 +95,18 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return currentMax
-    }).setOutput([
-      1 + (rangeMatrix.width() - windowSize) / stride,
-      1 + (rangeMatrix.height() - windowSize) / stride,
-    ])
+    }).setOutput([ outputSize.width, outputSize.height ])
 
-    return new Matrix(kernel(rangeMatrix.raw(), windowSize, stride) as number[][])
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
+      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
+      outputSize
+    )
   }
 
-  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
+  public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    const rangeMatrix = this.evaluateAst(rangeArg, formulaAddress)
+    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -111,6 +121,13 @@ export class MatrixPlugin extends FunctionPlugin {
 
     if (rangeMatrix instanceof CellError) {
       return rangeMatrix
+    } else if (rangeMatrix === null) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const outputSize = {
+      width: 1 + (rangeMatrix.width() - windowSize) / stride,
+      height: 1 + (rangeMatrix.height() - windowSize) / stride,
     }
 
     /* istanbul ignore next: gpu.js */
@@ -166,19 +183,21 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return result
-    }).setOutput([
-      1 + (rangeMatrix.width() - windowSize) / stride,
-      1 + (rangeMatrix.height() - windowSize) / stride,
-    ])
+    }).setOutput([ outputSize.width, outputSize.height ])
 
-    return new Matrix(kernel(rangeMatrix.raw(), windowSize, stride) as number[][])
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
+      kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
+      outputSize
+    )
   }
 
-  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    const value = this.evaluateAst(ast.args[0], formulaAddress)
+  public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    let value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {
       return value
+    } else if (value === null) {
+      return new CellError(ErrorType.VALUE)
     }
 
     const matrixSize = checkMatrixSize(ast, formulaAddress)
@@ -186,7 +205,7 @@ export class MatrixPlugin extends FunctionPlugin {
       throw new Error("Size of a transpose can't be computed")
     }
 
-    const input = value.raw()
+    const input = value.rawNumbers()
     const result: number[][] = []
     for (let i=0; i<matrixSize.height; ++i) {
       result[i] = [];
@@ -195,49 +214,12 @@ export class MatrixPlugin extends FunctionPlugin {
       }
     }
 
-    return new Matrix(result)
-  }
-
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): Matrix | CellError {
-    if (ast.type === AstNodeType.CELL_RANGE) {
-      const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-      const matrixVertex = this.dependencyGraph.getMatrix(range)
-      if (matrixVertex !== undefined) {
-        return matrixVertex.getCellValue()
-      }
-      return this.matrixFromRange(range)
-    }
-    const value = super.evaluateAst(ast, formulaAddress)
-
-    if (typeof value === 'number') {
-      return new Matrix([[value]])
-    } else if (value instanceof Matrix) {
-      return value
-    }
-
-    throw new Error('Got not as a value something which is neither matrix nor range')
-  }
-
-  private matrixFromRange(range: AbsoluteCellRange): Matrix | CellError {
-    const result = []
-
-    let i = 0
-    let row = []
-    for (const cellFromRange of range.addresses()) {
-      const value = this.dependencyGraph.getCellValue(cellFromRange)
-      if (typeof value === 'number') {
-        row.push(value)
-        ++i
-      } else {
-        return new CellError(ErrorType.VALUE)
-      }
-
-      if (i % range.width() === 0) {
-        i = 0
-        result.push([...row])
-        row = []
-      }
-    }
-    return new Matrix(result)
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(
+      result,
+      {
+        width: matrixSize.width,
+        height: matrixSize.height,
+      },
+    )
   }
 }

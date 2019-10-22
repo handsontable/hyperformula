@@ -7,6 +7,7 @@ import {Ast, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
@@ -174,6 +175,9 @@ export class SumifPlugin extends FunctionPlugin {
       return this.evaluateRangeCountif(simpleConditionRange, criterionString, criterion)
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
       const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
+      if (valueFromCellReference instanceof SimpleRangeValue) {
+        throw "Cant happen"
+      }
       const criterionResult = criterionLambda(valueFromCellReference)
       if (criterionResult) {
         return 1

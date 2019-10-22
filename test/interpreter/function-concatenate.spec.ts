@@ -26,4 +26,12 @@ describe('function CONCATENATE', () => {
 
     expect(engine.getCellValue('D1')).toEqual('foobar')
   })
+
+  xit('supports range values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['foo', 'bar', 'baz', '=CONCATENATE(A1:C1)']
+    ])
+
+    expect(engine.getCellValue('D1')).toEqual('foobarbaz')
+  })
 })

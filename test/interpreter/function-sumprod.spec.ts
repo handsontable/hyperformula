@@ -55,15 +55,71 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue('A4')).toEqual(5)
   })
 
-  it('works even if garbage in data',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
-      ['1', '1'],
-      ['asdf', '2'],
-      ['3', '3'],
-      ['=SUMPRODUCT(A1:A3,B1:B3)'],
+  xit('it makes a coercion from other values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TRUE()', '42'],
+      ['=SUMPRODUCT(A1,B1)'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(10)
+    expect(engine.getCellValue('A3')).toEqual(42)
+  })
+
+  it('works even if some string in data',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '1'],
+      ['asdf', 'fdsafdsa'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(1)
+  })
+
+  it('works even if both strings passed',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['asdf', 'fdsafdsa'],
+      ['=SUMPRODUCT(A1,B1)'],
+    ])
+
+    expect(engine.getCellValue('A2')).toEqual(0)
+  })
+
+  it('works even if both booleans passed',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['=TRUE()', '=FALSE()'],
+      ['=SUMPRODUCT(A1,B1)'],
+    ])
+
+    expect(engine.getCellValue('A2')).toEqual(0)
+  })
+
+  it('error if error is somewhere in right value',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '78'],
+      ['13', '=4/0'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('error if error is somewhere in left value',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '78'],
+      ['=3/0', '13'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('error in left has precedence over error in right',  () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['42', '78'],
+      ['=UNKNOWNFUNCTION()', '=3/0'],
+      ['=SUMPRODUCT(A1:A2,B1:B2)'],
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.NAME))
   })
 
   it('error when different size',  () => {
@@ -76,17 +132,6 @@ describe('Function SUMPRODUCT', () => {
 
     expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('error when not supported types',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
-      ['=SUMPRODUCT(1, B1:B2)'],
-      ['=SUMPRODUCT(B1:B2, "a")'],
-      ['=SUMPRODUCT(A1, B1:B2)'],
-    ])
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('works with matrices',  () => {

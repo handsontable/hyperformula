@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
+import {IMatrix, Matrix, NotComputedMatrix, MatrixSize} from '../Matrix'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 
@@ -29,18 +29,15 @@ export class MatrixVertex {
   }
   public cellAddress: SimpleCellAddress
   private formula: Ast | null
-  private matrix: IMatrix | CellError
+  public matrix: IMatrix | CellError
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
     this.formula = formula || null
-    this.matrix = new NotComputedMatrix(width, height)
+    this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
-  public setCellValue(matrix: CellValue) {
-    if (!(matrix instanceof Matrix) && !(matrix instanceof CellError)) {
-      throw Error('Unsupported cell type')
-    }
+  public setCellValue(matrix: Matrix | CellError) {
     this.matrix = matrix
   }
 

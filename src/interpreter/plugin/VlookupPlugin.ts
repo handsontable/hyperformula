@@ -3,6 +3,7 @@ import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} f
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics/Statistics'
 import {FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue} from '../InterpreterValue'
 
 export class VlookupPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -43,8 +44,10 @@ export class VlookupPlugin extends FunctionPlugin {
 
     let sorted: CellValue = true
     if (ast.args.length === 4) {
-      sorted = this.evaluateAst(ast.args[3], formulaAddress)
-      if (typeof sorted !== 'boolean') {
+      const computedSorted = this.evaluateAst(ast.args[3], formulaAddress)
+      if (typeof computedSorted === 'boolean') {
+        sorted = computedSorted
+      } else {
         return new CellError(ErrorType.VALUE)
       }
     }
@@ -72,7 +75,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted: CellValue = 1
+    let sorted: InterpreterValue = 1
     if (ast.args.length === 3) {
       sorted = this.evaluateAst(ast.args[2], formulaAddress)
       if (typeof sorted !== 'number') {

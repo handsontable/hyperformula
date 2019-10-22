@@ -1,4 +1,5 @@
 import {CellValue} from '../Cell'
+import {InterpreterValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -16,7 +17,7 @@ export const buildCriterion = (operator: CriterionType, value: number | string) 
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: CellValue): Criterion | null => {
+export const parseCriterion = (criterion: InterpreterValue): Criterion | null => {
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {

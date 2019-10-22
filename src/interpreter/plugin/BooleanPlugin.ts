@@ -2,6 +2,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {booleanRepresentation} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
+import {InterpreterValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing boolean functions
@@ -65,7 +66,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     const condition = booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
     if (condition === true) {
       return this.evaluateAst(ast.args[1], formulaAddress)

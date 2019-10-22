@@ -4,12 +4,13 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {Matrix} from '../Matrix'
+import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {addStrict} from './scalar'
 import {concatenate} from './text'
+import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
 
 export class Interpreter {
   public readonly gpu: GPU
@@ -26,13 +27,22 @@ export class Interpreter {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
 
+  public evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+    const interpreterValue = this.evaluateAst(ast, formulaAddress)
+    if (interpreterValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return interpreterValue
+    }
+  }
+
   /**
    * Calculates cell value from formula abstract syntax tree
    *
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+  public evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
@@ -124,37 +134,8 @@ export class Interpreter {
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof Matrix && ast.right.type === AstNodeType.CELL_RANGE) {
-          const rightRange = AbsoluteCellRange.fromCellRange(ast.right, formulaAddress)
-          const matrixVertex = this.dependencyGraph.getMatrix(rightRange)
-          if (matrixVertex === undefined) {
-            const resultMatrix: number[][] = []
-            let currentRow = 0
-            while (currentRow < leftResult.height()) {
-              const row: number[] = []
-              let currentColumn = 0
-              while (currentColumn < leftResult.width()) {
-                row.push(addStrict(
-                  leftResult.get(currentColumn, currentRow),
-                  this.dependencyGraph.getCellValue(rightRange.getAddress(currentColumn, currentRow)),
-                ) as number)
-                currentColumn++
-              }
-              resultMatrix.push(row)
-              currentRow++
-            }
-            return new Matrix(resultMatrix)
-          } else {
-            const matrixValue = matrixVertex.getCellValue()
-            if (matrixValue instanceof CellError) {
-              return matrixValue
-            }
-            const kernel = this.gpu.createKernel(function(a: number[][], b: number[][]) {
-              return a[this.thread.y as number][this.thread.x as number] + b[this.thread.y as number][this.thread.x as number]
-            }).setOutput([matrixVertex.width, matrixVertex.height])
-
-            return new Matrix(kernel(leftResult.raw(), matrixValue.raw()) as number[][])
-          }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         return addStrict(leftResult, rightResult)
       }
@@ -215,7 +196,22 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
-        return new CellError(ErrorType.VALUE)
+        const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+        const matrixVertex = this.dependencyGraph.getMatrix(range)
+        if (matrixVertex) {
+          const matrix = matrixVertex.matrix
+          if (matrix instanceof NotComputedMatrix) {
+            throw "Matrix should be already computed"
+          } else if (matrix instanceof CellError) {
+            return matrix
+          } else if (matrix instanceof Matrix) {
+            return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
+          } else {
+            throw "Unknown matrix"
+          }
+        } else {
+          return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
+        }
       }
       case AstNodeType.ERROR: {
         if (ast.error !== undefined) {

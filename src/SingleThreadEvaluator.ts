@@ -6,6 +6,8 @@ import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {Matrix} from './Matrix'
+import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
@@ -32,20 +34,34 @@ export class SingleThreadEvaluator implements Evaluator {
   public partialRun(vertices: Vertex[]) {
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
-        if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-          let address, formula
-          if (vertex instanceof FormulaCellVertex) {
-            address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-            formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
-          } else {
-            address = vertex.getAddress()
-            formula = vertex.getFormula() as Ast
-          }
+        if (vertex instanceof FormulaCellVertex) {
+          const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+          const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.interpreter.evaluateAst(formula, address)
+          const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
           vertex.setCellValue(newCellValue)
           this.columnSearch.change(currentValue, newCellValue, address)
           return (currentValue !== newCellValue)
+        } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+          const address = vertex.getAddress()
+          const formula = vertex.getFormula() as Ast
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+          const newCellValue = this.interpreter.evaluateAst(formula, address)
+          if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+            const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+            vertex.setCellValue(newCellMatrix)
+            this.columnSearch.change(currentValue, newCellMatrix, address)
+            return true
+          } else if (newCellValue instanceof CellError) {
+            vertex.setCellValue(newCellValue)
+            this.columnSearch.change(currentValue, newCellValue, address)
+            return true
+          } else {
+            const error = new CellError(ErrorType.VALUE)
+            vertex.setCellValue(error)
+            this.columnSearch.change(currentValue, error, address)
+            return true
+          }
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
           return true
@@ -67,18 +83,28 @@ export class SingleThreadEvaluator implements Evaluator {
       (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
     })
     sorted.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaCellVertex || (vertex instanceof MatrixVertex && vertex.isFormula())) {
-        let address, formula
-        if (vertex instanceof FormulaCellVertex) {
-          address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-          formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as Ast
+      if (vertex instanceof FormulaCellVertex) {
+        const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+        const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+        const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+        vertex.setCellValue(newCellValue)
+        this.columnSearch.add(newCellValue, address)
+      } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+        const address = vertex.getAddress()
+        const formula = vertex.getFormula() as Ast
+        const newCellValue = this.interpreter.evaluateAst(formula, address)
+        if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+          const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+          vertex.setCellValue(newCellMatrix)
+          this.columnSearch.add(newCellMatrix, address)
+        } else if (newCellValue instanceof CellError) {
+          vertex.setCellValue(newCellValue)
+          this.columnSearch.add(newCellValue, address)
         } else {
-          address = vertex.getAddress()
-          formula = vertex.getFormula() as Ast
+          const error = new CellError(ErrorType.VALUE)
+          vertex.setCellValue(error)
+          this.columnSearch.add(error, address)
         }
-        const cellValue = this.interpreter.evaluateAst(formula, address)
-        vertex.setCellValue(cellValue)
-        this.columnSearch.add(cellValue, address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }

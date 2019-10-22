@@ -1,6 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {Matrix} from '../Matrix'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
@@ -12,11 +13,11 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
       private config: Config,
   ) {}
 
-  public add(value: CellValue, address: SimpleCellAddress): void {}
+  public add(value: CellValue | Matrix, address: SimpleCellAddress): void {}
 
-  public remove(value: CellValue | null, address: SimpleCellAddress): void {}
+  public remove(value: CellValue | Matrix | null, address: SimpleCellAddress): void {}
 
-  public change(oldValue: CellValue | null, newValue: CellValue, address: SimpleCellAddress): void {}
+  public change(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress): void {}
 
   public addColumns(columnsSpan: ColumnsSpan): void {}
 
