@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {checkMatrixSize, Matrix} from '../../Matrix'
+import {checkMatrixSize, matrixSizeForTranspose, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -210,12 +210,6 @@ export class MatrixPlugin extends FunctionPlugin {
       }
     }
 
-    return SimpleRangeValue.onlyNumbersDataWithoutRange(
-      result,
-      {
-        width: inputSize.height,
-        height: inputSize.width,
-      },
-    )
+    return SimpleRangeValue.onlyNumbersDataWithoutRange(result, matrixSizeForTranspose(inputSize))
   }
 }

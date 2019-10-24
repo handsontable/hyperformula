@@ -11,6 +11,10 @@ export class MatrixSize {
 }
 export type MatrixSizeCheck = MatrixSize | false
 
+export function matrixSizeForTranspose(inputSize: MatrixSize): MatrixSize {
+  return new MatrixSize(inputSize.height, inputSize.width)
+}
+
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
     switch (ast.procedureName) {
@@ -74,10 +78,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 
         const size = checkMatrixSize(ast.args[0], formulaAddress)
 
-        return !size ? false : {
-          width: size.height,
-          height: size.width,
-        }
+        return !size ? false : matrixSizeForTranspose(size)
       }
       default: {
         return false
