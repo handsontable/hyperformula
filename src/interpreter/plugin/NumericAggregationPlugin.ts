@@ -3,6 +3,7 @@ import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {add, max, min} from '../scalar'
+import {coerceToRange} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -41,11 +42,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    const values = this.computeListOfValues(ast.args, formulaAddress)
     let counter = 0
-    for (const value of values) {
-      if (value === EmptyValue) {
-        counter++
+    for (const arg of ast.args) {
+      const rangeValue = coerceToRange(this.evaluateAst(arg, formulaAddress))
+      for (const value of rangeValue.valuesFromTopLeftCorner()) {
+        if (value === EmptyValue) {
+          counter++
+        }
       }
     }
     return counter

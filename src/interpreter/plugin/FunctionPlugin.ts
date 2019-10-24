@@ -71,25 +71,6 @@ export abstract class FunctionPlugin {
     return values
   }
 
-  protected computeListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): CellValue[] {
-    const values: CellValue[] = []
-    for (const ast of asts) {
-      if (ast.type === AstNodeType.CELL_RANGE) {
-        for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).addresses()) {
-          const value = this.dependencyGraph.getCellValue(cellFromRange)
-          values.push(value)
-        }
-      } else {
-        const value = this.evaluateAst(ast, formulaAddress)
-        if (value instanceof SimpleRangeValue) {
-          throw "Not yet supported"
-        }
-        values.push(value)
-      }
-    }
-    return values
-  }
-
   protected computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
     const values: CellValue[] = []
     for (const cellFromRange of range.addresses()) {
