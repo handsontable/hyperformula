@@ -6,33 +6,40 @@ export interface CellContentUpdate {
   row: number,
   col: number,
   value: CellValue,
-  oldValue: CellValue | null
 }
 
 export class ContentUpdate {
   public changes: Array<CellContentUpdate> = []
 
-  public addChange(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress): void {
-    if (newValue instanceof Matrix && oldValue instanceof Matrix) {
-      for (const [matrixValue, cellAddress] of newValue.generateValues(address)) {
-        this.addSingleCellValue(matrixValue, cellAddress)
-      }
-    } else {
-      this.addSingleCellValue(newValue, address)
+  public static empty() {
+    return new ContentUpdate()
+  }
+
+  public addAll(other: ContentUpdate): ContentUpdate {
+    this.changes.push(...other.changes)
+    return this
+  }
+
+  public addMatrixChange(newValue: Matrix, address: SimpleCellAddress): void {
+    for (const [matrixValue, cellAddress] of newValue.generateValues(address)) {
+      this.addSingleCellValue(matrixValue, cellAddress)
     }
   }
 
-  private addSingleCellValue(value: CellValue, oldValue: CellValue, address: SimpleCellAddress) {
+  public addChange(newValue: CellValue, address: SimpleCellAddress): void {
+    this.addSingleCellValue(newValue, address)
+  }
+
+  public getChanges() {
+    return this.changes
+  }
+
+  private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
     this.changes.push({
       sheet: address.sheet,
       col: address.col,
       row: address.row,
       value: value,
-      oldValue: null
     })
-  }
-
-  private add(change: CellContentUpdate): void {
-    this.changes.push(change)
   }
 }

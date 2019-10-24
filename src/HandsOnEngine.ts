@@ -31,6 +31,7 @@ import {CellAddress, cellAddressFromString, isFormula, isMatrix, ParserWithCachi
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
+import {CellContentUpdate, ContentUpdate} from "./ContentUpdate";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -191,9 +192,10 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    * @param recompute - specifies if recomputation should be fired after change
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): void {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): CellContentUpdate[] {
     this.ensureThatAddressIsCorrect(address)
 
+    const changes = new ContentUpdate()
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
@@ -219,25 +221,29 @@ export class HandsOnEngine {
       } else if (newCellContent === '') {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.columnSearch.remove(oldValue, address)
+        changes.addChange(EmptyValue, address)
         this.dependencyGraph.setCellEmpty(address)
       } else if (!isNaN(Number(newCellContent))) {
         const newValue = Number(newCellContent)
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newValue)
         this.columnSearch.change(oldValue, newValue, address)
+        changes.addChange(newValue, address)
       } else {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newCellContent)
         this.columnSearch.change(oldValue, newCellContent, address)
+        changes.addChange(newCellContent, address)
       }
     } else {
       throw new Error('Illegal operation')
     }
 
     if (recompute) {
-      this.evaluator.partialRun(Array.from(this.dependencyGraph.verticesToRecompute()))
-      this.dependencyGraph.clearRecentlyChangedVertices()
+      return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
     }
+
+    return changes.getChanges()
   }
 
   /**
@@ -477,13 +483,15 @@ export class HandsOnEngine {
   /**
    * Runs recomputation starting from recently changed vertices.
    * */
-  private recomputeIfDependencyGraphNeedsIt(): void {
+  private recomputeIfDependencyGraphNeedsIt(): ContentUpdate {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
     if (verticesToRecomputeFrom) {
-      this.evaluator.partialRun(verticesToRecomputeFrom)
+      return this.evaluator.partialRun(verticesToRecomputeFrom)
     }
+
+    return ContentUpdate.empty()
   }
 
   /**

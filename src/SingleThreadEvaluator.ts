@@ -1,4 +1,4 @@
-import {CellError, ErrorType, SimpleCellAddress, CellValue} from './Cell'
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
@@ -7,7 +7,7 @@ import {Interpreter} from './interpreter/Interpreter'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {Matrix} from './Matrix'
-import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
 import {ContentUpdate} from "./ContentUpdate";
 
 export class SingleThreadEvaluator implements Evaluator {
@@ -32,7 +32,9 @@ export class SingleThreadEvaluator implements Evaluator {
     })
   }
 
-  public partialRun(vertices: Vertex[]) {
+  public partialRun(vertices: Vertex[]): ContentUpdate {
+    const changes = new ContentUpdate()
+
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex) {
@@ -41,8 +43,12 @@ export class SingleThreadEvaluator implements Evaluator {
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
           const newCellValue = this.evaluateAstToScalarValue(formula, address)
           vertex.setCellValue(newCellValue)
-          this.columnSearch.change(currentValue, newCellValue, address)
-          return (currentValue !== newCellValue)
+          if (newCellValue !== currentValue) {
+            changes.addChange(newCellValue, address)
+            this.columnSearch.change(currentValue, newCellValue, address)
+            return true
+          }
+          return false
         } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
           const address = vertex.getAddress()
           const formula = vertex.getFormula() as Ast
@@ -51,9 +57,11 @@ export class SingleThreadEvaluator implements Evaluator {
           if (newCellValue instanceof SimpleRangeValue) {
             const newCellMatrix = new Matrix(newCellValue.rawNumbers())
             vertex.setCellValue(newCellMatrix)
+            changes.addMatrixChange(newCellMatrix, address)
             this.columnSearch.change(currentValue, newCellMatrix, address)
           } else {
             vertex.setErrorValue(newCellValue)
+            changes.addChange(newCellValue, address)
             this.columnSearch.change(currentValue, newCellValue, address)
           }
           return true
@@ -65,9 +73,13 @@ export class SingleThreadEvaluator implements Evaluator {
         }
       })
       cycled.forEach((vertex: Vertex) => {
-        (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
+        const formulaVertex = vertex as FormulaCellVertex
+        const error = new CellError(ErrorType.CYCLE)
+        formulaVertex.setCellValue(error)
+        changes.addChange(error, formulaVertex.address)
       })
     })
+    return changes
   }
 
   /**
