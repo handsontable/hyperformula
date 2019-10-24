@@ -1,23 +1,16 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {IMatrix, Matrix, NotComputedMatrix, MatrixSize} from '../Matrix'
+import {IMatrix, Matrix, ErroredMatrix, NotComputedMatrix, MatrixSize} from '../Matrix'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 
 export class MatrixVertex {
-
   get width(): number {
-    if (this.matrix instanceof CellError) {
-      return 0
-    }
     return this.matrix.width()
   }
 
   get height(): number {
-    if (this.matrix instanceof CellError) {
-      return 0
-    }
     return this.matrix.height()
   }
 
@@ -29,7 +22,7 @@ export class MatrixVertex {
   }
   public cellAddress: SimpleCellAddress
   private formula: Ast | null
-  public matrix: IMatrix | CellError
+  public matrix: IMatrix
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
@@ -37,8 +30,12 @@ export class MatrixVertex {
     this.matrix = new NotComputedMatrix(new MatrixSize(width, height))
   }
 
-  public setCellValue(matrix: Matrix | CellError) {
+  public setCellValue(matrix: Matrix) {
     this.matrix = matrix
+  }
+
+  public setErrorValue(error: CellError) {
+    this.matrix = new ErroredMatrix(error, this.matrix.size)
   }
 
   public getCellValue(): Matrix | CellError {
@@ -52,11 +49,7 @@ export class MatrixVertex {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
-    if (this.matrix instanceof CellError) {
-      return this.matrix
-    } else {
-      return this.matrix.get(col, row)
-    }
+    return this.matrix.get(col, row)
   }
 
   public setMatrixCellValue(address: SimpleCellAddress, value: number): void {

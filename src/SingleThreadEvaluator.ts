@@ -53,12 +53,12 @@ export class SingleThreadEvaluator implements Evaluator {
             this.columnSearch.change(currentValue, newCellMatrix, address)
             return true
           } else if (newCellValue instanceof CellError) {
-            vertex.setCellValue(newCellValue)
+            vertex.setErrorValue(newCellValue)
             this.columnSearch.change(currentValue, newCellValue, address)
             return true
           } else {
             const error = new CellError(ErrorType.VALUE)
-            vertex.setCellValue(error)
+            vertex.setErrorValue(error)
             this.columnSearch.change(currentValue, error, address)
             return true
           }
@@ -98,11 +98,11 @@ export class SingleThreadEvaluator implements Evaluator {
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
         } else if (newCellValue instanceof CellError) {
-          vertex.setCellValue(newCellValue)
+          vertex.setErrorValue(newCellValue)
           this.columnSearch.add(newCellValue, address)
         } else {
           const error = new CellError(ErrorType.VALUE)
-          vertex.setCellValue(error)
+          vertex.setErrorValue(error)
           this.columnSearch.add(error, address)
         }
       } else if (vertex instanceof RangeVertex) {

@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {simpleCellAddress, SimpleCellAddress, CellError} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -96,7 +96,8 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 export interface IMatrix {
   width(): number,
   height(): number,
-  get(col: number, row: number): number,
+  size: MatrixSize,
+  get(col: number, row: number): number | CellError,
 }
 
 export class NotComputedMatrix implements IMatrix {
@@ -201,5 +202,25 @@ export class Matrix implements IMatrix {
 
   private outOfBound(col: number, row: number): boolean {
     return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
+  }
+}
+
+export class ErroredMatrix implements IMatrix {
+  constructor(
+    private readonly error: CellError,
+    public readonly size: MatrixSize,
+  ) {
+  }
+
+  public get(col: number, row: number): CellError {
+    return this.error
+  }
+
+  public width(): number {
+    return this.size.width
+  }
+
+  public height(): number {
+    return this.size.height
   }
 }
