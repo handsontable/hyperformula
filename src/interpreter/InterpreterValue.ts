@@ -152,6 +152,10 @@ export class SimpleRangeValue {
     return this.data.size.height;
   }
 
+  public get size(): MatrixSize {
+    return this.data.size;
+  }
+
   public raw(): CellValue[][] {
     return this.data.raw()
   }

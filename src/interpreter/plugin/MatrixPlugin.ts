@@ -200,16 +200,12 @@ export class MatrixPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const matrixSize = checkMatrixSize(ast, formulaAddress)
-    if (!matrixSize) {
-      throw new Error("Size of a transpose can't be computed")
-    }
-
     const input = value.rawNumbers()
+    const inputSize = value.size
     const result: number[][] = []
-    for (let i=0; i<matrixSize.height; ++i) {
+    for (let i=0; i<inputSize.width; ++i) {
       result[i] = [];
-      for (let j=0; j<matrixSize.width; ++j) {
+      for (let j=0; j<inputSize.height; ++j) {
         result[i][j] = input[j][i]
       }
     }
@@ -217,8 +213,8 @@ export class MatrixPlugin extends FunctionPlugin {
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       result,
       {
-        width: matrixSize.width,
-        height: matrixSize.height,
+        width: inputSize.height,
+        height: inputSize.width,
       },
     )
   }
