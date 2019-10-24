@@ -19,6 +19,13 @@ export function matrixSizeForMultiplication(leftMatrixSize: MatrixSize, rightMat
   return new MatrixSize(rightMatrixSize.width, leftMatrixSize.height)
 }
 
+export function matrixSizeForPoolFunction(inputMatrix: MatrixSize, windowSize: number, stride: number): MatrixSize {
+  return new MatrixSize(
+    1 + (inputMatrix.width - windowSize) / stride,
+    1 + (inputMatrix.height - windowSize) / stride,
+  )
+}
+
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
     switch (ast.procedureName) {
@@ -67,10 +74,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           return false
         }
 
-        return {
-          width: 1 + (matrix.width - window) / stride,
-          height: 1 + (matrix.height - window) / stride,
-        }
+        return matrixSizeForPoolFunction(matrix, window, stride)
       }
       case 'TRANSPOSE': {
         if (ast.args.length !== 1) {

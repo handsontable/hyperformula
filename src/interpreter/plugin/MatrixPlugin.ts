@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {checkMatrixSize, matrixSizeForTranspose, matrixSizeForMultiplication, Matrix} from '../../Matrix'
+import {matrixSizeForPoolFunction, matrixSizeForTranspose, matrixSizeForMultiplication, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -76,10 +76,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const outputSize = {
-      width: 1 + (rangeMatrix.width() - windowSize) / stride,
-      height: 1 + (rangeMatrix.height() - windowSize) / stride,
-    }
+    const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
@@ -92,7 +89,7 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return currentMax
-    }).setOutput([ outputSize.width, outputSize.height ])
+    }).setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
@@ -122,10 +119,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const outputSize = {
-      width: 1 + (rangeMatrix.width() - windowSize) / stride,
-      height: 1 + (rangeMatrix.height() - windowSize) / stride,
-    }
+    const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
@@ -180,7 +174,7 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return result
-    }).setOutput([ outputSize.width, outputSize.height ])
+    }).setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
