@@ -27,15 +27,6 @@ export class Interpreter {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
 
-  public evaluateAstToCellValue(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
-    const interpreterValue = this.evaluateAst(ast, formulaAddress)
-    if (interpreterValue instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    } else {
-      return interpreterValue
-    }
-  }
-
   /**
    * Calculates cell value from formula abstract syntax tree
    *

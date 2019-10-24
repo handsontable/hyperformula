@@ -1,4 +1,4 @@
-import {CellError, ErrorType} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress, CellValue} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
@@ -38,7 +38,7 @@ export class SingleThreadEvaluator implements Evaluator {
           const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
           const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+          const newCellValue = this.evaluateAstToScalarValue(formula, address)
           vertex.setCellValue(newCellValue)
           this.columnSearch.change(currentValue, newCellValue, address)
           return (currentValue !== newCellValue)
@@ -86,7 +86,7 @@ export class SingleThreadEvaluator implements Evaluator {
       if (vertex instanceof FormulaCellVertex) {
         const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
         const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        const newCellValue = this.interpreter.evaluateAstToCellValue(formula, address)
+        const newCellValue = this.evaluateAstToScalarValue(formula, address)
         vertex.setCellValue(newCellValue)
         this.columnSearch.add(newCellValue, address)
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
@@ -109,5 +109,14 @@ export class SingleThreadEvaluator implements Evaluator {
         vertex.clearCache()
       }
     })
+  }
+
+  private evaluateAstToScalarValue(ast: Ast, formulaAddress: SimpleCellAddress): CellValue {
+    const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
+    if (interpreterValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return interpreterValue
+    }
   }
 }
