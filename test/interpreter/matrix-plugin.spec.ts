@@ -179,7 +179,7 @@ describe('Matrix plugin', () => {
 })
 
 describe('Function TRANSPOSE', () => {
-  it('matrix transpose', () => {
+  it('transpose works', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -195,14 +195,27 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue('C5')).toBeCloseTo(6)
   })
 
-  xit('transpose works even if theres an error', () => {
+  it('transpose works for scalar', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['=3/0'],
-      ['{=TRANSPOSE(A1:A2)}'],
+      ['{=TRANSPOSE(1)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A3')).toBeCloseTo(1)
-    expect(engine.getCellValue('B3')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue('A1')).toBeCloseTo(1)
+  })
+
+  it('transpose returns error if argument evaluates to error', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['{=TRANSPOSE(4/0)}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('transpose returns VALUE when wrong type', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['{=TRANSPOSE("fdsa")}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
   })
 })
