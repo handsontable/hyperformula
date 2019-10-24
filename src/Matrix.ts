@@ -7,6 +7,9 @@ export class MatrixSize {
     public width: number,
     public height: number
   ) {
+    if (width <= 0 || height <= 0) {
+      throw Error("Incorrect matrix size")
+    }
   }
 }
 export type MatrixSizeCheck = MatrixSize | false
