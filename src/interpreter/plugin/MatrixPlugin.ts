@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {checkMatrixSize, matrixSizeForTranspose, Matrix} from '../../Matrix'
+import {checkMatrixSize, matrixSizeForTranspose, matrixSizeForMultiplication, Matrix} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -37,10 +37,7 @@ export class MatrixPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const outputSize = {
-      width: rightMatrix.width(),
-      height: leftMatrix.height(),
-    }
+    const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
     /* istanbul ignore next: gpu.js */
     const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {

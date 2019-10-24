@@ -15,6 +15,10 @@ export function matrixSizeForTranspose(inputSize: MatrixSize): MatrixSize {
   return new MatrixSize(inputSize.height, inputSize.width)
 }
 
+export function matrixSizeForMultiplication(leftMatrixSize: MatrixSize, rightMatrixSize: MatrixSize): MatrixSize {
+  return new MatrixSize(rightMatrixSize.width, leftMatrixSize.height)
+}
+
 export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): MatrixSizeCheck {
   if (ast.type === AstNodeType.FUNCTION_CALL) {
     switch (ast.procedureName) {
@@ -30,10 +34,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
           return false
         }
 
-        return {
-          width: right.width,
-          height: left.height,
-        }
+        return matrixSizeForMultiplication(left, right)
       }
       case 'MEDIANPOOL':
       case 'MAXPOOL': {
