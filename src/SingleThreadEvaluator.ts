@@ -46,22 +46,16 @@ export class SingleThreadEvaluator implements Evaluator {
           const address = vertex.getAddress()
           const formula = vertex.getFormula() as Ast
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.interpreter.evaluateAst(formula, address)
-          if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+          const newCellValue = this.evaluateAstToRangeValue(formula, address)
+          if (newCellValue instanceof SimpleRangeValue) {
             const newCellMatrix = new Matrix(newCellValue.rawNumbers())
             vertex.setCellValue(newCellMatrix)
             this.columnSearch.change(currentValue, newCellMatrix, address)
-            return true
-          } else if (newCellValue instanceof CellError) {
+          } else {
             vertex.setErrorValue(newCellValue)
             this.columnSearch.change(currentValue, newCellValue, address)
-            return true
-          } else {
-            const error = new CellError(ErrorType.VALUE)
-            vertex.setErrorValue(error)
-            this.columnSearch.change(currentValue, error, address)
-            return true
           }
+          return true
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()
           return true
@@ -92,18 +86,14 @@ export class SingleThreadEvaluator implements Evaluator {
       } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
         const address = vertex.getAddress()
         const formula = vertex.getFormula() as Ast
-        const newCellValue = this.interpreter.evaluateAst(formula, address)
-        if (newCellValue instanceof SimpleRangeValue && newCellValue.hasOnlyNumbers() && newCellValue.width() === vertex.width && newCellValue.height() === vertex.height) {
+        const newCellValue = this.evaluateAstToRangeValue(formula, address)
+        if (newCellValue instanceof SimpleRangeValue) {
           const newCellMatrix = new Matrix(newCellValue.rawNumbers())
           vertex.setCellValue(newCellMatrix)
           this.columnSearch.add(newCellMatrix, address)
-        } else if (newCellValue instanceof CellError) {
+        } else {
           vertex.setErrorValue(newCellValue)
           this.columnSearch.add(newCellValue, address)
-        } else {
-          const error = new CellError(ErrorType.VALUE)
-          vertex.setErrorValue(error)
-          this.columnSearch.add(error, address)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
@@ -117,6 +107,17 @@ export class SingleThreadEvaluator implements Evaluator {
       return new CellError(ErrorType.VALUE)
     } else {
       return interpreterValue
+    }
+  }
+
+  private evaluateAstToRangeValue(ast: Ast, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
+    if (interpreterValue instanceof CellError) {
+      return interpreterValue
+    } else if (interpreterValue instanceof SimpleRangeValue && interpreterValue.hasOnlyNumbers()) {
+      return interpreterValue
+    } else {
+      return new CellError(ErrorType.VALUE)
     }
   }
 }
