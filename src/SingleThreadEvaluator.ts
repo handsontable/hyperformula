@@ -8,6 +8,7 @@ import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {Matrix} from './Matrix'
 import {InterpreterValue, SimpleRangeValue} from './interpreter/InterpreterValue'
+import {ContentUpdate} from "./ContentUpdate";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
