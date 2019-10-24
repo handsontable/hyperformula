@@ -179,25 +179,6 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue('D6')).toBeCloseTo(33)
   })
 
-  xit('matrix element-wise addition', () => {
-    const config = new Config({functionPlugins: [MatrixPlugin]})
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2', '100', '200'],
-      ['3', '4', '300', '400'],
-      ['5', '6', '500', '600'],
-      ['1', '2'],
-      ['3', '4'],
-      ['{=MMULT(A1:B3,A4:B5) + C1:D3}'],
-    ], config)
-
-    expect(engine.getCellValue('A6')).toBeCloseTo(107)
-    expect(engine.getCellValue('B6')).toBeCloseTo(210)
-    expect(engine.getCellValue('A7')).toBeCloseTo(315)
-    expect(engine.getCellValue('B7')).toBeCloseTo(422)
-    expect(engine.getCellValue('A8')).toBeCloseTo(523)
-    expect(engine.getCellValue('B8')).toBeCloseTo(634)
-  })
-
   it('matrix medianpool on even square', () => {
     const config = new Config({functionPlugins: [MatrixPlugin]})
     const engine = HandsOnEngine.buildFromArray([
