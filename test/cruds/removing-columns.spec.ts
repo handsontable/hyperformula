@@ -5,6 +5,88 @@ import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractMatrixRange, extractRange, extractReference} from '../testUtils'
 
+describe('Removing columns - checking if its possible', () => {
+  it('no if starting column is negative', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, -1, 1)).toEqual(false)
+  })
+
+  it('no if starting column is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 1.5, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, NaN, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, Infinity, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, -Infinity, 2)).toEqual(false)
+  })
+
+  it('no if ending column is negative', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 0, -1)).toEqual(false)
+  })
+
+  it('no if ending column is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 0, 1.5)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 0, NaN)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 0, Infinity)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 0, -Infinity)).toEqual(false)
+  })
+
+  it('no if ending column smaller than starting column', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 0)).toEqual(false)
+  })
+
+  it('no if sheet does not exist', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(1.5, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(-1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(NaN, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(-Infinity, 0, 1)).toEqual(false)
+  })
+
+  it('no if theres a formula matrix in place where we remove', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}', '13'],
+      ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+    ])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 2, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 3, 3)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, 4, 4)).toEqual(true)
+  })
+
+  it('yes if theres a numeric matrix in place where we add', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    expect(engine.isItPossibleToRemoveColumns(0, 0, 0)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveColumns(0, 0, 0)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, 1, 2)).toEqual(true)
+  })
+})
+
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency before removed column should not be affected', () => {
     const engine = HandsOnEngine.buildFromArray([

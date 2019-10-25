@@ -11,6 +11,10 @@ export class ColumnsSpan {
   public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
     return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
   }
+
+  public static fromColumnStartAndEnd(sheet: number, columnStart: number, columnEnd: number) {
+    return new ColumnsSpan(sheet, columnStart, columnEnd)
+  }
   constructor(
     public readonly sheet: number,
     public readonly columnStart: number,

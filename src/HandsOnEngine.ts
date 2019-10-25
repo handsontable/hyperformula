@@ -391,6 +391,29 @@ export class HandsOnEngine {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  public isItPossibleToRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): boolean {
+    if (columnStart < 0 || !Number.isInteger(columnStart)) {
+      return false
+    }
+    if (columnEnd < 0 || !Number.isInteger(columnEnd)) {
+      return false
+    }
+    if (columnEnd < columnStart) {
+      return false
+    }
+    const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
+
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Removes multiple columns from sheet. </br>
    * Does nothing if columns are outside of effective sheet size.
