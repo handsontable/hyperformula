@@ -699,3 +699,41 @@ describe('overlapping areas', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 })
+
+describe('column index', () => {
+  xit('should update column index when moving cell', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1'],
+        ['=VLOOKUP(1, A1:A1, 1, TRUE())']
+    ], new Config({ useColumnIndex: true }))
+
+    engine.moveCells(adr("A1"), 1, 1, adr("B1"))
+
+    const index = engine.columnSearch as ColumnIndex
+    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+  })
+
+  xit('should update column index when moving cell - more complex example', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['=VLOOKUP(1, A1:A1, 1, TRUE())']
+    ], new Config({ useColumnIndex: true }))
+
+    engine.moveCells(adr("A1"), 1, 1, adr("B1"))
+
+    const index = engine.columnSearch as ColumnIndex
+    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+  })
+
+  xit('should update column index when moving cell - overal', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['=VLOOKUP(1, A1:A1, 1, TRUE())']
+    ], new Config({ useColumnIndex: true }))
+
+    engine.moveCells(adr("A1"), 1, 1, adr("B1"))
+
+    const index = engine.columnSearch as ColumnIndex
+    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+  })
+})
