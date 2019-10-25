@@ -290,20 +290,6 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('A1')).toBe(5)
   })
 
-  it('change numeric value inside matrix to NaN', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], config)
-
-    expect(engine.getCellValue('A1')).toBe(1)
-
-    expect(() => {
-      engine.setCellContent(adr('A1'), 'foo')
-    }).toThrowError('Illegal operation')
-  })
-
   it('ensure that only part of the tree is evaluated', () => {
     const sheet = [
       ['1', '2'],
