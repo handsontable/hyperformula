@@ -1,17 +1,19 @@
-import {EmptyValue, HandsOnEngine} from '../../src'
+import {Config, EmptyValue, HandsOnEngine} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr,
+  adr, expect_array_with_same_content, expect_function_to_have_ref_error,
   expect_reference_to_have_ref_error,
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
   extractReference,
 } from '../testUtils'
+import {privateDecrypt} from "crypto";
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
@@ -85,6 +87,18 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
     expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(0, -1, 3))
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
+  })
+
+  xit('should return #REF when overriding whole range', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['=SUM(B1:B2)']
+    ])
+
+    engine.moveCells(adr("A1"), 1, 2, adr("B1"))
+
+    expect_function_to_have_ref_error(engine, adr("A3"))
   })
 })
 
