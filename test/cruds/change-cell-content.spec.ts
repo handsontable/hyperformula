@@ -436,10 +436,10 @@ describe('changing cell content', () => {
 
   it('returns change of numeric matrix', () => {
     const sheet = [
-        ['1', '2'],
-        ['3', '4'],
+      ['1', '2'],
+      ['3', '4'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    const engine = HandsOnEngine.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     const changes = engine.setCellContent(adr("A1"), "7")
 
@@ -547,9 +547,9 @@ describe('change multiple cells contents', () => {
 describe('updating column index', () => {
   it('should update column index when changing simple value', () => {
     const engine = HandsOnEngine.buildFromArray([
-        ['1', '2'],
-        ['3', '15']
-    ], new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
+      ['1', '2'],
+      ['3', '15']
+    ], new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
 
     engine.setCellContent(adr("B2"), "8")
 
@@ -561,11 +561,56 @@ describe('updating column index', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '15']
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
 
     engine.setCellContent(adr("B2"), "8")
 
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
   });
+})
+
+describe('numeric matrices', () => {
+  it('should not break matrix into single vertices when changing to numeric value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.setCellContent(adr("A1"), '7')
+
+    expect(engine.graph.nodesCount()).toBe(1)
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
+    expect(engine.getCellValue("A1")).toBe(7)
+  })
+
+  it('should allow to change numeric matrix cell to non-numeric value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.setCellContent(adr("A1"), 'foo')
+
+    expect(engine.graph.nodesCount()).toBe(4)
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
+    expect(engine.getCellValue("A1")).toEqual('foo')
+  })
+
+
+  it('should break only affected matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      [''],
+      ['5', '6'],
+      ['7', '8'],
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.setCellContent(adr("A1"), 'foo')
+
+    expect(engine.graph.nodesCount()).toBe(5)
+    expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
+    expect(engine.getCellValue("A1")).toBe('foo')
+  })
 })
