@@ -12,16 +12,18 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, -1, 1)).toEqual(false)
   })
 
-  xit('no if starting column is not an integer', () => {
+  it('no if starting column is not an integer', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 1.5, 1)).toEqual(false)
   })
 
-  xit('no if starting column is NaN', () => {
+  it('no if starting column is NaN/Infinity', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, NaN, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, Infinity, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, -Infinity, 1)).toEqual(false)
   })
 
   it('no if number of columns is not positive', () => {
@@ -30,16 +32,18 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(0, 0, 0)).toEqual(false)
   })
 
-  xit('no if number of columns is not an integer', () => {
+  it('no if number of columns is not an integer', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, 1.5)).toEqual(false)
   })
 
-  xit('no if number of columns is NaN', () => {
+  it('no if number of columns is NaN/Infinity', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, NaN)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, 0, Infinity)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, 0, -Infinity)).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
@@ -49,6 +53,8 @@ describe('Adding column - checking if its possible', () => {
     expect(engine.isItPossibleToAddColumns(1.5, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToAddColumns(-1, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToAddColumns(NaN, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(-Infinity, 0, 1)).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we add', () => {

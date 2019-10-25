@@ -12,16 +12,18 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, -1, 1)).toEqual(false)
   })
 
-  xit('no if starting row is not an integer', () => {
+  it('no if starting row is not an integer', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddRows(0, 1.5, 1)).toEqual(false)
   })
 
-  xit('no if starting row is NaN', () => {
+  it('no if starting row is NaN', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddRows(0, NaN, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, Infinity, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, -Infinity, 1)).toEqual(false)
   })
 
   it('no if number of rows is not positive', () => {
@@ -30,16 +32,18 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, 0, 0)).toEqual(false)
   })
 
-  xit('no if number of rows is not an integer', () => {
+  it('no if number of rows is not an integer', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddRows(0, 0, 1.5)).toEqual(false)
   })
 
-  xit('no if number of rows is NaN', () => {
+  it('no if number of rows is NaN', () => {
     const engine = HandsOnEngine.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddRows(0, 0, NaN)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, 0, Infinity)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, 0, -Infinity)).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
@@ -49,6 +53,8 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(1.5, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToAddRows(-1, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToAddRows(NaN, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(-Infinity, 0, 1)).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we add', () => {

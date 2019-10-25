@@ -269,7 +269,7 @@ export class HandsOnEngine {
   }
 
   public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
-    if (row < 0 || numberOfRowsToAdd <= 0) {
+    if (row < 0 || !Number.isInteger(row) || numberOfRowsToAdd <= 0 || !Number.isInteger(numberOfRowsToAdd)) {
       return false
     }
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
@@ -336,7 +336,7 @@ export class HandsOnEngine {
   }
 
   public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
-    if (column < 0 || numberOfColumnsToAdd <= 0) {
+    if (column < 0 || !Number.isInteger(column) || numberOfColumnsToAdd <= 0 || !Number.isInteger(numberOfColumnsToAdd)) {
       return false
     }
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
