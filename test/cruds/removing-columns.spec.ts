@@ -398,6 +398,17 @@ describe('Removing columns - reevaluation', () => {
     expect(c1setCellValueSpy).toHaveBeenCalled()
     expect_function_to_have_ref_error(engine, adr('A1'))
   })
+
+  it('returns changed values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2', '=SUM(A1:B1)'],
+    ])
+
+    const changes = engine.removeColumns(0, 0, 0)
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 1, value: 2})
+  })
 })
 
 describe('Removing columns - matrices', () => {

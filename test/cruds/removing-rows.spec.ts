@@ -739,4 +739,17 @@ describe('Removing rows - sheet dimensions', () => {
       height: 2,
     })
   });
+
+  it('returns changed values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUM(A1:A2)']
+    ])
+
+    const changes = engine.removeRows(0, 0, 0)
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({ sheet: 0, row: 1, col: 0, value: 2})
+  })
 })
