@@ -77,4 +77,14 @@ describe('SUM', () => {
     const engine = HandsOnEngine.buildFromArray([['42', '', '13', '=SUM(A1:C1)']])
     expect(engine.getCellValue('D1')).toEqual(55)
   })
+
+  it('over a range value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=SUM(MMULT(A1:B2, A1:B2))']
+    ])
+
+    expect(engine.getCellValue('A3')).toEqual(54)
+  })
 })

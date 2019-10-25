@@ -113,7 +113,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
-          throw "Not implemented yet" // should be handled like above
+          value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()), initialAccValue, reducingFunction)
         }
       }
 
@@ -128,7 +128,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param initialAccValue - initial accumulator value for reducing function
    * @param reducingFunction - reducing function
    */
-  private reduceRange(rangeValues: CellValue[], initialAccValue: CellValue, reducingFunction: BinaryOperation) {
+  private reduceRange(rangeValues: CellValue[], initialAccValue: CellValue, reducingFunction: BinaryOperation): CellValue {
     let acc = initialAccValue
     for (const val of rangeValues) {
       acc = reducingFunction(acc, val)
