@@ -5,7 +5,7 @@ import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 
 export class MatrixMapping {
-  private readonly matrixMapping: Map<string, MatrixVertex> = new Map()
+  public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
 
   public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
     return this.matrixMapping.get(range.toString())

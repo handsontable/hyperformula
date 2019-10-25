@@ -5,6 +5,86 @@ import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, extractMatrixRange} from '../testUtils'
 
+describe('Adding row - checking if its possible', () => {
+  it('no if starting row is negative', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, -1, 1)).toEqual(false)
+  })
+
+  xit('no if starting row is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, 1.5, 1)).toEqual(false)
+  })
+
+  xit('no if starting row is NaN', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, NaN, 1)).toEqual(false)
+  })
+
+  it('no if number of rows is not positive', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, 0, 0)).toEqual(false)
+  })
+
+  xit('no if number of rows is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, 0, 1.5)).toEqual(false)
+  })
+
+  xit('no if number of rows is NaN', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, 0, NaN)).toEqual(false)
+  })
+
+  it('no if sheet does not exist', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(1.5, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(-1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(NaN, 0, 1)).toEqual(false)
+  })
+
+  it('no if theres a formula matrix in place where we add', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(engine.isItPossibleToAddRows(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, 2, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, 3, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, 4, 1)).toEqual(true)
+  })
+
+  it('yes if theres a numeric matrix in place where we add', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    expect(engine.isItPossibleToAddRows(0, 0, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, 1, 1)).toEqual(true)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToAddRows(0, 0, 1)).toEqual(true)
+  })
+})
+
 describe('Adding row - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
     const engine = HandsOnEngine.buildFromArray([

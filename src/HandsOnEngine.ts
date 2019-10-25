@@ -268,6 +268,23 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
+    if (row < 0 || numberOfRowsToAdd <= 0) {
+      return false
+    }
+    const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
