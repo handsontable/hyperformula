@@ -46,6 +46,11 @@ export const expect_cell_to_have_formula = (engine: HandsOnEngine, addressString
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 
+export const expect_array_with_same_content = (expected: any[], actual: any[]) => {
+  expect(actual.length).toBe(expected.length)
+  expect(actual).toEqual(expect.arrayContaining(expected))
+}
+
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
   const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
 

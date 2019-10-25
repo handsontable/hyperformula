@@ -1,10 +1,17 @@
-import {CellError, HandsOnEngine} from '../../src'
+import {CellError, Config, HandsOnEngine} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
-import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
+import {
+  adr,
+  expect_array_with_same_content,
+  expect_reference_to_have_ref_error,
+  expectEngineToBeTheSameAs,
+  extractReference
+} from '../testUtils'
 import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
 import {MatrixVertex} from "../../src/DependencyGraph";
 import {ErrorType} from "../../src/Cell";
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
@@ -229,4 +236,19 @@ describe('remove sheet - adjust matrix mapping', () => {
     expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A2", 1), 1, 1))).toBeInstanceOf(MatrixVertex)
     expect(engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr("A3", 1), 1, 1))).toBeInstanceOf(MatrixVertex)
   });
+})
+
+describe('remove sheet - adjust column index', () => {
+  it('should remove sheet from index', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1']
+    ], new Config({ useColumnIndex: true }))
+    const index = engine.columnSearch as ColumnIndex
+    const removeSheetSpy = jest.spyOn(index, 'removeSheet')
+
+    engine.removeSheet(0)
+
+    expect(removeSheetSpy).toHaveBeenCalled()
+    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
+  })
 })

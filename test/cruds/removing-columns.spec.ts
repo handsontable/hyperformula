@@ -3,7 +3,16 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
-import {adr, expect_function_to_have_ref_error, expect_reference_to_have_ref_error, extractMatrixRange, extractRange, extractReference} from '../testUtils'
+import {
+  adr,
+  expect_array_with_same_content,
+  expect_function_to_have_ref_error,
+  expect_reference_to_have_ref_error,
+  extractMatrixRange,
+  extractRange,
+  extractReference
+} from '../testUtils'
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing columns - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -769,4 +778,17 @@ describe('Removing columns - sheet dimensions', () => {
       height: 1,
     })
   });
+})
+
+describe('Removing columns - column index', () => {
+  it('should update column index when adding row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
+    ], new Config({ useColumnIndex: true }))
+
+    engine.removeColumns(0, 0, 0)
+
+    const index = (engine.columnSearch as ColumnIndex)
+    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
+  })
 })

@@ -3,7 +3,8 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
-import {adr, extractMatrixRange, extractRange} from '../testUtils'
+import {adr, expect_array_with_same_content, extractMatrixRange, extractRange} from '../testUtils'
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -289,3 +290,20 @@ describe('Adding column - sheet dimensions', () => {
     })
   });
 })
+
+describe('Adding column - column index', () => {
+  it('should update column index when adding row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
+    ], new Config({ useColumnIndex: true }))
+    const index = (engine.columnSearch as ColumnIndex)
+
+    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
+
+    engine.addColumns(0, 0, 1)
+
+    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
+    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+  })
+})
+

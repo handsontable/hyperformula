@@ -4,13 +4,14 @@ import { MatrixVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr,
+  adr, expect_array_with_same_content,
   expect_function_to_have_ref_error,
   expect_reference_to_have_ref_error,
   extractMatrixRange,
   extractRange,
   extractReference,
 } from '../testUtils'
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing rows - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -838,3 +839,21 @@ describe('Removing rows - sheet dimensions', () => {
     expect(changes).toContainEqual({ sheet: 0, row: 1, col: 0, value: 2})
   })
 })
+
+describe('Removing rows - column index', () => {
+  it('should update column index when adding row', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
+      [''],
+      ['2'],
+    ], new Config({ useColumnIndex: true }))
+
+    engine.removeRows(0, 1, 1)
+
+    const index = (engine.columnSearch as ColumnIndex)
+
+    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
+    expect_array_with_same_content([1], index.getValueIndex(0, 0, 2).index)
+  })
+})
+
