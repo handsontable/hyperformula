@@ -504,6 +504,10 @@ export class HandsOnEngine {
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
+  public isItPossibleToRemoveSheet(sheet: number): boolean {
+    return this.sheetMapping.hasSheetWithId(sheet)
+  }
+
   /**
    * Removes sheet with given id
    *

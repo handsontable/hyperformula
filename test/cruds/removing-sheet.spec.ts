@@ -6,6 +6,20 @@ import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
 import {MatrixVertex} from "../../src/DependencyGraph";
 import {ErrorType} from "../../src/Cell";
 
+describe('Removing sheet - checking if its possible', () => {
+  it('no if theres no such sheet', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveSheet(1)).toEqual(false)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveSheet(0)).toEqual(true)
+  })
+})
+
 describe('remove sheet', () => {
   it('should remove sheet by id', () => {
     const engine = HandsOnEngine.buildFromArray([['foo']])
