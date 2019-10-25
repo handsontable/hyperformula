@@ -9,7 +9,7 @@ export interface CellValueChange {
 }
 
 export class ContentChanges {
-  public changes: Array<CellValueChange> = []
+  private changes: Array<CellValueChange> = []
 
   public static empty() {
     return new ContentChanges()
@@ -30,12 +30,16 @@ export class ContentChanges {
     this.addSingleCellValue(newValue, address)
   }
 
+  public add(...change: CellValueChange[]) {
+    this.changes.push(...change)
+  }
+
   public getChanges() {
     return this.changes
   }
 
   private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
-    this.changes.push({
+    this.add({
       sheet: address.sheet,
       col: address.col,
       row: address.row,

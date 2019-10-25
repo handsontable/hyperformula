@@ -252,7 +252,7 @@ export class HandsOnEngine {
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
    */
-  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): void {
+  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): CellValueChange[] {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
@@ -261,17 +261,20 @@ export class HandsOnEngine {
       }
     }
 
+    const changes = new ContentChanges()
+
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
-        this.setCellContent({
+        const change = this.setCellContent({
           sheet: topLeftCornerAddress.sheet,
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
         }, cellContents[i][j], false)
+        changes.add(...change)
       }
     }
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
   }
 
   public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
