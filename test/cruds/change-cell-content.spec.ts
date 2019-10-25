@@ -2,6 +2,8 @@ import {Config, EmptyValue, HandsOnEngine, InvalidAddressError, NoSuchSheetError
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr} from '../testUtils'
+import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
+import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('changing cell content', () => {
   it('update formula vertex', () => {
@@ -339,7 +341,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue('C1')).toBe(2)
   })
 
-  it('it not possible to set cell content in sheet which does not exist', () => {
+  it('is not possible to set cell content in sheet which does not exist', () => {
     const sheet = [
       ['1', '2'],
     ]
@@ -350,7 +352,7 @@ describe('changing cell content', () => {
     }).toThrow(new NoSuchSheetError(1))
   })
 
-  it('it not possible to set cell content with invalid address', () => {
+  it('is not possible to set cell content with invalid address', () => {
     const sheet = [
       ['1', '2'],
     ]
@@ -540,4 +542,30 @@ describe('change multiple cells contents', () => {
     expect(changes.length).toEqual(6)
     expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
   })
+})
+
+describe('updating column index', () => {
+  it('should update column index when changing simple value', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '2'],
+        ['3', '15']
+    ], new Config({ matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
+
+    engine.setCellContent(adr("B2"), "8")
+
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+  })
+
+  it('should update column index when changing value inside numeric matrix', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '15']
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
+
+    engine.setCellContent(adr("B2"), "8")
+
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
+    expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
+  });
 })

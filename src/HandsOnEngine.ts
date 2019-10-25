@@ -200,8 +200,10 @@ export class HandsOnEngine {
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       const newValue = Number(newCellContent)
-      vertex.setMatrixCellValue(address, newValue)
+      const oldValue = this.dependencyGraph.getCellValue(address)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      vertex.setMatrixCellValue(address, newValue)
+      this.columnSearch.change(oldValue, newValue, address)
       changes.addChange(newValue, address)
     } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
