@@ -375,6 +375,48 @@ describe('changing cell content', () => {
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
+
+  it('returns cell value change', () => {
+    const sheet = [
+      ['1']
+    ]
+
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    const changes = engine.setCellContent(adr("A1"), '2')
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({
+      sheet: 0,
+      col: 0,
+      row: 0,
+      value: 2
+    })
+  })
+
+  it('returns dependent formula value change', () => {
+    const sheet = [
+      ['1', '=A1']
+    ]
+
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    const changes = engine.setCellContent(adr("A1"), '2')
+
+    expect(changes.length).toBe(2)
+    expect(changes).toContainEqual({
+      sheet: 0,
+      col: 0,
+      row: 0,
+      value: 2
+    })
+    expect(changes).toContainEqual({
+      sheet: 0,
+      col: 1,
+      row: 0,
+      value: 2
+    })
+  })
 })
 
 describe('change multiple cells contents', () => {
