@@ -2,6 +2,14 @@ import {Config, EmptyValue, HandsOnEngine} from '../../src'
 import '../testConfig'
 import {plPL} from "../../src/i18n";
 
+describe('Adding sheet - checking if its possible', () => {
+  it('yes', () => {
+    const engine = HandsOnEngine.buildEmpty()
+
+    expect(engine.isItPossibleToAddSheet()).toEqual(true)
+  })
+})
+
 describe('add sheet to engine', () => {
   it('should add sheet to empty engine', function() {
     const engine = HandsOnEngine.buildEmpty()
