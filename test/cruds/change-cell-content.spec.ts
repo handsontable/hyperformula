@@ -1,7 +1,7 @@
-import {Config, EmptyValue, HandsOnEngine, InvalidAddressError, NoSuchSheetError} from '../src'
-import {EmptyCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import './testConfig.ts'
-import {adr} from './testUtils'
+import {Config, EmptyValue, HandsOnEngine, InvalidAddressError, NoSuchSheetError} from '../../src'
+import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('changing cell content', () => {
   it('update formula vertex', () => {
