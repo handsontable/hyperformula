@@ -304,9 +304,9 @@ export class HandsOnEngine {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    * */
-  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
+  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): CellValueChange[] {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return
+      return []
     }
 
     const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
@@ -318,7 +318,7 @@ export class HandsOnEngine {
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -329,9 +329,9 @@ export class HandsOnEngine {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
+  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): CellValueChange[] {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return
+      return []
     }
 
     const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
@@ -343,7 +343,7 @@ export class HandsOnEngine {
       this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
     })
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
@@ -371,9 +371,9 @@ export class HandsOnEngine {
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
    * */
-  public addColumns(sheet: number, column: number, numberOfColumns: number = 1): void {
+  public addColumns(sheet: number, column: number, numberOfColumns: number = 1): CellValueChange[] {
     if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return
+      return []
     }
 
     const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
@@ -386,7 +386,7 @@ export class HandsOnEngine {
       this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
     })
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -397,9 +397,9 @@ export class HandsOnEngine {
    * @param columnStart - number of the first column to be deleted
    * @param columnEnd - number of the last row to be deleted
    * */
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
+  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): CellValueChange[] {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return
+      return []
     }
 
     const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
@@ -412,7 +412,7 @@ export class HandsOnEngine {
       this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
     })
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -423,7 +423,7 @@ export class HandsOnEngine {
    * @param height - height of the cell block being moved
    * @param destinationLeftCorner - upper left address of the target cell block
    * */
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
@@ -441,7 +441,7 @@ export class HandsOnEngine {
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -457,7 +457,7 @@ export class HandsOnEngine {
    *
    * @param sheet - sheet id number
    * */
-  public removeSheet(sheet: number): void {
+  public removeSheet(sheet: number): CellValueChange[] {
     this.dependencyGraph.removeSheet(sheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -468,7 +468,7 @@ export class HandsOnEngine {
     this.sheetMapping.removeSheet(sheet)
     this.columnSearch.removeSheet(sheet)
 
-    this.recomputeIfDependencyGraphNeedsIt()
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
