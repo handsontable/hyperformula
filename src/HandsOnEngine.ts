@@ -335,6 +335,23 @@ export class HandsOnEngine {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
+    if (column < 0 || numberOfColumnsToAdd <= 0) {
+      return false
+    }
+    const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
+
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Add multiple columns to sheet </br>
    * Does nothing if columns are outside of effective sheet size
