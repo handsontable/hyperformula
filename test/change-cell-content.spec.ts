@@ -424,12 +424,31 @@ describe('changing cell content', () => {
       ['3', '4'],
       ['{=MMULT(A1:B2,A1:B2)}']
     ]
-
     const engine = HandsOnEngine.buildFromArray(sheet)
+
     const changes = engine.setCellContent(adr("A1"), '2')
 
     expect(changes.length).toBe(5)
     expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
+  })
+
+  it('returns change of numeric matrix', () => {
+    const sheet = [
+        ['1', '2'],
+        ['3', '4'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet, new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    const changes = engine.setCellContent(adr("A1"), "7")
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({
+      sheet: 0,
+      row: 0,
+      col: 0,
+      value: 7
+    })
+
   })
 })
 
