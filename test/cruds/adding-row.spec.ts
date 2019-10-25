@@ -153,6 +153,19 @@ describe('Adding row - reevaluation', () => {
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
+
+  it('returns changed values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1'],
+      ['2', '=COUNTBLANK(A1:A2)'],
+    ])
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+
+    const changes = engine.addRows(0, 1, 1)
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
+  })
 })
 
 describe('Adding row - MatrixVertex', () => {

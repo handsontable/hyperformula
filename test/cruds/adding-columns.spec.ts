@@ -147,6 +147,19 @@ describe('Adding column - reevaluation', () => {
     expect(c1setCellValueSpy).toHaveBeenCalled()
     expect(extractRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C1')))
   })
+
+  it('returns changed values', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      /* */
+      ['1', '2', '=COLUMNS(A1:B1)'],
+    ])
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+
+    const changes = engine.addColumns(0, 1, 1)
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({ sheet: 0, col: 3, row: 0, value: 3 })
+  })
 })
 
 describe('Adding column - FormulaCellVertex#address update', () => {
