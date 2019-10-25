@@ -417,6 +417,20 @@ describe('changing cell content', () => {
       value: 2
     })
   })
+
+  it('return dependent matrix value changes', () => {
+    const sheet = [
+        ['1', '2'],
+        ['3', '4'],
+        ['{=MMULT(A1:B2,A1:B2)}']
+    ]
+
+    const engine = HandsOnEngine.buildFromArray(sheet)
+    const changes = engine.setCellContent(adr("A1"), '2')
+
+    expect(changes.length).toBe(5)
+    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
+  })
 })
 
 describe('change multiple cells contents', () => {
