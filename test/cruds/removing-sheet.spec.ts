@@ -1,9 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {CellError, HandsOnEngine} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {adr, expect_reference_to_have_ref_error, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
 import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
 import {MatrixVertex} from "../../src/DependencyGraph";
+import {ErrorType} from "../../src/Cell";
 
 describe('remove sheet', () => {
   it('should remove sheet by id', () => {
@@ -138,6 +139,22 @@ describe('remove sheet - adjust formula dependencies', () => {
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
     expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
+  })
+
+  it('should return changed values', () => {
+    const engine = HandsOnEngine.buildFromSheets({
+      Sheet1: [
+        ['=$Sheet2.A1'],
+      ],
+      Sheet2: [
+        ['1'],
+      ],
+    })
+
+    const changes = engine.removeSheet(1)
+
+    expect(changes.length).toBe(1)
+    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 0, value: new CellError(ErrorType.REF) })
   })
 })
 
