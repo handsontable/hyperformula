@@ -427,7 +427,7 @@ export class HandsOnEngine {
       return []
     }
 
-    const removedColumns = new ColumnsSpan(sheet, columnStart, columnEnd)
+    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
     this.dependencyGraph.removeColumns(removedColumns)
     this.columnSearch.removeColumns(removedColumns)

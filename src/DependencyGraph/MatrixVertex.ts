@@ -127,7 +127,7 @@ export class MatrixVertex {
   }
 
   public columnsFromMatrix() {
-    return new ColumnsSpan(this.cellAddress.sheet, this.cellAddress.col, this.cellAddress.col + this.width - 1)
+    return ColumnsSpan.fromNumberOfColumns(this.cellAddress.sheet, this.cellAddress.col, this.width)
   }
 
   public rowsFromMatrix() {
