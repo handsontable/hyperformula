@@ -359,7 +359,7 @@ export class HandsOnEngine {
       return []
     }
 
-    const removedRows = new RowsSpan(sheet, rowStart, rowEnd)
+    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
     this.dependencyGraph.removeRows(removedRows)
 
