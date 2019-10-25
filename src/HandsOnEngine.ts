@@ -196,7 +196,12 @@ export class HandsOnEngine {
     this.ensureThatAddressIsCorrect(address)
 
     const changes = new ContentChanges()
-    const vertex = this.dependencyGraph.getCell(address)
+    let vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && isNaN(Number(newCellContent))) {
+      this.dependencyGraph.breakNumericMatrix(vertex)
+      vertex = this.dependencyGraph.getCell(address)
+    }
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
       const newValue = Number(newCellContent)

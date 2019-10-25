@@ -367,36 +367,40 @@ export class DependencyGraph {
   }
 
   public disableNumericMatrices() {
-    for (const [key, matrixVertex] of this.matrixMapping.numericMatrices()) {
-      const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-      // 1. split matrix to chunks, add value cell vertices
-      // 2. update address mapping for each address in matrix
-      for (const address of matrixRange.addresses()) {
-        const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
-        const valueVertex = new ValueCellVertex(value)
-        this.addVertex(address, valueVertex)
-      }
+    for (const [_, matrixVertex] of this.matrixMapping.numericMatrices()) {
+      this.breakNumericMatrix(matrixVertex)
+    }
+  }
 
-      for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
-        // 3. update dependencies for each range that has this matrix in dependencies
-        if (adjacentNode instanceof RangeVertex) {
-          for (const address of adjacentNode.range.addresses()) {
-            const vertex = this.fetchCell(address)
-            this.graph.addEdge(vertex, adjacentNode)
-          }
-          // 4. fix edges for cell references in formulas
-        } else if (adjacentNode instanceof FormulaCellVertex) {
-          const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(this.lazilyTransformingAstService), adjacentNode.getAddress(this.lazilyTransformingAstService), matrixRange)
-          for (const vertex of relevantReferences) {
-            this.graph.addEdge(vertex, adjacentNode)
-          }
+  public breakNumericMatrix(matrixVertex: MatrixVertex) {
+    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    // 1. split matrix to chunks, add value cell vertices
+    // 2. update address mapping for each address in matrix
+    for (const address of matrixRange.addresses()) {
+      const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
+      const valueVertex = new ValueCellVertex(value)
+      this.addVertex(address, valueVertex)
+    }
+
+    for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
+      // 3. update dependencies for each range that has this matrix in dependencies
+      if (adjacentNode instanceof RangeVertex) {
+        for (const address of adjacentNode.range.addresses()) {
+          const vertex = this.fetchCell(address)
+          this.graph.addEdge(vertex, adjacentNode)
+        }
+        // 4. fix edges for cell references in formulas
+      } else if (adjacentNode instanceof FormulaCellVertex) {
+        const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(this.lazilyTransformingAstService), adjacentNode.getAddress(this.lazilyTransformingAstService), matrixRange)
+        for (const vertex of relevantReferences) {
+          this.graph.addEdge(vertex, adjacentNode)
         }
       }
-
-      // 4. remove old matrix
-      this.graph.removeNode(matrixVertex)
-      this.matrixMapping.removeMatrix(key)
     }
+
+    // 4. remove old matrix
+    this.graph.removeNode(matrixVertex)
+    this.matrixMapping.removeMatrix(matrixVertex.getRange())
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
