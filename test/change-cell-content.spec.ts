@@ -356,7 +356,7 @@ describe('changing cell content', () => {
     ]
     const engine = HandsOnEngine.buildFromArray(sheet)
 
-    const address = { row: -1, col: 0, sheet: 0 }
+    const address = {row: -1, col: 0, sheet: 0}
     expect(() => {
       engine.setCellContent(address, '3')
     }).toThrow(new InvalidAddressError(address))
@@ -418,11 +418,11 @@ describe('changing cell content', () => {
     })
   })
 
-  it('return dependent matrix value changes', () => {
+  it('returns dependent matrix value changes', () => {
     const sheet = [
-        ['1', '2'],
-        ['3', '4'],
-        ['{=MMULT(A1:B2,A1:B2)}']
+      ['1', '2'],
+      ['3', '4'],
+      ['{=MMULT(A1:B2,A1:B2)}']
     ]
 
     const engine = HandsOnEngine.buildFromArray(sheet)
@@ -491,5 +491,34 @@ describe('change multiple cells contents', () => {
       engine.setMultipleCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
     }).toThrow('Cant change matrices in batch operation')
     expect(engine.getCellValue('A1')).toBe(1)
+  })
+
+  it('returns changes of mutliple values', () => {
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
+
+    expect(changes.length).toEqual(4)
+    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10]))
+  })
+
+  it('returns changes of mutliple values dependent formulas', () => {
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=SUM(A1:B1)', '=SUM(B1:B2)']
+    ]
+    const engine = HandsOnEngine.buildFromArray(sheet)
+
+    const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
+
+    expect(changes.length).toEqual(6)
+    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
   })
 })
