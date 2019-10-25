@@ -1,21 +1,21 @@
 import {CellValue, SimpleCellAddress} from "./Cell";
 import {Matrix} from "./Matrix";
 
-export interface CellContentUpdate {
+export interface CellValueChange {
   sheet: number,
   row: number,
   col: number,
   value: CellValue,
 }
 
-export class ContentUpdate {
-  public changes: Array<CellContentUpdate> = []
+export class ContentChanges {
+  public changes: Array<CellValueChange> = []
 
   public static empty() {
-    return new ContentUpdate()
+    return new ContentChanges()
   }
 
-  public addAll(other: ContentUpdate): ContentUpdate {
+  public addAll(other: ContentChanges): ContentChanges {
     this.changes.push(...other.changes)
     return this
   }

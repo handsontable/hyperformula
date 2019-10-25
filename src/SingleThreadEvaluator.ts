@@ -8,7 +8,7 @@ import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {Matrix} from './Matrix'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
-import {ContentUpdate} from "./ContentUpdate";
+import {ContentChanges} from "./ContentChanges";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
@@ -32,8 +32,8 @@ export class SingleThreadEvaluator implements Evaluator {
     })
   }
 
-  public partialRun(vertices: Vertex[]): ContentUpdate {
-    const changes = new ContentUpdate()
+  public partialRun(vertices: Vertex[]): ContentChanges {
+    const changes = new ContentChanges()
 
     this.stats.measure(StatType.EVALUATION, () => {
       const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {

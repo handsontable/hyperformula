@@ -1,7 +1,7 @@
 import {Vertex} from './DependencyGraph'
-import {ContentUpdate} from "./ContentUpdate";
+import {ContentChanges} from "./ContentChanges";
 
 export interface Evaluator {
   run(): void,
-  partialRun(vertices: Vertex[]): ContentUpdate,
+  partialRun(vertices: Vertex[]): ContentChanges,
 }

@@ -31,7 +31,7 @@ import {CellAddress, cellAddressFromString, isFormula, isMatrix, ParserWithCachi
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
-import {CellContentUpdate, ContentUpdate} from "./ContentUpdate";
+import {CellValueChange, ContentChanges} from "./ContentChanges";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -192,10 +192,10 @@ export class HandsOnEngine {
    * @param newCellContent - new cell content
    * @param recompute - specifies if recomputation should be fired after change
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): CellContentUpdate[] {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): CellValueChange[] {
     this.ensureThatAddressIsCorrect(address)
 
-    const changes = new ContentUpdate()
+    const changes = new ContentChanges()
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
@@ -483,7 +483,7 @@ export class HandsOnEngine {
   /**
    * Runs recomputation starting from recently changed vertices.
    * */
-  private recomputeIfDependencyGraphNeedsIt(): ContentUpdate {
+  private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
@@ -491,7 +491,7 @@ export class HandsOnEngine {
       return this.evaluator.partialRun(verticesToRecomputeFrom)
     }
 
-    return ContentUpdate.empty()
+    return ContentChanges.empty()
   }
 
   /**
