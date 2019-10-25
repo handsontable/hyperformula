@@ -199,8 +199,10 @@ export class HandsOnEngine {
     const vertex = this.dependencyGraph.getCell(address)
 
     if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
-      vertex.setMatrixCellValue(address, Number(newCellContent))
+      const newValue = Number(newCellContent)
+      vertex.setMatrixCellValue(address, newValue)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      changes.addChange(newValue, address)
     } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
       const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
       const parseResult = this.parser.parse(matrixFormula, address)
