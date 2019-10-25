@@ -323,6 +323,29 @@ export class HandsOnEngine {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  public isItPossibleToRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): boolean {
+    if (rowStart < 0 || !Number.isInteger(rowStart)) {
+      return false
+    }
+    if (rowEnd < 0 || !Number.isInteger(rowEnd)) {
+      return false
+    }
+    if (rowEnd < rowStart) {
+      return false
+    }
+    const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
+
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Removes multiple rows from sheet. </br>
    * Does nothing if rows are outside of effective sheet size.

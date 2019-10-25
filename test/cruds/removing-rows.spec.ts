@@ -12,6 +12,91 @@ import {
   extractReference,
 } from '../testUtils'
 
+describe('Removing rows - checking if its possible', () => {
+  it('no if starting row is negative', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, -1, 1)).toEqual(false)
+  })
+
+  it('no if starting row is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, 1.5, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, NaN, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, Infinity, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, -Infinity, 2)).toEqual(false)
+  })
+
+  it('no if ending row is negative', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, 0, -1)).toEqual(false)
+  })
+
+  it('no if ending row is not an integer', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, 0, 1.5)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 0, NaN)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 0, Infinity)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 0, -Infinity)).toEqual(false)
+  })
+
+  it('no if ending row smaller than starting row', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, 1, 0)).toEqual(false)
+  })
+
+  it('no if sheet does not exist', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(1.5, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(-1, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(NaN, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(-Infinity, 0, 1)).toEqual(false)
+  })
+
+  it('no if theres a formula matrix in place where we remove', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, 1, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 2, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 3, 3)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, 4, 4)).toEqual(true)
+  })
+
+  it('yes if theres a numeric matrix in place where we add', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    expect(engine.isItPossibleToRemoveRows(0, 0, 0)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HandsOnEngine.buildFromArray([[]])
+
+    expect(engine.isItPossibleToRemoveRows(0, 0, 0)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, 1, 2)).toEqual(true)
+  })
+})
+
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency above removed row should not be affected', () => {
     const engine = HandsOnEngine.buildFromArray([

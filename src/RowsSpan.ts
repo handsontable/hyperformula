@@ -11,6 +11,10 @@ export class RowsSpan {
   public static fromNumberOfRows(sheet: number, rowStart: number, numberOfRows: number) {
     return new RowsSpan(sheet, rowStart, rowStart + numberOfRows - 1)
   }
+
+  public static fromRowStartAndEnd(sheet: number, rowStart: number, rowEnd: number) {
+    return new RowsSpan(sheet, rowStart, rowEnd)
+  }
   constructor(
     public readonly sheet: number,
     public readonly rowStart: number,
