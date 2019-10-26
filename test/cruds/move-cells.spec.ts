@@ -14,6 +14,7 @@ import {
 } from '../testUtils'
 import {privateDecrypt} from "crypto";
 import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
+import {utc} from "moment";
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
@@ -727,5 +728,43 @@ describe('column index', () => {
     expect_array_with_same_content([], index.getValueIndex(0, 0, 3).index)
     expect_array_with_same_content([], index.getValueIndex(0, 1, 1).index)
     expect_array_with_same_content([1], index.getValueIndex(0, 1, 3).index)
+  })
+
+  it('should update column index when source and target overlaps', () => {
+    const engine = HandsOnEngine.buildFromArray([
+        ['1', '2'],
+        ['3', '4', '5'],
+        ['' , '6', '7'],
+    ], new Config({ useColumnIndex: true }))
+
+    engine.moveCells(adr("A1"), 2, 2, adr("B2"))
+
+    const index = engine.columnSearch as ColumnIndex
+    expect(index.getColumnMap(0, 0).size).toEqual(0)
+    expect(index.getColumnMap(0, 1).size).toEqual(2)
+    expect_array_with_same_content([1], index.getValueIndex(0, 1, 1).index)
+    expect_array_with_same_content([2], index.getValueIndex(0, 1, 3).index)
+    expect(index.getColumnMap(0, 2).size).toEqual(2)
+    expect_array_with_same_content([1], index.getValueIndex(0, 2, 2).index)
+    expect_array_with_same_content([2], index.getValueIndex(0, 2, 4).index)
+  })
+
+  it('should update column index when source and target overlaps - oposite way', () => {
+    const engine = HandsOnEngine.buildFromArray([
+      ['1', '2'],
+      ['3', '4', '5'],
+      ['' , '6', '7'],
+    ], new Config({ useColumnIndex: true }))
+
+    engine.moveCells(adr("B2"), 2, 2, adr("A1"))
+
+    const index = engine.columnSearch as ColumnIndex
+    expect(index.getColumnMap(0, 0).size).toEqual(2)
+    expect_array_with_same_content([0], index.getValueIndex(0, 0, 4).index)
+    expect_array_with_same_content([1], index.getValueIndex(0, 0, 6).index)
+    expect(index.getColumnMap(0, 0).size).toEqual(2)
+    expect_array_with_same_content([0], index.getValueIndex(0, 1, 5).index)
+    expect_array_with_same_content([1], index.getValueIndex(0, 1, 7).index)
+    expect(index.getColumnMap(0, 2).size).toEqual(0)
   })
 })
