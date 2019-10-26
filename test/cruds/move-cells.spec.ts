@@ -701,7 +701,7 @@ describe('overlapping areas', () => {
 })
 
 describe('column index', () => {
-  xit('should update column index when moving cell', () => {
+  it('should update column index when moving cell', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['1'],
         ['=VLOOKUP(1, A1:A1, 1, TRUE())']
@@ -710,11 +710,11 @@ describe('column index', () => {
     engine.moveCells(adr("A1"), 1, 1, adr("B1"))
 
     const index = engine.columnSearch as ColumnIndex
-    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
+    expect_array_with_same_content([1], index.getValueIndex(0, 0, 1).index)
     expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
   })
 
-  xit('should update column index when moving cell - REFs', () => {
+  it('should update column index when moving cell - REFs', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],

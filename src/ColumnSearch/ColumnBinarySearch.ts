@@ -25,6 +25,10 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
 
   public removeSheet(sheetId: number): void {}
 
+  public moveValues(sourceRange: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
+
+  public removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void {}
+
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.vlookupThreshold || !sorted) {
       const values = this.computeListOfValuesInRange(range)

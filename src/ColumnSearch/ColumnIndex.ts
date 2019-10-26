@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, SimpleCellAddress} from '../Cell'
+import {CellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -68,6 +68,20 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
     this.remove(oldValue, address)
     this.add(newValue, address)
+  }
+
+  public moveValues(sourceRange: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
+    for (const [value, address] of sourceRange) {
+      const targetAddress = movedSimpleCellAddress(address, toSheet, toRight, toBottom)
+      this.remove(value, address)
+      this.add(value, targetAddress)
+    }
+  }
+
+  public removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void {
+    for (const [value, address] of range) {
+      this.remove(value, address)
+    }
   }
 
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {

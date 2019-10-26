@@ -37,6 +37,9 @@ export interface SimpleCellAddress {
 }
 export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({ sheet, col, row })
 export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean => (address.col < 0 || address.row < 0)
+export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
+  return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
+}
 
 export interface SheetCellAddress {
   col: number,

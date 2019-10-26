@@ -16,6 +16,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {IColumnSearchStrategy} from "../ColumnSearch/ColumnSearchStrategy";
 
 export class DependencyGraph {
   /*

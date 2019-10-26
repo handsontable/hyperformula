@@ -21,6 +21,10 @@ export interface IColumnSearchStrategy {
 
   removeSheet(sheetId: number): void
 
+  moveValues(range: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void
+
+  removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void
+
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number
 }
 

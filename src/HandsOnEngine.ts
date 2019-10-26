@@ -487,6 +487,11 @@ export class HandsOnEngine {
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
+    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
+    this.columnSearch.removeValues(valuesToRemove)
+    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
+    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
+
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
