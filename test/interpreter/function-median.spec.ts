@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function MEDIAN', () => {
   it('single number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(1)'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('two numbers', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(1, 2)'],
     ])
 
@@ -20,7 +20,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('more numbers (odd)', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(3, 1, 2, 5, 7)'],
     ])
 
@@ -28,7 +28,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('more numbers (even)', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(3, 4, 1, 2, 5, 7)'],
     ])
 
@@ -36,7 +36,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['3', '5', '1'],
       ['=MEDIAN(A1:C1)'],
     ])
@@ -45,7 +45,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('propagates error from regular argument', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=3/0', '=MEDIAN(A1)'],
     ])
 
@@ -53,7 +53,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('propagates first error from range argument', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=3/0', '=FOO', '=MEDIAN(A1:B1)'],
     ])
 
@@ -61,7 +61,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('return error when an argument is not a number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['foo', '=MEDIAN(A1)'],
     ])
 
@@ -69,7 +69,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('return error when range argument contains not a number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['5', 'foo', '=MEDIAN(A1:B1)'],
     ])
 
@@ -77,7 +77,7 @@ describe('Function MEDIAN', () => {
   })
 
   it('return error when no arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MEDIAN()'],
     ])
 

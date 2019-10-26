@@ -1,4 +1,4 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import {CellError, Config, HyperFormula} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
@@ -15,13 +15,13 @@ import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveSheet(1)).toEqual(false)
   })
 
   it('yes otherwise', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveSheet(0)).toEqual(true)
   })
@@ -29,7 +29,7 @@ describe('Removing sheet - checking if its possible', () => {
 
 describe('remove sheet', () => {
   it('should remove sheet by id', () => {
-    const engine = HandsOnEngine.buildFromArray([['foo']])
+    const engine = HyperFormula.buildFromArray([['foo']])
 
     engine.removeSheet(0)
 
@@ -38,7 +38,7 @@ describe('remove sheet', () => {
   })
 
   it('should remove empty sheet', () => {
-    const engine = HandsOnEngine.buildFromArray([])
+    const engine = HyperFormula.buildFromArray([])
 
     engine.removeSheet(0)
 
@@ -47,7 +47,7 @@ describe('remove sheet', () => {
   })
 
   it('should decrease last sheet id when removing last sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [],
       Sheet2: [],
     })
@@ -60,7 +60,7 @@ describe('remove sheet', () => {
   })
 
   it('should not decrease last sheet id when removing sheet other than last', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [],
       Sheet2: [],
       Sheet3: [],
@@ -74,7 +74,7 @@ describe('remove sheet', () => {
   })
 
   it('should remove sheet with matrix', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
           ['1'],
           ['{=TRANSPOSE(A1:A1)}']
@@ -90,7 +90,7 @@ describe('remove sheet', () => {
 
 describe('remove sheet - adjust edges', () => {
   it('should not affect dependencies to sheet other than removed', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '=A1'],
       ],
@@ -108,7 +108,7 @@ describe('remove sheet - adjust edges', () => {
   })
 
   it('should remove edge between sheets', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
       ],
@@ -129,7 +129,7 @@ describe('remove sheet - adjust edges', () => {
 
 describe('remove sheet - adjust formula dependencies', () => {
   it('should not affect formula with dependency to sheet other than removed', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '=A1'],
       ],
@@ -143,11 +143,11 @@ describe('remove sheet - adjust formula dependencies', () => {
     const reference = extractReference(engine, adr('B1'))
 
     expect(reference).toEqual(CellAddress.relative(0, -1, 0))
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['1', '=A1']]))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['1', '=A1']]))
   })
 
   it('should be #REF after removing sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
       ],
@@ -159,11 +159,11 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet(1)
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([['=$Sheet2.A1']]))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=$Sheet2.A1']]))
   })
 
   it('should return changed values', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
       ],
@@ -181,7 +181,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
 describe('remove sheet - adjust address mapping', () => {
   it('should remove sheet from address mapping', () => {
-    const engine = HandsOnEngine.buildFromArray([])
+    const engine = HyperFormula.buildFromArray([])
 
     engine.removeSheet(0)
 
@@ -191,7 +191,7 @@ describe('remove sheet - adjust address mapping', () => {
 
 describe('remove sheet - adjust range mapping', () => {
   it('should remove ranges from range mapping when removing sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       'Sheet1': [
           ['=SUM(B1:B2)'],
           ['=SUM(C1:C2)'],
@@ -214,7 +214,7 @@ describe('remove sheet - adjust range mapping', () => {
 
 describe('remove sheet - adjust matrix mapping', () => {
   it('should remove matrices from matrix mapping when removing sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       'Sheet1': [
         ['1', '2'],
         ['{=TRANSPOSE(A1:A1)}'],
@@ -240,7 +240,7 @@ describe('remove sheet - adjust matrix mapping', () => {
 
 describe('remove sheet - adjust column index', () => {
   it('should remove sheet from index', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
         ['1']
     ], new Config({ useColumnIndex: true }))
     const index = engine.columnSearch as ColumnIndex

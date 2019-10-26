@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src'
 import {
   EmptyCellVertex,
@@ -10,7 +10,7 @@ import {adr} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42'],
     ])
 
@@ -20,7 +20,7 @@ describe('GraphBuilder', () => {
   })
 
   it('build sheet with simple string cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['foo'],
     ])
 
@@ -30,7 +30,7 @@ describe('GraphBuilder', () => {
   })
 
   it('building for cell with empty string should give empty vertex', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=A1'],
     ])
 
@@ -39,7 +39,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph works with ranges', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
     ])
@@ -54,7 +54,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
       ['=A1:B1'],
@@ -77,7 +77,7 @@ describe('GraphBuilder', () => {
   })
 
   it('build with range one row smaller', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A2'],
       ['5', '=A1:A3'],
@@ -97,7 +97,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph should work even if range dependencies are empty', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '0', '=SUM(A1:B2)'],
     ])
 
@@ -114,7 +114,7 @@ describe('GraphBuilder', () => {
   })
 
   it("optimization doesn't work if smaller range is after bigger", () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A3'],
       ['5', '=A1:A2'],
@@ -136,7 +136,7 @@ describe('GraphBuilder', () => {
 
 describe('GraphBuilder with matrix detection', () => {
   it('matrix with plain numbers', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
@@ -152,7 +152,7 @@ describe('GraphBuilder with matrix detection', () => {
   })
 
   it('matrix detection strategy and regular values', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', 'foobar'],
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
 
@@ -161,7 +161,7 @@ describe('GraphBuilder with matrix detection', () => {
   })
 
   it('matrix detection threshold', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['', ''],

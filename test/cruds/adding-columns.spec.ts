@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -8,19 +8,19 @@ import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, -1, 1)).toEqual(false)
   })
 
   it('no if starting column is not an integer', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 1.5, 1)).toEqual(false)
   })
 
   it('no if starting column is NaN/Infinity', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, NaN, 1)).toEqual(false)
     expect(engine.isItPossibleToAddColumns(0, Infinity, 1)).toEqual(false)
@@ -28,19 +28,19 @@ describe('Adding column - checking if its possible', () => {
   })
 
   it('no if number of columns is not positive', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, 0)).toEqual(false)
   })
 
   it('no if number of columns is not an integer', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, 1.5)).toEqual(false)
   })
 
   it('no if number of columns is NaN/Infinity', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, NaN)).toEqual(false)
     expect(engine.isItPossibleToAddColumns(0, 0, Infinity)).toEqual(false)
@@ -48,7 +48,7 @@ describe('Adding column - checking if its possible', () => {
   })
 
   it('no if sheet does not exist', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(1, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToAddColumns(1.5, 0, 1)).toEqual(false)
@@ -59,7 +59,7 @@ describe('Adding column - checking if its possible', () => {
   })
 
   it('no if theres a formula matrix in place where we add', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}', '13'],
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
@@ -72,7 +72,7 @@ describe('Adding column - checking if its possible', () => {
 
   it('yes if theres a numeric matrix in place where we add', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -83,7 +83,7 @@ describe('Adding column - checking if its possible', () => {
   })
 
   it('yes otherwise', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToAddColumns(0, 0, 1)).toEqual(true)
   })
@@ -91,7 +91,7 @@ describe('Adding column - checking if its possible', () => {
 
 describe('Adding column - matrix check', () => {
   it('raise error if trying to add a row in a row with matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
@@ -111,7 +111,7 @@ describe('Adding column - matrix check', () => {
 
 describe('Adding column - reevaluation', () => {
   it('reevaluates cells', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
     ])
 
@@ -121,7 +121,7 @@ describe('Adding column - reevaluation', () => {
   })
 
   it('dont reevaluate everything', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
       ['=SUM(A1:A1)'],
     ])
@@ -137,7 +137,7 @@ describe('Adding column - reevaluation', () => {
   })
 
   it('reevaluates cells which are dependent on structure changes', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '=COLUMNS(A1:B1)'],
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
@@ -150,7 +150,7 @@ describe('Adding column - reevaluation', () => {
   })
 
   it('returns changed values', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       /* */
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
@@ -165,7 +165,7 @@ describe('Adding column - reevaluation', () => {
 
 describe('Adding column - FormulaCellVertex#address update', () => {
   it('updates addresses in formulas', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', /* new col */ '=A1'],
     ])
 
@@ -179,7 +179,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
 
 describe('Adding column', () => {
   it('MatrixVertex#formula should be updated', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
@@ -190,7 +190,7 @@ describe('Adding column', () => {
   })
 
   it('MatrixVertex#address should be updated', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
@@ -202,7 +202,7 @@ describe('Adding column', () => {
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
         ['3', '4'],
@@ -222,7 +222,7 @@ describe('Adding column', () => {
 describe('Adding column', () => {
   it('add column inside numeric matrix, expand matrix', () => {
     const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -239,7 +239,7 @@ describe('Adding column', () => {
 
 describe('Adding column - address mapping', () => {
   it('verify sheet dimensions', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', /* new col */ '=A1'],
     ])
 
@@ -254,7 +254,7 @@ describe('Adding column - address mapping', () => {
 
 describe('different sheet', () => {
   it('adding row in different sheet but same row as formula should not update formula address', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'],
       ],
@@ -275,7 +275,7 @@ describe('different sheet', () => {
 
 describe('Adding column - sheet dimensions', () => {
   it('should do nothing when adding column outside effective sheet', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
     ])
 
@@ -293,7 +293,7 @@ describe('Adding column - sheet dimensions', () => {
 
 describe('Adding column - column index', () => {
   it('should update column index when adding row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
     ], new Config({ useColumnIndex: true }))
     const index = (engine.columnSearch as ColumnIndex)

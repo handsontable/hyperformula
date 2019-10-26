@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine} from '../src'
+import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
@@ -12,7 +12,7 @@ describe('Disable matrix optimizatoins', () => {
       ['3', '4'],
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, config)
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(MatrixVertex)
 
@@ -34,7 +34,7 @@ describe('Disable matrix optimizatoins', () => {
       ['=SUM(A1:B1)'],
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, config)
     let range = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
     expect(engine.graph.getDependencies(range).length).toBe(1)
     expect(engine.dependencyGraph.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).not.toBe(undefined)
@@ -60,7 +60,7 @@ describe('Disable matrix optimizatoins', () => {
       ['=A1+B2'],
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, config)
     const a1 = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     const b2 = engine.addressMapping.fetchCell(adr('B2')) as MatrixVertex
     expect(a1).toBeInstanceOf(MatrixVertex)
@@ -88,7 +88,7 @@ describe('Disable matrix optimizatoins', () => {
       ['=A1+C1'],
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, config)
 
     const a3 = engine.addressMapping.fetchCell(adr('A3')) as ValueCellVertex
     const a1 = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex

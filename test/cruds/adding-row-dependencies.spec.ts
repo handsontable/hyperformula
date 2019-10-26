@@ -1,4 +1,4 @@
-import { HandsOnEngine} from '../../src'
+import { HyperFormula} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
@@ -7,7 +7,7 @@ import {adr, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
 describe('Adding row - fixing dependencies', () => {
   describe('all in same sheet (case 1)', () => {
     it('same sheet, case Aa, absolute row', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=A$1'],
@@ -19,7 +19,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Aa, absolute row and col', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=$A$1'],
@@ -31,7 +31,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Ab', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['=A$2'],
         // new row
         ['42'],
@@ -43,7 +43,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Raa', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['=A2'],
         ['13'],
         // new row
@@ -56,7 +56,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rab', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['42'],
         ['13'],
         // new row
@@ -69,7 +69,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rba', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['=A3'],
         ['13'],
         // new row
@@ -82,7 +82,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rbb', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['42'],
         // new row
         ['=A3'],
@@ -95,7 +95,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, same row', () => {
-      const engine = HandsOnEngine.buildFromArray([
+      const engine = HyperFormula.buildFromArray([
         ['42'],
         ['43', '=A2'],
       ])
@@ -108,7 +108,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
     it('absolute case', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=$Sheet2.A$1'],
@@ -124,7 +124,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('R < r', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           [''],
@@ -141,7 +141,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('r = R', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=$Sheet2.A2'],
@@ -158,7 +158,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('r < R', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=$Sheet2.A1'],
           // new row
@@ -176,7 +176,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('formula address sheet different than dependency address sheet and sheet in which we add rows (case 3)', () => {
     it('dependency address before added row', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -193,7 +193,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('dependency address at added row', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -209,7 +209,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('dependency address after added row', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           ['1'],
           // new row
@@ -227,7 +227,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('sheet where we add rows different than dependency address and formula address (case 4)', () => {
     it('works', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=A2'],
           ['13'],
@@ -247,7 +247,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('each sheet different (case 5)', () => {
     it('works', () => {
-      const engine = HandsOnEngine.buildFromSheets({
+      const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=$Sheet2.A2'],
           ['13'],
@@ -272,7 +272,7 @@ describe('Adding row - fixing dependencies', () => {
 
 describe('Adding row, ranges', () => {
   it('insert row in middle of range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       // new row
       ['2', ''],
@@ -284,7 +284,7 @@ describe('Adding row, ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A4)'],
       ['', ''],
       ['2', ''],
@@ -293,7 +293,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('insert row above range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       // new row
       ['1', '=SUM(A1:A3)'],
       ['2', ''],
@@ -305,7 +305,7 @@ describe('Adding row, ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(null)
     expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['', ''],
       ['1', '=SUM(A2:A4)'],
       ['2', ''],
@@ -314,7 +314,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('insert row below range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', ''],
       ['3', ''],
@@ -325,7 +325,7 @@ describe('Adding row, ranges', () => {
     engine.addRows(0, 3, 1)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', ''],
       ['3', ''],
@@ -334,7 +334,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('it should insert new cell with edge to only one range below', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
       // new row
@@ -352,7 +352,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('it should insert new cell with edge to only one range below, shifted by 1', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
@@ -365,7 +365,7 @@ describe('Adding row, ranges', () => {
     const a4 = engine.addressMapping.getCell(adr('A4'))
     expect(a4).toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
@@ -375,7 +375,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range start in row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A2:A4)'],
@@ -388,7 +388,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A3:A5)'],
@@ -398,7 +398,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range start above row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A1:A4)'],
@@ -413,7 +413,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A1:A5)'],
@@ -423,7 +423,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range start below row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A3:A4)'],
@@ -436,7 +436,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A4:A5)'],
@@ -446,7 +446,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range end above row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A1:A1)'],
@@ -459,7 +459,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A1:A1)'],
@@ -469,7 +469,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range end in a row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A1:A2)'],
@@ -485,7 +485,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A1:A3)'],
@@ -495,7 +495,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range end below row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A1:A3)'],
@@ -511,7 +511,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A1:A4)'],
@@ -521,7 +521,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('range start and end in a row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       // new row
       ['2', '=SUM(A2:A2)'],
@@ -534,7 +534,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(null)
 
-    expectEngineToBeTheSameAs(engine, HandsOnEngine.buildFromArray([
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', ''],
       ['', ''],
       ['2', '=SUM(A3:A3)'],

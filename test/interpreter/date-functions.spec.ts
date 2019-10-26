@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {dateNumberToString} from '../../src/Date'
@@ -6,7 +6,7 @@ import '../testConfig'
 
 describe('Interpreter', () => {
   it('function DATE with 3 numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
+    const engine = HyperFormula.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
 
     expect(engine.getCellValue('A1')).toEqual(2)
     expect(dateNumberToString(engine.getCellValue('A1') as number, Config.defaultConfig.dateFormat)).toEqual('01/01/1900')
@@ -16,13 +16,13 @@ describe('Interpreter', () => {
   })
 
   it('function DATE with less than 3 numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=DATE(1900, 1)']])
+    const engine = HyperFormula.buildFromArray([['=DATE(1900, 1)']])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
   })
 
   it('function DATE with non numerical argument', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=DATE("foo", 1, 1)'],
       ['=DATE(1900, "foo", 1)'],
       ['=DATE(1900, 1, "foo")'],
@@ -34,7 +34,7 @@ describe('Interpreter', () => {
   })
 
   it('function MONTH with numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
+    const engine = HyperFormula.buildFromArray([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
 
     expect(engine.getCellValue('A1')).toEqual(12)
     expect(engine.getCellValue('B1')).toEqual(1)
@@ -42,7 +42,7 @@ describe('Interpreter', () => {
   })
 
   it('function MONTH with string arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH("12/31/1899")', '=MONTH("01/01/1900")', '=MONTH("12/31/2018")']])
+    const engine = HyperFormula.buildFromArray([['=MONTH("12/31/1899")', '=MONTH("01/01/1900")', '=MONTH("12/31/2018")']])
 
     expect(engine.getCellValue('A1')).toEqual(12)
     expect(engine.getCellValue('B1')).toEqual(1)
@@ -50,7 +50,7 @@ describe('Interpreter', () => {
   })
 
   it('function MONTH with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=MONTH("foo")', '=MONTH("30/12/2018")', '=MONTH(1, 2)', '=MONTH()']])
+    const engine = HyperFormula.buildFromArray([['=MONTH("foo")', '=MONTH("30/12/2018")', '=MONTH(1, 2)', '=MONTH()']])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
@@ -59,7 +59,7 @@ describe('Interpreter', () => {
   })
 
   it('function YEAR with numerical arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
+    const engine = HyperFormula.buildFromArray([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
 
     expect(engine.getCellValue('A1')).toEqual(1899)
     expect(engine.getCellValue('B1')).toEqual(1900)
@@ -67,7 +67,7 @@ describe('Interpreter', () => {
   })
 
   it('function YEAR with string arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR("12/31/1899")', '=YEAR("01/01/1900")', '=YEAR("12/31/2018")']])
+    const engine = HyperFormula.buildFromArray([['=YEAR("12/31/1899")', '=YEAR("01/01/1900")', '=YEAR("12/31/2018")']])
 
     expect(engine.getCellValue('A1')).toEqual(1899)
     expect(engine.getCellValue('B1')).toEqual(1900)
@@ -75,7 +75,7 @@ describe('Interpreter', () => {
   })
 
   it('function YEAR with wrong arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([['=YEAR("foo")', '=YEAR("30/12/2018")', '=YEAR(1, 2)', '=YEAR()']])
+    const engine = HyperFormula.buildFromArray([['=YEAR("foo")', '=YEAR("30/12/2018")', '=YEAR(1, 2)', '=YEAR()']])
 
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))

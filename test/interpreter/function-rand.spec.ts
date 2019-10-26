@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter - function RAND', () => {
   it('works',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=RAND()'],
     ])
 
@@ -13,7 +13,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('validates number of arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=RAND(42)'],
     ])
 

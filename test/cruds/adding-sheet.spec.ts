@@ -1,10 +1,10 @@
-import {Config, EmptyValue, HandsOnEngine} from '../../src'
+import {Config, EmptyValue, HyperFormula} from '../../src'
 import '../testConfig'
 import {plPL} from "../../src/i18n";
 
 describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
-    const engine = HandsOnEngine.buildEmpty()
+    const engine = HyperFormula.buildEmpty()
 
     expect(engine.isItPossibleToAddSheet()).toEqual(true)
   })
@@ -12,7 +12,7 @@ describe('Adding sheet - checking if its possible', () => {
 
 describe('add sheet to engine', () => {
   it('should add sheet to empty engine', function() {
-    const engine = HandsOnEngine.buildEmpty()
+    const engine = HyperFormula.buildEmpty()
 
     engine.addSheet()
 
@@ -21,7 +21,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should add sheet to engine with one sheet', function() {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
         ['foo'],
     ])
 
@@ -32,7 +32,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should be possible to fetch empty cell from newly added sheet', function() {
-    const engine = HandsOnEngine.buildEmpty()
+    const engine = HyperFormula.buildEmpty()
 
     engine.addSheet()
 
@@ -40,7 +40,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should add sheet with translated sheet name', function() {
-    const engine = HandsOnEngine.buildEmpty(new Config({ language: plPL }))
+    const engine = HyperFormula.buildEmpty(new Config({ language: plPL }))
 
     engine.addSheet()
 

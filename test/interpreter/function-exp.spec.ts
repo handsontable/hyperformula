@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter', () => {
   it('function EXP happy path',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=EXP(0)', '=EXP(2)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Interpreter', () => {
   })
 
   it('function EXP given wrong argument type',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=EXP("foo")'],
     ])
 
@@ -21,7 +21,7 @@ describe('Interpreter', () => {
   })
 
   it('function EXP given wrong number of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=EXP()'],
       ['=EXP(1, 2)'],
     ])

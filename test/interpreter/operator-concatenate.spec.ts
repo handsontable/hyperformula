@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter - concatenate operator', () => {
   it('Ampersand with string arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['="foo"&"bar"'],
     ])
 
@@ -12,7 +12,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with cell address', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['foo', '=A1&"bar"'],
     ])
 
@@ -20,7 +20,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=1&2'],
     ])
 
@@ -28,7 +28,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with bool', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['="foo"&TRUE()'],
     ])
 
@@ -36,7 +36,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with error', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=1/0', '=A1&TRUE()'],
     ])
 

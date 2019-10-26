@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function SUMPRODUCT', () => {
   it('works',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1'],
       ['2', '2'],
       ['3', '3'],
@@ -15,7 +15,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works with wider ranges',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '3', '1', '3'],
       ['2', '4', '2', '4'],
       ['=SUMPRODUCT(A1:B2,C1:D2)'],
@@ -25,7 +25,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works with cached smaller range',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMPRODUCT(A1:A1, B1:B1)'],
       ['2', '2', '=SUMPRODUCT(A1:A2, B1:B2)'],
       ['3', '3', '=SUMPRODUCT(A1:A3, B1:B3)'],
@@ -37,7 +37,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('sumproduct from scalars',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMPRODUCT(42, 78)'],
     ])
 
@@ -45,7 +45,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('use cached value if the same formula used',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1'],
       ['2', '2'],
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
@@ -56,7 +56,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   xit('it makes a coercion from other values', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=TRUE()', '42'],
       ['=SUMPRODUCT(A1,B1)'],
     ])
@@ -65,7 +65,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works even if some string in data',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['asdf', 'fdsafdsa'],
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
@@ -75,7 +75,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works even if both strings passed',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['asdf', 'fdsafdsa'],
       ['=SUMPRODUCT(A1,B1)'],
     ])
@@ -84,7 +84,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works even if both booleans passed',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=TRUE()', '=FALSE()'],
       ['=SUMPRODUCT(A1,B1)'],
     ])
@@ -93,7 +93,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('error if error is somewhere in right value',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42', '78'],
       ['13', '=4/0'],
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
@@ -103,7 +103,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('error if error is somewhere in left value',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42', '78'],
       ['=3/0', '13'],
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
@@ -113,7 +113,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('error in left has precedence over error in right',  () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42', '78'],
       ['=UNKNOWNFUNCTION()', '=3/0'],
       ['=SUMPRODUCT(A1:A2,B1:B2)'],
@@ -123,7 +123,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('error when different size',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '3', '1', '3'],
       ['2', '4', '2', '4'],
       ['=SUMPRODUCT(A1:B2,C1:C2)'],
@@ -135,7 +135,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works with matrices',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
         ['1', '2'],
         ['3'],
         ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
@@ -144,7 +144,7 @@ describe('Function SUMPRODUCT', () => {
   })
 
   it('works if same number of elements in ranges',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['2'],
       ['3'],

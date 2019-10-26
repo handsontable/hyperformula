@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function COUNTIF', () => {
   it('works',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -15,7 +15,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('use partial cache',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2', '=COUNTIF(A1:A3, ">=1")'],
@@ -28,7 +28,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('use full cache',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '=COUNTIF(A1:A3, ">=1")'],
       ['1', '=COUNTIF(A1:A3, ">=1")'],
       ['2'],
@@ -40,7 +40,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works for only one cell',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '=COUNTIF(A1, ">=1")'],
       ['0', '=COUNTIF(A2, ">=1")'],
     ])
@@ -50,7 +50,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('error when 1st arg is not a range',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=COUNTIF(42, ">0")'],
     ])
 
@@ -58,7 +58,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('error when 2nd arg is not a string',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=COUNTIF(C1:C2, 78)'],
     ])
 
@@ -66,7 +66,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('error when criterion unparsable',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=COUNTIF(B1:B2, "><foo")'],
     ])
 

@@ -1,11 +1,11 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import {CellError, Config, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
 import '../testConfig.ts'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(1)'],
       ['=MATCH(1, B1:B3, 0, 42)'],
     ])
@@ -15,7 +15,7 @@ describe('Function MATCH', () => {
   })
 
   it('validates that 1st argument is number, string or boolean', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(1/0, B1:B1)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function MATCH', () => {
   })
 
   it('validates that 2nd argument is range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(1, 42)'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function MATCH', () => {
   })
 
   it('validates that 3rd argument is number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(0, B1:B1, 1/0)'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - works when value is in first cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['103'],
       ['200'],
@@ -51,7 +51,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - works when value is in the last cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['200'],
@@ -63,7 +63,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - returns the position in the range, not the row number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(102, A6:A9, 0)'],
       [''],
       [''],
@@ -79,7 +79,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - returns first result', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['103'],
@@ -91,7 +91,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - doesnt return result if value after searched range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['200'],
@@ -104,7 +104,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - doesnt return result if value before searched range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A3:A5, 0)'],
       ['103'],
       ['200'],
@@ -116,7 +116,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - works when value is in first cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['103', '200', '200', '200'],
     ])
@@ -125,7 +125,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - works when value is in the last cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '200', '200', '103'],
     ])
@@ -134,7 +134,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - returns the position in the range, not the column number', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(102, E2:H2, 0)'],
       ['', '', '', '', '100', '101', '102', '103'],
     ])
@@ -143,7 +143,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - returns first result', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '103', '103', '200'],
     ])
@@ -152,7 +152,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - doesnt return result if value after searched range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '200', '200', '200', '103'],
     ])
@@ -161,7 +161,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - doesnt return result if value before searched range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(103, B2:D2, 0)'],
       ['103', '200', '200', '200'],
     ])
@@ -172,7 +172,7 @@ describe('Function MATCH', () => {
   it('uses binsearch', () => {
     const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
       ['100'],
       ['200'],
@@ -188,7 +188,7 @@ describe('Function MATCH', () => {
   it('uses indexOf', () => {
     const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],
       ['100'],
       ['200'],
@@ -202,7 +202,7 @@ describe('Function MATCH', () => {
   })
 
   it('returns lower bound match for sorted data', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MATCH(203, A2:A5, 1)'],
       ['100'],
       ['200'],

@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function SUMIFS', () => {
   it('error when 1st arg is not a range or reference',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(42, B1:B2, ">0")'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when 2nd arg is not a range or reference',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(C1:C2, 42, ">0")'],
     ])
 
@@ -20,7 +20,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when 3rd arg is not a string or number',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(C1:C2, B1:B2, 1/0)'],
     ])
 
@@ -28,7 +28,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when 4th arg is not a range or reference',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(C1:C2, B1:B2, ">0", 42, ">0")'],
     ])
 
@@ -36,7 +36,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when criterion unparsable',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(B1:B2, C1:C2, "><foo")'],
     ])
 
@@ -44,7 +44,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when different width dimension of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(B1:C1, B2:D2, ">0")'],
       ['=SUMIFS(B1, B2:D2, ">0")'],
       ['=SUMIFS(B1:D1, B2, ">0")'],
@@ -56,7 +56,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('error when different height dimension of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(B1:B2, C1:C3, ">0")'],
       ['=SUMIFS(B1, C1:C2, ">0")'],
       ['=SUMIFS(B1:B2, C1, ">0")'],
@@ -68,7 +68,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of greater than operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -79,7 +79,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of greater than or equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -90,7 +90,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of less than operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -101,7 +101,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of less than or equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -112,7 +112,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -123,7 +123,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('usage of not equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -134,7 +134,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('works when arguments are just references',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['2', '3'],
       ['=SUMIFS(B1, A1, ">1")'],
     ])
@@ -143,7 +143,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('works for subranges with different conditions',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&A1)'],
       ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&A2)'],
       ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&A3)'],
@@ -159,7 +159,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('works for subranges with inequality',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIFS(B1:B1, A1:A1, ">2")'],
       ['2', '1', '=SUMIFS(B1:B2, A1:A2, ">2")'],
       ['3', '1', '=SUMIFS(B1:B3, A1:A3, ">2")'],
@@ -173,7 +173,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('works for subranges with more interesting criterions',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIFS(B1:B1, A1:A1, "=1")'],
       ['2', '1', '=SUMIFS(B1:B2, A1:A2, "<=2")'],
       ['1', '1', '=SUMIFS(B1:B3, A1:A3, "<2")'],
@@ -187,7 +187,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('discontinuous sumif range',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&B1)'],
       ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&B2)'],
       ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&B3)'],
@@ -202,7 +202,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('using full cache',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -216,7 +216,7 @@ describe('Function SUMIFS', () => {
   })
 
   it('works for more than one criterion/range pair', () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '100', '3'],
       ['1', '101', '5'],
       ['2', '102', '7'],

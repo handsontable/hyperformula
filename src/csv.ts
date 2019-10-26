@@ -1,6 +1,6 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
-import {CellError, CellValue, Config, EmptyValue, HandsOnEngine, Sheets} from './'
+import {CellError, CellValue, Config, EmptyValue, HyperFormula, Sheets} from './'
 
 export type CsvSheets = Record<string, string>
 
@@ -15,7 +15,7 @@ function cellValueToCsvString(value: CellValue): string {
 }
 
 export class CsvExporter {
-  public static export(engine: HandsOnEngine, csvDelimiter = ',', sheetName = 'Sheet1'): string {
+  public static export(engine: HyperFormula, csvDelimiter = ',', sheetName = 'Sheet1'): string {
     const exporter = new CsvExporter(csvDelimiter)
     return exporter.exportSheetByName(engine, sheetName)
   }
@@ -27,7 +27,7 @@ export class CsvExporter {
   /**
    * Creates CSV string out of sheet content
    */
-  public exportSheetByName(engine: HandsOnEngine, sheetName: string): string {
+  public exportSheetByName(engine: HyperFormula, sheetName: string): string {
     const sheet = engine.sheetMapping.fetch(sheetName)
     const values = engine.getValues(sheet).map((row) => row.map(cellValueToCsvString))
     return stringify(values, {
@@ -35,7 +35,7 @@ export class CsvExporter {
     })
   }
 
-  public exportAllSheets(engine: HandsOnEngine): CsvSheets {
+  public exportAllSheets(engine: HyperFormula): CsvSheets {
     const sheets: CsvSheets = {}
     for (const sheetName of engine.sheetMapping.names()) {
       sheets[sheetName] = this.exportSheetByName(engine, sheetName)
@@ -55,8 +55,8 @@ export class CsvImporter {
    *
    * @param csv - csv representation of sheet
    */
-  public importSheet(csv: string, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromArray(this.csvSheetToSheet(csv), config)
+  public importSheet(csv: string, config: Config = new Config()): HyperFormula {
+    return HyperFormula.buildFromArray(this.csvSheetToSheet(csv), config)
   }
 
   /**
@@ -64,8 +64,8 @@ export class CsvImporter {
    *
    * @param csv - csv representation of sheet
    */
-  public importSheets(csvSheets: CsvSheets, config: Config = new Config()): HandsOnEngine {
-    return HandsOnEngine.buildFromSheets(this.csvSheetsToSheets(csvSheets), config)
+  public importSheets(csvSheets: CsvSheets, config: Config = new Config()): HyperFormula {
+    return HyperFormula.buildFromSheets(this.csvSheetsToSheets(csvSheets), config)
   }
 
   public csvSheetsToSheets(csvSheets: CsvSheets): Sheets {

@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Text', () => {
   it('works',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
     ]])
@@ -13,7 +13,7 @@ describe('Text', () => {
   })
 
   it('wrong number of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=TEXT(42)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Text', () => {
   })
 
   it('wrong format argument',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=TEXT(2, 42)'],
     ])
 
@@ -29,7 +29,7 @@ describe('Text', () => {
   })
 
   it('wrong date argument',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=TEXT(TRUE(), "mm/dd/yyyy")'],
     ])
 
@@ -37,7 +37,7 @@ describe('Text', () => {
   })
 
   it('day formats',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "d d")',
       '=TEXT(A1, "dd DD")',
@@ -52,7 +52,7 @@ describe('Text', () => {
   })
 
   it('month formats',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "m M")',
       '=TEXT(A1, "mm MM")',
@@ -69,7 +69,7 @@ describe('Text', () => {
   })
 
   it('year formats',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "yy YY")',
       '=TEXT(A1, "yyyy YYYY")',
@@ -80,7 +80,7 @@ describe('Text', () => {
   })
 
   it('12 hours',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "hh:mm AM/PM")',
     ]])
@@ -88,7 +88,7 @@ describe('Text', () => {
   })
 
   it('24 hours',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "HH:mm")',
     ]])
@@ -96,7 +96,7 @@ describe('Text', () => {
   })
 
   it('distinguishes between months and minutes',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "mm")',
       '=TEXT(A1, "HH:mm")',
@@ -110,7 +110,7 @@ describe('Text', () => {
   })
 
   it('works for number format',  () => {
-    const engine =  HandsOnEngine.buildFromArray([[
+    const engine =  HyperFormula.buildFromArray([[
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',

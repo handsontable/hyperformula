@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
 import {enGB, extendFunctions} from '../src/i18n'
@@ -45,7 +45,7 @@ describe('Documentation example spec', () => {
       SQUARE: 'SQUARE',
     })
     const config = new Config({ functionPlugins: [SquarePlugin], language: enGBextended })
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],

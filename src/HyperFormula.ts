@@ -48,7 +48,7 @@ export class InvalidAddressError extends Error {
 /**
  * Engine for one sheet
  */
-export class HandsOnEngine {
+export class HyperFormula {
   constructor(
       /** Engine config */
       public readonly config: Config,
@@ -73,7 +73,7 @@ export class HandsOnEngine {
    * @param sheet - two-dimensional array representation of sheet
    * @param maybeConfig - config
    */
-  public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HandsOnEngine {
+  public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
   }
 
@@ -83,7 +83,7 @@ export class HandsOnEngine {
    * @param sheets - object with sheets definition
    * @param maybeConfig - config
   * */
-  public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HandsOnEngine {
+  public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
   }
 
@@ -92,7 +92,7 @@ export class HandsOnEngine {
    *
    * @param maybeConfig - config
    * */
-  public static buildEmpty(maybeConfig?: Config): HandsOnEngine {
+  public static buildEmpty(maybeConfig?: Config): HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 

@@ -1,11 +1,11 @@
-import {CellError, Config, HandsOnEngine} from '../../src'
+import {CellError, Config, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
 import {adr} from '../testUtils'
 
-const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HandsOnEngine) => {
+const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
     it('not enough parameters', function() {
       const engine = builder([
@@ -240,7 +240,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
 describe('ColumnIndex strategy', () => {
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HandsOnEngine.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, new Config({
       useColumnIndex: true,
       ...config,
     }))
@@ -249,14 +249,14 @@ describe('ColumnIndex strategy', () => {
 
 describe('BinarySearchStrategy', () => {
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HandsOnEngine.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, new Config({
       useColumnIndex: false,
       ...config,
     }))
   })
 
   it('should calculate indexes properly when using binary search', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
         ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
         [],
         [],
@@ -272,7 +272,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should calculate indexes properly when using naitve approach', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, FALSE())'],
       [],
       [],

@@ -1,4 +1,4 @@
-import { Config, HandsOnEngine} from '../../src'
+import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { MatrixVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
@@ -15,13 +15,13 @@ import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing rows - checking if its possible', () => {
   it('no if starting row is negative', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, -1, 1)).toEqual(false)
   })
 
   it('no if starting row is not an integer', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, 1.5, 2)).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, NaN, 2)).toEqual(false)
@@ -30,13 +30,13 @@ describe('Removing rows - checking if its possible', () => {
   })
 
   it('no if ending row is negative', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, 0, -1)).toEqual(false)
   })
 
   it('no if ending row is not an integer', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, 0, 1.5)).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, 0, NaN)).toEqual(false)
@@ -45,13 +45,13 @@ describe('Removing rows - checking if its possible', () => {
   })
 
   it('no if ending row smaller than starting row', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, 1, 0)).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(1, 0, 1)).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(1.5, 0, 1)).toEqual(false)
@@ -62,7 +62,7 @@ describe('Removing rows - checking if its possible', () => {
   })
 
   it('no if theres a formula matrix in place where we remove', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
@@ -79,7 +79,7 @@ describe('Removing rows - checking if its possible', () => {
 
   it('yes if theres a numeric matrix in place where we add', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -90,7 +90,7 @@ describe('Removing rows - checking if its possible', () => {
   })
 
   it('yes otherwise', () => {
-    const engine = HandsOnEngine.buildFromArray([[]])
+    const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, 0, 0)).toEqual(true)
     expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
@@ -100,7 +100,7 @@ describe('Removing rows - checking if its possible', () => {
 
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency above removed row should not be affected', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       [''],
       ['1'],
       [''], // row to delete
@@ -113,7 +113,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Ab: absolute dependency below removed row should be shifted', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=A$3'],
       [''], // row to delete
       ['42'],
@@ -125,7 +125,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=A$2'],
       [''], // row to delete
     ])
@@ -136,7 +136,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Raa: relative dependency and formula above removed rows should not be affected', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42'],
       ['=A1'],
       ['2'],
@@ -148,7 +148,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rab: relative address should be shifted when only formula is moving', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['42'],
       ['1'],
       ['2'],
@@ -161,7 +161,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rba: relative address should be shifted when only dependency is moving', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=A4'],
       ['1'],
       ['2'],
@@ -174,7 +174,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=A4'],
@@ -186,7 +186,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rca: relative dependency in deleted row range should be replaced by #REF', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=A3'],
       ['1'],
       ['2'],
@@ -198,7 +198,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rcb: relative dependency in deleted row range should be replaced by #REF', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -210,7 +210,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   })
 
   it('case Rca, range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SUM(A2:A3)'],
       ['1'], //
       ['2'], //
@@ -222,7 +222,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
 describe('Address dependencies, Case 2: formula in sheet where we make crud with dependency to other sheet', () => {
   it('case A: should not affect absolute dependencies', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
         ['=$Sheet2.A$1'],
@@ -238,7 +238,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   })
 
   it('case Ra: removing row above formula should shift dependency', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
         ['=$Sheet2.A1'],
@@ -254,7 +254,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   })
 
   it('case Rb: removing row below formula should not affect dependency', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
         ['1'], // row to delete
@@ -272,7 +272,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 
 describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A3'],
         ['=$Sheet2.A3'],
@@ -295,7 +295,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   })
 
   it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A1'],
         ['=$Sheet2.A$1'],
@@ -313,7 +313,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   })
 
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=$Sheet2.A$1'],
         ['=$Sheet2.A1'],
@@ -331,7 +331,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   })
 
   it('does not truncate any ranges if rows are removed from different sheet', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['', '=SUM(A2:A3)'],
         ['2'],
@@ -350,7 +350,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 
 describe('Address dependencies, Case 4: remove rows in sheet different than formula or dependency sheet', () => {
   it('should not affect dependency when removing rows in not relevant sheet', function() {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
       ],
@@ -366,7 +366,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
   })
 
   it('should not affect dependency when removing rows in not relevant sheet, more sheets', function() {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
       ],
@@ -387,7 +387,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 
 describe('Removing rows - range dependencies, same sheet', () => {
   it('truncates range by one row from top if topmost row removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A3)'],
       ['1'],
       ['2'],
@@ -399,7 +399,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by one row from bottom if last row removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A3)'],
       ['1'],
       ['2'],
@@ -411,7 +411,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from top if topmost rows removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -425,7 +425,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from top if topmost rows removed - removing does not have to start with range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A3:A6)'],
       [''],
       ['3'],
@@ -440,7 +440,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from top if topmost rows removed - removing does not have to start with range but may end on start', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A3:A6)'],
       [''],
       ['3'],
@@ -455,7 +455,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from bottom if bottomest rows removed', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -469,7 +469,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -484,7 +484,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
   })
 
   it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range but may start on end', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['', '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -501,7 +501,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
 describe('Removing rows - reevaluation', () => {
   it('reevaluates cells', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)'],
       [''], // deleted
       ['3'],
@@ -513,7 +513,7 @@ describe('Removing rows - reevaluation', () => {
   })
 
   it('dont reevaluate everything', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
       [''], // deleted
       ['3'],
@@ -530,7 +530,7 @@ describe('Removing rows - reevaluation', () => {
   })
 
   it('reevaluates cells which are dependent on structure changes', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '=COLUMNS(A1:B1)'],
       ['1'],
     ])
@@ -543,7 +543,7 @@ describe('Removing rows - reevaluation', () => {
   })
 
   it('should reevaluate formula when range reduced to zero', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(A1:A2)'],
@@ -561,7 +561,7 @@ describe('Removing rows - reevaluation', () => {
 
 describe('Removing rows - matrices', () => {
   it('should not remove row with formula matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['{=MMULT(A1:B2, A1:B2)}'],
@@ -572,7 +572,7 @@ describe('Removing rows - matrices', () => {
 
   it('should remove row from numeric matrix', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -586,7 +586,7 @@ describe('Removing rows - matrices', () => {
 
   it('should remove rows when partial overlap', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -599,7 +599,7 @@ describe('Removing rows - matrices', () => {
 
   it('should remove MatrixVertex completely from graph', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -612,7 +612,7 @@ describe('Removing rows - matrices', () => {
 
   it('should remove MatrixVertex completely from graph, more rows', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['foo', 'bar'],
@@ -626,7 +626,7 @@ describe('Removing rows - matrices', () => {
 
   it('does not remove matrix vertices from graph', function() {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['1', '2'],
@@ -638,7 +638,7 @@ describe('Removing rows - matrices', () => {
 
   it('reevaluates cells dependent on matrix vertex', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A1:B3)'],
       ['1', '2'],
       ['1', '2'],
@@ -650,7 +650,7 @@ describe('Removing rows - matrices', () => {
   })
 
   it('MatrixVertex#formula should be updated', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
@@ -664,7 +664,7 @@ describe('Removing rows - matrices', () => {
   })
 
   it('MatrixVertex#address should be updated', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
@@ -679,7 +679,7 @@ describe('Removing rows - matrices', () => {
   })
 
   it('MatrixVertex#formula should be updated when different sheets', () => {
-    const engine = HandsOnEngine.buildFromSheets({
+    const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '4'],
         ['2', '5'],
@@ -699,7 +699,7 @@ describe('Removing rows - matrices', () => {
 
 describe('Removing rows - graph', function() {
   it('should remove edges from other cells to removed nodes', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=A2'], //
@@ -712,7 +712,7 @@ describe('Removing rows - graph', function() {
   })
 
   it('should remove vertices from graph', function() {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ])
@@ -722,7 +722,7 @@ describe('Removing rows - graph', function() {
   })
 
   it('works if there are empty cells removed', function() {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       [''],
       ['3'],
@@ -735,7 +735,7 @@ describe('Removing rows - graph', function() {
 
 describe('Removing rows - range mapping', function() {
   it('shift ranges in range mapping, range start below removed rows', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '=SUM(A2:A3)'],
       ['3', ''],
@@ -748,7 +748,7 @@ describe('Removing rows - range mapping', function() {
   })
 
   it('shift ranges in range mapping, range start above removed rows', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', ''],
       ['3', ''],
@@ -761,7 +761,7 @@ describe('Removing rows - range mapping', function() {
   })
 
   it('shift ranges in range mapping, whole range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -776,7 +776,7 @@ describe('Removing rows - range mapping', function() {
   })
 
   it('should remove smaller range dependency', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -795,7 +795,7 @@ describe('Removing rows - range mapping', function() {
 
 describe('Removing rows - sheet dimensions', () => {
   it('should do nothing when removed row outside effective sheet', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
     ])
 
@@ -811,7 +811,7 @@ describe('Removing rows - sheet dimensions', () => {
   });
 
   it('should do nothing when start row greater than end row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
     ])
@@ -827,7 +827,7 @@ describe('Removing rows - sheet dimensions', () => {
   });
 
   it('returns changed values', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(A1:A2)']
@@ -842,7 +842,7 @@ describe('Removing rows - sheet dimensions', () => {
 
 describe('Removing rows - column index', () => {
   it('should update column index when adding row', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
       [''],
       ['2'],

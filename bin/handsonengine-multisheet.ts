@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as readline from 'readline'
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {Sheets} from '../src'
 import {CsvExporter, CsvImporter, CsvSheets} from '../src/csv'
 
@@ -52,7 +52,7 @@ export function load(inputDir: string, csvDelimiter: string): Promise<Sheets> {
   })
 }
 
-export function save(engine: HandsOnEngine, outputDir: string) {
+export function save(engine: HyperFormula, outputDir: string) {
   const exporter = new CsvExporter()
   const sheets: CsvSheets = exporter.exportAllSheets(engine)
   if (!fs.existsSync(outputDir)) {

@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Function SUMIF', () => {
   it('error when 1st arg is not a range or reference',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(42, ">0", B1:B2)'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when 2nd arg is not a string',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(C1:C2, 78, B1:B2)'],
     ])
 
@@ -20,7 +20,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when 3rd arg is not a range or reference',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(C1:C2, ">0", 42)'],
     ])
 
@@ -28,7 +28,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when criterion unparsable',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(B1:B2, "><foo", C1:C2)'],
     ])
 
@@ -36,7 +36,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when different width dimension of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(B1:C1, ">0", B2:D2)'],
       ['=SUMIF(B1, ">0", B2:D2)'],
       ['=SUMIF(B1:D1, ">0", B2)'],
@@ -48,7 +48,7 @@ describe('Function SUMIF', () => {
   })
 
   it('error when different height dimension of arguments',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(B1:B2, ">0", C1:C3)'],
       ['=SUMIF(B1, ">0", C1:C2)'],
       ['=SUMIF(B1:B2, ">0", C1)'],
@@ -60,7 +60,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of greater than operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -71,7 +71,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of greater than or equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -82,7 +82,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of less than operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -93,7 +93,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of less than or equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -104,7 +104,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -115,7 +115,7 @@ describe('Function SUMIF', () => {
   })
 
   it('usage of not equal operator',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -126,7 +126,7 @@ describe('Function SUMIF', () => {
   })
 
   it('works when arguments are just references',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['2', '3'],
       ['=SUMIF(A1, ">1", B1)'],
     ])
@@ -135,7 +135,7 @@ describe('Function SUMIF', () => {
   })
 
   it('works for subranges with different conditions',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,"="&A1,B1:B1)'],
       ['2', '1', '=SUMIF(A1:A2,"="&A2,B1:B2)'],
       ['1', '1', '=SUMIF(A1:A3,"="&A3,B1:B3)'],
@@ -151,7 +151,7 @@ describe('Function SUMIF', () => {
   })
 
   it('works for subranges with inequality',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,">2",B1:B1)'],
       ['2', '1', '=SUMIF(A1:A2,">2",B1:B2)'],
       ['3', '1', '=SUMIF(A1:A3,">2",B1:B3)'],
@@ -165,7 +165,7 @@ describe('Function SUMIF', () => {
   })
 
   it('works for subranges with more interesting criterions',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,"=1",B1:B1)'],
       ['2', '1', '=SUMIF(A1:A2,"<=2",B1:B2)'],
       ['1', '1', '=SUMIF(A1:A3,"<2",B1:B3)'],
@@ -179,7 +179,7 @@ describe('Function SUMIF', () => {
   })
 
   it('discontinuous sumif range',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['1', '1', '=SUMIF(A1:A1,"="&A1,B1:B1)'],
       ['2', '1', '=SUMIF(A1:A2,"="&A2,B1:B2)'],
       ['1', '1', '=SUMIF(A1:A3,"="&A3,B1:B3)'],
@@ -194,7 +194,7 @@ describe('Function SUMIF', () => {
   })
 
   it('using full cache',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],

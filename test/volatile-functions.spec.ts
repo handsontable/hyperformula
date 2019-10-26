@@ -1,11 +1,11 @@
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
 import {adr} from './testUtils'
 
 describe('Interpreter - function RAND', () => {
   it('works', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42'],
     ])
     const valueBeforeRecomputation = engine.getCellValue('A1')
@@ -16,7 +16,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('cell which is dependent on volatile formula is also recomputed', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42', '=A1'],
     ])
     const valueBeforeRecomputation = engine.getCellValue('C1')
@@ -27,7 +27,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('formula can be recognized as volatile even if entered later', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=A2+A3', '42'],
     ])
 
@@ -38,7 +38,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('volatile vertices should not be recomputed after removing from graph', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42'],
     ])
 
@@ -48,7 +48,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('volatile formula after moving is still volatile', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42'],
     ])
 

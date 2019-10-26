@@ -1,4 +1,4 @@
-import {Config, HandsOnEngine, LazilyTransformingAstService} from './'
+import {Config, HyperFormula, LazilyTransformingAstService} from './'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
@@ -7,7 +7,7 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
 export class BuildEngineFromArraysFactory {
-  public buildFromSheets(sheets: Sheets, config: Config = new Config()): HandsOnEngine {
+  public buildFromSheets(sheets: Sheets, config: Config = new Config()): HyperFormula {
     const stats = new Statistics()
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
@@ -36,7 +36,7 @@ export class BuildEngineFromArraysFactory {
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
 
-    const engine = new HandsOnEngine(
+    const engine = new HyperFormula(
       config,
       stats,
       dependencyGraph,
@@ -49,7 +49,7 @@ export class BuildEngineFromArraysFactory {
     return engine
   }
 
-  public buildFromSheet(sheet: Sheet, config: Config = new Config()): HandsOnEngine {
+  public buildFromSheet(sheet: Sheet, config: Config = new Config()): HyperFormula {
     return this.buildFromSheets({Sheet1: sheet}, config)
   }
 }

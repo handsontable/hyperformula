@@ -1,14 +1,14 @@
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
 import './testConfig.ts'
 
 describe('i18n', () => {
   it('using functions in different languages', () => {
-    const enginePL = HandsOnEngine.buildFromArray([
+    const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],
     ], new Config({language: plPL}))
-    const engineEN = HandsOnEngine.buildFromArray([
+    const engineEN = HyperFormula.buildFromArray([
       ['=SUM(42)'],
     ], new Config({language: enGB}))
 

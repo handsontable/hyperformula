@@ -1,5 +1,5 @@
 import * as path from 'path'
-import {Config, HandsOnEngine} from '../src'
+import {Config, HyperFormula} from '../src'
 import {load, save, validateArguments} from './handsonengine-multisheet'
 
 async function start() {
@@ -15,7 +15,7 @@ async function start() {
 
   const sheets = await load(inputDir, ',')
   const config = new Config({ gpuMode: 'cpu' })
-  const engine = HandsOnEngine.buildFromSheets(sheets, config)
+  const engine = HyperFormula.buildFromSheets(sheets, config)
   save(engine, outputDir)
 }
 

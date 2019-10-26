@@ -1,10 +1,10 @@
-import {CellError, HandsOnEngine} from '../../src'
+import {CellError, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig.ts'
 
 describe('Function INDEX', () => {
   it('validates number of arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INDEX()'],
       ['=INDEX(B1:D3, 1, 1, 42)'],
     ])
@@ -14,7 +14,7 @@ describe('Function INDEX', () => {
   })
 
   it('requires 2nd and 3rd arguments to be integers', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INDEX(B1:B1, "foo", 1)'],
       ['=INDEX(B1:B1, 1, "bar")'],
     ])
@@ -24,7 +24,7 @@ describe('Function INDEX', () => {
   })
 
   it('requires 2nd argument to be in bounds of range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INDEX(B1:D3, -1, 1)'],
       ['=INDEX(B1:D3, 4, 1)'],
       ['=INDEX(42, -1, 1)'],
@@ -42,7 +42,7 @@ describe('Function INDEX', () => {
   })
 
   it('requires 2nd and 3rd arguments to be in bounds of range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INDEX(B1:D3, 1, -1)'],
       ['=INDEX(B1:D3, 1, 4)'],
       ['=INDEX(42, 1, -1)'],
@@ -60,7 +60,7 @@ describe('Function INDEX', () => {
   })
 
   it('works for range and nonzero arguments', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INDEX(B1:C2, 1, 1)', '1', '2'],
       ['=INDEX(B1:C2, 1, 2)', '3', '4'],
       ['=INDEX(B1:C2, 2, 1)'],

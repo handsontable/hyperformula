@@ -1,5 +1,5 @@
 import {deepStrictEqual} from 'assert'
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {sheetCellAddressToString, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
@@ -13,8 +13,8 @@ import {
 
 export class EngineComparator {
 
-  constructor(private expected: HandsOnEngine,
-              private actual: HandsOnEngine) {
+  constructor(private expected: HyperFormula,
+              private actual: HyperFormula) {
   }
 
   public compare() {
@@ -86,7 +86,7 @@ export class EngineComparator {
     }
   }
 
-  private getAddressOfVertex(engine: HandsOnEngine, vertex: Vertex, sheet: number): SimpleCellAddress | AbsoluteCellRange {
+  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex, sheet: number): SimpleCellAddress | AbsoluteCellRange {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }

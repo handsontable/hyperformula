@@ -1,10 +1,10 @@
-import {HandsOnEngine} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 
 describe('Interpreter', () => {
   it('function ISBLANK should return true for references to empty cells',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['', '=ISBLANK(A1)', '=ISBLANK($A1)', '=ISBLANK(OFFSET(C1,0,-2))', '=ISBLANK(A2)'],
       ['=A1'],
     ])
@@ -15,7 +15,7 @@ describe('Interpreter', () => {
   })
 
   it('function ISBLANK should return false if it is not reference to empty cell',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['', '=ISBLANK("")', '=ISBLANK(4)', '=ISBLANK(CONCATENATE(A1,A1))'],
     ])
     expect(engine.getCellValue('B1')).toEqual(false)
@@ -24,7 +24,7 @@ describe('Interpreter', () => {
   })
 
   it('function ISBLANK takes exactly one argument',  () => {
-    const engine =  HandsOnEngine.buildFromArray([
+    const engine =  HyperFormula.buildFromArray([
       ['=ISBLANK(A3, A2)', '=ISBLANK()'],
     ])
     expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))

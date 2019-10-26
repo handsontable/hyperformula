@@ -1,4 +1,4 @@
-import {HandsOnEngine} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src'
 import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
@@ -21,7 +21,7 @@ describe('Plugins', () => {
     const enGBextended = extendFunctions(enGB, {
       FOO: 'FOO',
     })
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], new Config({functionPlugins: [FooPlugin], language: enGBextended}))
 

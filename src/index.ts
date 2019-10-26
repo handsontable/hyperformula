@@ -1,6 +1,6 @@
 export {Sheets} from './GraphBuilder'
 export {Config} from './Config'
-export {HandsOnEngine, NoSuchSheetError, InvalidAddressError} from './HandsOnEngine'
+export {HyperFormula, NoSuchSheetError, InvalidAddressError} from './HyperFormula'
 export {CellValue, EmptyValue, CellError} from './Cell'
 export {CsvImporter, CsvExporter} from './csv'
 export {LazilyTransformingAstService} from './LazilyTransformingAstService'

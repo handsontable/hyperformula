@@ -1,8 +1,7 @@
-import {Config, EmptyValue, HandsOnEngine, InvalidAddressError, NoSuchSheetError} from '../../src'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSuchSheetError} from '../../src'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr} from '../testUtils'
-import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
 import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('changing cell content', () => {
@@ -10,7 +9,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
     let c1 = engine.addressMapping.fetchCell(adr('C1'))
@@ -31,7 +30,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -46,7 +45,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -58,7 +57,7 @@ describe('changing cell content', () => {
   })
 
   it('set vertex with edge to empty cell', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '=A1'],
     ])
 
@@ -75,7 +74,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -92,7 +91,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     let b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -109,7 +108,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue('B1')).toBe(2)
     engine.setCellContent(adr('B1'), '3')
@@ -120,7 +119,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2', '=SUM(A1:B1)'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
     const c1 = engine.addressMapping.getCell(adr('C1'))
@@ -136,7 +135,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue('B1')).toBe(2)
     engine.setCellContent(adr('B1'), '')
@@ -151,7 +150,7 @@ describe('changing cell content', () => {
       ['=A1', ''],
       ['1', 'foo'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A3'), '{=MMULT(A1:B2,A1:B2)}')
     expect(engine.addressMapping.fetchCell(adr('A3'))).toBeInstanceOf(MatrixVertex)
@@ -160,7 +159,7 @@ describe('changing cell content', () => {
   })
 
   it('#loadSheet - changing value inside range', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['3', '=SUM(A1:A3)'],
@@ -175,7 +174,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['42', ''],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('B1'), '=A1')
 
@@ -189,7 +188,7 @@ describe('changing cell content', () => {
     const sheet = [
       [''],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), '')
     const a1 = engine.addressMapping.getCell(adr('A1'))
@@ -201,7 +200,7 @@ describe('changing cell content', () => {
     const sheet = [
       [''],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), '7')
 
@@ -212,7 +211,7 @@ describe('changing cell content', () => {
     const sheet = [
       [''],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), 'foo')
 
@@ -223,7 +222,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['42', '', '=B1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('B1'), '=A1')
 
@@ -240,7 +239,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), '')
 
@@ -254,7 +253,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), '7')
 
@@ -268,7 +267,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['', '=A1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContent(adr('A1'), 'foo')
 
@@ -280,7 +279,7 @@ describe('changing cell content', () => {
 
   it('change numeric value inside matrix to another number', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], config)
@@ -295,7 +294,7 @@ describe('changing cell content', () => {
       ['1', '2'],
       ['=A1', '=B1'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b2 = engine.addressMapping.getCell(adr('B2'))
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
@@ -307,7 +306,7 @@ describe('changing cell content', () => {
   })
 
   it('should not be possible to edit part of a Matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['', '{=TRANSPOSE(A1:B1)}'],
     ])
@@ -318,7 +317,7 @@ describe('changing cell content', () => {
   })
 
   it('is not recomputed if user doesnt want it', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '=B1'],
     ])
 
@@ -331,7 +330,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     expect(() => {
       engine.setCellContent(adr('B1', 1), '3')
@@ -342,7 +341,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const address = {row: -1, col: 0, sheet: 0}
     expect(() => {
@@ -351,7 +350,7 @@ describe('changing cell content', () => {
   })
 
   it('remembers if the new formula is structure dependent', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '=TRUE()'],
       ['1'],
     ])
@@ -369,7 +368,7 @@ describe('changing cell content', () => {
       ['1']
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setCellContent(adr("A1"), '2')
 
@@ -387,7 +386,7 @@ describe('changing cell content', () => {
       ['1', '=A1']
     ]
 
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setCellContent(adr("A1"), '2')
 
@@ -412,7 +411,7 @@ describe('changing cell content', () => {
       ['3', '4'],
       ['{=MMULT(A1:B2,A1:B2)}']
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setCellContent(adr("A1"), '2')
 
@@ -425,7 +424,7 @@ describe('changing cell content', () => {
       ['1', '2'],
       ['3', '4'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    const engine = HyperFormula.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     const changes = engine.setCellContent(adr("A1"), "7")
 
@@ -445,7 +444,7 @@ describe('change multiple cells contents', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setMultipleCellContents(adr('B1'), [['3']])
     expect(engine.getCellValue('B1')).toBe(3)
@@ -456,7 +455,7 @@ describe('change multiple cells contents', () => {
       ['1', '2', '3'],
       ['4', '5', '6'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setMultipleCellContents(adr('B1'), [
       ['12', '13'],
@@ -476,7 +475,7 @@ describe('change multiple cells contents', () => {
       ['1', '2', '3'],
       ['4', '5', '6'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
     const evaluatorCallSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
 
     engine.setMultipleCellContents(adr('B1'), [
@@ -492,7 +491,7 @@ describe('change multiple cells contents', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     expect(() => {
       engine.setMultipleCellContents(adr('A1'), [['42', '{=MMULT(A1:B2,A1:B2)}']])
@@ -506,7 +505,7 @@ describe('change multiple cells contents', () => {
       ['3', '4'],
       ['5', '6'],
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
 
@@ -521,7 +520,7 @@ describe('change multiple cells contents', () => {
       ['5', '6'],
       ['=SUM(A1:B1)', '=SUM(B1:B2)']
     ]
-    const engine = HandsOnEngine.buildFromArray(sheet)
+    const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
 
@@ -532,7 +531,7 @@ describe('change multiple cells contents', () => {
 
 describe('updating column index', () => {
   it('should update column index when changing simple value', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15']
     ], new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
@@ -544,7 +543,7 @@ describe('updating column index', () => {
   })
 
   it('should update column index when changing value inside numeric matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15']
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
@@ -558,7 +557,7 @@ describe('updating column index', () => {
 
 describe('numeric matrices', () => {
   it('should not break matrix into single vertices when changing to numeric value', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
@@ -571,7 +570,7 @@ describe('numeric matrices', () => {
   })
 
   it('should allow to change numeric matrix cell to non-numeric value', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
@@ -585,7 +584,7 @@ describe('numeric matrices', () => {
 
 
   it('should break only affected matrix', () => {
-    const engine = HandsOnEngine.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       [''],
