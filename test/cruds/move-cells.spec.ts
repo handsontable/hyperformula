@@ -522,7 +522,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('overlapped rows - oposit way', () => {
+  it('overlapped rows - opposite way', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -552,7 +552,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('overlapped columns - oposit way', () => {
+  it('overlapped columns - opposite way', () => {
     const engine = HandsOnEngine.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
@@ -710,30 +710,22 @@ describe('column index', () => {
     engine.moveCells(adr("A1"), 1, 1, adr("B1"))
 
     const index = engine.columnSearch as ColumnIndex
+    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
     expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
   })
 
-  xit('should update column index when moving cell - more complex example', () => {
+  xit('should update column index when moving cell - REFs', () => {
     const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['=VLOOKUP(1, A1:A1, 1, TRUE())']
+      ['=B2', '1'],
+      ['3', '2'],
     ], new Config({ useColumnIndex: true }))
 
-    engine.moveCells(adr("A1"), 1, 1, adr("B1"))
+    engine.moveCells(adr('A1'), 1, 2, adr('B1'))
 
     const index = engine.columnSearch as ColumnIndex
-    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
-  })
-
-  xit('should update column index when moving cell - overal', () => {
-    const engine = HandsOnEngine.buildFromArray([
-      ['1'],
-      ['=VLOOKUP(1, A1:A1, 1, TRUE())']
-    ], new Config({ useColumnIndex: true }))
-
-    engine.moveCells(adr("A1"), 1, 1, adr("B1"))
-
-    const index = engine.columnSearch as ColumnIndex
-    expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
+    expect_array_with_same_content([], index.getValueIndex(0, 0, 2).index)
+    expect_array_with_same_content([], index.getValueIndex(0, 0, 3).index)
+    expect_array_with_same_content([], index.getValueIndex(0, 1, 1).index)
+    expect_array_with_same_content([1], index.getValueIndex(0, 1, 3).index)
   })
 })
