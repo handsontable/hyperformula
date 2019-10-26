@@ -45,6 +45,10 @@ export class InvalidAddressError extends Error {
   }
 }
 
+function isPositiveInteger(x: number) {
+  return Number.isInteger(x) && x > 0
+}
+
 /**
  * Engine for one sheet
  */
@@ -153,7 +157,7 @@ export class HyperFormula {
 
   /**
    * Returns map containing dimensions of all sheets.
-  * */
+   * */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
     for (const sheetName of this.sheetMapping.names()) {
@@ -466,6 +470,32 @@ export class HyperFormula {
     })
 
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
+    if (
+      invalidSimpleCellAddress(sourceLeftCorner) ||
+      !isPositiveInteger(width) ||
+      !isPositiveInteger(height) ||
+      invalidSimpleCellAddress(destinationLeftCorner) ||
+      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+    ) {
+      return false
+    }
+
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
+      return false
+    }
+
+    return true
   }
 
   /**

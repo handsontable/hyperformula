@@ -15,6 +15,82 @@ import {
 } from '../testUtils'
 import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
+describe('Removing rows - checking if its possible', () => {
+  it('source top left corner should have valid coordinates', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(simpleCellAddress(0, -1, 0), 1, 1, adr('A2'))).toEqual(false)
+  })
+
+  it('source top left corner should be in existing sheet', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1', 1), 1, 1, adr('A2'))).toEqual(false)
+  })
+
+  it('target top left corner should have valid coordinates', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1, simpleCellAddress(0, -1, 0))).toEqual(false)
+  })
+
+  it('target top left corner should be in existing sheet', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1, adr('A2', 1))).toEqual(false)
+  })
+
+  it('width should be positive integer', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1.5, 1, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 0, 1, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), NaN, 1, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), Infinity, 1, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), -Infinity, 1, adr('A2'))).toBe(false)
+  })
+
+  it('height should be positive integer', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1.5, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 0, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, NaN, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, Infinity, adr('A2'))).toBe(false)
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, -Infinity, adr('A2'))).toBe(false)
+  })
+
+  it('no if we move the range which overlaps with matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(engine.isItPossibleToMoveCells(adr('A2'), 1, 2, adr('A10'))).toBe(false)
+  })
+
+  it('no if we move to range which overlaps with matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 2, adr('B2'))).toBe(false)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToMoveCells(adr('A1'), 1, 1, adr('A2'))).toBe(true)
+  })
+})
+
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
     const engine = HyperFormula.buildFromArray([
