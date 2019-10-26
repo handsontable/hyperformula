@@ -1,6 +1,6 @@
-# HandsOnEngine
+# HyperFormula
 
-HandsOnEngine is a JavaScript engine for efficient processing of formulas in spreadsheets.
+HyperFormula is a JavaScript engine for efficient processing of formulas in spreadsheets.
 
 ## Table of Contents
 1. [What to use it for?](#what-to-use-it-for)
@@ -10,8 +10,8 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
 5. [Demos](#demos)
 5. [Basic usage](#basic-usage)
       - [Config file](#config-file)
-      - [handsonengine-convert](#handsonengine-convert)
-      - [handsonengine-diff](#handsonengine-diff)
+      - [hyperformula-convert](#hyperformula-convert)
+      - [hyperformula-diff](#hyperformula-diff)
       - [Source code](#source-code)
 6. [Errors](#errors)
 7. [Detailed description](#detailed-description)
@@ -26,7 +26,7 @@ HandsOnEngine is a JavaScript engine for efficient processing of formulas in spr
 
 ## What to use it for
 
-You can use HandsOnEngine for processing spreadsheet-like data and formulas in various ways:
+You can use HyperFormula for processing spreadsheet-like data and formulas in various ways:
 - as a standalone tool
 - as a service via an API, embedded in a larger system
 - as a spreadsheet, while combined with suitable UI
@@ -100,17 +100,17 @@ First, there are various parameters that you might want to edit in the [Config f
 - LANGUAGE - language, currently only English and Polish are supported (default: 'EN'). Other languages can be easily added by inserting translations of function names in corresponding files of [src/interpreter/](src/interpreter/).
 
 
-### handsonengine-convert
+### hyperformula-convert
 
-[This script](bin/handsonengine-diff.ts) provides a converter from a CSV file with formulas (exported from some other tool) to a CSV file with values computed by our engine.
+[This script](bin/hyperformula-diff.ts) provides a converter from a CSV file with formulas (exported from some other tool) to a CSV file with values computed by our engine.
 
 Usage:
 
 ```
-yarn ts-node bin/handsonengine-convert formulas.csv ours.csv
+yarn ts-node bin/hyperformula-convert formulas.csv ours.csv
 ```
 
-You can also call HandsOnEngine class yourself:
+You can also call HyperFormula class yourself:
 ````
 formulasCsvString = fs.readFileSync(formulasCsvPath, { encoding: 'utf8' })
 
@@ -121,14 +121,14 @@ exportedCsvString = exporter.exportSheetByName(engine, 'Sheet1')
 fs.writeFileSync(outputCsvPath, exportedCsvString)
 ````
 
-### handsonengine-diff
+### hyperformula-diff
 
-[This script](bin/handsonengine-diff.ts) provides a diff tool between 3 CSV files: a CSV file with formulars, a CSV file with expected values (exported from some other tool), and another CSV file with values computed by our engine.
+[This script](bin/hyperformula-diff.ts) provides a diff tool between 3 CSV files: a CSV file with formulars, a CSV file with expected values (exported from some other tool), and another CSV file with values computed by our engine.
 
 Usage:
 
 ```
-yarn ts-node bin/handsonengine-diff formulas.csv expected-values.csv ours.csv 0,3,7
+yarn ts-node bin/hyperformula-diff formulas.csv expected-values.csv ours.csv 0,3,7
 ```
 
 The last argument is optional and represents columns to be ignored in final diff. That argument are zero-based, comma-separated indexes of columns, so for example `0,3,7` tells the script to ignore columns `A`, `D` and `H`.
@@ -232,7 +232,7 @@ As one range can be used in different formulas, we can reuse its node and avoid 
 
 ## Implementing custom procedures
 
-HandsOnEngine can be extended by writing plugins which add new procedures to formula interpreter.
+HyperFormula can be extended by writing plugins which add new procedures to formula interpreter.
 Implementing a plugin means implementing a class deriving from `FunctionPlugin` class.
 
 This class needs to:
@@ -283,7 +283,7 @@ After writing a plugin, all you need is to instantiate an engine with config ext
 
 ```
 const config = new Config({ functionPlugins: [SquarePlugin] })
-const engine = HandsOnEngine.buildFromArray(sheet, config)
+const engine = HyperFormula.buildFromArray(sheet, config)
 ```
 
 
