@@ -90,16 +90,19 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
   })
 
-  xit('should return #REF when overriding whole range', () => {
+  it('should evaluate formula when overriding external formula dependency', () => {
     const engine = HandsOnEngine.buildFromArray([
         ['1', '2'],
         ['3', '4'],
-        ['=SUM(B1:B2)']
+        ['5', '6'],
+        ['=SUM(B1:B2)'],
+        ['=B3']
     ])
 
-    engine.moveCells(adr("A1"), 1, 2, adr("B1"))
+    engine.moveCells(adr("A1"), 1, 3, adr("B1"))
 
-    expect_function_to_have_ref_error(engine, adr("A3"))
+    expect(engine.getCellValue("A4")).toEqual(4)
+    expect(engine.getCellValue("A5")).toEqual(5)
   })
 })
 
