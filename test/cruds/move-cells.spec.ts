@@ -5,16 +5,15 @@ import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr, expect_array_with_same_content, expect_function_to_have_ref_error,
+  adr,
+  expect_array_with_same_content,
   expect_reference_to_have_ref_error,
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
   extractReference,
 } from '../testUtils'
-import {privateDecrypt} from "crypto";
 import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
-import {utc} from "moment";
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
