@@ -9,7 +9,7 @@ const CSV_DELIMITER = ','
 const FLOAT_ROUND = 2
 
 if (process.argv.length < 5) {
-  console.log('Usage:\nyarn ts-node bin/handsonengine-diff formulas.csv expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
+  console.log('Usage:\nyarn ts-node bin/hyperformula-diff formulas.csv expected.csv ours.csv 1,2,3,4\nLast argument is optional and represents indexes of columns to ignore. Zero-based, comma-separated, no spaces.')
   process.exit(1)
 }
 

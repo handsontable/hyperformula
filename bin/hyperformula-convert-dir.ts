@@ -1,10 +1,10 @@
 import * as path from 'path'
 import {Config, HyperFormula} from '../src'
-import {load, save, validateArguments} from './handsonengine-multisheet'
+import {load, save, validateArguments} from './hyperformula-multisheet'
 
 async function start() {
   if (process.argv.length < 4) {
-    console.log('Usage:\nyarn ts-node bin/handsonengine-convert-dir inputdir outputdir')
+    console.log('Usage:\nyarn ts-node bin/hyperformula-convert-dir inputdir outputdir')
     process.exit(1)
   }
 

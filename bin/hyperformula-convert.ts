@@ -4,7 +4,7 @@ import {CsvExporter, CsvImporter} from '../src'
 
 async function start() {
   if (process.argv.length < 4) {
-    console.log('Usage:\nyarn ts-node bin/handsonengine-convert formulas.csv output.csv')
+    console.log('Usage:\nyarn ts-node bin/hyperformula-convert formulas.csv output.csv')
     process.exit(1)
   }
 
