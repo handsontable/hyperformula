@@ -58,7 +58,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies, plugins = [] }) =
 const libraryBundleConfiguration = (props) => {
   const config = buildConfiguration(props)
   config.entry = "./src/index.ts"
-  config.output.library = "HandsOnEngine"
+  config.output.library = "HyperFormula"
   config.output.libraryTarget = "umd"
   return config
 }
