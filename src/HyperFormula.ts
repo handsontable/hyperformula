@@ -49,6 +49,10 @@ function isPositiveInteger(x: number) {
   return Number.isInteger(x) && x > 0
 }
 
+function isNonnegativeInteger(x: number) {
+  return Number.isInteger(x) && x >= 0
+}
+
 /**
  * Engine for one sheet
  */
@@ -291,7 +295,7 @@ export class HyperFormula {
   }
 
   public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
-    if (row < 0 || !Number.isInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
+    if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
       return false
     }
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
@@ -333,10 +337,7 @@ export class HyperFormula {
   }
 
   public isItPossibleToRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): boolean {
-    if (rowStart < 0 || !Number.isInteger(rowStart)) {
-      return false
-    }
-    if (rowEnd < 0 || !Number.isInteger(rowEnd)) {
+    if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
       return false
     }
     if (rowEnd < rowStart) {
@@ -381,7 +382,7 @@ export class HyperFormula {
   }
 
   public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
-    if (column < 0 || !Number.isInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
+    if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
       return false
     }
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
@@ -424,10 +425,7 @@ export class HyperFormula {
   }
 
   public isItPossibleToRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): boolean {
-    if (columnStart < 0 || !Number.isInteger(columnStart)) {
-      return false
-    }
-    if (columnEnd < 0 || !Number.isInteger(columnEnd)) {
+    if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
       return false
     }
     if (columnEnd < columnStart) {
