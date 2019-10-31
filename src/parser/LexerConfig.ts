@@ -51,7 +51,7 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
 /* prcoedures */
 export const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: /OFFSET/i })
-export const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z]+/})
+export const ProcedureName = createToken({name: 'ProcedureName', pattern: /[A-Za-z\u00C0-\u02AF]+/})
 
 /* terminals */
 export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})

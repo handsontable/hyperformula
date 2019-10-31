@@ -126,6 +126,15 @@ describe('ParserWithCaching', () => {
     expect(ast.args.length).toBe(0)
   })
 
+  it('function without polish characters', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const ast = parser.parse('=żółćąęźśńŻÓŁĆĄĘŹŚŃ()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('ŻÓŁĆĄĘŹŚŃŻÓŁĆĄĘŹŚŃ')
+    expect(ast.args.length).toBe(0)
+  })
+
+
   it('SUM function with args', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=SUM(1, A1)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
