@@ -134,6 +134,14 @@ describe('ParserWithCaching', () => {
     expect(ast.args.length).toBe(0)
   })
 
+  xit('function with dot separator', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toBe('NR.SER.OST.DN.MIEŚ')
+    expect(ast.args.length).toBe(0)
+  })
+
 
   it('SUM function with args', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
