@@ -16,6 +16,24 @@ describe('i18n', () => {
     expect(engineEN.getCellValue('A1')).toBe(42)
   })
 
+  it('using functions in different languages with not standard characters', () => {
+    const enginePL = HyperFormula.buildFromArray([
+      ['0'],
+      ['1'],
+      ['2'],
+      ['=LICZ.JEŻELI(A1:A3, ">=1")']
+    ], new Config({language: plPL}))
+    const engineEN = HyperFormula.buildFromArray([
+      ['0'],
+      ['1'],
+      ['2'],
+      ['=COUNTIF(A1:A3, ">=1")'],
+    ], new Config({language: enGB}))
+
+    expect(enginePL.getCellValue('A4')).toBe(2)
+    expect(engineEN.getCellValue('A4')).toBe(2)
+  })
+
   it('all function translation keys has to be upper cased', () => {
     for (const lang in languages) {
       const translationPackage = languages[lang]
