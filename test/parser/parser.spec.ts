@@ -134,7 +134,7 @@ describe('ParserWithCaching', () => {
     expect(ast.args.length).toBe(0)
   })
 
-  xit('function with dot separator', () => {
+  it('function with dot separator', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
