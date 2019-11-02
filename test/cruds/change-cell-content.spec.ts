@@ -1,8 +1,52 @@
 import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSuchSheetError} from '../../src'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {simpleCellAddress} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
+
+describe("Changing cell content - checking if its possible", () => {
+  it('address should have valid coordinates', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToChangeContent(simpleCellAddress(0, -1, 0))).toEqual(false)
+  })
+
+  it('address should be in existing sheet', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToChangeContent(adr('A1', 1))).toEqual(false)
+  })
+
+  it('no if in formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['13'],
+    ])
+
+    expect(engine.isItPossibleToChangeContent(adr('A3'))).toBe(false)
+  })
+
+  it('yes if numeric matrix', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], config)
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    expect(engine.isItPossibleToChangeContent(adr('A2'))).toBe(true)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToChangeContent(adr('A1'))).toEqual(true)
+  })
+})
 
 describe('changing cell content', () => {
   it('update formula vertex', () => {

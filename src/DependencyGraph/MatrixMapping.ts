@@ -3,6 +3,7 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {filterWith} from '../generatorUtils'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
+import {SimpleCellAddress} from '../Cell'
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -44,6 +45,15 @@ export class MatrixMapping {
   public isMatrixInRange(range: AbsoluteCellRange) {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.getRange().doesOverlap(range)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public isFormulaMatrixAtAddress(address: SimpleCellAddress) {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.getRange().addressInRange(address) && mtx.isFormula()) {
         return true
       }
     }

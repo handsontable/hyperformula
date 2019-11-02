@@ -193,6 +193,21 @@ export class HyperFormula {
     return this.stats.snapshot()
   }
 
+  public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
+    if (
+      invalidSimpleCellAddress(address) ||
+      !this.sheetMapping.hasSheetWithId(address.sheet)
+    ) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
+      return false
+    }
+
+    return true
+  }
+
   /**
    * Sets content of a cell with given address.
    *
