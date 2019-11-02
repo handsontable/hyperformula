@@ -31,6 +31,26 @@ export function add(left: CellValue, right: CellValue): number | CellError {
 }
 
 /**
+ * Subtracts two numbers
+ *
+ * Implementation of subtracting which is used in interpreter.
+ *
+ * Errors are propagated, non-numerical values are ignored.
+ *
+ * @param left - left operand of addition
+ * @param right - right operand of addition
+ */
+export function subtract(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return left - right
+  }
+}
+
+/**
  * Returns max from two numbers
  *
  * Implementation of max function which is used in interpreter.
