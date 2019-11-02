@@ -35,10 +35,10 @@ export function add(left: CellValue, right: CellValue): number | CellError {
  *
  * Implementation of subtracting which is used in interpreter.
  *
- * Errors are propagated, non-numerical values are ignored.
+ * Errors are propagated.
  *
- * @param left - left operand of addition
- * @param right - right operand of addition
+ * @param left - left operand of subtraction
+ * @param right - right operand of subtraction
  */
 export function subtract(left: number | CellError, right: number | CellError): number | CellError {
   if (left instanceof CellError) {
@@ -47,6 +47,26 @@ export function subtract(left: number | CellError, right: number | CellError): n
     return right
   } else {
     return left - right
+  }
+}
+
+/**
+ * Multiplies two numbers
+ *
+ * Implementation of multiplication which is used in interpreter.
+ *
+ * Errors are propagated.
+ *
+ * @param left - left operand of multiplication
+ * @param right - right operand of multiplication
+ */
+export function multiply(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return left * right
   }
 }
 

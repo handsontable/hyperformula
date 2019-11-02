@@ -8,7 +8,7 @@ import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, subtract} from './scalar'
+import {add, subtract, multiply} from './scalar'
 import {coerceScalarToNumber} from './coerce'
 import {concatenate} from './text'
 import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
@@ -142,11 +142,10 @@ export class Interpreter {
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult * rightResult
-        } else {
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+        return multiply(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
