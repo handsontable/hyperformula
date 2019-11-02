@@ -8,7 +8,8 @@ import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {addStrict} from './scalar'
+import {add} from './scalar'
+import {coerceScalarToNumber} from './coerce'
 import {concatenate} from './text'
 import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
 
@@ -128,7 +129,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return addStrict(leftResult, rightResult)
+        return add(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

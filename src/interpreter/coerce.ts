@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType} from '../Cell'
+import {EmptyValue, CellError, CellValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -55,5 +55,20 @@ export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeV
     return SimpleRangeValue.fromScalar(arg)
   } else {
     return null
+  }
+}
+
+export function coerceScalarToNumber(arg: CellValue): number | CellError {
+  if (arg === EmptyValue) {
+    return 0
+  }
+  if (arg instanceof CellError) {
+    return arg
+  }
+  const coercedNumber = Number(arg)
+  if (isNaN(coercedNumber)) {
+    return new CellError(ErrorType.VALUE)
+  } else {
+    return coercedNumber
   }
 }

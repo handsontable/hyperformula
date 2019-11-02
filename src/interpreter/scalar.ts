@@ -10,7 +10,7 @@ import {CellError, CellValue, ErrorType} from '../Cell'
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function add(left: CellValue, right: CellValue): CellValue {
+export function add(left: CellValue, right: CellValue): number | CellError {
   if (left instanceof CellError) {
     return left
   }

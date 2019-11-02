@@ -12,14 +12,14 @@ describe("Operator PLUS", () => {
     expect(engine.getCellValue(adr('A1'))).toBe(5)
   })
 
-  xit('use number coerce', () => {
+  it('use number coerce', () => {
     const engine = HyperFormula.buildFromArray([
       ['="2"+"3"'],
       ['="foobar"+1'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
-    expect(engine.getCellValue(adr('A2'))).toBe(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('pass error from left operand', () => {
