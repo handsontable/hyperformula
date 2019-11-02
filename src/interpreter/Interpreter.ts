@@ -8,7 +8,7 @@ import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, subtract, multiply, power, divide} from './scalar'
+import {add, subtract, multiply, power, divide, unaryminus} from './scalar'
 import {coerceScalarToNumber} from './coerce'
 import {concatenate} from './text'
 import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
@@ -164,12 +164,11 @@ export class Interpreter {
         return divide(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        const value = this.evaluateAst(ast.value, formulaAddress)
-        if (typeof value === 'number') {
-          return -value
-        } else {
+        const result = this.evaluateAst(ast.value, formulaAddress)
+        if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+        return unaryminus(coerceScalarToNumber(result))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
