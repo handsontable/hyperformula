@@ -25,6 +25,7 @@ export const plPL: TranslationPackage = {
     MIN: 'MIN',
     MMULT: 'MACIERZ.ILOCZYN',
     MONTH: 'MIESIĄC',
+    OFFSET: 'PRZESUNIĘCIE',
     OR: 'LUB',
     RAND: 'LOSUJ',
     SPLIT: 'PODZIEL.TEKST',

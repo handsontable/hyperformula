@@ -1,7 +1,8 @@
-import {HyperFormula} from '../src'
-import {Config} from '../src'
+import {Config, HyperFormula} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
 import './testConfig.ts'
+import {adr, extractReference} from "./testUtils";
+import {CellAddress} from "../src/parser";
 
 describe('i18n', () => {
   it('using functions in different languages', () => {
@@ -32,6 +33,19 @@ describe('i18n', () => {
 
     expect(enginePL.getCellValue('A4')).toBe(2)
     expect(engineEN.getCellValue('A4')).toBe(2)
+  })
+
+  it('translation works for parser hardcoded offset procedure', () => {
+    const enginePL = HyperFormula.buildFromArray([
+      ['=PRZESUNIĘCIE(A1, 1, 1)']
+    ], new Config({language: plPL}))
+    const engineEN = HyperFormula.buildFromArray([
+      ['=OFFSET(A1, 1, 1)']
+    ])
+
+
+    expect(extractReference(enginePL, adr("A1"))).toEqual(CellAddress.relative(0, 1, 1))
+    expect(extractReference(engineEN, adr("A1"))).toEqual(CellAddress.relative(0, 1, 1))
   })
 
   it('all function translation keys has to be upper cased', () => {

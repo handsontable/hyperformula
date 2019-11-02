@@ -47,7 +47,6 @@ import {
   MultiplicationOp,
   NotEqualOp,
   NumberLiteral,
-  OffsetProcedureName,
   PlusOp,
   PowerOp,
   ProcedureName,
@@ -331,7 +330,7 @@ export class FormulaParser extends Parser {
    */
   private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
     const args: Ast[] = []
-    this.CONSUME(OffsetProcedureName)
+    this.CONSUME(this.lexerConfig.OffsetProcedureName)
     this.CONSUME(LParen)
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,

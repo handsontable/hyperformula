@@ -25,6 +25,7 @@ export const enGB: TranslationPackage = {
     MIN: 'MIN',
     MMULT: 'MMULT',
     MONTH: 'MONTH',
+    OFFSET: 'OFFSET',
     OR: 'OR',
     RAND: 'RAND',
     SPLIT: 'SPLIT',

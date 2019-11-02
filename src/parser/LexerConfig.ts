@@ -50,7 +50,6 @@ export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
 /* prcoedures */
-export const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: /OFFSET/i })
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[A-Za-z\u00C0-\u02AF]+)+/})
 
 /* terminals */
@@ -71,11 +70,15 @@ export const WhiteSpace = createToken({
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
+  OffsetProcedureName: TokenType
   allTokens: TokenType[],
 }
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+
+  const offsetProcedureNameLiteral = config.language.functions['OFFSET'] || 'OFFSET'
+  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -116,6 +119,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   ]
   return {
     ArgSeparator,
+    OffsetProcedureName,
     allTokens,
   }
 }
