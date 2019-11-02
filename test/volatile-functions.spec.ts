@@ -8,22 +8,22 @@ describe('Interpreter - function RAND', () => {
     const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42'],
     ])
-    const valueBeforeRecomputation = engine.getCellValue('A1')
+    const valueBeforeRecomputation = engine.getCellValue(adr('A1'))
 
     engine.setCellContent(adr('B1'), '35')
 
-    expect(engine.getCellValue('A1')).not.toEqual(valueBeforeRecomputation)
+    expect(engine.getCellValue(adr('A1'))).not.toEqual(valueBeforeRecomputation)
   })
 
   it('cell which is dependent on volatile formula is also recomputed', () => {
     const engine = HyperFormula.buildFromArray([
       ['=RAND()', '42', '=A1'],
     ])
-    const valueBeforeRecomputation = engine.getCellValue('C1')
+    const valueBeforeRecomputation = engine.getCellValue(adr('C1'))
 
     engine.setCellContent(adr('B1'), '35')
 
-    expect(engine.getCellValue('C1')).not.toEqual(valueBeforeRecomputation)
+    expect(engine.getCellValue(adr('C1'))).not.toEqual(valueBeforeRecomputation)
   })
 
   it('formula can be recognized as volatile even if entered later', () => {

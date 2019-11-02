@@ -2,6 +2,7 @@ import {EmptyValue, HyperFormula} from '../../src'
 import {Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
+import {adr} from '../testUtils'
 import '../testConfig.ts'
 
 const configWithMatrixPlugin = new Config({functionPlugins: [MatrixPlugin]})
@@ -17,12 +18,12 @@ describe('Matrix plugin', () => {
       ['{=MMULT(A1:B3,A4:B5)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A6')).toBeCloseTo(7)
-    expect(engine.getCellValue('B6')).toBeCloseTo(10)
-    expect(engine.getCellValue('A7')).toBeCloseTo(15)
-    expect(engine.getCellValue('B7')).toBeCloseTo(22)
-    expect(engine.getCellValue('A8')).toBeCloseTo(23)
-    expect(engine.getCellValue('B8')).toBeCloseTo(34)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
+    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
+    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
+    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
   })
 
   it('matrix multiplication wrong size', () => {
@@ -36,8 +37,8 @@ describe('Matrix plugin', () => {
       ['{=mmult(A1:B3,A4:C6)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A7')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B7')).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A7'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B7'))).toEqual(EmptyValue)
   })
 
   it('matrix multiplication with string in data', () => {
@@ -48,14 +49,14 @@ describe('Matrix plugin', () => {
       ['3', '4'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('D1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C2')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('D2')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C3')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('D4')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C3')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('D4')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D4'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D4'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('nested matrix multiplication', () => {
@@ -65,10 +66,10 @@ describe('Matrix plugin', () => {
       ['{=MMULT(A1:B2, MMULT(A1:B2,A1:B2))}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A3')).toEqual(37)
-    expect(engine.getCellValue('B3')).toEqual(54)
-    expect(engine.getCellValue('A4')).toEqual(81)
-    expect(engine.getCellValue('B4')).toEqual(118)
+    expect(engine.getCellValue(adr('A3'))).toEqual(37)
+    expect(engine.getCellValue(adr('B3'))).toEqual(54)
+    expect(engine.getCellValue(adr('A4'))).toEqual(81)
+    expect(engine.getCellValue(adr('B4'))).toEqual(118)
   })
 
   it('mmult of other mmult', () => {
@@ -78,10 +79,10 @@ describe('Matrix plugin', () => {
       ['{=MMULT(A1:B2, C1:D2)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A3')).toEqual(37)
-    expect(engine.getCellValue('B3')).toEqual(54)
-    expect(engine.getCellValue('A4')).toEqual(81)
-    expect(engine.getCellValue('B4')).toEqual(118)
+    expect(engine.getCellValue(adr('A3'))).toEqual(37)
+    expect(engine.getCellValue(adr('B3'))).toEqual(54)
+    expect(engine.getCellValue(adr('A4'))).toEqual(81)
+    expect(engine.getCellValue(adr('B4'))).toEqual(118)
   })
 
   it('mmult of a number', () => {
@@ -89,7 +90,7 @@ describe('Matrix plugin', () => {
       ['{=MMULT(3, 4)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A1')).toEqual(12)
+    expect(engine.getCellValue(adr('A1'))).toEqual(12)
   })
 
   it('matrix multiplication by sumproduct', () => {
@@ -104,12 +105,12 @@ describe('Matrix plugin', () => {
       ['=SUMPRODUCT($A3:$B3,transpose(A$4:A$5))', '=SUMPRODUCT($A3:$B3,transpose(B$4:B$5))'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A6')).toBeCloseTo(7)
-    expect(engine.getCellValue('B6')).toBeCloseTo(10)
-    expect(engine.getCellValue('A7')).toBeCloseTo(15)
-    expect(engine.getCellValue('B7')).toBeCloseTo(22)
-    expect(engine.getCellValue('A8')).toBeCloseTo(23)
-    expect(engine.getCellValue('B8')).toBeCloseTo(34)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
+    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)
+    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(22)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(23)
+    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(34)
   })
 
   it('matrix maxpool', () => {
@@ -120,8 +121,8 @@ describe('Matrix plugin', () => {
       ['{=maxpool(A1:F3,3)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A4')).toBeCloseTo(23)
-    expect(engine.getCellValue('B4')).toBeCloseTo(26)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(23)
+    expect(engine.getCellValue(adr('B4'))).toBeCloseTo(26)
   })
 
   it('matrix maxpool, custom stride', () => {
@@ -133,14 +134,14 @@ describe('Matrix plugin', () => {
       ['{=maxpool(A1:F4,3,1)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A5')).toBeCloseTo(23)
-    expect(engine.getCellValue('A6')).toBeCloseTo(30)
-    expect(engine.getCellValue('B5')).toBeCloseTo(24)
-    expect(engine.getCellValue('B6')).toBeCloseTo(31)
-    expect(engine.getCellValue('C5')).toBeCloseTo(25)
-    expect(engine.getCellValue('C6')).toBeCloseTo(32)
-    expect(engine.getCellValue('D5')).toBeCloseTo(26)
-    expect(engine.getCellValue('D6')).toBeCloseTo(33)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(23)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(30)
+    expect(engine.getCellValue(adr('B5'))).toBeCloseTo(24)
+    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(31)
+    expect(engine.getCellValue(adr('C5'))).toBeCloseTo(25)
+    expect(engine.getCellValue(adr('C6'))).toBeCloseTo(32)
+    expect(engine.getCellValue(adr('D5'))).toBeCloseTo(26)
+    expect(engine.getCellValue(adr('D6'))).toBeCloseTo(33)
   })
 
   it('matrix medianpool on even square', () => {
@@ -150,9 +151,9 @@ describe('Matrix plugin', () => {
       ['{=medianpool(A1:F2,2)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A3')).toBeCloseTo(2.5)
-    expect(engine.getCellValue('B3')).toBeCloseTo(2.5)
-    expect(engine.getCellValue('C3')).toBeCloseTo(5.5)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.5)
+    expect(engine.getCellValue(adr('B3'))).toBeCloseTo(2.5)
+    expect(engine.getCellValue(adr('C3'))).toBeCloseTo(5.5)
   })
 
   it('matrix medianpool on odd square', () => {
@@ -172,9 +173,9 @@ describe('Matrix plugin', () => {
       ['{=medianpool(A1:C9,3)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A10')).toBeCloseTo(2)
-    expect(engine.getCellValue('A11')).toBeCloseTo(4)
-    expect(engine.getCellValue('A12')).toBeCloseTo(6)
+    expect(engine.getCellValue(adr('A10'))).toBeCloseTo(2)
+    expect(engine.getCellValue(adr('A11'))).toBeCloseTo(4)
+    expect(engine.getCellValue(adr('A12'))).toBeCloseTo(6)
   })
 })
 
@@ -187,12 +188,12 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE(A1:B3)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A4')).toBeCloseTo(1)
-    expect(engine.getCellValue('B4')).toBeCloseTo(3)
-    expect(engine.getCellValue('C4')).toBeCloseTo(5)
-    expect(engine.getCellValue('A5')).toBeCloseTo(2)
-    expect(engine.getCellValue('B5')).toBeCloseTo(4)
-    expect(engine.getCellValue('C5')).toBeCloseTo(6)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1)
+    expect(engine.getCellValue(adr('B4'))).toBeCloseTo(3)
+    expect(engine.getCellValue(adr('C4'))).toBeCloseTo(5)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(2)
+    expect(engine.getCellValue(adr('B5'))).toBeCloseTo(4)
+    expect(engine.getCellValue(adr('C5'))).toBeCloseTo(6)
   })
 
   it('transpose works for scalar', () => {
@@ -200,7 +201,7 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE(1)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A1')).toBeCloseTo(1)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1)
   })
 
   it('transpose returns error if argument evaluates to error', () => {
@@ -208,7 +209,7 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE(4/0)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('transpose returns VALUE when wrong type', () => {
@@ -216,6 +217,6 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE("fdsa")}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })

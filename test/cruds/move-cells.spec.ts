@@ -176,8 +176,8 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr("A1"), 1, 3, adr("B1"))
 
-    expect(engine.getCellValue("A4")).toEqual(4)
-    expect(engine.getCellValue("A5")).toEqual(5)
+    expect(engine.getCellValue(adr("A4"))).toEqual(4)
+    expect(engine.getCellValue(adr("A5"))).toEqual(5)
   })
 })
 
@@ -190,7 +190,7 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('A2'))
 
-    expect(engine.getCellValue('A2')).toEqual('foo')
+    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
   })
 
   it('should update reference of moved formula when moving to other sheet', () => {
@@ -263,8 +263,8 @@ describe('Move cells', () => {
 
     expect(engine.graph.edgesCount()).toBe(0)
     expect(engine.graph.nodesCount()).toBe(1)
-    expect(engine.getCellValue('A1')).toBe(EmptyValue)
-    expect(engine.getCellValue('A2')).toBe(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
   it('moving empty vertex', () => {
@@ -327,7 +327,7 @@ describe('Move cells', () => {
     expect(source).toBe(null)
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(target, b1)).toBe(true)
-    expect(engine.getCellValue('A2')).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 })
 
@@ -344,7 +344,7 @@ describe('moving ranges', () => {
     const range = extractRange(engine, adr('A3'))
     expect(range.start).toEqual(adr('A1'))
     expect(range.end).toEqual(adr('A2'))
-    expect(engine.getCellValue('A3')).toEqual(2)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('A2'))
@@ -374,7 +374,7 @@ describe('moving ranges', () => {
     const range = extractRange(engine, adr('A3'))
     expect(range.start).toEqual(adr('B1'))
     expect(range.end).toEqual(adr('B2'))
-    expect(engine.getCellValue('A3')).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
 
     expect(engine.addressMapping.getCell(adr('A1'))).toBe(null)
     expect(engine.addressMapping.getCell(adr('A2'))).toBe(null)
@@ -439,7 +439,7 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(source, range)).toBe(true)
     expect(engine.graph.existsEdge(target, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
-    expect(engine.getCellValue('A2')).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['', '=SUM(A1:A2)'],

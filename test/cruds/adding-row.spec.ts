@@ -120,9 +120,9 @@ describe('Adding row - reevaluation', () => {
       ['2'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
     engine.addRows(0, 1, 1)
-    expect(engine.getCellValue('B1')).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
 
   it('dont reevaluate everything', () => {
@@ -258,13 +258,13 @@ describe('Adding row - matrices adjustments', () => {
       ['3', '4'],
     ], config)
 
-    expect(engine.getCellValue('A2')).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
 
     engine.addRows(0, 1, 2)
 
-    expect(engine.getCellValue('A2')).toEqual(0)
-    expect(engine.getCellValue('A3')).toEqual(0)
-    expect(engine.getCellValue('A4')).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 })
 

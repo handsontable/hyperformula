@@ -22,8 +22,8 @@ describe('Disable matrix optimizatoins', () => {
     expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('A2'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)
-    expect(engine.getCellValue('A1')).toBe(1)
-    expect(engine.getCellValue('B2')).toBe(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B2'))).toBe(4)
   })
 
   it('should update edges between matrix and range', () => {

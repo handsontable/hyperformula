@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Interpreter', () => {
   it('function EXP happy path',  () => {
@@ -8,8 +9,8 @@ describe('Interpreter', () => {
       ['=EXP(0)', '=EXP(2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1)
-    expect(engine.getCellValue('B1')).toBeCloseTo(7.38905609893065)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(7.38905609893065)
   })
 
   it('function EXP given wrong argument type',  () => {
@@ -17,7 +18,7 @@ describe('Interpreter', () => {
       ['=EXP("foo")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('function EXP given wrong number of arguments',  () => {
@@ -26,7 +27,7 @@ describe('Interpreter', () => {
       ['=EXP(1, 2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
   })
 })

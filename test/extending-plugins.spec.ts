@@ -2,6 +2,7 @@ import {HyperFormula} from '../src'
 import {Config} from '../src'
 import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
+import {adr} from './testUtils'
 import './testConfig.ts'
 
 class FooPlugin extends FunctionPlugin {
@@ -25,6 +26,6 @@ describe('Plugins', () => {
       ['=foo()'],
     ], new Config({functionPlugins: [FooPlugin], language: enGBextended}))
 
-    expect(engine.getCellValue('A1')).toBe(42)
+    expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 })

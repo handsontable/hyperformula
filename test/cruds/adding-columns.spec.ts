@@ -115,9 +115,9 @@ describe('Adding column - reevaluation', () => {
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(0)
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
     engine.addColumns(0, 1, 1)
-    expect(engine.getCellValue('D1')).toEqual(1)
+    expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 
   it('dont reevaluate everything', () => {
@@ -227,13 +227,13 @@ describe('Adding column', () => {
       ['3', '4'],
     ], config)
 
-    expect(engine.getCellValue('B1')).toEqual(2)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
 
     engine.addColumns(0, 1, 2)
 
-    expect(engine.getCellValue('B1')).toEqual(0)
-    expect(engine.getCellValue('C1')).toEqual(0)
-    expect(engine.getCellValue('D1')).toEqual(2)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 })
 

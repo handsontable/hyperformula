@@ -507,9 +507,9 @@ describe('Removing rows - reevaluation', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
     engine.removeRows(0, 1, 1)
-    expect(engine.getCellValue('B1')).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
   })
 
   it('dont reevaluate everything', () => {
@@ -646,7 +646,7 @@ describe('Removing rows - matrices', () => {
 
     engine.removeRows(0, 1, 1)
 
-    expect(engine.getCellValue('C1')).toEqual(6)
+    expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
 
   it('MatrixVertex#formula should be updated', () => {

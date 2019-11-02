@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 import '../testConfig'
 
 describe('Interpreter - function RAND', () => {
@@ -8,8 +9,8 @@ describe('Interpreter - function RAND', () => {
       ['=RAND()'],
     ])
 
-    expect(engine.getCellValue('A1')).toBeGreaterThanOrEqual(0.0)
-    expect(engine.getCellValue('A1')).toBeLessThan(1.0)
+    expect(engine.getCellValue(adr('A1'))).toBeGreaterThanOrEqual(0.0)
+    expect(engine.getCellValue(adr('A1'))).toBeLessThan(1.0)
   })
 
   it('validates number of arguments', () => {
@@ -17,6 +18,6 @@ describe('Interpreter - function RAND', () => {
       ['=RAND(42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 })

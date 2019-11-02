@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function MEDIAN', () => {
   it('single number', () => {
@@ -8,7 +9,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(1)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('two numbers', () => {
@@ -16,7 +17,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(1, 2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1.5)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
   })
 
   it('more numbers (odd)', () => {
@@ -24,7 +25,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(3, 1, 2, 5, 7)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
   it('more numbers (even)', () => {
@@ -32,7 +33,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(3, 4, 1, 2, 5, 7)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(3.5)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3.5)
   })
 
   it('works with ranges', () => {
@@ -41,7 +42,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(A1:C1)'],
     ])
 
-    expect(engine.getCellValue('A2')).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
   it('propagates error from regular argument', () => {
@@ -49,7 +50,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('propagates first error from range argument', () => {
@@ -57,7 +58,7 @@ describe('Function MEDIAN', () => {
       ['=3/0', '=FOO', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error when an argument is not a number', () => {
@@ -65,7 +66,7 @@ describe('Function MEDIAN', () => {
       ['foo', '=MEDIAN(A1)'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('return error when range argument contains not a number', () => {
@@ -73,7 +74,7 @@ describe('Function MEDIAN', () => {
       ['5', 'foo', '=MEDIAN(A1:B1)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('return error when no arguments', () => {
@@ -81,6 +82,6 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 })

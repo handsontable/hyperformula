@@ -5,6 +5,7 @@ import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'
+import {adr} from './testUtils'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -51,9 +52,9 @@ describe('Documentation example spec', () => {
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
     ], config)
-    expect(engine.getCellValue('A1')).toEqual(4)
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })

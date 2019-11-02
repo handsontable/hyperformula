@@ -129,11 +129,7 @@ export class HyperFormula {
    *
    * @param stringAddress - cell coordinates (e.g. 'A1')
    */
-  public getCellValue(stringAddress: string): CellValue {
-    const address = cellAddressFromString(this.sheetMapping.fetch, stringAddress, CellAddress.absolute(0, 0, 0))
-    if (address === undefined) {
-      return EmptyValue
-    }
+  public getCellValue(address: SimpleCellAddress): CellValue {
     return this.dependencyGraph.getCellValue(address)
   }
 

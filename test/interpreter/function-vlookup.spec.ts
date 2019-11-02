@@ -12,7 +12,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3)'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
     })
 
     it('to many parameters', function() {
@@ -20,7 +20,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
     })
 
     it('wrong type of first argument', function() {
@@ -28,7 +28,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     })
 
     it('wrong type of second argument', function() {
@@ -36,7 +36,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     })
 
     it('wrong type of third argument', function() {
@@ -44,7 +44,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     })
 
     it('wrong type of fourth argument', function() {
@@ -52,7 +52,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 2, "bar")'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     })
 
     it('should return error when index argument greater that range width', () => {
@@ -60,7 +60,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 3)'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
     })
   })
 
@@ -75,7 +75,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(2, A1:B5, 2)'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue('A6')).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
 
     it('should find value in sorted range using linearSearch', () => {
@@ -88,7 +88,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue('A6')).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
 
     it('should find value in unsorted range using linearSearch', () => {
@@ -101,7 +101,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue('A6')).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
     it('should find value in unsorted range using linearSearch', () => {
@@ -114,7 +114,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue('A6')).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
     it('should find value in sorted range with different types', () => {
@@ -127,7 +127,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue('A6')).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
     it('should find value in unsorted range with different types', () => {
@@ -140,7 +140,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue('A6')).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
     it('should return lower bound for sorted values', () => {
@@ -151,7 +151,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue('A4')).toEqual('c')
+      expect(engine.getCellValue(adr('A4'))).toEqual('c')
     })
 
     it('should return error when all values are greater', () => {
@@ -162,7 +162,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NA))
     })
 
     it('should return error when value not present using linear search', () => {
@@ -173,7 +173,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A1:B3, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue('A4')).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NA))
     })
 
     it('should find value if index build during evaluation', () => {
@@ -184,7 +184,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue('A4')).toEqual('a')
+      expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
 
     it('should properly calculate absolute row index', () => {
@@ -196,7 +196,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
           ['3'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(3)
+      expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
     it('should work for detected matrices', () => {
@@ -207,7 +207,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['3'],
       ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
-      expect(engine.getCellValue('A1')).toEqual(3)
+      expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
     it('should work for standard matrices', () => {
@@ -218,7 +218,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toEqual(6)
     })
 
     it('should work after updating standard matrix', () => {
@@ -229,11 +229,11 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
 
       engine.setCellContent(adr('C2'), '4')
 
-      expect(engine.getCellValue('A1')).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toEqual(6)
     })
   })
 }
@@ -268,7 +268,7 @@ describe('BinarySearchStrategy', () => {
         ['5'],
     ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
 
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('should calculate indexes properly when using naitve approach', () => {
@@ -284,6 +284,6 @@ describe('BinarySearchStrategy', () => {
       ['5'],
     ], new Config({ useColumnIndex: false }))
 
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 })

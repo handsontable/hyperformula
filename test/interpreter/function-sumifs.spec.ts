@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 import '../testConfig'
 
 describe('Function SUMIFS', () => {
@@ -8,7 +9,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(42, B1:B2, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 2nd arg is not a range or reference',  () => {
@@ -16,7 +17,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(C1:C2, 42, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 3rd arg is not a string or number',  () => {
@@ -24,7 +25,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(C1:C2, B1:B2, 1/0)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 4th arg is not a range or reference',  () => {
@@ -32,7 +33,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(C1:C2, B1:B2, ">0", 42, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -40,7 +41,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B2, C1:C2, "><foo")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -50,9 +51,9 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:D1, B2, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -62,9 +63,9 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B2, C1, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('usage of greater than operator',  () => {
@@ -75,7 +76,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, ">1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(7)
+    expect(engine.getCellValue(adr('A4'))).toEqual(7)
   })
 
   it('usage of greater than or equal operator',  () => {
@@ -86,7 +87,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, ">=1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(12)
+    expect(engine.getCellValue(adr('A4'))).toEqual(12)
   })
 
   it('usage of less than operator',  () => {
@@ -97,7 +98,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B2, A1:A2, "<1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
   it('usage of less than or equal operator',  () => {
@@ -108,7 +109,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, "<=1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(8)
+    expect(engine.getCellValue(adr('A4'))).toEqual(8)
   })
 
   it('usage of equal operator',  () => {
@@ -119,7 +120,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, "=1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
   it('usage of not equal operator',  () => {
@@ -130,7 +131,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, "<>1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
   it('works when arguments are just references',  () => {
@@ -139,7 +140,7 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1, A1, ">1")'],
     ])
 
-    expect(engine.getCellValue('A2')).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
   it('works for subranges with different conditions',  () => {
@@ -151,11 +152,11 @@ describe('Function SUMIFS', () => {
       ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&A5)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(1)
-    expect(engine.getCellValue('C2')).toEqual(1)
-    expect(engine.getCellValue('C3')).toEqual(2)
-    expect(engine.getCellValue('C4')).toEqual(1)
-    expect(engine.getCellValue('C5')).toEqual(3)
+    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C2'))).toEqual(1)
+    expect(engine.getCellValue(adr('C3'))).toEqual(2)
+    expect(engine.getCellValue(adr('C4'))).toEqual(1)
+    expect(engine.getCellValue(adr('C5'))).toEqual(3)
   })
 
   it('works for subranges with inequality',  () => {
@@ -166,10 +167,10 @@ describe('Function SUMIFS', () => {
       ['4', '1', '=SUMIFS(B1:B4, A1:A4, ">2")'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(0)
-    expect(engine.getCellValue('C2')).toEqual(0)
-    expect(engine.getCellValue('C3')).toEqual(1)
-    expect(engine.getCellValue('C4')).toEqual(2)
+    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C2'))).toEqual(0)
+    expect(engine.getCellValue(adr('C3'))).toEqual(1)
+    expect(engine.getCellValue(adr('C4'))).toEqual(2)
   })
 
   it('works for subranges with more interesting criterions',  () => {
@@ -180,10 +181,10 @@ describe('Function SUMIFS', () => {
       ['1', '1', '=SUMIFS(B1:B4, A1:A4, ">4")'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(1)
-    expect(engine.getCellValue('C2')).toEqual(2)
-    expect(engine.getCellValue('C3')).toEqual(2)
-    expect(engine.getCellValue('C4')).toEqual(0)
+    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C2'))).toEqual(2)
+    expect(engine.getCellValue(adr('C3'))).toEqual(2)
+    expect(engine.getCellValue(adr('C4'))).toEqual(0)
   })
 
   it('discontinuous sumif range',  () => {
@@ -195,10 +196,10 @@ describe('Function SUMIFS', () => {
       ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&B5)'],
     ])
 
-    expect(engine.getCellValue('C1')).toEqual(1)
-    expect(engine.getCellValue('C2')).toEqual(1)
-    expect(engine.getCellValue('C3')).toEqual(2)
-    expect(engine.getCellValue('C5')).toEqual(3)
+    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C2'))).toEqual(1)
+    expect(engine.getCellValue(adr('C3'))).toEqual(2)
+    expect(engine.getCellValue(adr('C5'))).toEqual(3)
   })
 
   it('using full cache',  () => {
@@ -210,8 +211,8 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B3, A1:A3, "=1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(5)
-    expect(engine.getCellValue('A5')).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A5'))).toEqual(5)
     expect(engine.stats.sumifFullCacheUsed).toEqual(1)
   })
 
@@ -223,6 +224,6 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(C1:C3, A1:A3, ">=1", B1:B3, "<102")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 })

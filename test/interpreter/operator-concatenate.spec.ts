@@ -1,5 +1,6 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 import '../testConfig'
 
 describe('Interpreter - concatenate operator', () => {
@@ -8,7 +9,7 @@ describe('Interpreter - concatenate operator', () => {
       ['="foo"&"bar"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe('foobar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foobar')
   })
 
   it('Ampersand with cell address', () => {
@@ -16,7 +17,7 @@ describe('Interpreter - concatenate operator', () => {
       ['foo', '=A1&"bar"'],
     ])
 
-    expect(engine.getCellValue('B1')).toBe('foobar')
+    expect(engine.getCellValue(adr('B1'))).toBe('foobar')
   })
 
   it('Ampersand with number', () => {
@@ -24,7 +25,7 @@ describe('Interpreter - concatenate operator', () => {
       ['=1&2'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe('12')
+    expect(engine.getCellValue(adr('A1'))).toBe('12')
   })
 
   it('Ampersand with bool', () => {
@@ -32,7 +33,7 @@ describe('Interpreter - concatenate operator', () => {
       ['="foo"&TRUE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe('footrue')
+    expect(engine.getCellValue(adr('A1'))).toBe('footrue')
   })
 
   it('Ampersand with error', () => {
@@ -40,6 +41,6 @@ describe('Interpreter - concatenate operator', () => {
       ['=1/0', '=A1&TRUE()'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })

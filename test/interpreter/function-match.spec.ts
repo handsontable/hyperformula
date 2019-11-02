@@ -2,6 +2,7 @@ import {CellError, Config, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
 import '../testConfig.ts'
+import {adr} from '../testUtils'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
@@ -10,8 +11,8 @@ describe('Function MATCH', () => {
       ['=MATCH(1, B1:B3, 0, 42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('validates that 1st argument is number, string or boolean', () => {
@@ -19,7 +20,7 @@ describe('Function MATCH', () => {
       ['=MATCH(1/0, B1:B1)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('validates that 2nd argument is range', () => {
@@ -27,7 +28,7 @@ describe('Function MATCH', () => {
       ['=MATCH(1, 42)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('validates that 3rd argument is number', () => {
@@ -35,7 +36,7 @@ describe('Function MATCH', () => {
       ['=MATCH(0, B1:B1, 1/0)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('column - works when value is in first cell', () => {
@@ -47,7 +48,7 @@ describe('Function MATCH', () => {
       ['200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('column - works when value is in the last cell', () => {
@@ -59,7 +60,7 @@ describe('Function MATCH', () => {
       ['103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('column - returns the position in the range, not the row number', () => {
@@ -75,7 +76,7 @@ describe('Function MATCH', () => {
       ['103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
   it('column - returns first result', () => {
@@ -87,7 +88,7 @@ describe('Function MATCH', () => {
       ['200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
   it('column - doesnt return result if value after searched range', () => {
@@ -100,7 +101,7 @@ describe('Function MATCH', () => {
       ['103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('column - doesnt return result if value before searched range', () => {
@@ -112,7 +113,7 @@ describe('Function MATCH', () => {
       ['200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('row - works when value is in first cell', () => {
@@ -121,7 +122,7 @@ describe('Function MATCH', () => {
       ['103', '200', '200', '200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('row - works when value is in the last cell', () => {
@@ -130,7 +131,7 @@ describe('Function MATCH', () => {
       ['200', '200', '200', '103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('row - returns the position in the range, not the column number', () => {
@@ -139,7 +140,7 @@ describe('Function MATCH', () => {
       ['', '', '', '', '100', '101', '102', '103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
   it('row - returns first result', () => {
@@ -148,7 +149,7 @@ describe('Function MATCH', () => {
       ['200', '103', '103', '200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
   it('row - doesnt return result if value after searched range', () => {
@@ -157,7 +158,7 @@ describe('Function MATCH', () => {
       ['200', '200', '200', '200', '103'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('row - doesnt return result if value before searched range', () => {
@@ -166,7 +167,7 @@ describe('Function MATCH', () => {
       ['103', '200', '200', '200'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('uses binsearch', () => {
@@ -182,7 +183,7 @@ describe('Function MATCH', () => {
     ], new Config({ vlookupThreshold: 1 }))
 
     expect(spy).not.toHaveBeenCalled()
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('uses indexOf', () => {
@@ -198,7 +199,7 @@ describe('Function MATCH', () => {
     ], new Config({ vlookupThreshold: 1 }))
 
     expect(spy).toHaveBeenCalled()
-    expect(engine.getCellValue('A1')).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('returns lower bound match for sorted data', () => {
@@ -211,6 +212,6 @@ describe('Function MATCH', () => {
       ['500'],
     ], new Config({ vlookupThreshold: 1 }))
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 })

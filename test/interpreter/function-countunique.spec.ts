@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function COUNTUNIQUE', () => {
   it('error when no arguments', () => {
@@ -8,7 +9,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('errors in arguments are propagated', () => {
@@ -16,7 +17,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(5/0)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('single number', () => {
@@ -24,7 +25,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(1)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('two numbers', () => {
@@ -32,7 +33,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(1, 2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
   it('three numbers', () => {
@@ -40,7 +41,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(2, 1, 2)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
   it('three numbers', () => {
@@ -48,6 +49,6 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(2, 1, 1)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 })

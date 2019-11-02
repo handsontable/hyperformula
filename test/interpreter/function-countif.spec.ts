@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function COUNTIF', () => {
   it('works',  () => {
@@ -11,7 +12,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(A1:A3, ">=1")'],
     ])
 
-    expect(engine.getCellValue('A4')).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
   it('use partial cache',  () => {
@@ -22,8 +23,8 @@ describe('Function COUNTIF', () => {
       ['3', '=COUNTIF(A1:A4, ">=1")'],
     ])
 
-    expect(engine.getCellValue('B3')).toEqual(2)
-    expect(engine.getCellValue('B4')).toEqual(3)
+    expect(engine.getCellValue(adr('B3'))).toEqual(2)
+    expect(engine.getCellValue(adr('B4'))).toEqual(3)
     expect(engine.stats.countifPartialCacheUsed).toEqual(1)
   })
 
@@ -34,8 +35,8 @@ describe('Function COUNTIF', () => {
       ['2'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(2)
-    expect(engine.getCellValue('B2')).toEqual(2)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.getCellValue(adr('B2'))).toEqual(2)
     expect(engine.stats.countifFullCacheUsed).toEqual(1)
   })
 
@@ -45,8 +46,8 @@ describe('Function COUNTIF', () => {
       ['0', '=COUNTIF(A2, ">=1")'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(1)
-    expect(engine.getCellValue('B2')).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(0)
   })
 
   it('error when 1st arg is not a range',  () => {
@@ -54,7 +55,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(42, ">0")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when 2nd arg is not a string',  () => {
@@ -62,7 +63,7 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(C1:C2, 78)'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -70,6 +71,6 @@ describe('Function COUNTIF', () => {
       ['=COUNTIF(B1:B2, "><foo")'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })

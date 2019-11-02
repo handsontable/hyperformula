@@ -439,11 +439,11 @@ describe('Removing columns - reevaluation', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(B1:D1)', '2', '4', '3'],
     ])
-    expect(engine.getCellValue('A1')).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
 
     engine.removeColumns(0, 2, 2)
 
-    expect(engine.getCellValue('A1')).toEqual(2.5)
+    expect(engine.getCellValue(adr('A1'))).toEqual(2.5)
   })
 
   it('dont reevaluate everything', () => {
@@ -585,11 +585,11 @@ describe('Removing columns - matrices', () => {
       ['=SUM(A1:C2)'],
     ], config)
 
-    expect(engine.getCellValue('A3')).toEqual(9)
+    expect(engine.getCellValue(adr('A3'))).toEqual(9)
 
     engine.removeColumns(0, 1, 1)
 
-    expect(engine.getCellValue('A3')).toEqual(6)
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
   })
 
   it('MatrixVertex#formula should be updated', () => {

@@ -1,6 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Interpreter - Boolean operators', () => {
   it('Equals operator - numbers',  () => {
@@ -10,9 +11,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=TRUE()=TRUE()', '=FALSE()=FALSE()', '=TRUE()=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(false)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('Equals operator - strings',  () => {
@@ -20,9 +21,9 @@ describe('Interpreter - Boolean operators', () => {
       ['="abc"="abc"', '="foo"="bar"', '="a"="foo"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('Equals operator - booleans',  () => {
@@ -30,9 +31,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=TRUE()=TRUE()', '=FALSE()=FALSE()', '=TRUE()=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('Equal operator with different types',  () => {
@@ -40,10 +41,10 @@ describe('Interpreter - Boolean operators', () => {
       ['="foo"=1', '="foo"=TRUE()', '=1="foo"', '=TRUE()="foo"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(false)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(false)
-    expect(engine.getCellValue('D1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
   })
 
   it('Equals operator with error',  () => {
@@ -51,8 +52,8 @@ describe('Interpreter - Boolean operators', () => {
         ['=1/0', '=A1=2', '=2=A1'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('Not equals operator - numbers',  () => {
@@ -60,9 +61,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=1<>2', '=1<>1', '=1+2<>3'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('Not equals operator - strings',  () => {
@@ -70,9 +71,9 @@ describe('Interpreter - Boolean operators', () => {
       ['="abc"<>"abc"', '="foo"<>"bar"', '="a"<>"foo"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(false)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('Not equals operator - booleans',  () => {
@@ -80,9 +81,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=TRUE()<>TRUE()', '=FALSE()<>FALSE()', '=TRUE()<>FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(false)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('Not equals operator with error',  () => {
@@ -90,8 +91,8 @@ describe('Interpreter - Boolean operators', () => {
       ['=1/0', '=A1<>2', '=2<>A1'],
     ])
 
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('Not Equal operator with different types',  () => {
@@ -99,10 +100,10 @@ describe('Interpreter - Boolean operators', () => {
       ['="foo"<>1', '="foo"<>TRUE()', '=1<>"foo"', '=TRUE()<>"foo"'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
   it('Less than operator with number arguments',  () => {
@@ -110,10 +111,10 @@ describe('Interpreter - Boolean operators', () => {
         ['=1<2', '=2<2', '=-3<4', '=-4<-3'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
   it('Less than operator with wrong arguments',  () => {
@@ -121,9 +122,9 @@ describe('Interpreter - Boolean operators', () => {
         ['=1<"foo"', '="foo"<"bar"', '=TRUE()<FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Greater than operator with number arguments',  () => {
@@ -131,10 +132,10 @@ describe('Interpreter - Boolean operators', () => {
       ['=2>1', '=2>2', '=4>-3', '=-3>-4'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(false)
-    expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
   it('Greater than operator with wrong arguments',  () => {
@@ -142,9 +143,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=1>"foo"', '="foo">"bar"', '=TRUE()>FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Less than or equal operator with number arguments',  () => {
@@ -152,11 +153,11 @@ describe('Interpreter - Boolean operators', () => {
       ['=1<=2', '=2<=2', '=-3<=4', '=-4<=-3', '=5<=4'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toBe(true)
-    expect(engine.getCellValue('E1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('Less than or equal operator with wrong arguments',  () => {
@@ -164,9 +165,9 @@ describe('Interpreter - Boolean operators', () => {
       ['=1<="foo"', '="foo"<="bar"', '=TRUE()<=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('Greater than or equal operator with number arguments',  () => {
@@ -174,11 +175,11 @@ describe('Interpreter - Boolean operators', () => {
       ['=2>=1', '=2>=2', '=4>=-3', '=-3>=-4', '=4>=5'],
     ])
 
-    expect(engine.getCellValue('A1')).toBe(true)
-    expect(engine.getCellValue('B1')).toBe(true)
-    expect(engine.getCellValue('C1')).toBe(true)
-    expect(engine.getCellValue('D1')).toBe(true)
-    expect(engine.getCellValue('E1')).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('Greater than or equal operator with wrong arguments',  () => {
@@ -186,8 +187,8 @@ describe('Interpreter - Boolean operators', () => {
       ['=1>="foo"', '="foo">="bar"', '=TRUE()>=FALSE()'],
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('B1')).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue('C1')).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })
