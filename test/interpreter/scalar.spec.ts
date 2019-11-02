@@ -1,5 +1,5 @@
 import {CellError, ErrorType} from '../../src/Cell'
-import {add, addStrict, max, min} from '../../src/interpreter/scalar'
+import {add, max, min} from '../../src/interpreter/scalar'
 import '../testConfig'
 
 describe('add', () => {
@@ -69,25 +69,5 @@ describe('min', () => {
 
   it('returns positive infinity if only non-numerics', () => {
     expect(min('bar', 'foo')).toEqual(Number.POSITIVE_INFINITY)
-  })
-})
-
-describe('addStrict', () => {
-  it('adds', () => {
-    expect(addStrict(2, 3)).toEqual(5)
-  })
-
-  it('return error of right operand', () => {
-    expect(addStrict(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-  })
-
-  it('return error of left operand if both present', () => {
-    expect(addStrict(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
-  })
-
-  it('error when non-numerics', () => {
-    expect(addStrict('foo', 5)).toEqual(new CellError(ErrorType.VALUE))
-    expect(addStrict(5, 'foo')).toEqual(new CellError(ErrorType.VALUE))
-    expect(addStrict('bar', 'foo')).toEqual(new CellError(ErrorType.VALUE))
   })
 })

@@ -89,28 +89,3 @@ export function min(left: CellValue, right: CellValue): CellValue {
     return Number.POSITIVE_INFINITY
   }
 }
-
-/**
- * Adds two numbers
- *
- * Implementation of adding which is used in interpreter.
- *
- * Errors are propagated, non-numerical values cause it to return VALUE error.
- *
- * @param left - left operand of addition
- * @param right - right operand of addition
- */
-export function addStrict(left: CellValue, right: CellValue): CellValue {
-  if (left instanceof CellError) {
-    return left
-  }
-  if (right instanceof CellError) {
-    return right
-  }
-
-  if (typeof left === 'number' && typeof right === 'number') {
-    return left + right
-  } else {
-    return new CellError(ErrorType.VALUE)
-  }
-}
