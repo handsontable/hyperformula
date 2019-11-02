@@ -28,14 +28,3 @@ export function count<T>(iterable: IterableIterator<T>): number {
   }
   return counter
 }
-
-export function * zip<T1, T2>(iterable1: IterableIterator<T1>, iterable2: IterableIterator<T2>): IterableIterator<[T1, T2]> {
-  const asSplit1 = split(iterable1)
-  const asSplit2 = split(iterable2)
-
-  if (asSplit1.hasOwnProperty('value') && asSplit2.hasOwnProperty('value')) {
-    yield [asSplit1.value as T1, asSplit2.value as T2]
-
-    yield * zip(asSplit1.rest, asSplit2.rest)
-  }
-}
