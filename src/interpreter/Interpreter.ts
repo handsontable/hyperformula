@@ -206,9 +206,6 @@ export class Interpreter {
         }
         return new CellError(ErrorType.NAME)
       }
-      default: {
-        throw Error('Not supported Ast node type')
-      }
     }
   }
 
