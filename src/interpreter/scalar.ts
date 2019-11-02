@@ -80,6 +80,18 @@ export function power(left: number | CellError, right: number | CellError): numb
   }
 }
 
+export function divide(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else if (right === 0) {
+    return new CellError(ErrorType.DIV_BY_ZERO)
+  } else {
+    return (left / right)
+  }
+}
+
 /**
  * Returns max from two numbers
  *

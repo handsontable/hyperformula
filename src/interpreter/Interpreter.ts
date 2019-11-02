@@ -8,7 +8,7 @@ import {NotComputedMatrix, Matrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, subtract, multiply, power} from './scalar'
+import {add, subtract, multiply, power, divide} from './scalar'
 import {coerceScalarToNumber} from './coerce'
 import {concatenate} from './text'
 import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
@@ -158,14 +158,10 @@ export class Interpreter {
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          if (rightResult === 0) {
-            return new CellError(ErrorType.DIV_BY_ZERO)
-          }
-          return leftResult / rightResult
-        } else {
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+        return divide(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const value = this.evaluateAst(ast.value, formulaAddress)
