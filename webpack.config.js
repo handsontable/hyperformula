@@ -1,12 +1,13 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const chevrotain = require('chevrotain');
+const Config = require('./lib/src').Config;
 const buildLexerConfig = require('./lib/src/parser/LexerConfig.js').buildLexerConfig;
 const WebpackBar = require('webpackbar');
 
 // We need to compute token names, these variables can't be mangled.
 // http://sap.github.io/chevrotain/docs/FAQ.html#MINIFIED
-const reservedTokenNames = buildLexerConfig({ functionArgSeparator: /,/ }).allTokens.map(function (currentToken) {
+const reservedTokenNames = buildLexerConfig(new Config({ functionArgSeparator: /,/ })).allTokens.map(function (currentToken) {
   return chevrotain.tokenName(currentToken)
 })
 
