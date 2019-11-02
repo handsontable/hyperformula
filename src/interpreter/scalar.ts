@@ -70,6 +70,16 @@ export function multiply(left: number | CellError, right: number | CellError): n
   }
 }
 
+export function power(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return Math.pow(left, right)
+  }
+}
+
 /**
  * Returns max from two numbers
  *
