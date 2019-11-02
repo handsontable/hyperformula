@@ -1,7 +1,7 @@
 (async function() {
-  var HandsOnEngine = require("../dist/optimized-full/bundle.js")
-  var Engine = HandsOnEngine.HandsOnEngine
-  var Config = HandsOnEngine.Config
+  var HyperFormula = require("../dist/optimized-full/bundle.js")
+  var Engine = HyperFormula.HyperFormula
+  var Config = HyperFormula.Config
   var assert = require('assert')
 
   var engine = await Engine.buildFromArray([
