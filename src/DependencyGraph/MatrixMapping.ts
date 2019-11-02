@@ -1,6 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {filterWith} from '../generatorUtils'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 import {SimpleCellAddress} from '../Cell'
@@ -61,21 +60,27 @@ export class MatrixMapping {
   }
 
   public* numericMatrices(): IterableIterator<[string, MatrixVertex]> {
-    yield* filterWith(([, mtx]) => {
-      return !mtx.isFormula()
-    }, this.matrixMapping.entries())[Symbol.iterator]()
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (!mtx.isFormula()) {
+        yield [mtxKey, mtx]
+      }
+    }
   }
 
   public* numericMatricesInRows(rowsSpan: RowsSpan): IterableIterator<[string, MatrixVertex]> {
-    yield* filterWith(([, mtx]) => {
-      return mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd) && !mtx.isFormula()
-    }, this.matrixMapping.entries()[Symbol.iterator]())
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd) && !mtx.isFormula()) {
+        yield [mtxKey, mtx]
+      }
+    }
   }
 
   public* numericMatricesInColumns(columnsSpan: ColumnsSpan): IterableIterator<[string, MatrixVertex]> {
-    yield* filterWith(([, mtx]) => {
-      return mtx.spansThroughSheetColumn(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd) && !mtx.isFormula()
-    }, this.matrixMapping.entries()[Symbol.iterator]())
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.spansThroughSheetColumn(columnsSpan.sheet, columnsSpan.columnStart, columnsSpan.columnEnd) && !mtx.isFormula()) {
+        yield [mtxKey, mtx]
+      }
+    }
   }
 
   public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {

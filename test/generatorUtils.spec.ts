@@ -1,4 +1,4 @@
-import {count, empty, filterWith, first, split, zip} from '../src/generatorUtils'
+import {count, empty, first, split, zip} from '../src/generatorUtils'
 
 describe('empty', () => {
   it('works', () => {
@@ -48,36 +48,6 @@ describe('first', () => {
     const arr = [42, 43]
 
     expect(first(arr[Symbol.iterator]())).toEqual(42)
-  })
-})
-
-describe('filterWith', () => {
-  it('works for empty case', () => {
-    const arr: number[] = []
-
-    const result = filterWith((x) => (x % 2 == 0), arr[Symbol.iterator]())
-
-    expect(Array.from(result)).toEqual([])
-  })
-
-  it('works for one element case', () => {
-    const arr = [42]
-
-    const result1 = filterWith((x) => (x % 2 == 0), arr[Symbol.iterator]())
-    const result2 = filterWith((x) => (x % 2 == 1), arr[Symbol.iterator]())
-
-    expect(Array.from(result1)).toEqual([42])
-    expect(Array.from(result2)).toEqual([])
-  })
-
-  it('works for more elements case', () => {
-    const arr = [42, 43]
-
-    const result1 = filterWith((x) => (x % 2 == 0), arr[Symbol.iterator]())
-    const result2 = filterWith((x) => (x % 2 == 1), arr[Symbol.iterator]())
-
-    expect(Array.from(result1)).toEqual([42])
-    expect(Array.from(result2)).toEqual([43])
   })
 })
 

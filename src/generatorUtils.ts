@@ -21,19 +21,6 @@ export function first<T>(iterable: IterableIterator<T>): T | undefined {
   return undefined
 }
 
-export function * filterWith<T>(fn: ((x: T) => boolean), iterable: IterableIterator<T>): IterableIterator<T> {
-  const asSplit = split(iterable)
-
-  if (asSplit.hasOwnProperty('value')) {
-    const value = asSplit.value as T
-
-    if (fn(value)) {
-      yield value
-    }
-    yield * filterWith(fn, asSplit.rest)
-  }
-}
-
 export function count<T>(iterable: IterableIterator<T>): number {
   let counter = 0
   for (const val of iterable) {
