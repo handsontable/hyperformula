@@ -72,3 +72,22 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
     return coercedNumber
   }
 }
+
+export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
+  if (arg instanceof CellError || typeof arg === 'boolean') {
+    return arg
+  } else if (arg === EmptyValue) {
+    return false
+  } else if (typeof arg === 'number') {
+    return arg !== 0
+  } else {
+    const argUppered = arg.toUpperCase()
+    if (argUppered === 'TRUE') {
+      return true
+    } else if (argUppered === 'FALSE') {
+      return false
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
+  }
+}
