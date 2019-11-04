@@ -75,18 +75,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.NAME))
   })
 
-  it('function TRUE', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE()']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(true)
-  })
-
-  it('function TRUE is 0-arity', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE(1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function FALSE', () => {
     const engine = HyperFormula.buildFromArray([['=FALSE()']])
 
