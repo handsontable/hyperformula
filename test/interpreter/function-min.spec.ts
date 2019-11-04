@@ -24,24 +24,22 @@ describe('MIN', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
-  it('MIN with string', () => {
-    const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MIN(A1:A3,"foo")']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-  })
-
-  it('MIN with string in range', () => {
-    const engine = HyperFormula.buildFromArray([['1'], ['3'], ['foo'], ['=MIN(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-  })
-
-  it('MIN of strings', () => {
-    const engine = HyperFormula.buildFromArray([['foo'], ['bar'], ['=MIN(A1:A2)']])
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
-  })
-
   it('MIN of strings and number', () => {
     const engine = HyperFormula.buildFromArray([['foo'], ['bar'], ['5'], ['=MIN(A1:A3)']])
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
+  })
+
+  it('doesnt do coercions',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['foo'],
+      ['=TRUE()'],
+      ['=CONCATENATE("1","0")'],
+      ['=MIN(A1:A5)'],
+    ])
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
   })
 
   it('MIN of empty value', () => {
@@ -52,5 +50,25 @@ describe('MIN', () => {
   it('MIN of empty value and some negative number', () => {
     const engine = HyperFormula.buildFromArray([['', '1', '=MIN(A1,B1)']])
     expect(engine.getCellValue(adr('C1'))).toEqual(1)
+  })
+
+  it('over a range value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MIN(MMULT(A1:B2, A1:B2))']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+  })
+
+  it('propagates errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=4/0'],
+      ['=FOOBAR()', '4'],
+      ['=MIN(A1:B2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })

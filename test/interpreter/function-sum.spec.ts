@@ -39,6 +39,7 @@ describe('SUM', () => {
       ['=CONCATENATE("1","0")'],
       ['=SUM(A1:A5)'],
     ])
+
     expect(engine.getCellValue(adr('A6'))).toEqual(3)
   })
 

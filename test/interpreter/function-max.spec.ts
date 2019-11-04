@@ -24,19 +24,17 @@ describe('MAX', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(4)
   })
 
-  it('MAX with string',  () => {
-    const engine =  HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAX(A1:A3,"foo")']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-  })
+  it('doesnt do coercions',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['foo'],
+      ['=TRUE()'],
+      ['=CONCATENATE("1","0")'],
+      ['=MAX(A1:A5)'],
+    ])
 
-  it('MAX with string in range',  () => {
-    const engine =  HyperFormula.buildFromArray([['1'], ['3'], ['foo'], ['=MAX(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-  })
-
-  it('MAX of strings',  () => {
-    const engine =  HyperFormula.buildFromArray([['foo'], ['bar'], ['=MAX(A1:A2)']])
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A6'))).toEqual(2)
   })
 
   it('MAX of strings and -1',  () => {
@@ -52,5 +50,25 @@ describe('MAX', () => {
   it('MAX of empty value and some negative number',  () => {
     const engine =  HyperFormula.buildFromArray([['', '-1', '=MAX(A1,B1)']])
     expect(engine.getCellValue(adr('C1'))).toEqual(-1)
+  })
+
+  it('over a range value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MAX(MMULT(A1:B2, A1:B2))']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(22)
+  })
+
+  it('propagates errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=4/0'],
+      ['=FOOBAR()', '4'],
+      ['=MAX(A1:B2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
