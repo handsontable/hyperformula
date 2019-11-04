@@ -1,8 +1,8 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {booleanRepresentation} from '../coerce'
+import {booleanRepresentation, coerceScalarToBoolean} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
-import {InterpreterValue} from '../InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing boolean functions
@@ -98,7 +98,16 @@ export class BooleanPlugin extends FunctionPlugin {
     let index = 0
     while (result === true && index < ast.args.length) {
       const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-      result = booleanRepresentation(argValue)
+      if (argValue instanceof SimpleRangeValue) {
+        for (const value of argValue.valuesFromTopLeftCorner()) {
+          result = coerceScalarToBoolean(value)
+          if (result !== true) {
+            break
+          }
+        }
+      } else {
+        result = coerceScalarToBoolean(argValue)
+      }
       ++index
     }
     return result

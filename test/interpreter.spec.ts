@@ -219,34 +219,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('function AND usage', () => {
-    const engine = HyperFormula.buildFromArray([
-        ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())', '=AND(TRUE(), "asdf")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('B1'))).toBe(false)
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('function AND with numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([
-        ['=AND(1)', '=AND(0)', '=AND(1, TRUE())'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('B1'))).toBe(false)
-    expect(engine.getCellValue(adr('C1'))).toBe(true)
-  })
-
-  it('function AND takes at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=AND()'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function OR usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
