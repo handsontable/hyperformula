@@ -30,33 +30,16 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(7)
   })
 
-  it('SUM with bool',  () => {
-    const engine =  HyperFormula.buildFromArray([['=SUM(1,TRUE())']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-  })
-
-  it('SUM with string',  () => {
-    const engine =  HyperFormula.buildFromArray([['=SUM(1,"foo")']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-  })
-
-  it('SUM and + of 1 with "foo"',  () => {
+  it('doesnt do coercions',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1', 'foo'],
-      ['=A1+B1', '=SUM(A1:B1)'],
+      ['1'],
+      ['2'],
+      ['foo'],
+      ['=TRUE()'],
+      ['=CONCATENATE("1","0")'],
+      ['=SUM(A1:A5)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
-  })
-
-  it('SUM range with string values',  () => {
-    const engine =  HyperFormula.buildFromArray([['1'], ['2'], ['foo'], ['=SUM(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-  })
-
-  it('SUM range with bool values',  () => {
-    const engine =  HyperFormula.buildFromArray([['1'], ['2'], ['=TRUE()'], ['=SUM(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A6'))).toEqual(3)
   })
 
   it('doesnt take value from range if it does not store cached value for that function',  () => {
@@ -87,5 +70,15 @@ describe('SUM', () => {
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(54)
+  })
+
+  it('propagates errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=4/0'],
+      ['=FOOBAR()', '4'],
+      ['=SUM(A1:B2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
