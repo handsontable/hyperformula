@@ -124,48 +124,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('function IF when value is true', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
-  })
-
-  it('function IF when value is false', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes", "no")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('no')
-  })
-
-  it('function IF when condition is weird type', () => {
-    const engine = HyperFormula.buildFromArray([['=IF("foo", "yes", "no")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('function IF when condition is number', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(1, "yes", "no")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
-  })
-
-  it('function IF when condition is logic function', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(OR(1, FALSE()), "yes", "no")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
-  })
-
-  it('function IF works when only first part is given', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
-  })
-
-  it('function IF works when only first part is given and condition is falsey', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
-  })
-
   it('function ISERROR should return true for common errors', () => {
     const engine = HyperFormula.buildFromArray([
         ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],
