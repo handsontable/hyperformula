@@ -96,17 +96,28 @@ export class BooleanPlugin extends FunctionPlugin {
 
     let result: CellValue = true
     let index = 0
-    while (result === true && index < ast.args.length) {
+    while (index < ast.args.length) {
       const argValue = this.evaluateAst(ast.args[index], formulaAddress)
       if (argValue instanceof SimpleRangeValue) {
         for (const value of argValue.valuesFromTopLeftCorner()) {
-          result = coerceScalarToBoolean(value)
-          if (result !== true) {
-            break
+          if (value instanceof CellError) {
+            return value
+          } else {
+            const coercedValue = coerceScalarToBoolean(value)
+            if (coercedValue instanceof CellError) {
+              return coercedValue
+            }
+            result = result && coercedValue
           }
         }
+      } else if (argValue instanceof CellError) {
+        return argValue
       } else {
-        result = coerceScalarToBoolean(argValue)
+        const coercedValue = coerceScalarToBoolean(argValue)
+        if (coercedValue instanceof CellError) {
+          return coercedValue
+        }
+        result = result && coercedValue
       }
       ++index
     }

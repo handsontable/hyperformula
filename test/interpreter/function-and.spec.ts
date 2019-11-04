@@ -59,4 +59,14 @@ describe("Function AND", () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
+
+  it('is computed eagerly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0', '=4/0'],
+      ['1', '1'],
+      ['=AND(A1:B2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
 })
