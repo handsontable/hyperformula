@@ -22,24 +22,6 @@ export function dateNumberRepresentation(arg: InterpreterValue, dateFormat: stri
   }
 }
 
-/**
- * Converts cell value to boolean representation
- *
- * if value is a boolean simply returns value
- * if value is a number return true if value is different than 0
- *
- * @param arg
- */
-export function booleanRepresentation(arg: InterpreterValue): boolean | CellError {
-  if (typeof arg === 'number') {
-    return arg !== 0
-  } else if (typeof arg === 'boolean') {
-    return arg
-  } else {
-    return new CellError(ErrorType.VALUE)
-  }
-}
-
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg
@@ -73,6 +55,11 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
   }
 }
 
+/**
+ * Coerce scalar value to boolean if possible, or error if value is an error
+ *
+ * @param arg
+ */
 export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
   if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg

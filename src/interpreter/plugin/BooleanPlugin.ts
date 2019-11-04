@@ -1,6 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {booleanRepresentation, coerceScalarToBoolean} from '../coerce'
+import {coerceScalarToBoolean} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
