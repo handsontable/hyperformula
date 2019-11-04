@@ -22,6 +22,18 @@ describe("Function IF", () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
+  it('use coercion', () => {
+    const engine = HyperFormula.buildFromArray([['=IF("TRUE", "yes", "no")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual("yes")
+  })
+
+  it('returns error if condition is an error', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(4/0, "yes", "no")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
   it('when condition is number', () => {
     const engine = HyperFormula.buildFromArray([['=IF(1, "yes", "no")']])
 
@@ -44,5 +56,17 @@ describe("Function IF", () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
+  })
+
+  // Inconsistency with Product 1
+  it('range value results in VALUE error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0', '=IF(A1:A3,"yes","no")'],
+      ['1', '=IF(A1:A3,"yes","no")'],
+      ['3'],
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })

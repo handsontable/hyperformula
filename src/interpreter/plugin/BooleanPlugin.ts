@@ -67,7 +67,11 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    const condition = booleanRepresentation(this.evaluateAst(ast.args[0], formulaAddress))
+    const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (conditionValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const condition = coerceScalarToBoolean(conditionValue)
     if (condition === true) {
       return this.evaluateAst(ast.args[1], formulaAddress)
     } else if (condition === false) {
@@ -76,6 +80,8 @@ export class BooleanPlugin extends FunctionPlugin {
       } else {
         return false
       }
+    } else if (condition instanceof CellError) {
+      return condition
     } else {
       return new CellError(ErrorType.VALUE)
     }
