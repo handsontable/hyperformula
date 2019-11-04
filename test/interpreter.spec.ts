@@ -75,18 +75,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.NAME))
   })
 
-  it('function FALSE', () => {
-    const engine = HyperFormula.buildFromArray([['=FALSE()']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
-  })
-
-  it('function FALSE is 0-arity', () => {
-    const engine = HyperFormula.buildFromArray([['=FALSE(1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function ACOS happy path', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
 
