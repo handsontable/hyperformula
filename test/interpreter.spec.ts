@@ -219,35 +219,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('function OR usage', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('B1'))).toBe(false)
-    expect(engine.getCellValue(adr('C1'))).toBe(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('function OR with numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=OR(1)', '=OR(0)', '=OR(FALSE(), 42)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('B1'))).toBe(false)
-    expect(engine.getCellValue(adr('C1'))).toBe(true)
-  })
-
-  it('function OR takes at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=OR()'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function COLUMNS works', () => {
     const engine = HyperFormula.buildFromArray([['=COLUMNS(A1:C2)']])
 
