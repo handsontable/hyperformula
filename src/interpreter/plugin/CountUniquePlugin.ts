@@ -39,17 +39,4 @@ export class CountUniquePlugin extends FunctionPlugin {
     
     return valuesSet.size + errorsSet.size
   }
-
-  private* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
-    for (const argAst of asts) {
-      const value = this.evaluateAst(argAst, formulaAddress)
-      if (value instanceof SimpleRangeValue) {
-        for (const scalarValue of value.valuesFromTopLeftCorner()) {
-          yield scalarValue
-        }
-      } else {
-        yield value
-      }
-    }
-  }
 }

@@ -43,32 +43,17 @@ export abstract class FunctionPlugin {
     return this.interpreter.evaluateAst(ast, formulaAddress)
   }
 
-  protected computeNumericListOfValues(asts: Ast[], formulaAddress: SimpleCellAddress): number[] | CellError {
-    const values: number[] = []
-    for (const ast of asts) {
-      if (ast.type === AstNodeType.CELL_RANGE) {
-        for (const cellFromRange of AbsoluteCellRange.fromCellRange(ast, formulaAddress).addresses()) {
-          const value = this.dependencyGraph.getCellValue(cellFromRange)
-          if (typeof value === 'number') {
-            values.push(value)
-          } else if (value instanceof CellError) {
-            return value
-          } else if (typeof value === 'string' || typeof value === 'boolean') {
-            return new CellError(ErrorType.NA)
-          }
+  protected* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+    for (const argAst of asts) {
+      const value = this.evaluateAst(argAst, formulaAddress)
+      if (value instanceof SimpleRangeValue) {
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          yield scalarValue
         }
       } else {
-        const value = this.evaluateAst(ast, formulaAddress)
-        if (typeof value === 'number') {
-          values.push(value)
-        } else if (value instanceof CellError) {
-          return value
-        } else if (typeof value === 'string' || typeof value === 'boolean') {
-          return new CellError(ErrorType.NA)
-        }
+        yield value
       }
     }
-    return values
   }
 
   protected computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
