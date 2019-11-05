@@ -1,6 +1,7 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {ProcedureAst, Ast} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -26,18 +27,38 @@ export class MedianPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const values = this.computeNumericListOfValues(ast.args, formulaAddress)
-
-    if (Array.isArray(values)) {
-      values.sort((a, b) => (a - b))
-
-      if (values.length % 2 === 0) {
-        return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
-      } else {
-        return values[Math.floor(values.length / 2)]
+    const values: number[] = []
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      if (scalarValue instanceof CellError) {
+        return scalarValue
+      } else if (typeof scalarValue === 'number') {
+        values.push(scalarValue)
       }
+    }
+    
+    if (values.length === 0) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    values.sort((a, b) => (a - b))
+
+    if (values.length % 2 === 0) {
+      return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
     } else {
-      return values
+      return values[Math.floor(values.length / 2)]
+    }
+  }
+
+  private* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+    for (const argAst of asts) {
+      const value = this.evaluateAst(argAst, formulaAddress)
+      if (value instanceof SimpleRangeValue) {
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          yield scalarValue
+        }
+      } else {
+        yield value
+      }
     }
   }
 }

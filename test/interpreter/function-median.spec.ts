@@ -61,27 +61,38 @@ describe('Function MEDIAN', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('return error when an argument is not a number', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['foo', '=MEDIAN(A1)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
-  it('return error when range argument contains not a number', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['5', 'foo', '=MEDIAN(A1:B1)'],
-    ])
-
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('return error when no arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MEDIAN()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+  })
+
+  it('doesnt do coercions of nonnumeric arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['="12"', '="11"', '="13"', '=MEDIAN(A1:C1)'],
+      ['=MEDIAN(TRUE())'],
+    ])
+
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
+  })
+
+  it('ignores nonnumeric values as long as theres at least one numeric value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(TRUE(), "foobar", 42)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+  })
+
+  // Inconsistency with Product 1
+  it('doesnt do coercions of given string arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN("12", "11", "13")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
   })
 })
