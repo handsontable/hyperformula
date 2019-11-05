@@ -1,6 +1,7 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst} from '../../parser'
+import {EmptyValueType, CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst, Ast} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
@@ -25,22 +26,30 @@ export class CountUniquePlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const values = this.computeNumericListOfValues(ast.args, formulaAddress)
-    if (Array.isArray(values)) {
-      values.sort((a, b) => (a - b))
+    const valuesSet = new Set<number | string | boolean | EmptyValueType>()
+    const errorsSet = new Set<ErrorType>()
 
-      let uniqueValues = 1
-      let previous = values[0]
-      for (let i = 1; i < values.length; i++) {
-        if (previous !== values[i]) {
-          previous = values[i]
-          uniqueValues++
-        }
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      if (scalarValue instanceof CellError) {
+        errorsSet.add(scalarValue.type)
+      } else if (scalarValue !== "") {
+        valuesSet.add(scalarValue)
       }
+    }
+    
+    return valuesSet.size + errorsSet.size
+  }
 
-      return uniqueValues
-    } else {
-      return values
+  private* iterateOverScalarValues(asts: Ast[], formulaAddress: SimpleCellAddress): IterableIterator<CellValue> {
+    for (const argAst of asts) {
+      const value = this.evaluateAst(argAst, formulaAddress)
+      if (value instanceof SimpleRangeValue) {
+        for (const scalarValue of value.valuesFromTopLeftCorner()) {
+          yield scalarValue
+        }
+      } else {
+        yield value
+      }
     }
   }
 }
