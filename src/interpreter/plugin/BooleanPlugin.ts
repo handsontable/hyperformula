@@ -101,31 +101,13 @@ export class BooleanPlugin extends FunctionPlugin {
     }
 
     let result: CellValue = true
-    let index = 0
-    while (index < ast.args.length) {
-      const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-      if (argValue instanceof SimpleRangeValue) {
-        for (const value of argValue.valuesFromTopLeftCorner()) {
-          if (value instanceof CellError) {
-            return value
-          } else {
-            const coercedValue = coerceScalarToBoolean(value)
-            if (coercedValue instanceof CellError) {
-              return coercedValue
-            }
-            result = result && coercedValue
-          }
-        }
-      } else if (argValue instanceof CellError) {
-        return argValue
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      const coercedValue = coerceScalarToBoolean(scalarValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
       } else {
-        const coercedValue = coerceScalarToBoolean(argValue)
-        if (coercedValue instanceof CellError) {
-          return coercedValue
-        }
         result = result && coercedValue
       }
-      ++index
     }
     return result
   }
@@ -144,31 +126,13 @@ export class BooleanPlugin extends FunctionPlugin {
     }
 
     let result: CellValue = false
-    let index = 0
-    while (index < ast.args.length) {
-      const argValue = this.evaluateAst(ast.args[index], formulaAddress)
-      if (argValue instanceof SimpleRangeValue) {
-        for (const value of argValue.valuesFromTopLeftCorner()) {
-          if (value instanceof CellError) {
-            return value
-          } else {
-            const coercedValue = coerceScalarToBoolean(value)
-            if (coercedValue instanceof CellError) {
-              return coercedValue
-            }
-            result = result || coercedValue
-          }
-        }
-      } else if (argValue instanceof CellError) {
-        return argValue
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      const coercedValue = coerceScalarToBoolean(scalarValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
       } else {
-        const coercedValue = coerceScalarToBoolean(argValue)
-        if (coercedValue instanceof CellError) {
-          return coercedValue
-        }
         result = result || coercedValue
       }
-      ++index
     }
     return result
   }
