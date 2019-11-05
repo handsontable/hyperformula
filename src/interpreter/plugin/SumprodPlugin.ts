@@ -5,7 +5,7 @@ import {Matrix} from '../../Matrix'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {coerceToRange} from '../coerce'
+import {coerceToRange, coerceScalarToNumber} from '../coerce'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -19,13 +19,6 @@ export class SumprodPlugin extends FunctionPlugin {
 
     const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))
     const rightArgValue = coerceToRange(this.evaluateAst(right, formulaAddress))
-    if (leftArgValue instanceof CellError) {
-      return leftArgValue
-    } else if (rightArgValue instanceof CellError) {
-      return rightArgValue
-    } else if (leftArgValue === null || rightArgValue === null) {
-      return new CellError(ErrorType.VALUE)
-    }
 
     if (leftArgValue.numberOfElements() !== rightArgValue.numberOfElements()) {
       return new CellError(ErrorType.VALUE)
@@ -46,8 +39,12 @@ export class SumprodPlugin extends FunctionPlugin {
         return l.value
       } else if (r.value instanceof CellError) {
         return r.value
-      } else if (typeof l.value === 'number' && typeof r.value === 'number') {
-        result += l.value * r.value
+      } else {
+        const lval = coerceScalarToNumber(l.value)
+        const rval = coerceScalarToNumber(r.value)
+        if (typeof lval === 'number' && typeof rval === 'number') {
+          result += lval * rval
+        }
       }
     }
 

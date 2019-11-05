@@ -56,13 +56,22 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
-  xit('it makes a coercion from other values', () => {
+  it('it makes a coercion from other values', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TRUE()', '42'],
       ['=SUMPRODUCT(A1,B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(42)
+    expect(engine.getCellValue(adr('A2'))).toEqual(42)
+  })
+
+  it('if coercion unsuccessful, it ignores it', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['"foobar"', '42'],
+      ['=SUMPRODUCT(A1,B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
   it('works even if some string in data',  () => {
@@ -151,6 +160,18 @@ describe('Function SUMPRODUCT', () => {
       ['3'],
       ['=SUMPRODUCT(A1:C1,A1:A3)'],
     ])
+
     expect(engine.getCellValue(adr('A4'))).toEqual(14)
+  })
+
+  // Inconsistency with Product 1
+  it('order of errors', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '2', '', '=FOOBAR()', '12'],
+      ['3', '=4/0', '', '13', '14'],
+      ['=SUMPRODUCT(A1:B2, D1:E2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.NAME))
   })
 })
