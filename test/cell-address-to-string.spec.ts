@@ -1,5 +1,5 @@
 import {sheetCellAddress, sheetCellAddressToString, simpleCellAddress} from '../src/Cell'
-import {simpleCellAddressFromString} from "../src/parser";
+import {simpleCellAddressFromString, simpleCellAddressToString} from "../src/parser";
 
 describe('sheetCellAddressToString', () => {
   it('is zero based', () => {
@@ -45,5 +45,25 @@ describe('simpleCellAddressFromString', () => {
 
   it('should return address with sheet number from sheet mapping regardless of override parameter', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, '$Sheet3.A1', 1)).toEqual(simpleCellAddress(2, 0, 0))
+  })
+})
+
+describe('simpleCellAddressToString', () => {
+  const sheetIndexMappingFunction = (index: number): string | undefined => {
+    const name =  ['Sheet1', 'Sheet2', 'Sheet3'][index]
+    return name
+  }
+
+  it('should return string representation', () => {
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0))).toEqual('A1')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 50, 6))).toEqual('AY7')
+  })
+
+  it('should return string representation with sheet name', () => {
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0), true)).toEqual('$Sheet1.A1')
+  })
+
+  it('should return undefined', () => {
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(42, 0, 0), true)).toBeUndefined()
   })
 })
