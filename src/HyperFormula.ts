@@ -32,6 +32,7 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
+import {simpleCellAddressFromString} from "./parser/cellAddressFromString";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -654,6 +655,19 @@ export class HyperFormula {
    */
   public disableNumericMatrices(): void {
     this.dependencyGraph.disableNumericMatrices()
+  }
+
+  /**
+   * Computes simple (absolute) address of a cell address based on it's string representation.
+   * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
+   * If sheet name is not present in string representation, returns {@param overrideSheet} as sheet number
+   *
+   * @param stringAddress - string representation of cell address, e.g. 'C64'
+   * @param overrideSheet - override sheet index regardless of sheet mapping
+   * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
+   */
+  public simpleCellAddressFromString(stringAddress: string, overrideSheet?: number) {
+    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, overrideSheet)
   }
 
   /**
