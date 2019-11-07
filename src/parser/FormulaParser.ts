@@ -125,7 +125,9 @@ export class FormulaParser extends Parser {
       } else if (tokenMatcher(op, LessThanOrEqualOp)) {
         lhs = buildLessThanOrEqualOpAst(lhs, rhs)
       } else {
-        throw Error('Operator not supported')
+        this.ACTION(() => {
+          throw Error('Operator not supported')
+        })
       }
     })
 
@@ -162,7 +164,9 @@ export class FormulaParser extends Parser {
       } else if (tokenMatcher(op, MinusOp)) {
         lhs = buildMinusOpAst(lhs, rhs)
       } else {
-        throw Error('Operator not supported')
+        this.ACTION(() => {
+          throw Error('Operator not supported')
+        })
       }
     })
 
@@ -184,7 +188,9 @@ export class FormulaParser extends Parser {
       } else if (tokenMatcher(op, DivOp)) {
         lhs = buildDivOpAst(lhs, rhs)
       } else {
-        throw Error('Operator not supported')
+        this.ACTION(() => {
+          throw Error('Operator not supported')
+        })
       }
     })
 
@@ -204,7 +210,9 @@ export class FormulaParser extends Parser {
       if (tokenMatcher(op, PowerOp)) {
         lhs = buildPowerOpAst(lhs, rhs)
       } else {
-        throw Error('Operator not supported')
+        this.ACTION(() => {
+          throw Error('Operator not supported')
+        })
       }
     })
 
@@ -348,7 +356,12 @@ export class FormulaParser extends Parser {
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.SUBRULE(this.cellReference) as CellReferenceAst
     this.CONSUME2(RangeSeparator)
-    const end = this.SUBRULE(this.endOfRangeExpression, { ARGS: [start.reference.sheet]})
+
+    const sheet = this.ACTION(() => {
+      return start.reference.sheet
+    })
+
+    const end = this.SUBRULE(this.endOfRangeExpression, {ARGS: [sheet]})
 
     if (end.type !== AstNodeType.CELL_REFERENCE) {
       return buildErrorAst([
@@ -371,7 +384,7 @@ export class FormulaParser extends Parser {
     return this.OR([
       {
         ALT: () => {
-          return this.SUBRULE(this.cellReference, { ARGS: [sheet] })
+          return this.SUBRULE(this.cellReference, {ARGS: [sheet]})
         },
       },
       {
@@ -397,7 +410,9 @@ export class FormulaParser extends Parser {
    */
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
-    const address = cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet)
+    const address = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet)
+    })
     if (address === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     } else {
@@ -446,10 +461,10 @@ export class FormulaParser extends Parser {
 
     if (errors.length > 0) {
       return buildErrorAst(errors.map((e) =>
-        ({
-          type: ParsingErrorType.ParserError,
-          message: e.message,
-        }),
+          ({
+            type: ParsingErrorType.ParserError,
+            message: e.message,
+          }),
       ))
     }
 
@@ -541,10 +556,10 @@ export class FormulaParser extends Parser {
     }
 
     const topLeftCorner = new CellAddress(
-      this.formulaAddress!.sheet,
-      cellArg.reference.col + colShift,
-      cellArg.reference.row + rowShift,
-      cellArg.reference.type,
+        this.formulaAddress!.sheet,
+        cellArg.reference.col + colShift,
+        cellArg.reference.row + rowShift,
+        cellArg.reference.type,
     )
 
     let absoluteCol = topLeftCorner.col
@@ -569,10 +584,10 @@ export class FormulaParser extends Parser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-        this.formulaAddress!.sheet,
-        topLeftCorner.col + width - 1,
-        topLeftCorner.row + height - 1,
-        topLeftCorner.type,
+          this.formulaAddress!.sheet,
+          topLeftCorner.col + width - 1,
+          topLeftCorner.row + height - 1,
+          topLeftCorner.type,
       )
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
@@ -586,7 +601,7 @@ export class FormulaLexer {
   private readonly lexer: Lexer
 
   constructor(lexerConfig: ILexerConfig) {
-    this.lexer = new Lexer(lexerConfig.allTokens, { ensureOptimizations: true })
+    this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 
   /**
