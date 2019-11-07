@@ -7,8 +7,8 @@
   var engine = await Engine.buildFromArray([
     ['42', '=A1 + 2']
   ], new Config({ gpuMode: "cpu" }))
-  var valueA1 = engine.getCellValue('A1')
-  var valueB1 = engine.getCellValue('B1')
+  var valueA1 = engine.getCellValue({ sheet: 0, row: 0, col: 0})
+  var valueB1 = engine.getCellValue({ sheet: 0, row: 0, col: 1})
 
   assert(valueA1 === 42)
   assert(valueB1 === 44)
