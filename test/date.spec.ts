@@ -1,5 +1,5 @@
 import {Config} from '../src'
-import {dateNumberToMonthNumber, dateNumberToString, toDateNumber} from '../src/Date'
+import {dateNumberToMonthNumber, toDateNumber} from '../src/Date'
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {
@@ -7,12 +7,6 @@ describe('Date helpers', () => {
     expect(toDateNumber(1899, 12, 30)).toBe(0)
     expect(toDateNumber(1900, 12, 31)).toBe(366)
     expect(toDateNumber(2018, 12, 31)).toBe(43465)
-  })
-
-  it ('#dateNumberToString should return properly formatted  date', () => {
-    expect(dateNumberToString(0, Config.defaultConfig.dateFormat)).toEqual('12/30/1899')
-    expect(dateNumberToString(2, Config.defaultConfig.dateFormat)).toEqual('01/01/1900')
-    expect(dateNumberToString(43465, Config.defaultConfig.dateFormat)).toEqual('12/31/2018')
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {

@@ -1,8 +1,7 @@
 import {HyperFormula} from '../../src'
 import {Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {dateNumberToString} from '../../src/Date'
-import {adr} from '../testUtils'
+import {adr, dateNumberToString} from '../testUtils'
 import '../testConfig'
 
 describe('Interpreter', () => {
@@ -10,10 +9,10 @@ describe('Interpreter', () => {
     const engine = HyperFormula.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')) as number, Config.defaultConfig.dateFormat)).toEqual('01/01/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('01/01/1900')
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue(adr('B1')) as number, Config.defaultConfig.dateFormat)).toEqual('01/02/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')) as number, Config.defaultConfig.dateFormat)).toEqual('10/24/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('01/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('10/24/1915')
   })
 
   it('function DATE with less than 3 numerical arguments', () => {

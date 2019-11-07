@@ -1,7 +1,8 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, Config} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
+import {CellValue, CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {dateNumberToMoment} from '../src/Date'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -71,4 +72,8 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
 export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperFormula) => {
   const comparator = new EngineComparator(expected, actual)
   comparator.compare()
+}
+
+export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
+  return dateNumberToMoment(dateNumber as number).format(dateFormat)
 }
