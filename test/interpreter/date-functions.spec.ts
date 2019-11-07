@@ -5,34 +5,6 @@ import {adr, dateNumberToString} from '../testUtils'
 import '../testConfig'
 
 describe('Interpreter', () => {
-  it('function DATE with 3 numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('01/01/1900')
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('01/02/1900')
-    expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('10/24/1915')
-  })
-
-  it('function DATE with less than 3 numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=DATE(1900, 1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
-  it('function DATE with non numerical argument', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE("foo", 1, 1)'],
-      ['=DATE(1900, "foo", 1)'],
-      ['=DATE(1900, 1, "foo")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
   it('function MONTH with numerical arguments', () => {
     const engine = HyperFormula.buildFromArray([['=MONTH(0)', '=MONTH(2)', '=MONTH(43465)']])
 

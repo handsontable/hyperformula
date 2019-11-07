@@ -3,8 +3,9 @@ import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, mom
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
-import {dateNumberRepresentation} from '../coerce'
+import {dateNumberRepresentation, coerceScalarToNumber} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
+import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing date-specific functions
@@ -44,12 +45,27 @@ export class DatePlugin extends FunctionPlugin {
     const year = this.evaluateAst(ast.args[0], formulaAddress)
     const month = this.evaluateAst(ast.args[1], formulaAddress)
     const day = this.evaluateAst(ast.args[2], formulaAddress)
-
-    if (typeof year !== 'number' || typeof month !== 'number' || typeof day !== 'number') {
+    if (year instanceof SimpleRangeValue || month instanceof SimpleRangeValue || day instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
 
-    return toDateNumber(year, month, day)
+    const coercedYear = coerceScalarToNumber(year)
+    const coercedMonth = coerceScalarToNumber(month)
+    const coercedDay = coerceScalarToNumber(day)
+
+    if (coercedYear instanceof CellError) {
+      return coercedYear
+    }
+
+    if (coercedMonth instanceof CellError) {
+      return coercedMonth
+    }
+
+    if (coercedDay instanceof CellError) {
+      return coercedDay
+    }
+
+    return toDateNumber(coercedYear, coercedMonth, coercedDay)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
