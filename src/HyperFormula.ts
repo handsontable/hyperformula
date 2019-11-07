@@ -27,12 +27,18 @@ import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {CellAddress, cellAddressFromString, isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
+import {
+  isFormula,
+  isMatrix,
+  ParserWithCaching,
+  ProcedureAst,
+  simpleCellAddressFromString,
+  simpleCellAddressToString
+} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {simpleCellAddressFromString} from "./parser";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -668,6 +674,17 @@ export class HyperFormula {
    */
   public simpleCellAddressFromString(stringAddress: string, overrideSheet?: number) {
     return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, overrideSheet)
+  }
+
+  /**
+   * Returns string representation of absolute address
+   * If {@param withSheetName} is true and sheet index is not present in sheet mapping, returns undefined.
+   *
+   * @param address - object representation of absolute address
+   * @param withSheetName - whether to return address with sheet name
+   * */
+  public simpleCellAddressToString(address: SimpleCellAddress, withSheetName: boolean = false): string | undefined {
+    return simpleCellAddressToString(this.sheetMapping.name, address, withSheetName)
   }
 
   /**

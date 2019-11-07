@@ -1,8 +1,8 @@
 import {SimpleCellAddress} from '../Cell'
 import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {CellAddress, CellReferenceType} from './CellAddress'
 import {ParserConfig} from './ParserConfig'
+import {cellAddressToString} from "./addressRepresentationConverters";
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -31,18 +31,18 @@ export class Unparser {
       }
       case AstNodeType.CELL_REFERENCE: {
         if (ast.reference.sheet === address.sheet) {
-          return addressToString(ast.reference, address)
+          return cellAddressToString(ast.reference, address)
         } else {
           const sheet = this.sheetMappingFn(ast.reference.sheet)
-          return '$' + sheet + '.' + addressToString(ast.reference, address)
+          return '$' + sheet + '.' + cellAddressToString(ast.reference, address)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (ast.start.sheet === address.sheet) {
-          return addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
+          return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
           const sheet = this.sheetMappingFn(ast.start.sheet)
-          return '$' + sheet + '.' + addressToString(ast.start, address) + ':' + addressToString(ast.end, address)
+          return '$' + sheet + '.' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -60,23 +60,4 @@ export class Unparser {
       }
     }
   }
-}
-
-export function columnIndexToLabel(column: number) {
-  let result = ''
-
-  while (column >= 0) {
-    result = String.fromCharCode((column % 26) + 97) + result
-    column = Math.floor(column / 26) - 1
-  }
-
-  return result.toUpperCase()
-}
-
-export function addressToString(address: CellAddress, baseAddress: SimpleCellAddress): string {
-  const simpleAddress = address.toSimpleCellAddress(baseAddress)
-  const column = columnIndexToLabel(simpleAddress.col)
-  const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
-  const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
-  return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
 }

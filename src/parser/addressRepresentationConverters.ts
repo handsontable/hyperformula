@@ -1,7 +1,8 @@
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {CellAddress} from './CellAddress'
+import {CellAddress, CellReferenceType} from './CellAddress'
 
 export type SheetMappingFn = (sheetName: string) => number | undefined
+export type SheetIndexMappingFn = (sheetIndex: number) => string | undefined
 
 const addressRegex = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/
 
@@ -44,6 +45,15 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   }
 }
 
+
+export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
+  const simpleAddress = address.toSimpleCellAddress(baseAddress)
+  const column = columnIndexToLabel(simpleAddress.col)
+  const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+  const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
+  return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
+}
+
 /**
  * Computes simple (absolute) address of a cell address based on it's string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
@@ -75,6 +85,19 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
 }
 
 /**
+ * Returns string representation of absolute address
+ * If {@param withSheetName} is true and sheet index is not present in sheet mapping, returns undefined.
+ *
+ * @param sheetIndexMapping - mapping function needed to change sheet index to sheet name
+ * @param address - object representation of absolute address
+ * @param withSheetName - whether to return address with sheet name
+ * */
+export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, withSheetName: boolean = false): string | undefined => {
+  /* TODO */
+  return undefined
+}
+
+/**
 * Convert column label to index
 *
 * @param columnStringRepresentation - column label (e.g. 'AAB')
@@ -88,4 +111,15 @@ function columnLabelToIndex(columnStringRepresentation: string): number {
       return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
     }, 0) - 1
   }
+}
+
+function columnIndexToLabel(column: number) {
+  let result = ''
+
+  while (column >= 0) {
+    result = String.fromCharCode((column % 26) + 97) + result
+    column = Math.floor(column / 26) - 1
+  }
+
+  return result.toUpperCase()
 }
