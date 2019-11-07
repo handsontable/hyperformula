@@ -90,7 +90,7 @@ export class HyperFormula {
    *
    * @param sheets - object with sheets definition
    * @param maybeConfig - config
-  * */
+   */
   public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
   }
@@ -99,7 +99,7 @@ export class HyperFormula {
    * Builds empty engine instance.
    *
    * @param maybeConfig - config
-   * */
+   */
   public static buildEmpty(maybeConfig?: Config): HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
@@ -137,7 +137,7 @@ export class HyperFormula {
    * Returns array with values of all cells.
    *
    * @param sheet - sheet id number
-   * */
+   */
   public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
@@ -157,7 +157,8 @@ export class HyperFormula {
 
   /**
    * Returns map containing dimensions of all sheets.
-   * */
+   *
+   */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
     for (const sheetName of this.sheetMapping.names()) {
@@ -171,10 +172,10 @@ export class HyperFormula {
   }
 
   /**
-  * Returns dimensions of specific sheet.
-  *
-  * @param sheet - sheet id number
-  * */
+   * Returns dimensions of specific sheet.
+   *
+   * @param sheet - sheet id number
+   */
   public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
       width: this.dependencyGraph.getSheetWidth(sheet),
@@ -189,6 +190,13 @@ export class HyperFormula {
     return this.stats.snapshot()
   }
 
+  /**
+   * Returns information whether its possible to change content in given address
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param address - cell coordinates
+   */
   public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
     if (
       invalidSimpleCellAddress(address) ||
@@ -305,6 +313,15 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
   }
 
+  /**
+   * Returns information whether its possible to add rows
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param row - row number above which the rows will be added
+   * @param numberOfRowsToAdd - number of rows to add
+   */
   public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
     if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
       return false
@@ -329,7 +346,7 @@ export class HyperFormula {
    * @param sheet - sheet id in which rows will be added
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
-   * */
+   */
   public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): CellValueChange[] {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return []
@@ -347,6 +364,15 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Returns information whether its possible to remove rows
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sheet - sheet id from which rows will be removed
+   * @param rowStart - number of the first row to be deleted
+   * @param rowEnd - number of the last row to be deleted
+   */
   public isItPossibleToRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): boolean {
     if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
       return false
@@ -392,6 +418,15 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Returns information whether its possible to add columns
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   */
   public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
     if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
       return false
@@ -416,7 +451,7 @@ export class HyperFormula {
    * @param sheet - sheet id in which columns will be added
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
-   * */
+   */
   public addColumns(sheet: number, column: number, numberOfColumns: number = 1): CellValueChange[] {
     if (this.columnEffectivelyNotInSheet(column, sheet)) {
       return []
@@ -435,6 +470,15 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Returns information whether its possible to remove columns
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   */
   public isItPossibleToRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): boolean {
     if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
       return false
@@ -462,7 +506,7 @@ export class HyperFormula {
    * @param sheet - sheet id from which columns will be removed
    * @param columnStart - number of the first column to be deleted
    * @param columnEnd - number of the last row to be deleted
-   * */
+   */
   public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): CellValueChange[] {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
       return []
@@ -481,6 +525,16 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Returns information whether its possible to move cells
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sourceLeftCorner - address of the upper left corner of moved block
+   * @param width - width of the cell block being moved
+   * @param height - height of the cell block being moved
+   * @param destinationLeftCorner - upper left address of the target cell block
+   */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
     if (
       invalidSimpleCellAddress(sourceLeftCorner) ||
@@ -514,7 +568,7 @@ export class HyperFormula {
    * @param width - width of the cell block being moved
    * @param height - height of the cell block being moved
    * @param destinationLeftCorner - upper left address of the target cell block
-   * */
+   */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -541,18 +595,30 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Returns information whether its possible to add sheet
+   *
+   * If returns true, doing this operation won't throw any errors
+   */
   public isItPossibleToAddSheet(): boolean {
     return true
   }
 
   /**
    * Adds new sheet to engine. Name of the new sheet will be autogenerated.
-   * */
+   */
   public addSheet(): void {
     const sheetId = this.sheetMapping.addSheet()
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
+  /**
+   * Returns information whether its possible to remove sheet
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param sheet - sheet id number
+   */
   public isItPossibleToRemoveSheet(sheet: number): boolean {
     return this.sheetMapping.hasSheetWithId(sheet)
   }
@@ -561,7 +627,7 @@ export class HyperFormula {
    * Removes sheet with given id
    *
    * @param sheet - sheet id number
-   * */
+   */
   public removeSheet(sheet: number): CellValueChange[] {
     this.dependencyGraph.removeSheet(sheet)
 
@@ -578,21 +644,21 @@ export class HyperFormula {
 
   /**
    * Forces engine to recompute postponed transformations. Useful during testing.
-   * */
+   */
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
 
   /**
    * Disables numeric arrays detected during graph build phase replacing them with ordinary numeric cells.
-   * */
+   */
   public disableNumericMatrices(): void {
     this.dependencyGraph.disableNumericMatrices()
   }
 
   /**
    * Runs recomputation starting from recently changed vertices.
-   * */
+   */
   private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
@@ -606,7 +672,7 @@ export class HyperFormula {
 
   /**
    * Throws error when given address is incorrect.
-  * */
+   */
   private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
@@ -622,7 +688,7 @@ export class HyperFormula {
    *
    * @param row - row number
    * @param sheet - sheet id number
-  * */
+   */
   private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.addressMapping.getHeight(sheet)
     return row >= height;
@@ -633,7 +699,7 @@ export class HyperFormula {
    *
    * @param column - row number
    * @param sheet - sheet id number
-   * */
+   */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
     return column >= width;
