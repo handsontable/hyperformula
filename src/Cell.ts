@@ -47,24 +47,6 @@ export interface SheetCellAddress {
 }
 export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({ col, row })
 
-/**
- * Converts simple object representation of cell address to string representation.
- *
- * @param address - address to convert
- * @returns string representation, e.g. 'C64'
- */
-export function sheetCellAddressToString(address: SheetCellAddress): string {
-  let result = ''
-  let column = address.col
-
-  while (column >= 0) {
-    result = String.fromCharCode((column % 26) + 97) + result
-    column = Math.floor(column / 26) - 1
-  }
-
-  return `${result.toUpperCase()}${address.row + 1}`
-}
-
 export interface CellRange {
   start: CellAddress,
   end: CellAddress,

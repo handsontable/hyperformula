@@ -1,8 +1,9 @@
 import parse from 'csv-parse/lib/sync'
 import * as fs from 'fs'
 import * as path from 'path'
-import {sheetCellAddress, sheetCellAddressToString} from '../src/Cell'
 import {findBoundaries} from '../src/DependencyGraph'
+import {simpleCellAddressToString} from "../src/parser";
+import {simpleCellAddress} from "../src/Cell";
 
 // Config
 const CSV_DELIMITER = ','
@@ -82,9 +83,13 @@ for (let currentRowIdx = 0; currentRowIdx < height; currentRowIdx++) {
 
 differences.forEach((e: [number, number, string, string, string]) => {
   const [currentRowIdx, currentColumnIdx, expectedValue, actualValue, formulaString] = e
-  console.log(`In cell ${sheetCellAddressToString(sheetCellAddress(currentColumnIdx, currentRowIdx))} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
+  console.log(`In cell ${addressToString(currentColumnIdx, currentRowIdx)} expected '${expectedValue}' but got '${actualValue}'. Original raw cell content: ${formulaString}`)
 })
 
 if (differences.length > 0) {
   process.exit(1)
+}
+
+function addressToString(col: number, row: number) {
+  return simpleCellAddressToString(() => '', simpleCellAddress(0, col, row), 0)
 }

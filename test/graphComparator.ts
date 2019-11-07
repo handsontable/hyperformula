@@ -1,7 +1,7 @@
 import {deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {sheetCellAddressToString, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
   FormulaCellVertex,
@@ -10,6 +10,7 @@ import {
   ValueCellVertex,
   Vertex,
 } from '../src/DependencyGraph'
+import {simpleCellAddressToString} from "../src/parser";
 
 export class EngineComparator {
 
@@ -81,7 +82,7 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${sheetCellAddressToString(address)} (Sheet '${sheetMapping.name(address.sheet)}') are not same`)
+        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.name, address, 0)} (Sheet '${sheetMapping.name(address.sheet)}') are not same`)
       }
     }
   }

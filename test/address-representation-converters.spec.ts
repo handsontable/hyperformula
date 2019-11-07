@@ -1,28 +1,10 @@
-import {sheetCellAddress, sheetCellAddressToString, simpleCellAddress} from '../src/Cell'
+import {simpleCellAddress} from '../src/Cell'
 import {simpleCellAddressFromString, simpleCellAddressToString} from "../src/parser";
 
-describe('sheetCellAddressToString', () => {
-  it('is zero based', () => {
-    expect(sheetCellAddressToString(sheetCellAddress(0, 0))).toBe('A1')
-  })
-
-  it('last letter is Z', () => {
-    expect(sheetCellAddressToString(sheetCellAddress(25, 0))).toBe('Z1')
-    expect(sheetCellAddressToString(sheetCellAddress(26, 0))).toBe('AA1')
-  })
-
-  it('works for bigger rows', () => {
-    expect(sheetCellAddressToString(sheetCellAddress(2, 122))).toBe('C123')
-  })
-
-  it('works for many letters', () => {
-    expect(sheetCellAddressToString(sheetCellAddress(730, 0))).toBe('ABC1')
-  })
-})
 
 describe('simpleCellAddressFromString', () => {
   const sheetMappingFunction = (name: string): number | undefined => {
-    const index =  ['Sheet1', 'Sheet2', 'Sheet3'].indexOf(name)
+    const index = ['Sheet1', 'Sheet2', 'Sheet3'].indexOf(name)
     return index > 0 ? index : undefined
   }
 
@@ -50,7 +32,7 @@ describe('simpleCellAddressFromString', () => {
 
 describe('simpleCellAddressToString', () => {
   const sheetIndexMappingFunction = (index: number): string | undefined => {
-    const name =  ['Sheet1', 'Sheet2', 'Sheet3'][index]
+    const name = ['Sheet1', 'Sheet2', 'Sheet3'][index]
     return name
   }
 

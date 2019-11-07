@@ -123,6 +123,12 @@ function columnLabelToIndex(columnStringRepresentation: string): number {
   }
 }
 
+/**
+ * Converts column index to label
+ *
+ * @param column - address to convert
+ * @returns string representation, e.g. 'AAB'
+ */
 function columnIndexToLabel(column: number) {
   let result = ''
 
