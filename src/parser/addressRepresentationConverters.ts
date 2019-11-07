@@ -86,18 +86,22 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
 
 /**
  * Returns string representation of absolute address
- * If {@param withSheetName} is true and sheet index is not present in sheet mapping, returns undefined.
+ * If sheet index is not present in sheet mapping, returns undefined
  *
  * @param sheetIndexMapping - mapping function needed to change sheet index to sheet name
  * @param address - object representation of absolute address
- * @param withSheetName - whether to return address with sheet name
+ * @param sheetIndex - if is not equal with address sheet index, string representation will contain sheet name
  * */
-export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, withSheetName: boolean = false): string | undefined => {
+export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): string | undefined => {
   const column = columnIndexToLabel(address.col)
+  const sheetName = sheetIndexMapping(address.sheet)
 
-  if (withSheetName) {
-    const sheetName = sheetIndexMapping(address.sheet)
-    return sheetName !== undefined ? `\$${sheetName}.${column}${address.row + 1}` : undefined
+  if (sheetName === undefined) {
+    return undefined
+  }
+
+  if (sheetIndex !== address.sheet) {
+    return `\$${sheetName}.${column}${address.row + 1}`
   } else {
     return `${column}${address.row + 1}`
   }

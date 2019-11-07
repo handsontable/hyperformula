@@ -665,26 +665,26 @@ export class HyperFormula {
 
   /**
    * Computes simple (absolute) address of a cell address based on it's string representation.
-   * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
-   * If sheet name is not present in string representation and {@param overrideSheet} is passed, return {@param overrideSheet} as sheet index
+   * If sheet name is present in string representation but is not present in engine, returns undefined.
+   * If sheet name is not present in string representation, returns {@param sheet} as sheet number
    *
    * @param stringAddress - string representation of cell address, e.g. 'C64'
-   * @param overrideSheet - override sheet index regardless of sheet mapping
+   * @param sheet - override sheet index regardless of sheet mapping
    * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
    */
-  public simpleCellAddressFromString(stringAddress: string, overrideSheet: number) {
-    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, overrideSheet)
+  public simpleCellAddressFromString(stringAddress: string, sheet: number) {
+    return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, sheet)
   }
 
   /**
    * Returns string representation of absolute address
-   * If {@param withSheetName} is true and sheet index is not present in sheet mapping, returns undefined.
+   * If sheet index is not present in engine, returns undefined
    *
    * @param address - object representation of absolute address
-   * @param withSheetName - whether to return address with sheet name
+   * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
-  public simpleCellAddressToString(address: SimpleCellAddress, withSheetName: boolean = false): string | undefined {
-    return simpleCellAddressToString(this.sheetMapping.name, address, withSheetName)
+  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
+    return simpleCellAddressToString(this.sheetMapping.name, address, sheet)
   }
 
   /**

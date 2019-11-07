@@ -55,15 +55,16 @@ describe('simpleCellAddressToString', () => {
   }
 
   it('should return string representation', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0))).toEqual('A1')
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 50, 6))).toEqual('AY7')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0), 0)).toEqual('A1')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 50, 6), 0)).toEqual('AY7')
   })
 
   it('should return string representation with sheet name', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0), true)).toEqual('$Sheet1.A1')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 0, 0), 1)).toEqual('$Sheet1.A1')
   })
 
   it('should return undefined', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(42, 0, 0), true)).toBeUndefined()
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(42, 0, 0), 42)).toBeUndefined()
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(42, 0, 0), 1)).toBeUndefined()
   })
 })
