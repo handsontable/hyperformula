@@ -1,6 +1,8 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {SimpleRangeValue} from '../InterpreterValue'
+import {coerceScalarToNumber} from '../coerce'
 
 export class ExpPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -22,12 +24,16 @@ export class ExpPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     } else {
       const arg = this.evaluateAst(ast.args[0], formulaAddress)
-
-      if (typeof arg !== 'number') {
+      if (arg instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       }
 
-      return Math.exp(arg)
+      const coercedValue = coerceScalarToNumber(arg)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      } else {
+        return Math.exp(coercedValue)
+      }
     }
   }
 }
