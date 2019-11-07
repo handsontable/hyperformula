@@ -1,4 +1,4 @@
-import {IAnyOrAlt, ILexingResult, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
+import {ILexingResult, IOrAlt, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {
@@ -580,7 +580,7 @@ export class FormulaParser extends Parser {
 }
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
-type OrArg = Array<IAnyOrAlt<any>> | OrMethodOpts<any>
+type OrArg = Array<IOrAlt> | OrMethodOpts
 
 export class FormulaLexer {
   private readonly lexer: Lexer
