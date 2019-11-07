@@ -666,13 +666,13 @@ export class HyperFormula {
   /**
    * Computes simple (absolute) address of a cell address based on it's string representation.
    * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
-   * If sheet name is not present in string representation, returns {@param overrideSheet} as sheet number
+   * If sheet name is not present in string representation and {@param overrideSheet} is passed, return {@param overrideSheet} as sheet index
    *
    * @param stringAddress - string representation of cell address, e.g. 'C64'
    * @param overrideSheet - override sheet index regardless of sheet mapping
    * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
    */
-  public simpleCellAddressFromString(stringAddress: string, overrideSheet?: number) {
+  public simpleCellAddressFromString(stringAddress: string, overrideSheet: number) {
     return simpleCellAddressFromString(this.sheetMapping.get, stringAddress, overrideSheet)
   }
 

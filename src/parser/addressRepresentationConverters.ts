@@ -64,7 +64,7 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
  * @param overrideSheet - override sheet index regardless of sheet mapping
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, overrideSheet: number = 0): SimpleCellAddress | undefined => {
+export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, overrideSheet: number): SimpleCellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
   let col = columnLabelToIndex(result[4])
@@ -72,7 +72,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
   let sheet
   if (result[2]) {
     sheet = sheetMapping(result[2])
-  } else if (overrideSheet !== undefined) {
+  } else {
     sheet = overrideSheet
   }
 

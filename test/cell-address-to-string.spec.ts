@@ -27,12 +27,12 @@ describe('simpleCellAddressFromString', () => {
   }
 
   it('should return simple cell address', () => {
-    expect(simpleCellAddressFromString(sheetMappingFunction, 'A1')).toEqual(simpleCellAddress(0, 0, 0))
-    expect(simpleCellAddressFromString(sheetMappingFunction, 'AY7')).toEqual(simpleCellAddress(0, 50, 6))
+    expect(simpleCellAddressFromString(sheetMappingFunction, 'A1', 0)).toEqual(simpleCellAddress(0, 0, 0))
+    expect(simpleCellAddressFromString(sheetMappingFunction, 'AY7', 0)).toEqual(simpleCellAddress(0, 50, 6))
   })
 
   it('should return undefined', () => {
-    expect(simpleCellAddressFromString(sheetMappingFunction, '$Sheet4.A1')).toBeUndefined()
+    expect(simpleCellAddressFromString(sheetMappingFunction, '$Sheet4.A1', 0)).toBeUndefined()
   })
 
   it('should return address with overridden sheet', () => {
@@ -40,7 +40,7 @@ describe('simpleCellAddressFromString', () => {
   })
 
   it('should return address with sheet number from sheet mapping', () => {
-    expect(simpleCellAddressFromString(sheetMappingFunction, '$Sheet2.A1')).toEqual(simpleCellAddress(1, 0, 0))
+    expect(simpleCellAddressFromString(sheetMappingFunction, '$Sheet2.A1', 1)).toEqual(simpleCellAddress(1, 0, 0))
   })
 
   it('should return address with sheet number from sheet mapping regardless of override parameter', () => {
