@@ -3,8 +3,8 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe('Interpreter', () => {
-  it('function EXP happy path',  () => {
+describe('Function EXP', () => {
+  it('happy path',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=EXP(0)', '=EXP(2)'],
     ])
@@ -13,7 +13,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(7.38905609893065)
   })
 
-  it('function EXP given wrong argument type',  () => {
+  it('given wrong argument type',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=EXP("foo")'],
     ])
@@ -31,7 +31,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(1)
   })
 
-  it('function EXP given wrong number of arguments',  () => {
+  it('given wrong number of arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=EXP()'],
       ['=EXP(1, 2)'],
@@ -50,5 +50,13 @@ describe('Interpreter', () => {
     ])
 
     expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('errors propagation', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=EXP(4/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
