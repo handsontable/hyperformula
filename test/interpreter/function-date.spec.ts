@@ -64,13 +64,15 @@ describe('Function DATE', () => {
   })
 
   // // Inconsistency with Product 1
-  // it('range value results in VALUE error', () => {
-  //   const engine = HyperFormula.buildFromArray([
-  //     ['1'],
-  //     ['2', '=EXP(A1:A3)'],
-  //     ['3'],
-  //   ])
+  it('range value results in VALUE error', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2000'],
+      ['2', '2001', '=DATE(B1:B3, 1, 1)', '=DATE(1950, A1:A3, 1)', '=DATE(1950, 1, A1:A3)'],
+      ['3', '2002'],
+    ])
 
-  //   expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
-  // })
+    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('E2'))).toEqual(new CellError(ErrorType.VALUE))
+  })
 })
