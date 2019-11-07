@@ -32,7 +32,7 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {simpleCellAddressFromString} from "./parser/cellAddressFromString";
+import {simpleCellAddressFromString} from "./parser";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {

@@ -28,7 +28,7 @@ import {
   ParsingErrorType,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {cellAddressFromString, SheetMappingFn} from './cellAddressFromString'
+import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   AdditionOp,
   BooleanOp,

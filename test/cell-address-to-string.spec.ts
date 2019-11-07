@@ -1,5 +1,5 @@
 import {sheetCellAddress, sheetCellAddressToString, simpleCellAddress} from '../src/Cell'
-import {simpleCellAddressFromString} from "../src/parser/cellAddressFromString";
+import {simpleCellAddressFromString} from "../src/parser";
 
 describe('sheetCellAddressToString', () => {
   it('is zero based', () => {

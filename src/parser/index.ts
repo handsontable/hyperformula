@@ -1,4 +1,5 @@
-export {cellAddressFromString} from './cellAddressFromString'
+export {cellAddressFromString} from './addressRepresentationConverters'
+export {simpleCellAddressFromString} from './addressRepresentationConverters'
 
 export {CellAddress} from './CellAddress'
 
