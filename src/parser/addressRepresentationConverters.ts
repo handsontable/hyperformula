@@ -93,8 +93,14 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
  * @param withSheetName - whether to return address with sheet name
  * */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, withSheetName: boolean = false): string | undefined => {
-  /* TODO */
-  return undefined
+  const column = columnIndexToLabel(address.col)
+
+  if (withSheetName) {
+    const sheetName = sheetIndexMapping(address.sheet)
+    return sheetName !== undefined ? `\$${sheetName}.${column}${address.row + 1}` : undefined
+  } else {
+    return `${column}${address.row + 1}`
+  }
 }
 
 /**
