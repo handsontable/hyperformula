@@ -448,30 +448,13 @@ export class HyperFormula {
     return true
   }
 
-  /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  public addColumns(sheet: number, column: number, numberOfColumns: number = 1): CellValueChange[] {
-    if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return []
-    }
-
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
-
-    this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
+  public addColumns(sheet: number, ...indexes: Index[]) {
+    const normalizedIndexes = this.normalizeIndexes(indexes)
+    return this.batch(() => {
+      for (const index of normalizedIndexes) {
+        this.doAddColumns(sheet, index[0], index[1])
+      }
     })
-
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -786,6 +769,30 @@ export class HyperFormula {
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
+    })
+  }
+
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   */
+  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1) {
+    if (this.columnEffectivelyNotInSheet(column, sheet)) {
+      return
+    }
+
+    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
+
+    this.dependencyGraph.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
     })
   }
 }

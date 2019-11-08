@@ -100,11 +100,11 @@ describe('Adding column - matrix check', () => {
     ])
 
     expect(() => {
-      engine.addColumns(0, 0, 1)
+      engine.addColumns(0, [0, 1])
     }).toThrow(new Error('It is not possible to add column in column with matrix'))
 
     expect(() => {
-      engine.addColumns(0, 0, 1)
+      engine.addColumns(0, [0, 1])
     }).toThrow(new Error('It is not possible to add column in column with matrix'))
   })
 })
@@ -116,7 +116,7 @@ describe('Adding column - reevaluation', () => {
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 
@@ -130,7 +130,7 @@ describe('Adding column - reevaluation', () => {
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     expect(a2setCellValueSpy).not.toHaveBeenCalled()
     expect(c1setCellValueSpy).toHaveBeenCalled()
@@ -143,7 +143,7 @@ describe('Adding column - reevaluation', () => {
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
     expect(extractRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C1')))
@@ -156,7 +156,7 @@ describe('Adding column - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
 
-    const changes = engine.addColumns(0, 1, 1)
+    const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual({ sheet: 0, col: 3, row: 0, value: 3 })
@@ -169,7 +169,7 @@ describe('Adding column - FormulaCellVertex#address update', () => {
       ['1', /* new col */ '=A1'],
     ])
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     const c1 = engine.addressMapping.getCell(adr('C1')) as FormulaCellVertex
     expect(c1).toBeInstanceOf(FormulaCellVertex)
@@ -184,7 +184,7 @@ describe('Adding column', () => {
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
@@ -195,7 +195,7 @@ describe('Adding column', () => {
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('D1'))
@@ -213,7 +213,7 @@ describe('Adding column', () => {
       ],
     })
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
@@ -229,7 +229,7 @@ describe('Adding column', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
 
-    engine.addColumns(0, 1, 2)
+    engine.addColumns(0, [1, 2])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
@@ -243,7 +243,7 @@ describe('Adding column - address mapping', () => {
       ['1', /* new col */ '=A1'],
     ])
 
-    engine.addColumns(0, 1, 1)
+    engine.addColumns(0, [1, 1])
 
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 3,
@@ -263,7 +263,7 @@ describe('different sheet', () => {
       ],
     })
 
-    engine.addColumns(0, 0, 1)
+    engine.addColumns(0, [0, 1])
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
@@ -279,9 +279,9 @@ describe('Adding column - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
-    engine.addColumns(0, 1, 1)
-    engine.addColumns(0, 10, 15)
+    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    engine.addColumns(0, [1, 1])
+    engine.addColumns(0, [10, 15])
 
     expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
@@ -300,7 +300,7 @@ describe('Adding column - column index', () => {
 
     expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
 
-    engine.addColumns(0, 0, 1)
+    engine.addColumns(0, [0, 1])
 
     expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
     expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
