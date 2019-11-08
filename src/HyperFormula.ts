@@ -486,30 +486,13 @@ export class HyperFormula {
     return true
   }
 
-  /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): CellValueChange[] {
-    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return []
-    }
-
-    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    this.dependencyGraph.removeColumns(removedColumns)
-    this.columnSearch.removeColumns(removedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
+  public removeColumns(sheet: number, ...indexes: Index[]) {
+    const normalizedIndexes = this.normalizeIndexes(indexes)
+    return this.batch(() => {
+      for (const index of normalizedIndexes) {
+        this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
+      }
     })
-
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -793,6 +776,30 @@ export class HyperFormula {
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
+    })
+  }
+
+  /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   */
+  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
+      return
+    }
+
+    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
+
+    this.dependencyGraph.removeColumns(removedColumns)
+    this.columnSearch.removeColumns(removedColumns)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
     })
   }
 }
