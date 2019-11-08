@@ -39,6 +39,15 @@ export const enGB: TranslationPackage = {
     VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
   },
+  errors: {
+    DIV_BY_ZERO: '#DIV/0!',
+    NAME: '#NAME?',
+    VALUE: '#VALUE!',
+    NUM: '#NUM!',
+    NA: '#N/A',
+    CYCLE: '#CYCLE!',
+    REF: '#REF!',
+  },
   interface: {
     NEW_SHEET_PREFIX: 'Sheet'
   }

@@ -39,6 +39,15 @@ export const plPL: TranslationPackage = {
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
   },
+  errors: {
+    DIV_BY_ZERO: '#DZIEL/0!',
+    NAME: '#NAZWA?',
+    VALUE: '#ARG!',
+    NUM: '#LICZBA!',
+    NA: '#N/A',
+    CYCLE: '#CYKL!',
+    REF: '#ADR!',
+  },
   interface: {
     NEW_SHEET_PREFIX: 'Arkusz'
   }
