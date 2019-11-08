@@ -360,16 +360,6 @@ describe('changing cell content', () => {
     }).toThrow('You cannot modify only part of an array')
   })
 
-  it('is not recomputed if user doesnt want it', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=B1'],
-    ])
-
-    engine.setCellContent(adr('B1'), '3', false)
-
-    expect(engine.getCellValue(adr('C1'))).toBe(2)
-  })
-
   it('is not possible to set cell content in sheet which does not exist', () => {
     const sheet = [
       ['1', '2'],

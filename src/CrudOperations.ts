@@ -6,18 +6,32 @@ import {ColumnsSpan} from "./ColumnsSpan";
 import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
 import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
 import {Config} from "./Config";
-import {AddressMapping, DependencyGraph} from "./DependencyGraph";
+import {
+  AddressMapping,
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  SheetMapping,
+  ValueCellVertex
+} from "./DependencyGraph";
 import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
-import {ParserWithCaching} from "./parser";
+import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from "./parser";
 import {Evaluator} from "./Evaluator";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
 import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
-import {invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
+import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
+import {ContentChanges} from "./ContentChanges";
+import {buildMatrixVertex} from "./GraphBuilder";
+import {absolutizeDependencies} from "./absolutizeDependencies";
 
 export class CrudOperations implements IBatchExecutor {
+
+  private changes: ContentChanges = ContentChanges.empty()
+
   constructor(
       /** Engine config */
       private readonly config: Config,
@@ -65,6 +79,92 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
+  public moveCells (sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
+    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
+
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
+    this.columnSearch.removeValues(valuesToRemove)
+    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
+    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
+    })
+
+    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
+    this.ensureThatAddressIsCorrect(address)
+
+    let vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && isNaN(Number(newCellContent))) {
+      this.dependencyGraph.breakNumericMatrix(vertex)
+      vertex = this.dependencyGraph.getCell(address)
+    }
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
+      const newValue = Number(newCellContent)
+      const oldValue = this.dependencyGraph.getCellValue(address)
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      vertex.setMatrixCellValue(address, newValue)
+      this.columnSearch.change(oldValue, newValue, address)
+      this.changes.addChange(newValue, address)
+    } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
+      const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
+      const parseResult = this.parser.parse(matrixFormula, address)
+
+      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+
+      if (!size || !(newVertex instanceof MatrixVertex)) {
+        throw Error('What if new matrix vertex is not properly constructed?')
+      }
+
+      this.dependencyGraph.addNewMatrixVertex(newVertex)
+      this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+    } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
+      if (isFormula(newCellContent)) {
+        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
+        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+      } else if (newCellContent === '') {
+        const oldValue = this.dependencyGraph.getCellValue(address)
+        this.columnSearch.remove(oldValue, address)
+        this.changes.addChange(EmptyValue, address)
+        this.dependencyGraph.setCellEmpty(address)
+      } else if (!isNaN(Number(newCellContent))) {
+        const newValue = Number(newCellContent)
+        const oldValue = this.dependencyGraph.getCellValue(address)
+        this.dependencyGraph.setValueToCell(address, newValue)
+        this.columnSearch.change(oldValue, newValue, address)
+        this.changes.addChange(newValue, address)
+      } else {
+        const oldValue = this.dependencyGraph.getCellValue(address)
+        this.dependencyGraph.setValueToCell(address, newCellContent)
+        this.columnSearch.change(oldValue, newCellContent, address)
+        this.changes.addChange(newCellContent, address)
+      }
+    } else {
+      throw new Error('Illegal operation')
+    }
+  }
+
+  public getAndClearContentChanges(): ContentChanges {
+    const changes = this.changes
+    this.changes = ContentChanges.empty()
+    return changes
+  }
+
   /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
@@ -73,7 +173,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  public doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return
     }
@@ -96,7 +196,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  public doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
@@ -119,7 +219,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
    */
-  public doAddColumns(sheet: number, column: number, numberOfColumns: number = 1) {
+  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1) {
     if (this.columnEffectivelyNotInSheet(column, sheet)) {
       return
     }
@@ -143,7 +243,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param columnStart - number of the first column to be deleted
    * @param columnEnd - number of the last row to be deleted
    */
-  public doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
       return
     }
@@ -157,31 +257,6 @@ export class CrudOperations implements IBatchExecutor {
       RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
     })
-  }
-
-
-  public moveCells (sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
-    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
-
-    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
-    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
-    const toSheet = destinationLeftCorner.sheet
-
-    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
-    this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
-    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
-    })
-
-    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
   /**
@@ -210,8 +285,25 @@ export class CrudOperations implements IBatchExecutor {
     return this.dependencyGraph.addressMapping
   }
 
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
   private normalizeIndexes(indexes: Index[]): Index[] {
     /* TODO */
     return indexes
+  }
+
+  /**
+   * Throws error when given address is incorrect.
+   */
+  private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
+    if (invalidSimpleCellAddress(address)) {
+      throw new InvalidAddressError(address)
+    }
+
+    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
+      throw new NoSuchSheetError(address.sheet)
+    }
   }
 }

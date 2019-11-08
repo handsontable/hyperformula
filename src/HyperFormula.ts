@@ -1,41 +1,24 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
   AddressMapping,
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
+  DependencyGraph, FormulaCellVertex,
   Graph,
-  MatrixMapping,
-  MatrixVertex,
+  MatrixMapping, MatrixVertex,
   RangeMapping,
   SheetMapping,
-  ValueCellVertex,
   Vertex
 } from './DependencyGraph'
-import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
-import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
+import {Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {
-  isFormula,
-  isMatrix,
-  ParserWithCaching,
-  ProcedureAst,
-  simpleCellAddressFromString,
-  simpleCellAddressToString,
-  Unparser,
-} from './parser'
+import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
@@ -256,67 +239,9 @@ export class HyperFormula {
    * @param newCellContent - new cell content
    * @param recompute - specifies if recomputation should be fired after change
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): CellValueChange[] {
-    this.ensureThatAddressIsCorrect(address)
-
-    const changes = new ContentChanges()
-    let vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && isNaN(Number(newCellContent))) {
-      this.dependencyGraph.breakNumericMatrix(vertex)
-      vertex = this.dependencyGraph.getCell(address)
-    }
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
-      const newValue = Number(newCellContent)
-      const oldValue = this.dependencyGraph.getCellValue(address)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
-      changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
-      const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
-      const parseResult = this.parser.parse(matrixFormula, address)
-
-      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-
-      if (!size || !(newVertex instanceof MatrixVertex)) {
-        throw Error('What if new matrix vertex is not properly constructed?')
-      }
-
-      this.dependencyGraph.addNewMatrixVertex(newVertex)
-      this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-    } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
-        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-      } else if (newCellContent === '') {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnSearch.remove(oldValue, address)
-        changes.addChange(EmptyValue, address)
-        this.dependencyGraph.setCellEmpty(address)
-      } else if (!isNaN(Number(newCellContent))) {
-        const newValue = Number(newCellContent)
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnSearch.change(oldValue, newValue, address)
-        changes.addChange(newValue, address)
-      } else {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newCellContent)
-        this.columnSearch.change(oldValue, newCellContent, address)
-        changes.addChange(newCellContent, address)
-      }
-    } else {
-      throw new Error('Illegal operation')
-    }
-
-    if (recompute) {
-      return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
-    }
-
-    return changes.getChanges()
+  public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
+    this.crudOperations.setCellContent(address, newCellContent)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -334,20 +259,17 @@ export class HyperFormula {
       }
     }
 
-    const changes = new ContentChanges()
-
-    for (let i = 0; i < cellContents.length; i++) {
-      for (let j = 0; j < cellContents[i].length; j++) {
-        const change = this.setCellContent({
-          sheet: topLeftCornerAddress.sheet,
-          row: topLeftCornerAddress.row + i,
-          col: topLeftCornerAddress.col + j,
-        }, cellContents[i][j], false)
-        changes.add(...change)
+    return this.batch((e) => {
+      for (let i = 0; i < cellContents.length; i++) {
+        for (let j = 0; j < cellContents[i].length; j++) {
+          e.setCellContent({
+            sheet: topLeftCornerAddress.sheet,
+            row: topLeftCornerAddress.row + i,
+            col: topLeftCornerAddress.col + j,
+          }, cellContents[i][j])
+        }
       }
-    }
-
-    return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
+    })
   }
 
   /**
@@ -649,26 +571,14 @@ export class HyperFormula {
    * Runs recomputation starting from recently changed vertices.
    */
   private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
+    const changes = this.crudOperations.getAndClearContentChanges()
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
     if (verticesToRecomputeFrom.length > 0) {
-      return this.evaluator.partialRun(verticesToRecomputeFrom)
+      changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
     }
 
-    return ContentChanges.empty()
-  }
-
-  /**
-   * Throws error when given address is incorrect.
-   */
-  private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
-    if (invalidSimpleCellAddress(address)) {
-      throw new InvalidAddressError(address)
-    }
-
-    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
-    }
+    return changes
   }
 }

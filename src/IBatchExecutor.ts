@@ -8,5 +8,6 @@ export interface IBatchExecutor {
   addColumns: (sheet: number, ...indexes: Index[]) => void
   removeColumns: (sheet: number, ...indexes: Index[]) => void
   moveCells: (sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) => void
+  setCellContent: (address: SimpleCellAddress, newCellContent: string) => void
 }
 
