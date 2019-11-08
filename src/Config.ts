@@ -104,6 +104,10 @@ export class Config {
     return this.language.functions[functionTranslationKey]
   }
 
+  public getErrorTranslationFor(functionTranslationKey: string): string {
+    return this.language.functions[functionTranslationKey]
+  }
+
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
   }

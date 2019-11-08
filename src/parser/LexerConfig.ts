@@ -1,5 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ParserConfig} from './ParserConfig'
+import {ErrorType} from "../Cell";
+import {TranslationPackage} from "../i18n";
 
 /* arithmetic */
 // abstract for + -
@@ -36,13 +38,41 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
 export const RelativeCell = createToken({name: 'RelativeCell', pattern: /[A-Za-z]+[0-9]+/, categories: CellReference})
-export const AbsoluteColCell = createToken({name: 'AbsoluteColCell', pattern: /\$[A-Za-z]+[0-9]+/, categories: CellReference})
-export const AbsoluteRowCell = createToken({name: 'AbsoluteRowCell', pattern: /[A-Za-z]+\$[0-9]+/, categories: CellReference})
-export const AbsoluteCell = createToken({name: 'AbsoluteCell', pattern: /\$[A-Za-z]+\$[0-9]+/, categories: CellReference})
-export const SheetRelativeCell = createToken({name: 'SheetRelativeCell', pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+[0-9]+/, categories: CellReference})
-export const SheetAbsoluteColCell = createToken({name: 'SheetAbsoluteColCell', pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+[0-9]+/, categories: CellReference})
-export const SheetAbsoluteRowCell = createToken({name: 'SheetAbsoluteRowCell', pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+\$[0-9]+/, categories: CellReference})
-export const SheetAbsoluteCell = createToken({name: 'SheetAbsoluteCell', pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+\$[0-9]+/, categories: CellReference})
+export const AbsoluteColCell = createToken({
+  name: 'AbsoluteColCell',
+  pattern: /\$[A-Za-z]+[0-9]+/,
+  categories: CellReference
+})
+export const AbsoluteRowCell = createToken({
+  name: 'AbsoluteRowCell',
+  pattern: /[A-Za-z]+\$[0-9]+/,
+  categories: CellReference
+})
+export const AbsoluteCell = createToken({
+  name: 'AbsoluteCell',
+  pattern: /\$[A-Za-z]+\$[0-9]+/,
+  categories: CellReference
+})
+export const SheetRelativeCell = createToken({
+  name: 'SheetRelativeCell',
+  pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+[0-9]+/,
+  categories: CellReference
+})
+export const SheetAbsoluteColCell = createToken({
+  name: 'SheetAbsoluteColCell',
+  pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+[0-9]+/,
+  categories: CellReference
+})
+export const SheetAbsoluteRowCell = createToken({
+  name: 'SheetAbsoluteRowCell',
+  pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+\$[0-9]+/,
+  categories: CellReference
+})
+export const SheetAbsoluteCell = createToken({
+  name: 'SheetAbsoluteCell',
+  pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+\$[0-9]+/,
+  categories: CellReference
+})
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
 /* parenthesis */
@@ -72,13 +102,19 @@ export interface ILexerConfig {
   ArgSeparator: TokenType,
   OffsetProcedureName: TokenType
   allTokens: TokenType[],
+  errorMapping: Record<string, ErrorType>
 }
+
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
 
   const offsetProcedureNameLiteral = config.language.functions['OFFSET'] || 'OFFSET'
-  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
+  const OffsetProcedureName = createToken({
+    name: 'OffsetProcedureName',
+    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
+  })
+  const errorMapping = buildErrorMapping(config.language)
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -121,5 +157,13 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator,
     OffsetProcedureName,
     allTokens,
+    errorMapping
   }
+}
+
+const buildErrorMapping = (language: TranslationPackage): Record<string, ErrorType> => {
+  return Object.keys(language.errors).reduce((ret, key) => {
+    ret[language.errors[key as ErrorType]] = key as ErrorType
+    return ret
+  }, {} as Record<string, ErrorType>)
 }

@@ -56,10 +56,6 @@ import {
   TimesOp,
 } from './LexerConfig'
 
-const errors: Record<string, ErrorType> = {
-  REF: ErrorType.REF,
-}
-
 /**
  * LL(k) formula parser described using Chevrotain DSL
  *
@@ -271,10 +267,11 @@ export class FormulaParser extends Parser {
       },
       {
         ALT: () => {
-          const err = this.CONSUME(ErrorLiteral)
-          const errString = err.image.slice(1, -1).toUpperCase()
-          if (errors[errString]) {
-            return buildCellErrorAst(new CellError(errors[errString]))
+          const errString = this.CONSUME(ErrorLiteral).image.toUpperCase()
+          const errorType = this.lexerConfig.errorMapping[errString]
+          console.log
+          if (errorType) {
+            return buildCellErrorAst(new CellError(errorType))
           } else {
             return buildErrorAst([])
           }
