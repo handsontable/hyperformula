@@ -118,37 +118,37 @@ export class LazilyTransformingAstService {
       const transformation = this.transformations[v]
       switch (transformation.type) {
         case TransformationType.ADD_COLUMNS: {
-          const [newAst, newAddress] = AddColumnsDependencyTransformer.transform2(transformation.addedColumns, ast, address)
+          const [newAst, newAddress] = AddColumnsDependencyTransformer.transformSingleAst(transformation.addedColumns, ast, address)
           ast = newAst
           address = newAddress
           break
         }
         case TransformationType.ADD_ROWS: {
-          const [newAst, newAddress] = AddRowsDependencyTransformer.transform2(transformation.addedRows, ast, address)
+          const [newAst, newAddress] = AddRowsDependencyTransformer.transformSingleAst(transformation.addedRows, ast, address)
           ast = newAst
           address = newAddress
           break
         }
         case TransformationType.REMOVE_COLUMNS: {
-          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transform2(transformation.removedColumns, ast, address)
+          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transformSingleAst(transformation.removedColumns, ast, address)
           ast = newAst
           address = newAddress
           break
         }
         case TransformationType.REMOVE_ROWS: {
-          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transform2(transformation.removedRows, ast, address)
+          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
           ast = newAst
           address = newAddress
           break
         }
         case TransformationType.MOVE_CELLS: {
-          const [newAst, newAddress] = MoveCellsDependencyTransformer.transform2(transformation, ast, address)
+          const [newAst, newAddress] = MoveCellsDependencyTransformer.transformSingleAst(transformation, ast, address)
           ast = newAst
           address = newAddress
           break
         }
         case TransformationType.REMOVE_SHEET: {
-          ast = RemoveSheetDependencyTransformer.transform2(transformation.sheet, ast, address)
+          ast = RemoveSheetDependencyTransformer.transformSingleAst(transformation.sheet, ast, address)
           break
         }
       }

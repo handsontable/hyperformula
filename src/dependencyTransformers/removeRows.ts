@@ -5,27 +5,27 @@ import {RowsSpan} from '../RowsSpan'
 import {
   fixFormulaVertexRow,
   transformAddressesInFormula,
-  TransformCellAddressFunction,
-  TransformCellRangeFunction,
+  CellAddressTransformerFunction,
+  CellRangeTransformerFunction,
 } from './common'
 
 export namespace RemoveRowsDependencyTransformer {
   export function transform(removedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(removedRows, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transformSingleAst(removedRows, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(removedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+  export function transformSingleAst(removedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = transformDependencies(removedRows)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences2(removedRows, transformCellAddressFn))
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(removedRows, transformCellAddressFn))
     return [newAst, fixFormulaVertexRow(nodeAddress, removedRows.sheet, removedRows.rowStart, -removedRows.numberOfRows)]
   }
 
-  export const transformCellRangeByReferences2 = (removedRows: RowsSpan, transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+  const cellRangeTransformer = (removedRows: RowsSpan, transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
@@ -59,7 +59,7 @@ export namespace RemoveRowsDependencyTransformer {
     }
   }
 
-  export function transformDependencies(removedRows: RowsSpan): TransformCellAddressFunction {
+  function transformDependencies(removedRows: RowsSpan): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       // Case 4
       if (removedRows.sheet !== formulaAddress.sheet && removedRows.sheet !== dependencyAddress.sheet) {

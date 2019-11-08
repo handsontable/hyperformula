@@ -2,25 +2,25 @@ import {SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {RowsSpan} from '../RowsSpan'
-import {fixFormulaVertexRow, transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
+import {fixFormulaVertexRow, transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from './common'
 
 export namespace AddRowsDependencyTransformer {
   export function transform(addedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(addedRows, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transformSingleAst(addedRows, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(addedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const transformCellAddressFn = transformDependencies(addedRows)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+  export function transformSingleAst(addedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = cellAddressTransformer(addedRows)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(transformCellAddressFn))
     return [newAst, fixFormulaVertexRow(nodeAddress, addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)]
   }
 
-  export function transformDependencies(addedRows: RowsSpan): TransformCellAddressFunction {
+  function cellAddressTransformer(addedRows: RowsSpan): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       // Case 4 and 5
       if ((dependencyAddress.sheet !== addedRows.sheet)

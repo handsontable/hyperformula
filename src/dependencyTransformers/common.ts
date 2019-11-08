@@ -1,11 +1,11 @@
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
-export type TransformCellAddressFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
+export type CellAddressTransformerFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
 
-export type TransformCellRangeFunction = (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, formulaAddress: SimpleCellAddress) => [CellAddress, CellAddress] | ErrorType.REF | false
+export type CellRangeTransformerFunction = (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, formulaAddress: SimpleCellAddress) => [CellAddress, CellAddress] | ErrorType.REF | false
 
-export const transformCellRangeByReferences = (transformCellAddressFn: TransformCellAddressFunction): TransformCellRangeFunction => {
+export const cellRangeTransformer = (transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
   return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
     const newStart = transformCellAddressFn(dependencyRangeStart, address)
     const newEnd = transformCellAddressFn(dependencyRangeEnd, address)
@@ -19,7 +19,7 @@ export const transformCellRangeByReferences = (transformCellAddressFn: Transform
   }
 }
 
-export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: TransformCellAddressFunction, transformCellRangeFn: TransformCellRangeFunction): Ast {
+export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: CellAddressTransformerFunction, transformCellRangeFn: CellRangeTransformerFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = transformCellAddressFn(ast.reference, address)

@@ -3,7 +3,7 @@ import { ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MoveCellsTransformation} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
-import {transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
+import {transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -15,13 +15,13 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  export function transform2(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+  export function transformSingleAst(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     if (transformation.sourceRange.addressInRange(nodeAddress)) {
       const newAst = transformAddressesInFormula(
           ast,
           nodeAddress,
           fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
-          transformCellRangeByReferences(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
+          cellRangeTransformer(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
       )
 
       return [newAst, {
@@ -35,7 +35,7 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): TransformCellAddressFunction {
+  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       const targetRange = sourceRange.shifted(toRight, toBottom)
 
@@ -58,7 +58,7 @@ export namespace MoveCellsDependencyTransformer {
     return false
   }
 
-  export function transformDependentFormulas(ast: Ast, address: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
+  function transformDependentFormulas(ast: Ast, address: SimpleCellAddress, sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number): Ast {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const newCellAddress = fixDependenciesWhenMovingCells(ast.reference, address, sourceRange, toRight, toBottom, toSheet)

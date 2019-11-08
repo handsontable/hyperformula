@@ -2,25 +2,25 @@ import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {fixFormulaVertexColumn, transformAddressesInFormula, TransformCellAddressFunction, transformCellRangeByReferences} from './common'
+import {fixFormulaVertexColumn, transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from './common'
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(addedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
     for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = transform2(addedColumns, node.getFormula()!, node.getAddress())
+      const [newAst, newAddress] = transformSingleAst(addedColumns, node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
     }
   }
 
-  export function transform2(addedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const transformCellAddressFn = transformDependencies(addedColumns)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeByReferences(transformCellAddressFn))
+  export function transformSingleAst(addedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
+    const transformCellAddressFn = cellAddressTransformer(addedColumns)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(transformCellAddressFn))
     return [newAst, fixFormulaVertexColumn(nodeAddress, addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)]
   }
 
-  export function transformDependencies(addedColumns: ColumnsSpan): TransformCellAddressFunction {
+  function cellAddressTransformer(addedColumns: ColumnsSpan): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       // Case 4 and 5
       if ((dependencyAddress.sheet !== addedColumns.sheet)
