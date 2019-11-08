@@ -4,7 +4,7 @@ import {ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB} from "../../src/i18n";
+import {enGB, plPL} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()
@@ -115,5 +115,16 @@ describe('Unparse', () => {
     const unparsed = unparser.unparse(ast, adr('A1'))
 
     expect(unparsed).toEqual('=#REF!')
+  })
+
+  it('#unparse with known error with translation', () => {
+    const config = new Config({ language: plPL })
+    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const unparser = new Unparser(config, sheetMapping.name)
+    const formula = '=#ADR!'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=#ADR!')
   })
 })

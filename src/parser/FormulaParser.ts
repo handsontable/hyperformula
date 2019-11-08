@@ -269,7 +269,6 @@ export class FormulaParser extends Parser {
         ALT: () => {
           const errString = this.CONSUME(ErrorLiteral).image.toUpperCase()
           const errorType = this.lexerConfig.errorMapping[errString]
-          console.log
           if (errorType) {
             return buildCellErrorAst(new CellError(errorType))
           } else {

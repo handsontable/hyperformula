@@ -15,6 +15,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ErrorType} from "./Cell";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -104,8 +105,8 @@ export class Config {
     return this.language.functions[functionTranslationKey]
   }
 
-  public getErrorTranslationFor(functionTranslationKey: string): string {
-    return this.language.functions[functionTranslationKey]
+  public getErrorTranslationFor(functionTranslationKey: ErrorType): string {
+    return this.language.errors[functionTranslationKey]
   }
 
   public allFunctionPlugins(): any[] {

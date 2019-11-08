@@ -50,7 +50,7 @@ export class Unparser {
       }
       case AstNodeType.ERROR: {
         if (ast.error) {
-          return `#${ast.error.type}!`
+          return this.config.getErrorTranslationFor(ast.error.type)
         } else {
           return '#ERR!'
         }
