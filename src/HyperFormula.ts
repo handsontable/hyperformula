@@ -40,6 +40,8 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
+import {CrudOperations} from "./CrudOperations";
+import {IBatchExecutor} from "./IBatchExecutor";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -61,12 +63,16 @@ function isNonnegativeInteger(x: number) {
   return Number.isInteger(x) && x >= 0
 }
 
-type Index = [number, number]
+export type Index = [number, number]
 
 /**
  * Engine for one sheet
  */
 export class HyperFormula {
+
+  private crudOperations: CrudOperations
+  private batchMode: boolean = false
+
   constructor(
       /** Engine config */
       public readonly config: Config,
@@ -84,6 +90,7 @@ export class HyperFormula {
       /** Service handling postponed CRUD transformations */
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, evaluator, lazilyTransformingAstService)
   }
 
   /**
@@ -371,12 +378,8 @@ export class HyperFormula {
   }
 
   public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
-    return this.batch(() => {
-      for (const index of normalizedIndexes) {
-        this.doAddRows(sheet, index[0], index[1])
-      }
-    })
+    this.crudOperations.addRows(sheet, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -409,17 +412,8 @@ export class HyperFormula {
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
-    return this.batch(() => {
-      for (const index of normalizedIndexes) {
-        this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
-      }
-    })
-  }
-
-  private normalizeIndexes(indexes: Index[]): Index[] {
-    /* TODO */
-    return indexes
+    this.crudOperations.removeRows(sheet, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -448,13 +442,9 @@ export class HyperFormula {
     return true
   }
 
-  public addColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
-    return this.batch(() => {
-      for (const index of normalizedIndexes) {
-        this.doAddColumns(sheet, index[0], index[1])
-      }
-    })
+  public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.addColumns(sheet, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -486,13 +476,9 @@ export class HyperFormula {
     return true
   }
 
-  public removeColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
-    return this.batch(() => {
-      for (const index of normalizedIndexes) {
-        this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
-      }
-    })
+  public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.removeColumns(sheet, ...indexes)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -655,8 +641,8 @@ export class HyperFormula {
    *
    * @param batchOperations
   * */
-  public batch(batchOperations: () => void): CellValueChange[] {
-    batchOperations.call(this)
+  public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
+    batchOperations(this.crudOperations)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -685,121 +671,5 @@ export class HyperFormula {
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
       throw new NoSuchSheetError(address.sheet)
     }
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param row - row number
-   * @param sheet - sheet id number
-   */
-  private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    const height = this.addressMapping.getHeight(sheet)
-    return row >= height;
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param column - row number
-   * @param sheet - sheet id number
-   */
-  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
-    const width = this.addressMapping.getWidth(sheet)
-    return column >= width;
-  }
-
-  /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
-   * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return
-    }
-
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    this.dependencyGraph.removeRows(removedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
-    })
-  }
-
-  /**
-   * Add multiple rows to sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
-   */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return
-    }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
-    })
-  }
-
-  /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1) {
-    if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return
-    }
-
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
-
-    this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
-    })
-  }
-
-  /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
-    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return
-    }
-
-    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    this.dependencyGraph.removeColumns(removedColumns)
-    this.columnSearch.removeColumns(removedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
-    })
   }
 }
