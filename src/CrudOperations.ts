@@ -11,8 +11,11 @@ import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {ParserWithCaching} from "./parser";
 import {Evaluator} from "./Evaluator";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index} from "./HyperFormula";
+import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
+import {invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
+import {AbsoluteCellRange} from "./AbsoluteCellRange";
+import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
 
 export class CrudOperations implements IBatchExecutor {
   constructor(
@@ -156,6 +159,30 @@ export class CrudOperations implements IBatchExecutor {
     })
   }
 
+
+  public moveCells (sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
+    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
+
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
+    this.columnSearch.removeValues(valuesToRemove)
+    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
+    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
+    })
+
+    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+  }
 
   /**
    * Returns true if row number is outside of given sheet.

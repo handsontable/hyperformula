@@ -71,7 +71,6 @@ export type Index = [number, number]
 export class HyperFormula {
 
   private crudOperations: CrudOperations
-  private batchMode: boolean = false
 
   constructor(
       /** Engine config */
