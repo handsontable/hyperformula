@@ -59,7 +59,7 @@ export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
 /* error literal */
-export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z]+!/})
+export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z\/]+[\?\!]?/})
 
 /* skipping whitespaces */
 export const WhiteSpace = createToken({
