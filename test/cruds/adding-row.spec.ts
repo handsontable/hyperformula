@@ -103,11 +103,11 @@ describe('Adding row - matrix check', () => {
     ])
 
     expect(() => {
-      engine.addRows(0, 3, 1)
+      engine.addRows(0, [3, 1])
     }).toThrow(new Error('It is not possible to add row in row with matrix'))
 
     expect(() => {
-      engine.addRows(0, 2, 1)
+      engine.addRows(0, [2, 1])
     }).toThrow(new Error('It is not possible to add row in row with matrix'))
   })
 })
@@ -121,7 +121,7 @@ describe('Adding row - reevaluation', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
 
@@ -136,7 +136,7 @@ describe('Adding row - reevaluation', () => {
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     expect(b1setCellValueSpy).toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
@@ -150,7 +150,7 @@ describe('Adding row - reevaluation', () => {
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
-    engine.addRows(0, 0, 1)
+    engine.addRows(0, [0, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
@@ -162,7 +162,7 @@ describe('Adding row - reevaluation', () => {
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
 
-    const changes = engine.addRows(0, 1, 1)
+    const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
@@ -178,7 +178,7 @@ describe('Adding row - MatrixVertex', () => {
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
@@ -195,7 +195,7 @@ describe('Adding row - MatrixVertex', () => {
       ],
     })
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
@@ -208,7 +208,7 @@ describe('Adding row - MatrixVertex', () => {
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('A4'))
@@ -224,7 +224,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     let vertex = engine.addressMapping.fetchCell(adr('A1')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1'))
-    engine.addRows(0, 0, 1)
+    engine.addRows(0, [0, 1])
     vertex = engine.addressMapping.fetchCell(adr('A2')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A2'))
   })
@@ -240,7 +240,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
       ],
     })
 
-    engine.addRows(0, 0, 1)
+    engine.addRows(0, [0, 1])
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
@@ -260,7 +260,7 @@ describe('Adding row - matrices adjustments', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
 
-    engine.addRows(0, 1, 2)
+    engine.addRows(0, [1, 2])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toEqual(0)
@@ -276,7 +276,7 @@ describe('Adding row - address mapping', () => {
       ['2'],
     ])
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 1,
@@ -292,9 +292,9 @@ describe('Adding row - sheet dimensions', () => {
       // new row
     ])
 
-    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
-    engine.addRows(0, 1, 1)
-    engine.addRows(0, 10, 15)
+    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    engine.addRows(0, [1, 1])
+    engine.addRows(0, [10, 15])
 
     expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
@@ -311,7 +311,7 @@ describe('Adding row - column index', () => {
         ['2'],
     ], new Config({ useColumnIndex: true }))
 
-    engine.addRows(0, 1, 1)
+    engine.addRows(0, [1, 1])
 
     const index = (engine.columnSearch as ColumnIndex)
     expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)

@@ -61,6 +61,8 @@ function isNonnegativeInteger(x: number) {
   return Number.isInteger(x) && x >= 0
 }
 
+type Index = [number, number]
+
 /**
  * Engine for one sheet
  */
@@ -368,29 +370,13 @@ export class HyperFormula {
     return true
   }
 
-  /**
-   * Add multiple rows to sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
-   */
-  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): CellValueChange[] {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return []
-    }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
+  public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    const normalizedIndexes = this.normalizeIndexes(indexes)
+    return this.batch(() => {
+      for (const index of normalizedIndexes) {
+        this.doAddRows(sheet, index[0], index[1])
+      }
     })
-
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -422,29 +408,18 @@ export class HyperFormula {
     return true
   }
 
-  /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
-   * */
-  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): CellValueChange[] {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return []
-    }
-
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    this.dependencyGraph.removeRows(removedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
+  public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    const normalizedIndexes = this.normalizeIndexes(indexes)
+    return this.batch(() => {
+      for (const index of normalizedIndexes) {
+        this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
+      }
     })
+  }
 
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  private normalizeIndexes(indexes: Index[]): Index[] {
+    /* TODO */
+    return indexes
   }
 
   /**
@@ -710,13 +685,23 @@ export class HyperFormula {
   }
 
   /**
+   * Run multiple operations and recompute formulas at the end
+   *
+   * @param batchOperations
+  * */
+  public batch(batchOperations: () => void): CellValueChange[] {
+    batchOperations.call(this)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
    * Runs recomputation starting from recently changed vertices.
    */
   private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
-    if (verticesToRecomputeFrom) {
+    if (verticesToRecomputeFrom.length > 0) {
       return this.evaluator.partialRun(verticesToRecomputeFrom)
     }
 
@@ -756,5 +741,51 @@ export class HyperFormula {
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
     return column >= width;
+  }
+
+  /**
+   * Removes multiple rows from sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which rows will be removed
+   * @param rowStart - number of the first row to be deleted
+   * @param rowEnd - number of the last row to be deleted
+   * */
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
+      return
+    }
+
+    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
+
+    this.dependencyGraph.removeRows(removedRows)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
+    })
+  }
+
+  /**
+   * Add multiple rows to sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param row - row number above which the rows will be added
+   * @param numberOfRowsToAdd - number of rows to add
+   */
+  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+    if (this.rowEffectivelyNotInSheet(row, sheet)) {
+      return
+    }
+
+    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+
+    this.dependencyGraph.addRows(addedRows)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
+    })
   }
 }

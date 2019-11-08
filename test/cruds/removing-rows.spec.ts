@@ -107,7 +107,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['=A$2'],
     ])
 
-    engine.removeRows(0, 2)
+    engine.removeRows(0, [2, 1])
 
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
@@ -119,7 +119,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['42'],
     ])
 
-    engine.removeRows(0, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
@@ -130,7 +130,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       [''], // row to delete
     ])
 
-    engine.removeRows(0, 1)
+    engine.removeRows(0, [1, 1])
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })
@@ -142,7 +142,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['2'],
     ])
 
-    engine.removeRows(0, 2, 2)
+    engine.removeRows(0, [2, 1])
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
   })
@@ -155,7 +155,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['=A1'],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
   })
@@ -168,7 +168,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['42'],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
@@ -181,7 +181,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['42'],
     ])
 
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
@@ -193,7 +193,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['3'],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })
 
@@ -205,7 +205,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['=A2'],
     ])
 
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
     expect_reference_to_have_ref_error(engine, adr('A2'))
   })
 
@@ -215,7 +215,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['1'], //
       ['2'], //
     ])
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
     expect_function_to_have_ref_error(engine, adr('A1'))
   })
 })
@@ -233,7 +233,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     })
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
-    engine.removeRows(0, 0, 0)
+    engine.removeRows(0, [0, 1])
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
   })
 
@@ -249,7 +249,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     })
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, -1))
-    engine.removeRows(0, 0, 0)
+    engine.removeRows(0, [0, 1])
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
   })
 
@@ -265,7 +265,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     })
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
   })
 })
@@ -286,7 +286,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
       ],
     })
 
-    engine.removeRows(1, 1, 1)
+    engine.removeRows(1, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, 0, 0))
@@ -306,7 +306,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
       ],
     })
 
-    engine.removeRows(1, 1, 1)
+    engine.removeRows(1, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 0))
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(1, 0, 0))
@@ -324,7 +324,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
       ],
     })
 
-    engine.removeRows(1, 0, 0)
+    engine.removeRows(1, [0, 1])
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
     expect_reference_to_have_ref_error(engine, adr('A2'))
@@ -342,7 +342,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
       ],
     })
 
-    engine.removeRows(1, 1, 1)
+    engine.removeRows(1, [1, 1])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
@@ -360,7 +360,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
       ],
     })
 
-    engine.removeRows(0, 0, 0)
+    engine.removeRows(0, [0, 1])
 
     expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 0, -1))
   })
@@ -379,7 +379,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
       ],
     })
 
-    engine.removeRows(0, 0, 0)
+    engine.removeRows(0, [0, 1])
 
     expect(extractReference(engine, adr('A2', 2))).toEqual(CellAddress.relative(1, 0, -1))
   })
@@ -393,7 +393,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['2'],
     ])
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
   })
@@ -405,7 +405,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['2'],
     ])
 
-    engine.removeRows(0, 2, 2)
+    engine.removeRows(0, [2, 1])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
   })
@@ -419,7 +419,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['5'],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
@@ -434,7 +434,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['6'],
     ])
 
-    engine.removeRows(0, 1, 3)
+    engine.removeRows(0, [1, 3])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
@@ -449,7 +449,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['6'],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
@@ -463,7 +463,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       ['5'],
     ])
 
-    engine.removeRows(0, 3, 4)
+    engine.removeRows(0, [3, 2])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
@@ -478,7 +478,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       [''],
     ])
 
-    engine.removeRows(0, 3, 5)
+    engine.removeRows(0, [3, 3])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
@@ -493,7 +493,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
       [''],
     ])
 
-    engine.removeRows(0, 4, 5)
+    engine.removeRows(0, [4, 2])
 
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
@@ -508,7 +508,7 @@ describe('Removing rows - reevaluation', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
   })
 
@@ -523,7 +523,7 @@ describe('Removing rows - reevaluation', () => {
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(b1setCellValueSpy).toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
@@ -537,7 +537,7 @@ describe('Removing rows - reevaluation', () => {
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
@@ -552,7 +552,7 @@ describe('Removing rows - reevaluation', () => {
     const a3 = engine.addressMapping.getCell(adr('A3'))
     const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
 
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
 
     expect(a3setCellValueSpy).toHaveBeenCalled()
     expect_function_to_have_ref_error(engine, adr('A1'))
@@ -567,7 +567,7 @@ describe('Removing rows - matrices', () => {
       ['{=MMULT(A1:B2, A1:B2)}'],
     ])
 
-    expect(() => engine.removeRows(0, 2, 2)).toThrowError('It is not possible to remove row with matrix')
+    expect(() => engine.removeRows(0, [2, 1])).toThrowError('It is not possible to remove row with matrix')
   })
 
   it('should remove row from numeric matrix', () => {
@@ -577,7 +577,7 @@ describe('Removing rows - matrices', () => {
       ['3', '4'],
     ], config)
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
@@ -591,7 +591,7 @@ describe('Removing rows - matrices', () => {
       ['3', '4'],
     ], config)
 
-    engine.removeRows(0, 1, 3)
+    engine.removeRows(0, [1, 3])
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     expect(matrix).toBeInstanceOf(MatrixVertex)
     expect(matrix.height).toBe(1)
@@ -605,7 +605,7 @@ describe('Removing rows - matrices', () => {
     ], config)
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
@@ -619,7 +619,7 @@ describe('Removing rows - matrices', () => {
     ], config)
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    engine.removeRows(0, 0, 2)
+    engine.removeRows(0, [0, 3])
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
     expect(engine.graph.nodes.size).toBe(0)
   })
@@ -632,7 +632,7 @@ describe('Removing rows - matrices', () => {
       ['1', '2'],
     ], config)
     expect(engine.graph.nodes.size).toBe(1)
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 2])
     expect(engine.graph.nodes.size).toBe(1)
   })
 
@@ -644,7 +644,7 @@ describe('Removing rows - matrices', () => {
       ['1', '2'],
     ], config)
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
@@ -658,7 +658,7 @@ describe('Removing rows - matrices', () => {
       ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
     ])
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
@@ -672,7 +672,7 @@ describe('Removing rows - matrices', () => {
       ['{=TRANSPOSE(A1:B3)}', '{=TRANSPOSE(A1:B3)}, {=TRANSPOSE(A1:B3)}'],
     ])
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as MatrixVertex
     expect(matrixVertex.cellAddress).toEqual(adr('A3'))
@@ -691,7 +691,7 @@ describe('Removing rows - matrices', () => {
       ],
     })
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
@@ -705,7 +705,7 @@ describe('Removing rows - graph', function() {
       ['=A2'], //
     ])
 
-    engine.removeRows(0, 2, 2)
+    engine.removeRows(0, [2, 1])
 
     const a2 = engine.addressMapping.fetchCell(adr('A2'))
     expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
@@ -717,7 +717,7 @@ describe('Removing rows - graph', function() {
       ['3', '4'],
     ])
     expect(engine.graph.nodes.size).toBe(4)
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
     expect(engine.graph.nodes.size).toBe(0)
   })
 
@@ -728,7 +728,7 @@ describe('Removing rows - graph', function() {
       ['3'],
     ])
     expect(engine.graph.nodes.size).toBe(2)
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
     expect(engine.graph.nodes.size).toBe(2)
   })
 })
@@ -741,7 +741,7 @@ describe('Removing rows - range mapping', function() {
       ['3', ''],
     ])
 
-    engine.removeRows(0, 0, 0)
+    engine.removeRows(0, [0, 1])
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
@@ -754,7 +754,7 @@ describe('Removing rows - range mapping', function() {
       ['3', ''],
     ])
 
-    engine.removeRows(0, 1, 2)
+    engine.removeRows(0, [1, 2])
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
@@ -769,7 +769,7 @@ describe('Removing rows - range mapping', function() {
     ])
 
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
-    engine.removeRows(0, 0, 2)
+    engine.removeRows(0, [0, 3])
     const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
@@ -786,7 +786,7 @@ describe('Removing rows - range mapping', function() {
 
     const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     expect(engine.graph.getDependencies(a1a3).length).toBe(2)
-    engine.removeRows(0, 0, 1)
+    engine.removeRows(0, [0, 2])
     const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
     expect(engine.graph.getDependencies(a1a1).length).toBe(1)
@@ -799,9 +799,9 @@ describe('Removing rows - sheet dimensions', () => {
       ['1'],
     ])
 
-    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
-    engine.removeRows(0, 1, 1)
-    engine.removeRows(0, 10, 15)
+    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    engine.removeRows(0, [1, 1])
+    engine.removeRows(0, [10, 6])
 
     expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
@@ -816,8 +816,8 @@ describe('Removing rows - sheet dimensions', () => {
       ['2'],
     ])
 
-    const recalcSpy = spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
-    engine.removeRows(0, 1, 0)
+    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
+    engine.removeRows(0, [1, 0])
 
     expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
@@ -833,7 +833,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['=SUM(A1:A2)']
     ])
 
-    const changes = engine.removeRows(0, 0, 0)
+    const changes = engine.removeRows(0, [0, 1])
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual({ sheet: 0, row: 1, col: 0, value: 2})
@@ -848,7 +848,7 @@ describe('Removing rows - column index', () => {
       ['2'],
     ], new Config({ useColumnIndex: true }))
 
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     const index = (engine.columnSearch as ColumnIndex)
 
