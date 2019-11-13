@@ -13,18 +13,13 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param dateFormat - date format pattern used when argument is a text
  */
 export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | CellError {
-  if (typeof arg === 'number' || arg instanceof CellError) {
-    return arg
-  } else if (typeof arg === 'string') {
+  if (typeof arg === 'string') {
     const parsedDateNumber = stringToDateNumber(arg, dateFormat)
-    if (parsedDateNumber === null) {
-      return new CellError(ErrorType.VALUE)
-    } else {
+    if (parsedDateNumber !== null) {
       return parsedDateNumber
     }
-  } else {
-    return new CellError(ErrorType.VALUE)
   }
+  return coerceScalarToNumber(arg)
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
