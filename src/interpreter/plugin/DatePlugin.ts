@@ -77,14 +77,21 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
+    if (arg instanceof CellError) {
+      return arg
+    }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
     if (dateNumber === null) {
       return new CellError(ErrorType.VALUE)
     }
 
-    const numberOfMonthsToShift = this.evaluateAst(ast.args[1], formulaAddress)
-    if (typeof numberOfMonthsToShift !== 'number') {
+    const numberOfMonthsToShiftValue = this.evaluateAst(ast.args[1], formulaAddress)
+    if (numberOfMonthsToShiftValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
+    }
+    const numberOfMonthsToShift = coerceScalarToNumber(numberOfMonthsToShiftValue)
+    if (numberOfMonthsToShift instanceof CellError) {
+      return numberOfMonthsToShift
     }
 
     const dateMoment = dateNumberToMoment(dateNumber)
