@@ -96,6 +96,16 @@ describe('Function EOMONTH', () => {
     expectToHaveDate(engine, adr('A2'), '02/28/2019')
   })
 
+  it('use number coercion for 1st argument', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=EOMONTH(TRUE(), 1)'],
+      ['=EOMONTH(1, 1)'],
+    ])
+
+    expectToHaveDate(engine, adr('A1'), '01/31/1900')
+    expectToHaveDate(engine, adr('A2'), '01/31/1900')
+  })
+
   it('use number coercion for 2nd argument', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
