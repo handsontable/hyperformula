@@ -77,12 +77,9 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    if (arg instanceof CellError) {
-      return arg
-    }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
-    if (dateNumber === null) {
-      return new CellError(ErrorType.VALUE)
+    if (dateNumber instanceof CellError) {
+      return dateNumber
     }
 
     const numberOfMonthsToShiftValue = this.evaluateAst(ast.args[1], formulaAddress)
@@ -122,12 +119,11 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
-
-    if (dateNumber !== null) {
-      return dateNumberToMonthNumber(dateNumber)
-    } else {
-      return new CellError(ErrorType.VALUE)
+    if (dateNumber instanceof CellError) {
+      return dateNumber
     }
+
+    return dateNumberToMonthNumber(dateNumber)
   }
 
   /**
@@ -148,12 +144,11 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
-
-    if (dateNumber !== null) {
-      return dateNumberToYearNumber(dateNumber)
-    } else {
-      return new CellError(ErrorType.VALUE)
+    if (dateNumber instanceof CellError) {
+      return dateNumber
     }
+
+    return dateNumberToYearNumber(dateNumber)
   }
 
   /**
@@ -176,8 +171,11 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const numberRepresentation = dateNumberRepresentation(dateArg, this.config.dateFormat)
+    if (numberRepresentation instanceof CellError) {
+      return numberRepresentation
+    }
 
-    if (numberRepresentation === null || typeof formatArg !== 'string') {
+    if (typeof formatArg !== 'string') {
       return new CellError(ErrorType.VALUE)
     }
 

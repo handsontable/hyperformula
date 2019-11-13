@@ -12,13 +12,18 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | null {
-  if (typeof arg === 'number') {
+export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | CellError {
+  if (typeof arg === 'number' || arg instanceof CellError) {
     return arg
   } else if (typeof arg === 'string') {
-    return stringToDateNumber(arg, dateFormat)
+    const parsedDateNumber = stringToDateNumber(arg, dateFormat)
+    if (parsedDateNumber === null) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return parsedDateNumber
+    }
   } else {
-    return null
+    return new CellError(ErrorType.VALUE)
   }
 }
 
