@@ -74,6 +74,9 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
     if (dateNumber === null) {
       return new CellError(ErrorType.VALUE)
@@ -108,6 +111,9 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
 
     if (dateNumber !== null) {
@@ -131,6 +137,9 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
     const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
 
     if (dateNumber !== null) {
@@ -155,6 +164,9 @@ export class DatePlugin extends FunctionPlugin {
 
     const dateArg = this.evaluateAst(ast.args[0], formulaAddress)
     const formatArg = this.evaluateAst(ast.args[1], formulaAddress)
+    if (dateArg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
 
     const numberRepresentation = dateNumberRepresentation(dateArg, this.config.dateFormat)
 

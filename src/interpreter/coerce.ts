@@ -12,7 +12,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function dateNumberRepresentation(arg: InterpreterValue, dateFormat: string): number | null {
+export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | null {
   if (typeof arg === 'number') {
     return arg
   } else if (typeof arg === 'string') {
