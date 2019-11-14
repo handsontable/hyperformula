@@ -27,6 +27,7 @@ import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells
 import {ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
+import {start} from "repl";
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -52,28 +53,28 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addRows(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeIndexes(indexes)
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
   }
 
   public removeRows(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeIndexes(indexes)
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
   }
 
   public addColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeIndexes(indexes)
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = this.normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeIndexes(indexes)
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -289,11 +290,6 @@ export class CrudOperations implements IBatchExecutor {
     return this.dependencyGraph.sheetMapping
   }
 
-  private normalizeIndexes(indexes: Index[]): Index[] {
-    /* TODO */
-    return indexes
-  }
-
   /**
    * Throws error when given address is incorrect.
    */
@@ -306,4 +302,25 @@ export class CrudOperations implements IBatchExecutor {
       throw new NoSuchSheetError(address.sheet)
     }
   }
+}
+
+export function normalizeIndexes(indexes: Index[]): Index[] {
+  if (indexes.length <= 1) {
+    return indexes
+  }
+
+  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+
+  return sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+    const previous = acc[acc.length - 1]
+    const lastIndex = previous[0] + previous[1]
+
+    if (startIndex <= lastIndex) {
+      previous[1] += Math.max(0, amount - (lastIndex - startIndex))
+    } else {
+      acc.push([startIndex, amount])
+    }
+
+    return acc
+  }, [sorted[0]])
 }
