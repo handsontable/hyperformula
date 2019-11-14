@@ -1,5 +1,4 @@
 import {CellValue} from '../Cell'
-import {InterpreterValue} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -15,9 +14,30 @@ export interface Criterion {
 }
 export const buildCriterion = (operator: CriterionType, value: number | string) => ({ operator, value })
 
+export class CriterionPackage {
+  constructor(
+    public readonly raw: string,
+    public readonly lambda: CriterionLambda,
+  ) {
+  }
+
+  public static fromCellValue(raw: CellValue): CriterionPackage | undefined {
+    if (typeof raw !== 'string') {
+      return undefined
+    }
+
+    const criterion = parseCriterion(raw)
+    if (criterion === null) {
+      return undefined
+    }
+
+    return new CriterionPackage(raw, buildCriterionLambda(criterion))
+  }
+}
+
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
-export const parseCriterion = (criterion: InterpreterValue): Criterion | null => {
+export const parseCriterion = (criterion: CellValue): Criterion | null => {
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {

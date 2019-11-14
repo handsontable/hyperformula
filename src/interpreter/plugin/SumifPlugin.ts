@@ -4,7 +4,7 @@ import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} f
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
 import {Ast, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser'
-import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
+import {buildCriterionLambda, CriterionPackage, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
 import {coerceToRange} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -67,14 +67,6 @@ class Condition2 {
   }
 }
 
-class CriterionPackage {
-  constructor(
-    public readonly raw: string,
-    public readonly lambda: CriterionLambda,
-  ) {
-  }
-}
-
 type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
 
 export class SumifPlugin extends FunctionPlugin {
@@ -101,7 +93,11 @@ export class SumifPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const criterionPackage = this.buildCriterion(ast.args[1], formulaAddress)
+    const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
+    if (criterionValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
@@ -132,6 +128,9 @@ export class SumifPlugin extends FunctionPlugin {
       const conditions: Condition[] = []
       for (let i = 1; i < ast.args.length; i += 2) {
         const criterionString = this.evaluateAst(ast.args[i + 1], formulaAddress)
+        if (criterionString instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
         const criterion = parseCriterion(criterionString)
         const conditionRange = this.rangeFromAst(ast.args[i], formulaAddress)
         if (conditionRange === null) {
@@ -216,20 +215,6 @@ export class SumifPlugin extends FunctionPlugin {
     const criterionLambda = buildCriterionLambda(criterion)
     const filteredValues = ifFilter([criterionLambda], [conditionValues], computableValues)
     return reduceSum(filteredValues)
-  }
-
-  private buildCriterion(ast: Ast, formulaAddress: SimpleCellAddress): CriterionPackage | undefined {
-    const criterionString = this.evaluateAst(ast, formulaAddress)
-    if (typeof criterionString !== 'string') {
-      return undefined
-    }
-
-    const criterion = parseCriterion(criterionString)
-    if (criterion === null) {
-      return undefined
-    }
-
-    return new CriterionPackage(criterionString, buildCriterionLambda(criterion))
   }
 
   /**
