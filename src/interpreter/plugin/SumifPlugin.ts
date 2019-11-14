@@ -260,7 +260,7 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  private getRangeVertexFromRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
+  private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
     const maybeRange = rangeValue.range()
     if (maybeRange === undefined) {
       return undefined
@@ -274,8 +274,8 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const valuesRangeVertex = this.getRangeVertexFromRangeValue(simpleValuesRange)
-    const conditionsVertices = conditions.map((c) => this.getRangeVertexFromRangeValue(c.conditionRange))
+    const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
+    const conditionsVertices = conditions.map((c) => this.tryToGetRangeVertexForRangeValue(c.conditionRange))
 
     if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
