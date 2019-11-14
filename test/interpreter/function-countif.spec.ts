@@ -1,9 +1,19 @@
-import {HyperFormula} from '../../src'
+import {HyperFormula, Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
 describe('Function COUNTIF', () => {
+  it('requires 2 arguments', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=COUNTIF(B1:B3)'],
+      ['=COUNTIF(B1:B3, ">0", B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+  })
+
   it('works',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['0'],
@@ -50,14 +60,6 @@ describe('Function COUNTIF', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(0)
   })
 
-  it('error when 1st arg is not a range',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=COUNTIF(42, ">0")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
   it('error when 2nd arg is not a string',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=COUNTIF(C1:C2, 78)'],
@@ -72,5 +74,60 @@ describe('Function COUNTIF', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('scalars are treated like singular arrays', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=COUNTIF(10, ">1")'],
+      ['=COUNTIF(0, ">1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+  })
+
+  it('error propagation', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=COUNTIF(4/0, ">1")'],
+      ['=COUNTIF(0, 4/0)'],
+      ['=COUNTIF(4/0, FOOBAR())'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('works with range values', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['3', '5'],
+      ['7', '9'],
+      ['=COUNTIF(A1:B2, ">4")'],
+      ['=COUNTIF(MMULT(A1:B2, A1:B2), ">50")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+  })
+
+  it('works for matrices', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=COUNTIF(A1:A2, ">0")']
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+  })
+
+  it('ignore errors', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['=4/0'],
+      ['1'],
+      ['=COUNTIF(A1:A3, "=1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 })
