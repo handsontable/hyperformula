@@ -237,7 +237,6 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    * @param newCellContent - new cell content
-   * @param recompute - specifies if recomputation should be fired after change
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
@@ -278,8 +277,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
+   * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
@@ -302,6 +300,13 @@ export class HyperFormula {
     return true
   }
 
+  /**
+   * Add multiple rows to sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   */
   public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addRows(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
@@ -313,8 +318,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
+   * @param indexes - non-contiguous indexes with format [row, amount]
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
@@ -341,6 +345,13 @@ export class HyperFormula {
     return true
   }
 
+  /**
+   * Removes multiple rows from sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which rows will be removed
+   * @param indexes - non-contiguous indexes with format [row, amount]
+   * */
   public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeRows(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
@@ -352,8 +363,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
+   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
@@ -376,6 +386,13 @@ export class HyperFormula {
     return true
   }
 
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
+   * */
   public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
@@ -387,8 +404,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
+   * @param indexes - non-contiguous indexes with format [column, amount]
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
@@ -416,6 +432,13 @@ export class HyperFormula {
     return true
   }
 
+  /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param indexes - non-contiguous indexes with format [column, amount]
+   * */
   public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
