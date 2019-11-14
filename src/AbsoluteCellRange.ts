@@ -34,8 +34,8 @@ export class AbsoluteCellRange {
   }
 
   constructor(
-      public readonly start: SimpleCellAddress,
-      public readonly end: SimpleCellAddress,
+    public readonly start: SimpleCellAddress,
+    public readonly end: SimpleCellAddress,
   ) {
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
