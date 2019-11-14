@@ -43,8 +43,6 @@ export class CrudOperations implements IBatchExecutor {
       private readonly columnSearch: IColumnSearchStrategy,
       /** Parser with caching */
       private readonly parser: ParserWithCaching,
-      /** Formula evaluator */
-      private readonly evaluator: Evaluator,
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {

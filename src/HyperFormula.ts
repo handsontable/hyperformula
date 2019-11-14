@@ -72,7 +72,7 @@ export class HyperFormula {
       /** Service handling postponed CRUD transformations */
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, evaluator, lazilyTransformingAstService)
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
   }
 
   /**
