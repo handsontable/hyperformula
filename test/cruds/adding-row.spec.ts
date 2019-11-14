@@ -10,52 +10,52 @@ describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, -1, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [-1, 1])).toEqual(false)
   })
 
   it('no if starting row is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, 1.5, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [1.5, 1])).toEqual(false)
   })
 
   it('no if starting row is NaN', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, NaN, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, Infinity, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, -Infinity, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [NaN, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [Infinity, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [-Infinity, 1])).toEqual(false)
   })
 
   it('no if number of rows is not positive', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, 0, 0)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, 0])).toEqual(false)
   })
 
   it('no if number of rows is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, 0, 1.5)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, 1.5])).toEqual(false)
   })
 
   it('no if number of rows is NaN', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, 0, NaN)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, 0, Infinity)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, 0, -Infinity)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, NaN])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, Infinity])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [0, -Infinity])).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(1.5, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(-1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(NaN, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(Infinity, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(-Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddRows(1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(1.5, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(-1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(NaN, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(-Infinity, [0, 1])).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we add', () => {
@@ -67,10 +67,10 @@ describe('Adding row - checking if its possible', () => {
       ['13'],
     ])
 
-    expect(engine.isItPossibleToAddRows(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, 2, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, 3, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, 4, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -81,14 +81,14 @@ describe('Adding row - checking if its possible', () => {
     ], config)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToAddRows(0, 0, 1)).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddRows(0, 0, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
   })
 })
 

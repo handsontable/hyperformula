@@ -23,7 +23,7 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {CrudOperations} from "./CrudOperations";
+import {CrudOperations, normalizeIndexes} from "./CrudOperations";
 import {IBatchExecutor} from "./IBatchExecutor";
 
 export class NoSuchSheetError extends Error {
@@ -281,18 +281,22 @@ export class HyperFormula {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
-    if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-      return false
-    }
-    const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+  public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeIndexes(indexes)
 
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
+    for (const [row, numberOfRowsToAdd] of normalizedIndexes) {
+      if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
+        return false
+      }
+      const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
-      return false
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
+        return false
+      }
     }
 
     return true
