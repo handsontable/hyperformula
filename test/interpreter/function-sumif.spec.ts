@@ -126,7 +126,7 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
-  xit('works when arguments are just references',  () => {
+  it('works when arguments are just references',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['2', '3'],
       ['=SUMIF(A1, ">1", B1)'],
@@ -135,7 +135,7 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
-  xit('works for mixed reference/range arguments', () => {
+  it('works for mixed reference/range arguments', () => {
     const engine =  HyperFormula.buildFromArray([
       ['2', '3'],
       ['=SUMIF(A1:A1, ">1", B1)'],
@@ -146,7 +146,7 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 
-  xit('works with range values', () => {
+  it('works with range values', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '1', '3', '5'],
       ['1', '1', '7', '9'],

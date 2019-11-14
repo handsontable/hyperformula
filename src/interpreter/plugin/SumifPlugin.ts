@@ -305,10 +305,10 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private evaluateRangeSumifValue2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
-    return this.computeCriterionValue(
+    return this.computeCriterionValue2(
       conditions.map((c) => c.criterion),
-      conditions.map((c) => c.conditionRange.range()!),
-      simpleValuesRange.range()!,
+      conditions.map((c) => c.conditionRange),
+      simpleValuesRange,
       (filteredValues: IterableIterator<CellValue>) => {
         return reduceSum(filteredValues)
       }
@@ -414,6 +414,14 @@ export class SumifPlugin extends FunctionPlugin {
     const criterionLambdas = criterions.map((criterion) => buildCriterionLambda(criterion))
     const values = getRangeValues(this.dependencyGraph, simpleValuesRange)
     const conditions = simpleConditionRanges.map((simpleConditionRange) => getRangeValues(this.dependencyGraph, simpleConditionRange))
+    const filteredValues = ifFilter(criterionLambdas, conditions, values)
+    return valueComputingFunction(filteredValues)
+  }
+
+  private computeCriterionValue2(criterions: Criterion[], simpleConditionRanges: SimpleRangeValue[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
+    const criterionLambdas = criterions.map((criterion) => buildCriterionLambda(criterion))
+    const values = simpleValuesRange.valuesFromTopLeftCorner()
+    const conditions = simpleConditionRanges.map((simpleConditionRange) => simpleConditionRange.valuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditions, values)
     return valueComputingFunction(filteredValues)
   }
