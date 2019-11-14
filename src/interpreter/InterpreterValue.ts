@@ -11,6 +11,10 @@ export class ArrayData {
   ) {
   }
 
+  public range(): undefined {
+    return undefined
+  }
+
   public hasOnlyNumbers() {
     return this._hasOnlyNumbers
   }
@@ -42,9 +46,13 @@ export class OnlyRangeData {
 
   constructor(
     public readonly size: MatrixSize,
-    public readonly range: AbsoluteCellRange,
+    public readonly _range: AbsoluteCellRange,
     public readonly dependencyGraph: DependencyGraph,
   ) {
+  }
+
+  public range(): AbsoluteCellRange {
+    return this._range
   }
 
   public raw(): CellValue[][] {
@@ -98,7 +106,7 @@ export class OnlyRangeData {
 
     let i = 0
     let row = []
-    for (const cellFromRange of this.range.addresses()) {
+    for (const cellFromRange of this._range.addresses()) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)
@@ -108,7 +116,7 @@ export class OnlyRangeData {
       }
       ++i
 
-      if (i % this.range.width() === 0) {
+      if (i % this._range.width() === 0) {
         i = 0
         result.push([...row])
         row = []
@@ -174,6 +182,14 @@ export class SimpleRangeValue {
 
   public rawNumbers(): number[][] {
     return this.data.rawNumbers()
+  }
+
+  public range(): AbsoluteCellRange | undefined {
+    return this.data.range()
+  }
+
+  public sameDimensionsAs(other: SimpleRangeValue): boolean {
+    return this.width() === other.width() && this.height() === other.height()
   }
 }
 

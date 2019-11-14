@@ -6,12 +6,18 @@ import {count, split} from '../../generatorUtils'
 import {Ast, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser'
 import {buildCriterionLambda, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
 import {add} from '../scalar'
+import {coerceToRange} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.sheet},${c.conditionRange.start.col},${c.conditionRange.start.row}`)
+  return ['SUMIF', ...conditionsStrings].join(',')
+}
+
+function sumifCacheKey2(conditions: Condition2[]): string {
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
 
@@ -47,6 +53,15 @@ export const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRang
 class Condition {
   constructor(
     public readonly conditionRange: AbsoluteCellRange,
+    public readonly criterionString: string,
+    public readonly criterion: Criterion,
+  ) {
+  }
+}
+
+class Condition2 {
+  constructor(
+    public readonly conditionRange: SimpleRangeValue,
     public readonly criterionString: string,
     public readonly criterion: Criterion,
   ) {
@@ -89,22 +104,10 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const conditionRangeArg = ast.args[0]
-    const valuesRangeArg = ast.args[2]
-
-    if (conditionRangeArg.type === AstNodeType.CELL_RANGE && valuesRangeArg.type === AstNodeType.CELL_RANGE) {
-      const simpleValuesRange = AbsoluteCellRange.fromCellRange(valuesRangeArg, formulaAddress)
-      const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
-
-      return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
-    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
-      const simpleValuesRange = AbsoluteCellRange.singleRangeFromCellAddress(valuesRangeArg.reference, formulaAddress)
-      const simpleConditionRange = AbsoluteCellRange.singleRangeFromCellAddress(conditionRangeArg.reference, formulaAddress)
-
-      return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
-    } else {
-      return new CellError(ErrorType.VALUE)
-    }
+    const conditionArg = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))
+    const valuesArg = coerceToRange(this.evaluateAst(ast.args[2], formulaAddress))
+    
+    return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionString, criterion)])
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -226,7 +229,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+    const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)
     
     if (valuesRangeVertex) {
       const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
@@ -254,6 +257,58 @@ export class SumifPlugin extends FunctionPlugin {
     } else {
       return this.evaluateRangeSumifValue(simpleValuesRange, conditions)
     }
+  }
+
+  private evaluateRangeSumif2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+    if (!conditions[0].conditionRange.sameDimensionsAs(simpleValuesRange)) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.range()!.start, simpleValuesRange.range()!.end)
+    const conditionsVertices = conditions.map((c) => {
+      if (c.conditionRange.range() === undefined) {
+        return undefined
+      }
+      return this.dependencyGraph.getRange(c.conditionRange.range()!.start, c.conditionRange.range()!.end)
+    })
+
+    if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
+      const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
+      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey2(conditions), fullCriterionString)
+      if (cachedResult) {
+        this.interpreter.stats.sumifFullCacheUsed++
+        return cachedResult
+      }
+
+      const cache = this.buildNewCriterionCache(sumifCacheKey2(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!,
+        (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+          return add(cacheCurrentValue, reduceSum(newFilteredValues))
+        })
+
+      if (!cache.has(fullCriterionString)) {
+        cache.set(fullCriterionString, [
+          this.evaluateRangeSumifValue2(simpleValuesRange, conditions),
+          conditions.map((condition) => buildCriterionLambda(condition.criterion))
+        ])
+      }
+
+      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey2(conditions), cache)
+
+      return cache.get(fullCriterionString)![0]
+    } else {
+      return this.evaluateRangeSumifValue2(simpleValuesRange, conditions)
+    }
+  }
+
+  private evaluateRangeSumifValue2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+    return this.computeCriterionValue(
+      conditions.map((c) => c.criterion),
+      conditions.map((c) => c.conditionRange.range()!),
+      simpleValuesRange.range()!,
+      (filteredValues: IterableIterator<CellValue>) => {
+        return reduceSum(filteredValues)
+      }
+    )
   }
 
   private evaluateRangeSumifValue(simpleValuesRange: AbsoluteCellRange, conditions: Condition[]): CellValue {

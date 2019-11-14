@@ -126,13 +126,34 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
-  it('works when arguments are just references',  () => {
+  xit('works when arguments are just references',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['2', '3'],
       ['=SUMIF(A1, ">1", B1)'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
+  })
+
+  xit('works for mixed reference/range arguments', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['2', '3'],
+      ['=SUMIF(A1:A1, ">1", B1)'],
+      ['=SUMIF(A1, ">1", B1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+  })
+
+  xit('works with range values', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '1', '3', '5'],
+      ['1', '1', '7', '9'],
+      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)']
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(24)
   })
 
   it('works for subranges with different conditions',  () => {
