@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {HyperFormula, Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {adr} from '../testUtils'
 import '../testConfig'
@@ -129,6 +129,16 @@ describe('Function SUMIF - argument validations and combinations', () => {
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(50)
+  })
+
+  it('works for matrices', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['=SUMIF(A1:A2, ">0", A1:A2)']
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 })
 
