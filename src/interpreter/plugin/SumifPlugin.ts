@@ -11,12 +11,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
-function sumifCacheKey(conditions: Condition[]): string {
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.sheet},${c.conditionRange.start.col},${c.conditionRange.start.row}`)
-  return ['SUMIF', ...conditionsStrings].join(',')
-}
-
-function sumifCacheKey2(conditions: Condition2[]): string {
+function sumifCacheKey(conditions: Condition2[]): string {
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
@@ -192,13 +187,13 @@ export class SumifPlugin extends FunctionPlugin {
 
     if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
-      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey2(conditions), fullCriterionString)
+      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
       if (cachedResult) {
         this.interpreter.stats.sumifFullCacheUsed++
         return cachedResult
       }
 
-      const cache = this.buildNewCriterionCache(sumifCacheKey2(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!,
+      const cache = this.buildNewCriterionCache(sumifCacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!,
         (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
           return add(cacheCurrentValue, reduceSum(newFilteredValues))
         })
@@ -210,7 +205,7 @@ export class SumifPlugin extends FunctionPlugin {
         ])
       }
 
-      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey2(conditions), cache)
+      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
 
       return cache.get(fullCriterionString)![0]
     } else {
