@@ -316,21 +316,26 @@ export class HyperFormula {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    */
-  public isItPossibleToRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): boolean {
-    if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-      return false
-    }
-    if (rowEnd < rowStart) {
-      return false
-    }
-    const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
+  public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeIndexes(indexes)
 
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
+    for (const [rowStart, numberOfRows] of normalizedIndexes) {
+      const rowEnd = rowStart + numberOfRows - 1
+      if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
+        return false
+      }
+      if (rowEnd < rowStart) {
+        return false
+      }
+      const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-      return false
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
+        return false
+      }
     }
 
     return true

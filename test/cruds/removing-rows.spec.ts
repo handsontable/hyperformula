@@ -17,48 +17,48 @@ describe('Removing rows - checking if its possible', () => {
   it('no if starting row is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, -1, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [-1, 1])).toEqual(false)
   })
 
   it('no if starting row is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, 1.5, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, NaN, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, Infinity, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, -Infinity, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [1.5, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [NaN, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [Infinity, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [-Infinity, 2])).toEqual(false)
   })
 
   it('no if ending row is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, 0, -1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [0, -1])).toEqual(false)
   })
 
   it('no if ending row is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, 0, 1.5)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 0, NaN)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 0, Infinity)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 0, -Infinity)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [0, 1.5])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [0, NaN])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [0, Infinity])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [0, -Infinity])).toEqual(false)
   })
 
   it('no if ending row smaller than starting row', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, 1, 0)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 0])).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(1.5, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(-1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(NaN, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(Infinity, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(-Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(1.5, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(-1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(NaN, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(-Infinity, [0, 1])).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we remove', () => {
@@ -70,11 +70,11 @@ describe('Removing rows - checking if its possible', () => {
       ['13'],
     ])
 
-    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, 1, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 2, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 3, 3)).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, 4, 4)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [2, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [4, 1])).toEqual(true)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -85,16 +85,16 @@ describe('Removing rows - checking if its possible', () => {
     ], config)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToRemoveRows(0, 0, 0)).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveRows(0, 0, 0)).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, 1, 2)).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(true)
   })
 })
 
