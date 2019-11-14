@@ -75,25 +75,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.NAME))
   })
 
-  it('function COLUMNS works', () => {
-    const engine = HyperFormula.buildFromArray([['=COLUMNS(A1:C2)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-  })
-
-  it('function COLUMNS returns error when argument of invalid type', () => {
-    const engine = HyperFormula.buildFromArray([['=COLUMNS(A1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('function COLUMNS accepts exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([['=COLUMNS()', '=COLUMNS(A1:B1, A2:B2)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function OFFSET basic use', () => {
     const engine = HyperFormula.buildFromArray([['5', '=OFFSET(B1, 0, -1)', '=OFFSET(A1, 0, 0)']])
 
