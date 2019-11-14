@@ -122,7 +122,7 @@ describe('Function SUMIF - argument validation', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 
-  xit('works for 2 arguments', () => {
+  it('works for 2 arguments', () => {
     const engine =  HyperFormula.buildFromArray([
       ['10', '20', '30'],
       ['=SUMIF(A1:C1, ">15")'],

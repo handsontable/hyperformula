@@ -108,11 +108,16 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const valuesArgValue = this.evaluateAst(ast.args[2], formulaAddress)
-    if (valuesArgValue instanceof CellError) {
-      return valuesArgValue
+    let valuesArg
+    if (ast.args.length == 2) {
+      valuesArg = conditionArg
+    } else {
+      const valuesArgValue = this.evaluateAst(ast.args[2], formulaAddress)
+      if (valuesArgValue instanceof CellError) {
+        return valuesArgValue
+      }
+      valuesArg = coerceToRange(valuesArgValue)
     }
-    const valuesArg = coerceToRange(valuesArgValue)
     
     return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionPackage)])
   }
