@@ -123,14 +123,27 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const valuesArg = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))
+    if (ast.args.length < 3 || ast.args.length % 2 === 0) {
+      return new CellError(ErrorType.NA)
+    }
+    const valueArgValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (valueArgValue instanceof CellError) {
+      return valueArgValue
+    }
+    const valuesArg = coerceToRange(valueArgValue)
 
     const conditions: Condition2[] = []
     for (let i = 1; i < ast.args.length; i += 2) {
-      const conditionArg = coerceToRange(this.evaluateAst(ast.args[i], formulaAddress))
+      const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
+      if (conditionArgValue instanceof CellError) {
+        return conditionArgValue
+      }
+      const conditionArg = coerceToRange(conditionArgValue)
       const criterionValue = this.evaluateAst(ast.args[i+1], formulaAddress)
       if (criterionValue instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
+      } else if (criterionValue instanceof CellError) {
+        return criterionValue
       }
       const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
       if (criterionPackage === undefined) {
@@ -197,8 +210,10 @@ export class SumifPlugin extends FunctionPlugin {
   }
 
   private evaluateRangeSumif2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
-    if (!conditions[0].conditionRange.sameDimensionsAs(simpleValuesRange)) {
-      return new CellError(ErrorType.VALUE)
+    for (const condition of conditions) {
+      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
+        return new CellError(ErrorType.VALUE)
+      }
     }
 
     const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)

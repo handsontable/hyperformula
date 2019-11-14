@@ -4,48 +4,48 @@ import {adr} from '../testUtils'
 import '../testConfig'
 
 describe('Function SUMIFS', () => {
-  it('error when 1st arg is not a range or reference',  () => {
+  it('requires odd number of arguments, but at least 3', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=SUMIFS(42, B1:B2, ">0")'],
+      ['=SUMIFS(C1, ">0")'],
+      ['=SUMIFS(C1, ">0", B1, B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
   })
 
-  it('error when 2nd arg is not a range or reference',  () => {
+  it('error when criterion arg is not a string or number',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=SUMIFS(C1:C2, 42, ">0")'],
+      ['=SUMIFS(C1:C2, B1:B2, 42)'],
+      ['=SUMIFS(C1:C2, B1:B2, "=1", B1:B2, 42)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('error when 3rd arg is not a string or number',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, 1/0)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(B1:B2, C1:C2, "><foo")'],
+      ['=SUMIFS(B1:B2, C1:C2, "=1", C1:C2, "><foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SUMIFS(B1:C1, B2:D2, ">0")'],
       ['=SUMIFS(B1, B2:D2, ">0")'],
       ['=SUMIFS(B1:D1, B2, ">0")'],
+      ['=SUMIFS(B1:D1, B2:D2, ">0", B2:E2, ">0")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -53,77 +53,39 @@ describe('Function SUMIFS', () => {
       ['=SUMIFS(B1:B2, C1:C3, ">0")'],
       ['=SUMIFS(B1, C1:C2, ">0")'],
       ['=SUMIFS(B1:B2, C1, ">0")'],
+      ['=SUMIFS(B1:B2, C1:C2, ">0", C1:C3, ">0")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('usage of greater than operator',  () => {
+  it('scalars are treated like singular arrays', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, ">1")'],
+      ['=SUMIFS(42, 10, ">1")'],
+      ['=SUMIFS(42, 0, ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(7)
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
-  it('usage of greater than or equal operator',  () => {
+  it('error propagation', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, ">=1")'],
+      ['=SUMIFS(4/0, 42, ">1")'],
+      ['=SUMIFS(0, 4/0, ">1")'],
+      ['=SUMIFS(0, 42, 4/0)'],
+      ['=SUMIFS(0, 4/0, FOOBAR())'],
+      ['=SUMIFS(4/0, FOOBAR(), ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(12)
-  })
-
-  it('usage of less than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B2, A1:A2, "<1")'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-  })
-
-  it('usage of less than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, "<=1")'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(8)
-  })
-
-  it('usage of equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
-  })
-
-  it('usage of not equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, "<>1")'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works when arguments are just references',  () => {
@@ -135,77 +97,30 @@ describe('Function SUMIFS', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
-  it('works for subranges with different conditions',  () => {
+  it('works with range values', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&A1)'],
-      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&A2)'],
-      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&A3)'],
-      ['3', '1', '=SUMIFS(B1:B4, A1:A4, "="&A4)'],
-      ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&A5)'],
+      ['1', '1', '3', '5'],
+      ['1', '1', '7', '9'],
+      ['=SUMIFS(MMULT(C1:D2, C1:D2), MMULT(A1:B2, A1:B2), "=2")'],
+      ['=SUMIFS(MMULT(C1:D2, C1:D2), A1:B2, "=1")'],
+      ['=SUMIFS(C1:D2, MMULT(A1:B2, A1:B2), "=2")'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C2'))).toEqual(1)
-    expect(engine.getCellValue(adr('C3'))).toEqual(2)
-    expect(engine.getCellValue(adr('C4'))).toEqual(1)
-    expect(engine.getCellValue(adr('C5'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(304)
+    expect(engine.getCellValue(adr('A4'))).toEqual(304)
+    expect(engine.getCellValue(adr('A5'))).toEqual(24)
   })
 
-  it('works for subranges with inequality',  () => {
+  it('works for mixed reference/range arguments', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, A1:A1, ">2")'],
-      ['2', '1', '=SUMIFS(B1:B2, A1:A2, ">2")'],
-      ['3', '1', '=SUMIFS(B1:B3, A1:A3, ">2")'],
-      ['4', '1', '=SUMIFS(B1:B4, A1:A4, ">2")'],
+      ['2', '3'],
+      ['=SUMIFS(B1, A1:A1, ">1")'],
+      ['4', '5'],
+      ['=SUMIFS(B3:B3, A3, ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C2'))).toEqual(0)
-    expect(engine.getCellValue(adr('C3'))).toEqual(1)
-    expect(engine.getCellValue(adr('C4'))).toEqual(2)
-  })
-
-  it('works for subranges with more interesting criterions',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "=1")'],
-      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "<=2")'],
-      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "<2")'],
-      ['1', '1', '=SUMIFS(B1:B4, A1:A4, ">4")'],
-    ])
-
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C2'))).toEqual(2)
-    expect(engine.getCellValue(adr('C3'))).toEqual(2)
-    expect(engine.getCellValue(adr('C4'))).toEqual(0)
-  })
-
-  it('discontinuous sumif range',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['1', '1', '=SUMIFS(B1:B1, A1:A1, "="&B1)'],
-      ['2', '1', '=SUMIFS(B1:B2, A1:A2, "="&B2)'],
-      ['1', '1', '=SUMIFS(B1:B3, A1:A3, "="&B3)'],
-      ['0', '0', '0'],
-      ['1', '1', '=SUMIFS(B1:B5, A1:A5, "="&B5)'],
-    ])
-
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C2'))).toEqual(1)
-    expect(engine.getCellValue(adr('C3'))).toEqual(2)
-    expect(engine.getCellValue(adr('C5'))).toEqual(3)
-  })
-
-  it('using full cache',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
-      ['=SUMIFS(B1:B3, A1:A3, "=1")'],
-    ])
-
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
-    expect(engine.getCellValue(adr('A5'))).toEqual(5)
-    expect(engine.stats.sumifFullCacheUsed).toEqual(1)
   })
 
   it('works for more than one criterion/range pair', () => {
