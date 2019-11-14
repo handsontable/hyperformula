@@ -78,3 +78,15 @@ export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
     }
   }
 }
+
+export function coerceScalarToString(arg: CellValue): string | CellError {
+  if (arg instanceof CellError || typeof arg === 'string') {
+    return arg
+  } else if (arg === EmptyValue) {
+    return ""
+  } else if (typeof arg === 'number') {
+    return arg.toString()
+  } else {
+    return arg ? "TRUE" : "FALSE"
+  }
+}

@@ -1,6 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {concatenate} from '../text'
+import {coerceScalarToString} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**
@@ -25,8 +25,20 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const values = ast.args.map((arg) => this.evaluateAst(arg, formulaAddress))
-    return concatenate(values)
+    if (ast.args.length == 0) {
+      return new CellError(ErrorType.NA)
+    }
+
+    let result = ''
+    for (const value of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      const coercedValue = coerceScalarToString(value)
+      if (coercedValue instanceof CellError) {
+        return value
+      } else {
+        result = result.concat(coercedValue)
+      }
+    }
+    return result
   }
 
   /**

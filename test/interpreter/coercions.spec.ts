@@ -1,5 +1,5 @@
 import {EmptyValue, CellError, ErrorType} from '../../src/Cell'
-import {coerceScalarToNumber, coerceScalarToBoolean, dateNumberRepresentation} from '../../src/interpreter/coerce'
+import {coerceScalarToNumber, coerceScalarToBoolean, dateNumberRepresentation, coerceScalarToString} from '../../src/interpreter/coerce'
 import {Config} from '../../src'
 import '../testConfig'
 
@@ -60,5 +60,25 @@ describe("#dateNumberRepresentation", () => {
   xit("incompatibility to fix", () => {
     const defaultFormat = Config.defaultConfig.dateFormat
     expect(dateNumberRepresentation("1", defaultFormat)).toEqual(1)
+  })
+})
+
+describe("#coerceScalarToString", () => {
+  it('works', () => {
+    expect(coerceScalarToString(true)).toBe("TRUE")
+    expect(coerceScalarToString(false)).toBe("FALSE")
+
+    expect(coerceScalarToString(1)).toBe("1")
+    expect(coerceScalarToString(0)).toBe("0")
+    expect(coerceScalarToString(2)).toBe("2")
+    expect(coerceScalarToString(-1)).toBe("-1")
+
+    expect(coerceScalarToString("foo")).toBe("foo")
+
+    expect(coerceScalarToString(EmptyValue)).toBe("")
+
+    expect(coerceScalarToString(1.42)).toBe("1.42")
+
+    expect(coerceScalarToString(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
