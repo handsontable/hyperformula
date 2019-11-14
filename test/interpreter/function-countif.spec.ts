@@ -119,4 +119,15 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
+
+  it('ignore errors', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1'],
+      ['=4/0'],
+      ['1'],
+      ['=COUNTIF(A1:A3, "=1")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
+  })
 })

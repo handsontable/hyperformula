@@ -247,6 +247,18 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
     expect(engine.getCellValue(adr('A4', 1))).toEqual(70)
     expect(engine.stats.sumifFullCacheUsed).toEqual(0)
   })
+
+  it('ignore errors', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '3'],
+      ['=4/0', '5'],
+      ['2', '=4/0'],
+      ['1', '10'],
+      ['=SUMIF(A1:A4, "=1", B1:B4)'],
+    ])
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(13)
+  })
 })
 
 describe('Criterions - operators computations', () => {
