@@ -29,25 +29,19 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(0, [-Infinity, 2])).toEqual(false)
   })
 
-  it('no if ending row is negative', () => {
+  it('no if number of rows is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [0, -1])).toEqual(false)
   })
 
-  it('no if ending row is not an integer', () => {
+  it('no if number of rows is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [0, 1.5])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, [0, NaN])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, [0, Infinity])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, [0, -Infinity])).toEqual(false)
-  })
-
-  it('no if ending row smaller than starting row', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-
-    expect(engine.isItPossibleToRemoveRows(0, [1, 0])).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
