@@ -28,14 +28,6 @@ describe('Function SUMIFS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  it('error when 4th arg is not a range or reference',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['=SUMIFS(C1:C2, B1:B2, ">0", 42, ">0")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
   it('error when criterion unparsable',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=SUMIFS(B1:B2, C1:C2, "><foo")'],
