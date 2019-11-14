@@ -390,21 +390,27 @@ export class HyperFormula {
    * @param columnStart - number of the first column to be deleted
    * @param columnEnd - number of the last row to be deleted
    */
-  public isItPossibleToRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): boolean {
-    if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-      return false
-    }
-    if (columnEnd < columnStart) {
-      return false
-    }
-    const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
+  public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeIndexes(indexes)
 
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
+    for (const [columnStart, numberOfColumns] of normalizedIndexes) {
+      const columnEnd = columnStart + numberOfColumns - 1
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-      return false
+      if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
+        return false
+      }
+      if (columnEnd < columnStart) {
+        return false
+      }
+      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
+
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
+        return false
+      }
     }
 
     return true

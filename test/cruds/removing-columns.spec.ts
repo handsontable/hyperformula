@@ -18,48 +18,42 @@ describe('Removing columns - checking if its possible', () => {
   it('no if starting column is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, -1, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [-1, 1])).toEqual(false)
   })
 
   it('no if starting column is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, 1.5, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, NaN, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, Infinity, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, -Infinity, 2)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [1.5, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [NaN, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [Infinity, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [-Infinity, 2])).toEqual(false)
   })
 
-  it('no if ending column is negative', () => {
+  it('no if number of columns is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, 0, -1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, -1])).toEqual(false)
   })
 
-  it('no if ending column is not an integer', () => {
+  it('no if number of columns is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, 0, 1.5)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 0, NaN)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 0, Infinity)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 0, -Infinity)).toEqual(false)
-  })
-
-  it('no if ending column smaller than starting column', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 0)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, 1.5])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, NaN])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, Infinity])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, -Infinity])).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(1.5, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(-1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(NaN, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(Infinity, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(-Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(1.5, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(-1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(NaN, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(-Infinity, [0, 1])).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we remove', () => {
@@ -68,11 +62,11 @@ describe('Removing columns - checking if its possible', () => {
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 2, 2)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 3, 3)).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, 4, 4)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [2, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [4, 1])).toEqual(true)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -83,16 +77,16 @@ describe('Removing columns - checking if its possible', () => {
     ], config)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToRemoveColumns(0, 0, 0)).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, 0, 0)).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, 1, 2)).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(true)
   })
 })
 
