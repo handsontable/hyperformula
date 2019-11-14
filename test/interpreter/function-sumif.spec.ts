@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import {adr} from '../testUtils'
 import '../testConfig'
 
-describe('Function SUMIF', () => {
+describe('Function SUMIF - argument validation', () => {
   it('requires 2 or 3 arguments', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=SUMIF(C1)'],
@@ -97,13 +97,18 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })
 
-  it('no coercion when sum', () => {
+  it('works with range values', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['2', '="3"'],
-      ['=SUMIF(A1, ">1", B1)'],
+      ['1', '1', '3', '5'],
+      ['1', '1', '7', '9'],
+      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", MMULT(C1:D2, C1:D2))'],
+      ['=SUMIF(A1:B2, "=1", MMULT(C1:D2, C1:D2))'],
+      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toEqual(304)
+    expect(engine.getCellValue(adr('A4'))).toEqual(304)
+    expect(engine.getCellValue(adr('A5'))).toEqual(24)
   })
 
   it('works for mixed reference/range arguments', () => {
@@ -117,18 +122,24 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 
-  it('works with range values', () => {
+  xit('works for 2 arguments', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1', '1', '3', '5'],
-      ['1', '1', '7', '9'],
-      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", MMULT(C1:D2, C1:D2))'],
-      ['=SUMIF(A1:B2, "=1", MMULT(C1:D2, C1:D2))'],
-      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)'],
+      ['10', '20', '30'],
+      ['=SUMIF(A1:C1, ">15")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(304)
-    expect(engine.getCellValue(adr('A4'))).toEqual(304)
-    expect(engine.getCellValue(adr('A5'))).toEqual(24)
+    expect(engine.getCellValue(adr('A2'))).toEqual(50)
+  })
+})
+
+describe("Function SUMIF(S) - calculations and optimizations", () => {
+  it('no coercion when sum', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['2', '="3"'],
+      ['=SUMIF(A1, ">1", B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
   it('works for subranges with different conditions',  () => {
