@@ -11,7 +11,7 @@ import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.start.col},${c.conditionRange.start.row}`)
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.sheet},${c.conditionRange.start.col},${c.conditionRange.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
 

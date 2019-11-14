@@ -207,4 +207,27 @@ describe('Function SUMIF', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(5)
     expect(engine.stats.sumifFullCacheUsed).toEqual(1)
   })
+
+  it('works with different sheets',  () => {
+    const engine =  HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['0', '3'],
+        ['1', '5'],
+        ['2', '7'],
+        ['=SUMIF(A1:A3, "=1", B1:B3)'],
+        ['=SUMIF($Sheet2.A1:A3, "=1", B1:B3)'],
+      ],
+      Sheet2: [
+        ['0', '30'],
+        ['0', '50'],
+        ['1', '70'],
+        ['=SUMIF(A1:A3, "=1", B1:B3)'],
+      ],
+    })
+
+    expect(engine.getCellValue(adr('A4', 0))).toEqual(5)
+    expect(engine.getCellValue(adr('A5', 0))).toEqual(7)
+    expect(engine.getCellValue(adr('A4', 1))).toEqual(70)
+    expect(engine.stats.sumifFullCacheUsed).toEqual(0)
+  })
 })
