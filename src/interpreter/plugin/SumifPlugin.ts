@@ -119,7 +119,7 @@ export class SumifPlugin extends FunctionPlugin {
       valuesArg = coerceToRange(valuesArgValue)
     }
     
-    return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionPackage)])
+    return this.evaluateRangeSumif(valuesArg, [new Condition2(conditionArg, criterionPackage)])
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -152,7 +152,7 @@ export class SumifPlugin extends FunctionPlugin {
       conditions.push(new Condition2(conditionArg, criterionPackage))
     }
     
-    return this.evaluateRangeSumif2(valuesArg, conditions)
+    return this.evaluateRangeSumif(valuesArg, conditions)
   }
 
   /**
@@ -209,7 +209,7 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  private evaluateRangeSumif2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+  private evaluateRangeSumif(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
         return new CellError(ErrorType.VALUE)
@@ -234,7 +234,7 @@ export class SumifPlugin extends FunctionPlugin {
 
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
-          this.evaluateRangeSumifValue2(simpleValuesRange, conditions),
+          this.evaluateRangeSumifValue(simpleValuesRange, conditions),
           conditions.map((condition) => condition.criterionPackage.lambda)
         ])
       }
@@ -243,11 +243,11 @@ export class SumifPlugin extends FunctionPlugin {
 
       return cache.get(fullCriterionString)![0]
     } else {
-      return this.evaluateRangeSumifValue2(simpleValuesRange, conditions)
+      return this.evaluateRangeSumifValue(simpleValuesRange, conditions)
     }
   }
 
-  private evaluateRangeSumifValue2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+  private evaluateRangeSumifValue(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
     return this.computeCriterionValue2(
       conditions,
       simpleValuesRange,
