@@ -88,17 +88,31 @@ export class SumifPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return new CellError(ErrorType.NA)
+    }
+    const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (conditionArgValue instanceof CellError) {
+      return conditionArgValue
+    }
+    const conditionArg = coerceToRange(conditionArgValue)
+
     const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
     if (criterionValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
+    } else if (criterionValue instanceof CellError) {
+      return criterionValue
     }
     const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
     if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
 
-    const conditionArg = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))
-    const valuesArg = coerceToRange(this.evaluateAst(ast.args[2], formulaAddress))
+    const valuesArgValue = this.evaluateAst(ast.args[2], formulaAddress)
+    if (valuesArgValue instanceof CellError) {
+      return valuesArgValue
+    }
+    const valuesArg = coerceToRange(valuesArgValue)
     
     return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionPackage)])
   }
