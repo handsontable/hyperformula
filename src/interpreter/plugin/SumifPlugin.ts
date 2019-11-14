@@ -259,18 +259,22 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
+  private getRangeVertexFromRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
+    const maybeRange = rangeValue.range()
+    if (maybeRange === undefined) {
+      return undefined
+    } else {
+      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end) || undefined
+    }
+  }
+
   private evaluateRangeSumif2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
     if (!conditions[0].conditionRange.sameDimensionsAs(simpleValuesRange)) {
       return new CellError(ErrorType.VALUE)
     }
 
-    const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.range()!.start, simpleValuesRange.range()!.end)
-    const conditionsVertices = conditions.map((c) => {
-      if (c.conditionRange.range() === undefined) {
-        return undefined
-      }
-      return this.dependencyGraph.getRange(c.conditionRange.range()!.start, c.conditionRange.range()!.end)
-    })
+    const valuesRangeVertex = this.getRangeVertexFromRangeValue(simpleValuesRange)
+    const conditionsVertices = conditions.map((c) => this.getRangeVertexFromRangeValue(c.conditionRange))
 
     if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
       const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
