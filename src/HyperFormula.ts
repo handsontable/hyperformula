@@ -489,28 +489,7 @@ export class HyperFormula {
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
-    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
-
-    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
-    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
-    const toSheet = destinationLeftCorner.sheet
-
-    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
-    this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
-    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
-    })
-
-    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
-
+    this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 

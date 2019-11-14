@@ -1,6 +1,5 @@
 import {Index} from "./HyperFormula";
 import {SimpleCellAddress} from "./Cell";
-import {ContentChanges} from "./ContentChanges";
 
 export interface IBatchExecutor {
   addRows: (sheet: number, ...indexes: Index[]) => void
