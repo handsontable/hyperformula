@@ -98,7 +98,10 @@ export class SumifPlugin extends FunctionPlugin {
 
       return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
     } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE && valuesRangeArg.type === AstNodeType.CELL_REFERENCE) {
-      return this.evaluateCellSumif(ast, formulaAddress, criterion)
+      const simpleValuesRange = AbsoluteCellRange.singleRangeFromCellAddress(valuesRangeArg.reference, formulaAddress)
+      const simpleConditionRange = AbsoluteCellRange.singleRangeFromCellAddress(conditionRangeArg.reference, formulaAddress)
+
+      return this.evaluateRangeSumif(simpleValuesRange, [new Condition(simpleConditionRange, criterionString, criterion)])
     } else {
       return new CellError(ErrorType.VALUE)
     }
@@ -199,24 +202,6 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  /**
-   * Computes SUMIF function for single-cell arguments
-   *
-   * @param ast - ast of the SUMIF function call
-   * @param formulaAddress - address of the cell with function call
-   * @param criterion - computed value of the criterion passed to function call
-   */
-  private evaluateCellSumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
-    const conditionReferenceArg = ast.args[0] as CellReferenceAst
-    const valuesReferenceArg = ast.args[2] as CellReferenceAst
-
-    const conditionValues = [this.evaluateAst(conditionReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
-    const computableValues = [this.evaluateAst(valuesReferenceArg, formulaAddress)][Symbol.iterator]() as IterableIterator<CellValue>
-    const criterionLambda = buildCriterionLambda(criterion)
-    const filteredValues = ifFilter([criterionLambda], [conditionValues], computableValues)
-    return reduceSum(filteredValues)
-  }
-
   private evaluateCellSumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress, criterion: Criterion): CellValue {
     const conditionReferenceArg = ast.args[1] as CellReferenceAst
     const valuesReferenceArg = ast.args[0] as CellReferenceAst
@@ -242,30 +227,33 @@ export class SumifPlugin extends FunctionPlugin {
     }
 
     const valuesRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-    assert.ok(valuesRangeVertex, 'Range does not exists in graph')
+    
+    if (valuesRangeVertex) {
+      const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
+      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
+      if (cachedResult) {
+        this.interpreter.stats.sumifFullCacheUsed++
+        return cachedResult
+      }
 
-    const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
-    const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
-    if (cachedResult) {
-      this.interpreter.stats.sumifFullCacheUsed++
-      return cachedResult
+      const cache = this.buildNewCriterionCache(sumifCacheKey(conditions), conditions.map((c) => c.conditionRange), simpleValuesRange,
+        (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+          return add(cacheCurrentValue, reduceSum(newFilteredValues))
+        })
+
+      if (!cache.has(fullCriterionString)) {
+        cache.set(fullCriterionString, [
+          this.evaluateRangeSumifValue(simpleValuesRange, conditions),
+          conditions.map((condition) => buildCriterionLambda(condition.criterion))
+        ])
+      }
+
+      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
+
+      return cache.get(fullCriterionString)![0]
+    } else {
+      return this.evaluateRangeSumifValue(simpleValuesRange, conditions)
     }
-
-    const cache = this.buildNewCriterionCache(sumifCacheKey(conditions), conditions.map((c) => c.conditionRange), simpleValuesRange,
-      (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-        return add(cacheCurrentValue, reduceSum(newFilteredValues))
-      })
-
-    if (!cache.has(fullCriterionString)) {
-      cache.set(fullCriterionString, [
-        this.evaluateRangeSumifValue(simpleValuesRange, conditions),
-        conditions.map((condition) => buildCriterionLambda(condition.criterion))
-      ])
-    }
-
-    valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
-
-    return cache.get(fullCriterionString)![0]
   }
 
   private evaluateRangeSumifValue(simpleValuesRange: AbsoluteCellRange, conditions: Condition[]): CellValue {
