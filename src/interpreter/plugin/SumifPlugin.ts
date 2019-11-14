@@ -11,7 +11,7 @@ import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
-function sumifCacheKey(conditions: Condition2[]): string {
+function sumifCacheKey(conditions: Condition[]): string {
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
@@ -45,7 +45,7 @@ export const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRang
   }
 }
 
-class Condition2 {
+class Condition {
   constructor(
     public readonly conditionRange: SimpleRangeValue,
     public readonly criterionPackage: CriterionPackage,
@@ -110,7 +110,7 @@ export class SumifPlugin extends FunctionPlugin {
       valuesArg = coerceToRange(valuesArgValue)
     }
     
-    return this.evaluateRangeSumif(valuesArg, [new Condition2(conditionArg, criterionPackage)])
+    return this.evaluateRangeSumif(valuesArg, [new Condition(conditionArg, criterionPackage)])
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -123,7 +123,7 @@ export class SumifPlugin extends FunctionPlugin {
     }
     const valuesArg = coerceToRange(valueArgValue)
 
-    const conditions: Condition2[] = []
+    const conditions: Condition[] = []
     for (let i = 1; i < ast.args.length; i += 2) {
       const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
       if (conditionArgValue instanceof CellError) {
@@ -140,7 +140,7 @@ export class SumifPlugin extends FunctionPlugin {
       if (criterionPackage === undefined) {
         return new CellError(ErrorType.VALUE)
       }
-      conditions.push(new Condition2(conditionArg, criterionPackage))
+      conditions.push(new Condition(conditionArg, criterionPackage))
     }
     
     return this.evaluateRangeSumif(valuesArg, conditions)
@@ -191,7 +191,7 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  private evaluateRangeSumif(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+  private evaluateRangeSumif(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): CellValue {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
         return new CellError(ErrorType.VALUE)
@@ -229,7 +229,7 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  private evaluateRangeSumifValue(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
+  private evaluateRangeSumifValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): CellValue {
     return this.computeCriterionValue2(
       conditions,
       simpleValuesRange,
@@ -279,7 +279,7 @@ export class SumifPlugin extends FunctionPlugin {
 
   private evaluateRangeCountifValue(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
     return this.computeCriterionValue2(
-      [new Condition2(simpleConditionRange, criterionPackage)],
+      [new Condition(simpleConditionRange, criterionPackage)],
       simpleConditionRange,
       (filteredValues: IterableIterator<CellValue>) => {
         return count(filteredValues)
@@ -335,7 +335,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param simpleValuesRange - values range
    * @param valueComputingFunction - function used to compute final value out of list of filtered cell values
    */
-  private computeCriterionValue2(conditions: Condition2[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
+  private computeCriterionValue2(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = simpleValuesRange.valuesFromTopLeftCorner()
     const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
