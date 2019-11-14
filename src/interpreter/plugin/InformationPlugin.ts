@@ -37,6 +37,9 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     } else {
       const arg = this.evaluateAst(ast.args[0], formulaAddress)
+      if (arg instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
       return (arg instanceof CellError)
     }
   }
