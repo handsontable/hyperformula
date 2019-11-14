@@ -167,37 +167,28 @@ export class SumifPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const conditionRangeArg = ast.args[0]
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
 
-    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
-    if (typeof criterionString !== 'string') {
+    const conditionArgValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (conditionArgValue instanceof CellError) {
+      return conditionArgValue
+    }
+    const conditionArg = coerceToRange(conditionArgValue)
+
+    const criterionValue = this.evaluateAst(ast.args[1], formulaAddress)
+    if (criterionValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else if (criterionValue instanceof CellError) {
+      return criterionValue
+    }
+    const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+    if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
 
-    const criterion = parseCriterion(criterionString)
-    if (criterion === null) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const criterionLambda = buildCriterionLambda(criterion)
-
-    if (conditionRangeArg.type === AstNodeType.CELL_RANGE) {
-      const simpleConditionRange = AbsoluteCellRange.fromCellRange(conditionRangeArg, formulaAddress)
-      return this.evaluateRangeCountif(simpleConditionRange, criterionString, criterion)
-    } else if (conditionRangeArg.type === AstNodeType.CELL_REFERENCE) {
-      const valueFromCellReference = this.evaluateAst(conditionRangeArg, formulaAddress)
-      if (valueFromCellReference instanceof SimpleRangeValue) {
-        throw "Cant happen"
-      }
-      const criterionResult = criterionLambda(valueFromCellReference)
-      if (criterionResult) {
-        return 1
-      } else {
-        return 0
-      }
-    } else {
-      return new CellError(ErrorType.VALUE)
-    }
+    return this.evaluateRangeCountif(conditionArg, criterionPackage)
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
@@ -264,33 +255,45 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeCountif(simpleConditionRange: AbsoluteCellRange, criterionString: string, criterion: Criterion): CellValue {
-    const conditionRangeVertex = this.dependencyGraph.getRange(simpleConditionRange.start, simpleConditionRange.end)!
-    assert.ok(conditionRangeVertex, 'Range does not exists in graph')
+  private evaluateRangeCountif(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
+    const conditionRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleConditionRange)
 
-    const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionString)
-    if (cachedResult) {
-      this.interpreter.stats.countifFullCacheUsed++
-      return cachedResult
-    }
+    if (conditionRangeVertex) {
+      const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionPackage.raw)
+      if (cachedResult) {
+        this.interpreter.stats.countifFullCacheUsed++
+        return cachedResult
+      }
 
-    const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, [simpleConditionRange], simpleConditionRange,
-      (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-        this.interpreter.stats.countifPartialCacheUsed++
-        return (cacheCurrentValue as number) + count(newFilteredValues)
-      })
-
-    if (!cache.has(criterionString)) {
-      const resultValue = this.computeCriterionValue([criterion], [simpleConditionRange], simpleConditionRange,
-        (filteredValues: IterableIterator<CellValue>) => {
-          return count(filteredValues)
+      const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, [simpleConditionRange.range()!], simpleConditionRange.range()!,
+        (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
+          this.interpreter.stats.countifPartialCacheUsed++
+          return (cacheCurrentValue as number) + count(newFilteredValues)
         })
-      cache.set(criterionString, [resultValue, [buildCriterionLambda(criterion)]])
+
+      if (!cache.has(criterionPackage.raw)) {
+        cache.set(criterionPackage.raw, [
+          this.evaluateRangeCountifValue(simpleConditionRange, criterionPackage),
+          [criterionPackage.lambda]
+        ])
+      }
+
+      conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
+
+      return cache.get(criterionPackage.raw)![0]
+    } else {
+      return this.evaluateRangeCountifValue(simpleConditionRange, criterionPackage)
     }
+  }
 
-    conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
-
-    return cache.get(criterionString)![0]
+  private evaluateRangeCountifValue(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
+    return this.computeCriterionValue2(
+      [new Condition2(simpleConditionRange, criterionPackage)],
+      simpleConditionRange,
+      (filteredValues: IterableIterator<CellValue>) => {
+        return count(filteredValues)
+      }
+    )
   }
 
   /**
@@ -341,14 +344,6 @@ export class SumifPlugin extends FunctionPlugin {
    * @param simpleValuesRange - values range
    * @param valueComputingFunction - function used to compute final value out of list of filtered cell values
    */
-  private computeCriterionValue(criterions: Criterion[], simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
-    const criterionLambdas = criterions.map((criterion) => buildCriterionLambda(criterion))
-    const values = getRangeValues(this.dependencyGraph, simpleValuesRange)
-    const conditions = simpleConditionRanges.map((simpleConditionRange) => getRangeValues(this.dependencyGraph, simpleConditionRange))
-    const filteredValues = ifFilter(criterionLambdas, conditions, values)
-    return valueComputingFunction(filteredValues)
-  }
-
   private computeCriterionValue2(conditions: Condition2[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = simpleValuesRange.valuesFromTopLeftCorner()
