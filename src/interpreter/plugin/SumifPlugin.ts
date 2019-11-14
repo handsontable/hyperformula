@@ -45,15 +45,6 @@ export const findSmallerRange = (dependencyGraph: DependencyGraph, conditionRang
   }
 }
 
-class Condition {
-  constructor(
-    public readonly conditionRange: AbsoluteCellRange,
-    public readonly criterionString: string,
-    public readonly criterion: Criterion,
-  ) {
-  }
-}
-
 class Condition2 {
   constructor(
     public readonly conditionRange: SimpleRangeValue,
