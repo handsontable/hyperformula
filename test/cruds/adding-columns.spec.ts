@@ -10,52 +10,52 @@ describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, -1, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [-1, 1])).toEqual(false)
   })
 
   it('no if starting column is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, 1.5, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [1.5, 1])).toEqual(false)
   })
 
   it('no if starting column is NaN/Infinity', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, NaN, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, Infinity, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, -Infinity, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [NaN, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [Infinity, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [-Infinity, 1])).toEqual(false)
   })
 
   it('no if number of columns is not positive', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, 0, 0)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 0])).toEqual(false)
   })
 
   it('no if number of columns is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, 0, 1.5)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1.5])).toEqual(false)
   })
 
   it('no if number of columns is NaN/Infinity', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, 0, NaN)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, 0, Infinity)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, 0, -Infinity)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, NaN])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, Infinity])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, -Infinity])).toEqual(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(1.5, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(-1, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(NaN, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(Infinity, 0, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(-Infinity, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(1.5, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(-1, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(NaN, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(-Infinity, [0, 1])).toEqual(false)
   })
 
   it('no if theres a formula matrix in place where we add', () => {
@@ -64,10 +64,10 @@ describe('Adding column - checking if its possible', () => {
       ['3', '4', '{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
     ])
 
-    expect(engine.isItPossibleToAddColumns(0, 1, 1)).toEqual(true)
-    expect(engine.isItPossibleToAddColumns(0, 2, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, 3, 1)).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, 4, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [1, 1])).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [2, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [4, 1])).toEqual(true)
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
@@ -78,14 +78,14 @@ describe('Adding column - checking if its possible', () => {
     ], config)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToAddColumns(0, 0, 1)).toEqual(true)
-    expect(engine.isItPossibleToAddColumns(0, 1, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [1, 1])).toEqual(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, 0, 1)).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
   })
 })
 

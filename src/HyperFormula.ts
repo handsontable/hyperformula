@@ -219,8 +219,8 @@ export class HyperFormula {
    */
   public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
     if (
-      invalidSimpleCellAddress(address) ||
-      !this.sheetMapping.hasSheetWithId(address.sheet)
+        invalidSimpleCellAddress(address) ||
+        !this.sheetMapping.hasSheetWithId(address.sheet)
     ) {
       return false
     }
@@ -355,18 +355,22 @@ export class HyperFormula {
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
    */
-  public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
-    if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-      return false
-    }
-    const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
+  public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeIndexes(indexes)
 
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
+    for (const [column, numberOfColumnsToAdd] of normalizedIndexes) {
+      if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
+        return false
+      }
+      const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
-      return false
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
+        return false
+      }
     }
 
     return true
@@ -423,12 +427,12 @@ export class HyperFormula {
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
     if (
-      invalidSimpleCellAddress(sourceLeftCorner) ||
-      !isPositiveInteger(width) ||
-      !isPositiveInteger(height) ||
-      invalidSimpleCellAddress(destinationLeftCorner) ||
-      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+        invalidSimpleCellAddress(sourceLeftCorner) ||
+        !isPositiveInteger(width) ||
+        !isPositiveInteger(height) ||
+        invalidSimpleCellAddress(destinationLeftCorner) ||
+        !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+        !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
       return false
     }
@@ -570,7 +574,7 @@ export class HyperFormula {
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
-  * */
+   * */
   public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
     batchOperations(this.crudOperations)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
