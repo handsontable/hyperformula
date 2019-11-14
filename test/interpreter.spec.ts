@@ -75,55 +75,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.NAME))
   })
 
-  it('function ACOS happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(0)
-  })
-
-  it('function ACOS when value not numeric', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS("foo")']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-  })
-
-  it('function ACOS for 1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(0)
-  })
-
-  it('function ACOS for -1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(-1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(Math.PI)
-  })
-
-  it('function ACOS when value too large', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1.1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-  })
-
-  it('function ACOS when value too small', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(-1.1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-  })
-
-  it('function ACOS happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toBe(0)
-  })
-
-  it('function ACOS wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS()', '=ACOS(1,-1)']])
-
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
-  })
-
   it('function ISERROR should return true for common errors', () => {
     const engine = HyperFormula.buildFromArray([
         ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],

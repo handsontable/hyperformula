@@ -1,6 +1,9 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {coerceScalarToNumber} from '../coerce'
+import {SimpleRangeValue} from '../InterpreterValue'
+
 
 /**
  * Interpreter plugin containing trigonometric functions
@@ -27,10 +30,14 @@ export class TrigonometryPlugin extends FunctionPlugin {
     }
 
     const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (typeof arg !== 'number') {
+    if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
-    } else if (-1 <= arg && arg <= 1) {
-      return Math.acos(arg)
+    }
+    const coercedArg = coerceScalarToNumber(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else if (-1 <= coercedArg && coercedArg <= 1) {
+      return Math.acos(coercedArg)
     } else {
       return new CellError(ErrorType.NUM)
     }
