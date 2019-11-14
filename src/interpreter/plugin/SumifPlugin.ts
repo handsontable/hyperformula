@@ -62,8 +62,15 @@ class Condition {
 class Condition2 {
   constructor(
     public readonly conditionRange: SimpleRangeValue,
-    public readonly criterionString: string,
-    public readonly criterion: Criterion,
+    public readonly criterionPackage: CriterionPackage,
+  ) {
+  }
+}
+
+class CriterionPackage {
+  constructor(
+    public readonly raw: string,
+    public readonly lambda: CriterionLambda,
   ) {
   }
 }
@@ -94,20 +101,15 @@ export class SumifPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    const criterionString = this.evaluateAst(ast.args[1], formulaAddress)
-    if (typeof criterionString !== 'string') {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const criterion = parseCriterion(criterionString)
-    if (criterion === null) {
+    const criterionPackage = this.buildCriterion(ast.args[1], formulaAddress)
+    if (criterionPackage === undefined) {
       return new CellError(ErrorType.VALUE)
     }
 
     const conditionArg = coerceToRange(this.evaluateAst(ast.args[0], formulaAddress))
     const valuesArg = coerceToRange(this.evaluateAst(ast.args[2], formulaAddress))
     
-    return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionString, criterion)])
+    return this.evaluateRangeSumif2(valuesArg, [new Condition2(conditionArg, criterionPackage)])
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -216,6 +218,20 @@ export class SumifPlugin extends FunctionPlugin {
     return reduceSum(filteredValues)
   }
 
+  private buildCriterion(ast: Ast, formulaAddress: SimpleCellAddress): CriterionPackage | undefined {
+    const criterionString = this.evaluateAst(ast, formulaAddress)
+    if (typeof criterionString !== 'string') {
+      return undefined
+    }
+
+    const criterion = parseCriterion(criterionString)
+    if (criterion === null) {
+      return undefined
+    }
+
+    return new CriterionPackage(criterionString, buildCriterionLambda(criterion))
+  }
+
   /**
    * Computes SUMIF function for range arguments.
    *
@@ -277,7 +293,7 @@ export class SumifPlugin extends FunctionPlugin {
     const conditionsVertices = conditions.map((c) => this.getRangeVertexFromRangeValue(c.conditionRange))
 
     if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
-      const fullCriterionString = conditions.map((c) => c.criterionString).join(',')
+      const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey2(conditions), fullCriterionString)
       if (cachedResult) {
         this.interpreter.stats.sumifFullCacheUsed++
@@ -292,7 +308,7 @@ export class SumifPlugin extends FunctionPlugin {
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
           this.evaluateRangeSumifValue2(simpleValuesRange, conditions),
-          conditions.map((condition) => buildCriterionLambda(condition.criterion))
+          conditions.map((condition) => condition.criterionPackage.lambda)
         ])
       }
 
@@ -306,8 +322,7 @@ export class SumifPlugin extends FunctionPlugin {
 
   private evaluateRangeSumifValue2(simpleValuesRange: SimpleRangeValue, conditions: Condition2[]): CellValue {
     return this.computeCriterionValue2(
-      conditions.map((c) => c.criterion),
-      conditions.map((c) => c.conditionRange),
+      conditions,
       simpleValuesRange,
       (filteredValues: IterableIterator<CellValue>) => {
         return reduceSum(filteredValues)
@@ -418,11 +433,11 @@ export class SumifPlugin extends FunctionPlugin {
     return valueComputingFunction(filteredValues)
   }
 
-  private computeCriterionValue2(criterions: Criterion[], simpleConditionRanges: SimpleRangeValue[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
-    const criterionLambdas = criterions.map((criterion) => buildCriterionLambda(criterion))
+  private computeCriterionValue2(conditions: Condition2[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
+    const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = simpleValuesRange.valuesFromTopLeftCorner()
-    const conditions = simpleConditionRanges.map((simpleConditionRange) => simpleConditionRange.valuesFromTopLeftCorner())
-    const filteredValues = ifFilter(criterionLambdas, conditions, values)
+    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
+    const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
     return valueComputingFunction(filteredValues)
   }
 }
