@@ -150,10 +150,14 @@ describe('Function SUMIF', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '1', '3', '5'],
       ['1', '1', '7', '9'],
-      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)']
+      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", MMULT(C1:D2, C1:D2))'],
+      ['=SUMIF(A1:B2, "=1", MMULT(C1:D2, C1:D2))'],
+      ['=SUMIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(24)
+    expect(engine.getCellValue(adr('A3'))).toEqual(304)
+    expect(engine.getCellValue(adr('A4'))).toEqual(304)
+    expect(engine.getCellValue(adr('A5'))).toEqual(24)
   })
 
   it('works for subranges with different conditions',  () => {
