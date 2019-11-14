@@ -257,16 +257,26 @@ export class SumifPlugin extends FunctionPlugin {
       })
 
     if (!cache.has(fullCriterionString)) {
-      const resultValue = this.computeCriterionValue(conditions.map((c) => c.criterion), conditions.map((c) => c.conditionRange), simpleValuesRange,
-        (filteredValues: IterableIterator<CellValue>) => {
-          return reduceSum(filteredValues)
-        })
-      cache.set(fullCriterionString, [resultValue, conditions.map((condition) => buildCriterionLambda(condition.criterion))])
+      cache.set(fullCriterionString, [
+        this.evaluateRangeSumifValue(simpleValuesRange, conditions),
+        conditions.map((condition) => buildCriterionLambda(condition.criterion))
+      ])
     }
 
     valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
 
     return cache.get(fullCriterionString)![0]
+  }
+
+  private evaluateRangeSumifValue(simpleValuesRange: AbsoluteCellRange, conditions: Condition[]): CellValue {
+    return this.computeCriterionValue(
+      conditions.map((c) => c.criterion),
+      conditions.map((c) => c.conditionRange),
+      simpleValuesRange,
+      (filteredValues: IterableIterator<CellValue>) => {
+        return reduceSum(filteredValues)
+      }
+    )
   }
 
   /**
