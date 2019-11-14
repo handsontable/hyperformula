@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
+import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing information functions
@@ -54,6 +55,9 @@ export class InformationPlugin extends FunctionPlugin {
     }
     const arg = ast.args[0]
     const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
     return (value === EmptyValue)
   }
 
