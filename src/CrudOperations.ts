@@ -81,9 +81,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
-    if (!this.isItPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -246,7 +244,7 @@ export class CrudOperations implements IBatchExecutor {
     return true
   }
 
-  public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
+  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
     if (
         invalidSimpleCellAddress(sourceLeftCorner) ||
         !isPositiveInteger(width) ||
@@ -255,28 +253,26 @@ export class CrudOperations implements IBatchExecutor {
         !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
         !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
-      return false
+      throw new Error('Invalid arguments')
     }
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
     if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
-      return false
+      throw new Error('It is not possible to move matrix')
     }
 
     if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
-      return false
+      throw new Error('It is not possible to replace cells with matrix')
     }
-
-    return true
   }
 
   public isItPossibleToAddSheet(): boolean {
     return true
   }
 
-  public isItPossibleToRemoveSheet(sheet: number): boolean {
+  public ensureItIsPossibleToRemoveSheet(sheet: number): boolean {
     return this.sheetMapping.hasSheetWithId(sheet)
   }
 

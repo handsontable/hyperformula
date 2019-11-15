@@ -381,7 +381,12 @@ export class HyperFormula {
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
-    return this.crudOperations.isItPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -422,7 +427,7 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public isItPossibleToRemoveSheet(sheet: number): boolean {
-    return this.crudOperations.isItPossibleToRemoveSheet(sheet)
+    return this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
   }
 
   /**
