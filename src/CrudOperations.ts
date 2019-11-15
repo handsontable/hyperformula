@@ -105,6 +105,14 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
+  public addSheet(name?: string): void {
+    if (name) {
+      this.ensureItIsPossibleToAddSheet(name)
+    }
+    const sheetId = this.sheetMapping.addSheet(name)
+    this.addressMapping.autoAddSheet(sheetId, [])
+  }
+
   public removeSheet(sheet: number): void {
     this.ensureItIsPossibleToRemoveSheet(sheet)
     this.dependencyGraph.removeSheet(sheet)
@@ -275,8 +283,10 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToAddSheet(): boolean {
-    return true
+  public ensureItIsPossibleToAddSheet(name: string): void {
+    if (this.sheetMapping.hasSheetWithName(name)) {
+      throw Error(`Sheet with name ${name} already exists`)
+    }
   }
 
   public ensureItIsPossibleToRemoveSheet(sheet: number): void {
