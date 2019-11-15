@@ -127,4 +127,58 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual('=#ADR!')
   })
+
+  it('#unparse forgets about downcase', () => {
+    const formula = '=sum(1,2,3)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=SUM(1,2,3)')
+  })
+
+  it('#unparse forgets about spaces', () => {
+    const formula = '= 1 + sum(1,2,   3)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=1+SUM(1,2,3)')
+  })
+
+  it('#unparse forgets about OFFSET', () => {
+    const formula = '=OFFSET(C3, 1, 1)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=D4')
+  })
+
+  it('#unparse forgets about unnecessary parenthesis', () => {
+    const formula = '=(1+2)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=1+2')
+  })
+
+  it('#unparse forgets about unnecessary sheet reference', () => {
+    const formula = '=$Sheet1.C3'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=C3')
+  })
+
+  xit('#unparse necessary parenthesis', () => {
+    const formula = '=(1+2)*3'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=(1+2)*3')
+  })
 })
