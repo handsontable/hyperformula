@@ -804,20 +804,13 @@ describe('Removing rows - sheet dimensions', () => {
     })
   });
 
-  it('should do nothing when start row greater than end row', () => {
+  it('should throw error when trying to remove non positive number of rows', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
     ])
 
-    const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
-    engine.removeRows(0, [1, 0])
-
-    expect(recalcSpy).not.toHaveBeenCalled()
-    expect(engine.getSheetDimensions(0)).toEqual({
-      width: 1,
-      height: 2,
-    })
+    expect(() => engine.removeRows(0, [1, 0])).toThrowError('Wrong indexes')
   });
 
   it('returns changed values', () => {

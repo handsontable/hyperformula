@@ -413,7 +413,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    */
   public isItPossibleToAddSheet(): boolean {
-    return this.crudOperations.isItPossibleToAddSheet()
+    return this.crudOperations.ensureItIsPossibleToAddSheet()
   }
 
   /**
@@ -432,7 +432,12 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public isItPossibleToRemoveSheet(sheet: number): boolean {
-    return this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -441,16 +446,7 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public removeSheet(sheet: number): CellValueChange[] {
-    this.dependencyGraph.removeSheet(sheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
-    })
-
-    this.sheetMapping.removeSheet(sheet)
-    this.columnSearch.removeSheet(sheet)
-
+    this.crudOperations.removeSheet(sheet)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 

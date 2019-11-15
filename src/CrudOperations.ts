@@ -23,10 +23,11 @@ import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {ContentChanges} from "./ContentChanges";
+import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
 import {start} from "repl";
+import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -49,7 +50,7 @@ export class CrudOperations implements IBatchExecutor {
 
   }
 
-  public addRows(sheet: number, ...indexes: Index[]) {
+  public addRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
@@ -57,7 +58,7 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public removeRows(sheet: number, ...indexes: Index[]) {
+  public removeRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
@@ -65,7 +66,7 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public addColumns(sheet: number, ...indexes: Index[]) {
+  public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
@@ -73,7 +74,7 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public removeColumns(sheet: number, ...indexes: Index[]) {
+  public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
@@ -81,7 +82,7 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -104,7 +105,20 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: string) {
+  public removeSheet(sheet: number): void {
+    this.ensureItIsPossibleToRemoveSheet(sheet)
+    this.dependencyGraph.removeSheet(sheet)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
+      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
+    })
+
+    this.sheetMapping.removeSheet(sheet)
+    this.columnSearch.removeSheet(sheet)
+  }
+
+  public setCellContent(address: SimpleCellAddress, newCellContent: string): void {
     this.ensureItIsPossibleToChangeContent(address)
 
     let vertex = this.dependencyGraph.getCell(address)
@@ -160,7 +174,7 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]) {
+  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw Error('Wrong indexes')
@@ -177,14 +191,14 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]) {
+  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]): void {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
         throw Error('Wrong indexes')
       }
       if (rowEnd < rowStart) {
-        return false
+        throw Error('Wrong indexes')
       }
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
@@ -196,11 +210,9 @@ export class CrudOperations implements IBatchExecutor {
         throw Error('It is not possible to remove row with matrix')
       }
     }
-
-    return true
   }
 
-  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]) {
+  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw Error('Wrong indexes')
@@ -215,11 +227,9 @@ export class CrudOperations implements IBatchExecutor {
         throw Error('It is not possible to add column in column with matrix')
       }
     }
-
-    return true
   }
 
-  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: Index[]) {
+  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): void {
     for (const [columnStart, numberOfColumns] of indexes) {
       const columnEnd = columnStart + numberOfColumns - 1
 
@@ -239,11 +249,9 @@ export class CrudOperations implements IBatchExecutor {
         throw Error('It is not possible to remove column within matrix')
       }
     }
-
-    return true
   }
 
-  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
         invalidSimpleCellAddress(sourceLeftCorner) ||
         !isPositiveInteger(width) ||
@@ -267,15 +275,17 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public isItPossibleToAddSheet(): boolean {
+  public ensureItIsPossibleToAddSheet(): boolean {
     return true
   }
 
-  public ensureItIsPossibleToRemoveSheet(sheet: number): boolean {
-    return this.sheetMapping.hasSheetWithId(sheet)
+  public ensureItIsPossibleToRemoveSheet(sheet: number): void {
+    if (!this.sheetMapping.hasSheetWithId(sheet)) {
+      throw new NoSuchSheetError(sheet)
+    }
   }
 
-  public ensureItIsPossibleToChangeContent(address: SimpleCellAddress) {
+  public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
     }
@@ -302,7 +312,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1) {
+  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return
     }
@@ -325,7 +335,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart) {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
@@ -348,7 +358,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param column - column number above which the columns will be added
    * @param numberOfColumns - number of columns to add
    */
-  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1) {
+  private doAddColumns(sheet: number, column: number, numberOfColumns: number = 1): void {
     if (this.columnEffectivelyNotInSheet(column, sheet)) {
       return
     }
@@ -372,7 +382,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param columnStart - number of the first column to be deleted
    * @param columnEnd - number of the last row to be deleted
    */
-  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart) {
+  private doRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): void {
     if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
       return
     }
@@ -478,10 +488,10 @@ export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
   return merged
 }
 
-function isPositiveInteger(x: number) {
+function isPositiveInteger(x: number): boolean {
   return Number.isInteger(x) && x > 0
 }
 
-function isNonnegativeInteger(x: number) {
+function isNonnegativeInteger(x: number): boolean {
   return Number.isInteger(x) && x >= 0
 }
