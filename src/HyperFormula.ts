@@ -281,23 +281,7 @@ export class HyperFormula {
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-
-    for (const [row, numberOfRowsToAdd] of normalizedIndexes) {
-      if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-        return false
-      }
-      const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
-        return false
-      }
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToAddRows(sheet, ...normalizedIndexes)
   }
 
   /**
@@ -322,27 +306,7 @@ export class HyperFormula {
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-
-    for (const [rowStart, numberOfRows] of normalizedIndexes) {
-      const rowEnd = rowStart + numberOfRows - 1
-      if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-        return false
-      }
-      if (rowEnd < rowStart) {
-        return false
-      }
-      const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-        return false
-      }
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToRemoveRows(sheet, ...normalizedIndexes)
   }
 
   /**
@@ -367,23 +331,7 @@ export class HyperFormula {
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-
-    for (const [column, numberOfColumnsToAdd] of normalizedIndexes) {
-      if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-        return false
-      }
-      const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
-        return false
-      }
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToAddColumns(sheet, ...normalizedIndexes)
   }
 
   /**
@@ -408,28 +356,7 @@ export class HyperFormula {
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-
-    for (const [columnStart, numberOfColumns] of normalizedIndexes) {
-      const columnEnd = columnStart + numberOfColumns - 1
-
-      if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-        return false
-      }
-      if (columnEnd < columnStart) {
-        return false
-      }
-      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-      if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        return false
-      }
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToRemoveColumns(sheet, ...normalizedIndexes)
   }
 
   /**

@@ -51,6 +51,9 @@ export class CrudOperations implements IBatchExecutor {
 
   public addRows(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
+    if (!this.isItPossibleToAddRows(sheet, ...normalizedIndexes)) {
+      throw Error()
+    }
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
@@ -58,6 +61,9 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeRows(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
+    if (!this.isItPossibleToRemoveRows(sheet, ...normalizedIndexes)) {
+      throw Error()
+    }
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -65,6 +71,9 @@ export class CrudOperations implements IBatchExecutor {
 
   public addColumns(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
+    if (!this.isItPossibleToAddColumns(sheet, ...normalizedIndexes)) {
+      throw Error()
+    }
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
@@ -72,6 +81,9 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeColumns(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
+    if (!this.isItPossibleToRemoveColumns(sheet, ...normalizedIndexes)) {
+      throw Error()
+    }
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -156,6 +168,92 @@ export class CrudOperations implements IBatchExecutor {
       throw new Error('Illegal operation')
     }
   }
+
+  public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
+    for (const [row, numberOfRowsToAdd] of indexes) {
+      if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
+        return false
+      }
+      const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
+    for (const [rowStart, numberOfRows] of indexes) {
+      const rowEnd = rowStart + numberOfRows - 1
+      if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
+        return false
+      }
+      if (rowEnd < rowStart) {
+        return false
+      }
+      const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
+
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
+    for (const [column, numberOfColumnsToAdd] of indexes) {
+      if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
+        return false
+      }
+      const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
+
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
+    for (const [columnStart, numberOfColumns] of indexes) {
+      const columnEnd = columnStart + numberOfColumns - 1
+
+      if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
+        return false
+      }
+      if (columnEnd < columnStart) {
+        return false
+      }
+      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
+
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
+        return false
+      }
+
+      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
 
   public getAndClearContentChanges(): ContentChanges {
     const changes = this.changes
@@ -320,4 +418,12 @@ export function normalizeIndexes(indexes: Index[]): Index[] {
 
     return acc
   }, [sorted[0]])
+}
+
+function isPositiveInteger(x: number) {
+  return Number.isInteger(x) && x > 0
+}
+
+function isNonnegativeInteger(x: number) {
+  return Number.isInteger(x) && x >= 0
 }
