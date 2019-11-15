@@ -18,7 +18,7 @@ import {
 import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from "./parser";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index} from "./HyperFormula";
+import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
@@ -104,9 +104,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    if (!this.isItPossibleToChangeContent(address)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToChangeContent(address)
 
     let vertex = this.dependencyGraph.getCell(address)
 
@@ -169,7 +167,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw Error('No such sheet')
+        throw new NoSuchSheetError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
@@ -190,7 +188,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw Error('No such sheet')
+        throw new NoSuchSheetError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
@@ -209,7 +207,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw Error('No such sheet')
+        throw new NoSuchSheetError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
@@ -233,7 +231,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw Error('No such sheet')
+        throw new NoSuchSheetError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
@@ -276,19 +274,17 @@ export class CrudOperations implements IBatchExecutor {
     return this.sheetMapping.hasSheetWithId(sheet)
   }
 
-  public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
-    if (
-        invalidSimpleCellAddress(address) ||
-        !this.sheetMapping.hasSheetWithId(address.sheet)
-    ) {
-      return false
+  public ensureItIsPossibleToChangeContent(address: SimpleCellAddress) {
+    if (invalidSimpleCellAddress(address)) {
+      throw new InvalidAddressError(address)
+    }
+    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
+      throw new NoSuchSheetError(address.sheet)
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      return false
+      throw Error('It is not possible to change part of a matrix')
     }
-
-    return true
   }
 
   public getAndClearContentChanges(): ContentChanges {
