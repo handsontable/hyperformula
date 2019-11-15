@@ -1,25 +1,23 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
   AddressMapping,
-  DependencyGraph, FormulaCellVertex,
+  DependencyGraph,
+  FormulaCellVertex,
   Graph,
-  MatrixMapping, MatrixVertex,
+  MatrixMapping,
+  MatrixVertex,
   RangeMapping,
   SheetMapping,
   Vertex
 } from './DependencyGraph'
-import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
-import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
@@ -36,14 +34,6 @@ export class InvalidAddressError extends Error {
   constructor(address: SimpleCellAddress) {
     super(`Address (row = ${address.row}, col = ${address.col}) is invalid`)
   }
-}
-
-function isPositiveInteger(x: number) {
-  return Number.isInteger(x) && x > 0
-}
-
-function isNonnegativeInteger(x: number) {
-  return Number.isInteger(x) && x >= 0
 }
 
 export type Index = [number, number]
@@ -218,18 +208,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
-    if (
-        invalidSimpleCellAddress(address) ||
-        !this.sheetMapping.hasSheetWithId(address.sheet)
-    ) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      return false
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToChangeContent(address)
   }
 
   /**
@@ -382,29 +361,7 @@ export class HyperFormula {
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
-    if (
-        invalidSimpleCellAddress(sourceLeftCorner) ||
-        !isPositiveInteger(width) ||
-        !isPositiveInteger(height) ||
-        invalidSimpleCellAddress(destinationLeftCorner) ||
-        !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-        !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
-    ) {
-      return false
-    }
-
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
-      return false
-    }
-
-    return true
+    return this.crudOperations.isItPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
   }
 
   /**
@@ -426,7 +383,7 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    */
   public isItPossibleToAddSheet(): boolean {
-    return true
+    return this.crudOperations.isItPossibleToAddSheet()
   }
 
   /**
@@ -445,7 +402,7 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public isItPossibleToRemoveSheet(sheet: number): boolean {
-    return this.sheetMapping.hasSheetWithId(sheet)
+    return this.crudOperations.isItPossibleToRemoveSheet(sheet)
   }
 
   /**

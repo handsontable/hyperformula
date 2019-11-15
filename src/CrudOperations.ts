@@ -17,9 +17,8 @@ import {
 } from "./DependencyGraph";
 import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from "./parser";
-import {Evaluator} from "./Evaluator";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
+import {Index} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
@@ -89,12 +88,13 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public moveCells (sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress) {
+    if (!this.isItPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)) {
+      throw Error()
+    }
+
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
-    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
 
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
@@ -114,7 +114,9 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: string) {
-    this.ensureThatAddressIsCorrect(address)
+    if (!this.isItPossibleToChangeContent(address)) {
+      throw Error()
+    }
 
     let vertex = this.dependencyGraph.getCell(address)
 
@@ -254,6 +256,54 @@ export class CrudOperations implements IBatchExecutor {
     return true
   }
 
+  public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
+    if (
+        invalidSimpleCellAddress(sourceLeftCorner) ||
+        !isPositiveInteger(width) ||
+        !isPositiveInteger(height) ||
+        invalidSimpleCellAddress(destinationLeftCorner) ||
+        !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+        !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+    ) {
+      return false
+    }
+
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
+      return false
+    }
+
+    return true
+  }
+
+  public isItPossibleToAddSheet(): boolean {
+    return true
+  }
+
+  public isItPossibleToRemoveSheet(sheet: number): boolean {
+    return this.sheetMapping.hasSheetWithId(sheet)
+  }
+
+  public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
+    if (
+        invalidSimpleCellAddress(address) ||
+        !this.sheetMapping.hasSheetWithId(address.sheet)
+    ) {
+      return false
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
+      return false
+    }
+
+    return true
+  }
 
   public getAndClearContentChanges(): ContentChanges {
     const changes = this.changes
@@ -383,19 +433,6 @@ export class CrudOperations implements IBatchExecutor {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
-  }
-
-  /**
-   * Throws error when given address is incorrect.
-   */
-  private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
-    if (invalidSimpleCellAddress(address)) {
-      throw new InvalidAddressError(address)
-    }
-
-    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
-    }
   }
 }
 
