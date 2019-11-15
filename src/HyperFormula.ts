@@ -136,7 +136,7 @@ export class HyperFormula {
   /**
    * Returns value of the cell with the given address.
    *
-   * @param stringAddress - cell coordinates (e.g. 'A1')
+   * @param address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.dependencyGraph.getCellValue(address)
