@@ -1,20 +1,51 @@
-import {HyperFormula} from "../../src";
+import {EmptyValue, HyperFormula} from "../../src";
 import '../testConfig'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from "../../src/CrudOperations";
-import {expect_array_with_same_content} from "../testUtils";
+import {adr, expect_array_with_same_content} from "../testUtils";
 
 describe('batch cruds', () => {
   it('should run batch cruds and call recompute only once', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const engine = HyperFormula.buildFromArray([
+        //
+        ['foo'],
+        //
+        ['bar']
+    ])
 
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
 
     engine.batch((e) => {
-      e.addRows(0, [0, 1], [0, 1])
-      e.removeRows(0, [0, 1], [0, 1])
+      e.addRows(0, [0, 1], [1, 1])
+      e.removeRows(0, [0, 1])
     })
 
     expect(recomputeSpy).toBeCalledTimes(1)
+    expect(engine.getCellValue(adr("A1"))).toEqual('foo')
+    expect(engine.getCellValue(adr("A2"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("A3"))).toEqual('bar')
+  })
+
+  it('should run batch cruds unitl fail and call recompute only once', () => {
+    const engine = HyperFormula.buildFromArray([
+      //
+      ['foo'],
+      //
+      ['bar']
+    ])
+
+    const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
+
+    engine.batch((e) => {
+      e.addRows(0, [0, 1], [1, 1])
+      e.removeRows(0, [0, 1])
+      e.addRows(1, [0, 1]) // fail
+      e.addRows(0, [0, 1])
+    })
+
+    expect(recomputeSpy).toBeCalledTimes(1)
+    expect(engine.getCellValue(adr("A1"))).toEqual('foo')
+    expect(engine.getCellValue(adr("A2"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("A3"))).toEqual('bar')
   })
 })
 

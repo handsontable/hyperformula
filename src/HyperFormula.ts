@@ -499,7 +499,11 @@ export class HyperFormula {
    * @param batchOperations
    * */
   public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
-    batchOperations(this.crudOperations)
+    try {
+      batchOperations(this.crudOperations)
+    } catch (e) {
+      /* TODO we should be able to return error information along with changes */
+    }
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
