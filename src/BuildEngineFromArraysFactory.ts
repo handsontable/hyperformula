@@ -2,7 +2,7 @@ import {Config, HyperFormula, LazilyTransformingAstService} from './'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {ParserWithCaching} from './parser'
+import {ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 
@@ -23,6 +23,7 @@ export class BuildEngineFromArraysFactory {
     }
 
     const parser = new ParserWithCaching(config, sheetMapping.get)
+    const unparser = new Unparser(config, sheetMapping.name)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, config, stats)
@@ -42,6 +43,7 @@ export class BuildEngineFromArraysFactory {
       dependencyGraph,
       columnIndex,
       parser,
+      unparser,
       evaluator,
       lazilyTransformingAstService,
     )

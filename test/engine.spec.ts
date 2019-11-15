@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, Config} from '../src'
 import {CellError, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 import {adr, expect_reference_to_have_ref_error} from './testUtils'
@@ -86,5 +86,52 @@ describe('Integration', () => {
     const engine = HyperFormula.buildFromArray([['=$Sheet2.A2']])
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
+  })
+
+  it('#getCellFormula returns formula when present', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(1,2,3,C3)']
+    ])
+
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(1,2,3,C3)')
+  })
+
+  it('#getCellFormula returns undefined for simple values', () => {
+    const engine = HyperFormula.buildFromArray([
+      [''],
+      ['42'],
+      ['foobar'],
+    ])
+
+    expect(engine.getCellFormula(adr('A1'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('A2'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('A3'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('A4'))).toEqual(undefined)
+  })
+
+  it('#getCellFormula returns matrix formula for matrix vertices', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['1', '1'],
+      ['{=MMULT(A1:B2,A1:B2)}', '{=MMULT(A1:B2,A1:B2)}'],
+      ['{=MMULT(A1:B2,A1:B2)}', '{=MMULT(A1:B2,A1:B2)}'],
+    ])
+
+    expect(engine.getCellFormula(adr('A3'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.getCellFormula(adr('A4'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.getCellFormula(adr('B3'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
+    expect(engine.getCellFormula(adr('B4'))).toEqual('{=MMULT(A1:B2,A1:B2)}')
+  })
+
+  it('#getCellFormula returns undefined for numeric matrices', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['1', '1'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+
+    expect(engine.getCellFormula(adr('A1'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('A2'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('B1'))).toEqual(undefined)
+    expect(engine.getCellFormula(adr('B2'))).toEqual(undefined)
   })
 })

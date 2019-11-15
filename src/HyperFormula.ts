@@ -33,7 +33,8 @@ import {
   ParserWithCaching,
   ProcedureAst,
   simpleCellAddressFromString,
-  simpleCellAddressToString
+  simpleCellAddressToString,
+  Unparser,
 } from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -75,6 +76,7 @@ export class HyperFormula {
       public readonly columnSearch: IColumnSearchStrategy,
       /** Parser with caching */
       private readonly parser: ParserWithCaching,
+      private readonly unparser: Unparser,
       /** Formula evaluator */
       public readonly evaluator: Evaluator,
       /** Service handling postponed CRUD transformations */
@@ -138,6 +140,26 @@ export class HyperFormula {
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.dependencyGraph.getCellValue(address)
+  }
+
+
+  /**
+   * Returns normalized formula string from the cell with the given address.
+   *
+   * @param address - cell coordinates
+   */
+  public getCellFormula(address: SimpleCellAddress): string | undefined {
+    const formulaVertex = this.dependencyGraph.getCell(address)
+    if (formulaVertex instanceof FormulaCellVertex) {
+      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+      return this.unparser.unparse(formula, address)
+    } else if (formulaVertex instanceof MatrixVertex) {
+      const formula = formulaVertex.getFormula()
+      if (formula) {
+        return "{" + this.unparser.unparse(formula, formulaVertex.getAddress()) + "}"
+      }
+    }
+    return undefined
   }
 
   /**
