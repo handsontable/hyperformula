@@ -8,8 +8,8 @@ export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
   constructor(
-      private readonly config: ParserConfig,
-      private readonly sheetMappingFn: SheetMappingFn,
+    private readonly config: ParserConfig,
+    private readonly sheetMappingFn: SheetMappingFn,
   ) {
   }
 
