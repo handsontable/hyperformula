@@ -360,16 +360,6 @@ describe('changing cell content', () => {
     }).toThrow('You cannot modify only part of an array')
   })
 
-  it('is not recomputed if user doesnt want it', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=B1'],
-    ])
-
-    engine.setCellContent(adr('B1'), '3', false)
-
-    expect(engine.getCellValue(adr('C1'))).toBe(2)
-  })
-
   it('is not possible to set cell content in sheet which does not exist', () => {
     const sheet = [
       ['1', '2'],
@@ -402,7 +392,7 @@ describe('changing cell content', () => {
     engine.setCellContent(adr('C1'), '=COLUMNS(A1:B1)')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
-    engine.removeRows(0, 1, 1)
+    engine.removeRows(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })

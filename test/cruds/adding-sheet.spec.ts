@@ -7,7 +7,17 @@ describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.isItPossibleToAddSheet()).toEqual(true)
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(true)
+  })
+
+  it('no', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [],
+      'Foo': [],
+    })
+
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(false)
+    expect(engine.isItPossibleToAddSheet('Foo')).toEqual(false)
   })
 })
 
@@ -47,5 +57,14 @@ describe('add sheet to engine', () => {
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
     expect(Array.from(engine.sheetMapping.names())).toEqual(['Arkusz1'])
+  })
+
+  it('should add sheet with given name', function() {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addSheet('foo')
+
+    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(Array.from(engine.sheetMapping.names())).toEqual(['foo'])
   })
 })

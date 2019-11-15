@@ -1,45 +1,27 @@
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {
   AddressMapping,
   DependencyGraph,
-  EmptyCellVertex,
   FormulaCellVertex,
   Graph,
   MatrixMapping,
   MatrixVertex,
   RangeMapping,
   SheetMapping,
-  ValueCellVertex,
   Vertex
 } from './DependencyGraph'
-import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
-import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
-import {buildMatrixVertex, Sheet, Sheets} from './GraphBuilder'
+import {Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {
-  isFormula,
-  isMatrix,
-  ParserWithCaching,
-  ProcedureAst,
-  simpleCellAddressFromString,
-  simpleCellAddressToString,
-  Unparser,
-} from './parser'
-import {RowsSpan} from './RowsSpan'
+import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
+import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
+import {IBatchExecutor} from "./IBatchExecutor";
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {
@@ -53,18 +35,15 @@ export class InvalidAddressError extends Error {
   }
 }
 
-function isPositiveInteger(x: number) {
-  return Number.isInteger(x) && x > 0
-}
-
-function isNonnegativeInteger(x: number) {
-  return Number.isInteger(x) && x >= 0
-}
+export type Index = [number, number]
 
 /**
  * Engine for one sheet
  */
 export class HyperFormula {
+
+  private crudOperations: CrudOperations
+
   constructor(
       /** Engine config */
       public readonly config: Config,
@@ -82,6 +61,7 @@ export class HyperFormula {
       /** Service handling postponed CRUD transformations */
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
   }
 
   /**
@@ -227,18 +207,12 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
-    if (
-      invalidSimpleCellAddress(address) ||
-      !this.sheetMapping.hasSheetWithId(address.sheet)
-    ) {
+    try {
+      this.crudOperations.ensureItIsPossibleToChangeContent(address)
+      return true
+    } catch (e) {
       return false
     }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -246,69 +220,10 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    * @param newCellContent - new cell content
-   * @param recompute - specifies if recomputation should be fired after change
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string, recompute: boolean = true): CellValueChange[] {
-    this.ensureThatAddressIsCorrect(address)
-
-    const changes = new ContentChanges()
-    let vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && isNaN(Number(newCellContent))) {
-      this.dependencyGraph.breakNumericMatrix(vertex)
-      vertex = this.dependencyGraph.getCell(address)
-    }
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
-      const newValue = Number(newCellContent)
-      const oldValue = this.dependencyGraph.getCellValue(address)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
-      changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
-      const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
-      const parseResult = this.parser.parse(matrixFormula, address)
-
-      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-
-      if (!size || !(newVertex instanceof MatrixVertex)) {
-        throw Error('What if new matrix vertex is not properly constructed?')
-      }
-
-      this.dependencyGraph.addNewMatrixVertex(newVertex)
-      this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-    } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
-        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-      } else if (newCellContent === '') {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnSearch.remove(oldValue, address)
-        changes.addChange(EmptyValue, address)
-        this.dependencyGraph.setCellEmpty(address)
-      } else if (!isNaN(Number(newCellContent))) {
-        const newValue = Number(newCellContent)
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnSearch.change(oldValue, newValue, address)
-        changes.addChange(newValue, address)
-      } else {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newCellContent)
-        this.columnSearch.change(oldValue, newCellContent, address)
-        changes.addChange(newCellContent, address)
-      }
-    } else {
-      throw new Error('Illegal operation')
-    }
-
-    if (recompute) {
-      return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
-    }
-
-    return changes.getChanges()
+  public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
+    this.crudOperations.setCellContent(address, newCellContent)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
@@ -326,20 +241,17 @@ export class HyperFormula {
       }
     }
 
-    const changes = new ContentChanges()
-
-    for (let i = 0; i < cellContents.length; i++) {
-      for (let j = 0; j < cellContents[i].length; j++) {
-        const change = this.setCellContent({
-          sheet: topLeftCornerAddress.sheet,
-          row: topLeftCornerAddress.row + i,
-          col: topLeftCornerAddress.col + j,
-        }, cellContents[i][j], false)
-        changes.add(...change)
+    return this.batch((e) => {
+      for (let i = 0; i < cellContents.length; i++) {
+        for (let j = 0; j < cellContents[i].length; j++) {
+          e.setCellContent({
+            sheet: topLeftCornerAddress.sheet,
+            row: topLeftCornerAddress.row + i,
+            col: topLeftCornerAddress.col + j,
+          }, cellContents[i][j])
+        }
       }
-    }
-
-    return this.recomputeIfDependencyGraphNeedsIt().addAll(changes).getChanges()
+    })
   }
 
   /**
@@ -348,24 +260,16 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
+   * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
-  public isItPossibleToAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): boolean {
-    if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
+  public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
       return false
     }
-    const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -373,23 +277,10 @@ export class HyperFormula {
    * Does nothing if rows are outside of effective sheet size.
    *
    * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
+   * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
-  public addRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): CellValueChange[] {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return []
-    }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
-    })
-
+  public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.addRows(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -399,27 +290,16 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
+   * @param indexes - non-contiguous indexes with format [row, amount]
    */
-  public isItPossibleToRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): boolean {
-    if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
+  public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
       return false
     }
-    if (rowEnd < rowStart) {
-      return false
-    }
-    const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -427,23 +307,10 @@ export class HyperFormula {
    * Does nothing if rows are outside of effective sheet size.
    *
    * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
+   * @param indexes - non-contiguous indexes with format [row, amount]
    * */
-  public removeRows(sheet: number, rowStart: number, rowEnd: number = rowStart): CellValueChange[] {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return []
-    }
-
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    this.dependencyGraph.removeRows(removedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
-    })
-
+  public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.removeRows(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -453,24 +320,16 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
+   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
    */
-  public isItPossibleToAddColumns(sheet: number, column: number, numberOfColumnsToAdd: number = 1): boolean {
-    if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
+  public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
       return false
     }
-    const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
-
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -478,24 +337,10 @@ export class HyperFormula {
    * Does nothing if columns are outside of effective sheet size
    *
    * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  public addColumns(sheet: number, column: number, numberOfColumns: number = 1): CellValueChange[] {
-    if (this.columnEffectivelyNotInSheet(column, sheet)) {
-      return []
-    }
-
-    const addedColumns = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumns)
-
-    this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
-    })
-
+   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
+   * */
+  public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.addColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -505,27 +350,16 @@ export class HyperFormula {
    * If returns true, doing this operation won't throw any errors
    *
    * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
+   * @param indexes - non-contiguous indexes with format [column, amount]
    */
-  public isItPossibleToRemoveColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): boolean {
-    if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
+  public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
       return false
     }
-    if (columnEnd < columnStart) {
-      return false
-    }
-    const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -533,24 +367,10 @@ export class HyperFormula {
    * Does nothing if columns are outside of effective sheet size.
    *
    * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  public removeColumns(sheet: number, columnStart: number, columnEnd: number = columnStart): CellValueChange[] {
-    if (this.columnEffectivelyNotInSheet(columnStart, sheet) || columnEnd < columnStart) {
-      return []
-    }
-
-    const removedColumns = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
-    this.dependencyGraph.removeColumns(removedColumns)
-    this.columnSearch.removeColumns(removedColumns)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
-    })
-
+   * @param indexes - non-contiguous indexes with format [column, amount]
+   * */
+  public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+    this.crudOperations.removeColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -565,29 +385,12 @@ export class HyperFormula {
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
-    if (
-      invalidSimpleCellAddress(sourceLeftCorner) ||
-      !isPositiveInteger(width) ||
-      !isPositiveInteger(height) ||
-      invalidSimpleCellAddress(destinationLeftCorner) ||
-      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
-    ) {
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+      return true
+    } catch (e) {
       return false
     }
-
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
-      return false
-    }
-
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -599,28 +402,7 @@ export class HyperFormula {
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    this.dependencyGraph.ensureNoMatrixInRange(sourceRange)
-    this.dependencyGraph.ensureNoMatrixInRange(targetRange)
-
-    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
-    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
-    const toSheet = destinationLeftCorner.sheet
-
-    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
-    this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
-    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
-    })
-
-    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
-
+    this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -629,16 +411,22 @@ export class HyperFormula {
    *
    * If returns true, doing this operation won't throw any errors
    */
-  public isItPossibleToAddSheet(): boolean {
-    return true
+  public isItPossibleToAddSheet(name: string): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToAddSheet(name)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
-   * Adds new sheet to engine. Name of the new sheet will be autogenerated.
+   * Adds new sheet to engine.
+   *
+   * @param name - if not specified, name will be autogenerated
    */
-  public addSheet(): void {
-    const sheetId = this.sheetMapping.addSheet()
-    this.addressMapping.autoAddSheet(sheetId, [])
+  public addSheet(name?: string): void {
+    this.crudOperations.addSheet(name)
   }
 
   /**
@@ -649,7 +437,12 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public isItPossibleToRemoveSheet(sheet: number): boolean {
-    return this.sheetMapping.hasSheetWithId(sheet)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -658,16 +451,7 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public removeSheet(sheet: number): CellValueChange[] {
-    this.dependencyGraph.removeSheet(sheet)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
-    })
-
-    this.sheetMapping.removeSheet(sheet)
-    this.columnSearch.removeSheet(sheet)
-
+    this.crudOperations.removeSheet(sheet)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
@@ -710,51 +494,31 @@ export class HyperFormula {
   }
 
   /**
+   * Run multiple operations and recompute formulas at the end
+   *
+   * @param batchOperations
+   * */
+  public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
+    try {
+      batchOperations(this.crudOperations)
+    } catch (e) {
+      /* TODO we should be able to return error information along with changes */
+    }
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
    * Runs recomputation starting from recently changed vertices.
    */
   private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
+    const changes = this.crudOperations.getAndClearContentChanges()
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
 
-    if (verticesToRecomputeFrom) {
-      return this.evaluator.partialRun(verticesToRecomputeFrom)
+    if (verticesToRecomputeFrom.length > 0) {
+      changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
     }
 
-    return ContentChanges.empty()
-  }
-
-  /**
-   * Throws error when given address is incorrect.
-   */
-  private ensureThatAddressIsCorrect(address: SimpleCellAddress): void {
-    if (invalidSimpleCellAddress(address)) {
-      throw new InvalidAddressError(address)
-    }
-
-    if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
-    }
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param row - row number
-   * @param sheet - sheet id number
-   */
-  private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    const height = this.addressMapping.getHeight(sheet)
-    return row >= height;
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param column - row number
-   * @param sheet - sheet id number
-   */
-  private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
-    const width = this.addressMapping.getWidth(sheet)
-    return column >= width;
+    return changes
   }
 }
