@@ -1,6 +1,6 @@
 import {HyperFormula} from "../../src";
 import '../testConfig'
-import {normalizeIndexes} from "../../src/CrudOperations";
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from "../../src/CrudOperations";
 import {expect_array_with_same_content} from "../testUtils";
 
 describe('batch cruds', () => {
@@ -18,34 +18,86 @@ describe('batch cruds', () => {
   })
 })
 
-describe('normalize indexes', () => {
+describe('normalize added indexes', () => {
   it('should return empty array', () => {
-    const normalized = normalizeIndexes([])
+    const normalized = normalizeAddedIndexes([])
     expect_array_with_same_content(normalized, [])
   })
 
   it('should return unchanged one element array', () => {
-    const normalized = normalizeIndexes([[3, 8]])
+    const normalized = normalizeAddedIndexes([[3, 8]])
     expect_array_with_same_content(normalized, [[3, 8]])
   })
 
-  it('should return unchanged when no overlapping indexes', () => {
-    const normalized = normalizeIndexes([[3, 5], [9, 5]])
-    expect_array_with_same_content(normalized, [[3, 5], [9, 5]])
+  it('should return shifted further indexes when expanding', () => {
+    const normalized = normalizeAddedIndexes([[3, 3], [7, 3]])
+    expect_array_with_same_content(normalized, [[3, 3], [10, 3]])
+  })
+
+  it('should merge indexes with same start', () => {
+    const normalized = normalizeAddedIndexes([[3, 3], [3, 7]])
+    expect_array_with_same_content(normalized, [[3, 7]])
+  })
+
+  it('should return shift further indexes - more arguments', () => {
+    const normalized = normalizeAddedIndexes([[3, 3], [7, 3], [11, 2]])
+    expect_array_with_same_content(normalized, [[3, 3], [10, 3], [17, 2]])
+  })
+
+  it('should return shift further indexes even when they overlap', () => {
+    const normalized = normalizeAddedIndexes([[3, 5], [8, 5]])
+    expect_array_with_same_content(normalized, [[3, 5], [13, 5]])
+  })
+
+  it('should normalize unsorted indexes', () => {
+    const normalized = normalizeAddedIndexes([[5, 9], [3, 5]])
+    expect_array_with_same_content(normalized, [[3, 5], [10, 9]])
+  })
+
+  it('mixed case', () => {
+    const normalized = normalizeAddedIndexes([[3, 7], [3, 2], [2, 1], [15, 15]])
+    expect_array_with_same_content(normalized, [[2, 1], [4, 7], [23, 15]])
+  })
+})
+
+describe('normalize removed indexes', () => {
+  it('should return empty array', () => {
+    const normalized = normalizeRemovedIndexes([])
+    expect_array_with_same_content(normalized, [])
+  })
+
+  it('should return unchanged one element array', () => {
+    const normalized = normalizeRemovedIndexes([[3, 8]])
+    expect_array_with_same_content(normalized, [[3, 8]])
+  })
+
+  it('should return shifted further indexes', () => {
+    const normalized = normalizeRemovedIndexes([[3, 3], [7, 3]])
+    expect_array_with_same_content(normalized, [[3, 3], [4, 3]])
+  })
+
+  it('should return shift further indexes - more arguments', () => {
+    const normalized = normalizeRemovedIndexes([[3, 3], [7, 3], [11, 2]])
+    expect_array_with_same_content(normalized, [[3, 3], [4, 3], [5, 2]])
   })
 
   it('should normalize adjacent indexes', () => {
-    const normalized = normalizeIndexes([[3, 5], [8, 5]])
+    const normalized = normalizeRemovedIndexes([[3, 5], [8, 5]])
     expect_array_with_same_content(normalized, [[3, 10]])
   })
 
   it('should normalize overlapping indexes', () => {
-    const normalized = normalizeIndexes([[3, 5], [5, 9]])
+    const normalized = normalizeRemovedIndexes([[3, 5], [5, 9]])
     expect_array_with_same_content(normalized, [[3, 11]])
   })
 
   it('should normalize unsorted indexes', () => {
-    const normalized = normalizeIndexes([[5, 9], [3, 5]])
+    const normalized = normalizeRemovedIndexes([[5, 9], [3, 5]])
     expect_array_with_same_content(normalized, [[3, 11]])
+  })
+
+  it('mixed case', () => {
+    const normalized = normalizeRemovedIndexes([[3, 7], [4, 8], [1, 1], [15, 5]])
+    expect_array_with_same_content(normalized, [[1, 1], [2, 9], [5, 5]])
   })
 })

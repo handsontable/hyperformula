@@ -26,6 +26,7 @@ import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells
 import {ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
+import {start} from "repl";
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -49,7 +50,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addRows(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
@@ -57,7 +58,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeRows(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
@@ -65,7 +66,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
@@ -73,7 +74,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeColumns(sheet: number, ...indexes: Index[]) {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
@@ -418,14 +419,43 @@ export class CrudOperations implements IBatchExecutor {
   }
 }
 
-export function normalizeIndexes(indexes: Index[]): Index[] {
+export function normalizeAddedIndexes(indexes: Index[]): Index[] {
   if (indexes.length <= 1) {
     return indexes
   }
 
   const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
 
-  return sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+  /* merge indexes with same start */
+  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+    const previous = acc[acc.length - 1]
+    if (startIndex === previous[0]) {
+      previous[1] = Math.max(previous[1], amount)
+    } else {
+      acc.push([startIndex, amount])
+    }
+    return acc
+  }, [sorted[0]])
+
+  /* shift further indexes */
+  let shift = 0
+  for (let i = 0; i < merged.length; ++i) {
+    merged[i][0] += shift
+    shift += merged[i][1]
+  }
+
+  return merged
+}
+
+export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
+  if (indexes.length <= 1) {
+    return indexes
+  }
+
+  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+
+  /* merge overlapping and adjacent indexes */
+  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
     const previous = acc[acc.length - 1]
     const lastIndex = previous[0] + previous[1]
 
@@ -437,6 +467,15 @@ export function normalizeIndexes(indexes: Index[]): Index[] {
 
     return acc
   }, [sorted[0]])
+
+  /* shift further indexes */
+  let shift = 0
+  for (let i = 0; i < merged.length; ++i) {
+    merged[i][0] -= shift
+    shift += merged[i][1]
+  }
+
+  return merged
 }
 
 function isPositiveInteger(x: number) {

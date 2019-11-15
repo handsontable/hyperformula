@@ -21,7 +21,7 @@ import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddr
 import {Statistics, StatType} from './statistics/Statistics'
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
 import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {CrudOperations, normalizeIndexes} from "./CrudOperations";
+import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
 import {IBatchExecutor} from "./IBatchExecutor";
 
 export class NoSuchSheetError extends Error {
@@ -264,7 +264,7 @@ export class HyperFormula {
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this.crudOperations.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
       return true
@@ -294,7 +294,7 @@ export class HyperFormula {
    * @param indexes - non-contiguous indexes with format [row, amount]
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this.crudOperations.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
       return true
@@ -324,7 +324,7 @@ export class HyperFormula {
    * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeAddedIndexes(indexes)
     try {
       this.crudOperations.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
       return true
@@ -354,7 +354,7 @@ export class HyperFormula {
    * @param indexes - non-contiguous indexes with format [column, amount]
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
-    const normalizedIndexes = normalizeIndexes(indexes)
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
     try {
       this.crudOperations.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
       return true
