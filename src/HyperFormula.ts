@@ -260,7 +260,12 @@ export class HyperFormula {
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-    return this.crudOperations.isItPossibleToAddRows(sheet, ...normalizedIndexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -285,7 +290,12 @@ export class HyperFormula {
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-    return this.crudOperations.isItPossibleToRemoveRows(sheet, ...normalizedIndexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -310,7 +320,12 @@ export class HyperFormula {
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-    return this.crudOperations.isItPossibleToAddColumns(sheet, ...normalizedIndexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**
@@ -335,7 +350,12 @@ export class HyperFormula {
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeIndexes(indexes)
-    return this.crudOperations.isItPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+    try {
+      this.crudOperations.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   /**

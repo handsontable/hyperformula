@@ -50,9 +50,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public addRows(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
-    if (!this.isItPossibleToAddRows(sheet, ...normalizedIndexes)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
@@ -60,9 +58,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeRows(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
-    if (!this.isItPossibleToRemoveRows(sheet, ...normalizedIndexes)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -70,9 +66,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public addColumns(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
-    if (!this.isItPossibleToAddColumns(sheet, ...normalizedIndexes)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
@@ -80,9 +74,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeColumns(sheet: number, ...indexes: Index[]) {
     const normalizedIndexes = normalizeIndexes(indexes)
-    if (!this.isItPossibleToRemoveColumns(sheet, ...normalizedIndexes)) {
-      throw Error()
-    }
+    this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -171,30 +163,28 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
+  public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]) {
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-        return false
+        throw Error('Wrong indexes')
       }
       const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
+        throw Error('No such sheet')
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
-        return false
+        throw Error('It is not possible to add row in row with matrix')
       }
     }
-
-    return true
   }
 
-  public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
+  public ensureItIsPossibleToRemoveRows(sheet: number, ...indexes: Index[]) {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-        return false
+        throw Error('Wrong indexes')
       }
       if (rowEnd < rowStart) {
         return false
@@ -202,54 +192,54 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
+        throw Error('No such sheet')
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
-        return false
+        throw Error('It is not possible to remove row with matrix')
       }
     }
 
     return true
   }
 
-  public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
+  public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]) {
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-        return false
+        throw Error('Wrong indexes')
       }
       const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
+        throw Error('No such sheet')
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
-        return false
+        throw Error('It is not possible to add column in column with matrix')
       }
     }
 
     return true
   }
 
-  public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
+  public ensureItIsPossibleToRemoveColumns(sheet: number, ...indexes: Index[]) {
     for (const [columnStart, numberOfColumns] of indexes) {
       const columnEnd = columnStart + numberOfColumns - 1
 
       if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-        return false
+        throw Error('Wrong indexes')
       }
       if (columnEnd < columnStart) {
-        return false
+        throw Error('Wrong indexes')
       }
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        return false
+        throw Error('No such sheet')
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        return false
+        throw Error('It is not possible to remove column within matrix')
       }
     }
 
