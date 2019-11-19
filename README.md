@@ -294,6 +294,7 @@ Our engine currently depends on the following packages:
 - [csv-parser](https://www.npmjs.com/package/csv-parser)
 - [csv-stringify](https://www.npmjs.com/package/csv-stringify)
 - [Moment](https://momentjs.com/)
+- [GPU.js](https://gpu.rocks/)
 
 ## License
 
