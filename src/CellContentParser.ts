@@ -11,7 +11,16 @@ export namespace CellContent {
     constructor(public readonly value: string) { }
   }
 
-  export class Empty { }
+  export class Empty {
+    private static instance: Empty
+
+    public static getSingletonInstance() {
+      if (!Empty.instance) {
+        Empty.instance = new Empty()
+      }
+      return Empty.instance
+    }
+  }
 
   export class Formula {
     constructor(public readonly formula: string) { }
@@ -31,7 +40,7 @@ export class CellContentParser {
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
     } else if (content === '') {
-      return new CellContent.Empty()
+      return CellContent.Empty.getSingletonInstance()
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
