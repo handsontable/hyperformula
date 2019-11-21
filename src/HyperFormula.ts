@@ -17,11 +17,12 @@ import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
+import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
 import {IBatchExecutor} from "./IBatchExecutor";
+import {isMatrix} from './CellContentParser'
 
 export class NoSuchSheetError extends Error {
   constructor(sheetId: number) {

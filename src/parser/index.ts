@@ -7,8 +7,6 @@ export {
 export {CellAddress} from './CellAddress'
 
 export {
-  isFormula,
-  isMatrix,
   ParserWithCaching,
 } from './ParserWithCaching'
 

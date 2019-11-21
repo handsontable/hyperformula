@@ -1,5 +1,3 @@
-import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
-
 export type RawCellContent = string
 
 export namespace CellContent {
@@ -31,6 +29,19 @@ export namespace CellContent {
   }
 
   export type Type = Number | String | Empty | Formula | MatrixFormula
+}
+
+/**
+ * Checks whether string looks like formula or not.
+ *
+ * @param text - formula
+ */
+export function isFormula(text: string): Boolean {
+  return text.startsWith('=')
+}
+
+export function isMatrix(text: string): Boolean {
+  return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
 export class CellContentParser {

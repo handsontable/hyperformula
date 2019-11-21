@@ -135,19 +135,6 @@ export class ParserWithCaching {
   }
 }
 
-/**
- * Checks whether string looks like formula or not.
- *
- * @param text - formula
- */
-export function isFormula(text: string): Boolean {
-  return text.startsWith('=')
-}
-
-export function isMatrix(text: string): Boolean {
-  return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
-}
-
 export const cellHashFromToken = (cellAddress: CellAddress): string => {
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {

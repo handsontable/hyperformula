@@ -16,7 +16,7 @@ import {
   ValueCellVertex
 } from "./DependencyGraph";
 import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
-import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from "./parser";
+import {ParserWithCaching, ProcedureAst} from "./parser";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
 import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
@@ -28,7 +28,7 @@ import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
 import {start} from "repl";
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
-import {CellContentParser, CellContent} from './CellContentParser'
+import {CellContentParser, CellContent, isMatrix} from './CellContentParser'
 
 export class CrudOperations implements IBatchExecutor {
 
