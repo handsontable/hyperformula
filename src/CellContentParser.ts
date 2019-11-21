@@ -1,27 +1,41 @@
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 
-export enum CellContentType {
-  NUMBER,
-  STRING,
-  FORMULA,
-  MATRIX_FORMULA,
-  EMPTY,
+export namespace CellContent {
+  export class Number {
+    constructor(public readonly value: number) { }
+  }
+
+  export class String {
+    constructor(public readonly value: string) { }
+  }
+
+  export class Empty { }
+
+  export class Formula {
+    constructor(public readonly formula: string) { }
+  }
+
+  export class MatrixFormula {
+    constructor(public readonly formula: string) { }
+  }
+
+  export type Type = Number | String | Empty | Formula | MatrixFormula
 }
 
 export class CellContentParser {
-  public parse(content: string): CellContentType {
+  public parse(content: string): CellContent.Type {
     if (isMatrix(content)) {
-      return CellContentType.MATRIX_FORMULA
+      return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
-      return CellContentType.FORMULA
+      return new CellContent.Formula(content)
     } else if (content === '') {
-      return CellContentType.EMPTY
+      return new CellContent.Empty()
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
-        return CellContentType.NUMBER
+        return new CellContent.Number(Number(trimmedContent))
       } else {
-        return CellContentType.STRING
+        return new CellContent.String(content)
       }
     }
   }
