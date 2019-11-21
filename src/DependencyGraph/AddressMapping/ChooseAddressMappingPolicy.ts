@@ -1,4 +1,3 @@
-import {PlusStrategy} from '../PlusTreeAddressMapping'
 import {SparseStrategy} from "./SparseStrategy";
 import {DenseStrategy} from "./DenseStrategy";
 import {IAddressMappingStrategyConstructor} from "./IAddressMappingStrategy";
@@ -31,11 +30,5 @@ export class AlwaysSparse implements IChooseAddressMapping {
 export class AlwaysDense implements IChooseAddressMapping {
   public call() {
     return DenseStrategy
-  }
-}
-
-export class AlwaysPlusTree implements IChooseAddressMapping {
-  public call() {
-    return PlusStrategy
   }
 }
