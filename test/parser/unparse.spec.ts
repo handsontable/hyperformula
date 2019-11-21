@@ -181,4 +181,14 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual('=(1+2)*3')
   })
+
+  xit('#unparse use language configuration', () => {
+    const parser = new ParserWithCaching(new Config({ language: plPL }), sheetMapping.get)
+    const unparser = new Unparser(new Config({ language: enGB }), sheetMapping.name)
+    const formula = '=SUMA(1,2)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=SUM(1,2)')
+  })
 })
