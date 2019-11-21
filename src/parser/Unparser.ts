@@ -71,7 +71,11 @@ export class Unparser {
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.unparseAst(ast.value, address)
+        let unparsedExpr = this.unparseAst(ast.value, address)
+        if (operatorPrecedence[ast.value.type] !== undefined) {
+          unparsedExpr = '(' + unparsedExpr + ')'
+        }
+        return '-' + unparsedExpr
       }
       case AstNodeType.ERROR: {
         if (ast.error) {

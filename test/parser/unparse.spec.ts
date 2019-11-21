@@ -214,7 +214,7 @@ describe('Unparse', () => {
     expect(unparsed2).toEqual(formula2)
   })
 
-  it('#unparse doesnt use parenthesis for functions or other unknown node types', () => {
+  it('#unparse doesnt use parenthesis for functions or other non-operator node types', () => {
     const formula1 = '=TRUE()*2'
     const formula2 = '=2*TRUE()'
     const ast1 = parser.parse(formula1, CellAddress.absolute(0, 0, 0)).ast
@@ -225,6 +225,33 @@ describe('Unparse', () => {
 
     expect(unparsed1).toEqual(formula1)
     expect(unparsed2).toEqual(formula2)
+  })
+
+  it('#unparse necessary parenthesis from subtree', () => {
+    const formula = '=-(3+4)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse double unary minus', () => {
+    const formula = '=-(-(3+4))'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse doesnt use parenthesis for non-operator node types', () => {
+    const formula = '=-42'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
   })
 
   xit('#unparse use language configuration', () => {
