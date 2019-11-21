@@ -306,7 +306,7 @@ export class DependencyGraph {
   }
 
   public ensureNoMatrixInRange(range: AbsoluteCellRange) {
-    if (this.matrixMapping.isMatrixInRange(range)) {
+    if (this.matrixMapping.isFormulaMatrixInRange(range)) {
       throw Error('It is not possible to move / replace cells with matrix')
     }
   }
@@ -370,6 +370,12 @@ export class DependencyGraph {
   public disableNumericMatrices() {
     for (const [_, matrixVertex] of this.matrixMapping.numericMatrices()) {
       this.breakNumericMatrix(matrixVertex)
+    }
+  }
+
+  public breakNumericMatricesInRange(range: AbsoluteCellRange) {
+    for (const [_, matrix] of this.matrixMapping.numericMatricesInRange(range)) {
+      this.breakNumericMatrix(matrix)
     }
   }
 

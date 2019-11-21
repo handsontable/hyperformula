@@ -88,6 +88,9 @@ export class CrudOperations implements IBatchExecutor {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
+    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
+    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
@@ -274,11 +277,11 @@ export class CrudOperations implements IBatchExecutor {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new Error('It is not possible to move matrix')
     }
 
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to replace cells with matrix')
     }
   }

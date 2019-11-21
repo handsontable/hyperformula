@@ -50,6 +50,15 @@ export class MatrixMapping {
     return false
   }
 
+  public isFormulaMatrixInRange(range: AbsoluteCellRange) {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.isFormula() && mtx.getRange().doesOverlap(range)) {
+        return true
+      }
+    }
+    return false
+  }
+
   public isFormulaMatrixAtAddress(address: SimpleCellAddress) {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.getRange().addressInRange(address) && mtx.isFormula()) {
@@ -82,6 +91,15 @@ export class MatrixMapping {
       }
     }
   }
+
+  public* numericMatricesInRange(range: AbsoluteCellRange): IterableIterator<[string, MatrixVertex]> {
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.getRange().doesOverlap(range)) {
+        yield [mtxKey, mtx]
+      }
+    }
+  }
+
 
   public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
