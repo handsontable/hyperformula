@@ -41,15 +41,6 @@ export class MatrixMapping {
     return false
   }
 
-  public isMatrixInRange(range: AbsoluteCellRange) {
-    for (const mtx of this.matrixMapping.values()) {
-      if (mtx.getRange().doesOverlap(range)) {
-        return true
-      }
-    }
-    return false
-  }
-
   public isFormulaMatrixInRange(range: AbsoluteCellRange) {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.isFormula() && mtx.getRange().doesOverlap(range)) {
