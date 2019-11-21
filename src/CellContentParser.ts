@@ -46,15 +46,13 @@ export function isMatrix(text: string): Boolean {
 
 export class CellContentParser {
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null) {
+    if (content === undefined || content === null || content === '') {
       return CellContent.Empty.getSingletonInstance()
     }
     if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
-    } else if (content === '') {
-      return CellContent.Empty.getSingletonInstance()
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
