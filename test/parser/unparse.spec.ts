@@ -1,6 +1,6 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {ParserWithCaching} from '../../src/parser'
+import {ParserWithCaching, buildLexerConfig} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
@@ -8,11 +8,12 @@ import {enGB, plPL} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()
+  const lexerConfig = buildLexerConfig(config)
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const unparser = new Unparser(config, sheetMapping.name)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.name)
 
   it('#unparse',  () => {
     const formula = '=1+SUM(1,2,3)*3'
@@ -120,7 +121,7 @@ describe('Unparse', () => {
   it('#unparse with known error with translation', () => {
     const config = new Config({ language: plPL })
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.name)
     const formula = '=#ADR!'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -173,7 +174,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=C3')
   })
 
-  xit('#unparse necessary parenthesis', () => {
+  it('#unparse necessary parenthesis from left subtree', () => {
     const formula = '=(1+2)*3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
@@ -182,9 +183,54 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=(1+2)*3')
   })
 
+  it('#unparse necessary parenthesis from right subtree', () => {
+    const formula = '=3*(1+2)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=3*(1+2)')
+  })
+
+  it('#unparse doesnt use parenthesis for the same operations', () => {
+    const formula = '=4*3*2'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=4*3*2')
+  })
+
+  it('#unparse doesnt use parenthesis for different operations of same precedece', () => {
+    const formula1 = '=4/3*2'
+    const formula2 = '=4*3/2'
+    const ast1 = parser.parse(formula1, CellAddress.absolute(0, 0, 0)).ast
+    const ast2 = parser.parse(formula2, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed1 = unparser.unparse(ast1, adr('A1'))
+    const unparsed2 = unparser.unparse(ast2, adr('A1'))
+
+    expect(unparsed1).toEqual(formula1)
+    expect(unparsed2).toEqual(formula2)
+  })
+
+  it('#unparse doesnt use parenthesis for functions or other unknown node types', () => {
+    const formula1 = '=TRUE()*2'
+    const formula2 = '=2*TRUE()'
+    const ast1 = parser.parse(formula1, CellAddress.absolute(0, 0, 0)).ast
+    const ast2 = parser.parse(formula2, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed1 = unparser.unparse(ast1, adr('A1'))
+    const unparsed2 = unparser.unparse(ast2, adr('A1'))
+
+    expect(unparsed1).toEqual(formula1)
+    expect(unparsed2).toEqual(formula2)
+  })
+
   xit('#unparse use language configuration', () => {
     const parser = new ParserWithCaching(new Config({ language: plPL }), sheetMapping.get)
-    const unparser = new Unparser(new Config({ language: enGB }), sheetMapping.name)
+    const configEN = new Config({ language: enGB })
+    const unparser = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.name)
     const formula = '=SUMA(1,2)'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))

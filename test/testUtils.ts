@@ -11,6 +11,7 @@ import {
   CellReferenceAst,
   ProcedureAst,
   Unparser,
+  buildLexerConfig,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 
@@ -43,7 +44,7 @@ export const expect_function_to_have_ref_error = (engine: HyperFormula, address:
 export const expect_cell_to_have_formula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
   const formula = (engine.addressMapping.fetchCell(address!) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
-  const unparser = new Unparser(engine.config, engine.sheetMapping.name)
+  const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.name)
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 
