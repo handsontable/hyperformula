@@ -22,6 +22,8 @@ describe('CellContentParser', () => {
 
   it('numbers', () => {
     expect(cellContentParser.parse('42')).toEqual(CellContentType.NUMBER)
+    expect(cellContentParser.parse(' 42')).toEqual(CellContentType.NUMBER)
+    expect(cellContentParser.parse('42 ')).toEqual(CellContentType.NUMBER)
     expect(cellContentParser.parse('42.13')).toEqual(CellContentType.NUMBER)
     expect(cellContentParser.parse('-42.13')).toEqual(CellContentType.NUMBER)
   })
@@ -30,5 +32,6 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('f42')).toEqual(CellContentType.STRING)
     expect(cellContentParser.parse('42f')).toEqual(CellContentType.STRING)
     expect(cellContentParser.parse(' =FOO()')).toEqual(CellContentType.STRING)
+    expect(cellContentParser.parse(' ')).toEqual(CellContentType.STRING)
   })
 })

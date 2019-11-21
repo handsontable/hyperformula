@@ -14,10 +14,11 @@ export class CellContentParser {
       return CellContentType.MATRIX_FORMULA
     } else if (isFormula(content)) {
       return CellContentType.FORMULA
+    } else if (content === '') {
+      return CellContentType.EMPTY
     } else {
-      if (content === '') {
-        return CellContentType.EMPTY
-      } else if (!isNaN(Number(content))) {
+      const trimmedContent = content.trim()
+      if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
         return CellContentType.NUMBER
       } else {
         return CellContentType.STRING
