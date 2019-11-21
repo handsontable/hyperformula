@@ -1,7 +1,7 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
-import {EmptyCellVertex} from '../../src/DependencyGraph'
+import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
@@ -844,5 +844,75 @@ describe('column index', () => {
     expect_array_with_same_content([0], index.getValueIndex(0, 1, 5).index)
     expect_array_with_same_content([1], index.getValueIndex(0, 1, 7).index)
     expect(index.getColumnMap(0, 2).size).toEqual(0)
+  })
+})
+
+describe('move cells with matrices', () => {
+  it('should not be possible to move part of formula matrix', function () {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}']
+    ])
+
+    expect(() => {
+      engine.moveCells(adr("A2"), 1, 1, adr("A3"))
+    }).toThrowError('It is not possible to move matrix')
+  });
+
+  it('should not be possible to move formula matrix at all', function () {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}']
+    ])
+
+    expect(() => {
+      engine.moveCells(adr("A2"), 2, 1, adr("A3"))
+    }).toThrowError('It is not possible to move matrix')
+  });
+
+  it('should be possible to move whole numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.moveCells(adr("A1"), 2, 1, adr("A2"))
+
+    expect(engine.getCellValue(adr("A1"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("B1"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("A2"))).toEqual(1)
+    expect(engine.getCellValue(adr("B2"))).toEqual(2)
+  })
+
+
+  it('should be possible to move part of a numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2']
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.moveCells(adr("B1"), 1, 1, adr("B2"))
+
+    expect(engine.addressMapping.getCell(adr("A1"))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.getCell(adr("B2"))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.getCellValue(adr("A1"))).toEqual(1)
+    expect(engine.getCellValue(adr("B1"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("B2"))).toEqual(2)
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
+  })
+
+  it('should be possible to move matrix onto numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['foo'],
+        ['3', '4']
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    engine.moveCells(adr("A1"), 2, 1, adr("A3"))
+
+    expect(engine.addressMapping.getCell(adr("A3"))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.addressMapping.getCell(adr("B3"))).toBeInstanceOf(ValueCellVertex)
+    expect(engine.getCellValue(adr("A1"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("B1"))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr("A3"))).toEqual(1)
+    expect(engine.getCellValue(adr("B3"))).toEqual(2)
   })
 })
