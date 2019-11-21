@@ -28,6 +28,7 @@ import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
 import {start} from "repl";
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
+import {CellContentParser, CellContent} from './CellContentParser'
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -131,6 +132,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public setCellContent(address: SimpleCellAddress, newCellContent: string): void {
     this.ensureItIsPossibleToChangeContent(address)
+    const contentParser = new CellContentParser()
 
     let vertex = this.dependencyGraph.getCell(address)
 
@@ -160,25 +162,29 @@ export class CrudOperations implements IBatchExecutor {
       this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-      if (isFormula(newCellContent)) {
+      const parsedCellContent = contentParser.parse(newCellContent)
+
+      if (parsedCellContent instanceof CellContent.Formula) {
         const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-      } else if (newCellContent === '') {
+      } else if (parsedCellContent instanceof CellContent.Empty) {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.columnSearch.remove(oldValue, address)
         this.changes.addChange(EmptyValue, address)
         this.dependencyGraph.setCellEmpty(address)
-      } else if (!isNaN(Number(newCellContent))) {
+      } else if (parsedCellContent instanceof CellContent.Number) {
         const newValue = Number(newCellContent)
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newValue)
         this.columnSearch.change(oldValue, newValue, address)
         this.changes.addChange(newValue, address)
-      } else {
+      } else if (parsedCellContent instanceof CellContent.String) {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newCellContent)
         this.columnSearch.change(oldValue, newCellContent, address)
         this.changes.addChange(newCellContent, address)
+      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
+        throw new Error('Cant happen')
       }
     } else {
       throw new Error('Illegal operation')
