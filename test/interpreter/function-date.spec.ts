@@ -63,7 +63,7 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NAME))
   })
 
-  // // Inconsistency with Product 1
+  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2000'],
