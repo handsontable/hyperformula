@@ -8,12 +8,12 @@ import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellContentParser, CellContent} from './CellContentParser'
+import {CellContentParser, CellContent, RawCellContent} from './CellContentParser'
 
 /**
  * Two-dimenstional array representation of sheet
  */
-export type Sheet = string[][]
+export type Sheet = RawCellContent[][]
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 

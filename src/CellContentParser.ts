@@ -1,5 +1,7 @@
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 
+export type RawCellContent = string
+
 export namespace CellContent {
   export class Number {
     constructor(public readonly value: number) { }
@@ -23,7 +25,7 @@ export namespace CellContent {
 }
 
 export class CellContentParser {
-  public parse(content: string): CellContent.Type {
+  public parse(content: RawCellContent): CellContent.Type {
     if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
