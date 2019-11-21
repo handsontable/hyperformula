@@ -20,6 +20,14 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('')).toStrictEqual(new CellContent.Empty())
   })
 
+  it('null is empty value', () => {
+    expect(cellContentParser.parse(null)).toStrictEqual(new CellContent.Empty())
+  })
+
+  it('undefined is empty value', () => {
+    expect(cellContentParser.parse(undefined)).toStrictEqual(new CellContent.Empty())
+  })
+
   it('numbers', () => {
     expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(' 42')).toStrictEqual(new CellContent.Number(42))

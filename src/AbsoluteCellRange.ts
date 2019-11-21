@@ -1,5 +1,4 @@
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {Matrix} from './Matrix'
 import {CellAddress} from './parser'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
@@ -161,25 +160,6 @@ export class AbsoluteCellRange {
       throw Error('Index out of bound')
     }
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
-  }
-
-  public matrixFromPlainValues(sheet: string[][]): Matrix {
-    const values = new Array(this.height())
-
-    for (let i = 0; i < this.height(); ++i) {
-      values[i] = new Array(this.width())
-    }
-
-    for (const address of this.addresses()) {
-      const value = sheet[address.row][address.col]
-      if (!isNaN(Number(value))) {
-        values[address.row - this.start.row][address.col - this.start.col] = Number(value)
-      } else {
-        throw new Error('Range contains not numeric values')
-      }
-    }
-
-    return new Matrix(values)
   }
 
   public shiftByRows(numberOfRows: number) {

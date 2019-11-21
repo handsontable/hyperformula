@@ -34,6 +34,14 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
 
+  it('handle different input types', () => {
+    const engine = HyperFormula.buildFromArray([['', null, undefined]])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
+  })
+
   it('loadSheet with a loop', () => {
     const engine = HyperFormula.buildFromArray([['=B1', '=C1', '=A1']])
 

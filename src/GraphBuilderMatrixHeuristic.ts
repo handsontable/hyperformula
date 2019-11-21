@@ -4,7 +4,8 @@ import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
-import {MatrixSize} from './Matrix'
+import {Matrix, MatrixSize} from './Matrix'
+import {CellContentParser, CellContent, RawCellContent} from './CellContentParser'
 
 export class Array2d<T> {
   public static fromArray<T>(input: T[][]): Array2d<T> {
@@ -86,7 +87,7 @@ export class GraphBuilderMatrixHeuristic {
       const possibleMatrix = elem.range
       const matrixVertex = MatrixVertex.fromRange(possibleMatrix)
       const sheet = sheets[this.dependencyGraph.getSheetName(possibleMatrix.start.sheet)]
-      const matrix = possibleMatrix.matrixFromPlainValues(sheet)
+      const matrix = this.matrixFromPlainValues(possibleMatrix, sheet)
       matrixVertex.setCellValue(matrix)
       this.dependencyGraph.addMatrixVertex(matrixVertex.getAddress(), matrixVertex)
       this.columnSearch.add(matrix, matrixVertex.getAddress())
@@ -94,6 +95,27 @@ export class GraphBuilderMatrixHeuristic {
 
     this.mapping.clear()
     return notMatrices
+  }
+
+  public matrixFromPlainValues(range: AbsoluteCellRange, sheet: RawCellContent[][]): Matrix {
+    const values = new Array(range.height())
+    const cellContentParser = new CellContentParser()
+
+    for (let i = 0; i < range.height(); ++i) {
+      values[i] = new Array(range.width())
+    }
+
+    for (const address of range.addresses()) {
+      const cellContent = sheet[address.row][address.col]
+      const parsedCellContent = cellContentParser.parse(cellContent)
+      if (parsedCellContent instanceof CellContent.Number) {
+        values[address.row - range.start.row][address.col - range.start.col] = parsedCellContent.value
+      } else {
+        throw new Error('Range contains not numeric values')
+      }
+    }
+
+    return new Matrix(values)
   }
 
   private findMatrices(): PossibleMatrix[] {

@@ -1,4 +1,4 @@
-export type RawCellContent = string
+export type RawCellContent = string | null | undefined
 
 export namespace CellContent {
   export class Number {
@@ -46,6 +46,9 @@ export function isMatrix(text: string): Boolean {
 
 export class CellContentParser {
   public parse(content: RawCellContent): CellContent.Type {
+    if (content === undefined || content === null) {
+      return CellContent.Empty.getSingletonInstance()
+    }
     if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
