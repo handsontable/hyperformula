@@ -8,6 +8,7 @@ import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {CellContentParser, CellContentType} from './CellContentParser'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -79,6 +80,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
+    const contentParser = new CellContentParser()
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -90,36 +92,47 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
 
-          if (isMatrix(cellContent)) {
-            if (this.dependencyGraph.existsVertex(address)) {
-              continue
+          switch (contentParser.parse(cellContent)) {
+            case CellContentType.MATRIX_FORMULA: {
+              if (this.dependencyGraph.existsVertex(address)) {
+                continue
+              }
+              const matrixFormula = cellContent.substr(1, cellContent.length - 2)
+              const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
+              const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+              this.dependencyGraph.addMatrixVertex(address, vertex)
+              break;
             }
-            const matrixFormula = cellContent.substr(1, cellContent.length - 2)
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
-            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-            this.dependencyGraph.addMatrixVertex(address, vertex)
-          } else if (isFormula(cellContent)) {
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
-            const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
-            dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
-            this.dependencyGraph.addVertex(address, vertex)
-            if (parseResult.hasVolatileFunction) {
-              this.dependencyGraph.markAsVolatile(vertex)
+            case CellContentType.FORMULA: {
+              const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
+              const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
+              dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
+              this.dependencyGraph.addVertex(address, vertex)
+              if (parseResult.hasVolatileFunction) {
+                this.dependencyGraph.markAsVolatile(vertex)
+              }
+              if (parseResult.hasStructuralChangeFunction) {
+                this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+              }
+              break;
             }
-            if (parseResult.hasStructuralChangeFunction) {
-              this.dependencyGraph.markAsDependentOnStructureChange(vertex)
+            case CellContentType.EMPTY: {
+              /* we don't care about empty cells here */
+              break;
             }
-          } else if (cellContent === '') {
-            /* we don't care about empty cells here */
-          } else if (!isNaN(Number(cellContent))) {
-            const vertex = new ValueCellVertex(Number(cellContent))
-            this.columnIndex.add(Number(cellContent), address)
-            this.dependencyGraph.addVertex(address, vertex)
-          } else {
-            const vertex = new ValueCellVertex(cellContent)
-            this.columnIndex.add(cellContent, address)
-            this.dependencyGraph.addVertex(address, vertex)
+            case CellContentType.NUMBER: {
+              const vertex = new ValueCellVertex(Number(cellContent))
+              this.columnIndex.add(Number(cellContent), address)
+              this.dependencyGraph.addVertex(address, vertex)
+              break;
+            }
+            case CellContentType.STRING: {
+              const vertex = new ValueCellVertex(cellContent)
+              this.columnIndex.add(cellContent, address)
+              this.dependencyGraph.addVertex(address, vertex)
+              break;
+            }
           }
         }
       }
