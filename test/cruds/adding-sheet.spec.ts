@@ -33,7 +33,7 @@ describe('add sheet to engine', () => {
 
   it('should add sheet to engine with one sheet', function() {
     const engine = HyperFormula.buildFromArray([
-        ['foo'],
+      ['foo'],
     ])
 
     engine.addSheet()
