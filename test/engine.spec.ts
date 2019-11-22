@@ -156,4 +156,18 @@ describe('Integration', () => {
 
     expect(engine.sheetName(0)).toBeUndefined()
   })
+
+  it('#sheetId if sheet exists', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addSheet('foobar')
+
+    expect(engine.sheetId('foobar')).toEqual(0)
+  })
+
+  it('#sheetId if sheet doesnt exists', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.sheetId('doesntexist')).toBeUndefined()
+  })
 })

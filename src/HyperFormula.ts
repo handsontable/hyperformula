@@ -514,6 +514,18 @@ export class HyperFormula {
   }
 
   /**
+   * Returns a unique sheet ID assigned to the sheet with given name
+   *
+   * Or undefined if the there's no sheet with given name
+   *
+   * @param sheetName - name of the sheet, for which we want to retrieve ID
+   * @returns ID of the sheet
+   */
+  public sheetId(sheetName: string): number | undefined {
+    return this.sheetMapping.get(sheetName)
+  }
+
+  /**
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
