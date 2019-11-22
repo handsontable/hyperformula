@@ -1,5 +1,5 @@
-import {Matrix} from './Matrix'
 import {CellAddress} from './parser'
+import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from "./DependencyGraph";
 
 /**
  * Possible errors returned by our interpreter.
@@ -30,6 +30,21 @@ export enum CellType {
   VALUE = 'VALUE',
   MATRIX = 'MATRIX',
   EMPTY = 'EMPTY'
+}
+
+export const getCellType = (vertex: CellVertex | null): CellType => {
+  if (vertex instanceof FormulaCellVertex) {
+    return CellType.FORMULA
+  }
+  if (vertex instanceof ValueCellVertex
+      || (vertex instanceof MatrixVertex && vertex.isNumeric())) {
+    return CellType.VALUE
+  }
+  if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+    return CellType.MATRIX
+  }
+
+  return CellType.EMPTY
 }
 
 export enum CellValueType {
