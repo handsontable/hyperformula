@@ -21,6 +21,13 @@ export enum ErrorType {
   REF = 'REF',
 }
 
+export enum CellType {
+  FORMULA = 'FORMULA',
+  VALUE = 'VALUE',
+  MATRIX = 'MATRIX',
+  EMPTY = 'EMPTY'
+}
+
 export class CellError {
   constructor(public readonly type: ErrorType) {
   }
@@ -35,7 +42,8 @@ export interface SimpleCellAddress {
   row: number,
   sheet: number,
 }
-export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({ sheet, col, row })
+
+export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({sheet, col, row})
 export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean => (address.col < 0 || address.row < 0)
 export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
@@ -45,10 +53,12 @@ export interface SheetCellAddress {
   col: number,
   row: number,
 }
-export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({ col, row })
+
+export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({col, row})
 
 export interface CellRange {
   start: CellAddress,
   end: CellAddress,
 }
-export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({ start, end })
+
+export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({start, end})

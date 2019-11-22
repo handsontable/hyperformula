@@ -1,5 +1,5 @@
 import {HyperFormula, Config} from '../src'
-import {CellError, EmptyValue, ErrorType} from '../src/Cell'
+import {CellError, CellType, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 import {adr, expect_reference_to_have_ref_error} from './testUtils'
 
@@ -135,7 +135,7 @@ describe('Integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     expect(engine.getCellFormula(adr('A1'))).toEqual(undefined)
     expect(engine.getCellFormula(adr('A2'))).toEqual(undefined)
@@ -236,5 +236,43 @@ describe('Integration', () => {
 
     expect(engine.sheetName(0)).toBe('foo')
     expect(engine.doesSheetExist('foo')).toBe(true)
+  })
+
+  it('#getCellType empty cell', () => {
+    const engine = HyperFormula.buildFromArray([['', null, undefined]])
+
+    expect(engine.getCellType(adr("A1"))).toBe(CellType.EMPTY)
+    expect(engine.getCellType(adr("B1"))).toBe(CellType.EMPTY)
+    expect(engine.getCellType(adr("C1"))).toBe(CellType.EMPTY)
+    expect(engine.getCellType(adr("D1"))).toBe(CellType.EMPTY)
+  })
+
+  it('#getCellType simple value', () => {
+    const engine = HyperFormula.buildFromArray([['1', 'foo']])
+
+    expect(engine.getCellType(adr("A1"))).toBe(CellType.VALUE)
+    expect(engine.getCellType(adr("B1"))).toBe(CellType.VALUE)
+  })
+
+  it('#getCellType formula', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)']])
+
+    expect(engine.getCellType(adr("A1"))).toBe(CellType.FORMULA)
+  })
+
+  it('#getCellType numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2']
+    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+
+    expect(engine.getCellType(adr("A1"))).toBe(CellType.VALUE)
+    expect(engine.getCellType(adr("B1"))).toBe(CellType.VALUE)
+  })
+
+  it('#getCellType formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([['{=TRANSPOSE(C1:C2)}', '{=TRANSPOSE(C1:C2)}']])
+
+    expect(engine.getCellType(adr("A1"))).toBe(CellType.MATRIX)
+    expect(engine.getCellType(adr("B1"))).toBe(CellType.MATRIX)
   })
 })

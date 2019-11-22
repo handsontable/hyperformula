@@ -1,5 +1,5 @@
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellType, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {
@@ -10,7 +10,7 @@ import {
   MatrixMapping,
   MatrixVertex,
   RangeMapping,
-  SheetMapping,
+  SheetMapping, ValueCellVertex,
   Vertex
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
@@ -532,6 +532,29 @@ export class HyperFormula {
    */
   public doesSheetExist(sheetName: string): boolean {
     return this.sheetMapping.hasSheetWithName(sheetName)
+  }
+
+  /**
+   * Returns type of a cell at given address
+   *
+   * @param address - cell coordinates
+   * @returns type of a cell
+   * */
+  public getCellType(address: SimpleCellAddress): CellType {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex instanceof FormulaCellVertex) {
+      return CellType.FORMULA
+    }
+    if (vertex instanceof ValueCellVertex
+        || (vertex instanceof MatrixVertex && vertex.isNumeric())) {
+      return CellType.VALUE
+    }
+    if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+      return CellType.MATRIX
+    }
+
+    return CellType.EMPTY
   }
 
   /**
