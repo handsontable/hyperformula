@@ -275,4 +275,59 @@ describe('Integration', () => {
     expect(engine.getCellType(adr("A1"))).toBe(CellType.MATRIX)
     expect(engine.getCellType(adr("B1"))).toBe(CellType.MATRIX)
   })
+
+  it('#doesCellHaveSimpleValue true', () => {
+    const engine = HyperFormula.buildFromArray([['1', 'foo']])
+    expect(engine.doesCellHaveSimpleValue(adr("A1"))).toEqual(true)
+    expect(engine.doesCellHaveSimpleValue(adr("B1"))).toEqual(true)
+  })
+
+  it('#doesCellHaveSimpleValue false', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', '', '{=TRANSPOSE(A1:A1)}']])
+    expect(engine.doesCellHaveSimpleValue(adr("A1"))).toEqual(false)
+    expect(engine.doesCellHaveSimpleValue(adr("B1"))).toEqual(false)
+    expect(engine.doesCellHaveSimpleValue(adr("C1"))).toEqual(false)
+  })
+
+  it('#doesCellHaveFormula true', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)']])
+    expect(engine.doesCellHaveFormula(adr("A1"))).toEqual(true)
+  })
+
+  it('#doesCellHaveFormula false', () => {
+    const engine = HyperFormula.buildFromArray([['1', '', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    expect(engine.doesCellHaveFormula(adr("A1"))).toEqual(false)
+    expect(engine.doesCellHaveFormula(adr("B1"))).toEqual(false)
+    expect(engine.doesCellHaveFormula(adr("C1"))).toEqual(false)
+    expect(engine.doesCellHaveFormula(adr("D1"))).toEqual(false)
+  })
+
+  it('#isCellEmpty true', () => {
+    const engine = HyperFormula.buildFromArray([['', null, undefined]])
+    expect(engine.isCellEmpty(adr("A1"))).toEqual(true)
+    expect(engine.isCellEmpty(adr("B1"))).toEqual(true)
+    expect(engine.isCellEmpty(adr("C1"))).toEqual(true)
+    expect(engine.isCellEmpty(adr("D1"))).toEqual(true)
+  })
+
+  it('#isCellEmpty false', () => {
+    const engine = HyperFormula.buildFromArray([['1', '=SUM(1, 2)', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    expect(engine.isCellEmpty(adr("A1"))).toEqual(false)
+    expect(engine.isCellEmpty(adr("B1"))).toEqual(false)
+    expect(engine.isCellEmpty(adr("C1"))).toEqual(false)
+    expect(engine.isCellEmpty(adr("D1"))).toEqual(false)
+  })
+
+  it('#isCellPartOfMatrix true', () => {
+    const engine = HyperFormula.buildFromArray([['{=TRANSPOSE(B1:B1)}']])
+    expect(engine.isCellPartOfMatrix(adr("A1"))).toEqual(true)
+  })
+
+  it('#isCellPartOfMatrix false', () => {
+    const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
+    expect(engine.isCellPartOfMatrix(adr("A1"))).toEqual(false)
+    expect(engine.isCellPartOfMatrix(adr("B1"))).toEqual(false)
+    expect(engine.isCellPartOfMatrix(adr("C1"))).toEqual(false)
+    expect(engine.isCellPartOfMatrix(adr("D1"))).toEqual(false)
+  })
 })

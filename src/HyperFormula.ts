@@ -10,7 +10,8 @@ import {
   MatrixMapping,
   MatrixVertex,
   RangeMapping,
-  SheetMapping, ValueCellVertex,
+  SheetMapping,
+  ValueCellVertex,
   Vertex
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
@@ -555,6 +556,42 @@ export class HyperFormula {
     }
 
     return CellType.EMPTY
+  }
+
+  /**
+   * Returns weather cell contains simple value
+   *
+   * @param address - cell coordinates
+   * */
+  public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.VALUE
+  }
+
+  /**
+   * Returns weather cell contains formula
+   *
+   * @param address - cell coordinates
+   * */
+  public doesCellHaveFormula(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.FORMULA
+  }
+
+  /**
+   * Returns weather cell is empty
+   *
+   * @param address - cell coordinates
+   * */
+  public isCellEmpty(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.EMPTY
+  }
+
+  /**
+   * Returns weather cell is part o a matrix
+   *
+   * @param address - cell coordinates
+   * */
+  public isCellPartOfMatrix(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.MATRIX
   }
 
   /**
