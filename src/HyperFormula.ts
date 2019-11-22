@@ -441,11 +441,11 @@ export class HyperFormula {
    *
    * If returns true, doing this operation won't throw any errors
    *
-   * @param sheetName - sheet name
+   * @param name - sheet name
    */
-  public isItPossibleToRemoveSheet(sheetName: string): boolean {
+  public isItPossibleToRemoveSheet(name: string): boolean {
     try {
-      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheetName)
+      this.crudOperations.ensureItIsPossibleToRemoveSheet(name)
       return true
     } catch (e) {
       return false
@@ -455,10 +455,10 @@ export class HyperFormula {
   /**
    * Removes sheet with given name
    *
-   * @param sheetName - sheet name
+   * @param name - sheet name
    */
-  public removeSheet(sheetName: string): CellValueChange[] {
-    this.crudOperations.removeSheet(sheetName)
+  public removeSheet(name: string): CellValueChange[] {
+    this.crudOperations.removeSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
