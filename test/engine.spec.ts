@@ -142,4 +142,18 @@ describe('Integration', () => {
     expect(engine.getCellFormula(adr('B1'))).toEqual(undefined)
     expect(engine.getCellFormula(adr('B2'))).toEqual(undefined)
   })
+
+  it('#sheetName if sheet exists', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addSheet()
+
+    expect(engine.sheetName(0)).toEqual('Sheet1')
+  })
+
+  it('#sheetName if sheet doesnt exists', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.sheetName(0)).toBeUndefined()
+  })
 })

@@ -52,6 +52,10 @@ export class SheetMapping {
     return name
   }
 
+  public getName(sheetId: number): string | undefined {
+    return this.reversedMapping.get(sheetId)
+  }
+
   public names(): IterableIterator<string> {
     return this.mapping.keys()
   }
