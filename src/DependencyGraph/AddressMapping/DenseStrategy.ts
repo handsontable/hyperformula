@@ -3,6 +3,7 @@ import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from "../../Cell
 import {RowsSpan} from "../../RowsSpan";
 import {ColumnsSpan} from "../../ColumnsSpan";
 import {IAddressMappingStrategy} from "./IAddressMappingStrategy";
+import {add} from "../../interpreter/scalar";
 
 /**
  * Mapping from cell addresses to vertices
@@ -30,11 +31,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
 
   /** @inheritDoc */
   public getCell(address: SheetCellAddress): CellVertex | null {
-    const row = this.mapping[address.row]
-    if (!row) {
-      return null
-    }
-    return row[address.col] || null
+    return this.getCellVertex(address.col, address.row)
   }
 
   /** @inheritDoc */
@@ -116,7 +113,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
 
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
-      const vertex = this.mapping[y][column]
+      const vertex = this.getCellVertex(column, y)
       if (vertex) {
         yield vertex
       }
@@ -125,7 +122,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
 
   public* verticesFromRow(row: number): IterableIterator<CellVertex> {
     for (let x = 0; x < this.width; ++x) {
-      const vertex = this.mapping[row][x]
+      const vertex = this.getCellVertex(x, row)
       if (vertex) {
         yield vertex
       }
@@ -135,7 +132,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
     for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
       for (let y = 0; y < this.height; ++y) {
-        const vertex = this.mapping[y][x]
+        const vertex = this.getCellVertex(x, y)
         if (vertex) {
           yield vertex
         }
@@ -146,7 +143,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     for (let x = 0; x < this.width; ++x) {
       for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
-        const vertex = this.mapping[y][x]
+        const vertex = this.getCellVertex(x, y)
         if (vertex) {
           yield vertex
         }
@@ -157,11 +154,19 @@ export class DenseStrategy implements IAddressMappingStrategy {
   public* vertices(): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
       for (let x = 0; x < this.width; ++x) {
-        const vertex = this.mapping[y][x]
+        const vertex = this.getCellVertex(x, y)
         if (vertex) {
           yield vertex
         }
       }
     }
+  }
+
+  private getCellVertex(x: number, y: number): CellVertex | null {
+    const row = this.mapping[y]
+    if (row) {
+      return this.mapping[y][x] || null
+    }
+    return null
   }
 }
