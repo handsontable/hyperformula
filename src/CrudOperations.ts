@@ -109,12 +109,13 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public addSheet(name?: string): void {
+  public addSheet(name?: string): string {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
     }
     const sheetId = this.sheetMapping.addSheet(name)
     this.addressMapping.autoAddSheet(sheetId, [])
+    return this.sheetMapping.name(sheetId)
   }
 
   public removeSheet(sheetName: string): void {
