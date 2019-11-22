@@ -1,5 +1,5 @@
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellType, CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellType, CellValue, CellValueType, getCellValueType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {
@@ -24,6 +24,7 @@ import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
 import {IBatchExecutor} from "./IBatchExecutor";
 import {isMatrix} from './CellContentParser'
+import {type} from "os";
 
 export class NoSheetWithIdError extends Error {
   constructor(sheetId: number) {
@@ -592,6 +593,16 @@ export class HyperFormula {
    * */
   public isCellPartOfMatrix(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.MATRIX
+  }
+
+  /**
+   * Return type of a cell value at given address
+   *
+   * @param address - cell coordinates
+   * */
+  public getCellValueType(address: SimpleCellAddress): CellValueType {
+    const value = this.getCellValue(address)
+    return getCellValueType(value)
   }
 
   /**

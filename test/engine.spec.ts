@@ -1,5 +1,5 @@
 import {HyperFormula, Config} from '../src'
-import {CellError, CellType, EmptyValue, ErrorType} from '../src/Cell'
+import {CellError, CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
 import {adr, expect_reference_to_have_ref_error} from './testUtils'
 
@@ -329,5 +329,34 @@ describe('Integration', () => {
     expect(engine.isCellPartOfMatrix(adr("B1"))).toEqual(false)
     expect(engine.isCellPartOfMatrix(adr("C1"))).toEqual(false)
     expect(engine.isCellPartOfMatrix(adr("D1"))).toEqual(false)
+  })
+
+  it('#getCellValueType string', () => {
+    const engine = HyperFormula.buildFromArray([['foo']])
+    expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.STRING)
+  })
+
+  it('#getCellValueType number', () => {
+    const engine = HyperFormula.buildFromArray([['42', '=SUM(1, A1)']])
+    expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.NUMBER)
+    expect(engine.getCellValueType(adr("B1"))).toBe(CellValueType.NUMBER)
+  })
+
+  it('#getCellValueType boolean', () => {
+    const engine = HyperFormula.buildFromArray([['=TRUE()']])
+    expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.BOOLEAN)
+  })
+
+  it('#getCellValueType empty value', () => {
+    const engine = HyperFormula.buildFromArray([['']])
+    expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.EMPTY)
+    expect(engine.getCellValueType(adr("B1"))).toBe(CellValueType.EMPTY)
+  })
+
+  it('#getCellValueType error', () => {
+    const engine = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
+    expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.ERROR)
+    expect(engine.getCellValueType(adr("B1"))).toBe(CellValueType.ERROR)
+    expect(engine.getCellValueType(adr("C1"))).toBe(CellValueType.ERROR)
   })
 })

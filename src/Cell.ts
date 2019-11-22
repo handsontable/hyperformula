@@ -21,6 +21,10 @@ export enum ErrorType {
   REF = 'REF',
 }
 
+export const EmptyValue = Symbol()
+export type EmptyValueType = typeof EmptyValue
+export type CellValue = boolean | string | number | CellError | EmptyValueType
+
 export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
@@ -28,14 +32,39 @@ export enum CellType {
   EMPTY = 'EMPTY'
 }
 
+export enum CellValueType {
+  BOOLEAN = 'BOOLEAN',
+  NUMBER = 'NUMBER',
+  STRING = 'STRING',
+  EMPTY = 'EMPTY',
+  ERROR = 'ERROR'
+}
+
+export const getCellValueType = (cellValue: CellValue): CellValueType => {
+  if (cellValue === EmptyValue) {
+    return CellValueType.EMPTY
+  }
+
+  if (cellValue instanceof CellError) {
+    return CellValueType.ERROR
+  }
+
+  switch (typeof cellValue) {
+    case "string":
+      return CellValueType.STRING
+    case "number":
+      return CellValueType.NUMBER
+    case "boolean":
+      return CellValueType.BOOLEAN
+  }
+
+  throw new Error("Cell value not computed")
+}
+
 export class CellError {
   constructor(public readonly type: ErrorType) {
   }
 }
-
-export const EmptyValue = Symbol()
-export type EmptyValueType = typeof EmptyValue
-export type CellValue = boolean | string | number | CellError | EmptyValueType
 
 export interface SimpleCellAddress {
   col: number,
