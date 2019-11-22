@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSuchSheetError} from '../../src'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import {simpleCellAddress} from '../../src/Cell'
 import '../testConfig'
@@ -368,7 +368,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContent(adr('B1', 1), '3')
-    }).toThrow(new NoSuchSheetError(1))
+    }).toThrow(new NoSheetWithIdError(1))
   })
 
   it('is not possible to set cell content with invalid address', () => {

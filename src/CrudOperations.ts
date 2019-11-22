@@ -18,7 +18,7 @@ import {
 import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
 import {ParserWithCaching, ProcedureAst} from "./parser";
 import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
+import {Index, InvalidAddressError, NoSheetWithIdError, NoSheetWithNameError} from "./HyperFormula";
 import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
@@ -117,17 +117,20 @@ export class CrudOperations implements IBatchExecutor {
     this.addressMapping.autoAddSheet(sheetId, [])
   }
 
-  public removeSheet(sheet: number): void {
-    this.ensureItIsPossibleToRemoveSheet(sheet)
-    this.dependencyGraph.removeSheet(sheet)
+  public removeSheet(sheetName: string): void {
+    this.ensureItIsPossibleToRemoveSheet(sheetName)
+
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.removeSheet(sheetId)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
+      RemoveSheetDependencyTransformer.transform(sheetId, this.dependencyGraph)
+      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheetId)
     })
 
-    this.sheetMapping.removeSheet(sheet)
-    this.columnSearch.removeSheet(sheet)
+    this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: string): void {
@@ -199,7 +202,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
@@ -220,7 +223,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
@@ -237,7 +240,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
@@ -259,7 +262,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
@@ -298,9 +301,9 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToRemoveSheet(sheet: number): void {
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      throw new NoSuchSheetError(sheet)
+  public ensureItIsPossibleToRemoveSheet(sheetName: string): void {
+    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
+      throw new NoSheetWithNameError(sheetName)
     }
   }
 
@@ -309,7 +312,7 @@ export class CrudOperations implements IBatchExecutor {
       throw new InvalidAddressError(address)
     }
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
+      throw new NoSheetWithIdError(address.sheet)
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {

@@ -24,9 +24,15 @@ import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./
 import {IBatchExecutor} from "./IBatchExecutor";
 import {isMatrix} from './CellContentParser'
 
-export class NoSuchSheetError extends Error {
+export class NoSheetWithIdError extends Error {
   constructor(sheetId: number) {
     super(`There's no sheet with id = ${sheetId}`)
+  }
+}
+
+export class NoSheetWithNameError extends Error {
+  constructor(sheetName: string) {
+    super(`There's no sheet with name '${sheetName}'`)
   }
 }
 
@@ -435,11 +441,11 @@ export class HyperFormula {
    *
    * If returns true, doing this operation won't throw any errors
    *
-   * @param sheet - sheet id number
+   * @param sheetName - sheet name
    */
-  public isItPossibleToRemoveSheet(sheet: number): boolean {
+  public isItPossibleToRemoveSheet(sheetName: string): boolean {
     try {
-      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
+      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheetName)
       return true
     } catch (e) {
       return false
@@ -449,10 +455,10 @@ export class HyperFormula {
   /**
    * Removes sheet with given id
    *
-   * @param sheet - sheet id number
+   * @param sheetName - sheet name
    */
-  public removeSheet(sheet: number): CellValueChange[] {
-    this.crudOperations.removeSheet(sheet)
+  public removeSheet(sheetName: string): CellValueChange[] {
+    this.crudOperations.removeSheet(sheetName)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
