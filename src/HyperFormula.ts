@@ -526,6 +526,15 @@ export class HyperFormula {
   }
 
   /**
+   * Returns whether sheet with given name exists
+   *
+   * @param sheetName - name of the sheet
+   */
+  public doesSheetExist(sheetName: string): boolean {
+    return this.sheetMapping.hasSheetWithName(sheetName)
+  }
+
+  /**
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
