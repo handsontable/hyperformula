@@ -453,7 +453,7 @@ export class HyperFormula {
   }
 
   /**
-   * Removes sheet with given id
+   * Removes sheet with given name
    *
    * @param sheetName - sheet name
    */
