@@ -535,6 +535,13 @@ export class HyperFormula {
   }
 
   /**
+   * Returns number of existing sheets
+   */
+  public numberOfSheets(): number {
+    return this.sheetMapping.numberOfSheets()
+  }
+
+  /**
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations

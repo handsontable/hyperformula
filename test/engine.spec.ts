@@ -184,4 +184,18 @@ describe('Integration', () => {
 
     expect(engine.doesSheetExist('foobar')).toBe(false)
   })
+
+  it('#numberOfSheets for zero', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.numberOfSheets()).toBe(0)
+  })
+
+  it('#numberOfSheets', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addSheet('foo')
+
+    expect(engine.numberOfSheets()).toBe(1)
+  })
 })
