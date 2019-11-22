@@ -541,6 +541,10 @@ export class HyperFormula {
     return this.sheetMapping.numberOfSheets()
   }
 
+  public renameSheet(sheetId: number, newName: string): void {
+    this.sheetMapping.renameSheet(sheetId, newName)
+  }
+
   /**
    * Run multiple operations and recompute formulas at the end
    *

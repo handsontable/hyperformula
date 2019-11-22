@@ -71,4 +71,22 @@ export class SheetMapping {
   public hasSheetWithName(sheetName: string): boolean {
     return this.mapping.has(sheetName)
   }
+
+  public renameSheet(sheetId: number, newName: string): void {
+    const currentName = this.reversedMapping.get(sheetId)
+    if (currentName === newName) {
+      return
+    }
+    if (currentName === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    if (this.mapping.has(newName)) {
+      throw new Error(`Sheet '${newName}' already exists`)
+    }
+
+    this.mapping.delete(currentName)
+    this.mapping.set(newName, sheetId)
+    this.reversedMapping.delete(sheetId)
+    this.reversedMapping.set(sheetId, newName)
+  }
 }

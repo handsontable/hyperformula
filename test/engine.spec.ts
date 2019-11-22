@@ -198,4 +198,43 @@ describe('Integration', () => {
 
     expect(engine.numberOfSheets()).toBe(1)
   })
+
+  it('#renameSheet', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('foo')
+
+    engine.renameSheet(0, 'bar')
+
+    expect(engine.sheetName(0)).toBe('bar')
+    expect(engine.doesSheetExist('foo')).toBe(false)
+    expect(engine.doesSheetExist('bar')).toBe(true)
+  })
+
+  it('#renameSheet when theres no sheet with given ID', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.renameSheet(0, 'bar')
+    }).toThrow(`Sheet with id 0 doesn't exist`)
+  })
+
+  it('#renameSheet when new sheet name is already taken', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet()
+    engine.addSheet('bar')
+
+    expect(() => {
+      engine.renameSheet(0, 'bar')
+    }).toThrow(`Sheet 'bar' already exists`)
+  })
+
+  it('#renameSheet for the same name', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('foo')
+
+    engine.renameSheet(0, 'foo')
+
+    expect(engine.sheetName(0)).toBe('foo')
+    expect(engine.doesSheetExist('foo')).toBe(true)
+  })
 })
