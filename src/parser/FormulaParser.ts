@@ -284,6 +284,7 @@ export class FormulaParser extends Parser {
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
     const procedureName = this.CONSUME(ProcedureName).image.toUpperCase()
+    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
     const args: Ast[] = []
     this.CONSUME(LParen)
     this.MANY_SEP({
@@ -293,7 +294,7 @@ export class FormulaParser extends Parser {
       },
     })
     this.CONSUME(RParen)
-    return buildProcedureAst(procedureName, args)
+    return buildProcedureAst(canonicalProcedureName, args)
   })
 
   /**

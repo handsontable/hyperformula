@@ -1,7 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ParserConfig} from './ParserConfig'
 import {ErrorType} from "../Cell";
-import {TranslationPackage} from "../i18n";
+import {languages, TranslationPackage} from "../i18n";
 
 /* arithmetic */
 // abstract for + -
@@ -102,19 +102,20 @@ export interface ILexerConfig {
   ArgSeparator: TokenType,
   OffsetProcedureName: TokenType
   allTokens: TokenType[],
-  errorMapping: Record<string, ErrorType>
+  errorMapping: Record<string, ErrorType>,
+  functionMapping: Record<string, string>
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-
   const offsetProcedureNameLiteral = config.language.functions['OFFSET'] || 'OFFSET'
   const OffsetProcedureName = createToken({
     name: 'OffsetProcedureName',
     pattern: new RegExp(offsetProcedureNameLiteral, 'i')
   })
   const errorMapping = buildErrorMapping(config.language)
+  const functionMapping = buildFunctionMapping(config.language)
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -157,7 +158,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator,
     OffsetProcedureName,
     allTokens,
-    errorMapping
+    errorMapping,
+    functionMapping
   }
 }
 
@@ -166,4 +168,11 @@ const buildErrorMapping = (language: TranslationPackage): Record<string, ErrorTy
     ret[language.errors[key as ErrorType]] = key as ErrorType
     return ret
   }, {} as Record<string, ErrorType>)
+}
+
+const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {
+  return Object.keys(language.functions).reduce((ret, key) => {
+    ret[language.functions[key]] = key
+    return ret
+  }, {} as Record<string, string>)
 }
