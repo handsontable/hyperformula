@@ -105,6 +105,9 @@ export namespace MoveCellsDependencyTransformer {
           args: ast.args.map((arg) => transformDependentFormulas(arg, address, sourceRange, toRight, toBottom, toSheet)),
         }
       }
+      case AstNodeType.PARENTHESIS: {
+        return transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet)
+      }
       default: {
         return {
           type: ast.type,

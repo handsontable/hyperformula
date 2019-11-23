@@ -18,6 +18,7 @@ import {
   StringAst,
 } from '../../src/parser'
 import {enGB, plPL} from "../../src/i18n";
+import {ParenthesisAst} from "../../src/parser/Ast";
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
@@ -192,7 +193,10 @@ describe('ParserWithCaching', () => {
     const ast = parser.parse('=1 + (2 + 3)', CellAddress.absolute(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.NUMBER)
-    expect(ast.right.type).toBe(AstNodeType.PLUS_OP)
+
+    const right = ast.right as ParenthesisAst
+    expect(right.type).toBe(AstNodeType.PARENTHESIS)
+    expect(right.expression.type).toBe(AstNodeType.PLUS_OP)
   })
 
   it('float literal', () => {

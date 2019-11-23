@@ -21,6 +21,7 @@ export type Ast =
   | DivOpAst
   | PowerOpAst
   | ProcedureAst
+  | ParenthesisAst
   | ErrorAst
 
 export interface ParsingError {
@@ -60,6 +61,8 @@ export enum AstNodeType {
   POWER_OP = 'POWER_OP',
 
   FUNCTION_CALL = 'FUNCTION_CALL',
+
+  PARENTHESIS = 'PARENTHESES',
 
   CELL_REFERENCE = 'CELL_REFERENCE',
 
@@ -259,6 +262,16 @@ export const buildProcedureAst = (procedureName: string, args: Ast[]): Procedure
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
+})
+
+export interface ParenthesisAst {
+  type: AstNodeType.PARENTHESIS,
+  expression: Ast
+}
+
+export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
+  type: AstNodeType.PARENTHESIS,
+  expression
 })
 
 export interface ErrorAst {

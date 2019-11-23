@@ -18,7 +18,7 @@ import {
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
-  buildNumberAst,
+  buildNumberAst, buildParenthesisAst,
   buildPercentOpAst,
   buildPlusOpAst,
   buildPowerOpAst,
@@ -482,7 +482,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.CONSUME(LParen)
     const expression = this.SUBRULE(this.booleanExpression)
     this.CONSUME(RParen)
-    return expression
+    return buildParenthesisAst(expression)
   })
 
   /**

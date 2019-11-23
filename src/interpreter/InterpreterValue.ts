@@ -1,4 +1,4 @@
-import {CellValue, ErrorType, CellError} from '../Cell'
+import {CellValue} from '../Cell'
 import {MatrixSize} from '../Matrix'
 import {DependencyGraph} from '../DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'

@@ -69,6 +69,8 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
       return doesContainFunctions(ast.left, interestingFunctions) || doesContainFunctions(ast.right, interestingFunctions)
+    case AstNodeType.PARENTHESIS:
+      return doesContainFunctions(ast.expression, interestingFunctions)
     case AstNodeType.FUNCTION_CALL: {
       if (interestingFunctions.has(ast.procedureName)) {
         return true

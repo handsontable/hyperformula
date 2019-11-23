@@ -1,6 +1,5 @@
-
 import {IToken, tokenMatcher} from 'chevrotain'
-import { SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -139,6 +138,9 @@ export class ParserWithCaching {
       }
       case AstNodeType.ERROR: {
         return '!ERR'
+      }
+      case AstNodeType.PARENTHESIS: {
+        return '(' + this.computeHashOfAstNode(ast.expression) + ')'
       }
       default: {
         return this.computeHashOfAstNode(ast.left) + binaryOpTokenMap[ast.type] + this.computeHashOfAstNode(ast.right)

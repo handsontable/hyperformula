@@ -558,6 +558,9 @@ export class DependencyGraph {
       case AstNodeType.FUNCTION_CALL: {
         return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
       }
+      case AstNodeType.PARENTHESIS: {
+        return this.cellReferencesInRange(ast.expression, baseAddress, range)
+      }
       default: {
         return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
       }

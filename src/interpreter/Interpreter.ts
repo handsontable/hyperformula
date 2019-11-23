@@ -202,6 +202,9 @@ export class Interpreter {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
       }
+      case AstNodeType.PARENTHESIS: {
+        return this.evaluateAst(ast.expression, formulaAddress)
+      }
       case AstNodeType.ERROR: {
         if (ast.error !== undefined) {
           return ast.error

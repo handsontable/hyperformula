@@ -156,13 +156,13 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=D4')
   })
 
-  it('#unparse forgets about unnecessary parenthesis', () => {
+  it('#unparse doesnt forget about unnecessary parenthesis', () => {
     const formula = '=(1+2)'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=1+2')
+    expect(unparsed).toEqual('=(1+2)')
   })
 
   it('#unparse forgets about unnecessary sheet reference', () => {

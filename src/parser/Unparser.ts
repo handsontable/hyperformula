@@ -8,28 +8,6 @@ import {ILexerConfig} from './LexerConfig'
 
 export type SheetMappingFn = (sheetId: number) => string
 
-const operatorPrecedence: Record<string, number> = {}
-operatorPrecedence[AstNodeType.MINUS_UNARY_OP] = 900;
-operatorPrecedence[AstNodeType.POWER_OP] = 800;
-operatorPrecedence[AstNodeType.TIMES_OP] = 700;
-operatorPrecedence[AstNodeType.DIV_OP] = 700;
-operatorPrecedence[AstNodeType.PLUS_OP] = 600;
-operatorPrecedence[AstNodeType.MINUS_OP] = 600;
-operatorPrecedence[AstNodeType.CONCATENATE_OP] = 500;
-operatorPrecedence[AstNodeType.EQUALS_OP] = 400;
-operatorPrecedence[AstNodeType.NOT_EQUAL_OP] = 400;
-operatorPrecedence[AstNodeType.GREATER_THAN_OP] = 400;
-operatorPrecedence[AstNodeType.LESS_THAN_OP] = 400;
-operatorPrecedence[AstNodeType.GREATER_THAN_OR_EQUAL_OP] = 400;
-operatorPrecedence[AstNodeType.LESS_THAN_OR_EQUAL_OP] = 400
-
-const isOperatorStrongerThan = (op1: AstNodeType, op2: AstNodeType): boolean => {
-  const idx1 = operatorPrecedence[op1]
-  const idx2 = operatorPrecedence[op2]
-  assert.ok(idx1 !== undefined, "Operator not included in precedence rules")
-  return idx1 > idx2
-}
-
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
@@ -73,9 +51,6 @@ export class Unparser {
       }
       case AstNodeType.MINUS_UNARY_OP: {
         let unparsedExpr = this.unparseAst(ast.value, address)
-        if (operatorPrecedence[ast.value.type] !== undefined) {
-          unparsedExpr = '(' + unparsedExpr + ')'
-        }
         return '-' + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
@@ -88,15 +63,13 @@ export class Unparser {
           return '#ERR!'
         }
       }
+      case AstNodeType.PARENTHESIS: {
+        const expression = this.unparseAst(ast.expression, address)
+        return '(' + expression + ')'
+      }
       default: {
         let left = this.unparseAst(ast.left, address)
-        if (isOperatorStrongerThan(ast.type, ast.left.type) === true) {
-          left = '(' + left + ')'
-        }
         let right = this.unparseAst(ast.right, address)
-        if (isOperatorStrongerThan(ast.type, ast.right.type) === true) {
-          right = '(' + right + ')'
-        }
         return left + binaryOpTokenMap[ast.type] + right
       }
     }
