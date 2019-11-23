@@ -2,7 +2,7 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB} from "../../src/i18n";
+import {enGB, plPL} from "../../src/i18n";
 
 describe('Compute hash from ast', () => {
   const config = new Config()
@@ -26,6 +26,17 @@ describe('Compute hash from ast', () => {
   it('function call',  () => {
     const address = adr('A1')
     const formula = '=SUM(1,2,3)'
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+
+    const hash = parser.computeHashFromAst(ast)
+    expect(hash).toEqual(hashFromTokens)
+  })
+
+  it('function call - case insensitive', () => {
+    const address = adr('A1')
+    const formula = '=SuM(1,2,3)'
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
     const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
@@ -119,6 +130,40 @@ describe('Compute hash from ast', () => {
     const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
 
     const hash = parser.computeHashFromAst(ast)
+    expect(hash).toEqual(hashFromTokens)
+  })
+
+  it('procedure hash using canonical name', () => {
+    const config = new Config({ language: plPL })
+    const sheetMapping = new SheetMapping(plPL)
+    sheetMapping.addSheet('Sheet1')
+    const lexer = new FormulaLexer(buildLexerConfig(config))
+    const parser = new ParserWithCaching(config, sheetMapping.get)
+
+    const formula = '=SUMA(A1)'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+    const hash = parser.computeHashFromAst(ast)
+
+    expect(hash).toEqual(hashFromTokens)
+  })
+
+  it('procedure name with missing translation', () => {
+    const config = new Config({ language: plPL })
+    const sheetMapping = new SheetMapping(plPL)
+    sheetMapping.addSheet('Sheet1')
+    const lexer = new FormulaLexer(buildLexerConfig(config))
+    const parser = new ParserWithCaching(config, sheetMapping.get)
+
+    const formula = '=FooBAR(A1)'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+    const hash = parser.computeHashFromAst(ast)
+
     expect(hash).toEqual(hashFromTokens)
   })
 })

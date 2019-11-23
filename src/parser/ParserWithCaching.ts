@@ -8,7 +8,7 @@ import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
+import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export interface ParsingResult {
@@ -84,6 +84,11 @@ export class ParserWithCaching {
         } else {
           hash = hash.concat(cellHashFromToken(cellAddress))
         }
+        idx++
+      } else if (tokenMatcher(token, ProcedureName)) {
+        const procedureName = token.image.toUpperCase()
+        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+        hash = hash.concat(canonicalProcedureName)
         idx++
       } else {
         hash = hash.concat(token.image)

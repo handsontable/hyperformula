@@ -2,12 +2,12 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB} from "../../src/i18n";
+import {enGB, plPL, TranslationPackage} from "../../src/i18n";
 
 describe('computeHashFromTokens', () => {
-  const computeFunc = (code: string, address: CellAddress): string => {
-    const config = new Config()
-    const sheetMapping = new SheetMapping(enGB)
+  const computeFunc = (code: string, address: CellAddress, language: TranslationPackage = enGB): string => {
+    const config = new Config({ language: language})
+    const sheetMapping = new SheetMapping(language)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -99,6 +99,18 @@ describe('computeHashFromTokens', () => {
   it('function call names are normalized', () => {
     const code = '=rAnd()'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=rAnd()')
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=RAND()')
+  })
+
+  it('function call in canonical form', () => {
+    const code = '=SUMA()'
+
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=SUM()')
+  })
+
+  it('function call when missing translation', () => {
+    const code = '=fooBAR()'
+
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=FOOBAR()')
   })
 })
