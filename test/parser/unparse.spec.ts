@@ -255,13 +255,19 @@ describe('Unparse', () => {
   })
 
   xit('#unparse use language configuration', () => {
-    const parser = new ParserWithCaching(new Config({ language: plPL }), sheetMapping.get)
     const configEN = new Config({ language: enGB })
-    const unparser = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.name)
-    const formula = '=SUMA(1,2)'
-    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
-    const unparsed = unparser.unparse(ast, adr('A1'))
+    const configPL = new Config({ language: plPL })
 
-    expect(unparsed).toEqual('=SUM(1,2)')
+    const parser = new ParserWithCaching(configPL, sheetMapping.get)
+
+    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.name)
+    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.name)
+
+    const formula = '=SUMA(1,2)'
+
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1,2)')
+    expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1,2)')
   })
 })
