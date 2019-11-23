@@ -254,7 +254,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  xit('#unparse use language configuration', () => {
+  it('#unparse use language configuration', () => {
     const configEN = new Config({ language: enGB })
     const configPL = new Config({ language: plPL })
 
