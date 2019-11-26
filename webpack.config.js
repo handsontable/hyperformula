@@ -13,7 +13,7 @@ const buildConfiguration = ({ name, mode, excludeDependencies, plugins = [] }) =
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
-          exclude: /node_modules/
+          include: /src/
         }
       ]
     },
