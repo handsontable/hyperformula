@@ -23,12 +23,11 @@ import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {CellValueChange, ContentChanges} from "./ContentChanges";
+import {ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
-import {start} from "repl";
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
-import {CellContentParser, CellContent, isMatrix} from './CellContentParser'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -134,7 +133,7 @@ export class CrudOperations implements IBatchExecutor {
     this.columnSearch.removeSheet(sheetId)
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: string | null): void {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
     const contentParser = new CellContentParser()
     const parsedCellContent = contentParser.parse(newCellContent)
