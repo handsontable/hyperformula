@@ -3,6 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {
   AstNodeType,
+  CellAddress,
   CellRangeAst,
   CellReferenceAst,
   ErrorAst,
@@ -16,8 +17,7 @@ import {
   ProcedureAst,
   StringAst,
 } from '../../src/parser'
-import {CellAddress} from '../../src/parser'
-import {enGB, languages, plPL} from "../../src/i18n";
+import {enGB, plPL} from "../../src/i18n";
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
