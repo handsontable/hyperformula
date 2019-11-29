@@ -19,6 +19,11 @@ describe('COUNTBLANK', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 
+  it('with empty strings', () => {
+    const engine = HyperFormula.buildFromArray([['', null, null, '=COUNTBLANK(A1:C1)']])
+    expect(engine.getCellValue(adr('D1'))).toEqual(2)
+  })
+
   it('does not propagate errors from ranges', () => {
     const engine = HyperFormula.buildFromArray([
       [null],
