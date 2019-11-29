@@ -16,6 +16,7 @@ const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) 
       }
       return
     }
+    case AstNodeType.PERCENT_OP:
     case AstNodeType.MINUS_UNARY_OP: {
       collectDependenciesFn(ast.value, dependenciesSet)
       return

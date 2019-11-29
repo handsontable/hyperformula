@@ -46,6 +46,12 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
     case AstNodeType.STRING: {
       return ast
     }
+    case AstNodeType.PERCENT_OP: {
+      return {
+        type: ast.type,
+        value: transformAddressesInFormula(ast.value, address, transformCellAddressFn, transformCellRangeFn),
+      }
+    }
     case AstNodeType.MINUS_UNARY_OP: {
       return {
         type: ast.type,

@@ -8,6 +8,7 @@ export type Ast =
   | CellRangeAst
   | ConcatenateOpAst
   | MinusUnaryOpAst
+  | PercentOpAst
   | EqualsOpAst
   | NotEqualOpAst
   | GreaterThanOpAst
@@ -40,6 +41,8 @@ export enum AstNodeType {
   STRING = 'STRING',
 
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
+
+  PERCENT_OP = 'PERCENT_OP',
 
   CONCATENATE_OP = 'CONCATENATE_OP',
 
@@ -234,6 +237,16 @@ export const buildPowerOpAst = (left: Ast, right: Ast): PowerOpAst => ({
   type: AstNodeType.POWER_OP,
   left,
   right,
+})
+
+export interface PercentOpAst {
+  type: AstNodeType.PERCENT_OP,
+  value: Ast,
+}
+
+export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
+  type: AstNodeType.PERCENT_OP,
+  value: value
 })
 
 export interface ProcedureAst {
