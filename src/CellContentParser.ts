@@ -46,7 +46,7 @@ export function isMatrix(text: string): Boolean {
 
 export class CellContentParser {
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null || content === '') {
+    if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
     }
     if (isMatrix(content)) {
