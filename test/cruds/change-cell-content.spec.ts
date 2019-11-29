@@ -191,7 +191,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['=A1', ''],
+      ['=A1', null],
       ['1', 'foo'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
@@ -242,7 +242,7 @@ describe('changing cell content', () => {
 
   it('set number for the first time', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -253,7 +253,7 @@ describe('changing cell content', () => {
 
   it('set text for the first time', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -264,7 +264,7 @@ describe('changing cell content', () => {
 
   it('change empty to formula', () => {
     const sheet = [
-      ['42', '', '=B1'],
+      ['42', null, '=B1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -281,11 +281,11 @@ describe('changing cell content', () => {
 
   it('set nothing again', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -295,7 +295,7 @@ describe('changing cell content', () => {
 
   it('change EMPTY to NUMBER', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -309,7 +309,7 @@ describe('changing cell content', () => {
 
   it('change EMPTY to TEXT', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -352,7 +352,7 @@ describe('changing cell content', () => {
   it('should not be possible to edit part of a Matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['', '{=TRANSPOSE(A1:B1)}'],
+      [null, '{=TRANSPOSE(A1:B1)}'],
     ])
 
     expect(() => {

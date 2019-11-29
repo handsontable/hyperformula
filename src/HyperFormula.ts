@@ -237,7 +237,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
+  public setCellContent(address: SimpleCellAddress, newCellContent: string | null): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
