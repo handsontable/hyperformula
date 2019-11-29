@@ -101,7 +101,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('ops',  () => {
-    const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1'
+    const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1%'
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -109,6 +109,7 @@ describe('Compute hash from ast', () => {
 
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual(hashFromTokens)
+    expect(hash).toEqual(formula)
   })
 
   it('cell ref between strings', () => {
