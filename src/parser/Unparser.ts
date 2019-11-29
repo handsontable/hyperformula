@@ -78,6 +78,9 @@ export class Unparser {
         }
         return '-' + unparsedExpr
       }
+      case AstNodeType.PERCENT_OP: {
+        return this.unparseAst(ast.value, address) + '%'
+      }
       case AstNodeType.ERROR: {
         if (ast.error) {
           return this.config.getErrorTranslationFor(ast.error.type)
