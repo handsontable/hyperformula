@@ -95,9 +95,9 @@ describe('Removing rows - checking if its possible', () => {
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency above removed row should not be affected', () => {
     const engine = HyperFormula.buildFromArray([
-      [''],
+      [null],
       ['1'],
-      [''], // row to delete
+      [null], // row to delete
       ['=A$2'],
     ])
 
@@ -109,7 +109,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('case Ab: absolute dependency below removed row should be shifted', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A$3'],
-      [''], // row to delete
+      [null], // row to delete
       ['42'],
     ])
 
@@ -121,7 +121,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
   it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A$2'],
-      [''], // row to delete
+      [null], // row to delete
     ])
 
     engine.removeRows(0, [1, 1])
@@ -327,7 +327,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('does not truncate any ranges if rows are removed from different sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['', '=SUM(A2:A3)'],
+        [null, '=SUM(A2:A3)'],
         ['2'],
         ['3'],
       ],
@@ -382,7 +382,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 describe('Removing rows - range dependencies, same sheet', () => {
   it('truncates range by one row from top if topmost row removed', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A3)'],
+      [null, '=SUM(A2:A3)'],
       ['1'],
       ['2'],
     ])
@@ -394,7 +394,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by one row from bottom if last row removed', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A3)'],
+      [null, '=SUM(A2:A3)'],
       ['1'],
       ['2'],
     ])
@@ -406,7 +406,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from top if topmost rows removed', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A5)'],
+      [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
       ['4'],
@@ -420,8 +420,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from top if topmost rows removed - removing does not have to start with range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A3:A6)'],
-      [''],
+      [null, '=SUM(A3:A6)'],
+      [null],
       ['3'],
       ['4'],
       ['5'],
@@ -435,8 +435,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from top if topmost rows removed - removing does not have to start with range but may end on start', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A3:A6)'],
-      [''],
+      [null, '=SUM(A3:A6)'],
+      [null],
       ['3'],
       ['4'],
       ['5'],
@@ -450,7 +450,7 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from bottom if bottomest rows removed', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A5)'],
+      [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
       ['4'],
@@ -464,12 +464,12 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A5)'],
+      [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
       ['4'],
       ['5'],
-      [''],
+      [null],
     ])
 
     engine.removeRows(0, [3, 3])
@@ -479,12 +479,12 @@ describe('Removing rows - range dependencies, same sheet', () => {
 
   it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range but may start on end', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUM(A2:A5)'],
+      [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
       ['4'],
       ['5'],
-      [''],
+      [null],
     ])
 
     engine.removeRows(0, [4, 2])
@@ -497,7 +497,7 @@ describe('Removing rows - reevaluation', () => {
   it('reevaluates cells', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)'],
-      [''], // deleted
+      [null], // deleted
       ['3'],
     ])
 
@@ -509,7 +509,7 @@ describe('Removing rows - reevaluation', () => {
   it('dont reevaluate everything', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
-      [''], // deleted
+      [null], // deleted
       ['3'],
     ])
     const b1 = engine.addressMapping.getCell(adr('B1'))
@@ -718,7 +718,7 @@ describe('Removing rows - graph', function() {
   it('works if there are empty cells removed', function() {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      [''],
+      [null],
       ['3'],
     ])
     expect(engine.graph.nodes.size).toBe(2)
@@ -730,9 +730,9 @@ describe('Removing rows - graph', function() {
 describe('Removing rows - range mapping', function() {
   it('shift ranges in range mapping, range start below removed rows', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', ''],
+      ['1', null],
       ['2', '=SUM(A2:A3)'],
-      ['3', ''],
+      ['3', null],
     ])
 
     engine.removeRows(0, [0, 1])
@@ -744,8 +744,8 @@ describe('Removing rows - range mapping', function() {
   it('shift ranges in range mapping, range start above removed rows', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
-      ['2', ''],
-      ['3', ''],
+      ['2', null],
+      ['3', null],
     ])
 
     engine.removeRows(0, [1, 2])
@@ -831,7 +831,7 @@ describe('Removing rows - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-      [''],
+      [null],
       ['2'],
     ], new Config({ useColumnIndex: true }))
 

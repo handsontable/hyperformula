@@ -79,7 +79,7 @@ describe('Adding column, fixing dependency', () => {
     it('same sheet, same column', () => {
       const engine = HyperFormula.buildFromArray([
         ['42', '43'],
-        ['', '=B1'],
+        [null, '=B1'],
       ])
 
       engine.addColumns(0, [1, 1])
@@ -107,7 +107,7 @@ describe('Adding column, fixing dependency', () => {
     it('R < r', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          [/* new col */ '', '=$Sheet2.A1'],
+          [/* new col */ null, '=$Sheet2.A1'],
         ],
         Sheet2: [
           ['1'],
@@ -125,7 +125,7 @@ describe('Adding column, fixing dependency', () => {
           [/* new col */ '=$Sheet2.B1'],
         ],
         Sheet2: [
-          ['', '1'],
+          [null, '1'],
         ],
       })
 
@@ -204,7 +204,7 @@ describe('Adding column, fixing dependency', () => {
           ['=B1', '13'],
         ],
         Sheet2: [
-          ['', /* new col */ '78'],
+          [null, /* new col */ '78'],
         ],
       })
 
@@ -221,10 +221,10 @@ describe('Adding column, fixing dependency', () => {
           ['=$Sheet2.B1', '13'],
         ],
         Sheet2: [
-          ['', '78'],
+          [null, '78'],
         ],
         Sheet3: [
-          ['', /* new col */ ''],
+          [null, /* new col */ null],
         ],
       })
 
@@ -238,7 +238,7 @@ describe('Adding column, fixing dependency', () => {
 describe('Adding column, fixing ranges', () => {
   it('insert column to empty range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', /* new col */ '', ''],
+      [null, /* new col */ null, null],
       ['=SUM(A1:C1)'],
     ])
 
@@ -250,7 +250,7 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['', '', '', ''],
+      [null, null, null, null],
       ['=SUM(A1:D1)'],
     ]))
   })
@@ -269,7 +269,7 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3'],
+      ['1', null, '2', '3'],
       ['=SUM(A1:D1)'],
     ]))
   })
@@ -286,8 +286,8 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.rangeMapping.getRange(adr('B1'), adr('D1'))).not.toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['', '1', '2', '3'],
-      ['', '=SUM(B1:D1)'],
+      [null, '1', '2', '3'],
+      [null, '=SUM(B1:D1)'],
     ]))
   })
 
@@ -302,7 +302,7 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '2', '3', ''],
+      ['1', '2', '3', null],
       ['=SUM(A1:C1)'],
     ]))
   })
@@ -327,7 +327,7 @@ describe('Adding column, fixing ranges', () => {
   it ('range start in column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(B1:D1)'],
+      [null, /* */ '=SUM(B1:D1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -336,15 +336,15 @@ describe('Adding column, fixing ranges', () => {
     expect(b1).toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(C1:E1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(C1:E1)'],
     ]))
   })
 
   it('range start before added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(A1:D1)'],
+      [null, /* */ '=SUM(A1:D1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -355,15 +355,15 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(A1:E1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(A1:E1)'],
     ]))
   })
 
   it ('range start after added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(C1:D1)'],
+      [null, /* */ '=SUM(C1:D1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -372,15 +372,15 @@ describe('Adding column, fixing ranges', () => {
     expect(b1).toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(D1:E1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(D1:E1)'],
     ]))
   })
 
   it ('range end before added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(A1:A1)'],
+      [null, /* */ '=SUM(A1:A1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -389,15 +389,15 @@ describe('Adding column, fixing ranges', () => {
     expect(b1).toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(A1:A1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(A1:A1)'],
     ]))
   })
 
   it ('range end in a added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(A1:B1)'],
+      [null, /* */ '=SUM(A1:B1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -409,15 +409,15 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(A1:C1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(A1:C1)'],
     ]))
   })
 
   it ('range end after added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(A1:C1)'],
+      [null, /* */ '=SUM(A1:C1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -429,15 +429,15 @@ describe('Adding column, fixing ranges', () => {
     expect(engine.graph.existsEdge(b1, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(A1:D1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(A1:D1)'],
     ]))
   })
 
   it ('range start and end in an added column', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* */ '2', '3', '4'],
-      ['', /* */ '=SUM(B1:B1)'],
+      [null, /* */ '=SUM(B1:B1)'],
     ])
 
     engine.addColumns(0, [1, 1])
@@ -446,8 +446,8 @@ describe('Adding column, fixing ranges', () => {
     expect(b1).toBe(null)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '', '2', '3', '4'],
-      ['', '', '=SUM(C1:C1)'],
+      ['1', null, '2', '3', '4'],
+      [null, null, '=SUM(C1:C1)'],
     ]))
   })
 })

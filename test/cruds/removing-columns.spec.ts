@@ -654,7 +654,7 @@ describe('Removing columns - graph', function() {
 
   it('works if there are empty cells removed', function() {
     const engine = HyperFormula.buildFromArray([
-      ['1', '', '3'],
+      ['1', null, '3'],
     ])
     expect(engine.graph.nodes.size).toBe(2)
     engine.removeColumns(0, [1, 1])

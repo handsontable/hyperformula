@@ -83,10 +83,10 @@ describe('Function COUNTUNIQUE', () => {
     const engine = HyperFormula.buildFromArray([
       ['TRUE()', '=COUNTUNIQUE(A1:A6)'],
       ['FALSE()'],
-      [''],
+      [null],
       ['TRUE()'],
       ['FALSE()'],
-      [''],
+      [null],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
