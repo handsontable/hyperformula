@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellType, CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -542,6 +542,7 @@ export class DependencyGraph {
       case AstNodeType.STRING: {
         return []
       }
+      case AstNodeType.PERCENT_OP:
       case AstNodeType.MINUS_UNARY_OP: {
         return this.cellReferencesInRange(ast.value, baseAddress, range)
       }

@@ -130,6 +130,9 @@ export class ParserWithCaching {
       case AstNodeType.MINUS_UNARY_OP: {
         return '-' + this.computeHashOfAstNode(ast.value)
       }
+      case AstNodeType.PERCENT_OP: {
+        return this.computeHashOfAstNode(ast.value) + '%'
+      }
       case AstNodeType.ERROR: {
         return '!ERR'
       }

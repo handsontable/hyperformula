@@ -1,17 +1,17 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {NotComputedMatrix, Matrix} from '../Matrix'
+import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, subtract, multiply, power, divide, unaryminus} from './scalar'
+import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
 import {coerceScalarToNumber} from './coerce'
 import {concatenate} from './text'
-import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
+import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 export class Interpreter {
   public readonly gpu: GPU
@@ -169,6 +169,13 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
         return unaryminus(coerceScalarToNumber(result))
+      }
+      case AstNodeType.PERCENT_OP: {
+        const result = this.evaluateAst(ast.value, formulaAddress)
+        if (result instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        return percent(coerceScalarToNumber(result))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)

@@ -100,6 +100,14 @@ export function unaryminus(value: number | CellError): number | CellError {
   }
 }
 
+export function percent(value: number | CellError): number | CellError {
+  if (value instanceof CellError) {
+    return value
+  } else {
+    return value / 100
+  }
+}
+
 /**
  * Returns max from two numbers
  *
