@@ -1,7 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ParserConfig} from './ParserConfig'
 import {ErrorType} from "../Cell";
-import {languages, TranslationPackage} from "../i18n";
+import {TranslationPackage} from "../i18n";
 
 /* arithmetic */
 // abstract for + -
@@ -21,6 +21,8 @@ export const TimesOp = createToken({name: 'TimesOp', pattern: /\*/, categories: 
 export const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: MultiplicationOp})
 
 export const PowerOp = createToken({name: 'PowerOp', pattern: /\^/})
+
+export const PercentOp = createToken({name: 'PercentOp', pattern: /%/})
 
 export const BooleanOp = createToken({
   name: 'BooleanOp',
@@ -127,6 +129,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     PowerOp,
     EqualsOp,
     NotEqualOp,
+    PercentOp,
     GreaterThanOrEqualOp,
     LessThanOrEqualOp,
     GreaterThanOp,

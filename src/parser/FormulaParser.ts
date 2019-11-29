@@ -19,6 +19,7 @@ import {
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
   buildNumberAst,
+  buildPercentOpAst,
   buildPlusOpAst,
   buildPowerOpAst,
   buildProcedureAst,
@@ -47,6 +48,7 @@ import {
   MultiplicationOp,
   NotEqualOp,
   NumberLiteral,
+  PercentOp,
   PlusOp,
   PowerOp,
   ProcedureName,
@@ -223,14 +225,30 @@ export class FormulaParser extends Parser {
       {
         ALT: () => {
           this.CONSUME(MinusOp)
-          const value = this.SUBRULE(this.positiveAtomicExpression)
+          const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
           return buildMinusUnaryOpAst(value)
         },
       },
       {
-        ALT: () => this.SUBRULE2(this.positiveAtomicExpression),
+        ALT: () => this.SUBRULE2(this.rightUnaryOpAtomicExpression),
       },
     ])
+  })
+
+  private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
+    const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
+
+    let percentage = false
+    this.OPTION(() => {
+      this.CONSUME(PercentOp)
+      percentage = true
+    })
+
+    if (percentage) {
+      return buildPercentOpAst(positiveAtomicExpression)
+    }
+
+    return positiveAtomicExpression
   })
 
   /**
