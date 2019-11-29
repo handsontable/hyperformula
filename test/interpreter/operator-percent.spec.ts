@@ -42,6 +42,12 @@ describe("Percent operator", () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
   })
 
+  it('works with other operator and coercion', () => {
+    const engine = HyperFormula.buildFromArray([['=TRUE()%*1']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
+  })
+
   // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([

@@ -53,9 +53,11 @@ describe('function CONCATENATE', () => {
 
   it('coerce to strings', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=TRUE()', '42', '=CONCATENATE(A1:B1)']
+      ['=TRUE()', '42', '=CONCATENATE(A1:B1)'],
+      ['=TRUE()', '=42%', '=CONCATENATE(A2:B2)']
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual('TRUE42')
+    expect(engine.getCellValue(adr('C2'))).toEqual('TRUE0.42')
   })
 })
