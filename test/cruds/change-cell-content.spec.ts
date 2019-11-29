@@ -105,7 +105,7 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ])
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
@@ -125,7 +125,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
 
-    engine.setCellContent(adr('B1'), '')
+    engine.setCellContent(adr('B1'), null)
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
@@ -182,7 +182,7 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
-    engine.setCellContent(adr('B1'), '')
+    engine.setCellContent(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
@@ -230,11 +230,11 @@ describe('changing cell content', () => {
 
   it('set nothing again', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
     expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
