@@ -29,7 +29,7 @@ describe('Integration', () => {
   })
 
   it('#loadSheet evaluate empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([['', '=A1']])
+    const engine = HyperFormula.buildFromArray([[null, '=A1']])
 
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
@@ -37,7 +37,7 @@ describe('Integration', () => {
   it('handle different input types', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
+    expect(engine.getCellValue(adr('A1'))).toEqual('')
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
     expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
   })
@@ -239,12 +239,11 @@ describe('Integration', () => {
   })
 
   it('#getCellType empty cell', () => {
-    const engine = HyperFormula.buildFromArray([['', null, undefined]])
+    const engine = HyperFormula.buildFromArray([[null, undefined]])
 
     expect(engine.getCellType(adr("A1"))).toBe(CellType.EMPTY)
     expect(engine.getCellType(adr("B1"))).toBe(CellType.EMPTY)
     expect(engine.getCellType(adr("C1"))).toBe(CellType.EMPTY)
-    expect(engine.getCellType(adr("D1"))).toBe(CellType.EMPTY)
   })
 
   it('#getCellType simple value', () => {
@@ -283,7 +282,7 @@ describe('Integration', () => {
   })
 
   it('#doesCellHaveSimpleValue false', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', '', '{=TRANSPOSE(A1:A1)}']])
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '{=TRANSPOSE(A1:A1)}']])
     expect(engine.doesCellHaveSimpleValue(adr("A1"))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr("B1"))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr("C1"))).toEqual(false)
@@ -295,19 +294,19 @@ describe('Integration', () => {
   })
 
   it('#doesCellHaveFormula false', () => {
-    const engine = HyperFormula.buildFromArray([['1', '', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    const engine = HyperFormula.buildFromArray([['1', '', '{=TRANSPOSE(A1:A1)}', 'foo', null]])
     expect(engine.doesCellHaveFormula(adr("A1"))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr("B1"))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr("C1"))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr("D1"))).toEqual(false)
+    expect(engine.doesCellHaveFormula(adr("E1"))).toEqual(false)
   })
 
   it('#isCellEmpty true', () => {
-    const engine = HyperFormula.buildFromArray([['', null, undefined]])
+    const engine = HyperFormula.buildFromArray([[null, undefined]])
     expect(engine.isCellEmpty(adr("A1"))).toEqual(true)
     expect(engine.isCellEmpty(adr("B1"))).toEqual(true)
     expect(engine.isCellEmpty(adr("C1"))).toEqual(true)
-    expect(engine.isCellEmpty(adr("D1"))).toEqual(true)
   })
 
   it('#isCellEmpty false', () => {
@@ -348,7 +347,7 @@ describe('Integration', () => {
   })
 
   it('#getCellValueType empty value', () => {
-    const engine = HyperFormula.buildFromArray([['']])
+    const engine = HyperFormula.buildFromArray([[null]])
     expect(engine.getCellValueType(adr("A1"))).toBe(CellValueType.EMPTY)
     expect(engine.getCellValueType(adr("B1"))).toBe(CellValueType.EMPTY)
   })
