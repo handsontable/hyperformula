@@ -254,6 +254,15 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
+  it('#unparse percent', () => {
+    const formula = '=42%'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
   it('#unparse use language configuration', () => {
     const configEN = new Config({ language: enGB })
     const configPL = new Config({ language: plPL })
