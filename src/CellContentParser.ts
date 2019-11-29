@@ -40,13 +40,16 @@ export function isFormula(text: string): Boolean {
   return text.startsWith('=')
 }
 
-export function isMatrix(text: string): Boolean {
+export function isMatrix(text: RawCellContent): Boolean {
+  if (typeof text !== 'string') {
+    return false
+  }
   return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
 export class CellContentParser {
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null || content === '') {
+    if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
     }
     if (isMatrix(content)) {

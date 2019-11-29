@@ -16,10 +16,6 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('=FOO()')).toStrictEqual(new CellContent.Formula('=FOO()'))
   })
 
-  it('empty value', () => {
-    expect(cellContentParser.parse('')).toStrictEqual(new CellContent.Empty())
-  })
-
   it('null is empty value', () => {
     expect(cellContentParser.parse(null)).toStrictEqual(new CellContent.Empty())
   })
@@ -41,5 +37,6 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('42f')).toStrictEqual(new CellContent.String('42f'))
     expect(cellContentParser.parse(' =FOO()')).toStrictEqual(new CellContent.String(' =FOO()'))
     expect(cellContentParser.parse(' ')).toStrictEqual(new CellContent.String(' '))
+    expect(cellContentParser.parse('')).toStrictEqual(new CellContent.String(''))
   })
 })

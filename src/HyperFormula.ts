@@ -30,7 +30,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
 import {IBatchExecutor} from "./IBatchExecutor";
-import {isMatrix} from './CellContentParser'
+import {isMatrix, RawCellContent} from './CellContentParser'
 import {type} from "os";
 
 export class NoSheetWithIdError extends Error {
@@ -237,7 +237,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
@@ -248,7 +248,7 @@ export class HyperFormula {
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
    */
-  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): CellValueChange[] {
+  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][]): CellValueChange[] {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {

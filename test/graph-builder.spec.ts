@@ -29,9 +29,9 @@ describe('GraphBuilder', () => {
     expect(vertex.getCellValue()).toBe('foo')
   })
 
-  it('building for cell with empty string should give empty vertex', () => {
+  it('building for cell with null should give empty vertex', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=A1'],
+      [null, '=A1'],
     ])
 
     const vertex = engine.addressMapping.fetchCell(adr('A1'))
