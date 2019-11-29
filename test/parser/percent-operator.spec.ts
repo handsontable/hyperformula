@@ -52,4 +52,11 @@ describe('percent', () => {
     expect(ast.type).toBe(AstNodeType.PERCENT_OP)
     expect(ast.value.type).toBe(AstNodeType.FUNCTION_CALL)
   })
+
+  it('%% should not parse', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=100%%', CellAddress.absolute(0, 0, 0)).ast as PercentOpAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+  })
 })
