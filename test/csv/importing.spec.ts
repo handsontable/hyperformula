@@ -1,4 +1,4 @@
-import {CsvImporter} from '../../src'
+import {CsvImporter, EmptyValue} from '../../src'
 import '../testConfig.ts'
 import {adr} from '../testUtils'
 
@@ -38,5 +38,11 @@ describe('Loading CSV', () => {
 
     expect(engine.getCellValue(adr('B2'))).toBe('Another header')
     expect(engine.getCellValue(adr('A2'))).toBe('Some simple string value')
+  })
+
+  it('should treat empty fields as EmptyValue', () => {
+    const engine = new CsvImporter().importSheet("foo,,bar")
+
+    expect(engine.getCellValue(adr("B1"))).toEqual(EmptyValue)
   })
 })

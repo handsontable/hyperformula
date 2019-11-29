@@ -1,6 +1,7 @@
 import parse from 'csv-parse/lib/sync'
 import stringify from 'csv-stringify/lib/sync'
 import {CellError, CellValue, Config, EmptyValue, HyperFormula, Sheets} from './'
+import {RawCellContent} from "./CellContentParser";
 
 export type CsvSheets = Record<string, string>
 
@@ -76,7 +77,15 @@ export class CsvImporter {
     return sheets
   }
 
-  public csvSheetToSheet(csv: string): string[][] {
-    return parse(csv, { delimiter: this.csvDelimiter })
+  public csvSheetToSheet(csv: string): RawCellContent[][] {
+    const parsed = parse(csv, { delimiter: this.csvDelimiter }) as RawCellContent[][]
+    for (let i=0; i<parsed.length; ++i) {
+      for (let j=0; j<parsed[i].length; ++j) {
+        if (parsed[i][j] === '') {
+          parsed[i][j] = null
+        }
+      }
+    }
+    return parsed
   }
 }
