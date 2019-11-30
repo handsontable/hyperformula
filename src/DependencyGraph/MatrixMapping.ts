@@ -115,4 +115,8 @@ export class MatrixMapping {
     }
     return verticesToRemove
   }
+
+  public destroy(): void {
+    this.matrixMapping.clear()
+  }
 }

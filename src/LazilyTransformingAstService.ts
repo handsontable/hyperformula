@@ -167,4 +167,8 @@ export class LazilyTransformingAstService {
       }
     }
   }
+
+  public destroy() {
+    this.transformations = [];
+  }
 }

@@ -626,6 +626,18 @@ export class HyperFormula {
   }
 
   /**
+   *  Destroys instance of HyperFormula
+   * */
+  public destroy(): void {
+    this.dependencyGraph.destroy()
+    this.columnSearch.destroy()
+    this.evaluator.destroy()
+    this.parser.destroy()
+    this.lazilyTransformingAstService.destroy()
+    this.stats.destroy()
+  }
+
+  /**
    * Runs recomputation starting from recently changed vertices.
    */
   private recomputeIfDependencyGraphNeedsIt(): ContentChanges {

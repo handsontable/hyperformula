@@ -216,6 +216,11 @@ export class Interpreter {
     }
   }
 
+  public destroy() {
+    this.gpu.destroy()
+    this.pluginCache.clear()
+  }
+
   /**
    * Registers plugins with functions to use
    *

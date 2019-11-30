@@ -242,4 +242,8 @@ export class AddressMapping {
   public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
     yield* this.mapping.get(sheet)!.verticesFromRow(row)
   }
+
+  public destroy(): void {
+    this.mapping.clear()
+  }
 }

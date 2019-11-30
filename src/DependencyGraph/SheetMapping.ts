@@ -89,4 +89,9 @@ export class SheetMapping {
     this.reversedMapping.delete(sheetId)
     this.reversedMapping.set(sheetId, newName)
   }
+
+  public destroy(): void {
+    this.mapping.clear()
+    this.reversedMapping.clear()
+  }
 }

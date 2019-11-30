@@ -107,6 +107,10 @@ export class ParserWithCaching {
     return '=' + this.computeHashOfAstNode(ast)
   }
 
+  public destroy(): void {
+    this.cache.destroy()
+  }
+
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
