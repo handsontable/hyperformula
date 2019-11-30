@@ -217,8 +217,9 @@ export class Interpreter {
   }
 
   public destroy() {
-    this.gpu.destroy()
     this.pluginCache.clear()
+    this.gpu.createKernel(function() { return 0 })
+    this.gpu.destroy()
   }
 
   /**
