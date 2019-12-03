@@ -40,7 +40,8 @@ export class MatrixPlugin extends FunctionPlugin {
     const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
     /* istanbul ignore next: gpu.js */
-    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], b: number[][], width: number) {
+    const gpu = this.interpreter.getGpuInstance()
+    const kernel = gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
       for (let i = 0; i < width; ++i) {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
@@ -79,7 +80,8 @@ export class MatrixPlugin extends FunctionPlugin {
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
 
     /* istanbul ignore next: gpu.js */
-    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
+    const gpu = this.interpreter.getGpuInstance()
+    const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
       const leftCornerX = this.thread.x as number * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
@@ -122,7 +124,8 @@ export class MatrixPlugin extends FunctionPlugin {
     const outputSize = matrixSizeForPoolFunction(rangeMatrix.size, windowSize, stride)
 
     /* istanbul ignore next: gpu.js */
-    const kernel = this.interpreter.gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
+    const gpu = this.interpreter.getGpuInstance()
+    const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
       const leftCornerX = this.thread.x as number * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]

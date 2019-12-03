@@ -14,7 +14,7 @@ import {concatenate} from './text'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 export class Interpreter {
-  public readonly gpu: GPU
+  private gpu?: GPU
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
@@ -23,8 +23,6 @@ export class Interpreter {
     public readonly config: Config,
     public readonly stats: Statistics,
   ) {
-    this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
-
     this.registerPlugins(this.config.allFunctionPlugins())
   }
 
@@ -216,10 +214,18 @@ export class Interpreter {
     }
   }
 
+  public getGpuInstance(): GPU {
+    if (!this.gpu) {
+      this.gpu = new GPU({mode: this.config.gpuMode, format: "Float"})
+    }
+    return this.gpu;
+  }
+
   public destroy() {
     this.pluginCache.clear()
-    this.gpu.createKernel(function() { return 0 })
-    this.gpu.destroy()
+    if (this.gpu) {
+      this.gpu.destroy()
+    }
   }
 
   /**
