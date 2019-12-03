@@ -161,7 +161,7 @@ export class Graph<T> {
   }
 
   public clearSpecialNodesRecentlyChanged() {
-    this.specialNodesRecentlyChanged = new Set()
+    this.specialNodesRecentlyChanged.clear()
   }
 
   /**
@@ -245,6 +245,14 @@ export class Graph<T> {
       }
     })
     return result
+  }
+
+  public destroy(): void {
+    this.edges.clear()
+    this.nodes.clear()
+    this.specialNodes.clear()
+    this.specialNodesStructuralChanges.clear()
+    this.clearSpecialNodesRecentlyChanged()
   }
 
   private removeDependencies(node: T) {

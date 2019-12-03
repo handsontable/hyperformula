@@ -27,13 +27,13 @@ export class DependencyGraph {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
-      addressMapping,
-      rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
-      new SheetMapping(config.language),
-      new MatrixMapping(),
-      stats,
-      lazilyTransformingAstService,
+        addressMapping,
+        rangeMapping,
+        new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
+        new SheetMapping(config.language),
+        new MatrixMapping(),
+        stats,
+        lazilyTransformingAstService,
     )
   }
 
@@ -45,7 +45,8 @@ export class DependencyGraph {
       public readonly matrixMapping: MatrixMapping,
       public readonly stats: Statistics = new Statistics(),
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-  ) {}
+  ) {
+  }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) {
     const vertex = this.addressMapping.getCell(address)
@@ -519,6 +520,14 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
+  }
+
+  public destroy(): void {
+    this.graph.destroy()
+    this.addressMapping.destroy()
+    this.rangeMapping.destroy()
+    this.sheetMapping.destroy()
+    this.matrixMapping.destroy()
   }
 
   private addStructuralNodesToChangeSet() {

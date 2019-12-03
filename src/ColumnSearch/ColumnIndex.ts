@@ -173,6 +173,10 @@ export class ColumnIndex implements IColumnSearchStrategy {
     valueIndex.version = actualVersion
   }
 
+  public destroy() {
+    this.index.clear()
+  }
+
   private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)

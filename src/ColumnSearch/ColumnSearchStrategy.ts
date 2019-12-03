@@ -26,6 +26,8 @@ export interface IColumnSearchStrategy {
   removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void
 
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number
+
+  destroy(): void
 }
 
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): IColumnSearchStrategy {

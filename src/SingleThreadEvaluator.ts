@@ -82,6 +82,10 @@ export class SingleThreadEvaluator implements Evaluator {
     return changes
   }
 
+  public destroy() {
+    this.interpreter.destroy()
+  }
+
   /**
    * Recalculates formulas in the topological sort order
    */

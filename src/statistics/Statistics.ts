@@ -35,6 +35,7 @@ export class Statistics {
     this.countifPartialCacheUsed = 0
     this.sumifFullCacheUsed = 0
     this.stats.clear()
+    this.startTimes.clear()
   }
 
   /**
@@ -46,8 +47,7 @@ export class Statistics {
     if (this.startTimes.get(name)) {
       throw Error(`Statistics ${name} already started`)
     } else {
-      const now = Date.now()
-      this.startTimes.set(name, now)
+      this.startTimes.set(name, Date.now())
     }
   }
 
@@ -90,5 +90,9 @@ export class Statistics {
    */
   public snapshot(): Map<StatType, number> {
     return new Map(this.stats)
+  }
+
+  public destroy() {
+    this.stats.clear()
   }
 }

@@ -38,6 +38,10 @@ export class Cache {
       return ast
     }
   }
+
+  public destroy() {
+    this.cache.clear()
+  }
 }
 
 export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>): boolean => {
