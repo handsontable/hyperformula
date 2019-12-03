@@ -169,6 +169,7 @@ export class LazilyTransformingAstService {
   }
 
   public destroy() {
+    this.parser = undefined
     this.transformations = [];
   }
 }
