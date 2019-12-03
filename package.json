@@ -1,6 +1,30 @@
 {
   "name": "hyperformula",
+  "description": "HyperFormula is a JavaScript engine for efficient processing of spreadsheet-like data and formulas",
+  "homepage": "https://handsontable.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/handsontable/hyperformula.git"
+  },
+  "bugs": {
+    "url": "https://github.com/handsontable/hyperformula/issues"
+  },
+  "author": "Handsoncode <hello@handsontable.com>",
   "version": "0.0.1",
+  "keywords": [
+    "formula",
+    "spreadsheet",
+    "calculation",
+    "data",
+    "compute",
+    "tabular-data",
+    "operation",
+    "conversion",
+    "arithmetic",
+    "concatenation",
+    "comparison",
+    "logical"
+  ],
   "module": "lib/src/index.js",
   "private": true,
   "devDependencies": {
