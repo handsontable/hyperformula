@@ -31,7 +31,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse simple addreess from other sheet',  () => {
-    const formula = '=$Sheet1.A1'
+    const formula = '=$Sheet1!A1'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
 
@@ -87,7 +87,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse cell range from other sheet',  () => {
-    const formula = '=$Sheet1.$A$1:B$2'
+    const formula = '=$Sheet1!$A$1:B$2'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
 
@@ -166,7 +166,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse forgets about unnecessary sheet reference', () => {
-    const formula = '=$Sheet1.C3'
+    const formula = '=$Sheet1!C3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))

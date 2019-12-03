@@ -119,7 +119,7 @@ describe('remove sheet - adjust edges', () => {
   it('should remove edge between sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A1'],
+        ['=$Sheet2!A1'],
       ],
       Sheet2: [
         ['1'],
@@ -158,7 +158,7 @@ describe('remove sheet - adjust formula dependencies', () => {
   it('should be #REF after removing sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A1'],
+        ['=$Sheet2!A1'],
       ],
       Sheet2: [
         ['1'],
@@ -168,13 +168,13 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet('Sheet2')
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=$Sheet2.A1']]))
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=$Sheet2!A1']]))
   })
 
   it('should return changed values', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A1'],
+        ['=$Sheet2!A1'],
       ],
       Sheet2: [
         ['1'],

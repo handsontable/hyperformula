@@ -111,7 +111,7 @@ describe('Adding row - fixing dependencies', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
-          ['=$Sheet2.A$1'],
+          ['=$Sheet2!A$1'],
         ],
         Sheet2: [
           ['1'],
@@ -128,7 +128,7 @@ describe('Adding row - fixing dependencies', () => {
         Sheet1: [
           // new row
           [null],
-          ['=$Sheet2.A1'],
+          ['=$Sheet2!A1'],
         ],
         Sheet2: [
           ['1'],
@@ -144,7 +144,7 @@ describe('Adding row - fixing dependencies', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
-          ['=$Sheet2.A2'],
+          ['=$Sheet2!A2'],
         ],
         Sheet2: [
           [null],
@@ -160,7 +160,7 @@ describe('Adding row - fixing dependencies', () => {
     it('r < R', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A1'],
+          ['=$Sheet2!A1'],
           // new row
         ],
         Sheet2: [
@@ -183,7 +183,7 @@ describe('Adding row - fixing dependencies', () => {
           ['2'],
         ],
         Sheet2: [
-          ['=$Sheet1.A2'],
+          ['=$Sheet1!A2'],
         ],
       })
 
@@ -199,7 +199,7 @@ describe('Adding row - fixing dependencies', () => {
           ['1'],
         ],
         Sheet2: [
-          ['=$Sheet1.A1'],
+          ['=$Sheet1!A1'],
         ],
       })
 
@@ -215,7 +215,7 @@ describe('Adding row - fixing dependencies', () => {
           // new row
         ],
         Sheet2: [
-          ['=$Sheet1.A1'],
+          ['=$Sheet1!A1'],
         ],
       })
 
@@ -249,7 +249,7 @@ describe('Adding row - fixing dependencies', () => {
     it('works', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A2'],
+          ['=$Sheet2!A2'],
           ['13'],
         ],
         Sheet2: [

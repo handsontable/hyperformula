@@ -131,7 +131,7 @@ describe('Interpreter', () => {
         ['2', '3'],
       ],
       Sheet2: [
-        ['=SUM($Sheet1.A1:$Sheet1.B2)'],
+        ['=SUM($Sheet1!A1:$Sheet1!B2)'],
       ],
     })
     expect(engine.getCellValue(adr('A1', 1))).toEqual(6)
@@ -144,7 +144,7 @@ describe('Interpreter', () => {
         ['2', '3'],
       ],
       Sheet2: [
-        ['=SUM($Sheet1.A1:$Sheet2.A2)'],
+        ['=SUM($Sheet1!A1:$Sheet2!A2)'],
         [''],
       ],
     })

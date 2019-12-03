@@ -280,7 +280,7 @@ describe('ParserWithCaching', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
-    const ast = parser.parse('=$Sheet2.D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    const ast = parser.parse('=$Sheet2!D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
     expect(ast.reference.col).toBe(3)

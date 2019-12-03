@@ -92,7 +92,7 @@ describe('Adding column, fixing dependency', () => {
     it('absolute case', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          [ /* new col */ '=$Sheet2.$A1'],
+          [ /* new col */ '=$Sheet2!$A1'],
         ],
         Sheet2: [
           ['1'],
@@ -107,7 +107,7 @@ describe('Adding column, fixing dependency', () => {
     it('R < r', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          [/* new col */ null, '=$Sheet2.A1'],
+          [/* new col */ null, '=$Sheet2!A1'],
         ],
         Sheet2: [
           ['1'],
@@ -122,7 +122,7 @@ describe('Adding column, fixing dependency', () => {
     it('r = R', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          [/* new col */ '=$Sheet2.B1'],
+          [/* new col */ '=$Sheet2!B1'],
         ],
         Sheet2: [
           [null, '1'],
@@ -137,7 +137,7 @@ describe('Adding column, fixing dependency', () => {
     it('r < R', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.A1' /* new col */ ],
+          ['=$Sheet2!A1' /* new col */ ],
         ],
         Sheet2: [
           ['1'],
@@ -157,7 +157,7 @@ describe('Adding column, fixing dependency', () => {
           [/* new col */ '1', '2'],
         ],
         Sheet2: [
-          ['=$Sheet1.B1'],
+          ['=$Sheet1!B1'],
         ],
       })
 
@@ -172,7 +172,7 @@ describe('Adding column, fixing dependency', () => {
           [/* new col */ '1'],
         ],
         Sheet2: [
-          ['=$Sheet1.A1'],
+          ['=$Sheet1!A1'],
         ],
       })
 
@@ -187,7 +187,7 @@ describe('Adding column, fixing dependency', () => {
           ['1' /* new col */ ],
         ],
         Sheet2: [
-          ['=$Sheet1.A1'],
+          ['=$Sheet1!A1'],
         ],
       })
 
@@ -218,7 +218,7 @@ describe('Adding column, fixing dependency', () => {
     it('works', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['=$Sheet2.B1', '13'],
+          ['=$Sheet2!B1', '13'],
         ],
         Sheet2: [
           [null, '78'],

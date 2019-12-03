@@ -91,7 +91,7 @@ describe('computeHashFromTokens', () => {
   })
 
   it('support sheets', () => {
-    const code = '=$Sheet2.A5'
+    const code = '=$Sheet2!A5'
 
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#1#3R-1')
   })
