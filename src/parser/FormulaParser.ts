@@ -1,4 +1,4 @@
-import {EmbeddedActionsParser, ILexingResult, IOrAlt, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
+import {EmbeddedActionsParser, ILexingResult, IOrAlt, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {
