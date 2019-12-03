@@ -124,6 +124,19 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(formula)
   })
 
+  it('nested parenthesis',  () => {
+    const formula = '=-(-(3+4))'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+
+    const hash = parser.computeHashFromAst(ast)
+    expect(hash).toEqual(hashFromTokens)
+    expect(hash).toEqual(formula)
+  })
+
+
   it('cell ref between strings', () => {
     const formula = '="A5"+A4+"A6"'
     const address = adr('A1')

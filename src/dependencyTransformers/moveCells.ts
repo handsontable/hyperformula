@@ -106,7 +106,10 @@ export namespace MoveCellsDependencyTransformer {
         }
       }
       case AstNodeType.PARENTHESIS: {
-        return transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet)
+        return {
+          type: ast.type,
+          expression: transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet)
+        }
       }
       default: {
         return {
