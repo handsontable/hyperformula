@@ -69,9 +69,10 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
 
   let col = columnLabelToIndex(result[6])
 
+  const maybeSheetName = result[2] || result[4]
   let sheet
-  if (result[2] || result[4]) {
-    sheet = sheetMapping(result[2] || result[4])
+  if (maybeSheetName) {
+    sheet = sheetMapping(maybeSheetName)
   } else {
     sheet = sheetContext
   }
