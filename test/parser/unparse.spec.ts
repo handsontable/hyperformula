@@ -12,6 +12,7 @@ describe('Unparse', () => {
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
+  sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.name)
 
@@ -278,5 +279,21 @@ describe('Unparse', () => {
 
     expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1,2)')
     expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1,2)')
+  })
+
+  it('unparsing sheet names in references sometimes have to wrap in quotes', () => {
+    const formula = "='Sheet with spaces'!A1"
+    const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('unparsing sheet names in ragnes sometimes have to wrap in quotes', () => {
+    const formula = "='Sheet with spaces'!A1:B1"
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 0))
+
+    expect(unparsed).toEqual(formula)
   })
 })

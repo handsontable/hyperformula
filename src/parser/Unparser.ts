@@ -37,16 +37,14 @@ export class Unparser {
         if (ast.reference.sheet === address.sheet) {
           return cellAddressToString(ast.reference, address)
         } else {
-          const sheet = this.sheetMappingFn(ast.reference.sheet)
-          return sheet + '!' + cellAddressToString(ast.reference, address)
+          return this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (ast.start.sheet === address.sheet) {
           return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
-          const sheet = this.sheetMappingFn(ast.start.sheet)
-          return sheet + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -72,6 +70,15 @@ export class Unparser {
         let right = this.unparseAst(ast.right, address)
         return left + binaryOpTokenMap[ast.type] + right
       }
+    }
+  }
+
+  private unparseSheetName(sheetId: number): string {
+    const sheet = this.sheetMappingFn(sheetId)
+    if (sheet.match(/ /)) {
+      return `'${sheet}'`
+    } else {
+      return sheet
     }
   }
 }
