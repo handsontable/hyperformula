@@ -322,4 +322,14 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toBeUndefined()
   })
+
+  // incompatibility with product 1
+  it('using unknown sheet gives REF', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=$Sheet2!A1', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error).toEqual(new CellError(ErrorType.REF))
+  })
 })
