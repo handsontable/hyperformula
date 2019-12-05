@@ -180,13 +180,6 @@ describe('ParserWithCaching', () => {
     expect(float.value).toBe(3.14)
   })
 
-  it('simple cell range', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=A1:B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
-    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-  })
-
   it('parsing error - unexpected token', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
@@ -264,7 +257,6 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toBeUndefined()
   })
-
 })
 
 describe('cell references and ranges', () => {
@@ -345,5 +337,87 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=Sheet_zażółć_gęślą_jaźń!A1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
+  })
+
+  xit('sheet name is case insensitive', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=shEEt2!A1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
+
+  xit('sheet name inside quotes', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet with spaces')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse("='Sheet with spaces'!A1", CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
+
+  it('simple cell range', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=A1:B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+  })
+
+  it('cell range with both start and end sheets specified', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:Sheet2!B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.start.sheet).toEqual(1)
+    expect(ast.end.sheet).toEqual(1)
+  })
+
+  it('cell range may have only sheet specified in start address', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.start.sheet).toEqual(1)
+    expect(ast.end.sheet).toEqual(1)
+  })
+
+  it('cell range with different start and end sheets', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    sheetMapping.addSheet('Sheet3')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', CellAddress.absolute(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.start.sheet).toEqual(1)
+    expect(ast.end.sheet).toEqual(2)
+  })
+
+  // weird error
+  it('cell range with unexisting end sheet', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
   })
 })
