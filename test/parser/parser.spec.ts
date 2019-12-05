@@ -332,4 +332,15 @@ describe('ParserWithCaching', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
+
+  it('sheet name with other characters', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet_zażółć_gęślą_jaźń')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=$Sheet_zażółć_gęślą_jaźń!A1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
 })

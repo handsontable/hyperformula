@@ -57,22 +57,22 @@ export const AbsoluteCell = createToken({
 })
 export const SheetRelativeCell = createToken({
   name: 'SheetRelativeCell',
-  pattern: /\$[A-Za-z0-9]+![A-Za-z]+[0-9]+/,
+  pattern: /\$[A-Za-z0-9_\u00C0-\u02AF]+![A-Za-z]+[0-9]+/,
   categories: CellReference
 })
 export const SheetAbsoluteColCell = createToken({
   name: 'SheetAbsoluteColCell',
-  pattern: /\$[A-Za-z0-9]+!\$[A-Za-z]+[0-9]+/,
+  pattern: /\$[A-Za-z0-9_\u00C0-\u02AF]+!\$[A-Za-z]+[0-9]+/,
   categories: CellReference
 })
 export const SheetAbsoluteRowCell = createToken({
   name: 'SheetAbsoluteRowCell',
-  pattern: /\$[A-Za-z0-9]+![A-Za-z]+\$[0-9]+/,
+  pattern: /\$[A-Za-z0-9_\u00C0-\u02AF]+![A-Za-z]+\$[0-9]+/,
   categories: CellReference
 })
 export const SheetAbsoluteCell = createToken({
   name: 'SheetAbsoluteCell',
-  pattern: /\$[A-Za-z0-9]+!\$[A-Za-z]+\$[0-9]+/,
+  pattern: /\$[A-Za-z0-9_\u00C0-\u02AF]+!\$[A-Za-z]+\$[0-9]+/,
   categories: CellReference
 })
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
