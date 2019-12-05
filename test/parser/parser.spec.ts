@@ -83,42 +83,6 @@ describe('ParserWithCaching', () => {
     expect(ast.right.type).toBe(AstNodeType.POWER_OP)
   })
 
-  it('absolute cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=$B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
-
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absolute(0, 1, 2))
-  })
-
-  it('relative cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
-
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(0, 0, 1))
-  })
-
-  it('absolute column cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=$B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
-
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteCol(0, 1, 1))
-  })
-
-  it('absolute row cell reference', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
-
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.absoluteRow(0, 0, 2))
-  })
-
   it('SUM function without args', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=SUM()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
@@ -265,28 +229,6 @@ describe('ParserWithCaching', () => {
     expect(ast.procedureName).toBe('SUM')
   })
 
-  it('cell references should not be case sensitive', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=d1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
-  })
-
-  it('cell reference with sheet name', () => {
-    const sheetMapping = new SheetMapping(enGB)
-    sheetMapping.addSheet('Sheet1')
-    sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
-
-    const ast = parser.parse('=Sheet2!D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
-    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference.sheet).toBe(1)
-    expect(ast.reference.col).toBe(3)
-    expect(ast.reference.row).toBe(0)
-  })
-
   it('allow to accept different lexer configs', () => {
     const parser1 = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const parser2 = new ParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(enGB).get)
@@ -321,6 +263,67 @@ describe('ParserWithCaching', () => {
     const ast = parser.parse('=#FOO!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toBeUndefined()
+  })
+
+})
+
+describe('cell references and ranges', () => {
+  it('absolute cell reference', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=$B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(CellAddress.absolute(0, 1, 2))
+  })
+
+  it('relative cell reference', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(CellAddress.relative(0, 0, 1))
+  })
+
+  it('absolute column cell reference', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=$B3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(CellAddress.absoluteCol(0, 1, 1))
+  })
+
+  it('absolute row cell reference', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=B$3', CellAddress.absolute(0, 1, 1)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(CellAddress.absoluteRow(0, 0, 2))
+  })
+
+  it('cell references should not be case sensitive', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast = parser.parse('=d1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.col).toBe(3)
+    expect(ast.reference.row).toBe(0)
+  })
+
+  it('cell reference with sheet name', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+    expect(ast.reference.col).toBe(3)
+    expect(ast.reference.row).toBe(0)
   })
 
   // incompatibility with product 1
