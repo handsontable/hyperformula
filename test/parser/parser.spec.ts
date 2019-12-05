@@ -364,13 +364,24 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
-  xit('sheet name inside quotes', () => {
+  xit('sheet name with spaces', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet with spaces')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
     const ast = parser.parse("='Sheet with spaces'!A1", CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
+
+  it('sheet name inside quotes', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse("='Sheet2'!A1", CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
   })

@@ -39,7 +39,7 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
-export const sheetNameRegexp = "[A-Za-z0-9_\u00C0-\u02AF]+!"
+export const sheetNameRegexp = "([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9_\u00C0-\u02AF]+')!"
 export const RelativeCell = createToken({
   name: 'RelativeCell',
   pattern: /[A-Za-z]+[0-9]+/,
