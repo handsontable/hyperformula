@@ -364,7 +364,7 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
-  xit('sheet name with spaces', () => {
+  it('sheet name with spaces', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet with spaces')
