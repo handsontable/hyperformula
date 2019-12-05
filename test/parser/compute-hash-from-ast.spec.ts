@@ -46,7 +46,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('simple addreess',  () => {
-    const formula = '=$Sheet1!A1'
+    const formula = '=Sheet1!A1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -57,7 +57,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('absolute col',  () => {
-    const formula = '=$Sheet1!$A1'
+    const formula = '=Sheet1!$A1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -68,7 +68,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('absolute row addreess',  () => {
-    const formula = '=$Sheet1!A$1'
+    const formula = '=Sheet1!A$1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -79,7 +79,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('absolute address',  () => {
-    const formula = '=$Sheet1!$A$1'
+    const formula = '=Sheet1!$A$1'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)
@@ -90,7 +90,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('cell range',  () => {
-    const formula = '=$Sheet1!$A$1:B$2'
+    const formula = '=Sheet1!$A$1:B$2'
     const address = adr('D6')
     const ast = parser.parse(formula, address).ast
     const lexerResult = lexer.tokenizeFormula(formula)

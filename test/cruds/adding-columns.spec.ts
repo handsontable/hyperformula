@@ -208,8 +208,8 @@ describe('Adding column', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
       ],
     })
 
@@ -259,7 +259,7 @@ describe('different sheet', () => {
         ['1'],
       ],
       Sheet2: [
-        ['=$Sheet1!A1'],
+        ['=Sheet1!A1'],
       ],
     })
 

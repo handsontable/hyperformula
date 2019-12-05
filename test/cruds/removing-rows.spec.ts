@@ -219,7 +219,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
-        ['=$Sheet2!A$1'],
+        ['=Sheet2!A$1'],
       ],
       Sheet2: [
         ['2'],
@@ -235,7 +235,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
-        ['=$Sheet2!A1'],
+        ['=Sheet2!A1'],
       ],
       Sheet2: [
         ['2'],
@@ -250,7 +250,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   it('case Rb: removing row below formula should not affect dependency', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2!A1'],
+        ['=Sheet2!A1'],
         ['1'], // row to delete
       ],
       Sheet2: [
@@ -268,10 +268,10 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2!A3'],
-        ['=$Sheet2!A3'],
-        ['=$Sheet2!A3'],
-        ['=$Sheet2!A$3'],
+        ['=Sheet2!A3'],
+        ['=Sheet2!A3'],
+        ['=Sheet2!A3'],
+        ['=Sheet2!A$3'],
       ],
       Sheet2: [
         ['1'],
@@ -291,8 +291,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2!A1'],
-        ['=$Sheet2!A$1'],
+        ['=Sheet2!A1'],
+        ['=Sheet2!A$1'],
       ],
       Sheet2: [
         ['0'],
@@ -309,8 +309,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2!A$1'],
-        ['=$Sheet2!A1'],
+        ['=Sheet2!A$1'],
+        ['=Sheet2!A1'],
       ],
       Sheet2: [
         ['1'], // row to delete
@@ -369,7 +369,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
       ],
       Sheet3: [
         ['1'],
-        ['=$Sheet2!A1'],
+        ['=Sheet2!A1'],
       ],
     })
 
@@ -680,8 +680,8 @@ describe('Removing rows - matrices', () => {
         ['3', '6'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1!A1:B3)}', '{=TRANSPOSE($Sheet1!A1:B3)}'],
-        ['{=TRANSPOSE($Sheet1!A1:B3)}', '{=TRANSPOSE($Sheet1!A1:B3)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B3)}', '{=TRANSPOSE(Sheet1!A1:B3)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B3)}', '{=TRANSPOSE(Sheet1!A1:B3)}'],
       ],
     })
 

@@ -38,7 +38,7 @@ export class Unparser {
           return cellAddressToString(ast.reference, address)
         } else {
           const sheet = this.sheetMappingFn(ast.reference.sheet)
-          return '$' + sheet + '!' + cellAddressToString(ast.reference, address)
+          return sheet + '!' + cellAddressToString(ast.reference, address)
         }
       }
       case AstNodeType.CELL_RANGE: {
@@ -46,7 +46,7 @@ export class Unparser {
           return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
           const sheet = this.sheetMappingFn(ast.start.sheet)
-          return '$' + sheet + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          return sheet + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {

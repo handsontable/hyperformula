@@ -190,8 +190,8 @@ describe('Adding row - MatrixVertex', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
       ],
     })
 
@@ -236,7 +236,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
         ['1'],
       ],
       Sheet2: [
-        ['=$Sheet1!A1'],
+        ['=Sheet1!A1'],
       ],
     })
 

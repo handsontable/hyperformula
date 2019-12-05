@@ -280,7 +280,7 @@ describe('ParserWithCaching', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
-    const ast = parser.parse('=$Sheet2!D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    const ast = parser.parse('=Sheet2!D1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
     expect(ast.reference.col).toBe(3)
@@ -327,7 +327,7 @@ describe('ParserWithCaching', () => {
   it('using unknown sheet gives REF', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
-    const ast = parser.parse('=$Sheet2!A1', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    const ast = parser.parse('=Sheet2!A1', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
 
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
@@ -339,7 +339,7 @@ describe('ParserWithCaching', () => {
     sheetMapping.addSheet('Sheet_zażółć_gęślą_jaźń')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
-    const ast = parser.parse('=$Sheet_zażółć_gęślą_jaźń!A1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    const ast = parser.parse('=Sheet_zażółć_gęślą_jaźń!A1', CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference.sheet).toBe(1)
   })

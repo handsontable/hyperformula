@@ -4,7 +4,7 @@ import {CellAddress, CellReferenceType} from './CellAddress'
 export type SheetMappingFn = (sheetName: string) => number | undefined
 export type SheetIndexMappingFn = (sheetIndex: number) => string | undefined
 
-const addressRegex = /^(\$([A-Za-z0-9_\u00C0-\u02AF]+)!)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/
+const addressRegex = /^(([A-Za-z0-9_\u00C0-\u02AF]+)!)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -101,7 +101,7 @@ export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn
   }
 
   if (sheetIndex !== address.sheet) {
-    return `\$${sheetName}!${column}${address.row + 1}`
+    return `${sheetName}!${column}${address.row + 1}`
   } else {
     return `${column}${address.row + 1}`
   }

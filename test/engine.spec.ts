@@ -91,7 +91,7 @@ describe('Integration', () => {
   })
 
   it('should be possible to build graph with reference to not existing sheet', () => {
-    const engine = HyperFormula.buildFromArray([['=$Sheet2!A2']])
+    const engine = HyperFormula.buildFromArray([['=Sheet2!A2']])
 
     expect_reference_to_have_ref_error(engine, adr('A1'))
   })

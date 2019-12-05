@@ -232,7 +232,7 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
         ['1', '5'],
         ['2', '7'],
         ['=SUMIF(A1:A3, "=1", B1:B3)'],
-        ['=SUMIF($Sheet2!A1:A3, "=1", B1:B3)'],
+        ['=SUMIF(Sheet2!A1:A3, "=1", B1:B3)'],
       ],
       Sheet2: [
         ['0', '30'],

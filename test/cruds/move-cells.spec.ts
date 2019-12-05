@@ -766,8 +766,8 @@ describe('overlapping areas', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE($Sheet1!A1:B2)}', '{=TRANSPOSE($Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
       ],
     })
 
