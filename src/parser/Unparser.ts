@@ -4,7 +4,7 @@ import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {ParserConfig} from './ParserConfig'
 import {cellAddressToString} from "./addressRepresentationConverters";
-import {ILexerConfig} from './LexerConfig'
+import {ILexerConfig, additionalCharactersAllowedInQuotes} from './LexerConfig'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -75,7 +75,7 @@ export class Unparser {
 
   private unparseSheetName(sheetId: number): string {
     const sheet = this.sheetMappingFn(sheetId)
-    if (sheet.match(/ /)) {
+    if (sheet.match(new RegExp(additionalCharactersAllowedInQuotes))) {
       return `'${sheet}'`
     } else {
       return sheet
