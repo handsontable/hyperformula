@@ -386,6 +386,17 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
+  xit('escaping support', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet("Some'sheet")
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse("='Some''sheet'!A1", CellAddress.absolute(0, 0, 0)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+  })
+
   it('simple cell range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
