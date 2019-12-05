@@ -20,9 +20,10 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   let col = columnLabelToIndex(result[6])
 
+  const maybeSheetName = result[3] || result[4]
   let sheet
-  if (result[3] || result[4]) {
-    sheet = sheetMapping(result[3] || result[4])
+  if (maybeSheetName) {
+    sheet = sheetMapping(maybeSheetName)
   } else if (overrideSheet !== undefined) {
     sheet = overrideSheet
   } else {
