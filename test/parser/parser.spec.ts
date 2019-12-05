@@ -305,6 +305,20 @@ describe('cell references and ranges', () => {
     expect(ast.reference.row).toBe(0)
   })
 
+  it('cell reference by default has sheet from the sheet it is written', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=D1', CellAddress.absolute(1, 0, 0)).ast as CellReferenceAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference.sheet).toBe(1)
+    expect(ast.reference.col).toBe(3)
+    expect(ast.reference.row).toBe(0)
+  })
+
   it('cell reference with sheet name', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
