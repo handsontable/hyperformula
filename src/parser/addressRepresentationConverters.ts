@@ -57,14 +57,14 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
 /**
  * Computes simple (absolute) address of a cell address based on it's string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
- * If sheet name is not present in string representation, returns {@param overrideSheet} as sheet number
+ * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
  *
  * @param sheetMapping - mapping function needed to change name of a sheet to index
  * @param stringAddress - string representation of cell address, e.g. 'C64'
- * @param overrideSheet - override sheet index regardless of sheet mapping
+ * @param sheetContext - sheet in context of which we should parse the address
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, overrideSheet: number): SimpleCellAddress | undefined => {
+export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): SimpleCellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
   let col = columnLabelToIndex(result[6])
@@ -73,7 +73,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
   if (result[2] || result[4]) {
     sheet = sheetMapping(result[2] || result[4])
   } else {
-    sheet = overrideSheet
+    sheet = sheetContext
   }
 
   if (sheet === undefined) {
