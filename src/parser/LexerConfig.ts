@@ -40,6 +40,7 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
 export const RelativeCell = createToken({name: 'RelativeCell', pattern: /[A-Za-z]+[0-9]+/, categories: CellReference})
+export const sheetNameRegexp = "[A-Za-z0-9_\u00C0-\u02AF]+!"
 export const AbsoluteColCell = createToken({
   name: 'AbsoluteColCell',
   pattern: /\$[A-Za-z]+[0-9]+/,
@@ -57,22 +58,22 @@ export const AbsoluteCell = createToken({
 })
 export const SheetRelativeCell = createToken({
   name: 'SheetRelativeCell',
-  pattern: /[A-Za-z0-9_\u00C0-\u02AF]+![A-Za-z]+[0-9]+/,
+  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+[0-9]+`),
   categories: CellReference
 })
 export const SheetAbsoluteColCell = createToken({
   name: 'SheetAbsoluteColCell',
-  pattern: /[A-Za-z0-9_\u00C0-\u02AF]+!\$[A-Za-z]+[0-9]+/,
+  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+[0-9]+`),
   categories: CellReference
 })
 export const SheetAbsoluteRowCell = createToken({
   name: 'SheetAbsoluteRowCell',
-  pattern: /[A-Za-z0-9_\u00C0-\u02AF]+![A-Za-z]+\$[0-9]+/,
+  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+\\$[0-9]+`),
   categories: CellReference
 })
 export const SheetAbsoluteCell = createToken({
   name: 'SheetAbsoluteCell',
-  pattern: /[A-Za-z0-9_\u00C0-\u02AF]+!\$[A-Za-z]+\$[0-9]+/,
+  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+\\$[0-9]+`),
   categories: CellReference
 })
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
