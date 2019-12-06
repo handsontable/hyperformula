@@ -23,7 +23,7 @@ import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {ContentChanges} from "./ContentChanges";
+import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
@@ -118,7 +118,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeSheet(sheetName: string): void {
-    this.ensureItIsPossibleToRemoveSheet(sheetName)
+    this.ensureSheetExists(sheetName)
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -134,7 +134,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public clearSheet(sheetName: string): void {
-    this.ensureItIsPossibleToClearSheet(sheetName)
+    this.ensureSheetExists(sheetName)
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -310,14 +310,6 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToRemoveSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
-  }
-
-  public ensureItIsPossibleToClearSheet(sheetName: string): void {
-    this.ensureSheetExists(sheetName)
-  }
-
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
@@ -337,7 +329,7 @@ export class CrudOperations implements IBatchExecutor {
     return changes
   }
 
-  private ensureSheetExists(sheetName: string) {
+  public ensureSheetExists(sheetName: string) {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }
