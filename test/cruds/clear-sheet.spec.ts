@@ -94,4 +94,20 @@ describe('Clear sheet content', () => {
 
     expect(changes.length).toEqual(2)
   })
+
+  it('should clear sheet and dont break edge between cells', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['1'],
+      ],
+      'Sheet2': [
+        ['=Sheet1!A1'],
+      ]
+    })
+
+    engine.clearSheet('Sheet1')
+    engine.setCellContent(adr('A1'), '2')
+
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
+  })
 })
