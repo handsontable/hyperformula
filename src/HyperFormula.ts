@@ -499,7 +499,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to clear sheet
+   * Returns information whether its possible to replace sheet content
    *
    * If returns true, doing this operation won't throw any errors
    *
