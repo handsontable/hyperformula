@@ -23,7 +23,16 @@
     "arithmetic",
     "concatenation",
     "comparison",
-    "logical"
+    "logical",
+    "formulas",
+    "parser",
+    "excel",
+    "office",
+    "workbook",
+    "worksheet",
+    "sheet",
+    "open formula",
+    "openformula"
   ],
   "module": "lib/src/index.js",
   "private": true,
