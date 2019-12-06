@@ -134,7 +134,13 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public clearSheet(sheetName: string): void {
+    /* TODO ensure it is possible to clear sheet */
+    const sheetId = this.sheetMapping.fetch(sheetName)
 
+    this.dependencyGraph.removeSheet(sheetId)
+    this.addressMapping.autoAddSheet(sheetId, [])
+
+    this.columnSearch.removeSheet(sheetId)
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
