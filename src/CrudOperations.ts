@@ -133,6 +133,10 @@ export class CrudOperations implements IBatchExecutor {
     this.columnSearch.removeSheet(sheetId)
   }
 
+  public clearSheet(sheetName: string): void {
+
+  }
+
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
     const contentParser = new CellContentParser()
@@ -304,6 +308,8 @@ export class CrudOperations implements IBatchExecutor {
       throw new NoSheetWithNameError(sheetName)
     }
   }
+
+
 
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {

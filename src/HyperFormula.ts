@@ -473,6 +473,16 @@ export class HyperFormula {
   }
 
   /**
+   * Clears sheet content
+   *
+   * @param name - sheet name
+   * */
+  public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.clearSheet(name)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
    * Forces engine to recompute postponed transformations. Useful during testing.
    */
   public forceApplyPostponedTransformations(): void {
