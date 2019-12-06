@@ -48,4 +48,12 @@ describe('Matrix size check tests', () => {
     const size = checkMatrixSize(ast, adr('A1'))
     expect(size).toEqual(new MatrixSize(3, 3))
   })
+
+  it('check transpose with cell reference', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const ast = parser.parse('=transpose(A2)', CellAddress.absolute(0, 0, 0)).ast
+
+    const size = checkMatrixSize(ast, adr('A1'))
+    expect(size).toEqual(new MatrixSize(1, 1))
+  })
 })

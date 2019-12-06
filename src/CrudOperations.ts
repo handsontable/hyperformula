@@ -138,8 +138,7 @@ export class CrudOperations implements IBatchExecutor {
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
-    this.dependencyGraph.removeSheet(sheetId)
-    this.addressMapping.autoAddSheet(sheetId, [])
+    this.dependencyGraph.clearSheet(sheetId)
 
     this.columnSearch.removeSheet(sheetId)
   }

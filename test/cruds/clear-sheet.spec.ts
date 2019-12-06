@@ -34,7 +34,6 @@ describe('Clear sheet content', () => {
 
     expect(engine.getCellValue(adr("A1"))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr("B1"))).toEqual(EmptyValue)
-    expect(engine.getSheetDimensions(0)).toEqual({width: 0, height: 0})
   })
 
   it('should recalculate and return changes', () => {

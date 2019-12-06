@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {simpleCellAddress, SimpleCellAddress, CellError} from './Cell'
+import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
 import {Ast, AstNodeType} from './parser'
 
 export class MatrixSize {
@@ -95,7 +95,7 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
   } else if (ast.type === AstNodeType.CELL_RANGE) {
     const range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
     return { width: range.width(), height: range.height() }
-  } else if (ast.type === AstNodeType.NUMBER) {
+  } else if (ast.type === AstNodeType.NUMBER || ast.type === AstNodeType.CELL_REFERENCE) {
     return { width: 1, height: 1 }
   } else {
     return false

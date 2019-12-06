@@ -50,7 +50,7 @@ export interface IAddressMappingStrategy {
 
   removeColumns(removedColumns: ColumnsSpan): void,
 
-  getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
+  getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]>,
 
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
 

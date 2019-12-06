@@ -137,7 +137,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
-  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (const [colNumber, col] of this.mapping) {
       for (const [rowNumber, value] of col) {
         yield [simpleCellAddress(sheet, colNumber, rowNumber), value]
