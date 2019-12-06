@@ -463,6 +463,23 @@ export class HyperFormula {
   }
 
   /**
+   * Returns information whether its possible to clear sheet
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param name - sheet name
+   */
+  public isItPossibleToClearSheet(name: string): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToClearSheet(name)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+
+  /**
    * Removes sheet with given name
    *
    * @param name - sheet name

@@ -134,7 +134,8 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public clearSheet(sheetName: string): void {
-    /* TODO ensure it is possible to clear sheet */
+    this.ensureItIsPossibleToClearSheet(sheetName)
+
     const sheetId = this.sheetMapping.fetch(sheetName)
 
     this.dependencyGraph.removeSheet(sheetId)
@@ -310,12 +311,12 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public ensureItIsPossibleToRemoveSheet(sheetName: string): void {
-    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
-      throw new NoSheetWithNameError(sheetName)
-    }
+    this.ensureSheetExists(sheetName)
   }
 
-
+  public ensureItIsPossibleToClearSheet(sheetName: string): void {
+    this.ensureSheetExists(sheetName)
+  }
 
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
@@ -334,6 +335,12 @@ export class CrudOperations implements IBatchExecutor {
     const changes = this.changes
     this.changes = ContentChanges.empty()
     return changes
+  }
+
+  private ensureSheetExists(sheetName: string) {
+    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
+      throw new NoSheetWithNameError(sheetName)
+    }
   }
 
   /**

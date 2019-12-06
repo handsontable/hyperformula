@@ -1,7 +1,30 @@
 import {Config, EmptyValue, HyperFormula} from "../../src";
 import {adr} from "../testUtils";
+import {NoSheetWithNameError} from "../../src/HyperFormula";
+
+describe('Clear sheet - checking if its possible', () => {
+  it('no if theres no such sheet', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToClearSheet('foo')).toEqual(false)
+  })
+
+  it('yes otherwise', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToClearSheet('Sheet1')).toEqual(true)
+  })
+})
 
 describe('Clear sheet content', () => {
+  it('should throw error when trying to clear not existing sheet', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(() => {
+      engine.clearSheet('foo')
+    }).toThrow(new NoSheetWithNameError('foo'))
+  })
+
   it('should clear sheet content', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', 'foo']
