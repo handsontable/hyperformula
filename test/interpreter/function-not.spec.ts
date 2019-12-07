@@ -13,6 +13,15 @@ describe("Function NOT", () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
   })
 
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NOT(TRUE())', '=NOT(FALSE())'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+  })
+
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NOT("FALSE")'],
