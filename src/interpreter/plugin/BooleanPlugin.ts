@@ -24,6 +24,9 @@ export class BooleanPlugin extends FunctionPlugin {
     or: {
       translationKey: 'OR',
     },
+    not: {
+      translationKey: 'NOT',
+    },
   }
 
   /**
@@ -135,5 +138,23 @@ export class BooleanPlugin extends FunctionPlugin {
       }
     }
     return result
+  }
+
+  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const argValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (argValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      const coercedValue = coerceScalarToBoolean(argValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      } else {
+        return !coercedValue
+      }
+    }
   }
 }
