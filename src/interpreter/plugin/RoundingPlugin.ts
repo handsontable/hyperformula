@@ -15,6 +15,9 @@ export class RoundingPlugin extends FunctionPlugin {
     round: {
       translationKey: 'ROUND',
     },
+    trunc: {
+      translationKey: 'TRUNC',
+    },
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -123,5 +126,9 @@ export class RoundingPlugin extends FunctionPlugin {
         }
       }
     }
+  }
+
+  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.rounddown(ast, formulaAddress)
   }
 }
