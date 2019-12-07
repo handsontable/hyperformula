@@ -18,6 +18,9 @@ export class RoundingPlugin extends FunctionPlugin {
     trunc: {
       translationKey: 'TRUNC',
     },
+    int_func: {
+      translationKey: 'INT',
+    },
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -130,5 +133,27 @@ export class RoundingPlugin extends FunctionPlugin {
 
   public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.rounddown(ast, formulaAddress)
+  }
+
+  public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    } else {
+      const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
+      if (numberToRound instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const coercedNumberToRound = coerceScalarToNumber(numberToRound)
+      if (coercedNumberToRound instanceof CellError) {
+        return coercedNumberToRound
+      } else {
+        if (coercedNumberToRound < 0) {
+          return -Math.floor(-coercedNumberToRound)
+        } else {
+          return Math.floor(coercedNumberToRound)
+        }
+      }
+    }
   }
 }
