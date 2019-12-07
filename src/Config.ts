@@ -17,6 +17,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
+import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
 import {ErrorType} from "./Cell";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
@@ -66,6 +67,7 @@ export class Config {
     VlookupPlugin,
     IsEvenPlugin,
     IsOddPlugin,
+    RoundingPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
