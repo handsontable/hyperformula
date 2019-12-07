@@ -37,10 +37,11 @@ export class RoundingPlugin extends FunctionPlugin {
       } else if (coercedPlaces instanceof CellError) {
         return coercedPlaces
       } else {
+        const placesMultiplier = Math.pow(10, coercedPlaces)
         if (coercedNumberToRound < 0) {
-          return -Math.ceil(-coercedNumberToRound * Math.pow(10, coercedPlaces)) / Math.pow(10, coercedPlaces)
+          return -Math.ceil(-coercedNumberToRound * placesMultiplier) / placesMultiplier
         } else {
-          return Math.ceil(coercedNumberToRound * Math.pow(10, coercedPlaces)) / Math.pow(10, coercedPlaces)
+          return Math.ceil(coercedNumberToRound * placesMultiplier) / placesMultiplier
         }
       }
     }
