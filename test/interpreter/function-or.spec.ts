@@ -3,8 +3,8 @@ import {CellError, ErrorType} from '../../src/Cell'
 import {adr} from '../testUtils'
 import '../testConfig'
 
-describe("Function AND", () => {
-  it('function OR usage', () => {
+describe("Function OR", () => {
+  it('usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
     ])
