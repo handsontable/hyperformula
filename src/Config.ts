@@ -15,6 +15,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {ErrorType} from "./Cell";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
@@ -62,6 +63,7 @@ export class Config {
     ExpPlugin,
     RandomPlugin,
     VlookupPlugin,
+    IsEvenPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
