@@ -30,6 +30,7 @@ export const enGB: TranslationPackage = {
     RAND: 'RAND',
     SPLIT: 'SPLIT',
     SUM: 'SUM',
+    SUMSQ: 'SUMSQ',
     SUMIF: 'SUMIF',
     SUMIFS: 'SUMIFS',
     SUMPRODUCT: 'SUMPRODUCT',

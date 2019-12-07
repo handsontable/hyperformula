@@ -30,6 +30,7 @@ export const plPL: TranslationPackage = {
     RAND: 'LOSUJ',
     SPLIT: 'PODZIEL.TEKST',
     SUM: 'SUMA',
+    SUMSQ: 'SUMSQ',
     SUMIF: 'SUMA.JEŻELI',
     SUMIFS: 'SUMY.JEŻELI',
     SUMPRODUCT: 'SUMA.ILOCZYNÓW',

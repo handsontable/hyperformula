@@ -10,10 +10,29 @@ import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 
+export type MapOperation = (arg: CellValue) => CellValue
+
+function idMap(arg: CellValue): CellValue {
+  return arg
+}
+
+function square(arg: CellValue): CellValue {
+  if (arg instanceof CellError) {
+    return arg
+  } else if (typeof arg === 'number') {
+    return arg * arg
+  } else {
+    return 0
+  }
+}
+
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sum: {
       translationKey: 'SUM',
+    },
+    sumsq: {
+      translationKey: 'SUMSQ',
     },
     max: {
       translationKey: 'MAX',
@@ -36,6 +55,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.reduce(ast, formulaAddress, 0, 'SUM', add)
+  }
+
+  public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', add, square)
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -105,15 +131,17 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    * */
-  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation): CellValue {
+  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation, mapFunction: MapOperation = idMap): CellValue {
     return ast.args.reduce((acc: CellValue, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
-        value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction)
+        value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
-          value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()), initialAccValue, reducingFunction)
+          value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()).map(mapFunction), initialAccValue, reducingFunction)
+        } else {
+          value = mapFunction(value)
         }
       }
 
@@ -145,7 +173,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation): CellValue {
+  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation, mapFunction: MapOperation): CellValue {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
@@ -163,7 +191,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
 
     let value = rangeVertex.getFunctionValue(functionName)
     if (!value) {
-      const rangeValues = this.getRangeValues(functionName, range)
+      const rangeValues = this.getRangeValues(functionName, range, mapFunction)
       value = this.reduceRange(rangeValues, initialAccValue, reducingFunction)
       rangeVertex.setFunctionValue(functionName, value)
     }
@@ -180,7 +208,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
    */
-  private getRangeValues(functionName: string, range: AbsoluteCellRange): CellValue[] {
+  private getRangeValues(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation): CellValue[] {
     const rangeResult: CellValue[] = []
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.dependencyGraph, [range])
     const restRange = restRanges[0]
@@ -191,12 +219,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         rangeResult.push(cachedValue)
       } else {
         for (const cellFromRange of smallerRangeVertex.range.addresses()) {
-          rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
+          rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
         }
       }
     }
     for (const cellFromRange of restRange.addresses()) {
-      rangeResult.push(this.dependencyGraph.getCellValue(cellFromRange))
+      rangeResult.push(mapFunction(this.dependencyGraph.getCellValue(cellFromRange)))
     }
 
     return rangeResult
