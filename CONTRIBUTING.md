@@ -13,7 +13,7 @@ Thank you for your commitment!
 
 ## Team rules
 
-The Handsontable team utilizes Git-Flow. Read more - [How we use Git-Flow](https://github.com/handsontable/handsontable/wiki/How-we-use-Git-Flow)
+The Handsontable team utilizes Git-Flow. Read more - [Understanding the GitHub flow](https://guides.github.com/introduction/flow/)
 
 ## Code of conduct
 
