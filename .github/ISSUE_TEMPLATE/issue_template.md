@@ -21,7 +21,7 @@ assignees: ''
 <!--- [optional] Provide a link to a live example  -->
 
 ### Your environment
-<!--- [recommended] Provide a link to a live example  -->
+<!--- [recommended]  -->
 
 * HyperFormula version:
 * Browser Name and version:
