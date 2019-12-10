@@ -6,7 +6,7 @@ Your contributions to this project are very welcome. If you want to fix a bug or
 2. Make your changes on a separate branch. This will speed up the merging process.
 3. Always make the target of your pull request the `develop` branch, not `master`.
 4. **Important: For any change you make, please add test specs** in `test` folder.
-5. Please lint the code. We recommend following provided tslint configuration - to run a linter you can either run `make lint` command or `yarn tslint --project tsconfig.json`. For a full list of avaible command please see `Makefile`.
+5. Please lint the code. We recommend following provided tslint configuration - to run a linter call `make lint` command. For a full list of avaible command please see `Makefile`.
 6. Add a thorough description of all the changes.
 
 Thank you for your commitment!
