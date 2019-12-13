@@ -20,6 +20,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
     cos: {
       translationKey: 'COS',
     },
+    sin: {
+      translationKey: 'SIN',
+    },
   }
 
   /**
@@ -82,6 +85,23 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return coercedArg
     } else {
       return Math.cos(coercedArg)
+    }
+  }
+
+  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedArg = coerceScalarToNumber(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else {
+      return Math.sin(coercedArg)
     }
   }
 }
