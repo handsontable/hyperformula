@@ -39,7 +39,9 @@ export const enGB: TranslationPackage = {
     TRUE: 'TRUE',
     VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
-    DEC2BIN: 'DEC2BIN'
+    DEC2BIN: 'DEC2BIN',
+    DEC2OCT: 'DEC2OCT',
+    DEC2HEX: 'DEC2HEX'
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

@@ -12,10 +12,24 @@ export class RadixConversionPlugin extends FunctionPlugin {
     dec2bin: {
       translationKey: 'DEC2BIN',
     },
+    dec2oct: {
+      translationKey: 'DEC2OCT',
+    },
+    dec2hex: {
+      translationKey: 'DEC2HEX',
+    },
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.dec2base(ast, formulaAddress, 2)
+  }
+
+  public dec2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.dec2base(ast, formulaAddress, 8)
+  }
+
+  public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.dec2base(ast, formulaAddress, 16)
   }
 
   private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
@@ -72,12 +86,11 @@ function decimalToBase(value: number, base: number, places?: number): string | C
 }
 
 function decimalToRadixComplement(value: number, base: number): string {
-  if (value >= 0) {
-    return value.toString(base)
-  } else {
-    const shifted = value + Math.pow(base, NUMBER_OF_BITS)
-    return shifted.toString(base)
+  let shifted = value
+  if (value < 0) {
+    shifted += Math.pow(base, NUMBER_OF_BITS)
   }
+  return shifted.toString(base).toUpperCase()
 }
 
 
