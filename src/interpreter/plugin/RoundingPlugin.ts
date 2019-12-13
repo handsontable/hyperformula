@@ -11,6 +11,11 @@ export function findNextOddNumber(arg: number): number {
   return (ceiled % 2 === 1) ? ceiled : ceiled + 1
 }
 
+export function findNextEvenNumber(arg: number): number {
+  const ceiled = Math.ceil(arg)
+  return (ceiled % 2 === 0) ? ceiled : ceiled + 1
+}
+
 export class RoundingPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     roundup: {
@@ -109,9 +114,9 @@ export class RoundingPlugin extends FunctionPlugin {
         return coercedNumberToRound
       } else {
         if (coercedNumberToRound < 0) {
-          return -Math.ceil(-coercedNumberToRound / 2) * 2
+          return -findNextEvenNumber(-coercedNumberToRound)
         } else {
-          return Math.ceil(coercedNumberToRound / 2) * 2
+          return findNextEvenNumber(coercedNumberToRound)
         }
       }
     }
