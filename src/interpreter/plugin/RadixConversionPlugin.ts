@@ -20,6 +20,12 @@ export class RadixConversionPlugin extends FunctionPlugin {
     },
     bin2dec: {
       translationKey: 'BIN2DEC'
+    },
+    bin2oct: {
+      translationKey: 'BIN2OCT'
+    },
+    bin2hex: {
+      translationKey: 'BIN2HEX'
     }
   }
 
@@ -46,6 +52,37 @@ export class RadixConversionPlugin extends FunctionPlugin {
     }
 
     return twoComplementToDecimal(binaryWithSign)
+  }
+
+  public bin2oct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.bin2base(ast, formulaAddress, 8)
+  }
+
+  public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.bin2base(ast, formulaAddress, 16)
+  }
+
+  private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
+    if (ast.args.length < 1 || ast.args.length > 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const binaryWithSign = this.getBinaryArgument(ast, formulaAddress, 0)
+    if (binaryWithSign instanceof CellError) {
+      return binaryWithSign
+    }
+
+    let places
+    if (ast.args.length === 2) {
+      places = this.getNumericArgument(ast, formulaAddress, 1, 1, 10)
+      if (places instanceof CellError) {
+        return places
+      }
+    }
+
+
+    const decimal = twoComplementToDecimal(binaryWithSign)
+    return decimalToBase(decimal, base, places)
   }
 
 

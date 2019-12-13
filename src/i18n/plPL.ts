@@ -43,6 +43,8 @@ export const plPL: TranslationPackage = {
     DEC2OCT: 'DEC2OCT',
     DEC2HEX: 'DEC2HEX',
     BIN2DEC: 'BIN2DEC',
+    BIN2OCT: 'BIN2OCT',
+    BIN2HEX: 'BIN2HEX',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
