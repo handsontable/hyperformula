@@ -14,6 +14,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
     acos: {
       translationKey: 'ACOS',
     },
+    asin: {
+      translationKey: 'ASIN',
+    },
   }
 
   /**
@@ -38,6 +41,25 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return coercedArg
     } else if (-1 <= coercedArg && coercedArg <= 1) {
       return Math.acos(coercedArg)
+    } else {
+      return new CellError(ErrorType.NUM)
+    }
+  }
+
+  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedArg = coerceScalarToNumber(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else if (-1 <= coercedArg && coercedArg <= 1) {
+      return Math.asin(coercedArg)
     } else {
       return new CellError(ErrorType.NUM)
     }
