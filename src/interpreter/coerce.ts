@@ -40,6 +40,10 @@ export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeV
   }
 }
 
+export function coerceBooleanToNumber(arg: boolean): number {
+  return Number(arg)
+}
+
 export function coerceScalarToNumber(arg: CellValue): number | CellError {
   if (arg === EmptyValue) {
     return 0

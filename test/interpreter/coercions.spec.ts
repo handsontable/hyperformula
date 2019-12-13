@@ -1,5 +1,5 @@
 import {EmptyValue, CellError, ErrorType} from '../../src/Cell'
-import {coerceScalarToNumber, coerceScalarToBoolean, dateNumberRepresentation, coerceScalarToString} from '../../src/interpreter/coerce'
+import {coerceBooleanToNumber, coerceScalarToNumber, coerceScalarToBoolean, dateNumberRepresentation, coerceScalarToString} from '../../src/interpreter/coerce'
 import {Config} from '../../src'
 import '../testConfig'
 
@@ -16,6 +16,18 @@ describe("#coerceScalarToNumber", () => {
     expect(coerceScalarToNumber(false)).toBe(0)
     expect(coerceScalarToNumber(EmptyValue)).toBe(0)
     expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+})
+
+describe('#coerceBooleanToNumber', () => {
+  it('works', () => {
+    expect(coerceBooleanToNumber(true)).toBe(1)
+    expect(coerceBooleanToNumber(false)).toBe(0)
+  })
+
+  it('behaves the same as more general coercion', () => {
+    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true))
+    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false))
   })
 })
 
