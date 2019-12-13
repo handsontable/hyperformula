@@ -23,6 +23,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
     sin: {
       translationKey: 'SIN',
     },
+    tan: {
+      translationKey: 'TAN',
+    },
   }
 
   /**
@@ -102,6 +105,23 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return coercedArg
     } else {
       return Math.sin(coercedArg)
+    }
+  }
+
+  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedArg = coerceScalarToNumber(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else {
+      return Math.tan(coercedArg)
     }
   }
 }
