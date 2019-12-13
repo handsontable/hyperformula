@@ -42,7 +42,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.ceil(-numberToRound * placesMultiplier) / placesMultiplier
@@ -53,7 +53,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.floor(-numberToRound * placesMultiplier) / placesMultiplier
@@ -64,7 +64,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (numberToRound: number, places: number): number => {
+    return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
         return -Math.round(-numberToRound * placesMultiplier) / placesMultiplier
@@ -144,7 +144,7 @@ export class RoundingPlugin extends FunctionPlugin {
     }
   }
 
-  private commonArgumentsHandling(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): CellValue {
+  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): CellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     } else {
