@@ -43,112 +43,60 @@ export class TrigonometryPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else if (-1 <= coercedArg && coercedArg <= 1) {
-      return Math.acos(coercedArg)
-    } else {
-      return new CellError(ErrorType.NUM)
-    }
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
+      if (-1 <= coercedArg && coercedArg <= 1) {
+        return Math.acos(coercedArg)
+      } else {
+        return new CellError(ErrorType.NUM)
+      }
+    })
   }
 
   public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else if (-1 <= coercedArg && coercedArg <= 1) {
-      return Math.asin(coercedArg)
-    } else {
-      return new CellError(ErrorType.NUM)
-    }
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
+      if (-1 <= coercedArg && coercedArg <= 1) {
+        return Math.asin(coercedArg)
+      } else {
+        return new CellError(ErrorType.NUM)
+      }
+    })
   }
 
   public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
       return Math.cos(coercedArg)
-    }
+    })
   }
 
   public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
       return Math.sin(coercedArg)
-    }
+    })
   }
 
   public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
       return Math.tan(coercedArg)
-    }
+    })
   }
 
   public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
       return Math.atan(coercedArg)
-    }
+    })
   }
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.commonTrigonometricFunction(ast, formulaAddress, (coercedArg) => {
+      if (coercedArg === 0) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      } else {
+        return (1 / Math.tan(coercedArg))
+      }
+    })
+  }
+
+  private commonTrigonometricFunction(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -160,10 +108,8 @@ export class TrigonometryPlugin extends FunctionPlugin {
     const coercedArg = coerceScalarToNumber(arg)
     if (coercedArg instanceof CellError) {
       return coercedArg
-    } else if (coercedArg === 0) {
-      return new CellError(ErrorType.DIV_BY_ZERO)
     } else {
-      return (1 / Math.tan(coercedArg))
+      return fn(coercedArg)
     }
   }
 }
