@@ -26,6 +26,9 @@ export class TrigonometryPlugin extends FunctionPlugin {
     tan: {
       translationKey: 'TAN',
     },
+    atan: {
+      translationKey: 'ATAN',
+    },
   }
 
   /**
@@ -122,6 +125,23 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return coercedArg
     } else {
       return Math.tan(coercedArg)
+    }
+  }
+
+  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedArg = coerceScalarToNumber(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else {
+      return Math.atan(coercedArg)
     }
   }
 }
