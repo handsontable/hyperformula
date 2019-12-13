@@ -1,7 +1,7 @@
 import {FunctionPlugin} from "./FunctionPlugin";
 import {ProcedureAst} from "../../parser";
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from "../../Cell";
-import {coerceScalarToNumber} from "../coerce";
+import {coerceScalarToNumber, coerceScalarToString} from "../coerce";
 import {SimpleRangeValue} from "../InterpreterValue";
 import {padLeft} from "../../format/format";
 
@@ -18,6 +18,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
     dec2hex: {
       translationKey: 'DEC2HEX',
     },
+    bin2dec: {
+      translationKey: 'BIN2DEC'
+    }
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -31,6 +34,20 @@ export class RadixConversionPlugin extends FunctionPlugin {
   public dec2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.dec2base(ast, formulaAddress, 16)
   }
+
+  public bin2dec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const binaryWithSign = this.getBinaryArgument(ast, formulaAddress, 0)
+    if (binaryWithSign instanceof CellError) {
+      return binaryWithSign
+    }
+
+    return twoComplementToDecimal(binaryWithSign)
+  }
+
 
   private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
@@ -54,6 +71,23 @@ export class RadixConversionPlugin extends FunctionPlugin {
     }
 
     return decimalToBase(value, base, places)
+  }
+
+  private getBinaryArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number): string | CellError  {
+    const arg = this.evaluateAst(ast.args[position], formulaAddress)
+
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const value = coerceScalarToString(arg)
+    if (typeof value === 'string') {
+      if (value.length > NUMBER_OF_BITS || !/^[01]+$/.test(value)) {
+        return new CellError(ErrorType.NUM)
+      }
+    }
+
+    return value
   }
 
   private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min: number, max: number): number | CellError {
@@ -86,11 +120,13 @@ function decimalToBase(value: number, base: number, places?: number): string | C
 }
 
 function decimalToRadixComplement(value: number, base: number): string {
-  let shifted = value
-  if (value < 0) {
-    shifted += Math.pow(base, NUMBER_OF_BITS)
-  }
-  return shifted.toString(base).toUpperCase()
+  const offset = value < 0 ? Math.pow(base, NUMBER_OF_BITS) : 0
+  return (value + offset).toString(base).toUpperCase()
+}
+
+function twoComplementToDecimal(value: string): number {
+  let offset = (value.length == NUMBER_OF_BITS && value.startsWith('1')) ? Math.pow(2, NUMBER_OF_BITS) : 0
+  return parseInt(value, 2) - offset
 }
 
 

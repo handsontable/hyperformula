@@ -41,7 +41,8 @@ export const plPL: TranslationPackage = {
     YEAR: 'ROK',
     DEC2BIN: 'DEC2BIN',
     DEC2OCT: 'DEC2OCT',
-    DEC2HEX: 'DEC2HEX'
+    DEC2HEX: 'DEC2HEX',
+    BIN2DEC: 'BIN2DEC',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
