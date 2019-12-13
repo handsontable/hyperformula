@@ -109,4 +109,22 @@ describe('Clear sheet content', () => {
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
   })
+
+  it('should clear sheet and dont break edge between cells, case with range', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['1']
+      ],
+      'Sheet2': [
+        ['=SUM(Sheet1!A1:B1)']
+      ]
+    })
+
+    const changes = engine.clearSheet('Sheet1')
+
+    engine.setCellContent(adr('A1'), '2')
+    engine.setCellContent(adr('B1'), '3')
+
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(5)
+  })
 })

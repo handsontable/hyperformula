@@ -36,7 +36,6 @@ describe("Replace sheet content", () => {
 
     engine.replaceSheetContent('Sheet1', [['3', '4']])
 
-    // expect(engine.getSheetDimensions(0)).toEqual({ width: 2, height: 1})
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
