@@ -19,6 +19,7 @@ import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
 import {ErrorType} from "./Cell";
+import {RadixConversionPlugin} from "./interpreter/plugin/RadixConversionPlugin";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -68,6 +69,7 @@ export class Config {
     IsEvenPlugin,
     IsOddPlugin,
     RoundingPlugin,
+    RadixConversionPlugin
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

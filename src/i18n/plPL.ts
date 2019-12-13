@@ -39,6 +39,7 @@ export const plPL: TranslationPackage = {
     TRUE: 'PRAWDA',
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
+    DEC2BIN: 'DEC2BIN'
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
