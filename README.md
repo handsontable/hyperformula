@@ -291,8 +291,6 @@ const engine = HyperFormula.buildFromArray(sheet, config)
 
 Our engine currently depends on the following packages:
 - [Chevrotain](http://sap.github.io/chevrotain/docs/)
-- [csv-parser](https://www.npmjs.com/package/csv-parser)
-- [csv-stringify](https://www.npmjs.com/package/csv-stringify)
 - [Moment](https://momentjs.com/)
 - [GPU.js](https://gpu.rocks/)
 
