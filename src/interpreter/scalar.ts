@@ -194,3 +194,29 @@ export function min(left: CellValue, right: CellValue): CellValue {
     return Number.POSITIVE_INFINITY
   }
 }
+
+export function mina(left: CellValue, right: CellValue): CellValue {
+  if (left instanceof CellError) {
+    return left
+  }
+  if (right instanceof CellError) {
+    return right
+  }
+  if (typeof left === 'boolean') {
+    left = coerceBooleanToNumber(left)
+  }
+  if (typeof right === 'boolean') {
+    right = coerceBooleanToNumber(right)
+  }
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return Math.min(left, right)
+    } else {
+      return left
+    }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return Number.POSITIVE_INFINITY
+  }
+}

@@ -2,7 +2,7 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {add, max, maxa, min} from '../scalar'
+import {add, max, maxa, min, mina} from '../scalar'
 import {coerceToRange} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
@@ -42,6 +42,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
     maxa: {
       translationKey: 'MAXA',
+    },
+    mina: {
+      translationKey: 'MINA',
     },
     countblank: {
       translationKey: 'COUNTBLANK',
@@ -130,6 +133,19 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min)
+
+    if (typeof value === 'number' && !Number.isFinite(value)) {
+      return 0
+    }
+
+    return value
+  }
+
+  public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina)
 
     if (typeof value === 'number' && !Number.isFinite(value)) {
       return 0
