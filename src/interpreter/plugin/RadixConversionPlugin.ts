@@ -5,6 +5,8 @@ import {coerceScalarToNumber} from "../coerce";
 import {SimpleRangeValue} from "../InterpreterValue";
 import {padLeft} from "../../format/format";
 
+const NUMBER_OF_BITS = 10
+
 export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     dec2bin: {
@@ -13,6 +15,10 @@ export class RadixConversionPlugin extends FunctionPlugin {
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.dec2base(ast, formulaAddress, 2)
+  }
+
+  private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     }
@@ -25,31 +31,18 @@ export class RadixConversionPlugin extends FunctionPlugin {
       }
     }
 
-    const value = this.getNumericArgument(ast, formulaAddress, 0, -512, 511)
+    const min = -Math.pow(base, NUMBER_OF_BITS) / 2
+    const max = -min - 1
+
+    const value = this.getNumericArgument(ast, formulaAddress, 0, min, max)
     if (value instanceof CellError) {
       return value
     }
 
-    let length = 10
-    let result  = ""
-    while (length--) {
-      result += (value >> length) & 1
-    }
-
-    result = result.replace(/^0+/, "")
-
-    if (places !== undefined) {
-      if (value > 0 && result.length > places) {
-        return new CellError(ErrorType.NUM)
-      } else {
-        return padLeft(result, places)
-      }
-    } else {
-      return result
-    }
+    return decimalToBase(value, base, places)
   }
 
-  private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min: number, max: number): number | CellError  {
+  private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min: number, max: number): number | CellError {
     const arg = this.evaluateAst(ast.args[position], formulaAddress)
 
     if (arg instanceof SimpleRangeValue) {
@@ -64,6 +57,26 @@ export class RadixConversionPlugin extends FunctionPlugin {
     }
 
     return value
+  }
+}
+
+function decimalToBase(value: number, base: number, places?: number): string | CellError {
+  const result = decimalToRadixComplement(value, base)
+  if (places === undefined || value < 0) {
+    return result
+  } else if (result.length > places) {
+    return new CellError(ErrorType.NUM)
+  } else {
+    return padLeft(result, places)
+  }
+}
+
+function decimalToRadixComplement(value: number, base: number): string {
+  if (value >= 0) {
+    return value.toString(base)
+  } else {
+    const shifted = value + Math.pow(base, NUMBER_OF_BITS)
+    return shifted.toString(base)
   }
 }
 
