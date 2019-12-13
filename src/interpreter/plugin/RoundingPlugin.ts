@@ -6,6 +6,11 @@ import {coerceScalarToNumber} from '../coerce'
 
 type RoundingFunction = (numberToRound: number, places: number) => number
 
+export function findNextOddNumber(arg: number): number {
+  const ceiled = Math.ceil(arg)
+  return (ceiled % 2 === 1) ? ceiled : ceiled + 1
+}
+
 export class RoundingPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     roundup: {
@@ -26,6 +31,9 @@ export class RoundingPlugin extends FunctionPlugin {
     even: {
       translationKey: 'EVEN',
     },
+    odd: {
+      translationKey: 'ODD',
+    }
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -104,6 +112,28 @@ export class RoundingPlugin extends FunctionPlugin {
           return -Math.ceil(-coercedNumberToRound / 2) * 2
         } else {
           return Math.ceil(coercedNumberToRound / 2) * 2
+        }
+      }
+    }
+  }
+
+  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    } else {
+      const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
+      if (numberToRound instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+
+      const coercedNumberToRound = coerceScalarToNumber(numberToRound)
+      if (coercedNumberToRound instanceof CellError) {
+        return coercedNumberToRound
+      } else {
+        if (coercedNumberToRound < 0) {
+          return -findNextOddNumber(-coercedNumberToRound)
+        } else {
+          return findNextOddNumber(coercedNumberToRound)
         }
       }
     }
