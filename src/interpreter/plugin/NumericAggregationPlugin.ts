@@ -26,6 +26,14 @@ function square(arg: CellValue): CellValue {
   }
 }
 
+function zeroForInfinite(value: CellValue) {
+  if (typeof value === 'number' && !Number.isFinite(value)) {
+    return 0
+  } else {
+    return value
+  }
+}
+
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sum: {
@@ -100,11 +108,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max)
 
-    if (typeof value === 'number' && !Number.isFinite(value)) {
-      return 0
-    }
-
-    return value
+    return zeroForInfinite(value)
   }
 
   public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -113,11 +117,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa)
 
-    if (typeof value === 'number' && !Number.isFinite(value)) {
-      return 0
-    }
-
-    return value
+    return zeroForInfinite(value)
   }
 
   /**
@@ -134,11 +134,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min)
 
-    if (typeof value === 'number' && !Number.isFinite(value)) {
-      return 0
-    }
-
-    return value
+    return zeroForInfinite(value)
   }
 
   public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -147,11 +143,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina)
 
-    if (typeof value === 'number' && !Number.isFinite(value)) {
-      return 0
-    }
-
-    return value
+    return zeroForInfinite(value)
   }
 
   /**
