@@ -88,7 +88,7 @@ export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
 /* prcoedures */
-export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[A-Za-z\u00C0-\u02AF]+)+/})
+export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
 /* terminals */
 export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
@@ -142,6 +142,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     LessThanOp,
     LParen,
     RParen,
+    OffsetProcedureName,
+    ProcedureName,
     RangeSeparator,
     SheetAbsoluteCell,
     SheetAbsoluteColCell,
@@ -151,8 +153,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AbsoluteColCell,
     AbsoluteRowCell,
     RelativeCell,
-    OffsetProcedureName,
-    ProcedureName,
     ArgSeparator,
     NumberLiteral,
     StringLiteral,

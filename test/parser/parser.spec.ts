@@ -187,20 +187,22 @@ describe('ParserWithCaching', () => {
     expect(float.value).toBe(3.14)
   })
 
-  it('parsing error - unexpected token', () => {
+  it('lexing error - unexpected token', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=A', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
-    expect(ast.args[0].message).toMatch(/Expecting token/)
+    expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
+    expect(ast.args[0].message).toMatch(/unexpected character/)
   })
 
-  it('parsing error - unexpected token', () => {
+  it('lexing error - unexpected token', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=SUM(A)', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
+    expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
+    expect(ast.args[0].message).toMatch(/unexpected character/)
+
   })
 
   it('parsing error - not all input parsed', () => {

@@ -85,9 +85,9 @@ export class ParserWithCaching {
         }
         idx++
       } else if (tokenMatcher(token, ProcedureName)) {
-        const procedureName = token.image.toUpperCase()
+        const procedureName = token.image.toUpperCase().slice(0, -1)
         const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
-        hash = hash.concat(canonicalProcedureName)
+        hash = hash.concat(canonicalProcedureName, "(")
         idx++
       } else {
         hash = hash.concat(token.image)

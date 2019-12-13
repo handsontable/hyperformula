@@ -341,10 +341,9 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for procedure expressions: SUM(1,A1)
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
-    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase()
+    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase().slice(0, -1)
     const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
     const args: Ast[] = []
-    this.CONSUME(LParen)
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,
       DEF: () => {
