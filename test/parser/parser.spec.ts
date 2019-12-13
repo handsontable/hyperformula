@@ -115,6 +115,13 @@ describe('ParserWithCaching', () => {
     expect(ast.args.length).toBe(0)
   })
 
+  it('function with number', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const ast = parser.parse('=DEC2BIN(4)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
+    expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
+    expect(ast.procedureName).toEqual('DEC2BIN')
+  })
+
   it('should leave original name if procedure translation not known', () => {
     const parser = new ParserWithCaching(new Config({ language: plPL }), new SheetMapping(plPL).get)
     const ast = parser.parse('=FOOBAR()', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
