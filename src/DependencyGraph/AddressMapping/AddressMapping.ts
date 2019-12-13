@@ -226,10 +226,10 @@ export class AddressMapping {
     }
   }
 
-  public* sheetEntries(sheet: number) {
+  public* sheetEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const sheetMapping = this.mapping.get(sheet)
     if (sheetMapping) {
-      yield* sheetMapping.vertices()
+      yield* sheetMapping.getEntries(sheet)
     } else {
       throw new Error("Sheet does not exists")
     }

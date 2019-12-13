@@ -16,6 +16,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {collectAddressesDependentToMatrix} from "./collectAddressesDependentToMatrix";
 
 export class DependencyGraph {
   /*
@@ -137,17 +138,17 @@ export class DependencyGraph {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
           for (const cellFromRange of restRange.addresses()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(cellFromRange), rangeVertex)
+            this.graph.addEdge(this.fetchCellOrCreateEmpty(cellFromRange), rangeVertex)
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
       } else {
-        this.graph.addEdge(this.fetchOrCreateEmptyCell(absStartCell), endVertex)
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
     })
   }
 
-  public fetchOrCreateEmptyCell(address: SimpleCellAddress): CellVertex {
+  public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {
     let vertex = this.addressMapping.getCell(address)
     if (!vertex) {
       vertex = new EmptyCellVertex()
@@ -191,12 +192,16 @@ export class DependencyGraph {
 
   public removeSheet(removedSheetId: number) {
     const matrices: Set<MatrixVertex> = new Set()
-    for (const vertex of this.addressMapping.sheetEntries(removedSheetId)) {
+    for (const [_, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
+      if (vertex instanceof MatrixVertex) {
+        if (matrices.has(vertex)) {
+          continue
+        } else {
+          matrices.add(vertex)
+        }
+      }
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
-      }
-      if (vertex instanceof MatrixVertex) {
-        matrices.add(vertex)
       }
       this.graph.removeNode(vertex)
     }
@@ -217,6 +222,23 @@ export class DependencyGraph {
         this.graph.removeNode(range)
       }
     })
+
+    this.addStructuralNodesToChangeSet()
+  }
+
+  public clearSheet(sheetId: number) {
+    const matrices: Set<MatrixVertex> = new Set()
+    for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
+      if (vertex instanceof MatrixVertex) {
+          matrices.add(vertex)
+      } else {
+        this.setCellEmpty(address)
+      }
+    }
+
+    for (const matrix of matrices.values()) {
+      this.setMatrixEmpty(matrix)
+    }
 
     this.addStructuralNodesToChangeSet()
   }
@@ -325,7 +347,7 @@ export class DependencyGraph {
         let emptyVertex = null
         for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
           if (adjacentNode instanceof RangeVertex && !sourceRange.containsRange(adjacentNode.range)) {
-            emptyVertex = emptyVertex || this.fetchOrCreateEmptyCell(sourceAddress)
+            emptyVertex = emptyVertex || this.fetchCellOrCreateEmpty(sourceAddress)
             this.graph.addEdge(emptyVertex, adjacentNode)
             this.graph.removeEdge(sourceVertex, adjacentNode)
           }
@@ -341,7 +363,7 @@ export class DependencyGraph {
           this.addressMapping.removeCell(targetAddress)
         }
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
-          sourceVertex = sourceVertex || this.fetchOrCreateEmptyCell(targetAddress)
+          sourceVertex = sourceVertex || this.fetchCellOrCreateEmpty(targetAddress)
           this.graph.addEdge(sourceVertex, adjacentNode)
           this.graph.markNodeAsSpecialRecentlyChanged(sourceVertex)
         }
@@ -355,7 +377,7 @@ export class DependencyGraph {
           this.graph.removeEdge(rangeVertex, adjacentNode)
 
           for (const address of rangeVertex.range.addresses()) {
-            const newEmptyVertex = this.fetchOrCreateEmptyCell(address)
+            const newEmptyVertex = this.fetchCellOrCreateEmpty(address)
             this.graph.addEdge(newEmptyVertex, adjacentNode)
             this.addressMapping.setCell(address, newEmptyVertex)
             this.graph.markNodeAsSpecialRecentlyChanged(newEmptyVertex)
@@ -381,31 +403,45 @@ export class DependencyGraph {
 
   public breakNumericMatrix(matrixVertex: MatrixVertex) {
     const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
-    // 1. split matrix to chunks, add value cell vertices
-    // 2. update address mapping for each address in matrix
+    const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
+
     for (const address of matrixRange.addresses()) {
       const value = this.getCellValue(address) as number // We wouldn't need that typecast if we would take values from Matrix
       const valueVertex = new ValueCellVertex(value)
       this.addVertex(address, valueVertex)
     }
 
-    for (const adjacentNode of this.graph.adjacentNodes(matrixVertex).values()) {
-      // 3. update dependencies for each range that has this matrix in dependencies
-      if (adjacentNode instanceof RangeVertex) {
-        for (const address of adjacentNode.range.addresses()) {
-          const vertex = this.fetchCell(address)
-          this.graph.addEdge(vertex, adjacentNode)
-        }
-        // 4. fix edges for cell references in formulas
-      } else if (adjacentNode instanceof FormulaCellVertex) {
-        const relevantReferences = this.cellReferencesInRange(adjacentNode.getFormula(this.lazilyTransformingAstService), adjacentNode.getAddress(this.lazilyTransformingAstService), matrixRange)
-        for (const vertex of relevantReferences) {
-          this.graph.addEdge(vertex, adjacentNode)
-        }
+    for (const adjacentNode of adjacentNodes.values()) {
+      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      for (const address of nodeDependencies) {
+        const vertex = this.fetchCell(address)
+        this.graph.addEdge(vertex, adjacentNode)
       }
     }
 
-    // 4. remove old matrix
+    this.graph.removeNode(matrixVertex)
+    this.matrixMapping.removeMatrix(matrixVertex.getRange())
+  }
+
+  public setMatrixEmpty(matrixVertex: MatrixVertex) {
+    const matrixRange = AbsoluteCellRange.spanFrom(matrixVertex.getAddress(), matrixVertex.width, matrixVertex.height)
+    const adjacentNodes = this.graph.adjacentNodes(matrixVertex)
+
+    for (const address of matrixRange.addresses()) {
+      this.addressMapping.removeCell(address)
+    }
+
+    for (const adjacentNode of adjacentNodes.values()) {
+      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      for (const address of nodeDependencies) {
+        const vertex = this.fetchCellOrCreateEmpty(address)
+        this.graph.addEdge(vertex, adjacentNode)
+      }
+      if (nodeDependencies.length > 0) {
+        this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
+      }
+    }
+
     this.graph.removeNode(matrixVertex)
     this.matrixMapping.removeMatrix(matrixVertex.getRange())
   }
@@ -536,37 +572,6 @@ export class DependencyGraph {
     }
   }
 
-  private cellReferencesInRange(ast: Ast, baseAddress: SimpleCellAddress, range: AbsoluteCellRange): CellVertex[] {
-    switch (ast.type) {
-      case AstNodeType.CELL_REFERENCE: {
-        const dependencyAddress = ast.reference.toSimpleCellAddress(baseAddress)
-        if (range.addressInRange(dependencyAddress)) {
-          return [this.fetchCell(dependencyAddress)]
-        }
-        return []
-      }
-      case AstNodeType.CELL_RANGE:
-      case AstNodeType.ERROR:
-      case AstNodeType.NUMBER:
-      case AstNodeType.STRING: {
-        return []
-      }
-      case AstNodeType.PERCENT_OP:
-      case AstNodeType.MINUS_UNARY_OP: {
-        return this.cellReferencesInRange(ast.value, baseAddress, range)
-      }
-      case AstNodeType.FUNCTION_CALL: {
-        return ast.args.map((arg) => this.cellReferencesInRange(arg, baseAddress, range)).reduce((a, b) => a.concat(b), [])
-      }
-      case AstNodeType.PARENTHESIS: {
-        return this.cellReferencesInRange(ast.expression, baseAddress, range)
-      }
-      default: {
-        return [...this.cellReferencesInRange(ast.left, baseAddress, range), ...this.cellReferencesInRange(ast.right, baseAddress, range)]
-      }
-    }
-  }
-
   private fixRanges(sheet: number, row: number, numberOfRows: number): void {
     for (const rangeVertex of this.rangeMapping.rangesInSheet(sheet)) {
       if (rangeVertex.range.includesRow(row)) {
@@ -574,7 +579,7 @@ export class DependencyGraph {
         if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
           const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, rangeVertex.start.col, row), rangeVertex.range.width(), numberOfRows)
           for (const address of addedSubrangeInThatRange.addresses()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), rangeVertex)
+            this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
         }
       }
@@ -588,7 +593,7 @@ export class DependencyGraph {
         if (this.graph.existsEdge(anyVertexInColumn, rangeVertex)) {
           const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.start.row), numberOfColumns, rangeVertex.range.height())
           for (const address of addedSubrangeInThatRange.addresses()) {
-            this.graph.addEdge(this.fetchOrCreateEmptyCell(address), rangeVertex)
+            this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
         }
       }

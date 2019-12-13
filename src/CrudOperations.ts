@@ -23,7 +23,7 @@ import {IBatchExecutor} from "./IBatchExecutor";
 import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
 import {AbsoluteCellRange} from "./AbsoluteCellRange";
 import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {ContentChanges} from "./ContentChanges";
+import {CellValueChange, ContentChanges} from "./ContentChanges";
 import {buildMatrixVertex} from "./GraphBuilder";
 import {absolutizeDependencies} from "./absolutizeDependencies";
 import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
@@ -118,7 +118,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeSheet(sheetName: string): void {
-    this.ensureItIsPossibleToRemoveSheet(sheetName)
+    this.ensureSheetExists(sheetName)
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -130,6 +130,16 @@ export class CrudOperations implements IBatchExecutor {
     })
 
     this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
+  }
+
+  public clearSheet(sheetName: string): void {
+    this.ensureSheetExists(sheetName)
+
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.clearSheet(sheetId)
+
     this.columnSearch.removeSheet(sheetId)
   }
 
@@ -299,12 +309,6 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToRemoveSheet(sheetName: string): void {
-    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
-      throw new NoSheetWithNameError(sheetName)
-    }
-  }
-
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
@@ -322,6 +326,12 @@ export class CrudOperations implements IBatchExecutor {
     const changes = this.changes
     this.changes = ContentChanges.empty()
     return changes
+  }
+
+  public ensureSheetExists(sheetName: string) {
+    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
+      throw new NoSheetWithNameError(sheetName)
+    }
   }
 
   /**

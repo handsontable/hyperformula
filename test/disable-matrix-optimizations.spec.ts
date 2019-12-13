@@ -52,6 +52,29 @@ describe('Disable matrix optimizatoins', () => {
     expect(engine.dependencyGraph.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).toBe(undefined)
   })
 
+  it('should update edges between numeric matrix and formula matrix', () => {
+    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const sheet = [
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1)}'],
+    ]
+
+    const engine = HyperFormula.buildFromArray(sheet, config)
+    let matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
+
+    engine.disableNumericMatrices()
+
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1')) as ValueCellVertex
+    const b1 = engine.dependencyGraph.fetchCell(adr('B1')) as ValueCellVertex
+
+    expect(a1).toBeInstanceOf(ValueCellVertex)
+
+    expect(engine.graph.getDependencies(matrix).length).toBe(1)
+    expect(engine.graph.existsEdge(a1, matrix)).toBe(true)
+    expect(engine.graph.existsEdge(b1, matrix)).toBe(false)
+  })
+
   it('should update edges between matrix and formulas', () => {
     const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [

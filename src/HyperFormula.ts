@@ -455,7 +455,7 @@ export class HyperFormula {
    */
   public isItPossibleToRemoveSheet(name: string): boolean {
     try {
-      this.crudOperations.ensureItIsPossibleToRemoveSheet(name)
+      this.crudOperations.ensureSheetExists(name)
       return true
     } catch (e) {
       return false
@@ -470,6 +470,73 @@ export class HyperFormula {
   public removeSheet(name: string): CellValueChange[] {
     this.crudOperations.removeSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   * Returns information whether its possible to clear sheet
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param name - sheet name
+   */
+  public isItPossibleToClearSheet(name: string): boolean {
+    try {
+      this.crudOperations.ensureSheetExists(name)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Clears sheet content
+   *
+   * @param name - sheet name
+   * */
+  public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.clearSheet(name)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   * Returns information whether its possible to replace sheet content
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param name - sheet name
+   */
+  public isItPossibleToReplaceSheetContent(name: string): boolean {
+    try {
+      this.crudOperations.ensureSheetExists(name)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Replaces sheet content with new values.
+   *
+   * @param sheetName - sheet name
+   * @param values - array of new values
+   * */
+  public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
+    this.crudOperations.ensureSheetExists(sheetName)
+
+    const sheetId = this.sheetId(sheetName)!
+
+    return this.batch((e) => {
+      e.clearSheet(sheetName)
+      for (let i = 0; i < values.length; i++) {
+        for (let j = 0; j < values[i].length; j++) {
+          e.setCellContent({
+            sheet: sheetId,
+            row: i,
+            col: j,
+          }, values[i][j])
+        }
+      }
+    })
   }
 
   /**

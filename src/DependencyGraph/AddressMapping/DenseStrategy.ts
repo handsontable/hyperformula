@@ -103,10 +103,13 @@ export class DenseStrategy implements IAddressMappingStrategy {
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
-  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+  public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (let y = 0; y < this.height; ++y) {
       for (let x = 0; x < this.width; ++x) {
-        yield [simpleCellAddress(sheet, x, y), this.mapping[y][x]]
+        const vertex = this.getCellVertex(x, y)
+        if (vertex) {
+          yield [simpleCellAddress(sheet, x, y), vertex]
+        }
       }
     }
   }

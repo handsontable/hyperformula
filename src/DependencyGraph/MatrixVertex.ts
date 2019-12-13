@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {CellError, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {IMatrix, Matrix, ErroredMatrix, NotComputedMatrix, MatrixSize} from '../Matrix'
+import {ErroredMatrix, IMatrix, Matrix, MatrixSize, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 
