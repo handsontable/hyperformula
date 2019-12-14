@@ -10,12 +10,25 @@ export class LogarithmPlugin extends FunctionPlugin {
     log10: {
       translationKey: 'LOG10',
     },
+    ln: {
+      translationKey: 'LN',
+    },
   }
 
   public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       if (arg > 0) {
         return Math.log10(arg)
+      } else {
+        return new CellError(ErrorType.NUM)
+      }
+    })
+  }
+
+  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
+      if (arg > 0) {
+        return Math.log(arg)
       } else {
         return new CellError(ErrorType.NUM)
       }
