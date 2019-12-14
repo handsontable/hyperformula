@@ -79,7 +79,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
       } else {
@@ -89,7 +89,7 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
       } else {
@@ -99,31 +99,13 @@ export class RoundingPlugin extends FunctionPlugin {
   }
 
   public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.commonArgumentsHandling(ast, formulaAddress, (coercedNumberToRound) => {
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
       } else {
         return findNextOddNumber(coercedNumberToRound)
       }
     })
-  }
-
-  private commonArgumentsHandling(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: (arg: number) => number): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    } else {
-      const numberToRound = this.evaluateAst(ast.args[0], formulaAddress)
-      if (numberToRound instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
-
-      const coercedNumberToRound = coerceScalarToNumber(numberToRound)
-      if (coercedNumberToRound instanceof CellError) {
-        return coercedNumberToRound
-      } else {
-        return roundingFunction(coercedNumberToRound)
-      }
-    }
   }
 
   private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): CellValue {

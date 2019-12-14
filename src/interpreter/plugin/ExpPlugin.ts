@@ -20,20 +20,8 @@ export class ExpPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    if (ast.args.length != 1) {
-      return new CellError(ErrorType.NA)
-    } else {
-      const arg = this.evaluateAst(ast.args[0], formulaAddress)
-      if (arg instanceof SimpleRangeValue) {
-        return new CellError(ErrorType.VALUE)
-      }
-
-      const coercedValue = coerceScalarToNumber(arg)
-      if (coercedValue instanceof CellError) {
-        return coercedValue
-      } else {
-        return Math.exp(coercedValue)
-      }
-    }
+    return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
+      return Math.exp(arg)
+    })
   }
 }
