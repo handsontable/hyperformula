@@ -24,6 +24,9 @@ export class BooleanPlugin extends FunctionPlugin {
     or: {
       translationKey: 'OR',
     },
+    xor: {
+      translationKey: 'XOR',
+    },
     not: {
       translationKey: 'NOT',
     },
@@ -156,5 +159,22 @@ export class BooleanPlugin extends FunctionPlugin {
         return !coercedValue
       }
     }
+  }
+
+  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    let truesCount = 0
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      const coercedValue = coerceScalarToBoolean(scalarValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      } else if (coercedValue) {
+        truesCount++
+      }
+    }
+    return (truesCount % 2 === 1)
   }
 }
