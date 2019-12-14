@@ -72,21 +72,4 @@ export class LogarithmPlugin extends FunctionPlugin {
       }
     })
   }
-
-  private templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
-
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
-      return fn(coercedArg)
-    }
-  }
 }
