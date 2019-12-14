@@ -18,6 +18,7 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
+import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
 import {ErrorType} from "./Cell";
 import {RadixConversionPlugin} from "./interpreter/plugin/RadixConversionPlugin";
 
@@ -69,7 +70,8 @@ export class Config {
     IsEvenPlugin,
     IsOddPlugin,
     RoundingPlugin,
-    RadixConversionPlugin
+    RadixConversionPlugin,
+    LogarithmPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
