@@ -107,15 +107,21 @@ export class BooleanPlugin extends FunctionPlugin {
     }
 
     let result: CellValue = true
+    let anyReasonableValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
         return coercedValue
-      } else {
+      } else if (coercedValue !== null) {
         result = result && coercedValue
+        anyReasonableValue = true
       }
     }
-    return result
+    if (anyReasonableValue) {
+      return result
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 
   /**
@@ -131,16 +137,20 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    let result: CellValue = false
+    let result: CellValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
         return coercedValue
-      } else {
+      } else if (coercedValue !== null) {
         result = result || coercedValue
       }
     }
-    return result
+    if (result === null) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return result
+    }
   }
 
   public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -167,14 +177,21 @@ export class BooleanPlugin extends FunctionPlugin {
     }
 
     let truesCount = 0
+    let anyFalseValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
         return coercedValue
-      } else if (coercedValue) {
+      } else if (coercedValue === true) {
         truesCount++
+      } else if (coercedValue === false) {
+        anyFalseValue = true
       }
     }
-    return (truesCount % 2 === 1)
+    if (anyFalseValue || truesCount > 0) {
+      return (truesCount % 2 === 1)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 }

@@ -45,10 +45,10 @@ describe("#coerceScalarToBoolean", () => {
     expect(coerceScalarToBoolean("FALSE")).toBe(false)
     expect(coerceScalarToBoolean("true")).toBe(true)
     expect(coerceScalarToBoolean("TRUE")).toBe(true)
-    expect(coerceScalarToBoolean(" ")).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceScalarToBoolean(" true")).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceScalarToBoolean("true ")).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceScalarToBoolean("prawda")).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceScalarToBoolean(" ")).toBe(null)
+    expect(coerceScalarToBoolean(" true")).toBe(null)
+    expect(coerceScalarToBoolean("true ")).toBe(null)
+    expect(coerceScalarToBoolean("prawda")).toBe(null)
 
     expect(coerceScalarToBoolean(EmptyValue)).toBe(false)
 

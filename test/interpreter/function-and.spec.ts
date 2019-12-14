@@ -6,12 +6,11 @@ import '../testConfig'
 describe("Function AND", () => {
   it('usage', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())', '=AND(TRUE(), "asdf")'],
+      ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('with numerical arguments', () => {
@@ -27,9 +26,11 @@ describe("Function AND", () => {
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['=AND("TRUE", 1)'],
+      ['=AND("foo", TRUE())'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(true)
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {

@@ -64,7 +64,7 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
+export function coerceScalarToBoolean(arg: CellValue): boolean | CellError | null {
   if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
@@ -78,7 +78,7 @@ export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
     } else if (argUppered === 'FALSE') {
       return false
     } else {
-      return new CellError(ErrorType.VALUE)
+      return null
     }
   }
 }

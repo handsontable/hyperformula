@@ -36,7 +36,7 @@ describe("Function XOR", () => {
     expect(engine.getCellValue(adr('A2'))).toBe(false)
   })
 
-  xit('use coercion', () => {
+  it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['=XOR("TRUE")'],
       ['=XOR(1)'],

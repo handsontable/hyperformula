@@ -18,9 +18,11 @@ describe("Function OR", () => {
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR("TRUE", 0)'],
+      ['=OR("foo", 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(false)
   })
 
   it('function OR with numerical arguments', () => {
