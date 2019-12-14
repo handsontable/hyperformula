@@ -179,7 +179,7 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    return this.evaluateRangeCountif(conditionArg, criterionPackage)
+    return this.evaluateRangeCountif(new Condition(conditionArg, criterionPackage))
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
@@ -246,7 +246,9 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeCountif(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
+  private evaluateRangeCountif(condition: Condition): CellValue {
+    const simpleConditionRange = condition.conditionRange
+    const criterionPackage = condition.criterionPackage
     const conditionRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleConditionRange)
 
     if (conditionRangeVertex) {
