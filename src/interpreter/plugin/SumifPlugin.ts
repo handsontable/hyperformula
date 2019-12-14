@@ -66,6 +66,9 @@ export class SumifPlugin extends FunctionPlugin {
     sumifs: {
       translationKey: 'SUMIFS',
     },
+    countifs: {
+      translationKey: 'COUNTIFS',
+    },
   }
 
   /**
@@ -180,6 +183,34 @@ export class SumifPlugin extends FunctionPlugin {
     }
 
     return this.evaluateRangeCountif(new Condition(conditionArg, criterionPackage))
+  }
+
+  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 2 || ast.args.length % 2 === 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const conditions: Condition[] = []
+    for (let i = 0; i < ast.args.length; i += 2) {
+      const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
+      if (conditionArgValue instanceof CellError) {
+        return conditionArgValue
+      }
+      const conditionArg = coerceToRange(conditionArgValue)
+      const criterionValue = this.evaluateAst(ast.args[i+1], formulaAddress)
+      if (criterionValue instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      } else if (criterionValue instanceof CellError) {
+        return criterionValue
+      }
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      if (criterionPackage === undefined) {
+        return new CellError(ErrorType.VALUE)
+      }
+      conditions.push(new Condition(conditionArg, criterionPackage))
+    }
+
+    return this.evaluateRangeCountif(conditions[0])
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
