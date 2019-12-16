@@ -23,7 +23,7 @@ describe('Function EXP', () => {
 
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ["2", '=EXP(A1)'],
+      ['="2"', '=EXP(A1)'],
       ["=FALSE()", '=EXP(A2)'],
     ])
 
