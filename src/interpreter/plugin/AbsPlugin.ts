@@ -11,14 +11,6 @@ export class AbsPlugin extends FunctionPlugin {
     },
   }
 
-  /**
-   * Corresponds to EXP(value)
-   *
-   * Calculates the exponent for basis e
-   *
-   * @param ast
-   * @param formulaAddress
-   */
   public abs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       return Math.abs(arg)
