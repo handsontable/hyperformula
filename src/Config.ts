@@ -5,6 +5,7 @@ import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
+import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
@@ -65,6 +66,7 @@ export class Config {
     SumprodPlugin,
     MatrixPlugin,
     ExpPlugin,
+    AbsPlugin,
     RandomPlugin,
     VlookupPlugin,
     IsEvenPlugin,
