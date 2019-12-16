@@ -6,6 +6,7 @@ import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
+import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
@@ -67,6 +68,7 @@ export class Config {
     MatrixPlugin,
     ExpPlugin,
     AbsPlugin,
+    DegreesPlugin,
     RandomPlugin,
     VlookupPlugin,
     IsEvenPlugin,
