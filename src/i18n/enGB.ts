@@ -47,6 +47,7 @@ export const enGB: TranslationPackage = {
     BIN2HEX: 'BIN2HEX',
     BITAND: 'BITAND',
     BITOR: 'BITOR',
+    BITXOR: 'BITXOR',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

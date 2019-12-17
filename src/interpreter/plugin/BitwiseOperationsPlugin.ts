@@ -12,6 +12,9 @@ export class BitwiseOperationsPlugin extends FunctionPlugin {
     bitor: {
       translationKey: 'BITOR',
     },
+    bitxor: {
+      translationKey: 'BITXOR',
+    },
   }
 
   public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -23,6 +26,12 @@ export class BitwiseOperationsPlugin extends FunctionPlugin {
   public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.templateWithTwoPositiveArguments(ast, formulaAddress, (left: number, right: number) => {
       return left | right
+    })
+  }
+
+  public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    return this.templateWithTwoPositiveArguments(ast, formulaAddress, (left: number, right: number) => {
+      return left ^ right
     })
   }
 
