@@ -17,6 +17,6 @@ describe('Quality Assurance tests', () => {
       ['=SUM(1,2)']
     ]);
 
-    expect(engine.getCellValue('A1')).toBe(2);
+    expect(engine.getCellValue('A1')).toBe(3);
   });
 });
