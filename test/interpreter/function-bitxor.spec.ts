@@ -35,6 +35,16 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
   })
 
+  it('should not work for non-integers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=BITXOR(1.2, 2)'],
+      ['=BITXOR(3.14, 5)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
+  })
+
   it('should work', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BITXOR(1, 5)'],

@@ -18,24 +18,24 @@ export class BitwiseOperationsPlugin extends FunctionPlugin {
   }
 
   public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.templateWithTwoPositiveArguments(ast, formulaAddress, (left: number, right: number) => {
+    return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left & right
     })
   }
 
   public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.templateWithTwoPositiveArguments(ast, formulaAddress, (left: number, right: number) => {
+    return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left | right
     })
   }
 
   public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.templateWithTwoPositiveArguments(ast, formulaAddress, (left: number, right: number) => {
+    return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left ^ right
     })
   }
 
-  protected templateWithTwoPositiveArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
+  protected templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -58,7 +58,7 @@ export class BitwiseOperationsPlugin extends FunctionPlugin {
       return coercedRight
     }
 
-    if (coercedLeft < 0 || coercedRight < 0) {
+    if (coercedLeft < 0 || coercedRight < 0 || !Number.isInteger(coercedLeft) || !Number.isInteger(coercedRight)) {
       return new CellError(ErrorType.NUM)
     }
 
