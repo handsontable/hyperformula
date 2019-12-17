@@ -45,6 +45,8 @@ export const plPL: TranslationPackage = {
     BIN2DEC: 'BIN2DEC',
     BIN2OCT: 'BIN2OCT',
     BIN2HEX: 'BIN2HEX',
+    BITAND: 'BITAND',
+    BITOR: 'BITOR',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
