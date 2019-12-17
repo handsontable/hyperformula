@@ -1,16 +1,15 @@
-import {EmptyValue, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {AbsoluteCellRange} from "../../src/AbsoluteCellRange";
-import {EmptyCellVertex, FormulaCellVertex} from "../../src/DependencyGraph";
+import {EmptyValue, HyperFormula} from '../../src'
+import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {
   it('should set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
         ['1', '2'],
         ['{=TRANSPOSE(A1:B1)}'],
-        ['{=TRANSPOSE(A1:B1)}']
+        ['{=TRANSPOSE(A1:B1)}'],
     ])
-    const dependencyGraph = engine.dependencyGraph;
+    const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
@@ -24,9 +23,9 @@ describe('Set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=A1+A2'],
       ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}']
+      ['{=TRANSPOSE(A1:B1)}'],
     ])
-    const dependencyGraph = engine.dependencyGraph;
+    const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
@@ -49,9 +48,9 @@ describe('Set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '{=TRANSPOSE(A2)}'],
       ['{=TRANSPOSE(A1:B1)}'],
-      ['{=TRANSPOSE(A1:B1)}']
+      ['{=TRANSPOSE(A1:B1)}'],
     ])
-    const dependencyGraph = engine.dependencyGraph;
+    const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     dependencyGraph.setMatrixEmpty(matrixVertex)
@@ -72,7 +71,7 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
       ['{=TRANSPOSE(A1:B1)}'],
     ])
-    const dependencyGraph = engine.dependencyGraph;
+    const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A2'), adr('A3'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
@@ -97,7 +96,7 @@ describe('Set matrix empty', () => {
       ['{=TRANSPOSE(A1:B1)}'],
       ['{=TRANSPOSE(A1:B1)}'],
     ])
-    const dependencyGraph = engine.dependencyGraph;
+    const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
     const rangeVertex  = dependencyGraph.rangeMapping.getRange(adr('A1'), adr('A2'))!
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)

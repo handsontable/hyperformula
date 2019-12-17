@@ -3,11 +3,10 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
-import {Matrix} from '../../Matrix'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, ProcedureAst} from '../../parser'
+import {coerceScalarToNumber} from '../coerce'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {coerceScalarToNumber} from '../coerce'
 
 interface IImplementedFunctions {
   [functionName: string]: {

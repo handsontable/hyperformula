@@ -2,11 +2,11 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {add, max, maxa, min, mina} from '../scalar'
 import {coerceToRange} from '../coerce'
+import { SimpleRangeValue} from '../InterpreterValue'
+import {add, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
 

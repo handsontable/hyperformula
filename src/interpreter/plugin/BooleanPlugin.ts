@@ -1,8 +1,8 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../coerce'
-import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions

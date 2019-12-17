@@ -10,7 +10,7 @@ import {
   ValueCellVertex,
   Vertex,
 } from '../src/DependencyGraph'
-import {simpleCellAddressToString} from "../src/parser";
+import {simpleCellAddressToString} from '../src/parser'
 
 export class EngineComparator {
 

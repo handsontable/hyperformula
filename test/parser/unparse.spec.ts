@@ -1,10 +1,10 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {ParserWithCaching, buildLexerConfig} from '../../src/parser'
+import {enGB, plPL} from '../../src/i18n'
+import {buildLexerConfig, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB, plPL} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()

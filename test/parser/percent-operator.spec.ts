@@ -1,8 +1,8 @@
-import {AstNodeType, CellAddress, MinusUnaryOpAst, ParserWithCaching, PlusOpAst, ProcedureAst} from "../../src/parser";
-import {Config} from "../../src";
-import {SheetMapping} from "../../src/DependencyGraph";
-import {enGB} from "../../src/i18n";
-import {PercentOpAst, TimesOpAst} from "../../src/parser/Ast";
+import {Config} from '../../src'
+import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
+import {AstNodeType, CellAddress, MinusUnaryOpAst, ParserWithCaching, PlusOpAst} from '../../src/parser'
+import {PercentOpAst, TimesOpAst} from '../../src/parser/Ast'
 
 describe('percent', () => {
   it('should parse % as operator', () => {

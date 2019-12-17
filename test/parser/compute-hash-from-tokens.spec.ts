@@ -1,12 +1,12 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB, plPL, TranslationPackage} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB, plPL, TranslationPackage} from "../../src/i18n";
 
 describe('computeHashFromTokens', () => {
   const computeFunc = (code: string, address: CellAddress, language: TranslationPackage = enGB): string => {
-    const config = new Config({ language: language})
+    const config = new Config({ language})
     const sheetMapping = new SheetMapping(language)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')

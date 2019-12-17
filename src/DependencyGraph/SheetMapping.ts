@@ -1,4 +1,4 @@
-import {TranslationPackage} from "../i18n";
+import {TranslationPackage} from '../i18n'
 export class SheetMapping {
   private readonly mapping: Map<string, number> = new Map()
   private readonly reversedMapping: Map<number, string> = new Map()
@@ -6,7 +6,7 @@ export class SheetMapping {
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    this.sheetNamePrefix = languages.interface['NEW_SHEET_PREFIX'] || this.sheetNamePrefix
+    this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
   }
 
   public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {

@@ -153,7 +153,7 @@ describe('Interpreter', () => {
 
   it('expression with parenthesis', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=(1+2)*3']
+        ['=(1+2)*3'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(9)

@@ -1,11 +1,10 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {matrixSizeForPoolFunction, matrixSizeForTranspose, matrixSizeForMultiplication, Matrix} from '../../Matrix'
+
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import { matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
-import {Interpreter} from '../Interpreter'
-import {FunctionPlugin} from './FunctionPlugin'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {coerceToRangeNumbersOrError} from '../coerce'
+import { SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -26,8 +25,8 @@ export class MatrixPlugin extends FunctionPlugin {
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [left, right] = ast.args
 
-    let leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
-    let rightMatrix = coerceToRangeNumbersOrError(this.evaluateAst(right, formulaAddress))
+    const leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
+    const rightMatrix = coerceToRangeNumbersOrError(this.evaluateAst(right, formulaAddress))
 
     if (leftMatrix instanceof CellError) {
       return leftMatrix
@@ -51,14 +50,14 @@ export class MatrixPlugin extends FunctionPlugin {
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
-      outputSize
+      outputSize,
     )
   }
 
   public maxpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
+    const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -95,14 +94,14 @@ export class MatrixPlugin extends FunctionPlugin {
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
-      outputSize
+      outputSize,
     )
   }
 
   public medianpool(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
     const [rangeArg, sizeArg] = ast.args as [Ast, NumberAst]
 
-    let rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
+    const rangeMatrix = coerceToRangeNumbersOrError(this.evaluateAst(rangeArg, formulaAddress))
     const windowSize = sizeArg.value
     let stride = windowSize
 
@@ -181,12 +180,12 @@ export class MatrixPlugin extends FunctionPlugin {
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
-      outputSize
+      outputSize,
     )
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
-    let value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
+    const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {
       return value
@@ -197,9 +196,9 @@ export class MatrixPlugin extends FunctionPlugin {
     const input = value.rawNumbers()
     const inputSize = value.size
     const result: number[][] = []
-    for (let i=0; i<inputSize.width; ++i) {
-      result[i] = [];
-      for (let j=0; j<inputSize.height; ++j) {
+    for (let i = 0; i < inputSize.width; ++i) {
+      result[i] = []
+      for (let j = 0; j < inputSize.height; ++j) {
         result[i][j] = input[j][i]
       }
     }

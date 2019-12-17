@@ -1,7 +1,7 @@
 import {Config, HyperFormula, LazilyTransformingAstService} from './'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
-import {ParserWithCaching, Unparser, buildLexerConfig} from './parser'
+import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics} from './statistics/Statistics'
 

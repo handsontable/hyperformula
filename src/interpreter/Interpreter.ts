@@ -8,10 +8,10 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
 import {coerceScalarToNumber} from './coerce'
-import {concatenate} from './text'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
+import {concatenate} from './text'
 
 export class Interpreter {
   private gpu?: GPU
@@ -190,13 +190,13 @@ export class Interpreter {
         if (matrixVertex) {
           const matrix = matrixVertex.matrix
           if (matrix instanceof NotComputedMatrix) {
-            throw "Matrix should be already computed"
+            throw new Error('Matrix should be already computed')
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
             return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
           } else {
-            throw "Unknown matrix"
+            throw new Error('Unknown matrix')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -219,9 +219,9 @@ export class Interpreter {
 
   public getGpuInstance(): GPU {
     if (!this.gpu) {
-      this.gpu = new GPU({mode: this.config.gpuMode, format: "Float"})
+      this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
     }
-    return this.gpu;
+    return this.gpu
   }
 
   public destroy() {

@@ -1,9 +1,8 @@
-import {CellVertex} from "../Vertex";
-import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from "../../Cell";
-import {RowsSpan} from "../../RowsSpan";
-import {ColumnsSpan} from "../../ColumnsSpan";
-import {IAddressMappingStrategy} from "./IAddressMappingStrategy";
-import {add} from "../../interpreter/scalar";
+import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {ColumnsSpan} from '../../ColumnsSpan'
+import {RowsSpan} from '../../RowsSpan'
+import {CellVertex} from '../Vertex'
+import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
 /**
  * Mapping from cell addresses to vertices

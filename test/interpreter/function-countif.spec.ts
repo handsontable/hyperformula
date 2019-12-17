@@ -1,4 +1,4 @@
-import {HyperFormula, Config} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
@@ -114,7 +114,7 @@ describe('Function COUNTIF', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1'],
       ['2'],
-      ['=COUNTIF(A1:A2, ">0")']
+      ['=COUNTIF(A1:A2, ">0")'],
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)

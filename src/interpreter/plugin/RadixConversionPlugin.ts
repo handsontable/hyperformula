@@ -1,9 +1,9 @@
-import {FunctionPlugin} from "./FunctionPlugin";
-import {ProcedureAst} from "../../parser";
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from "../../Cell";
-import {coerceScalarToNumber, coerceScalarToString} from "../coerce";
-import {SimpleRangeValue} from "../InterpreterValue";
-import {padLeft} from "../../format/format";
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {padLeft} from '../../format/format'
+import {ProcedureAst} from '../../parser'
+import {coerceScalarToNumber, coerceScalarToString} from '../coerce'
+import {SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 const NUMBER_OF_BITS = 10
 
@@ -19,14 +19,14 @@ export class RadixConversionPlugin extends FunctionPlugin {
       translationKey: 'DEC2HEX',
     },
     bin2dec: {
-      translationKey: 'BIN2DEC'
+      translationKey: 'BIN2DEC',
     },
     bin2oct: {
-      translationKey: 'BIN2OCT'
+      translationKey: 'BIN2OCT',
     },
     bin2hex: {
-      translationKey: 'BIN2HEX'
-    }
+      translationKey: 'BIN2HEX',
+    },
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -80,11 +80,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
       }
     }
 
-
     const decimal = twoComplementToDecimal(binaryWithSign)
     return decimalToBase(decimal, base, places)
   }
-
 
   private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
@@ -162,9 +160,6 @@ function decimalToRadixComplement(value: number, base: number): string {
 }
 
 function twoComplementToDecimal(value: string): number {
-  let offset = (value.length == NUMBER_OF_BITS && value.startsWith('1')) ? Math.pow(2, NUMBER_OF_BITS) : 0
+  const offset = (value.length == NUMBER_OF_BITS && value.startsWith('1')) ? Math.pow(2, NUMBER_OF_BITS) : 0
   return parseInt(value, 2) - offset
 }
-
-
-

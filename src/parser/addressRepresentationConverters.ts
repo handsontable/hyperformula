@@ -19,7 +19,7 @@ const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${a
 export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
-  let col = columnLabelToIndex(result[6])
+  const col = columnLabelToIndex(result[6])
 
   const maybeSheetName = result[3] || result[4]
   let sheet
@@ -47,7 +47,6 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   }
 }
 
-
 export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
   const simpleAddress = address.toSimpleCellAddress(baseAddress)
   const column = columnIndexToLabel(simpleAddress.col)
@@ -69,7 +68,7 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
 export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): SimpleCellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
-  let col = columnLabelToIndex(result[6])
+  const col = columnLabelToIndex(result[6])
 
   const maybeSheetName = result[3] || result[4]
   let sheet

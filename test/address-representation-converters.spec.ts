@@ -1,6 +1,5 @@
 import {simpleCellAddress} from '../src/Cell'
-import {simpleCellAddressFromString, simpleCellAddressToString} from "../src/parser";
-
+import {simpleCellAddressFromString, simpleCellAddressToString} from '../src/parser'
 
 describe('simpleCellAddressFromString', () => {
   const sheetMappingFunction = (name: string): number | undefined => {

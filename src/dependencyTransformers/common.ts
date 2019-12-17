@@ -68,7 +68,7 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
     case AstNodeType.PARENTHESIS: {
       return {
         type: ast.type,
-        expression: transformAddressesInFormula(ast.expression, address, transformCellAddressFn, transformCellRangeFn)
+        expression: transformAddressesInFormula(ast.expression, address, transformCellAddressFn, transformCellRangeFn),
       }
     }
     default: {

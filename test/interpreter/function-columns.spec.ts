@@ -25,11 +25,11 @@ describe('Function COLUMNS', () => {
   })
 
   // Inconsistency with Product 1
-  it("propagate only direct errors", () => {
+  it('propagate only direct errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=COLUMNS(4/0)'],
-      ['=COLUMNS(A1)']
+      ['=COLUMNS(A1)'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
@@ -37,11 +37,11 @@ describe('Function COLUMNS', () => {
   })
 
   // Inconsistency with Product 1
-  it("doesnt work with formulas", () => {
+  it('doesnt work with formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
-      ['=COLUMNS(MMULT(A1:B2, A1:B2))']
+      ['=COLUMNS(MMULT(A1:B2, A1:B2))'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))

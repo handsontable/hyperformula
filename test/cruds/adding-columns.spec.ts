@@ -1,10 +1,10 @@
 import {Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, expect_array_with_same_content, extractMatrixRange, extractRange} from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -288,7 +288,7 @@ describe('Adding column - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 })
 
 describe('Adding column - column index', () => {
@@ -306,4 +306,3 @@ describe('Adding column - column index', () => {
     expect_array_with_same_content([0], index.getValueIndex(0, 1, 1).index)
   })
 })
-

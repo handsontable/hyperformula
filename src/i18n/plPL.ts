@@ -56,6 +56,6 @@ export const plPL: TranslationPackage = {
     REF: '#ADR!',
   },
   interface: {
-    NEW_SHEET_PREFIX: 'Arkusz'
-  }
+    NEW_SHEET_PREFIX: 'Arkusz',
+  },
 }

@@ -1,9 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
-import {coerceScalarToNumber} from '../coerce'
-import {SimpleRangeValue} from '../InterpreterValue'
-
 
 /**
  * Interpreter plugin containing trigonometric functions

@@ -1,17 +1,17 @@
-import {HyperFormula, Config} from '../src'
+import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellValue, CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 import {dateNumberToMoment} from '../src/Date'
+import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {
   AstNodeType,
   buildCellErrorAst,
-  CellAddress, cellAddressFromString,
+  buildLexerConfig, CellAddress,
+  cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
   ProcedureAst,
   Unparser,
-  buildLexerConfig,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 

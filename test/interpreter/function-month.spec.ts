@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr, dateNumberToString} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Function MONTH', () => {
   it('with wrong arguments', () => {
@@ -59,4 +59,3 @@ describe('Function MONTH', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })
-

@@ -10,7 +10,6 @@ export namespace CellContent {
   }
 
   export class Empty {
-    private static instance: Empty
 
     public static getSingletonInstance() {
       if (!Empty.instance) {
@@ -18,6 +17,7 @@ export namespace CellContent {
       }
       return Empty.instance
     }
+    private static instance: Empty
   }
 
   export class Formula {

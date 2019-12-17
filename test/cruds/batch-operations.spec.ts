@@ -1,7 +1,7 @@
-import {EmptyValue, HyperFormula} from "../../src";
+import {EmptyValue, HyperFormula} from '../../src'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/CrudOperations'
 import '../testConfig'
-import {normalizeAddedIndexes, normalizeRemovedIndexes} from "../../src/CrudOperations";
-import {adr, expect_array_with_same_content} from "../testUtils";
+import {adr, expect_array_with_same_content} from '../testUtils'
 
 describe('batch cruds', () => {
   it('should run batch cruds and call recompute only once', () => {
@@ -9,7 +9,7 @@ describe('batch cruds', () => {
         //
         ['foo'],
         //
-        ['bar']
+        ['bar'],
     ])
 
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
@@ -20,9 +20,9 @@ describe('batch cruds', () => {
     })
 
     expect(recomputeSpy).toBeCalledTimes(1)
-    expect(engine.getCellValue(adr("A1"))).toEqual('foo')
-    expect(engine.getCellValue(adr("A2"))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr("A3"))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 
   it('should run batch cruds unitl fail and call recompute only once', () => {
@@ -30,7 +30,7 @@ describe('batch cruds', () => {
       //
       ['foo'],
       //
-      ['bar']
+      ['bar'],
     ])
 
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
@@ -43,9 +43,9 @@ describe('batch cruds', () => {
     })
 
     expect(recomputeSpy).toBeCalledTimes(1)
-    expect(engine.getCellValue(adr("A1"))).toEqual('foo')
-    expect(engine.getCellValue(adr("A2"))).toEqual(EmptyValue)
-    expect(engine.getCellValue(adr("A3"))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
+    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 })
 

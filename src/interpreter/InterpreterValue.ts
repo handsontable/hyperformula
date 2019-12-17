@@ -1,13 +1,13 @@
-import {CellValue} from '../Cell'
-import {MatrixSize} from '../Matrix'
-import {DependencyGraph} from '../DependencyGraph'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {CellValue} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
+import {MatrixSize} from '../Matrix'
 
 export class ArrayData {
   constructor(
     public readonly size: MatrixSize,
     public readonly data: CellValue[][],
-    public _hasOnlyNumbers: boolean
+    public _hasOnlyNumbers: boolean,
   ) {
   }
 
@@ -35,14 +35,14 @@ export class ArrayData {
     if (this.hasOnlyNumbers()) {
       return this.data as number[][]
     } else {
-      throw "Data is not only numbers"
+      throw new Error('Data is not only numbers')
     }
   }
 }
 
 export class OnlyRangeData {
   public data: CellValue[][] | undefined
-  public _hasOnlyNumbers?: boolean;
+  public _hasOnlyNumbers?: boolean
 
   constructor(
     public readonly size: MatrixSize,
@@ -65,13 +65,7 @@ export class OnlyRangeData {
     if (this.hasOnlyNumbers()) {
       return this.data as number[][]
     } else {
-      throw "Data is not only numbers"
-    }
-  }
-
-  private ensureThatComputed() {
-    if (this.data === undefined) {
-      this.data = this.computeDataFromDependencyGraph()
+      throw new Error('Data is not only numbers')
     }
   }
 
@@ -88,7 +82,7 @@ export class OnlyRangeData {
       this._hasOnlyNumbers = true
     }
 
-    return this._hasOnlyNumbers;
+    return this._hasOnlyNumbers
   }
 
   public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
@@ -98,6 +92,12 @@ export class OnlyRangeData {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data![i][j]
       }
+    }
+  }
+
+  private ensureThatComputed() {
+    if (this.data === undefined) {
+      this.data = this.computeDataFromDependencyGraph()
     }
   }
 
@@ -127,12 +127,12 @@ export class OnlyRangeData {
   }
 }
 
-export type RangeData = ArrayData | OnlyRangeData 
+export type RangeData = ArrayData | OnlyRangeData
 
 export class SimpleRangeValue {
-  constructor(
-    public readonly data: RangeData
-  ) {
+
+  public get size(): MatrixSize {
+    return this.data.size
   }
 
   public static onlyNumbersDataWithRange(data: number[][], size: MatrixSize, range: AbsoluteCellRange): SimpleRangeValue {
@@ -148,20 +148,20 @@ export class SimpleRangeValue {
   }
 
   public static fromScalar(scalar: CellValue): SimpleRangeValue {
-    let hasOnlyNumbers = (typeof scalar === 'number')
+    const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
+  }
+  constructor(
+    public readonly data: RangeData,
+  ) {
   }
 
   public width(): number {
-    return this.data.size.width;
+    return this.data.size.width
   }
 
   public height(): number {
-    return this.data.size.height;
-  }
-
-  public get size(): MatrixSize {
-    return this.data.size;
+    return this.data.size.height
   }
 
   public raw(): CellValue[][] {

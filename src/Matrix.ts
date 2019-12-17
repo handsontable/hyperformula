@@ -5,10 +5,10 @@ import {Ast, AstNodeType} from './parser'
 export class MatrixSize {
   constructor(
     public width: number,
-    public height: number
+    public height: number,
   ) {
     if (width <= 0 || height <= 0) {
-      throw Error("Incorrect matrix size")
+      throw Error('Incorrect matrix size')
     }
   }
 }
@@ -103,9 +103,9 @@ export function checkMatrixSize(ast: Ast, formulaAddress: SimpleCellAddress): Ma
 }
 
 export interface IMatrix {
+  size: MatrixSize,
   width(): number,
   height(): number,
-  size: MatrixSize,
   get(col: number, row: number): number | CellError,
 }
 
@@ -127,8 +127,8 @@ export class NotComputedMatrix implements IMatrix {
 }
 
 export class Matrix implements IMatrix {
-  private readonly matrix: number[][]
   public size: MatrixSize
+  private readonly matrix: number[][]
 
   constructor(matrix: number[][]) {
     this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)

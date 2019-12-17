@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('MINA', () => {
   it('MINA with empty args', () => {
@@ -52,7 +52,7 @@ describe('MINA', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['=MINA(MMULT(A1:B2, A1:B2))']
+      ['=MINA(MMULT(A1:B2, A1:B2))'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
@@ -62,7 +62,7 @@ describe('MINA', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
-      ['=MINA(A1:B2)']
+      ['=MINA(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

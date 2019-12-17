@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function IF", () => {
+describe('Function IF', () => {
   it('when value is true', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
 
@@ -25,7 +25,7 @@ describe("Function IF", () => {
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([['=IF("TRUE", "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("yes")
+    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
   })
 
   it('returns error if condition is an error', () => {

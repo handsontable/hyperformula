@@ -24,7 +24,7 @@ describe('Function ABS', () => {
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['="2"', '=ABS(A1)'],
-      ["=TRUE()", '=ABS(A2)'],
+      ['=TRUE()', '=ABS(A2)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(2)

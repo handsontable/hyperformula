@@ -1,4 +1,4 @@
-import {ErrorType} from "../Cell";
+import {ErrorType} from '../Cell'
 
 export type TranslationSet = Record<string, string>
 export type ErrorTranslationSet = Record<ErrorType, string>
@@ -17,7 +17,7 @@ export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTrans
   return {
     functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
     errors: pkg.errors,
-    interface: pkg.interface
+    interface: pkg.interface,
   }
 }
 

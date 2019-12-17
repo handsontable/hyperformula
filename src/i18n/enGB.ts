@@ -56,6 +56,6 @@ export const enGB: TranslationPackage = {
     REF: '#REF!',
   },
   interface: {
-    NEW_SHEET_PREFIX: 'Sheet'
-  }
+    NEW_SHEET_PREFIX: 'Sheet',
+  },
 }

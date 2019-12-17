@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function ROUNDUP", () => {
+describe('Function ROUNDUP', () => {
   it('number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ROUNDUP()', '=ROUNDUP(1, 2, 3)']
+      ['=ROUNDUP()', '=ROUNDUP(1, 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -60,7 +60,7 @@ describe("Function ROUNDUP", () => {
   it('propagates error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
-      ['=ROUNDUP(A1)', '=ROUNDUP(42, A1)', '=ROUNDUP(A1, FOO())']
+      ['=ROUNDUP(A1)', '=ROUNDUP(42, A1)', '=ROUNDUP(A1, FOO())'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

@@ -55,7 +55,7 @@ describe('MAXA', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['=MAXA(MMULT(A1:B2, A1:B2))']
+      ['=MAXA(MMULT(A1:B2, A1:B2))'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(22)
@@ -65,7 +65,7 @@ describe('MAXA', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
-      ['=MAXA(A1:B2)']
+      ['=MAXA(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

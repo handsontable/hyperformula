@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function INT", () => {
+describe('Function INT', () => {
   it('number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=INT()', '=INT(1, 2)']
+      ['=INT()', '=INT(1, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -42,7 +42,7 @@ describe("Function INT", () => {
   it('propagates error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
-      ['=INT(A1)']
+      ['=INT(A1)'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

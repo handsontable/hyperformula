@@ -3,9 +3,9 @@ import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, mom
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
-import {dateNumberRepresentation, coerceScalarToNumber} from '../coerce'
-import {FunctionPlugin} from './FunctionPlugin'
+import {coerceScalarToNumber, dateNumberRepresentation} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions

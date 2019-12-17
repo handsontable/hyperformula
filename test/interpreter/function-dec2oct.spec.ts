@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {CellValueType, ErrorType} from "../../src/Cell";
+import {CellError, HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 
 describe('function DEC2OCT', () => {
   it('should return error when wrong type of argument', () => {
@@ -27,10 +27,10 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(-12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("1")
-    expect(engine.getCellValue(adr('A2'))).toEqual("12")
-    expect(engine.getCellValue(adr('A3'))).toEqual("142")
-    expect(engine.getCellValue(adr('A4'))).toEqual("7777777764")
+    expect(engine.getCellValue(adr('A1'))).toEqual('1')
+    expect(engine.getCellValue(adr('A2'))).toEqual('12')
+    expect(engine.getCellValue(adr('A3'))).toEqual('142')
+    expect(engine.getCellValue(adr('A4'))).toEqual('7777777764')
   })
 
   it('should work for numeric strings', () => {
@@ -39,8 +39,8 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT("-15")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("173")
-    expect(engine.getCellValue(adr('A2'))).toEqual("7777777761")
+    expect(engine.getCellValue(adr('A1'))).toEqual('173')
+    expect(engine.getCellValue(adr('A2'))).toEqual('7777777761')
   })
 
   it('should work for reference', () => {
@@ -49,7 +49,7 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual("14")
+    expect(engine.getCellValue(adr('A2'))).toEqual('14')
   })
 
   it('should return string value', () => {

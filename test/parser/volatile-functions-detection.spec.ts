@@ -1,10 +1,10 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
 import {
   CellAddress,
   ParserWithCaching,
 } from '../../src/parser'
-import {enGB} from "../../src/i18n";
 
 describe('ParserWithCaching - volatile functions detection', () => {
   it('detects volatile functions', () => {

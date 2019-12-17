@@ -249,7 +249,7 @@ export interface PercentOpAst {
 
 export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
   type: AstNodeType.PERCENT_OP,
-  value: value
+  value,
 })
 
 export interface ProcedureAst {
@@ -271,7 +271,7 @@ export interface ParenthesisAst {
 
 export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
   type: AstNodeType.PARENTHESIS,
-  expression
+  expression,
 })
 
 export interface ErrorAst {

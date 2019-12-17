@@ -1,8 +1,8 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB, plPL} from "../../src/i18n";
 
 describe('Compute hash from ast', () => {
   const config = new Config()
@@ -135,7 +135,6 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
     expect(hash).toEqual(formula)
   })
-
 
   it('cell ref between strings', () => {
     const formula = '="A5"+A4+"A6"'

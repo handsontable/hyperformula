@@ -1,8 +1,6 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import { CellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
-import {SimpleRangeValue} from '../InterpreterValue'
-import {coerceScalarToNumber} from '../coerce'
 
 export class DegreesPlugin extends FunctionPlugin {
   public static implementedFunctions = {

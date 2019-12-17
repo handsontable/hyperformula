@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
-import {SimpleCellAddress} from '../Cell'
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -90,7 +90,6 @@ export class MatrixMapping {
       }
     }
   }
-
 
   public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()

@@ -1,11 +1,11 @@
-import {RowsSpan} from "./RowsSpan";
-import {Statistics, StatType} from "./statistics/Statistics";
-import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
-import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
-import {ColumnsSpan} from "./ColumnsSpan";
-import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
-import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
-import {Config} from "./Config";
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnsSpan} from './ColumnsSpan'
+import {Config} from './Config'
+import { ContentChanges} from './ContentChanges'
 import {
   AddressMapping,
   DependencyGraph,
@@ -13,21 +13,21 @@ import {
   FormulaCellVertex,
   MatrixVertex,
   SheetMapping,
-  ValueCellVertex
-} from "./DependencyGraph";
-import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
-import {ParserWithCaching, ProcedureAst} from "./parser";
-import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index, InvalidAddressError, NoSheetWithIdError, NoSheetWithNameError} from "./HyperFormula";
-import {IBatchExecutor} from "./IBatchExecutor";
-import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {buildMatrixVertex} from "./GraphBuilder";
-import {absolutizeDependencies} from "./absolutizeDependencies";
-import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
-import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+  ValueCellVertex,
+} from './DependencyGraph'
+import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
+import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
+import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
+import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
+import {buildMatrixVertex} from './GraphBuilder'
+import {Index, InvalidAddressError, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
+import {IBatchExecutor} from './IBatchExecutor'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ParserWithCaching, ProcedureAst} from './parser'
+import {RowsSpan} from './RowsSpan'
+import {Statistics, StatType} from './statistics/Statistics'
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -436,7 +436,7 @@ export class CrudOperations implements IBatchExecutor {
    */
   private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.addressMapping.getHeight(sheet)
-    return row >= height;
+    return row >= height
   }
 
   /**
@@ -447,7 +447,7 @@ export class CrudOperations implements IBatchExecutor {
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
-    return column >= width;
+    return column >= width
   }
 
   private get addressMapping(): AddressMapping {

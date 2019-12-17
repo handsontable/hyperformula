@@ -24,7 +24,7 @@ describe('Function DEGREES', () => {
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['="3.14"', '=DEGREES(A1)'],
-      ["=TRUE()", '=DEGREES(A2)'],
+      ['=TRUE()', '=DEGREES(A2)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(179.9087477)

@@ -1,4 +1,4 @@
-import {EmptyValue, CellError, CellValue, ErrorType} from '../Cell'
+import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -87,10 +87,10 @@ export function coerceScalarToString(arg: CellValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
   } else if (arg === EmptyValue) {
-    return ""
+    return ''
   } else if (typeof arg === 'number') {
     return arg.toString()
   } else {
-    return arg ? "TRUE" : "FALSE"
+    return arg ? 'TRUE' : 'FALSE'
   }
 }

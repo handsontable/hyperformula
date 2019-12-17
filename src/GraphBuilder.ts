@@ -1,5 +1,6 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
@@ -8,7 +9,6 @@ import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellContentParser, CellContent, RawCellContent} from './CellContentParser'
 
 /**
  * Two-dimenstional array representation of sheet

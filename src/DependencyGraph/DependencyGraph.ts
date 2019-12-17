@@ -6,17 +6,17 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, AstNodeType} from '../parser'
+import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
+import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {collectAddressesDependentToMatrix} from "./collectAddressesDependentToMatrix";
 
 export class DependencyGraph {
   /*

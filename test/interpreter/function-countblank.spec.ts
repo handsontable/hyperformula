@@ -28,7 +28,7 @@ describe('COUNTBLANK', () => {
     const engine = HyperFormula.buildFromArray([
       [null],
       ['=4/0'],
-      ['=COUNTBLANK(A1:A2)']
+      ['=COUNTBLANK(A1:A2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
@@ -36,7 +36,7 @@ describe('COUNTBLANK', () => {
 
   it('does not propagate errors from arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=COUNTBLANK(4/0)']
+      ['=COUNTBLANK(4/0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)

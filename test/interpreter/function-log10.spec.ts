@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe("Function LOG10", () => {
+describe('Function LOG10', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=LOG10(10)']])
 

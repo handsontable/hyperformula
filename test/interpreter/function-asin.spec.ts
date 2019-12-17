@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe("Function ASIN", () => {
+describe('Function ASIN', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=ASIN(0)']])
 

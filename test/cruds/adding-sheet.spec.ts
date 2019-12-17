@@ -1,6 +1,6 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
+import {plPL} from '../../src/i18n'
 import '../testConfig'
-import {plPL} from "../../src/i18n";
 import {adr} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
@@ -12,8 +12,8 @@ describe('Adding sheet - checking if its possible', () => {
 
   it('no', () => {
     const engine = HyperFormula.buildFromSheets({
-      'Sheet1': [],
-      'Foo': [],
+      Sheet1: [],
+      Foo: [],
     })
 
     expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(false)
@@ -73,7 +73,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet('foo')
 
-    expect(sheetName).toEqual("foo")
+    expect(sheetName).toEqual('foo')
 
   })
 
@@ -82,6 +82,6 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet()
 
-    expect(sheetName).toEqual("Sheet1")
+    expect(sheetName).toEqual('Sheet1')
   })
 })

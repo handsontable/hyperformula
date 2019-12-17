@@ -1,8 +1,8 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
 import {AstNodeType, ConcatenateOpAst, ParserWithCaching, ProcedureAst} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB} from "../../src/i18n";
 
 describe('Parser - Concatenate operators', () => {
   it('Greater than operator', () => {

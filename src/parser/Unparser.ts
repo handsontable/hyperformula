@@ -1,10 +1,10 @@
+
 import {SimpleCellAddress} from '../Cell'
-import assert from 'assert'
+import {cellAddressToString} from './addressRepresentationConverters'
 import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
+import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {cellAddressToString} from "./addressRepresentationConverters";
-import {ILexerConfig, additionalCharactersAllowedInQuotes} from './LexerConfig'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -48,7 +48,7 @@ export class Unparser {
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        let unparsedExpr = this.unparseAst(ast.value, address)
+        const unparsedExpr = this.unparseAst(ast.value, address)
         return '-' + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
@@ -66,8 +66,8 @@ export class Unparser {
         return '(' + expression + ')'
       }
       default: {
-        let left = this.unparseAst(ast.left, address)
-        let right = this.unparseAst(ast.right, address)
+        const left = this.unparseAst(ast.left, address)
+        const right = this.unparseAst(ast.right, address)
         return left + binaryOpTokenMap[ast.type] + right
       }
     }
