@@ -17,6 +17,7 @@ import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
+import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
@@ -80,6 +81,7 @@ export class Config {
     LogarithmPlugin,
     BitwiseLogicOperationsPlugin,
     BitShiftPlugin,
+    PowerPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

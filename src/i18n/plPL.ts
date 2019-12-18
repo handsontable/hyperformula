@@ -50,6 +50,7 @@ export const plPL: TranslationPackage = {
     BITXOR: 'BITXOR',
     BITLSHIFT: 'BITLSHIFT',
     BITRSHIFT: 'BITRSHIFT',
+    POWER: 'POTĘGA',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

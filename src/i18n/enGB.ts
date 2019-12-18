@@ -50,6 +50,7 @@ export const enGB: TranslationPackage = {
     BITXOR: 'BITXOR',
     BITLSHIFT: 'BITLSHIFT',
     BITRSHIFT: 'BITRSHIFT',
+    POWER: 'POWER',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
