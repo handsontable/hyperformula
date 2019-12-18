@@ -4,9 +4,9 @@ import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'
-import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {CellVertex} from '../Vertex'
-import {IAddressMappingStrategy} from "./IAddressMappingStrategy";
+import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
+import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
 /**
  * Returns actual width, height and fill ratio of a sheet
@@ -226,12 +226,12 @@ export class AddressMapping {
     }
   }
 
-  public* sheetEntries(sheet: number) {
+  public* sheetEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const sheetMapping = this.mapping.get(sheet)
     if (sheetMapping) {
-      yield* sheetMapping.vertices()
+      yield* sheetMapping.getEntries(sheet)
     } else {
-      throw new Error("Sheet does not exists")
+      throw new Error('Sheet does not exists')
     }
   }
 
@@ -241,5 +241,9 @@ export class AddressMapping {
 
   public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
     yield* this.mapping.get(sheet)!.verticesFromRow(row)
+  }
+
+  public destroy(): void {
+    this.mapping.clear()
   }
 }

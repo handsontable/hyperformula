@@ -1,10 +1,11 @@
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellAddress, CellReferenceType} from './CellAddress'
+import {additionalCharactersAllowedInQuotes} from './LexerConfig'
 
 export type SheetMappingFn = (sheetName: string) => number | undefined
 export type SheetIndexMappingFn = (sheetIndex: number) => string | undefined
 
-const addressRegex = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/
+const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -18,11 +19,12 @@ const addressRegex = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/
 export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
-  let col = columnLabelToIndex(result[4])
+  const col = columnLabelToIndex(result[6])
 
+  const maybeSheetName = result[3] || result[4]
   let sheet
-  if (result[2]) {
-    sheet = sheetMapping(result[2])
+  if (maybeSheetName) {
+    sheet = sheetMapping(maybeSheetName)
   } else if (overrideSheet !== undefined) {
     sheet = overrideSheet
   } else {
@@ -33,18 +35,17 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     return undefined
   }
 
-  const row = Number(result[6] as string) - 1
-  if (result[3] === '$' && result[5] === '$') {
+  const row = Number(result[8] as string) - 1
+  if (result[5] === '$' && result[7] === '$') {
     return CellAddress.absolute(sheet, col, row)
-  } else if (result[3] === '$') {
-    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
   } else if (result[5] === '$') {
+    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
+  } else if (result[7] === '$') {
     return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
   } else {
     return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
   }
 }
-
 
 export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
   const simpleAddress = address.toSimpleCellAddress(baseAddress)
@@ -57,30 +58,31 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
 /**
  * Computes simple (absolute) address of a cell address based on it's string representation.
  * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
- * If sheet name is not present in string representation, returns {@param overrideSheet} as sheet number
+ * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
  *
  * @param sheetMapping - mapping function needed to change name of a sheet to index
  * @param stringAddress - string representation of cell address, e.g. 'C64'
- * @param overrideSheet - override sheet index regardless of sheet mapping
+ * @param sheetContext - sheet in context of which we should parse the address
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, overrideSheet: number): SimpleCellAddress | undefined => {
+export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): SimpleCellAddress | undefined => {
   const result = stringAddress.match(addressRegex)!
 
-  let col = columnLabelToIndex(result[4])
+  const col = columnLabelToIndex(result[6])
 
+  const maybeSheetName = result[3] || result[4]
   let sheet
-  if (result[2]) {
-    sheet = sheetMapping(result[2])
+  if (maybeSheetName) {
+    sheet = sheetMapping(maybeSheetName)
   } else {
-    sheet = overrideSheet
+    sheet = sheetContext
   }
 
   if (sheet === undefined) {
     return undefined
   }
 
-  const row = Number(result[6] as string) - 1
+  const row = Number(result[8] as string) - 1
   return simpleCellAddress(sheet, col, row)
 }
 
@@ -101,7 +103,7 @@ export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn
   }
 
   if (sheetIndex !== address.sheet) {
-    return `\$${sheetName}.${column}${address.row + 1}`
+    return `${sheetName}!${column}${address.row + 1}`
   } else {
     return `${column}${address.row + 1}`
   }

@@ -1,9 +1,9 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
-import {Matrix} from '../Matrix'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {Matrix} from '../Matrix'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
@@ -26,6 +26,8 @@ export interface IColumnSearchStrategy {
   removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void
 
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number
+
+  destroy(): void
 }
 
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): IColumnSearchStrategy {

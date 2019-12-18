@@ -1,7 +1,6 @@
-import {EmptyValueType, CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst, Ast} from '../../parser'
+import {CellError, CellValue, EmptyValueType, ErrorType, SimpleCellAddress} from '../../Cell'
+import { ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
-import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
@@ -32,11 +31,11 @@ export class CountUniquePlugin extends FunctionPlugin {
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       if (scalarValue instanceof CellError) {
         errorsSet.add(scalarValue.type)
-      } else if (scalarValue !== "") {
+      } else if (scalarValue !== '') {
         valuesSet.add(scalarValue)
       }
     }
-    
+
     return valuesSet.size + errorsSet.size
   }
 }

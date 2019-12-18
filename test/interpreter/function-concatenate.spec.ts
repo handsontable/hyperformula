@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('function CONCATENATE', () => {
   it('validate arguments', () => {
@@ -35,7 +35,7 @@ describe('function CONCATENATE', () => {
 
   it('empty value is empty string', () => {
     const engine = HyperFormula.buildFromArray([
-      ['foo', '', 'bar', '=CONCATENATE(A1, B1, C1)']
+      ['foo', '', 'bar', '=CONCATENATE(A1, B1, C1)'],
     ])
 
     expect(engine.getCellValue(adr('D1'))).toEqual('foobar')
@@ -45,7 +45,7 @@ describe('function CONCATENATE', () => {
     const engine = HyperFormula.buildFromArray([
       ['Topleft', 'Topright'],
       ['Bottomleft', 'Bottomright'],
-      ['=CONCATENATE(A1:B2)']
+      ['=CONCATENATE(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual('TopleftToprightBottomleftBottomright')
@@ -53,9 +53,11 @@ describe('function CONCATENATE', () => {
 
   it('coerce to strings', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=TRUE()', '42', '=CONCATENATE(A1:B1)']
+      ['=TRUE()', '42', '=CONCATENATE(A1:B1)'],
+      ['=TRUE()', '=42%', '=CONCATENATE(A2:B2)'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual('TRUE42')
+    expect(engine.getCellValue(adr('C2'))).toEqual('TRUE0.42')
   })
 })

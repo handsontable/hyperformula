@@ -1,8 +1,8 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../coerce'
-import {FunctionPlugin} from './FunctionPlugin'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions
@@ -23,6 +23,12 @@ export class BooleanPlugin extends FunctionPlugin {
     },
     or: {
       translationKey: 'OR',
+    },
+    xor: {
+      translationKey: 'XOR',
+    },
+    not: {
+      translationKey: 'NOT',
     },
   }
 
@@ -101,15 +107,21 @@ export class BooleanPlugin extends FunctionPlugin {
     }
 
     let result: CellValue = true
+    let anyReasonableValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
         return coercedValue
-      } else {
+      } else if (coercedValue !== null) {
         result = result && coercedValue
+        anyReasonableValue = true
       }
     }
-    return result
+    if (anyReasonableValue) {
+      return result
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 
   /**
@@ -125,15 +137,61 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    let result: CellValue = false
+    let result: CellValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
         return coercedValue
-      } else {
+      } else if (coercedValue !== null) {
         result = result || coercedValue
       }
     }
-    return result
+    if (result === null) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return result
+    }
+  }
+
+  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const argValue = this.evaluateAst(ast.args[0], formulaAddress)
+    if (argValue instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      const coercedValue = coerceScalarToBoolean(argValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      } else {
+        return !coercedValue
+      }
+    }
+  }
+
+  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    let truesCount = 0
+    let anyFalseValue = false
+    for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
+      const coercedValue = coerceScalarToBoolean(scalarValue)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      } else if (coercedValue === true) {
+        truesCount++
+      } else if (coercedValue === false) {
+        anyFalseValue = true
+      }
+    }
+    if (anyFalseValue || truesCount > 0) {
+      return (truesCount % 2 === 1)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
   }
 }

@@ -1,7 +1,7 @@
-import {DependencyGraph} from "../DependencyGraph";
-import {Ast, CellAddress} from "../parser";
-import {transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from "./common";
-import {ErrorType, SimpleCellAddress} from "../Cell";
+import {ErrorType, SimpleCellAddress} from '../Cell'
+import {DependencyGraph} from '../DependencyGraph'
+import {Ast, CellAddress} from '../parser'
+import {CellAddressTransformerFunction, cellRangeTransformer, transformAddressesInFormula} from './common'
 
 export namespace RemoveSheetDependencyTransformer {
   export function transform(removedSheet: number, graph: DependencyGraph) {

@@ -8,6 +8,7 @@ export type Ast =
   | CellRangeAst
   | ConcatenateOpAst
   | MinusUnaryOpAst
+  | PercentOpAst
   | EqualsOpAst
   | NotEqualOpAst
   | GreaterThanOpAst
@@ -20,6 +21,7 @@ export type Ast =
   | DivOpAst
   | PowerOpAst
   | ProcedureAst
+  | ParenthesisAst
   | ErrorAst
 
 export interface ParsingError {
@@ -41,6 +43,8 @@ export enum AstNodeType {
 
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
 
+  PERCENT_OP = 'PERCENT_OP',
+
   CONCATENATE_OP = 'CONCATENATE_OP',
 
   EQUALS_OP = 'EQUALS_OP',
@@ -57,6 +61,8 @@ export enum AstNodeType {
   POWER_OP = 'POWER_OP',
 
   FUNCTION_CALL = 'FUNCTION_CALL',
+
+  PARENTHESIS = 'PARENTHESES',
 
   CELL_REFERENCE = 'CELL_REFERENCE',
 
@@ -236,6 +242,16 @@ export const buildPowerOpAst = (left: Ast, right: Ast): PowerOpAst => ({
   right,
 })
 
+export interface PercentOpAst {
+  type: AstNodeType.PERCENT_OP,
+  value: Ast,
+}
+
+export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
+  type: AstNodeType.PERCENT_OP,
+  value,
+})
+
 export interface ProcedureAst {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
@@ -246,6 +262,16 @@ export const buildProcedureAst = (procedureName: string, args: Ast[]): Procedure
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
+})
+
+export interface ParenthesisAst {
+  type: AstNodeType.PARENTHESIS,
+  expression: Ast
+}
+
+export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
+  type: AstNodeType.PARENTHESIS,
+  expression,
 })
 
 export interface ErrorAst {

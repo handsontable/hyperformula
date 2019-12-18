@@ -30,6 +30,7 @@ export const plPL: TranslationPackage = {
     RAND: 'LOSUJ',
     SPLIT: 'PODZIEL.TEKST',
     SUM: 'SUMA',
+    SUMSQ: 'SUMSQ',
     SUMIF: 'SUMA.JEŻELI',
     SUMIFS: 'SUMY.JEŻELI',
     SUMPRODUCT: 'SUMA.ILOCZYNÓW',
@@ -38,6 +39,15 @@ export const plPL: TranslationPackage = {
     TRUE: 'PRAWDA',
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
+    DEC2BIN: 'DEC2BIN',
+    DEC2OCT: 'DEC2OCT',
+    DEC2HEX: 'DEC2HEX',
+    BIN2DEC: 'BIN2DEC',
+    BIN2OCT: 'BIN2OCT',
+    BIN2HEX: 'BIN2HEX',
+    BITAND: 'BITAND',
+    BITOR: 'BITOR',
+    BITXOR: 'BITXOR',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
@@ -49,6 +59,6 @@ export const plPL: TranslationPackage = {
     REF: '#ADR!',
   },
   interface: {
-    NEW_SHEET_PREFIX: 'Arkusz'
-  }
+    NEW_SHEET_PREFIX: 'Arkusz',
+  },
 }

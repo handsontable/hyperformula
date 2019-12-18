@@ -1,14 +1,12 @@
 export {
   cellAddressFromString,
   simpleCellAddressFromString,
-  simpleCellAddressToString
+  simpleCellAddressToString,
 } from './addressRepresentationConverters'
 
 export {CellAddress} from './CellAddress'
 
 export {
-  isFormula,
-  isMatrix,
   ParserWithCaching,
 } from './ParserWithCaching'
 

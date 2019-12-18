@@ -1,10 +1,10 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function AND", () => {
-  it('function OR usage', () => {
+describe('Function OR', () => {
+  it('usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
     ])
@@ -18,9 +18,11 @@ describe("Function AND", () => {
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OR("TRUE", 0)'],
+      ['=OR("foo", 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(false)
   })
 
   it('function OR with numerical arguments', () => {
@@ -45,7 +47,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['=FOOBAR()', '1'],
-      ['=OR(A1:B2)']
+      ['=OR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -55,7 +57,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['0', '0'],
       ['0', '1'],
-      ['=OR(A1:B2)']
+      ['=OR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(true)
@@ -65,7 +67,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['0', '1'],
-      ['=OR(A1:B2)']
+      ['=OR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

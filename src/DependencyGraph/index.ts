@@ -10,5 +10,5 @@ export { FormulaCellVertex } from './FormulaCellVertex'
 export { EmptyCellVertex } from './EmptyCellVertex'
 export { ValueCellVertex } from './ValueCellVertex'
 export { RangeVertex, CriterionCache } from './RangeVertex'
-export {SparseStrategy} from "./AddressMapping/SparseStrategy";
-export {DenseStrategy} from "./AddressMapping/DenseStrategy";
+export {SparseStrategy} from './AddressMapping/SparseStrategy'
+export {DenseStrategy} from './AddressMapping/DenseStrategy'

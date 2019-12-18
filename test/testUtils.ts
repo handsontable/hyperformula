@@ -1,12 +1,13 @@
-import {HyperFormula, Config} from '../src'
+import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellValue, CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 import {dateNumberToMoment} from '../src/Date'
+import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {
   AstNodeType,
   buildCellErrorAst,
-  CellAddress, cellAddressFromString,
+  buildLexerConfig, CellAddress,
+  cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
   ProcedureAst,
@@ -43,7 +44,7 @@ export const expect_function_to_have_ref_error = (engine: HyperFormula, address:
 export const expect_cell_to_have_formula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
   const formula = (engine.addressMapping.fetchCell(address!) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
-  const unparser = new Unparser(engine.config, engine.sheetMapping.name)
+  const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.name)
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 

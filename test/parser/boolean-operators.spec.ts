@@ -1,5 +1,6 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
 import {
   AstNodeType,
   EqualsOpAst,
@@ -11,7 +12,6 @@ import {
   ParserWithCaching,
 } from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB} from "../../src/i18n";
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {

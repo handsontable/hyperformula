@@ -30,6 +30,7 @@ export const enGB: TranslationPackage = {
     RAND: 'RAND',
     SPLIT: 'SPLIT',
     SUM: 'SUM',
+    SUMSQ: 'SUMSQ',
     SUMIF: 'SUMIF',
     SUMIFS: 'SUMIFS',
     SUMPRODUCT: 'SUMPRODUCT',
@@ -38,6 +39,15 @@ export const enGB: TranslationPackage = {
     TRUE: 'TRUE',
     VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
+    DEC2BIN: 'DEC2BIN',
+    DEC2OCT: 'DEC2OCT',
+    DEC2HEX: 'DEC2HEX',
+    BIN2DEC: 'BIN2DEC',
+    BIN2OCT: 'BIN2OCT',
+    BIN2HEX: 'BIN2HEX',
+    BITAND: 'BITAND',
+    BITOR: 'BITOR',
+    BITXOR: 'BITXOR',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
@@ -49,6 +59,6 @@ export const enGB: TranslationPackage = {
     REF: '#REF!',
   },
   interface: {
-    NEW_SHEET_PREFIX: 'Sheet'
-  }
+    NEW_SHEET_PREFIX: 'Sheet',
+  },
 }

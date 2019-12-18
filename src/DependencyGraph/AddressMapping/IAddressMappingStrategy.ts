@@ -1,7 +1,7 @@
-import {SheetCellAddress, SimpleCellAddress} from "../../Cell";
-import {CellVertex} from "../Vertex";
-import {RowsSpan} from "../../RowsSpan";
-import {ColumnsSpan} from "../../ColumnsSpan";
+import {SheetCellAddress, SimpleCellAddress} from '../../Cell'
+import {ColumnsSpan} from '../../ColumnsSpan'
+import {RowsSpan} from '../../RowsSpan'
+import {CellVertex} from '../Vertex'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 /**
@@ -50,7 +50,7 @@ export interface IAddressMappingStrategy {
 
   removeColumns(removedColumns: ColumnsSpan): void,
 
-  getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex | null]>,
+  getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]>,
 
   verticesFromColumn(column: number): IterableIterator<CellVertex>,
 

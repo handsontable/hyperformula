@@ -1,8 +1,8 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
 import {cellAddressFromString} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB} from "../../src/i18n";
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
@@ -37,6 +37,6 @@ describe('cellAddressFromString', () => {
     const sheetMapping = new SheetMapping(enGB)
     const sheet1 = sheetMapping.addSheet('Sheet1')
     const sheet2 = sheetMapping.addSheet('Sheet2')
-    expect(cellAddressFromString(sheetMapping.get, '$Sheet2.B3', simpleCellAddress(sheet1, 0, 0))).toEqual(CellAddress.relative(sheet2, 1, 2))
+    expect(cellAddressFromString(sheetMapping.get, 'Sheet2!B3', simpleCellAddress(sheet1, 0, 0))).toEqual(CellAddress.relative(sheet2, 1, 2))
   })
 })

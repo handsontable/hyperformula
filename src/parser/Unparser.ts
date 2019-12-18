@@ -1,14 +1,17 @@
+
 import {SimpleCellAddress} from '../Cell'
+import {cellAddressToString} from './addressRepresentationConverters'
 import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
+import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {cellAddressToString} from "./addressRepresentationConverters";
 
 export type SheetMappingFn = (sheetId: number) => string
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
+    private readonly lexerConfig: ILexerConfig,
     private readonly sheetMappingFn: SheetMappingFn,
   ) {
   }
@@ -27,26 +30,29 @@ export class Unparser {
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        return ast.procedureName + '(' + args + ')'
+        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
+        return procedureName + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
         if (ast.reference.sheet === address.sheet) {
           return cellAddressToString(ast.reference, address)
         } else {
-          const sheet = this.sheetMappingFn(ast.reference.sheet)
-          return '$' + sheet + '.' + cellAddressToString(ast.reference, address)
+          return this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
         }
       }
       case AstNodeType.CELL_RANGE: {
         if (ast.start.sheet === address.sheet) {
           return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
-          const sheet = this.sheetMappingFn(ast.start.sheet)
-          return '$' + sheet + '.' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.unparseAst(ast.value, address)
+        const unparsedExpr = this.unparseAst(ast.value, address)
+        return '-' + unparsedExpr
+      }
+      case AstNodeType.PERCENT_OP: {
+        return this.unparseAst(ast.value, address) + '%'
       }
       case AstNodeType.ERROR: {
         if (ast.error) {
@@ -55,9 +61,24 @@ export class Unparser {
           return '#ERR!'
         }
       }
-      default: {
-        return this.unparseAst(ast.left, address) + binaryOpTokenMap[ast.type] + this.unparseAst(ast.right, address)
+      case AstNodeType.PARENTHESIS: {
+        const expression = this.unparseAst(ast.expression, address)
+        return '(' + expression + ')'
       }
+      default: {
+        const left = this.unparseAst(ast.left, address)
+        const right = this.unparseAst(ast.right, address)
+        return left + binaryOpTokenMap[ast.type] + right
+      }
+    }
+  }
+
+  private unparseSheetName(sheetId: number): string {
+    const sheet = this.sheetMappingFn(sheetId)
+    if (sheet.match(new RegExp(additionalCharactersAllowedInQuotes))) {
+      return `'${sheet}'`
+    } else {
+      return sheet
     }
   }
 }

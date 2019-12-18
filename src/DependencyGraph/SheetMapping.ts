@@ -1,4 +1,4 @@
-import {TranslationPackage} from "../i18n";
+import {TranslationPackage} from '../i18n'
 export class SheetMapping {
   private readonly mapping: Map<string, number> = new Map()
   private readonly reversedMapping: Map<number, string> = new Map()
@@ -6,7 +6,7 @@ export class SheetMapping {
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    this.sheetNamePrefix = languages.interface['NEW_SHEET_PREFIX'] || this.sheetNamePrefix
+    this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
   }
 
   public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
@@ -52,6 +52,10 @@ export class SheetMapping {
     return name
   }
 
+  public getName(sheetId: number): string | undefined {
+    return this.reversedMapping.get(sheetId)
+  }
+
   public names(): IterableIterator<string> {
     return this.mapping.keys()
   }
@@ -66,5 +70,28 @@ export class SheetMapping {
 
   public hasSheetWithName(sheetName: string): boolean {
     return this.mapping.has(sheetName)
+  }
+
+  public renameSheet(sheetId: number, newName: string): void {
+    const currentName = this.reversedMapping.get(sheetId)
+    if (currentName === newName) {
+      return
+    }
+    if (currentName === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    if (this.mapping.has(newName)) {
+      throw new Error(`Sheet '${newName}' already exists`)
+    }
+
+    this.mapping.delete(currentName)
+    this.mapping.set(newName, sheetId)
+    this.reversedMapping.delete(sheetId)
+    this.reversedMapping.set(sheetId, newName)
+  }
+
+  public destroy(): void {
+    this.mapping.clear()
+    this.reversedMapping.clear()
   }
 }

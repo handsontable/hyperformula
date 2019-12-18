@@ -145,6 +145,10 @@ export class RangeMapping {
     }
   }
 
+  public destroy(): void {
+    this.rangeMapping.clear()
+  }
+
   private* entriesFromSheet(sheet: number): IterableIterator<[string, RangeVertex]> {
     const sheetMap = this.rangeMapping.get(sheet)
     if (!sheetMap) {

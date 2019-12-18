@@ -1,8 +1,8 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB} from '../../src/i18n'
 import {AstNodeType, CellRangeAst, ErrorAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {enGB} from "../../src/i18n";
 
 describe('Parser - range offset', () => {
   it('OFFSET - usage with range', () => {

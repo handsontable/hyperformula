@@ -1,14 +1,13 @@
-
 import {IToken, tokenMatcher} from 'chevrotain'
-import { SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
+import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig} from './LexerConfig'
+import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export interface ParsingResult {
@@ -85,6 +84,11 @@ export class ParserWithCaching {
           hash = hash.concat(cellHashFromToken(cellAddress))
         }
         idx++
+      } else if (tokenMatcher(token, ProcedureName)) {
+        const procedureName = token.image.toUpperCase().slice(0, -1)
+        const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
+        hash = hash.concat(canonicalProcedureName, '(')
+        idx++
       } else {
         hash = hash.concat(token.image)
         idx++
@@ -100,6 +104,10 @@ export class ParserWithCaching {
 
   public computeHashFromAst(ast: Ast): string {
     return '=' + this.computeHashOfAstNode(ast)
+  }
+
+  public destroy(): void {
+    this.cache.destroy()
   }
 
   private computeHashOfAstNode(ast: Ast): string {
@@ -125,27 +133,20 @@ export class ParserWithCaching {
       case AstNodeType.MINUS_UNARY_OP: {
         return '-' + this.computeHashOfAstNode(ast.value)
       }
+      case AstNodeType.PERCENT_OP: {
+        return this.computeHashOfAstNode(ast.value) + '%'
+      }
       case AstNodeType.ERROR: {
         return '!ERR'
+      }
+      case AstNodeType.PARENTHESIS: {
+        return '(' + this.computeHashOfAstNode(ast.expression) + ')'
       }
       default: {
         return this.computeHashOfAstNode(ast.left) + binaryOpTokenMap[ast.type] + this.computeHashOfAstNode(ast.right)
       }
     }
   }
-}
-
-/**
- * Checks whether string looks like formula or not.
- *
- * @param text - formula
- */
-export function isFormula(text: string): Boolean {
-  return text.startsWith('=')
-}
-
-export function isMatrix(text: string): Boolean {
-  return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
 export const cellHashFromToken = (cellAddress: CellAddress): string => {

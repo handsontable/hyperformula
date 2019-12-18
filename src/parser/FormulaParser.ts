@@ -1,6 +1,7 @@
-import {ILexingResult, IOrAlt, Lexer, OrMethodOpts, Parser, tokenMatcher} from 'chevrotain'
+import {EmbeddedActionsParser, ILexingResult, IOrAlt, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -18,7 +19,8 @@ import {
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
-  buildNumberAst,
+  buildNumberAst, buildParenthesisAst,
+  buildPercentOpAst,
   buildPlusOpAst,
   buildPowerOpAst,
   buildProcedureAst,
@@ -28,7 +30,6 @@ import {
   ParsingErrorType,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   AdditionOp,
   BooleanOp,
@@ -47,6 +48,7 @@ import {
   MultiplicationOp,
   NotEqualOp,
   NumberLiteral,
+  PercentOp,
   PlusOp,
   PowerOp,
   ProcedureName,
@@ -74,7 +76,7 @@ import {
  * A -> A1 | $A1 | A$1 | $A$1 <br/>
  * P -> SUM(..) <br/>
  */
-export class FormulaParser extends Parser {
+export class FormulaParser extends EmbeddedActionsParser {
 
   /**
    * Entry rule
@@ -83,7 +85,6 @@ export class FormulaParser extends Parser {
     this.CONSUME(EqualsOp)
     return this.SUBRULE(this.booleanExpression)
   })
-
   private lexerConfig: ILexerConfig
 
   /**
@@ -223,14 +224,30 @@ export class FormulaParser extends Parser {
       {
         ALT: () => {
           this.CONSUME(MinusOp)
-          const value = this.SUBRULE(this.positiveAtomicExpression)
+          const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
           return buildMinusUnaryOpAst(value)
         },
       },
       {
-        ALT: () => this.SUBRULE2(this.positiveAtomicExpression),
+        ALT: () => this.SUBRULE2(this.rightUnaryOpAtomicExpression),
       },
     ])
+  })
+
+  private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
+    const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
+
+    let percentage = false
+    this.OPTION(() => {
+      this.CONSUME(PercentOp)
+      percentage = true
+    })
+
+    if (percentage) {
+      return buildPercentOpAst(positiveAtomicExpression)
+    }
+
+    return positiveAtomicExpression
   })
 
   /**
@@ -283,9 +300,9 @@ export class FormulaParser extends Parser {
    * Rule for procedure expressions: SUM(1,A1)
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
-    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase()
+    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase().slice(0, -1)
+    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
     const args: Ast[] = []
-    this.CONSUME(LParen)
     this.MANY_SEP({
       SEP: this.lexerConfig.ArgSeparator,
       DEF: () => {
@@ -293,7 +310,7 @@ export class FormulaParser extends Parser {
       },
     })
     this.CONSUME(RParen)
-    return buildProcedureAst(procedureName, args)
+    return buildProcedureAst(canonicalProcedureName, args)
   })
 
   /**
@@ -402,7 +419,7 @@ export class FormulaParser extends Parser {
   })
 
   /**
-   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42.A$17)
+   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
@@ -423,7 +440,7 @@ export class FormulaParser extends Parser {
     this.CONSUME(LParen)
     const expression = this.SUBRULE(this.booleanExpression)
     this.CONSUME(RParen)
-    return expression
+    return buildParenthesisAst(expression)
   })
 
   constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
@@ -431,16 +448,6 @@ export class FormulaParser extends Parser {
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping
     this.performSelfAnalysis()
-  }
-
-  /**
-   * Entry rule wrapper that sets formula address
-   *
-   * @param address - address of the cell in which formula is located
-   */
-  public formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
   }
 
   /**
@@ -465,6 +472,16 @@ export class FormulaParser extends Parser {
     }
 
     return ast
+  }
+
+  /**
+   * Entry rule wrapper that sets formula address
+   *
+   * @param address - address of the cell in which formula is located
+   */
+  private formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
   }
 
   /**
@@ -591,7 +608,7 @@ export class FormulaParser extends Parser {
 }
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
-type OrArg = Array<IOrAlt> | OrMethodOpts
+type OrArg = IOrAlt[] | OrMethodOpts
 
 export class FormulaLexer {
   private readonly lexer: Lexer

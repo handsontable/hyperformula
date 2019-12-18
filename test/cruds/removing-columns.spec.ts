@@ -1,5 +1,6 @@
 import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
@@ -10,9 +11,8 @@ import {
   expect_reference_to_have_ref_error,
   extractMatrixRange,
   extractRange,
-  extractReference
+  extractReference,
 } from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing columns - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -282,7 +282,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   it('case A: should not affect absolute dependencies', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['1', '=$Sheet2.$A1'],
+        ['1', '=Sheet2!$A1'],
       ],
       Sheet2: [
         ['2'],
@@ -297,7 +297,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   it('case Ra: removing column before formula should shift dependency', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['1', '=$Sheet2.A1'],
+        ['1', '=Sheet2!A1'],
       ],
       Sheet2: [
         ['2'],
@@ -312,7 +312,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
   it('case Rb: removing column after formula should not affect dependency', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A1', '1'],
+        ['=Sheet2!A1', '1'],
       ],
       Sheet2: [
         ['2'],
@@ -329,7 +329,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARa: relative/absolute dependency after removed column should be shifted ', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.C1', '=$Sheet2.C1', '=$Sheet2.C1', '=$Sheet2.$C1'],
+        ['=Sheet2!C1', '=Sheet2!C1', '=Sheet2!C1', '=Sheet2!$C1'],
       ],
       Sheet2: [
         ['1', '2', '3'],
@@ -347,7 +347,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARb: relative/absolute dependency before removed column should not be affected', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.A1', '=$Sheet2.$A1'],
+        ['=Sheet2!A1', '=Sheet2!$A1'],
       ],
       Sheet2: [
         ['0', '1'],
@@ -363,7 +363,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['=$Sheet2.$A1', '=$Sheet2.A1'],
+        ['=Sheet2!$A1', '=Sheet2!A1'],
       ],
       Sheet2: [
         ['1', '2'],
@@ -418,7 +418,7 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
         ['foo'],
       ],
       Sheet3: [
-        ['1', '=$Sheet2.A1'],
+        ['1', '=Sheet2!A1'],
       ],
     })
 
@@ -618,9 +618,9 @@ describe('Removing columns - matrices', () => {
         ['4', '5', '6'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
-        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
-        ['{=TRANSPOSE($Sheet1.A1:C2)}', '{=TRANSPOSE($Sheet1.A1:C2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:C2)}', '{=TRANSPOSE(Sheet1!A1:C2)}'],
       ],
     })
 
@@ -654,7 +654,7 @@ describe('Removing columns - graph', function() {
 
   it('works if there are empty cells removed', function() {
     const engine = HyperFormula.buildFromArray([
-      ['1', '', '3'],
+      ['1', null, '3'],
     ])
     expect(engine.graph.nodes.size).toBe(2)
     engine.removeColumns(0, [1, 1])
@@ -666,7 +666,7 @@ describe('Removing columns - dependencies', () => {
   it('should not affect absolute dependencies to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-        ['1', '2', '=$Sheet2.$A1'],
+        ['1', '2', '=Sheet2!$A1'],
         /*      */
       ],
       Sheet2: [
@@ -756,7 +756,7 @@ describe('Removing columns - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 
   it('should throw error when trying to remove non positive number of columns', () => {
     const engine = HyperFormula.buildFromArray([
@@ -764,7 +764,7 @@ describe('Removing columns - sheet dimensions', () => {
     ])
 
     expect(() => engine.removeColumns(0, [1, 0])).toThrowError()
-  });
+  })
 })
 
 describe('Removing columns - column index', () => {

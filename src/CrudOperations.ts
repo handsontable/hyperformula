@@ -1,11 +1,11 @@
-import {RowsSpan} from "./RowsSpan";
-import {Statistics, StatType} from "./statistics/Statistics";
-import {RemoveRowsDependencyTransformer} from "./dependencyTransformers/removeRows";
-import {AddRowsDependencyTransformer} from "./dependencyTransformers/addRows";
-import {ColumnsSpan} from "./ColumnsSpan";
-import {AddColumnsDependencyTransformer} from "./dependencyTransformers/addColumns";
-import {RemoveColumnsDependencyTransformer} from "./dependencyTransformers/removeColumns";
-import {Config} from "./Config";
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnsSpan} from './ColumnsSpan'
+import {Config} from './Config'
+import { ContentChanges} from './ContentChanges'
 import {
   AddressMapping,
   DependencyGraph,
@@ -13,21 +13,21 @@ import {
   FormulaCellVertex,
   MatrixVertex,
   SheetMapping,
-  ValueCellVertex
-} from "./DependencyGraph";
-import {IColumnSearchStrategy} from "./ColumnSearch/ColumnSearchStrategy";
-import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from "./parser";
-import {LazilyTransformingAstService} from "./LazilyTransformingAstService";
-import {Index, InvalidAddressError, NoSuchSheetError} from "./HyperFormula";
-import {IBatchExecutor} from "./IBatchExecutor";
-import {EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from "./Cell";
-import {AbsoluteCellRange} from "./AbsoluteCellRange";
-import {MoveCellsDependencyTransformer} from "./dependencyTransformers/moveCells";
-import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {buildMatrixVertex} from "./GraphBuilder";
-import {absolutizeDependencies} from "./absolutizeDependencies";
-import {start} from "repl";
-import {RemoveSheetDependencyTransformer} from "./dependencyTransformers/removeSheet";
+  ValueCellVertex,
+} from './DependencyGraph'
+import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
+import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
+import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
+import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
+import {buildMatrixVertex} from './GraphBuilder'
+import {Index, InvalidAddressError, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
+import {IBatchExecutor} from './IBatchExecutor'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ParserWithCaching, ProcedureAst} from './parser'
+import {RowsSpan} from './RowsSpan'
+import {Statistics, StatType} from './statistics/Statistics'
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -88,6 +88,9 @@ export class CrudOperations implements IBatchExecutor {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
+    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
+    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+
     const toRight = destinationLeftCorner.col - sourceLeftCorner.col
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
@@ -105,47 +108,62 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public addSheet(name?: string): void {
+  public addSheet(name?: string): string {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
     }
     const sheetId = this.sheetMapping.addSheet(name)
     this.addressMapping.autoAddSheet(sheetId, [])
+    return this.sheetMapping.name(sheetId)
   }
 
-  public removeSheet(sheet: number): void {
-    this.ensureItIsPossibleToRemoveSheet(sheet)
-    this.dependencyGraph.removeSheet(sheet)
+  public removeSheet(sheetName: string): void {
+    this.ensureSheetExists(sheetName)
+
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.removeSheet(sheetId)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheet, this.dependencyGraph)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheet)
+      RemoveSheetDependencyTransformer.transform(sheetId, this.dependencyGraph)
+      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheetId)
     })
 
-    this.sheetMapping.removeSheet(sheet)
-    this.columnSearch.removeSheet(sheet)
+    this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: string): void {
+  public clearSheet(sheetName: string): void {
+    this.ensureSheetExists(sheetName)
+
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.clearSheet(sheetId)
+
+    this.columnSearch.removeSheet(sheetId)
+  }
+
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
+    const contentParser = new CellContentParser()
+    const parsedCellContent = contentParser.parse(newCellContent)
 
     let vertex = this.dependencyGraph.getCell(address)
 
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && isNaN(Number(newCellContent))) {
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
       this.dependencyGraph.breakNumericMatrix(vertex)
       vertex = this.dependencyGraph.getCell(address)
     }
 
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !isNaN(Number(newCellContent))) {
-      const newValue = Number(newCellContent)
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
+      const newValue = parsedCellContent.value
       const oldValue = this.dependencyGraph.getCellValue(address)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
       vertex.setMatrixCellValue(address, newValue)
       this.columnSearch.change(oldValue, newValue, address)
       this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && isMatrix(newCellContent)) {
-      const matrixFormula = newCellContent.substr(1, newCellContent.length - 2)
-      const parseResult = this.parser.parse(matrixFormula, address)
+    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
+      const parseResult = this.parser.parse(parsedCellContent.formula, address)
 
       const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
 
@@ -157,25 +175,27 @@ export class CrudOperations implements IBatchExecutor {
       this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
-      if (isFormula(newCellContent)) {
-        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(newCellContent, address)
+      if (parsedCellContent instanceof CellContent.Formula) {
+        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-      } else if (newCellContent === '') {
+      } else if (parsedCellContent instanceof CellContent.Empty) {
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.columnSearch.remove(oldValue, address)
         this.changes.addChange(EmptyValue, address)
         this.dependencyGraph.setCellEmpty(address)
-      } else if (!isNaN(Number(newCellContent))) {
-        const newValue = Number(newCellContent)
+      } else if (parsedCellContent instanceof CellContent.Number) {
+        const newValue = parsedCellContent.value
         const oldValue = this.dependencyGraph.getCellValue(address)
         this.dependencyGraph.setValueToCell(address, newValue)
         this.columnSearch.change(oldValue, newValue, address)
         this.changes.addChange(newValue, address)
-      } else {
+      } else if (parsedCellContent instanceof CellContent.String) {
         const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newCellContent)
-        this.columnSearch.change(oldValue, newCellContent, address)
-        this.changes.addChange(newCellContent, address)
+        this.dependencyGraph.setValueToCell(address, parsedCellContent.value)
+        this.columnSearch.change(oldValue, parsedCellContent.value, address)
+        this.changes.addChange(parsedCellContent.value, address)
+      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
+        throw new Error('Cant happen')
       }
     } else {
       throw new Error('Illegal operation')
@@ -190,7 +210,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
@@ -211,7 +231,7 @@ export class CrudOperations implements IBatchExecutor {
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToRemove)) {
@@ -228,7 +248,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
@@ -250,7 +270,7 @@ export class CrudOperations implements IBatchExecutor {
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
-        throw new NoSuchSheetError(sheet)
+        throw new NoSheetWithIdError(sheet)
       }
 
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
@@ -274,11 +294,11 @@ export class CrudOperations implements IBatchExecutor {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(sourceRange)) {
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new Error('It is not possible to move matrix')
     }
 
-    if (this.dependencyGraph.matrixMapping.isMatrixInRange(targetRange)) {
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to replace cells with matrix')
     }
   }
@@ -289,18 +309,12 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToRemoveSheet(sheet: number): void {
-    if (!this.sheetMapping.hasSheetWithId(sheet)) {
-      throw new NoSuchSheetError(sheet)
-    }
-  }
-
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
     if (invalidSimpleCellAddress(address)) {
       throw new InvalidAddressError(address)
     }
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {
-      throw new NoSuchSheetError(address.sheet)
+      throw new NoSheetWithIdError(address.sheet)
     }
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixAtAddress(address)) {
@@ -312,6 +326,12 @@ export class CrudOperations implements IBatchExecutor {
     const changes = this.changes
     this.changes = ContentChanges.empty()
     return changes
+  }
+
+  public ensureSheetExists(sheetName: string) {
+    if (!this.sheetMapping.hasSheetWithName(sheetName)) {
+      throw new NoSheetWithNameError(sheetName)
+    }
   }
 
   /**
@@ -416,7 +436,7 @@ export class CrudOperations implements IBatchExecutor {
    */
   private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.addressMapping.getHeight(sheet)
-    return row >= height;
+    return row >= height
   }
 
   /**
@@ -427,7 +447,7 @@ export class CrudOperations implements IBatchExecutor {
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.addressMapping.getWidth(sheet)
-    return column >= width;
+    return column >= width
   }
 
   private get addressMapping(): AddressMapping {

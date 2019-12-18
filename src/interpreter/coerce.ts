@@ -1,4 +1,4 @@
-import {EmptyValue, CellError, CellValue, ErrorType} from '../Cell'
+import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
 import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -40,6 +40,10 @@ export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeV
   }
 }
 
+export function coerceBooleanToNumber(arg: boolean): number {
+  return Number(arg)
+}
+
 export function coerceScalarToNumber(arg: CellValue): number | CellError {
   if (arg === EmptyValue) {
     return 0
@@ -60,7 +64,7 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
+export function coerceScalarToBoolean(arg: CellValue): boolean | CellError | null {
   if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
@@ -74,7 +78,7 @@ export function coerceScalarToBoolean(arg: CellValue): boolean | CellError {
     } else if (argUppered === 'FALSE') {
       return false
     } else {
-      return new CellError(ErrorType.VALUE)
+      return null
     }
   }
 }
@@ -83,10 +87,10 @@ export function coerceScalarToString(arg: CellValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
   } else if (arg === EmptyValue) {
-    return ""
+    return ''
   } else if (typeof arg === 'number') {
     return arg.toString()
   } else {
-    return arg ? "TRUE" : "FALSE"
+    return arg ? 'TRUE' : 'FALSE'
   }
 }

@@ -23,8 +23,8 @@ describe('Function EXP', () => {
 
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ["2", '=EXP(A1)'],
-      ["=FALSE()", '=EXP(A2)'],
+      ['="2"', '=EXP(A1)'],
+      ['=FALSE()', '=EXP(A2)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(7.38905609893065)

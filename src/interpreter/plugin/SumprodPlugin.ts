@@ -1,11 +1,10 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
-import {Matrix} from '../../Matrix'
-import {AstNodeType, ProcedureAst} from '../../parser'
+import { ProcedureAst} from '../../parser'
+import {coerceScalarToNumber, coerceToRange} from '../coerce'
+import { SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {coerceToRange, coerceScalarToNumber} from '../coerce'
 
 export class SumprodPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -30,9 +29,9 @@ export class SumprodPlugin extends FunctionPlugin {
   private reduceSumprod(left: SimpleRangeValue, right: SimpleRangeValue): number | CellError {
     let result = 0
 
-    let lit = left.valuesFromTopLeftCorner()
-    let rit = right.valuesFromTopLeftCorner()
-    let l,r
+    const lit = left.valuesFromTopLeftCorner()
+    const rit = right.valuesFromTopLeftCorner()
+    let l, r
 
     while (l = lit.next(), r = rit.next(), !l.done && !r.done) {
       if (l.value instanceof CellError) {

@@ -1,5 +1,5 @@
-import {CellValue, SimpleCellAddress} from "./Cell";
-import {Matrix} from "./Matrix";
+import {CellValue, SimpleCellAddress} from './Cell'
+import {Matrix} from './Matrix'
 
 export interface CellValueChange {
   sheet: number,
@@ -9,11 +9,11 @@ export interface CellValueChange {
 }
 
 export class ContentChanges {
-  private changes: Array<CellValueChange> = []
 
   public static empty() {
     return new ContentChanges()
   }
+  private changes: CellValueChange[] = []
 
   public addAll(other: ContentChanges): ContentChanges {
     this.changes.push(...other.changes)
@@ -43,7 +43,7 @@ export class ContentChanges {
       sheet: address.sheet,
       col: address.col,
       row: address.row,
-      value: value,
+      value,
     })
   }
 }

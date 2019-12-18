@@ -2,7 +2,7 @@ import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {fixFormulaVertexColumn, transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from './common'
+import {CellAddressTransformerFunction, cellRangeTransformer, fixFormulaVertexColumn, transformAddressesInFormula} from './common'
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(addedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {

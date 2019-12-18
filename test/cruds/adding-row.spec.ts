@@ -1,10 +1,10 @@
 import {Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, expect_array_with_same_content, extractMatrixRange} from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -190,8 +190,8 @@ describe('Adding row - MatrixVertex', () => {
         ['3', '4'],
       ],
       Sheet2: [
-        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
-        ['{=TRANSPOSE($Sheet1.A1:B2)}', '{=TRANSPOSE($Sheet1.A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
+        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
       ],
     })
 
@@ -236,7 +236,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
         ['1'],
       ],
       Sheet2: [
-        ['=$Sheet1.A1'],
+        ['=Sheet1!A1'],
       ],
     })
 
@@ -301,7 +301,7 @@ describe('Adding row - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 })
 
 describe('Adding row - column index', () => {

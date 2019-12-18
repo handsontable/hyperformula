@@ -1,7 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
+import {ErrorType} from '../Cell'
+import {TranslationPackage} from '../i18n'
 import {ParserConfig} from './ParserConfig'
-import {ErrorType} from "../Cell";
-import {TranslationPackage} from "../i18n";
 
 /* arithmetic */
 // abstract for + -
@@ -22,6 +22,8 @@ export const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: Mult
 
 export const PowerOp = createToken({name: 'PowerOp', pattern: /\^/})
 
+export const PercentOp = createToken({name: 'PercentOp', pattern: /%/})
+
 export const BooleanOp = createToken({
   name: 'BooleanOp',
   pattern: Lexer.NA,
@@ -37,41 +39,47 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
-export const RelativeCell = createToken({name: 'RelativeCell', pattern: /[A-Za-z]+[0-9]+/, categories: CellReference})
+export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
+export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
+export const RelativeCell = createToken({
+  name: 'RelativeCell',
+  pattern: /[A-Za-z]+[0-9]+/,
+  categories: CellReference,
+})
 export const AbsoluteColCell = createToken({
   name: 'AbsoluteColCell',
   pattern: /\$[A-Za-z]+[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const AbsoluteRowCell = createToken({
   name: 'AbsoluteRowCell',
   pattern: /[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const AbsoluteCell = createToken({
   name: 'AbsoluteCell',
   pattern: /\$[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const SheetRelativeCell = createToken({
   name: 'SheetRelativeCell',
-  pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+[0-9]+/,
-  categories: CellReference
+  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+[0-9]+`),
+  categories: CellReference,
 })
 export const SheetAbsoluteColCell = createToken({
   name: 'SheetAbsoluteColCell',
-  pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+[0-9]+/,
-  categories: CellReference
+  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+[0-9]+`),
+  categories: CellReference,
 })
 export const SheetAbsoluteRowCell = createToken({
   name: 'SheetAbsoluteRowCell',
-  pattern: /\$[A-Za-z0-9]+\.[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+\\$[0-9]+`),
+  categories: CellReference,
 })
 export const SheetAbsoluteCell = createToken({
   name: 'SheetAbsoluteCell',
-  pattern: /\$[A-Za-z0-9]+\.\$[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+\\$[0-9]+`),
+  categories: CellReference,
 })
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
@@ -80,7 +88,7 @@ export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
 /* prcoedures */
-export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[A-Za-z\u00C0-\u02AF]+)+/})
+export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
 /* terminals */
 export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
@@ -102,19 +110,20 @@ export interface ILexerConfig {
   ArgSeparator: TokenType,
   OffsetProcedureName: TokenType
   allTokens: TokenType[],
-  errorMapping: Record<string, ErrorType>
+  errorMapping: Record<string, ErrorType>,
+  functionMapping: Record<string, string>
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-
-  const offsetProcedureNameLiteral = config.language.functions['OFFSET'] || 'OFFSET'
+  const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
   const OffsetProcedureName = createToken({
     name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
+    pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
   })
   const errorMapping = buildErrorMapping(config.language)
+  const functionMapping = buildFunctionMapping(config.language)
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -126,12 +135,15 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     PowerOp,
     EqualsOp,
     NotEqualOp,
+    PercentOp,
     GreaterThanOrEqualOp,
     LessThanOrEqualOp,
     GreaterThanOp,
     LessThanOp,
     LParen,
     RParen,
+    OffsetProcedureName,
+    ProcedureName,
     RangeSeparator,
     SheetAbsoluteCell,
     SheetAbsoluteColCell,
@@ -141,8 +153,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AbsoluteColCell,
     AbsoluteRowCell,
     RelativeCell,
-    OffsetProcedureName,
-    ProcedureName,
     ArgSeparator,
     NumberLiteral,
     StringLiteral,
@@ -157,7 +167,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator,
     OffsetProcedureName,
     allTokens,
-    errorMapping
+    errorMapping,
+    functionMapping,
   }
 }
 
@@ -166,4 +177,11 @@ const buildErrorMapping = (language: TranslationPackage): Record<string, ErrorTy
     ret[language.errors[key as ErrorType]] = key as ErrorType
     return ret
   }, {} as Record<string, ErrorType>)
+}
+
+const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {
+  return Object.keys(language.functions).reduce((ret, key) => {
+    ret[language.functions[key]] = key
+    return ret
+  }, {} as Record<string, string>)
 }

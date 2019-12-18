@@ -1,4 +1,5 @@
 import {CellError, CellValue, ErrorType} from '../Cell'
+import {coerceBooleanToNumber} from './coerce'
 
 /**
  * Adds two numbers
@@ -100,6 +101,14 @@ export function unaryminus(value: number | CellError): number | CellError {
   }
 }
 
+export function percent(value: number | CellError): number | CellError {
+  if (value instanceof CellError) {
+    return value
+  } else {
+    return value / 100
+  }
+}
+
 /**
  * Returns max from two numbers
  *
@@ -130,6 +139,32 @@ export function max(left: CellValue, right: CellValue): CellValue {
   }
 }
 
+export function maxa(left: CellValue, right: CellValue): CellValue {
+  if (left instanceof CellError) {
+    return left
+  }
+  if (right instanceof CellError) {
+    return right
+  }
+  if (typeof left === 'boolean') {
+    left = coerceBooleanToNumber(left)
+  }
+  if (typeof right === 'boolean') {
+    right = coerceBooleanToNumber(right)
+  }
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return Math.max(left, right)
+    } else {
+      return left
+    }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return Number.NEGATIVE_INFINITY
+  }
+}
+
 /**
  * Returns min from two numbers
  *
@@ -146,6 +181,32 @@ export function min(left: CellValue, right: CellValue): CellValue {
   }
   if (right instanceof CellError) {
     return right
+  }
+  if (typeof left === 'number') {
+    if (typeof right === 'number') {
+      return Math.min(left, right)
+    } else {
+      return left
+    }
+  } else if (typeof right === 'number') {
+    return right
+  } else {
+    return Number.POSITIVE_INFINITY
+  }
+}
+
+export function mina(left: CellValue, right: CellValue): CellValue {
+  if (left instanceof CellError) {
+    return left
+  }
+  if (right instanceof CellError) {
+    return right
+  }
+  if (typeof left === 'boolean') {
+    left = coerceBooleanToNumber(left)
+  }
+  if (typeof right === 'boolean') {
+    right = coerceBooleanToNumber(right)
   }
   if (typeof left === 'number') {
     if (typeof right === 'number') {

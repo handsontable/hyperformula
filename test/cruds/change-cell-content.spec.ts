@@ -1,11 +1,11 @@
-import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSuchSheetError} from '../../src'
-import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
+import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr} from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
-describe("Changing cell content - checking if its possible", () => {
+describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -105,7 +105,7 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ])
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const a2 = engine.addressMapping.fetchCell(adr('B1'))
@@ -125,7 +125,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
 
-    engine.setCellContent(adr('B1'), '')
+    engine.setCellContent(adr('B1'), null)
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
     expect(engine.graph.nodes).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
@@ -182,7 +182,7 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
-    engine.setCellContent(adr('B1'), '')
+    engine.setCellContent(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
@@ -191,7 +191,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['=A1', ''],
+      ['=A1', null],
       ['1', 'foo'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
@@ -230,11 +230,11 @@ describe('changing cell content', () => {
 
   it('set nothing again', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
     expect(a1).toBe(null)
     expect(engine.getCellValue(adr('A1'))).toBe(EmptyValue)
@@ -242,7 +242,7 @@ describe('changing cell content', () => {
 
   it('set number for the first time', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -253,7 +253,7 @@ describe('changing cell content', () => {
 
   it('set text for the first time', () => {
     const sheet = [
-      [''],
+      [null],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -264,7 +264,7 @@ describe('changing cell content', () => {
 
   it('change empty to formula', () => {
     const sheet = [
-      ['42', '', '=B1'],
+      ['42', null, '=B1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -281,11 +281,11 @@ describe('changing cell content', () => {
 
   it('set nothing again', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    engine.setCellContent(adr('A1'), '')
+    engine.setCellContent(adr('A1'), null)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
@@ -295,7 +295,7 @@ describe('changing cell content', () => {
 
   it('change EMPTY to NUMBER', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -309,7 +309,7 @@ describe('changing cell content', () => {
 
   it('change EMPTY to TEXT', () => {
     const sheet = [
-      ['', '=A1'],
+      [null, '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
@@ -352,7 +352,7 @@ describe('changing cell content', () => {
   it('should not be possible to edit part of a Matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['', '{=TRANSPOSE(A1:B1)}'],
+      [null, '{=TRANSPOSE(A1:B1)}'],
     ])
 
     expect(() => {
@@ -368,7 +368,7 @@ describe('changing cell content', () => {
 
     expect(() => {
       engine.setCellContent(adr('B1', 1), '3')
-    }).toThrow(new NoSuchSheetError(1))
+    }).toThrow(new NoSheetWithIdError(1))
   })
 
   it('is not possible to set cell content with invalid address', () => {
@@ -399,43 +399,43 @@ describe('changing cell content', () => {
 
   it('returns cell value change', () => {
     const sheet = [
-      ['1']
+      ['1'],
     ]
 
     const engine = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContent(adr("A1"), '2')
+    const changes = engine.setCellContent(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual({
       sheet: 0,
       col: 0,
       row: 0,
-      value: 2
+      value: 2,
     })
   })
 
   it('returns dependent formula value change', () => {
     const sheet = [
-      ['1', '=A1']
+      ['1', '=A1'],
     ]
 
     const engine = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContent(adr("A1"), '2')
+    const changes = engine.setCellContent(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
     expect(changes).toContainEqual({
       sheet: 0,
       col: 0,
       row: 0,
-      value: 2
+      value: 2,
     })
     expect(changes).toContainEqual({
       sheet: 0,
       col: 1,
       row: 0,
-      value: 2
+      value: 2,
     })
   })
 
@@ -443,14 +443,14 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
       ['3', '4'],
-      ['{=MMULT(A1:B2,A1:B2)}']
+      ['{=MMULT(A1:B2,A1:B2)}'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContent(adr("A1"), '2')
+    const changes = engine.setCellContent(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
-    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
+    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([2, 10, 12, 18, 22]))
   })
 
   it('returns change of numeric matrix', () => {
@@ -460,14 +460,14 @@ describe('changing cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
-    const changes = engine.setCellContent(adr("A1"), "7")
+    const changes = engine.setCellContent(adr('A1'), '7')
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual({
       sheet: 0,
       row: 0,
       col: 0,
-      value: 7
+      value: 7,
     })
 
   })
@@ -541,10 +541,10 @@ describe('change multiple cells contents', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
+    const changes = engine.setMultipleCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
-    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10]))
+    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10]))
   })
 
   it('returns changes of mutliple values dependent formulas', () => {
@@ -552,14 +552,14 @@ describe('change multiple cells contents', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-      ['=SUM(A1:B1)', '=SUM(B1:B2)']
+      ['=SUM(A1:B1)', '=SUM(B1:B2)'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setMultipleCellContents(adr("A1"), [['7', '8'], ['9', '10']])
+    const changes = engine.setMultipleCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
-    expect(changes.map(change => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
+    expect(changes.map((change) => change.value)).toEqual(expect.arrayContaining([7, 8, 9, 10, 15, 18]))
   })
 })
 
@@ -567,10 +567,10 @@ describe('updating column index', () => {
   it('should update column index when changing simple value', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['3', '15']
+      ['3', '15'],
     ], new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
 
-    engine.setCellContent(adr("B2"), "8")
+    engine.setCellContent(adr('B2'), '8')
 
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
@@ -579,14 +579,14 @@ describe('updating column index', () => {
   it('should update column index when changing value inside numeric matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['3', '15']
+      ['3', '15'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
 
-    engine.setCellContent(adr("B2"), "8")
+    engine.setCellContent(adr('B2'), '8')
 
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 4).index).toEqual(expect.arrayContaining([]))
     expect((engine.columnSearch as ColumnIndex).getValueIndex(0, 1, 8).index).toEqual(expect.arrayContaining([1]))
-  });
+  })
 })
 
 describe('numeric matrices', () => {
@@ -596,11 +596,11 @@ describe('numeric matrices', () => {
       ['3', '4'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
-    engine.setCellContent(adr("A1"), '7')
+    engine.setCellContent(adr('A1'), '7')
 
     expect(engine.graph.nodesCount()).toBe(1)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    expect(engine.getCellValue(adr("A1"))).toBe(7)
+    expect(engine.getCellValue(adr('A1'))).toBe(7)
   })
 
   it('should allow to change numeric matrix cell to non-numeric value', () => {
@@ -609,27 +609,26 @@ describe('numeric matrices', () => {
       ['3', '4'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
-    engine.setCellContent(adr("A1"), 'foo')
+    engine.setCellContent(adr('A1'), 'foo')
 
     expect(engine.graph.nodesCount()).toBe(4)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(0)
-    expect(engine.getCellValue(adr("A1"))).toEqual('foo')
+    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
-
 
   it('should break only affected matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      [''],
+      [null],
       ['5', '6'],
       ['7', '8'],
     ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
 
-    engine.setCellContent(adr("A1"), 'foo')
+    engine.setCellContent(adr('A1'), 'foo')
 
     expect(engine.graph.nodesCount()).toBe(5)
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
-    expect(engine.getCellValue(adr("A1"))).toBe('foo')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
 })

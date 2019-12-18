@@ -1,14 +1,14 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
+import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
+import {SimpleRangeValue} from './interpreter/InterpreterValue'
+import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {Matrix} from './Matrix'
-import {SimpleRangeValue} from './interpreter/InterpreterValue'
-import {ContentChanges} from "./ContentChanges";
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
@@ -80,6 +80,10 @@ export class SingleThreadEvaluator implements Evaluator {
       })
     })
     return changes
+  }
+
+  public destroy() {
+    this.interpreter.destroy()
   }
 
   /**

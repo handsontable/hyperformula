@@ -3,10 +3,10 @@ import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {
-  fixFormulaVertexRow,
-  transformAddressesInFormula,
   CellAddressTransformerFunction,
   CellRangeTransformerFunction,
+  fixFormulaVertexRow,
+  transformAddressesInFormula,
 } from './common'
 
 export namespace RemoveRowsDependencyTransformer {

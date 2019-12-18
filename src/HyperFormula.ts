@@ -1,7 +1,19 @@
+
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {CellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {
+  CellType,
+  CellValue,
+  CellValueType,
+  getCellType,
+  getCellValueType,
+  simpleCellAddress,
+  SimpleCellAddress,
+} from './Cell'
+import {isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
+import {CellValueChange, ContentChanges} from './ContentChanges'
+import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -11,21 +23,25 @@ import {
   MatrixVertex,
   RangeMapping,
   SheetMapping,
-  Vertex
+  Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
+import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {isMatrix, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
+import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
-import {IBatchExecutor} from "./IBatchExecutor";
 
-export class NoSuchSheetError extends Error {
+export class NoSheetWithIdError extends Error {
   constructor(sheetId: number) {
     super(`There's no sheet with id = ${sheetId}`)
+  }
+}
+
+export class NoSheetWithNameError extends Error {
+  constructor(sheetName: string) {
+    super(`There's no sheet with name '${sheetName}'`)
   }
 }
 
@@ -42,26 +58,24 @@ export type Index = [number, number]
  */
 export class HyperFormula {
 
-  private crudOperations: CrudOperations
+  public get graph(): Graph<Vertex> {
+    return this.dependencyGraph.graph
+  }
 
-  constructor(
-      /** Engine config */
-      public readonly config: Config,
-      /** Statistics module for benchmarking */
-      public readonly stats: Statistics,
-      /** Dependency graph storing sheets structure */
-      public readonly dependencyGraph: DependencyGraph,
-      /** Column search strategy used by VLOOKUP plugin */
-      public readonly columnSearch: IColumnSearchStrategy,
-      /** Parser with caching */
-      private readonly parser: ParserWithCaching,
-      private readonly unparser: Unparser,
-      /** Formula evaluator */
-      public readonly evaluator: Evaluator,
-      /** Service handling postponed CRUD transformations */
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-  ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
+  public get rangeMapping(): RangeMapping {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  public get matrixMapping(): MatrixMapping {
+    return this.dependencyGraph.matrixMapping
+  }
+
+  public get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public get addressMapping(): AddressMapping {
+    return this.dependencyGraph.addressMapping
   }
 
   /**
@@ -93,24 +107,26 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  public get graph(): Graph<Vertex> {
-    return this.dependencyGraph.graph
-  }
+  private crudOperations: CrudOperations
 
-  public get rangeMapping(): RangeMapping {
-    return this.dependencyGraph.rangeMapping
-  }
-
-  public get matrixMapping(): MatrixMapping {
-    return this.dependencyGraph.matrixMapping
-  }
-
-  public get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
-  }
-
-  public get addressMapping(): AddressMapping {
-    return this.dependencyGraph.addressMapping
+  constructor(
+      /** Engine config */
+      public readonly config: Config,
+      /** Statistics module for benchmarking */
+      public readonly stats: Statistics,
+      /** Dependency graph storing sheets structure */
+      public readonly dependencyGraph: DependencyGraph,
+      /** Column search strategy used by VLOOKUP plugin */
+      public readonly columnSearch: IColumnSearchStrategy,
+      /** Parser with caching */
+      private readonly parser: ParserWithCaching,
+      private readonly unparser: Unparser,
+      /** Formula evaluator */
+      public readonly evaluator: Evaluator,
+      /** Service handling postponed CRUD transformations */
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+  ) {
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
   }
 
   /**
@@ -121,7 +137,6 @@ export class HyperFormula {
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.dependencyGraph.getCellValue(address)
   }
-
 
   /**
    * Returns normalized formula string from the cell with the given address.
@@ -136,7 +151,7 @@ export class HyperFormula {
     } else if (formulaVertex instanceof MatrixVertex) {
       const formula = formulaVertex.getFormula()
       if (formula) {
-        return "{" + this.unparser.unparse(formula, formulaVertex.getAddress()) + "}"
+        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
       }
     }
     return undefined
@@ -221,7 +236,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    * @param newCellContent - new cell content
    */
-  public setCellContent(address: SimpleCellAddress, newCellContent: string): CellValueChange[] {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
@@ -232,7 +247,7 @@ export class HyperFormula {
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
    */
-  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: string[][]): CellValueChange[] {
+  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][]): CellValueChange[] {
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
@@ -424,9 +439,10 @@ export class HyperFormula {
    * Adds new sheet to engine.
    *
    * @param name - if not specified, name will be autogenerated
+   * @returns given or autogenerated name of a new sheet
    */
-  public addSheet(name?: string): void {
-    this.crudOperations.addSheet(name)
+  public addSheet(name?: string): string {
+    return this.crudOperations.addSheet(name)
   }
 
   /**
@@ -434,11 +450,11 @@ export class HyperFormula {
    *
    * If returns true, doing this operation won't throw any errors
    *
-   * @param sheet - sheet id number
+   * @param name - sheet name
    */
-  public isItPossibleToRemoveSheet(sheet: number): boolean {
+  public isItPossibleToRemoveSheet(name: string): boolean {
     try {
-      this.crudOperations.ensureItIsPossibleToRemoveSheet(sheet)
+      this.crudOperations.ensureSheetExists(name)
       return true
     } catch (e) {
       return false
@@ -446,13 +462,80 @@ export class HyperFormula {
   }
 
   /**
-   * Removes sheet with given id
+   * Removes sheet with given name
    *
-   * @param sheet - sheet id number
+   * @param name - sheet name
    */
-  public removeSheet(sheet: number): CellValueChange[] {
-    this.crudOperations.removeSheet(sheet)
+  public removeSheet(name: string): CellValueChange[] {
+    this.crudOperations.removeSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   * Returns information whether its possible to clear sheet
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param name - sheet name
+   */
+  public isItPossibleToClearSheet(name: string): boolean {
+    try {
+      this.crudOperations.ensureSheetExists(name)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Clears sheet content
+   *
+   * @param name - sheet name
+   * */
+  public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.clearSheet(name)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   * Returns information whether its possible to replace sheet content
+   *
+   * If returns true, doing this operation won't throw any errors
+   *
+   * @param name - sheet name
+   */
+  public isItPossibleToReplaceSheetContent(name: string): boolean {
+    try {
+      this.crudOperations.ensureSheetExists(name)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Replaces sheet content with new values.
+   *
+   * @param sheetName - sheet name
+   * @param values - array of new values
+   * */
+  public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
+    this.crudOperations.ensureSheetExists(sheetName)
+
+    const sheetId = this.sheetId(sheetName)!
+
+    return this.batch((e) => {
+      e.clearSheet(sheetName)
+      for (let i = 0; i < values.length; i++) {
+        for (let j = 0; j < values[i].length; j++) {
+          e.setCellContent({
+            sheet: sheetId,
+            row: i,
+            col: j,
+          }, values[i][j])
+        }
+      }
+    })
   }
 
   /**
@@ -494,6 +577,107 @@ export class HyperFormula {
   }
 
   /**
+   * Returns a unique sheet name assigned to the sheet of given id
+   *
+   * Or undefined if the there's no sheet with given ID
+   *
+   * @param sheetId - ID of the sheet, for which we want to retrieve name
+   * @returns name of the sheet
+   */
+  public sheetName(sheetId: number): string | undefined {
+    return this.sheetMapping.getName(sheetId)
+  }
+
+  /**
+   * Returns a unique sheet ID assigned to the sheet with given name
+   *
+   * Or undefined if the there's no sheet with given name
+   *
+   * @param sheetName - name of the sheet, for which we want to retrieve ID
+   * @returns ID of the sheet
+   */
+  public sheetId(sheetName: string): number | undefined {
+    return this.sheetMapping.get(sheetName)
+  }
+
+  /**
+   * Returns whether sheet with given name exists
+   *
+   * @param sheetName - name of the sheet
+   */
+  public doesSheetExist(sheetName: string): boolean {
+    return this.sheetMapping.hasSheetWithName(sheetName)
+  }
+
+  /**
+   * Returns type of a cell at given address
+   *
+   * @param address - cell coordinates
+   * @returns type of a cell
+   * */
+  public getCellType(address: SimpleCellAddress): CellType {
+    const vertex = this.dependencyGraph.getCell(address)
+    return getCellType(vertex)
+  }
+
+  /**
+   * Returns weather cell contains simple value
+   *
+   * @param address - cell coordinates
+   * */
+  public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.VALUE
+  }
+
+  /**
+   * Returns weather cell contains formula
+   *
+   * @param address - cell coordinates
+   * */
+  public doesCellHaveFormula(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.FORMULA
+  }
+
+  /**
+   * Returns weather cell is empty
+   *
+   * @param address - cell coordinates
+   * */
+  public isCellEmpty(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.EMPTY
+  }
+
+  /**
+   * Returns weather cell is part o a matrix
+   *
+   * @param address - cell coordinates
+   * */
+  public isCellPartOfMatrix(address: SimpleCellAddress): boolean {
+    return this.getCellType(address) === CellType.MATRIX
+  }
+
+  /**
+   * Returns type of a cell value at given address
+   *
+   * @param address - cell coordinates
+   * */
+  public getCellValueType(address: SimpleCellAddress): CellValueType {
+    const value = this.getCellValue(address)
+    return getCellValueType(value)
+  }
+
+  /**
+   * Returns number of existing sheets
+   */
+  public numberOfSheets(): number {
+    return this.sheetMapping.numberOfSheets()
+  }
+
+  public renameSheet(sheetId: number, newName: string): void {
+    this.sheetMapping.renameSheet(sheetId, newName)
+  }
+
+  /**
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
@@ -505,6 +689,18 @@ export class HyperFormula {
       /* TODO we should be able to return error information along with changes */
     }
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   *  Destroys instance of HyperFormula
+   * */
+  public destroy(): void {
+    this.dependencyGraph.destroy()
+    this.columnSearch.destroy()
+    this.evaluator.destroy()
+    this.parser.destroy()
+    this.lazilyTransformingAstService.destroy()
+    this.stats.destroy()
   }
 
   /**

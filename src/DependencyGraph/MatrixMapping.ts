@@ -1,8 +1,8 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
-import {SimpleCellAddress} from '../Cell'
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
@@ -41,9 +41,9 @@ export class MatrixMapping {
     return false
   }
 
-  public isMatrixInRange(range: AbsoluteCellRange) {
+  public isFormulaMatrixInRange(range: AbsoluteCellRange) {
     for (const mtx of this.matrixMapping.values()) {
-      if (mtx.getRange().doesOverlap(range)) {
+      if (mtx.isFormula() && mtx.getRange().doesOverlap(range)) {
         return true
       }
     }
@@ -83,6 +83,14 @@ export class MatrixMapping {
     }
   }
 
+  public* numericMatricesInRange(range: AbsoluteCellRange): IterableIterator<[string, MatrixVertex]> {
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.getRange().doesOverlap(range)) {
+        yield [mtxKey, mtx]
+      }
+    }
+  }
+
   public truncateMatricesByRows(rowsSpan: RowsSpan): MatrixVertex[] {
     const verticesToRemove = Array<MatrixVertex>()
     for (const [key, matrix] of this.numericMatricesInRows(rowsSpan)) {
@@ -105,5 +113,9 @@ export class MatrixMapping {
       }
     }
     return verticesToRemove
+  }
+
+  public destroy(): void {
+    this.matrixMapping.clear()
   }
 }

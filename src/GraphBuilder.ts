@@ -1,18 +1,19 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
-import {isFormula, isMatrix, ParserWithCaching, ProcedureAst} from './parser'
+import {ParserWithCaching, ProcedureAst} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 
 /**
  * Two-dimenstional array representation of sheet
  */
-export type Sheet = string[][]
+export type Sheet = RawCellContent[][]
 
 export type Dependencies = Map<Vertex, CellDependency[]>
 
@@ -79,6 +80,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
+    const contentParser = new CellContentParser()
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -90,17 +92,17 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
 
-          if (isMatrix(cellContent)) {
+          const parsedCellContent = contentParser.parse(cellContent)
+          if (parsedCellContent instanceof CellContent.MatrixFormula) {
             if (this.dependencyGraph.existsVertex(address)) {
               continue
             }
-            const matrixFormula = cellContent.substr(1, cellContent.length - 2)
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
-          } else if (isFormula(cellContent)) {
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
+          } else if (parsedCellContent instanceof CellContent.Formula) {
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
@@ -110,15 +112,15 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             if (parseResult.hasStructuralChangeFunction) {
               this.dependencyGraph.markAsDependentOnStructureChange(vertex)
             }
-          } else if (cellContent === '') {
+          } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
-          } else if (!isNaN(Number(cellContent))) {
-            const vertex = new ValueCellVertex(Number(cellContent))
-            this.columnIndex.add(Number(cellContent), address)
+          } else if (parsedCellContent instanceof CellContent.String) {
+            const vertex = new ValueCellVertex(parsedCellContent.value)
+            this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
-          } else {
-            const vertex = new ValueCellVertex(cellContent)
-            this.columnIndex.add(cellContent, address)
+          } else if (parsedCellContent instanceof CellContent.Number) {
+            const vertex = new ValueCellVertex(parsedCellContent.value)
+            this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -142,6 +144,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
     const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, dependencies, this.threshold)
+    const contentParser = new CellContentParser()
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -158,27 +161,27 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
 
-          if (isMatrix(cellContent)) {
+          const parsedCellContent = contentParser.parse(cellContent)
+          if (parsedCellContent instanceof CellContent.MatrixFormula) {
             if (this.dependencyGraph.existsVertex(address)) {
               continue
             }
-            const matrixFormula = cellContent.substr(1, cellContent.length - 2)
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(matrixFormula, address))
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
-          } else if (isFormula(cellContent)) {
-            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(cellContent, address))
+          } else if (parsedCellContent instanceof CellContent.Formula) {
+            const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addVertex(address, vertex)
-          } else if (cellContent === '') {
+          } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
-          } else if (!isNaN(Number(cellContent))) {
+          } else if (parsedCellContent instanceof CellContent.Number) {
             matrixHeuristic.add(address)
-          } else {
-            const vertex = new ValueCellVertex(cellContent)
-            this.columnSearch.add(cellContent, address)
+          } else if (parsedCellContent instanceof CellContent.String) {
+            const vertex = new ValueCellVertex(parsedCellContent.value)
+            this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }

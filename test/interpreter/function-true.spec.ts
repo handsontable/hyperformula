@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function TRUE", () => {
+describe('Function TRUE', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE()']])
 

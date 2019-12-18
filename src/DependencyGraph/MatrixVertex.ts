@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, SimpleCellAddress} from '../Cell'
+import {CellError, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {IMatrix, Matrix, ErroredMatrix, NotComputedMatrix, MatrixSize} from '../Matrix'
+import {ErroredMatrix, IMatrix, Matrix, MatrixSize, NotComputedMatrix} from '../Matrix'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 
@@ -21,8 +21,8 @@ export class MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
   public cellAddress: SimpleCellAddress
-  private formula: Ast | null
   public matrix: IMatrix
+  private formula: Ast | null
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress
@@ -82,6 +82,10 @@ export class MatrixVertex {
 
   public isFormula(): boolean {
     return this.formula !== null
+  }
+
+  public isNumeric(): boolean {
+    return this.formula === null
   }
 
   public spansThroughSheetRows(sheet: number, startRow: number, endRow: number = startRow): boolean {

@@ -1,7 +1,7 @@
-import {HyperFormula, Config} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -135,14 +135,14 @@ describe('Function SUMIF - argument validations and combinations', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1'],
       ['2'],
-      ['=SUMIF(A1:A2, ">0", A1:A2)']
+      ['=SUMIF(A1:A2, ">0", A1:A2)'],
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 })
 
-describe("Function SUMIF(S) - calculations and optimizations", () => {
+describe('Function SUMIF(S) - calculations and optimizations', () => {
   it('no coercion when sum', () => {
     const engine =  HyperFormula.buildFromArray([
       ['2', '="3"'],
@@ -232,7 +232,7 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
         ['1', '5'],
         ['2', '7'],
         ['=SUMIF(A1:A3, "=1", B1:B3)'],
-        ['=SUMIF($Sheet2.A1:A3, "=1", B1:B3)'],
+        ['=SUMIF(Sheet2!A1:A3, "=1", B1:B3)'],
       ],
       Sheet2: [
         ['0', '30'],
@@ -258,74 +258,6 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
     ])
 
     expect(engine.getCellValue(adr('A5'))).toEqual(13)
-  })
-})
-
-describe('Criterions - operators computations', () => {
-  it('usage of greater than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A3, ">1", B1:B3)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(7)
-  })
-
-  it('usage of greater than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A3, ">=1", B1:B3)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(12)
-  })
-
-  it('usage of less than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A2, "<1", B1:B2)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
-  })
-
-  it('usage of less than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A3, "<=1", B1:B3)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(8)
-  })
-
-  it('usage of equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A3, "=1", B1:B3)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
-  })
-
-  it('usage of not equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
-      ['0', '3'],
-      ['1', '5'],
-      ['2', '7'],
-      ['=SUMIF(A1:A3, "<>1", B1:B3)'],
-    ])
-
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 })
 
@@ -450,7 +382,7 @@ describe('Function SUMIFS - argument validations and combinations', () => {
   })
 })
 
-describe("Function SUMIFS - calcultions on more than one criteria", () => {
+describe('Function SUMIFS - calcultions on more than one criteria', () => {
   it('works for more than one criterion/range pair', () => {
     const engine =  HyperFormula.buildFromArray([
       ['0', '100', '3'],

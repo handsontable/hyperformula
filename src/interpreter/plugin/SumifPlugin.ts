@@ -1,14 +1,14 @@
-import assert from 'assert'
+
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {count, split} from '../../generatorUtils'
-import {Ast, AstNodeType, CellReferenceAst, ProcedureAst} from '../../parser'
-import {buildCriterionLambda, CriterionPackage, Criterion, CriterionLambda, parseCriterion} from '../Criterion'
-import {add} from '../scalar'
+import { ProcedureAst} from '../../parser'
 import {coerceToRange} from '../coerce'
+import { CriterionLambda, CriterionPackage} from '../Criterion'
+import { SimpleRangeValue} from '../InterpreterValue'
+import {add} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
-import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
@@ -66,6 +66,9 @@ export class SumifPlugin extends FunctionPlugin {
     sumifs: {
       translationKey: 'SUMIFS',
     },
+    countifs: {
+      translationKey: 'COUNTIFS',
+    },
   }
 
   /**
@@ -109,7 +112,7 @@ export class SumifPlugin extends FunctionPlugin {
       }
       valuesArg = coerceToRange(valuesArgValue)
     }
-    
+
     return this.evaluateRangeSumif(valuesArg, [new Condition(conditionArg, criterionPackage)])
   }
 
@@ -130,7 +133,7 @@ export class SumifPlugin extends FunctionPlugin {
         return conditionArgValue
       }
       const conditionArg = coerceToRange(conditionArgValue)
-      const criterionValue = this.evaluateAst(ast.args[i+1], formulaAddress)
+      const criterionValue = this.evaluateAst(ast.args[i + 1], formulaAddress)
       if (criterionValue instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       } else if (criterionValue instanceof CellError) {
@@ -142,7 +145,7 @@ export class SumifPlugin extends FunctionPlugin {
       }
       conditions.push(new Condition(conditionArg, criterionPackage))
     }
-    
+
     return this.evaluateRangeSumif(valuesArg, conditions)
   }
 
@@ -179,7 +182,35 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    return this.evaluateRangeCountif(conditionArg, criterionPackage)
+    return this.evaluateRangeCountif(new Condition(conditionArg, criterionPackage))
+  }
+
+  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 2 || ast.args.length % 2 === 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const conditions: Condition[] = []
+    for (let i = 0; i < ast.args.length; i += 2) {
+      const conditionArgValue = this.evaluateAst(ast.args[i], formulaAddress)
+      if (conditionArgValue instanceof CellError) {
+        return conditionArgValue
+      }
+      const conditionArg = coerceToRange(conditionArgValue)
+      const criterionValue = this.evaluateAst(ast.args[i + 1], formulaAddress)
+      if (criterionValue instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      } else if (criterionValue instanceof CellError) {
+        return criterionValue
+      }
+      const criterionPackage = CriterionPackage.fromCellValue(criterionValue)
+      if (criterionPackage === undefined) {
+        return new CellError(ErrorType.VALUE)
+      }
+      conditions.push(new Condition(conditionArg, criterionPackage))
+    }
+
+    return this.evaluateRangeCountif(conditions[0])
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
@@ -201,7 +232,7 @@ export class SumifPlugin extends FunctionPlugin {
     const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
     const conditionsVertices = conditions.map((c) => this.tryToGetRangeVertexForRangeValue(c.conditionRange))
 
-    if (valuesRangeVertex && conditionsVertices.every(e => e !== undefined)) {
+    if (valuesRangeVertex && conditionsVertices.every((e) => e !== undefined)) {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
       if (cachedResult) {
@@ -217,7 +248,7 @@ export class SumifPlugin extends FunctionPlugin {
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
           this.evaluateRangeSumifValue(simpleValuesRange, conditions),
-          conditions.map((condition) => condition.criterionPackage.lambda)
+          conditions.map((condition) => condition.criterionPackage.lambda),
         ])
       }
 
@@ -235,7 +266,7 @@ export class SumifPlugin extends FunctionPlugin {
       simpleValuesRange,
       (filteredValues: IterableIterator<CellValue>) => {
         return reduceSum(filteredValues)
-      }
+      },
     )
   }
 
@@ -246,7 +277,9 @@ export class SumifPlugin extends FunctionPlugin {
    * @param criterionString - criterion in raw string format
    * @param criterion - already parsed criterion structure
    */
-  private evaluateRangeCountif(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
+  private evaluateRangeCountif(condition: Condition): CellValue {
+    const simpleConditionRange = condition.conditionRange
+    const criterionPackage = condition.criterionPackage
     const conditionRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleConditionRange)
 
     if (conditionRangeVertex) {
@@ -265,7 +298,7 @@ export class SumifPlugin extends FunctionPlugin {
       if (!cache.has(criterionPackage.raw)) {
         cache.set(criterionPackage.raw, [
           this.evaluateRangeCountifValue(simpleConditionRange, criterionPackage),
-          [criterionPackage.lambda]
+          [criterionPackage.lambda],
         ])
       }
 
@@ -283,7 +316,7 @@ export class SumifPlugin extends FunctionPlugin {
       simpleConditionRange,
       (filteredValues: IterableIterator<CellValue>) => {
         return count(filteredValues)
-      }
+      },
     )
   }
 

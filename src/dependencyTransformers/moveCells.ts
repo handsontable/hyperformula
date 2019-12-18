@@ -1,9 +1,9 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import { ErrorType, SimpleCellAddress} from '../Cell'
+import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MoveCellsTransformation} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
-import {transformAddressesInFormula, CellAddressTransformerFunction, cellRangeTransformer} from './common'
+import {CellAddressTransformerFunction, cellRangeTransformer, transformAddressesInFormula} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -86,6 +86,12 @@ export namespace MoveCellsDependencyTransformer {
       case AstNodeType.STRING: {
         return ast
       }
+      case AstNodeType.PERCENT_OP: {
+        return {
+          type: ast.type,
+          value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
+        }
+      }
       case AstNodeType.MINUS_UNARY_OP: {
         return {
           type: ast.type,
@@ -97,6 +103,12 @@ export namespace MoveCellsDependencyTransformer {
           type: ast.type,
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => transformDependentFormulas(arg, address, sourceRange, toRight, toBottom, toSheet)),
+        }
+      }
+      case AstNodeType.PARENTHESIS: {
+        return {
+          type: ast.type,
+          expression: transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       default: {

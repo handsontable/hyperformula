@@ -38,6 +38,10 @@ export class Cache {
       return ast
     }
   }
+
+  public destroy() {
+    this.cache.clear()
+  }
 }
 
 export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>): boolean => {
@@ -48,6 +52,7 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.CELL_REFERENCE:
     case AstNodeType.CELL_RANGE:
       return false
+    case AstNodeType.PERCENT_OP:
     case AstNodeType.MINUS_UNARY_OP: {
       return doesContainFunctions(ast.value, interestingFunctions)
     }
@@ -64,6 +69,8 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
       return doesContainFunctions(ast.left, interestingFunctions) || doesContainFunctions(ast.right, interestingFunctions)
+    case AstNodeType.PARENTHESIS:
+      return doesContainFunctions(ast.expression, interestingFunctions)
     case AstNodeType.FUNCTION_CALL: {
       if (interestingFunctions.has(ast.procedureName)) {
         return true

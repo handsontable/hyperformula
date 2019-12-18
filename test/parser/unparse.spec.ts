@@ -1,18 +1,20 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {ParserWithCaching} from '../../src/parser'
+import {enGB, plPL} from '../../src/i18n'
+import {buildLexerConfig, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB, plPL} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()
+  const lexerConfig = buildLexerConfig(config)
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
+  sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const unparser = new Unparser(config, sheetMapping.name)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.name)
 
   it('#unparse',  () => {
     const formula = '=1+SUM(1,2,3)*3'
@@ -30,7 +32,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse simple addreess from other sheet',  () => {
-    const formula = '=$Sheet1.A1'
+    const formula = '=Sheet1!A1'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
 
@@ -86,7 +88,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse cell range from other sheet',  () => {
-    const formula = '=$Sheet1.$A$1:B$2'
+    const formula = '=Sheet1!$A$1:B$2'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
 
@@ -120,7 +122,7 @@ describe('Unparse', () => {
   it('#unparse with known error with translation', () => {
     const config = new Config({ language: plPL })
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.name)
     const formula = '=#ADR!'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -155,17 +157,17 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=D4')
   })
 
-  it('#unparse forgets about unnecessary parenthesis', () => {
+  it('#unparse doesnt forget about unnecessary parenthesis', () => {
     const formula = '=(1+2)'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=1+2')
+    expect(unparsed).toEqual('=(1+2)')
   })
 
   it('#unparse forgets about unnecessary sheet reference', () => {
-    const formula = '=$Sheet1.C3'
+    const formula = '=Sheet1!C3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -173,12 +175,125 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=C3')
   })
 
-  xit('#unparse necessary parenthesis', () => {
+  it('#unparse necessary parenthesis from left subtree', () => {
     const formula = '=(1+2)*3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
     expect(unparsed).toEqual('=(1+2)*3')
+  })
+
+  it('#unparse necessary parenthesis from right subtree', () => {
+    const formula = '=3*(1+2)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=3*(1+2)')
+  })
+
+  it('#unparse doesnt use parenthesis for the same operations', () => {
+    const formula = '=4*3*2'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=4*3*2')
+  })
+
+  it('#unparse doesnt use parenthesis for different operations of same precedece', () => {
+    const formula1 = '=4/3*2'
+    const formula2 = '=4*3/2'
+    const ast1 = parser.parse(formula1, CellAddress.absolute(0, 0, 0)).ast
+    const ast2 = parser.parse(formula2, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed1 = unparser.unparse(ast1, adr('A1'))
+    const unparsed2 = unparser.unparse(ast2, adr('A1'))
+
+    expect(unparsed1).toEqual(formula1)
+    expect(unparsed2).toEqual(formula2)
+  })
+
+  it('#unparse doesnt use parenthesis for functions or other non-operator node types', () => {
+    const formula1 = '=TRUE()*2'
+    const formula2 = '=2*TRUE()'
+    const ast1 = parser.parse(formula1, CellAddress.absolute(0, 0, 0)).ast
+    const ast2 = parser.parse(formula2, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed1 = unparser.unparse(ast1, adr('A1'))
+    const unparsed2 = unparser.unparse(ast2, adr('A1'))
+
+    expect(unparsed1).toEqual(formula1)
+    expect(unparsed2).toEqual(formula2)
+  })
+
+  it('#unparse necessary parenthesis from subtree', () => {
+    const formula = '=-(3+4)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse double unary minus', () => {
+    const formula = '=-(-(3+4))'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse doesnt use parenthesis for non-operator node types', () => {
+    const formula = '=-42'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse percent', () => {
+    const formula = '=42%'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse use language configuration', () => {
+    const configEN = new Config({ language: enGB })
+    const configPL = new Config({ language: plPL })
+
+    const parser = new ParserWithCaching(configPL, sheetMapping.get)
+
+    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.name)
+    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.name)
+
+    const formula = '=SUMA(1,2)'
+
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1,2)')
+    expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1,2)')
+  })
+
+  it('unparsing sheet names in references sometimes have to wrap in quotes', () => {
+    const formula = "='Sheet with spaces'!A1"
+    const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('unparsing sheet names in ragnes sometimes have to wrap in quotes', () => {
+    const formula = "='Sheet with spaces'!A1:B1"
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 0))
+
+    expect(unparsed).toEqual(formula)
   })
 })

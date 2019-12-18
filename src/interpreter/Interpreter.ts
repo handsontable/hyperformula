@@ -1,20 +1,20 @@
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
-import {NotComputedMatrix, Matrix} from '../Matrix'
+import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, subtract, multiply, power, divide, unaryminus} from './scalar'
 import {coerceScalarToNumber} from './coerce'
+import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
 import {concatenate} from './text'
-import {SimpleRangeValue, InterpreterValue} from './InterpreterValue'
 
 export class Interpreter {
-  public readonly gpu: GPU
+  private gpu?: GPU
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
@@ -23,8 +23,6 @@ export class Interpreter {
     public readonly config: Config,
     public readonly stats: Statistics,
   ) {
-    this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
-
     this.registerPlugins(this.config.allFunctionPlugins())
   }
 
@@ -170,6 +168,13 @@ export class Interpreter {
         }
         return unaryminus(coerceScalarToNumber(result))
       }
+      case AstNodeType.PERCENT_OP: {
+        const result = this.evaluateAst(ast.value, formulaAddress)
+        if (result instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        return percent(coerceScalarToNumber(result))
+      }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
         if (pluginEntry) {
@@ -185,17 +190,20 @@ export class Interpreter {
         if (matrixVertex) {
           const matrix = matrixVertex.matrix
           if (matrix instanceof NotComputedMatrix) {
-            throw "Matrix should be already computed"
+            throw new Error('Matrix should be already computed')
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
             return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
           } else {
-            throw "Unknown matrix"
+            throw new Error('Unknown matrix')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+      }
+      case AstNodeType.PARENTHESIS: {
+        return this.evaluateAst(ast.expression, formulaAddress)
       }
       case AstNodeType.ERROR: {
         if (ast.error !== undefined) {
@@ -209,6 +217,20 @@ export class Interpreter {
     }
   }
 
+  public getGpuInstance(): GPU {
+    if (!this.gpu) {
+      this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
+    }
+    return this.gpu
+  }
+
+  public destroy() {
+    this.pluginCache.clear()
+    if (this.gpu) {
+      this.gpu.destroy()
+    }
+  }
+
   /**
    * Registers plugins with functions to use
    *
@@ -219,8 +241,8 @@ export class Interpreter {
       const pluginInstance = new pluginClass(this)
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
         const pluginFunctionData = pluginClass.implementedFunctions[pluginFunction]
-        const translatedFunctionName = this.config.getFunctionTranslationFor(pluginFunctionData.translationKey).toUpperCase()
-        this.pluginCache.set(translatedFunctionName, [pluginInstance, pluginFunction])
+        const functionName = pluginFunctionData.translationKey.toUpperCase()
+        this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
       })
     }
   }

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function SUMPRODUCT', () => {
   it('works',  () => {
@@ -169,7 +169,7 @@ describe('Function SUMPRODUCT', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '2', '', '=FOOBAR()', '12'],
       ['3', '=4/0', '', '13', '14'],
-      ['=SUMPRODUCT(A1:B2, D1:E2)']
+      ['=SUMPRODUCT(A1:B2, D1:E2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.NAME))

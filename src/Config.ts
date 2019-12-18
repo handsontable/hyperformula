@@ -1,21 +1,29 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {ErrorType} from './Cell'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
+import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
+import {BitwiseOperationsPlugin} from './interpreter/plugin/BitwiseOperationsPlugin'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
+import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
+import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
+import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
+import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
+import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
+import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
 import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
 import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {ErrorType} from "./Cell";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -60,8 +68,16 @@ export class Config {
     SumprodPlugin,
     MatrixPlugin,
     ExpPlugin,
+    AbsPlugin,
+    DegreesPlugin,
     RandomPlugin,
     VlookupPlugin,
+    IsEvenPlugin,
+    IsOddPlugin,
+    RoundingPlugin,
+    RadixConversionPlugin,
+    LogarithmPlugin,
+    BitwiseOperationsPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

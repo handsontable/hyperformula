@@ -67,7 +67,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
       const beforeToken = str.substr(start, token.index - start)
       tokens.push(formatToken(TokenType.FREE_TEXT, beforeToken))
     }
-    if (token[0].startsWith("\\")) {
+    if (token[0].startsWith('\\')) {
       tokens.push(formatToken(TokenType.FREE_TEXT, token[0]))
     } else {
       tokens.push(formatToken(TokenType.FORMAT, token[0]))
@@ -89,7 +89,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
 export function parse(str: string): FormatExpression {
   const dateFormatTokens = matchDateFormat(str)
 
-  if (dateFormatTokens.filter(elem => !isEscapeToken(elem)).length > 0) {
+  if (dateFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
     return {
       type: FormatExpressionType.DATE,
       tokens: createTokens(dateFormatTokens, str),
@@ -97,7 +97,7 @@ export function parse(str: string): FormatExpression {
   }
 
   const numberFormatTokens = matchNumberFormat(str)
-  if (numberFormatTokens.filter(elem => !isEscapeToken(elem)).length > 0) {
+  if (numberFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
     return {
       type: FormatExpressionType.NUMBER,
       tokens: createTokens(numberFormatTokens, str),

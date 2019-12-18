@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr, dateNumberToString} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Function YEAR', () => {
   it('validate arguments', () => {

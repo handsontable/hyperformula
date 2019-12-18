@@ -1,10 +1,10 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {Matrix} from '../Matrix'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
+import {Matrix} from '../Matrix'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 
 export class ColumnBinarySearch implements IColumnSearchStrategy {
@@ -28,6 +28,8 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
   public moveValues(sourceRange: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
 
   public removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void {}
+
+  public destroy(): void {}
 
   public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
     if (range.height() < this.config.vlookupThreshold || !sorted) {
