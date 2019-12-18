@@ -47,12 +47,6 @@ module.exports.create = function create(processedFile) {
     plugins: [
       new BannerPlugin(licenseBody),
     ],
-    // node: {
-    //   global: false,
-    //   process: false,
-    //   Buffer: false,
-    //   setImmediate: false,
-    // },
   };
 
   return [config];
