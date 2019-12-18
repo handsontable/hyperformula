@@ -35,7 +35,7 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
     })
   }
 
-  protected templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
+  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }

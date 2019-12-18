@@ -48,6 +48,8 @@ export const enGB: TranslationPackage = {
     BITAND: 'BITAND',
     BITOR: 'BITOR',
     BITXOR: 'BITXOR',
+    BITLSHIFT: 'BITLSHIFT',
+    BITRSHIFT: 'BITRSHIFT',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

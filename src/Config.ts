@@ -3,6 +3,7 @@ import {ErrorType} from './Cell'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
+import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
@@ -78,6 +79,7 @@ export class Config {
     RadixConversionPlugin,
     LogarithmPlugin,
     BitwiseLogicOperationsPlugin,
+    BitShiftPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
