@@ -5,7 +5,7 @@ setup: ## Setup project
 	@yarn install
 
 compile: ## Compile to javascript
-	@yarn tsc -d
+	@yarn tsc
 
 test: ## Run tests
 	@yarn jest
@@ -33,13 +33,31 @@ servedoc: ## Run server with documentation
 	@yarn http-server doc -p 5005
 
 clean: ## Clean compiled files
-	@rm -rf lib/
+	@rm -rf lib/ es/ commonjs/ dist/ typings/
 
-bundle: compile
-	@yarn webpack --config webpack.config.js
+bundle: compile bundle-es bundle-commonjs bundle-development bundle-production bundle-typings check-bundle ## Bundle library by making CommonJS, ES and UMD compatible files
+
+bundle-es: compile ## Transpiles files to ES
+	@yarn cross-env-shell BABEL_ENV=es babel lib --out-dir es
+
+bundle-commonjs: compile ## Transpiles files to CommonJS
+	@yarn cross-env-shell BABEL_ENV=commonjs babel lib --out-dir commonjs
+
+bundle-development: compile ## Transpiles and bundles files to UMD format (without minification)
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=development webpack ./lib/index.js
+
+bundle-production: compile ## Transpiles and bundles files to UMD format (with minification)
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=production webpack ./lib/index.js
+
+bundle-typings: ## Generates TypeScript declaration files
+	@yarn tsc --emitDeclarationOnly -d --outDir typings
 
 check-bundle:
-	@node script/check-minified.js
+	@node script/check-file.js dist/hyperformula.js
+	@node script/check-file.js dist/hyperformula.min.js
+	@node script/check-file.js dist/hyperformula.full.js
+	@node script/check-file.js dist/hyperformula.full.min.js
+	@node script/check-file.js commonjs
 
 verify-production-licenses:
 	@yarn license-checker --production --excludePackages="hyperformula@0.0.1" --onlyAllow="MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense"
