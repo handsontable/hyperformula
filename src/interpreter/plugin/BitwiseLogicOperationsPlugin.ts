@@ -4,7 +4,7 @@ import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
-export class BitwiseOperationsPlugin extends FunctionPlugin {
+export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     bitand: {
       translationKey: 'BITAND',
