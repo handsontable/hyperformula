@@ -296,4 +296,13 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('unparsing function without translation should unparse to canonical name', () => {
+    const formula = '=FOOBAR(1,2,3)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=FOOBAR(1,2,3)')
+  })
 })

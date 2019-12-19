@@ -31,7 +31,7 @@ export class Unparser {
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
         const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        return procedureName + '(' + args + ')'
+        return (procedureName || ast.procedureName) + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
         if (ast.reference.sheet === address.sheet) {
