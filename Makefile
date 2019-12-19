@@ -38,16 +38,16 @@ clean: ## Clean compiled files
 bundle: compile bundle-es bundle-commonjs bundle-development bundle-production bundle-typings check-bundle ## Bundle library by making CommonJS, ES and UMD compatible files
 
 bundle-es: compile ## Transpiles files to ES
-	@yarn cross-env-shell BABEL_ENV=es babel lib --out-dir es
+	@yarn cross-env-shell BABEL_ENV=es env-cmd -f ./ht.config.js babel lib --out-dir es
 
 bundle-commonjs: compile ## Transpiles files to CommonJS
-	@yarn cross-env-shell BABEL_ENV=commonjs babel lib --out-dir commonjs
+	@yarn cross-env-shell BABEL_ENV=commonjs env-cmd -f ./ht.config.js babel lib --out-dir commonjs
 
 bundle-development: compile ## Transpiles and bundles files to UMD format (without minification)
-	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=development webpack ./lib/index.js
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=development env-cmd -f ./ht.config.js webpack ./lib/index.js
 
 bundle-production: compile ## Transpiles and bundles files to UMD format (with minification)
-	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=production webpack ./lib/index.js
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=production env-cmd -f ./ht.config.js webpack ./lib/index.js
 
 bundle-typings: ## Generates TypeScript declaration files
 	@yarn tsc --emitDeclarationOnly -d --outDir typings

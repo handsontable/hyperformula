@@ -54,6 +54,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "cross-env": "^6.0.3",
+    "env-cmd": "9",
     "jest": "^23.6.0",
     "license-checker": "^25.0.1",
     "ts-jest": "^23.10.1",
