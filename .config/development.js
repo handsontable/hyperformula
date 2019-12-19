@@ -3,7 +3,6 @@
  *  - hyperformula.js
  *  - hyperformula.full.js
  */
-const path = require('path');
 const WebpackBar = require('webpackbar');
 const configFactory = require('./base');
 
