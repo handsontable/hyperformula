@@ -3,7 +3,7 @@ import {TranslationPackage} from '../i18n'
 class Sheet {
   constructor(
     public readonly id: number,
-    public fullName: string,
+    public displayName: string,
   ) {
   }
 }
@@ -27,7 +27,7 @@ export class SheetMapping {
     this.lastSheetId++
     const sheet = new Sheet(this.lastSheetId, sheetName)
     this.reversedMapping.set(sheet.id, sheet)
-    this.mapping.set(sheet.fullName, sheet)
+    this.mapping.set(sheet.displayName, sheet)
     return sheet.id
   }
 
@@ -39,7 +39,7 @@ export class SheetMapping {
     if (sheetId == this.lastSheetId) {
       --this.lastSheetId
     }
-    this.mapping.delete(sheet.fullName)
+    this.mapping.delete(sheet.displayName)
     this.reversedMapping.delete(sheetId)
   }
 
@@ -65,13 +65,13 @@ export class SheetMapping {
     if (sheet === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
-    return sheet.fullName
+    return sheet.displayName
   }
 
   public getName(sheetId: number): string | undefined {
     const sheet = this.reversedMapping.get(sheetId)
     if (sheet) {
-      return sheet.fullName
+      return sheet.displayName
     } else {
       return undefined
     }
@@ -98,7 +98,7 @@ export class SheetMapping {
     if (sheet === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
-    const currentName = sheet.fullName
+    const currentName = sheet.displayName
     if (currentName === newName) {
       return
     }
@@ -106,7 +106,7 @@ export class SheetMapping {
       throw new Error(`Sheet '${newName}' already exists`)
     }
 
-    sheet.fullName = newName
+    sheet.displayName = newName
     this.mapping.delete(currentName)
     this.mapping.set(newName, sheet)
     this.reversedMapping.delete(sheetId)
