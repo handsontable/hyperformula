@@ -17,6 +17,7 @@ module.exports.create = function create(processedFile) {
     output: {
       globalObject: `typeof self !== 'undefined' ? self : this`,
       library: 'HyperFormula',
+      libraryExport: 'default',
       libraryTarget: 'umd',
       path: path.resolve(__dirname, '../dist'),
       umdNamedDefine: true,
@@ -33,6 +34,9 @@ module.exports.create = function create(processedFile) {
           exclude: [
             /node_modules/,
           ],
+          options: {
+            cacheDirectory: false, // Disable cache. Necessary for injected variables into source code via ht.config.js
+          },
         },
       ]
     },
