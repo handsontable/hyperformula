@@ -26,14 +26,14 @@ export class SheetMapping {
     this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
   }
 
-  public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
-    const newSheetCanonicalName = canonicalize(sheetName)
+  public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
+    const newSheetCanonicalName = canonicalize(newSheetDisplayName)
     if (this.mappingFromCanonicalName.has(newSheetCanonicalName)) {
-      throw new Error(`Sheet ${sheetName} already exists`)
+      throw new Error(`Sheet ${newSheetDisplayName} already exists`)
     }
 
     this.lastSheetId++
-    const sheet = new Sheet(this.lastSheetId, sheetName)
+    const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
     this.mappingFromId.set(sheet.id, sheet)
     this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
     return sheet.id
@@ -48,7 +48,7 @@ export class SheetMapping {
       --this.lastSheetId
     }
     this.mappingFromCanonicalName.delete(sheet.canonicalName)
-    this.mappingFromId.delete(sheetId)
+    this.mappingFromId.delete(sheet.id)
   }
 
   public fetch = (sheetName: string): number => {
@@ -103,22 +103,23 @@ export class SheetMapping {
     return this.mappingFromCanonicalName.has(canonicalize(sheetName))
   }
 
-  public renameSheet(sheetId: number, newName: string): void {
+  public renameSheet(sheetId: number, newDisplayName: string): void {
     const sheet = this.mappingFromId.get(sheetId)
     if (sheet === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
-    const currentName = sheet.displayName
-    if (currentName === newName) {
+    const currentDisplayName = sheet.displayName
+    if (currentDisplayName === newDisplayName) {
       return
     }
-    const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newName))
-    if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheetId) {
-      throw new Error(`Sheet '${newName}' already exists`)
+
+    const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
+    if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheet.id) {
+      throw new Error(`Sheet '${newDisplayName}' already exists`)
     }
 
     const currentCanonicalName = sheet.canonicalName
-    sheet.displayName = newName
+    sheet.displayName = newDisplayName
     this.mappingFromCanonicalName.delete(currentCanonicalName)
     this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
     this.mappingFromId.delete(sheetId)
