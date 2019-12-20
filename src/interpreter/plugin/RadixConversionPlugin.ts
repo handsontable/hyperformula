@@ -34,6 +34,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
     decimal: {
       translationKey: 'DECIMAL',
     },
+    base: {
+      translationKey: 'BASE',
+    },
   }
 
   public dec2bin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -67,6 +70,36 @@ export class RadixConversionPlugin extends FunctionPlugin {
 
   public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.bin2base(ast, formulaAddress, 16)
+  }
+
+  public base(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const value = this.getNumericArgument(ast, formulaAddress, 0)
+    if (value instanceof CellError) {
+      return value
+    }
+
+    const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
+    if (base instanceof CellError) {
+      return base
+    }
+
+    let padding
+    if (ast.args.length === 3) {
+      padding = this.getNumericArgument(ast, formulaAddress, 2, 0, DECIMAL_NUMBER_OF_BITS)
+      if (padding instanceof CellError) {
+        return padding
+      }
+    }
+
+    if (value < 0) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    return decimalToBaseWithMinimumPadding(value, base, padding)
   }
 
   public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -106,7 +139,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     }
 
     const decimal = twoComplementToDecimal(binaryWithSign)
-    return decimalToBase(decimal, base, places)
+    return decimalToBaseWithExactPadding(decimal, base, places)
   }
 
   private dec2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {
@@ -130,7 +163,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
       return value
     }
 
-    return decimalToBase(value, base, places)
+    return decimalToBaseWithExactPadding(value, base, places)
   }
 
   private getFirstArgumentAsNumberInBase(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number, maxLength: number): string | CellError {
@@ -152,7 +185,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return value
   }
 
-  private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min: number, max: number): number | CellError {
+  private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
     const arg = this.evaluateAst(ast.args[position], formulaAddress)
 
     if (arg instanceof SimpleRangeValue) {
@@ -161,7 +194,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
 
     const value = coerceScalarToNumber(arg)
     if (typeof value === 'number') {
-      if (value < min || value > max) {
+      if (min !== undefined && max !== undefined && (value < min || value > max)) {
         return new CellError(ErrorType.NUM)
       }
     }
@@ -170,7 +203,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
   }
 }
 
-function decimalToBase(value: number, base: number, places?: number): string | CellError {
+function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
   const result = decimalToRadixComplement(value, base)
   if (places === undefined || value < 0) {
     return result
@@ -178,6 +211,15 @@ function decimalToBase(value: number, base: number, places?: number): string | C
     return new CellError(ErrorType.NUM)
   } else {
     return padLeft(result, places)
+  }
+}
+
+function decimalToBaseWithMinimumPadding(value: number, base: number, places?: number): string {
+  const result = decimalToRadixComplement(value, base)
+  if (places !== undefined && places > result.length) {
+    return padLeft(result, places)
+  } else {
+    return result
   }
 }
 

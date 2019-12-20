@@ -42,6 +42,7 @@ export const enGB: TranslationPackage = {
     VLOOKUP: 'VLOOKUP',
     YEAR: 'YEAR',
     DECIMAL: 'DECIMAL',
+    BASE: 'BASE',
     DEC2BIN: 'DEC2BIN',
     DEC2OCT: 'DEC2OCT',
     DEC2HEX: 'DEC2HEX',
