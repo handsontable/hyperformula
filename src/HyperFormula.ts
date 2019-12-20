@@ -584,7 +584,7 @@ export class HyperFormula {
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
    */
-  public sheetName(sheetId: number): string | undefined {
+  public getSheetName(sheetId: number): string | undefined {
     return this.sheetMapping.getDisplayName(sheetId)
   }
 

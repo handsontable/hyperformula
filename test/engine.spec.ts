@@ -148,13 +148,13 @@ describe('Integration', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetName(0)).toEqual('Sheet1')
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
   })
 
   it('#sheetName if sheet doesnt exists', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.sheetName(0)).toBeUndefined()
+    expect(engine.getSheetName(0)).toBeUndefined()
   })
 
   it('#sheetId if sheet exists', () => {
@@ -205,7 +205,7 @@ describe('Integration', () => {
 
     engine.renameSheet(0, 'bar')
 
-    expect(engine.sheetName(0)).toBe('bar')
+    expect(engine.getSheetName(0)).toBe('bar')
     expect(engine.doesSheetExist('foo')).toBe(false)
     expect(engine.doesSheetExist('bar')).toBe(true)
   })
@@ -234,7 +234,7 @@ describe('Integration', () => {
 
     engine.renameSheet(0, 'foo')
 
-    expect(engine.sheetName(0)).toBe('foo')
+    expect(engine.getSheetName(0)).toBe('foo')
     expect(engine.doesSheetExist('foo')).toBe(true)
   })
 
@@ -244,7 +244,7 @@ describe('Integration', () => {
 
     engine.renameSheet(0, 'FOO')
 
-    expect(engine.sheetName(0)).toBe('FOO')
+    expect(engine.getSheetName(0)).toBe('FOO')
     expect(engine.doesSheetExist('FOO')).toBe(true)
   })
 
