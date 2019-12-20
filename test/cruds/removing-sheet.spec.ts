@@ -63,9 +63,9 @@ describe('remove sheet', () => {
 
     engine.removeSheet('Sheet2')
 
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1'])
     engine.addSheet()
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet2'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet2'])
   })
 
   it('should not decrease last sheet id when removing sheet other than last', () => {
@@ -77,9 +77,9 @@ describe('remove sheet', () => {
 
     engine.removeSheet('Sheet2')
 
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet3'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet3'])
     engine.addSheet()
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet3', 'Sheet4'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet3', 'Sheet4'])
   })
 
   it('should remove sheet with matrix', () => {

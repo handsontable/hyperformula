@@ -77,7 +77,7 @@ export class SheetMapping {
     }
   }
 
-  public* names(): IterableIterator<string> {
+  public* displayNames(): IterableIterator<string> {
     for (const sheet of this.mappingFromCanonicalName.values()) {
       yield sheet.displayName
     }

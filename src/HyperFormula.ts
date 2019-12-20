@@ -185,7 +185,7 @@ export class HyperFormula {
    */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
-    for (const sheetName of this.sheetMapping.names()) {
+    for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions.set(sheetName, {
         width: this.dependencyGraph.getSheetWidth(sheetId),
