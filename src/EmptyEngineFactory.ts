@@ -12,7 +12,7 @@ export class EmptyEngineFactory {
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
-    const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.fetchDisplayName)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats)
     lazilyTransformingAstService.parser = parser
     const engine = new HyperFormula(

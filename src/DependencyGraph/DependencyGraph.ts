@@ -511,7 +511,7 @@ export class DependencyGraph {
   }
 
   public getSheetName(sheetId: number): string {
-    return this.sheetMapping.name(sheetId)
+    return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
   public getSheetHeight(sheet: number): number {

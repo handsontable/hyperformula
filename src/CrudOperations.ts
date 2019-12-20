@@ -114,7 +114,7 @@ export class CrudOperations implements IBatchExecutor {
     }
     const sheetId = this.sheetMapping.addSheet(name)
     this.addressMapping.autoAddSheet(sheetId, [])
-    return this.sheetMapping.name(sheetId)
+    return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
   public removeSheet(sheetName: string): void {

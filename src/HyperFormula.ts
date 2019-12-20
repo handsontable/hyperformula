@@ -573,7 +573,7 @@ export class HyperFormula {
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
-    return simpleCellAddressToString(this.sheetMapping.name, address, sheet)
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
   /**

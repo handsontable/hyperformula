@@ -64,7 +64,7 @@ export class SheetMapping {
     }
   }
 
-  public name = (sheetId: number): string => {
+  public fetchDisplayName = (sheetId: number): string => {
     return this.fetchSheetById(sheetId).displayName
   }
 
