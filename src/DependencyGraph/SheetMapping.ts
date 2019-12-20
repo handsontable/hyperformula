@@ -34,8 +34,7 @@ export class SheetMapping {
 
     this.lastSheetId++
     const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
-    this.mappingFromId.set(sheet.id, sheet)
-    this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
+    this.store(sheet)
     return sheet.id
   }
 
@@ -121,12 +120,16 @@ export class SheetMapping {
     const currentCanonicalName = sheet.canonicalName
     sheet.displayName = newDisplayName
     this.mappingFromCanonicalName.delete(currentCanonicalName)
-    this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
-    this.mappingFromId.set(sheetId, sheet)
+    this.store(sheet)
   }
 
   public destroy(): void {
     this.mappingFromCanonicalName.clear()
     this.mappingFromId.clear()
+  }
+
+  private store(sheet: Sheet): void {
+    this.mappingFromId.set(sheet.id, sheet)
+    this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
   }
 }
