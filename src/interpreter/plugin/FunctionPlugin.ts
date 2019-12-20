@@ -82,4 +82,30 @@ export abstract class FunctionPlugin {
       return fn(coercedArg)
     }
   }
+
+  protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const left = this.evaluateAst(ast.args[0], formulaAddress)
+    if (left instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedLeft = coerceScalarToNumber(left)
+    if (coercedLeft instanceof CellError) {
+      return coercedLeft
+    }
+
+    const right = this.evaluateAst(ast.args[1], formulaAddress)
+    if (right instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const coercedRight = coerceScalarToNumber(right)
+    if (coercedRight instanceof CellError) {
+      return coercedRight
+    }
+
+    return [coercedLeft, coercedRight]
+  }
 }
