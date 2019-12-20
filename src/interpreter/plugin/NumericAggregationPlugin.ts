@@ -157,12 +157,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
     const value = this.reduce(ast, formulaAddress, 0, 'COUNT', (left, right) => {
-      if (typeof left === 'number' && typeof right === 'number') {
-        return left + right
-      } else {
-        throw "Can't happen"
-      }
-    }, (arg) => {
+      return left + right
+    }, (arg): number => {
       return (typeof arg === 'number') ? 1 : 0
     })
 
