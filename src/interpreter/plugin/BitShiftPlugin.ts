@@ -1,7 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
-import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
@@ -27,27 +25,13 @@ export class BitShiftPlugin extends FunctionPlugin {
   }
 
   private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): CellValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    const value = this.evaluateAst(ast.args[0], formulaAddress)
-    if (value instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedValue = coerceScalarToNumber(value)
-    if (coercedValue instanceof CellError) {
-      return coercedValue
+    const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
+
+    if (validationResult instanceof CellError) {
+      return validationResult
     }
 
-    const positions = this.evaluateAst(ast.args[1], formulaAddress)
-    if (positions instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const coercedPositions = coerceScalarToNumber(positions)
-    if (coercedPositions instanceof CellError) {
-      return coercedPositions
-    }
+    const [coercedValue, coercedPositions] = validationResult
 
     if (coercedValue < 0 || !Number.isInteger(coercedValue) || !Number.isInteger(coercedPositions)) {
       return new CellError(ErrorType.NUM)

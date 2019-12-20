@@ -298,7 +298,7 @@ describe('Unparse', () => {
   })
 
   it('unparsing sheet name always returns its original name', () => {
-    const formula = "=shEET2!A1:B1"
+    const formula = '=shEET2!A1:B1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1', 0))

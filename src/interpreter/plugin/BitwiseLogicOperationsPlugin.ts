@@ -1,7 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
-import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
@@ -36,28 +34,13 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   }
 
   private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
-    if (ast.args.length !== 2) {
-      return new CellError(ErrorType.NA)
-    }
-    const left = this.evaluateAst(ast.args[0], formulaAddress)
-    if (left instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedLeft = coerceScalarToNumber(left)
-    if (coercedLeft instanceof CellError) {
-      return coercedLeft
+    const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
+
+    if (validationResult instanceof CellError) {
+      return validationResult
     }
 
-    const right = this.evaluateAst(ast.args[1], formulaAddress)
-    if (right instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const coercedRight = coerceScalarToNumber(right)
-    if (coercedRight instanceof CellError) {
-      return coercedRight
-    }
-
+    const [coercedLeft, coercedRight] = validationResult
     if (coercedLeft < 0 || coercedRight < 0 || !Number.isInteger(coercedLeft) || !Number.isInteger(coercedRight)) {
       return new CellError(ErrorType.NUM)
     }

@@ -14,13 +14,16 @@ import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
 import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
+import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
+import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
 import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
+import {SqrtPlugin} from './interpreter/plugin/SqrtPlugin'
 import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
 import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
@@ -82,6 +85,9 @@ export class Config {
     BitwiseLogicOperationsPlugin,
     BitShiftPlugin,
     PowerPlugin,
+    MathConstantsPlugin,
+    SqrtPlugin,
+    ModuloPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

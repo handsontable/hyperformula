@@ -75,6 +75,9 @@ export const enGB: TranslationPackage = {
     ROUNDUP: 'ROUNDUP',
     TRUNC: 'TRUNC',
     XOR: 'XOR',
+    PI: 'PI',
+    SQRT: 'SQRT',
+    MOD: 'MOD',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
