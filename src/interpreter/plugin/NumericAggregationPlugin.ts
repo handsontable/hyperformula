@@ -8,9 +8,9 @@ import {add, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 
-export type BinaryOperation = (left: CellValue, right: CellValue) => CellValue
+export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation = (arg: CellValue) => CellValue
+export type MapOperation<T> = (arg: CellValue) => T
 
 function idMap(arg: CellValue): CellValue {
   return arg
@@ -71,7 +71,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.reduce(ast, formulaAddress, 0, 'SUM', add)
+    return this.reduce(ast, formulaAddress, 0, 'SUM', add, idMap)
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -109,7 +109,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max)
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAX', max, idMap)
 
     return zeroForInfinite(value)
   }
@@ -118,7 +118,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa)
+    const value = this.reduce(ast, formulaAddress, Number.NEGATIVE_INFINITY, 'MAXA', maxa, idMap)
 
     return zeroForInfinite(value)
   }
@@ -135,7 +135,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MIN', min, idMap)
 
     return zeroForInfinite(value)
   }
@@ -144,7 +144,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina)
+    const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina, idMap)
 
     return zeroForInfinite(value)
   }
@@ -175,8 +175,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    * */
-  private reduce(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation, mapFunction: MapOperation = idMap): CellValue {
-    return ast.args.reduce((acc: CellValue, arg) => {
+  private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+    return ast.args.reduce((acc: T, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
@@ -200,7 +200,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param initialAccValue - initial accumulator value for reducing function
    * @param reducingFunction - reducing function
    */
-  private reduceRange(rangeValues: CellValue[], initialAccValue: CellValue, reducingFunction: BinaryOperation): CellValue {
+  private reduceRange<T>(rangeValues: T[], initialAccValue: T, reducingFunction: BinaryOperation<T>): T {
     let acc = initialAccValue
     for (const val of rangeValues) {
       acc = reducingFunction(acc, val)
@@ -217,13 +217,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: CellValue, functionName: string, reducingFunction: BinaryOperation, mapFunction: MapOperation): CellValue {
+  private evaluateRange<T>(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-    } catch (err) {
+    } catch(err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
-        return new CellError(ErrorType.VALUE)
+        return mapFunction(new CellError(ErrorType.VALUE))
       } else {
         throw err
       }
@@ -233,7 +233,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
     assert.ok(rangeVertex, 'Range does not exists in graph')
 
-    let value = rangeVertex.getFunctionValue(functionName)
+    let value = rangeVertex.getFunctionValue(functionName) as T
     if (!value) {
       const rangeValues = this.getRangeValues(functionName, range, mapFunction)
       value = this.reduceRange(rangeValues, initialAccValue, reducingFunction)
@@ -252,13 +252,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
    */
-  private getRangeValues(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation): CellValue[] {
-    const rangeResult: CellValue[] = []
+  private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>): T[] {
+    const rangeResult: T[] = []
     const {smallerRangeVertex, restRanges} = findSmallerRange(this.dependencyGraph, [range])
     const restRange = restRanges[0]
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      const cachedValue = smallerRangeVertex.getFunctionValue(functionName)
+      const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
       if (cachedValue) {
         rangeResult.push(cachedValue)
       } else {
