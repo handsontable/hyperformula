@@ -68,7 +68,7 @@ export class SheetMapping {
     return this.fetchSheetById(sheetId).displayName
   }
 
-  public getName(sheetId: number): string | undefined {
+  public getDisplayName(sheetId: number): string | undefined {
     const sheet = this.mappingFromId.get(sheetId)
     if (sheet) {
       return sheet.displayName

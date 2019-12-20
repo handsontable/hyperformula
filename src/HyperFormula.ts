@@ -585,7 +585,7 @@ export class HyperFormula {
    * @returns name of the sheet
    */
   public sheetName(sheetId: number): string | undefined {
-    return this.sheetMapping.getName(sheetId)
+    return this.sheetMapping.getDisplayName(sheetId)
   }
 
   /**
