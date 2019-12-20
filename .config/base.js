@@ -10,6 +10,7 @@ licenseBody += '\nRelease date: ' + process.env.HT_RELEASE_DATE + ' (built at ' 
 module.exports.create = function create(processedFile) {
   const config = {
     devtool: false,
+    mode: 'none',
     performance: {
       hints: false,
     },
@@ -24,21 +25,13 @@ module.exports.create = function create(processedFile) {
       alias: {},
       extensions: [ '.tsx', '.ts', '.js' ],
     },
-    mode: 'none',
     module: {
       rules: [
-        {
-          test: /\.tsx?$/,
-          loader: 'ts-loader',
-          exclude: [
-            /node_modules/,
-          ],
-        },
         {
           test: /\.js$/,
           loader: 'babel-loader',
           exclude: [
-            /node_modules/,
+            /node_modules\/(?!gpu\.js).*/, // The gpu.js library is distributed with non transpiled files
           ],
         },
       ]

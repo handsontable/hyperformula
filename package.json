@@ -57,7 +57,6 @@
     "jest": "^23.6.0",
     "license-checker": "^25.0.1",
     "ts-jest": "^23.10.1",
-    "ts-loader": "^6.2.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-etc": "^1.5.2",
