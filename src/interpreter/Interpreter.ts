@@ -1,4 +1,4 @@
-import {GPU} from 'gpu.js'
+import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
@@ -14,7 +14,7 @@ import {add, divide, multiply, percent, power, subtract, unaryminus} from './sca
 import {concatenate} from './text'
 
 export class Interpreter {
-  private gpu?: GPU
+  private gpu?: GPU.GPU
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
@@ -217,9 +217,10 @@ export class Interpreter {
     }
   }
 
-  public getGpuInstance(): GPU {
+  public getGpuInstance(): GPU.GPU {
     if (!this.gpu) {
-      this.gpu = new GPU({mode: this.config.gpuMode })
+      const GPUConstructor = GPU.GPU || GPU
+      this.gpu = new GPUConstructor({mode: this.config.gpuMode })
     }
     return this.gpu
   }
