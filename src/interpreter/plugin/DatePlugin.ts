@@ -5,7 +5,7 @@ import {
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
   momentToDateNumber,
-  toDateNumber
+  toDateNumber,
 } from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
@@ -35,8 +35,8 @@ export class DatePlugin extends FunctionPlugin {
       translationKey: 'EOMONTH',
     },
     day: {
-      translationKey: 'DAY'
-    }
+      translationKey: 'DAY',
+    },
   }
 
   /**

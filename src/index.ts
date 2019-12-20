@@ -1,7 +1,7 @@
-import {Sheets} from './GraphBuilder'
+import {CellError, CellValue, EmptyValue} from './Cell'
 import {Config} from './Config'
-import {HyperFormula, NoSheetWithIdError, InvalidAddressError} from './HyperFormula'
-import {CellValue, EmptyValue, CellError} from './Cell'
+import {Sheets} from './GraphBuilder'
+import {HyperFormula, InvalidAddressError, NoSheetWithIdError} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 class HyperFormulaNS extends HyperFormula {

@@ -233,7 +233,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
-    } catch(err) {
+    } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
         return mapFunction(new CellError(ErrorType.VALUE))
       } else {
