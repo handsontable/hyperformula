@@ -17,6 +17,7 @@ import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
 import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
+import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
 import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
@@ -86,6 +87,7 @@ export class Config {
     PowerPlugin,
     MathConstantsPlugin,
     SqrtPlugin,
+    ModuloPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
