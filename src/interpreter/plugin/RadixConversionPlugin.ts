@@ -6,6 +6,7 @@ import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 const NUMBER_OF_BITS = 10
+const ALPHABET='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -46,7 +47,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const binaryWithSign = this.getBinaryArgument(ast, formulaAddress, 0)
+    const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
     if (binaryWithSign instanceof CellError) {
       return binaryWithSign
     }
@@ -67,7 +68,7 @@ export class RadixConversionPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const binaryWithSign = this.getBinaryArgument(ast, formulaAddress, 0)
+    const binaryWithSign = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, 2, NUMBER_OF_BITS)
     if (binaryWithSign instanceof CellError) {
       return binaryWithSign
     }
@@ -108,8 +109,8 @@ export class RadixConversionPlugin extends FunctionPlugin {
     return decimalToBase(value, base, places)
   }
 
-  private getBinaryArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number): string | CellError  {
-    const arg = this.evaluateAst(ast.args[position], formulaAddress)
+  private getFirstArgumentAsNumberInBase(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number, maxLength: number): string | CellError {
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
 
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -117,7 +118,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
 
     const value = coerceScalarToString(arg)
     if (typeof value === 'string') {
-      if (value.length > NUMBER_OF_BITS || !/^[01]+$/.test(value)) {
+      const baseAlphabet = ALPHABET.substr(0, base)
+      const regex = new RegExp(`^[${baseAlphabet}]+$`)
+      if (value.length > maxLength || !regex.test(value)) {
         return new CellError(ErrorType.NUM)
       }
     }
