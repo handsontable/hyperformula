@@ -9,6 +9,8 @@ export const enGB: TranslationPackage = {
     COUNTBLANK: 'COUNTBLANK',
     COUNTIF: 'COUNTIF',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUNT: 'COUNT',
+    COUNTA: 'COUNTA',
     DATE: 'DATE',
     EOMONTH: 'EOMONTH',
     EXP: 'EXP',

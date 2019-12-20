@@ -12,7 +12,7 @@ export type CriterionCache = Map<string, [CellValue, CriterionLambda[]]>
  */
 export class RangeVertex {
   /** Cache for associative aggregate functions. */
-  private functionCache: Map<string, CellValue>
+  private functionCache: Map<string, any>
 
   /** Cache for criterion-based functions. */
   private criterionFuncitonCache: Map<string, CriterionCache>
@@ -39,7 +39,7 @@ export class RangeVertex {
    *
    * @param functionName - name of the function
    */
-  public getFunctionValue(functionName: string): CellValue | null {
+  public getFunctionValue(functionName: string): any {
     return this.functionCache.get(functionName) || null
   }
 
@@ -49,7 +49,7 @@ export class RangeVertex {
    * @param functionName - name of the function
    * @param value - cached value
    */
-  public setFunctionValue(functionName: string, value: CellValue) {
+  public setFunctionValue(functionName: string, value: any) {
     this.functionCache.set(functionName, value)
   }
 
