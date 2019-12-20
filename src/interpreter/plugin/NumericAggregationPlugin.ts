@@ -57,6 +57,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     countblank: {
       translationKey: 'COUNTBLANK',
     },
+    count: {
+      translationKey: 'COUNT',
+    },
   }
 
   /**
@@ -144,6 +147,23 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     const value = this.reduce(ast, formulaAddress, Number.POSITIVE_INFINITY, 'MINA', mina)
 
     return zeroForInfinite(value)
+  }
+
+  public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const value = this.reduce(ast, formulaAddress, 0, 'COUNT', (left, right) => {
+      if (typeof left === 'number' && typeof right === 'number') {
+        return left + right
+      } else {
+        throw "Can't happen"
+      }
+    }, (arg) => {
+      return (typeof arg === 'number') ? 1 : 0
+    })
+
+    return value
   }
 
   /**
