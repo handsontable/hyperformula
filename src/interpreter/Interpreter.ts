@@ -219,7 +219,7 @@ export class Interpreter {
 
   public getGpuInstance(): GPU {
     if (!this.gpu) {
-      this.gpu = new GPU({mode: this.config.gpuMode, format: 'Float'})
+      this.gpu = new GPU({mode: this.config.gpuMode })
     }
     return this.gpu
   }
