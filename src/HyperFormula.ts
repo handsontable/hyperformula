@@ -522,7 +522,7 @@ export class HyperFormula {
   public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
 
-    const sheetId = this.sheetId(sheetName)!
+    const sheetId = this.getSheetId(sheetName)!
 
     return this.batch((e) => {
       e.clearSheet(sheetName)
@@ -596,7 +596,7 @@ export class HyperFormula {
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
    */
-  public sheetId(sheetName: string): number | undefined {
+  public getSheetId(sheetName: string): number | undefined {
     return this.sheetMapping.get(sheetName)
   }
 
