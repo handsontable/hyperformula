@@ -118,8 +118,9 @@ export class SheetMapping {
     }
 
     const currentCanonicalName = sheet.canonicalName
-    sheet.displayName = newDisplayName
     this.mappingFromCanonicalName.delete(currentCanonicalName)
+
+    sheet.displayName = newDisplayName
     this.store(sheet)
   }
 
