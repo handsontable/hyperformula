@@ -23,7 +23,7 @@ describe('COUNT', () => {
   })
 
   it('COUNT ignores all nonnumeric arguments', () => {
-    const engine = HyperFormula.buildFromArray([['foo'], [''], ['=TRUE()'], ['=COUNT(A1:A3)']])
+    const engine = HyperFormula.buildFromArray([['foo'], [null], ['=TRUE()'], ['=COUNT(A1:A3)']])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
