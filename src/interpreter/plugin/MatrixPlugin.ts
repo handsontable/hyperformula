@@ -45,7 +45,7 @@ export class MatrixPlugin extends FunctionPlugin {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setPrecision("unsigned")
+    }).setPrecision('unsigned')
       .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
@@ -90,7 +90,7 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return currentMax
-    }).setPrecision("unsigned")
+    }).setPrecision('unsigned')
       .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
@@ -177,7 +177,7 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return result
-    }).setPrecision("unsigned")
+    }).setPrecision('unsigned')
       .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(

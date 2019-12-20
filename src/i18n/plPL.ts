@@ -76,7 +76,7 @@ export const plPL: TranslationPackage = {
     TRUNC: 'LICZBA.CAŁK',
     XOR: 'XOR',
     PI: 'PI',
-    SQRT: 'PIERWIASTEK'
+    SQRT: 'PIERWIASTEK',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

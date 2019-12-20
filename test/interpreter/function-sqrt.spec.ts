@@ -5,7 +5,7 @@ import {adr} from '../testUtils'
 describe('Function SQRT', () => {
   it('should return error for negative numbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SQRT(-2)']
+      ['=SQRT(-2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
@@ -14,7 +14,7 @@ describe('Function SQRT', () => {
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SQRT()'],
-      ['=SQRT(1, 2)']
+      ['=SQRT(1, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -23,7 +23,7 @@ describe('Function SQRT', () => {
 
   it('should return error for arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SQRT("foo")']
+      ['=SQRT("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
@@ -33,7 +33,7 @@ describe('Function SQRT', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SQRT(0)'],
       ['=SQRT(16)'],
-      ['=SQRT(2)']
+      ['=SQRT(2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
