@@ -60,6 +60,9 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     count: {
       translationKey: 'COUNT',
     },
+    counta: {
+      translationKey: 'COUNTA',
+    },
   }
 
   /**
@@ -161,6 +164,19 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       }
     }, (arg) => {
       return (typeof arg === 'number') ? 1 : 0
+    })
+
+    return value
+  }
+
+  public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const value = this.reduce(ast, formulaAddress, 0, 'COUNTA', (left, right) => {
+      return left + right
+    }, (arg): number => {
+      return (arg === EmptyValue) ? 0 : 1
     })
 
     return value

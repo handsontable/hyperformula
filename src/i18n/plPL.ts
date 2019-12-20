@@ -9,6 +9,7 @@ export const plPL: TranslationPackage = {
     COUNTBLANK: 'LICZ.PUSTE',
     COUNTIF: 'LICZ.JEŻELI',
     COUNTUNIQUE: 'COUNTUNIQUE',
+    COUNTA: 'COUNTA',
     DATE: 'DATA',
     EOMONTH: 'NR.SER.OST.DN.MIEŚ',
     EXP: 'EXP',
