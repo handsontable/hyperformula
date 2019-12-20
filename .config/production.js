@@ -4,6 +4,7 @@
  *  - hyperformula.full.min.js
  */
 const WebpackBar = require('webpackbar');
+const TerserPlugin = require('terser-webpack-plugin');
 const configFactory = require('./development');
 
 module.exports.create = function create() {
@@ -16,6 +17,14 @@ module.exports.create = function create() {
 
     c.optimization = {
       minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            mangle: false,    // This option has to be disabled, otherwise GPU function doesn't work for min files.
+            compress: false,  // This option has to be disabled, otherwise GPU function doesn't work for min files.
+          }
+        })
+      ]
     };
 
     c.plugins.forEach((plugin) => {

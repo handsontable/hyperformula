@@ -148,13 +148,13 @@ describe('Integration', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetName(0)).toEqual('Sheet1')
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
   })
 
   it('#sheetName if sheet doesnt exists', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.sheetName(0)).toBeUndefined()
+    expect(engine.getSheetName(0)).toBeUndefined()
   })
 
   it('#sheetId if sheet exists', () => {
@@ -162,13 +162,13 @@ describe('Integration', () => {
 
     engine.addSheet('foobar')
 
-    expect(engine.sheetId('foobar')).toEqual(0)
+    expect(engine.getSheetId('foobar')).toEqual(0)
   })
 
   it('#sheetId if sheet doesnt exists', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.sheetId('doesntexist')).toBeUndefined()
+    expect(engine.getSheetId('doesntexist')).toBeUndefined()
   })
 
   it('#doesSheetExist if sheet exists', () => {
@@ -188,7 +188,7 @@ describe('Integration', () => {
   it('#numberOfSheets for zero', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.numberOfSheets()).toBe(0)
+    expect(engine.countSheets()).toBe(0)
   })
 
   it('#numberOfSheets', () => {
@@ -196,7 +196,7 @@ describe('Integration', () => {
 
     engine.addSheet('foo')
 
-    expect(engine.numberOfSheets()).toBe(1)
+    expect(engine.countSheets()).toBe(1)
   })
 
   it('#renameSheet', () => {
@@ -205,7 +205,7 @@ describe('Integration', () => {
 
     engine.renameSheet(0, 'bar')
 
-    expect(engine.sheetName(0)).toBe('bar')
+    expect(engine.getSheetName(0)).toBe('bar')
     expect(engine.doesSheetExist('foo')).toBe(false)
     expect(engine.doesSheetExist('bar')).toBe(true)
   })
@@ -234,8 +234,18 @@ describe('Integration', () => {
 
     engine.renameSheet(0, 'foo')
 
-    expect(engine.sheetName(0)).toBe('foo')
+    expect(engine.getSheetName(0)).toBe('foo')
     expect(engine.doesSheetExist('foo')).toBe(true)
+  })
+
+  it('#renameSheet for the same canonical name', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('Foo')
+
+    engine.renameSheet(0, 'FOO')
+
+    expect(engine.getSheetName(0)).toBe('FOO')
+    expect(engine.doesSheetExist('FOO')).toBe(true)
   })
 
   it('#getCellType empty cell', () => {

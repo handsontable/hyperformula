@@ -23,7 +23,7 @@ export class BuildEngineFromArraysFactory {
     }
 
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, config, stats)

@@ -38,7 +38,6 @@ export class MatrixPlugin extends FunctionPlugin {
 
     const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
-    /* istanbul ignore next: gpu.js */
     const gpu = this.interpreter.getGpuInstance()
     const kernel = gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
@@ -46,7 +45,8 @@ export class MatrixPlugin extends FunctionPlugin {
         sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
       }
       return sum
-    }).setOutput([outputSize.width, outputSize.height])
+    }).setPrecision("unsigned")
+      .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(leftMatrix.rawNumbers(), rightMatrix.rawNumbers(), leftMatrix.width()) as number[][],
@@ -90,7 +90,8 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return currentMax
-    }).setOutput([outputSize.width, outputSize.height])
+    }).setPrecision("unsigned")
+      .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],
@@ -176,7 +177,8 @@ export class MatrixPlugin extends FunctionPlugin {
         }
       }
       return result
-    }).setOutput([outputSize.width, outputSize.height])
+    }).setPrecision("unsigned")
+      .setOutput([outputSize.width, outputSize.height])
 
     return SimpleRangeValue.onlyNumbersDataWithoutRange(
       kernel(rangeMatrix.rawNumbers(), windowSize, stride) as number[][],

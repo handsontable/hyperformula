@@ -185,7 +185,7 @@ export class HyperFormula {
    */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
-    for (const sheetName of this.sheetMapping.names()) {
+    for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions.set(sheetName, {
         width: this.dependencyGraph.getSheetWidth(sheetId),
@@ -522,7 +522,7 @@ export class HyperFormula {
   public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
 
-    const sheetId = this.sheetId(sheetName)!
+    const sheetId = this.getSheetId(sheetName)!
 
     return this.batch((e) => {
       e.clearSheet(sheetName)
@@ -573,7 +573,7 @@ export class HyperFormula {
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
-    return simpleCellAddressToString(this.sheetMapping.name, address, sheet)
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
   /**
@@ -584,8 +584,8 @@ export class HyperFormula {
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
    */
-  public sheetName(sheetId: number): string | undefined {
-    return this.sheetMapping.getName(sheetId)
+  public getSheetName(sheetId: number): string | undefined {
+    return this.sheetMapping.getDisplayName(sheetId)
   }
 
   /**
@@ -596,7 +596,7 @@ export class HyperFormula {
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
    */
-  public sheetId(sheetName: string): number | undefined {
+  public getSheetId(sheetName: string): number | undefined {
     return this.sheetMapping.get(sheetName)
   }
 
@@ -669,7 +669,7 @@ export class HyperFormula {
   /**
    * Returns number of existing sheets
    */
-  public numberOfSheets(): number {
+  public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
   }
 

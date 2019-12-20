@@ -31,7 +31,7 @@ module.exports.create = function create(processedFile) {
           test: /\.js$/,
           loader: 'babel-loader',
           exclude: [
-            /node_modules\/(?!gpu\.js).*/, // The gpu.js library is distributed with non transpiled files
+            /node_modules/,
           ],
         },
       ]

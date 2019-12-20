@@ -4,7 +4,7 @@ import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
-export class BitwiseOperationsPlugin extends FunctionPlugin {
+export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     bitand: {
       translationKey: 'BITAND',
@@ -35,7 +35,7 @@ export class BitwiseOperationsPlugin extends FunctionPlugin {
     })
   }
 
-  protected templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
+  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }

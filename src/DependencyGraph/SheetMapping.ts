@@ -1,7 +1,24 @@
 import {TranslationPackage} from '../i18n'
+
+function canonicalize(sheetDisplayName: string): string {
+  return sheetDisplayName.toLowerCase()
+}
+
+class Sheet {
+  constructor(
+    public readonly id: number,
+    public displayName: string,
+  ) {
+  }
+
+  public get canonicalName() {
+    return canonicalize(this.displayName)
+  }
+}
+
 export class SheetMapping {
-  private readonly mapping: Map<string, number> = new Map()
-  private readonly reversedMapping: Map<number, string> = new Map()
+  private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
+  private readonly mappingFromId: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string = 'Sheet'
   private lastSheetId = -1
 
@@ -9,89 +26,110 @@ export class SheetMapping {
     this.sheetNamePrefix = languages.interface.NEW_SHEET_PREFIX || this.sheetNamePrefix
   }
 
-  public addSheet(sheetName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
-    if (this.mapping.has(sheetName)) {
-      throw new Error(`Sheet ${sheetName} already exists`)
+  public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
+    const newSheetCanonicalName = canonicalize(newSheetDisplayName)
+    if (this.mappingFromCanonicalName.has(newSheetCanonicalName)) {
+      throw new Error(`Sheet ${newSheetDisplayName} already exists`)
     }
 
     this.lastSheetId++
-    this.reversedMapping.set(this.lastSheetId, sheetName)
-    this.mapping.set(sheetName, this.lastSheetId)
-    return this.lastSheetId
+    const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
+    this.store(sheet)
+    return sheet.id
   }
 
   public removeSheet(sheetId: number) {
-    const sheetName = this.reversedMapping.get(sheetId)
-    if (sheetName === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
-    }
+    const sheet = this.fetchSheetById(sheetId)
     if (sheetId == this.lastSheetId) {
       --this.lastSheetId
     }
-    this.mapping.delete(sheetName)
-    this.reversedMapping.delete(sheetId)
+    this.mappingFromCanonicalName.delete(sheet.canonicalName)
+    this.mappingFromId.delete(sheet.id)
   }
 
   public fetch = (sheetName: string): number => {
-    const sheetId = this.mapping.get(sheetName)
-    if (sheetId === undefined) {
+    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
+    if (sheet === undefined) {
       throw new Error(`Sheet ${sheetName} doesn't exist`)
     }
-    return sheetId
+    return sheet.id
   }
 
   public get = (sheetName: string): number | undefined => {
-    return this.mapping.get(sheetName)
-  }
-
-  public name = (sheetId: number): string => {
-    const name = this.reversedMapping.get(sheetId)
-    if (name === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
+    if (sheet) {
+      return sheet.id
+    } else {
+      return undefined
     }
-    return name
   }
 
-  public getName(sheetId: number): string | undefined {
-    return this.reversedMapping.get(sheetId)
+  public fetchDisplayName = (sheetId: number): string => {
+    return this.fetchSheetById(sheetId).displayName
   }
 
-  public names(): IterableIterator<string> {
-    return this.mapping.keys()
+  public getDisplayName(sheetId: number): string | undefined {
+    const sheet = this.mappingFromId.get(sheetId)
+    if (sheet) {
+      return sheet.displayName
+    } else {
+      return undefined
+    }
+  }
+
+  public* displayNames(): IterableIterator<string> {
+    for (const sheet of this.mappingFromCanonicalName.values()) {
+      yield sheet.displayName
+    }
   }
 
   public numberOfSheets(): number {
-    return this.mapping.size
+    return this.mappingFromCanonicalName.size
   }
 
   public hasSheetWithId(sheetId: number): boolean {
-    return this.reversedMapping.has(sheetId)
+    return this.mappingFromId.has(sheetId)
   }
 
   public hasSheetWithName(sheetName: string): boolean {
-    return this.mapping.has(sheetName)
+    return this.mappingFromCanonicalName.has(canonicalize(sheetName))
   }
 
-  public renameSheet(sheetId: number, newName: string): void {
-    const currentName = this.reversedMapping.get(sheetId)
-    if (currentName === newName) {
+  public renameSheet(sheetId: number, newDisplayName: string): void {
+    const sheet = this.fetchSheetById(sheetId)
+
+    const currentDisplayName = sheet.displayName
+    if (currentDisplayName === newDisplayName) {
       return
     }
-    if (currentName === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
-    }
-    if (this.mapping.has(newName)) {
-      throw new Error(`Sheet '${newName}' already exists`)
+
+    const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
+    if (sheetWithThisCanonicalName && sheetWithThisCanonicalName.id !== sheet.id) {
+      throw new Error(`Sheet '${newDisplayName}' already exists`)
     }
 
-    this.mapping.delete(currentName)
-    this.mapping.set(newName, sheetId)
-    this.reversedMapping.delete(sheetId)
-    this.reversedMapping.set(sheetId, newName)
+    const currentCanonicalName = sheet.canonicalName
+    this.mappingFromCanonicalName.delete(currentCanonicalName)
+
+    sheet.displayName = newDisplayName
+    this.store(sheet)
   }
 
   public destroy(): void {
-    this.mapping.clear()
-    this.reversedMapping.clear()
+    this.mappingFromCanonicalName.clear()
+    this.mappingFromId.clear()
+  }
+
+  private store(sheet: Sheet): void {
+    this.mappingFromId.set(sheet.id, sheet)
+    this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
+  }
+
+  private fetchSheetById(sheetId: number): Sheet {
+    const sheet = this.mappingFromId.get(sheetId)
+    if (sheet === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    return sheet
   }
 }

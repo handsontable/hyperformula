@@ -3,7 +3,8 @@ import {ErrorType} from './Cell'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
-import {BitwiseOperationsPlugin} from './interpreter/plugin/BitwiseOperationsPlugin'
+import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
+import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
@@ -16,6 +17,7 @@ import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
+import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
@@ -77,7 +79,9 @@ export class Config {
     RoundingPlugin,
     RadixConversionPlugin,
     LogarithmPlugin,
-    BitwiseOperationsPlugin,
+    BitwiseLogicOperationsPlugin,
+    BitShiftPlugin,
+    PowerPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
