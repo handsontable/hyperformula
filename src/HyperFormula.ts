@@ -58,6 +58,9 @@ export type Index = [number, number]
  */
 export class HyperFormula {
 
+  public static version = (process.env.HT_VERSION || '')
+  public static buildDate = (process.env.HT_BUILD_DATE || '')
+
   public get graph(): Graph<Vertex> {
     return this.dependencyGraph.graph
   }

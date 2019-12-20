@@ -1,5 +1,5 @@
-import {TranslationPackage} from "../i18n";
-import {ErrorType} from "../Cell";
+import {TranslationPackage} from '../i18n'
+import {ErrorType} from '../Cell'
 
 export interface ParserConfig {
   functionArgSeparator: string,
