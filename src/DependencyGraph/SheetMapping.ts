@@ -39,10 +39,7 @@ export class SheetMapping {
   }
 
   public removeSheet(sheetId: number) {
-    const sheet = this.mappingFromId.get(sheetId)
-    if (sheet === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
-    }
+    const sheet = this.fetchSheetById(sheetId)
     if (sheetId == this.lastSheetId) {
       --this.lastSheetId
     }
@@ -68,11 +65,7 @@ export class SheetMapping {
   }
 
   public name = (sheetId: number): string => {
-    const sheet = this.mappingFromId.get(sheetId)
-    if (sheet === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
-    }
-    return sheet.displayName
+    return this.fetchSheetById(sheetId).displayName
   }
 
   public getName(sheetId: number): string | undefined {
@@ -103,10 +96,8 @@ export class SheetMapping {
   }
 
   public renameSheet(sheetId: number, newDisplayName: string): void {
-    const sheet = this.mappingFromId.get(sheetId)
-    if (sheet === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
-    }
+    const sheet = this.fetchSheetById(sheetId)
+
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
       return
@@ -132,5 +123,13 @@ export class SheetMapping {
   private store(sheet: Sheet): void {
     this.mappingFromId.set(sheet.id, sheet)
     this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
+  }
+
+  private fetchSheetById(sheetId: number): Sheet {
+    const sheet = this.mappingFromId.get(sheetId)
+    if (sheet === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    return sheet
   }
 }
