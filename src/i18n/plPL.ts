@@ -75,6 +75,7 @@ export const plPL: TranslationPackage = {
     ROUNDUP: 'ZAOKR.GÓRA',
     TRUNC: 'LICZBA.CAŁK',
     XOR: 'XOR',
+    PI: 'PI'
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

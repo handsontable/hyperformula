@@ -14,6 +14,7 @@ import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
 import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
+import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
@@ -82,6 +83,7 @@ export class Config {
     BitwiseLogicOperationsPlugin,
     BitShiftPlugin,
     PowerPlugin,
+    MathConstantsPlugin
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
