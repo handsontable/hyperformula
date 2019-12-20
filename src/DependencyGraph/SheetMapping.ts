@@ -1,7 +1,16 @@
 import {TranslationPackage} from '../i18n'
+
+class Sheet {
+  constructor(
+    public readonly id: number,
+    public fullName: string,
+  ) {
+  }
+}
+
 export class SheetMapping {
-  private readonly mapping: Map<string, number> = new Map()
-  private readonly reversedMapping: Map<number, string> = new Map()
+  private readonly mapping: Map<string, Sheet> = new Map()
+  private readonly reversedMapping: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string = 'Sheet'
   private lastSheetId = -1
 
@@ -14,46 +23,58 @@ export class SheetMapping {
       throw new Error(`Sheet ${sheetName} already exists`)
     }
 
+
     this.lastSheetId++
-    this.reversedMapping.set(this.lastSheetId, sheetName)
-    this.mapping.set(sheetName, this.lastSheetId)
-    return this.lastSheetId
+    const sheet = new Sheet(this.lastSheetId, sheetName)
+    this.reversedMapping.set(sheet.id, sheet)
+    this.mapping.set(sheet.fullName, sheet)
+    return sheet.id
   }
 
   public removeSheet(sheetId: number) {
-    const sheetName = this.reversedMapping.get(sheetId)
-    if (sheetName === undefined) {
+    const sheet = this.reversedMapping.get(sheetId)
+    if (sheet === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
     if (sheetId == this.lastSheetId) {
       --this.lastSheetId
     }
-    this.mapping.delete(sheetName)
+    this.mapping.delete(sheet.fullName)
     this.reversedMapping.delete(sheetId)
   }
 
   public fetch = (sheetName: string): number => {
-    const sheetId = this.mapping.get(sheetName)
-    if (sheetId === undefined) {
+    const sheet = this.mapping.get(sheetName)
+    if (sheet === undefined) {
       throw new Error(`Sheet ${sheetName} doesn't exist`)
     }
-    return sheetId
+    return sheet.id
   }
 
   public get = (sheetName: string): number | undefined => {
-    return this.mapping.get(sheetName)
+    const sheet = this.mapping.get(sheetName)
+    if (sheet) {
+      return sheet.id
+    } else {
+      return undefined
+    }
   }
 
   public name = (sheetId: number): string => {
-    const name = this.reversedMapping.get(sheetId)
-    if (name === undefined) {
+    const sheet = this.reversedMapping.get(sheetId)
+    if (sheet === undefined) {
       throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
-    return name
+    return sheet.fullName
   }
 
   public getName(sheetId: number): string | undefined {
-    return this.reversedMapping.get(sheetId)
+    const sheet = this.reversedMapping.get(sheetId)
+    if (sheet) {
+      return sheet.fullName
+    } else {
+      return undefined
+    }
   }
 
   public names(): IterableIterator<string> {
@@ -73,21 +94,23 @@ export class SheetMapping {
   }
 
   public renameSheet(sheetId: number, newName: string): void {
-    const currentName = this.reversedMapping.get(sheetId)
+    const sheet = this.reversedMapping.get(sheetId)
+    if (sheet === undefined) {
+      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
+    }
+    const currentName = sheet.fullName
     if (currentName === newName) {
       return
-    }
-    if (currentName === undefined) {
-      throw new Error(`Sheet with id ${sheetId} doesn't exist`)
     }
     if (this.mapping.has(newName)) {
       throw new Error(`Sheet '${newName}' already exists`)
     }
 
+    sheet.fullName = newName
     this.mapping.delete(currentName)
-    this.mapping.set(newName, sheetId)
+    this.mapping.set(newName, sheet)
     this.reversedMapping.delete(sheetId)
-    this.reversedMapping.set(sheetId, newName)
+    this.reversedMapping.set(sheetId, sheet)
   }
 
   public destroy(): void {
