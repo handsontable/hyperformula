@@ -6,7 +6,10 @@ import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 const NUMBER_OF_BITS = 10
-const ALPHABET='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const DECIMAL_NUMBER_OF_BITS = 255
+const MIN_BASE = 2
+const MAX_BASE = 36
+const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 export class RadixConversionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -27,6 +30,9 @@ export class RadixConversionPlugin extends FunctionPlugin {
     },
     bin2hex: {
       translationKey: 'BIN2HEX',
+    },
+    decimal: {
+      translationKey: 'DECIMAL',
     },
   }
 
@@ -61,6 +67,24 @@ export class RadixConversionPlugin extends FunctionPlugin {
 
   public bin2hex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     return this.bin2base(ast, formulaAddress, 16)
+  }
+
+  public decimal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const base = this.getNumericArgument(ast, formulaAddress, 1, MIN_BASE, MAX_BASE)
+    if (base instanceof CellError) {
+      return base
+    }
+
+    const input = this.getFirstArgumentAsNumberInBase(ast, formulaAddress, base, DECIMAL_NUMBER_OF_BITS)
+    if (input instanceof CellError) {
+      return input
+    }
+
+    return parseInt(input, base)
   }
 
   private bin2base(ast: ProcedureAst, formulaAddress: SimpleCellAddress, base: number): CellValue {

@@ -41,6 +41,7 @@ export const plPL: TranslationPackage = {
     TRUE: 'PRAWDA',
     VLOOKUP: 'WYSZUKAJ.PIONOWO',
     YEAR: 'ROK',
+    DECIMAL: 'DZIESIĘTNA',
     DEC2BIN: 'DZIES.NA.DWÓJK',
     DEC2OCT: 'DZIES.NA.ÓSM',
     DEC2HEX: 'DZIES.NA.SZESN',
