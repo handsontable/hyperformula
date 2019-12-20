@@ -12,6 +12,7 @@ export const plPL: TranslationPackage = {
     COUNT: 'COUNT',
     COUNTA: 'COUNTA',
     DATE: 'DATA',
+    DAY: 'DZIEŃ',
     EOMONTH: 'NR.SER.OST.DN.MIEŚ',
     EXP: 'EXP',
     FALSE: 'FAŁSZ',

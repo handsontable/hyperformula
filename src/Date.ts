@@ -20,6 +20,10 @@ export function dateNumberToMoment(dateNumber: number): Moment {
   return DATE_ZERO.clone().add(dateNumber, 'days')
 }
 
+export function dateNumberToDayOfMonth(dateNumber: number): number {
+  return dateNumberToMoment(dateNumber).date()
+}
+
 export function dateNumberToMonthNumber(dateNumber: number): number {
   return dateNumberToMoment(dateNumber).month() + 1
 }

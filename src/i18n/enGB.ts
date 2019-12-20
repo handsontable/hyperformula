@@ -12,6 +12,7 @@ export const enGB: TranslationPackage = {
     COUNT: 'COUNT',
     COUNTA: 'COUNTA',
     DATE: 'DATE',
+    DAY: 'DAY',
     EOMONTH: 'EOMONTH',
     EXP: 'EXP',
     FALSE: 'FALSE',

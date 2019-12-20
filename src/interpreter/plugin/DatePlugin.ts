@@ -1,5 +1,12 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, momentToDateNumber, toDateNumber} from '../../Date'
+import {
+  dateNumberToDayOfMonth,
+  dateNumberToMoment,
+  dateNumberToMonthNumber,
+  dateNumberToYearNumber,
+  momentToDateNumber,
+  toDateNumber
+} from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
@@ -27,6 +34,9 @@ export class DatePlugin extends FunctionPlugin {
     eomonth: {
       translationKey: 'EOMONTH',
     },
+    day: {
+      translationKey: 'DAY'
+    }
   }
 
   /**
@@ -99,6 +109,23 @@ export class DatePlugin extends FunctionPlugin {
     }
     dateMoment.endOf('month').startOf('date')
     return momentToDateNumber(dateMoment)
+  }
+
+  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
+    if (dateNumber instanceof CellError) {
+      return dateNumber
+    }
+
+    return dateNumberToDayOfMonth(dateNumber)
   }
 
   /**
