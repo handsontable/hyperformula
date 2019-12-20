@@ -46,6 +46,15 @@ describe('remove sheet', () => {
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   })
 
+  it('can remove sheet by any kind of case in name', () => {
+    const engine = HyperFormula.buildFromArray([['foo']])
+
+    engine.removeSheet('SHEET1')
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  })
+
   it('should remove empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
 

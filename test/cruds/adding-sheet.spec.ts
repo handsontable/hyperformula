@@ -68,6 +68,17 @@ describe('add sheet to engine', () => {
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
   })
 
+  it('cannot add another sheet with same lowercased name', function() {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('foo')
+
+    expect(() => {
+      engine.addSheet('FOO')
+    }).toThrow(/already exists/)
+    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
+  })
+
   it('should return given name', function() {
     const engine = HyperFormula.buildEmpty()
 
