@@ -22,6 +22,7 @@ import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
+import {SqrtPlugin} from './interpreter/plugin/SqrtPlugin'
 import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
 import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
@@ -83,7 +84,8 @@ export class Config {
     BitwiseLogicOperationsPlugin,
     BitShiftPlugin,
     PowerPlugin,
-    MathConstantsPlugin
+    MathConstantsPlugin,
+    SqrtPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

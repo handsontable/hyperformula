@@ -76,6 +76,7 @@ export const enGB: TranslationPackage = {
     TRUNC: 'TRUNC',
     XOR: 'XOR',
     PI: 'PI',
+    SQRT: 'SQRT'
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
