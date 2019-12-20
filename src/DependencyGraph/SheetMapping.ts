@@ -122,7 +122,6 @@ export class SheetMapping {
     sheet.displayName = newDisplayName
     this.mappingFromCanonicalName.delete(currentCanonicalName)
     this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
-    this.mappingFromId.delete(sheetId)
     this.mappingFromId.set(sheetId, sheet)
   }
 
