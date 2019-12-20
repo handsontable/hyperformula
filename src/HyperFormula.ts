@@ -669,7 +669,7 @@ export class HyperFormula {
   /**
    * Returns number of existing sheets
    */
-  public numberOfSheets(): number {
+  public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
   }
 

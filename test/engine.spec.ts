@@ -188,7 +188,7 @@ describe('Integration', () => {
   it('#numberOfSheets for zero', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.numberOfSheets()).toBe(0)
+    expect(engine.countSheets()).toBe(0)
   })
 
   it('#numberOfSheets', () => {
@@ -196,7 +196,7 @@ describe('Integration', () => {
 
     engine.addSheet('foo')
 
-    expect(engine.numberOfSheets()).toBe(1)
+    expect(engine.countSheets()).toBe(1)
   })
 
   it('#renameSheet', () => {
