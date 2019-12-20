@@ -297,6 +297,15 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
+  it('unparsing sheet name always returns its original name', () => {
+    const formula = "=shEET2!A1:B1"
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1', 0))
+
+    expect(unparsed).toEqual('=Sheet2!A1:B1')
+  })
+
   it('unparsing function without translation should unparse to canonical name', () => {
     const formula = '=FOOBAR(1,2,3)'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast

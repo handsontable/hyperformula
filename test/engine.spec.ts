@@ -238,6 +238,16 @@ describe('Integration', () => {
     expect(engine.doesSheetExist('foo')).toBe(true)
   })
 
+  it('#renameSheet for the same canonical name', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('Foo')
+
+    engine.renameSheet(0, 'FOO')
+
+    expect(engine.sheetName(0)).toBe('FOO')
+    expect(engine.doesSheetExist('FOO')).toBe(true)
+  })
+
   it('#getCellType empty cell', () => {
     const engine = HyperFormula.buildFromArray([[null, undefined]])
 
