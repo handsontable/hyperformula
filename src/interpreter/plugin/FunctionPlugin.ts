@@ -4,7 +4,7 @@ import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
+import {coerceScalarToNumber, coerceScalarToString} from '../coerce'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
@@ -67,20 +67,11 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
-    if (ast.args.length !== 1) {
-      return new CellError(ErrorType.NA)
-    }
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToNumber, fn)
+  }
 
-    const arg = this.evaluateAst(ast.args[0], formulaAddress)
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-    const coercedArg = coerceScalarToNumber(arg)
-    if (coercedArg instanceof CellError) {
-      return coercedArg
-    } else {
-      return fn(coercedArg)
-    }
+  protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => CellValue): CellValue {
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToString, fn)
   }
 
   protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
@@ -126,5 +117,27 @@ export abstract class FunctionPlugin {
     }
 
     return value
+  }
+
+  private templateWithOneArgumentCoercion(
+      ast: ProcedureAst,
+      formulaAddress: SimpleCellAddress,
+      coerceFunction: (arg: CellValue) => CellValue,
+      fn: (arg: any) => CellValue
+  ) {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedArg = coerceFunction(arg)
+    if (coercedArg instanceof CellError) {
+      return coercedArg
+    } else {
+      return fn(coercedArg)
+    }
   }
 }
