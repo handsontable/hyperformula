@@ -80,6 +80,7 @@ export const enGB: TranslationPackage = {
     ROUNDDOWN: 'ROUNDDOWN',
     ROUNDUP: 'ROUNDUP',
     TRUNC: 'TRUNC',
+    CEILING: 'CEILING',
     XOR: 'XOR',
     PI: 'PI',
     SQRT: 'SQRT',

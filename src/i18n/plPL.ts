@@ -80,6 +80,7 @@ export const plPL: TranslationPackage = {
     ROUNDDOWN: 'ZAOKR.DÓŁ',
     ROUNDUP: 'ZAOKR.GÓRA',
     TRUNC: 'LICZBA.CAŁK',
+    CEILING: 'ZAOKR.W.GÓRĘ',
     XOR: 'XOR',
     PI: 'PI',
     SQRT: 'PIERWIASTEK',
