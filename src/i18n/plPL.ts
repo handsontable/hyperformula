@@ -84,6 +84,7 @@ export const plPL: TranslationPackage = {
     PI: 'PI',
     SQRT: 'PIERWIASTEK',
     MOD: 'MOD',
+    DELTA: 'DELTA',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

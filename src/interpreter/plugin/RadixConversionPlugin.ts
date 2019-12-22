@@ -1,7 +1,7 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {padLeft} from '../../format/format'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber, coerceScalarToString} from '../coerce'
+import { coerceScalarToString} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -178,23 +178,6 @@ export class RadixConversionPlugin extends FunctionPlugin {
       const baseAlphabet = ALPHABET.substr(0, base)
       const regex = new RegExp(`^[${baseAlphabet}]+$`)
       if (value.length > maxLength || !regex.test(value)) {
-        return new CellError(ErrorType.NUM)
-      }
-    }
-
-    return value
-  }
-
-  private getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
-    const arg = this.evaluateAst(ast.args[position], formulaAddress)
-
-    if (arg instanceof SimpleRangeValue) {
-      return new CellError(ErrorType.VALUE)
-    }
-
-    const value = coerceScalarToNumber(arg)
-    if (typeof value === 'number') {
-      if (min !== undefined && max !== undefined && (value < min || value > max)) {
         return new CellError(ErrorType.NUM)
       }
     }

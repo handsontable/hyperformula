@@ -9,6 +9,7 @@ import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
+import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
@@ -88,6 +89,7 @@ export class Config {
     MathConstantsPlugin,
     SqrtPlugin,
     ModuloPlugin,
+    DeltaPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

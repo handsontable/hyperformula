@@ -108,4 +108,23 @@ export abstract class FunctionPlugin {
 
     return [coercedLeft, coercedRight]
   }
+
+  protected getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
+    if (position > ast.args.length - 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[position], formulaAddress)
+
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const value = coerceScalarToNumber(arg)
+    if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    return value
+  }
 }
