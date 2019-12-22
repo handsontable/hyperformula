@@ -7,6 +7,7 @@ import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CharPlugin} from './interpreter/plugin/CharPlugin'
+import {CodePlugin} from './interpreter/plugin/CodePlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
@@ -92,6 +93,7 @@ export class Config {
     ModuloPlugin,
     DeltaPlugin,
     CharPlugin,
+    CodePlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

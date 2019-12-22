@@ -123,7 +123,7 @@ export abstract class FunctionPlugin {
       ast: ProcedureAst,
       formulaAddress: SimpleCellAddress,
       coerceFunction: (arg: CellValue) => CellValue,
-      fn: (arg: any) => CellValue
+      fn: (arg: any) => CellValue,
   ) {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)

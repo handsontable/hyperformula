@@ -86,6 +86,7 @@ export const plPL: TranslationPackage = {
     MOD: 'MOD',
     DELTA: 'DELTA',
     CHAR: 'ZNAK',
+    CODE: 'KOD',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

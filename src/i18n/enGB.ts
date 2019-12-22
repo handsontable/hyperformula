@@ -86,6 +86,7 @@ export const enGB: TranslationPackage = {
     MOD: 'MOD',
     DELTA: 'DELTA',
     CHAR: 'CHAR',
+    CODE: 'CODE',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
