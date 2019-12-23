@@ -20,11 +20,3 @@ export function first<T>(iterable: IterableIterator<T>): T | undefined {
   }
   return undefined
 }
-
-export function count<T>(iterable: IterableIterator<T>): number {
-  let counter = 0
-  for (const val of iterable) {
-    counter++
-  }
-  return counter
-}
