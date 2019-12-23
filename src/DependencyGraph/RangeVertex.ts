@@ -5,7 +5,7 @@ import {CriterionLambda} from '../interpreter/Criterion'
 /**
  * Represents cache structure for one criterion
  */
-export type CriterionCache = Map<string, [CellValue, CriterionLambda[]]>
+export type CriterionCache = Map<string, [any, CriterionLambda[]]>
 
 /**
  * Represents vertex bound to range
@@ -59,7 +59,7 @@ export class RangeVertex {
    * @param cacheKey - key to retrieve from the cache
    * @param criterionString - criterion text (ex. '<=5')
    */
-  public getCriterionFunctionValue(cacheKey: string, criterionString: string): CellValue | null {
+  public getCriterionFunctionValue(cacheKey: string, criterionString: string): any | null {
     const values = this.getCriterionFunctionValues(cacheKey)
     const value = values.get(criterionString)
     return value ? value[0] : null
@@ -70,7 +70,7 @@ export class RangeVertex {
    *
    * @param cacheKey - key to retrieve from the cache
    */
-  public getCriterionFunctionValues(cacheKey: string): Map<string, [CellValue, CriterionLambda[]]> {
+  public getCriterionFunctionValues(cacheKey: string): Map<string, [any, CriterionLambda[]]> {
     return this.criterionFuncitonCache.get(cacheKey) || new Map()
   }
 
