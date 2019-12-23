@@ -109,7 +109,7 @@ class CriterionFunctionCompute<T> {
   }
 
   private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T {
-    return this.computeCriterionValue3(
+    return this.computeCriterionValue(
       conditions,
       simpleValuesRange,
       (filteredValues: IterableIterator<T>) => {
@@ -130,7 +130,7 @@ class CriterionFunctionCompute<T> {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 
-  private computeCriterionValue3(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<T>) => T)) {
+  private computeCriterionValue(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<T>) => T)) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
     const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
