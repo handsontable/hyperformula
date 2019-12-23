@@ -9,6 +9,7 @@ export const plPL: TranslationPackage = {
     AVERAGEIF: 'ŚREDNIA.JEŻELI',
     COLUMNS: 'LICZBA.KOLUMN',
     CONCATENATE: 'ZŁĄCZ.TEKST',
+    CORREL: 'WSP.KORELACJI',
     COUNTBLANK: 'LICZ.PUSTE',
     COUNTIF: 'LICZ.JEŻELI',
     COUNTIFS: 'LICZ.WARUNKI',

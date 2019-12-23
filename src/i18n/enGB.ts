@@ -9,6 +9,7 @@ export const enGB: TranslationPackage = {
     AVERAGEIF: 'AVERAGEIF',
     COLUMNS: 'COLUMNS',
     CONCATENATE: 'CONCATENATE',
+    CORREL: 'CORREL',
     COUNTBLANK: 'COUNTBLANK',
     COUNTIF: 'COUNTIF',
     COUNTIFS: 'COUNTIFS',
