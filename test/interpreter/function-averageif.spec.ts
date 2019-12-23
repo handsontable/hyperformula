@@ -72,6 +72,17 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
+  it('no coercion', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['="1"'],
+      ['="foo"'],
+      [null],
+      ['=AVERAGEIF(A1:A3, "<>42")'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
   it('error propagation', () => {
     const engine =  HyperFormula.buildFromArray([
       ['=AVERAGEIF(4/0, ">1", 42)'],
