@@ -55,7 +55,6 @@ class CriterionFunctionCompute<T> {
   constructor(
     private readonly interpreter: Interpreter,
     private readonly cacheKey: (conditions: Condition[]) => string,
-    private readonly cacheBuildFunction: (cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>) => T,
     private readonly reduceInitialValue: T,
     private readonly composeFunction: (left: T, right: T) => T,
     private readonly mapFunction: (arg: CellValue) => T,
@@ -96,6 +95,10 @@ class CriterionFunctionCompute<T> {
     } else {
       return this.evaluateRangeValue(simpleValuesRange, conditions)
     }
+  }
+
+  private cacheBuildFunction(cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>): T {
+    return this.composeFunction(cacheCurrentValue, this.reduceFunction(newFilteredValues))
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
@@ -328,9 +331,6 @@ export class SumifPlugin extends FunctionPlugin {
     const averageResult = new CriterionFunctionCompute<AverageResult>(
       this.interpreter,
       averageifCacheKey,
-      (cacheKey: string, cacheCurrentValue: AverageResult, newFilteredValues: IterableIterator<AverageResult>) => {
-        return cacheCurrentValue.compose(reduceAverage(newFilteredValues))
-      },
       AverageResult.empty,
       (left, right) => left.compose(right),
       (arg: CellValue) => {
