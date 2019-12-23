@@ -50,7 +50,7 @@ function erf(x: number): number {
 }
 
 function erfApprox(x: number): number {
-  const polyFactor = 16
+  const polyExponent = 16
   const coefficients = [
     0.0705230784,
     0.0422820123,
@@ -60,11 +60,11 @@ function erfApprox(x: number): number {
     0.0000430638
   ]
 
-  const poly = coefficients.reduce((acc: number, coefficent: number, index: number) => {
-    return acc + coefficent * Math.pow(x, index + 1)
+  const poly = coefficients.reduce((acc: number, coefficient: number, index: number) => {
+    return acc + coefficient * Math.pow(x, index + 1)
   }, 1)
 
-  return 1 - (1 / Math.pow(poly, polyFactor))
+  return 1 - (1 / Math.pow(poly, polyExponent))
 }
 
 function erf2(lowerBound: number, upperBound: number): number {
