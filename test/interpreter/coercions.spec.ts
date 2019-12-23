@@ -1,6 +1,6 @@
 import {Config} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {coerceBooleanToNumber, coerceScalarToBoolean, coerceScalarToNumber, coerceScalarToString, dateNumberRepresentation} from '../../src/interpreter/coerce'
+import {coerceBooleanToNumber, coerceScalarToBoolean, coerceScalarToNumber, coerceScalarToString, dateNumberRepresentation, coerceScalarToMaybeNumber} from '../../src/interpreter/coerce'
 import '../testConfig'
 
 describe('#coerceScalarToNumber', () => {
@@ -16,6 +16,22 @@ describe('#coerceScalarToNumber', () => {
     expect(coerceScalarToNumber(false)).toBe(0)
     expect(coerceScalarToNumber(EmptyValue)).toBe(0)
     expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+})
+
+describe('#coerceScalarToMaybeNumber', () => {
+  it('works', () => {
+    expect(coerceScalarToMaybeNumber(42)).toBe(42)
+    expect(coerceScalarToMaybeNumber('42')).toBe(42)
+    expect(coerceScalarToMaybeNumber(' 42')).toBe(42)
+    expect(coerceScalarToMaybeNumber('42 ')).toBe(42)
+    expect(coerceScalarToMaybeNumber('0000042')).toBe(42)
+    expect(coerceScalarToMaybeNumber('42foo')).toEqual(null)
+    expect(coerceScalarToMaybeNumber('foo42')).toEqual(null)
+    expect(coerceScalarToMaybeNumber(true)).toBe(1)
+    expect(coerceScalarToMaybeNumber(false)).toBe(0)
+    expect(coerceScalarToMaybeNumber(EmptyValue)).toBe(0)
+    expect(coerceScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
