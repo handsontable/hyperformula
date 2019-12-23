@@ -46,8 +46,10 @@ function averageifCacheKey(conditions: Condition[]): string {
   return ['AVERAGEIF', ...conditionsStrings].join(',')
 }
 
-/** COUNTIF key for criterion function cache */
-const COUNTIF_CACHE_KEY = 'COUNTIF'
+function countifsCacheKey(conditions: Condition[]): string {
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
+  return ['COUNTIFS', ...conditionsStrings].join(',')
+}
 
 class CriterionFunctionCompute<T> {
   private readonly dependencyGraph: DependencyGraph
@@ -151,6 +153,7 @@ class CriterionFunctionCompute<T> {
     smallerCache.forEach(([value, criterionLambdas]: [T, CriterionLambda[]], key: string) => {
       const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map(this.mapFunction)[Symbol.iterator]())
       const newCacheValue = this.composeFunction(value, this.reduceFunction(filteredValues))
+      this.interpreter.stats.criterionFunctionPartialCacheUsed++
       newCache.set(key, [newCacheValue, criterionLambdas])
     })
 
@@ -191,8 +194,6 @@ class Condition {
   ) {
   }
 }
-
-type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -392,7 +393,15 @@ export class SumifPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    return this.evaluateRangeCountif(new Condition(conditionArg, criterionPackage))
+    const result = new CriterionFunctionCompute<number>(
+      this.interpreter,
+      () => 'COUNTIF',
+      0,
+      (left, right) => left + right,
+      (arg) => 1,
+    ).compute(conditionArg, [new Condition(conditionArg, criterionPackage)])
+
+    return result
   }
 
   public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -420,122 +429,15 @@ export class SumifPlugin extends FunctionPlugin {
       conditions.push(new Condition(conditionArg, criterionPackage))
     }
 
-    return this.evaluateRangeCountif(conditions[0])
-  }
+    const result = new CriterionFunctionCompute<number>(
+      this.interpreter,
+      countifsCacheKey,
+      0,
+      (left, right) => left + right,
+      (arg) => 1,
+    ).compute(conditions[0].conditionRange, conditions)
 
-  private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
-    const maybeRange = rangeValue.range()
-    if (maybeRange === undefined) {
-      return undefined
-    } else {
-      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end) || undefined
-    }
-  }
-
-  /**
-   * Computes COUNTIF function for range arguments.
-   *
-   * @param simpleConditionRange - condition range
-   * @param criterionString - criterion in raw string format
-   * @param criterion - already parsed criterion structure
-   */
-  private evaluateRangeCountif(condition: Condition): CellValue {
-    const simpleConditionRange = condition.conditionRange
-    const criterionPackage = condition.criterionPackage
-    const conditionRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleConditionRange)
-
-    if (conditionRangeVertex) {
-      const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionPackage.raw)
-      if (cachedResult) {
-        this.interpreter.stats.criterionFunctionFullCacheUsed++
-        return cachedResult
-      }
-
-      const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, [simpleConditionRange.range()!], simpleConditionRange.range()!,
-        (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-          this.interpreter.stats.criterionFunctionPartialCacheUsed++
-          return (cacheCurrentValue as number) + count(newFilteredValues)
-        })
-
-      if (!cache.has(criterionPackage.raw)) {
-        cache.set(criterionPackage.raw, [
-          this.evaluateRangeCountifValue(simpleConditionRange, criterionPackage),
-          [criterionPackage.lambda],
-        ])
-      }
-
-      conditionRangeVertex.setCriterionFunctionValues(COUNTIF_CACHE_KEY, cache)
-
-      return cache.get(criterionPackage.raw)![0]
-    } else {
-      return this.evaluateRangeCountifValue(simpleConditionRange, criterionPackage)
-    }
-  }
-
-  private evaluateRangeCountifValue(simpleConditionRange: SimpleRangeValue, criterionPackage: CriterionPackage): CellValue {
-    return this.computeCriterionValue2(
-      [new Condition(simpleConditionRange, criterionPackage)],
-      simpleConditionRange,
-      (filteredValues: IterableIterator<CellValue>) => {
-        return count(filteredValues)
-      },
-    )
-  }
-
-  /**
-   * Finds whether criterion was already computed for given range
-   *
-   * @param simpleConditionRange - condition range
-   * @param criterionString - criterion in raw string format
-   * @param criterion - already parsed criterion structure
-   */
-  private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
-    return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
-  }
-
-  /**
-   * Builds new criterion cache.
-   *
-   * @param cacheKey - key to use in criterion cache
-   * @param simpleConditionRange - condition range
-   * @param simpleValuesRange - values range
-   * @param cacheBuilder - function used to compute values in new cache
-   */
-  private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction): CriterionCache {
-    const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-    const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
-
-    let smallerCache
-    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
-    } else {
-      smallerCache = new Map()
-    }
-
-    const newCache: CriterionCache = new Map()
-    smallerCache.forEach(([value, criterionLambdas]: [CellValue, CriterionLambda[]], key: string) => {
-      const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), getRangeValues(this.dependencyGraph, restValuesRange))
-      const newCacheValue = cacheBuilder(key, value, filteredValues)
-      newCache.set(key, [newCacheValue, criterionLambdas])
-    })
-
-    return newCache
-  }
-
-  /**
-   * Computes value of criterion function if no partial result available.
-   *
-   * @param criterion - criterion structure to compute
-   * @param simpleConditionRange - condition range
-   * @param simpleValuesRange - values range
-   * @param valueComputingFunction - function used to compute final value out of list of filtered cell values
-   */
-  private computeCriterionValue2(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
-    const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
-    const values = simpleValuesRange.valuesFromTopLeftCorner()
-    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
-    const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
-    return valueComputingFunction(filteredValues)
+    return result
   }
 }
 
