@@ -222,7 +222,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
     expect(engine.getCellValue(adr('A5'))).toEqual(5)
-    expect(engine.stats.sumifFullCacheUsed).toEqual(1)
+    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(1)
   })
 
   it('works with different sheets',  () => {
@@ -245,7 +245,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A4', 0))).toEqual(5)
     expect(engine.getCellValue(adr('A5', 0))).toEqual(7)
     expect(engine.getCellValue(adr('A4', 1))).toEqual(70)
-    expect(engine.stats.sumifFullCacheUsed).toEqual(0)
+    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(0)
   })
 
   it('ignore errors', () => {

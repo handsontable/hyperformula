@@ -76,7 +76,7 @@ class CriterionFunctionCompute<T> {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, this.cacheKey(conditions), fullCriterionString)
       if (cachedResult) {
-        this.interpreter.stats.sumifFullCacheUsed++
+        this.interpreter.stats.criterionFunctionFullCacheUsed++
         return cachedResult
       }
 
@@ -447,13 +447,13 @@ export class SumifPlugin extends FunctionPlugin {
     if (conditionRangeVertex) {
       const cachedResult = this.findAlreadyComputedValueInCache(conditionRangeVertex, COUNTIF_CACHE_KEY, criterionPackage.raw)
       if (cachedResult) {
-        this.interpreter.stats.countifFullCacheUsed++
+        this.interpreter.stats.criterionFunctionFullCacheUsed++
         return cachedResult
       }
 
       const cache = this.buildNewCriterionCache(COUNTIF_CACHE_KEY, [simpleConditionRange.range()!], simpleConditionRange.range()!,
         (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-          this.interpreter.stats.countifPartialCacheUsed++
+          this.interpreter.stats.criterionFunctionPartialCacheUsed++
           return (cacheCurrentValue as number) + count(newFilteredValues)
         })
 
