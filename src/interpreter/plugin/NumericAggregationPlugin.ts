@@ -34,6 +34,31 @@ function zeroForInfinite(value: CellValue) {
   }
 }
 
+class AverageResult {
+  constructor(
+    public readonly sum: number,
+    public readonly count: number,
+  ) { }
+
+  public static empty = new AverageResult(0, 0)
+
+  public static single(arg: number): AverageResult {
+    return new AverageResult(arg, 1)
+  }
+
+  public compose(other: AverageResult) {
+    return new AverageResult(this.sum + other.sum, this.count + other.count)
+  }
+
+  public averageValue(): number | undefined {
+    if (this.count > 0) {
+      return this.sum / this.count
+    } else {
+      return undefined
+    }
+  }
+}
+
 export class NumericAggregationPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     sum: {
@@ -189,33 +214,28 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const result = this.reduce<[number, number] | CellError>(ast, formulaAddress, [0, 0], 'AVERAGE', (left, right) => {
+    const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
       if (left instanceof CellError) {
         return left
       } else if (right instanceof CellError) {
         return right
       } else {
-        return [left[0] + right[0], left[1] + right[1]]
+        return left.compose(right)
       }
-    }, (arg): [number, number] | CellError => {
+    }, (arg): AverageResult | CellError => {
       if (arg instanceof CellError) {
         return arg
       } else if (typeof arg === 'number') {
-        return [arg, 1]
+        return AverageResult.single(arg)
       } else {
-        return [0, 0]
+        return AverageResult.empty
       }
     })
 
     if (result instanceof CellError) {
       return result
     } else {
-      const [sum, count] = result
-      if (count > 0) {
-        return sum / count
-      } else {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
+      return result.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
@@ -224,25 +244,25 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const result = this.reduce<[number, number] | CellError>(ast, formulaAddress, [0, 0], 'AVERAGE', (left, right) => {
+    const result = this.reduce<AverageResult | CellError>(ast, formulaAddress, AverageResult.empty, 'AVERAGE', (left, right) => {
       if (left instanceof CellError) {
         return left
       } else if (right instanceof CellError) {
         return right
       } else {
-        return [left[0] + right[0], left[1] + right[1]]
+        return left.compose(right)
       }
-    }, (arg): [number, number] | CellError => {
+    }, (arg): AverageResult | CellError => {
       if (arg === EmptyValue) {
-        return [0, 0]
+        return AverageResult.empty
       } else {
         const coercedArg = coerceScalarToMaybeNumber(arg)
         if (coercedArg === null) {
-          return [0, 0]
+          return AverageResult.empty
         } else if (coercedArg instanceof CellError) {
           return coercedArg
         } else {
-          return [coercedArg, 1]
+          return AverageResult.single(coercedArg)
         }
       }
     })
@@ -250,12 +270,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     if (result instanceof CellError) {
       return result
     } else {
-      const [sum, count] = result
-      if (count > 0) {
-        return sum / count
-      } else {
-        return new CellError(ErrorType.DIV_BY_ZERO)
-      }
+      return result.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
     }
   }
 
