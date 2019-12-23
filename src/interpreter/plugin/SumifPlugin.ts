@@ -1,6 +1,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
+import {Interpreter} from '../Interpreter'
 import {count, split} from '../../generatorUtils'
 import { ProcedureAst} from '../../parser'
 import {coerceToRange} from '../coerce'
@@ -48,6 +49,107 @@ function averageifCacheKey(conditions: Condition[]): string {
 /** COUNTIF key for criterion function cache */
 const COUNTIF_CACHE_KEY = 'COUNTIF'
 
+class CriterionFunctionCompute<T> {
+  private readonly dependencyGraph: DependencyGraph
+
+  constructor(
+    private readonly interpreter: Interpreter,
+    private readonly cacheKey: (conditions: Condition[]) => string,
+    private readonly cacheBuildFunction: (cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>) => T,
+    private readonly reduceFunction: (iterable: IterableIterator<T>) => T,
+    private readonly mapFunction: (arg: CellValue) => T,
+  ) {
+    this.dependencyGraph = this.interpreter.dependencyGraph
+  }
+
+  public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
+    for (const condition of conditions) {
+      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
+        return new CellError(ErrorType.VALUE)
+      }
+    }
+
+    const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
+    const conditionsVertices = conditions.map((c) => this.tryToGetRangeVertexForRangeValue(c.conditionRange))
+
+    if (valuesRangeVertex && conditionsVertices.every((e) => e !== undefined)) {
+      const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
+      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, this.cacheKey(conditions), fullCriterionString)
+      if (cachedResult) {
+        this.interpreter.stats.sumifFullCacheUsed++
+        return cachedResult
+      }
+
+      const cache = this.buildNewCriterionCache2(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!, this.cacheBuildFunction)
+
+      if (!cache.has(fullCriterionString)) {
+        cache.set(fullCriterionString, [
+          this.evaluateRangeValue(simpleValuesRange, conditions),
+          conditions.map((condition) => condition.criterionPackage.lambda),
+        ])
+      }
+
+      valuesRangeVertex.setCriterionFunctionValues(this.cacheKey(conditions), cache)
+
+      return cache.get(fullCriterionString)![0]
+    } else {
+      return this.evaluateRangeValue(simpleValuesRange, conditions)
+    }
+  }
+
+  private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
+    const maybeRange = rangeValue.range()
+    if (maybeRange === undefined) {
+      return undefined
+    } else {
+      return this.dependencyGraph.getRange(maybeRange.start, maybeRange.end) || undefined
+    }
+  }
+
+  private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T {
+    return this.computeCriterionValue3(
+      conditions,
+      simpleValuesRange,
+      (filteredValues: IterableIterator<T>) => {
+        return this.reduceFunction(filteredValues)
+      },
+    )
+  }
+
+  private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
+    return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
+  }
+
+  private computeCriterionValue3(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<T>) => T)) {
+    const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
+    const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
+    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
+    const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
+    return valueComputingFunction(filteredValues)
+  }
+
+  private buildNewCriterionCache2(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction3<T>): CriterionCache {
+    const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
+      const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
+
+    let smallerCache
+    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+      smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
+    } else {
+      smallerCache = new Map()
+    }
+
+    const newCache: CriterionCache = new Map()
+    smallerCache.forEach(([value, criterionLambdas]: [T, CriterionLambda[]], key: string) => {
+      const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map(this.mapFunction)[Symbol.iterator]())
+      const newCacheValue = cacheBuilder(key, value, filteredValues)
+      newCache.set(key, [newCacheValue, criterionLambdas])
+    })
+
+    return newCache
+  }
+}
+
 /**
  * Finds smaller available range when computing criterion functions.
  *
@@ -83,7 +185,7 @@ class Condition {
 }
 
 type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
-type CacheBuildingFunction2 = (cacheKey: string, cacheCurrentValue: AverageResult, newFilteredValues: IterableIterator<AverageResult>) => AverageResult
+type CacheBuildingFunction3<T> = (cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>) => T
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -214,7 +316,21 @@ export class SumifPlugin extends FunctionPlugin {
       valuesArg = coerceToRange(valuesArgValue)
     }
 
-    const averageResult = this.evaluateRangeAverageif(valuesArg, [new Condition(conditionArg, criterionPackage)])
+    const averageResult = new CriterionFunctionCompute<AverageResult>(
+      this.interpreter,
+      averageifCacheKey,
+      (cacheKey: string, cacheCurrentValue: AverageResult, newFilteredValues: IterableIterator<AverageResult>) => {
+        return cacheCurrentValue.compose(reduceAverage(newFilteredValues))
+      },
+      reduceAverage,
+      (arg: CellValue) => {
+        if (typeof arg === 'number') {
+          return AverageResult.single(arg)
+        } else {
+          return AverageResult.empty
+        }
+      }
+    ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
     if (averageResult instanceof CellError) {
       return averageResult
     } else {
@@ -343,44 +459,6 @@ export class SumifPlugin extends FunctionPlugin {
     )
   }
 
-  private evaluateRangeAverageif(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): AverageResult | CellError {
-    for (const condition of conditions) {
-      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
-      }
-    }
-
-    const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
-    const conditionsVertices = conditions.map((c) => this.tryToGetRangeVertexForRangeValue(c.conditionRange))
-
-    if (valuesRangeVertex && conditionsVertices.every((e) => e !== undefined)) {
-      const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
-      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, averageifCacheKey(conditions), fullCriterionString)
-      if (cachedResult) {
-        this.interpreter.stats.sumifFullCacheUsed++
-        return cachedResult
-      }
-
-      const cache = this.buildNewCriterionCache2(averageifCacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!,
-        (cacheKey: string, cacheCurrentValue: AverageResult, newFilteredValues: IterableIterator<AverageResult>) => {
-          return cacheCurrentValue.compose(reduceAverage(newFilteredValues))
-        })
-
-      if (!cache.has(fullCriterionString)) {
-        cache.set(fullCriterionString, [
-          this.evaluateRangeAverageifValue(simpleValuesRange, conditions),
-          conditions.map((condition) => condition.criterionPackage.lambda),
-        ])
-      }
-
-      valuesRangeVertex.setCriterionFunctionValues(averageifCacheKey(conditions), cache)
-
-      return cache.get(fullCriterionString)![0]
-    } else {
-      return this.evaluateRangeAverageifValue(simpleValuesRange, conditions)
-    }
-  }
-
   /**
    * Computes COUNTIF function for range arguments.
    *
@@ -431,16 +509,6 @@ export class SumifPlugin extends FunctionPlugin {
     )
   }
 
-  private evaluateRangeAverageifValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): AverageResult {
-    return this.computeCriterionValue3(
-      conditions,
-      simpleValuesRange,
-      (filteredValues: IterableIterator<AverageResult>) => {
-        return reduceAverage(filteredValues)
-      },
-    )
-  }
-
   /**
    * Finds whether criterion was already computed for given range
    *
@@ -481,33 +549,6 @@ export class SumifPlugin extends FunctionPlugin {
     return newCache
   }
 
-  private buildNewCriterionCache2(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction2): CriterionCache {
-    const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-    const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
-
-    let smallerCache
-    if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
-      smallerCache = smallerRangeVertex.getCriterionFunctionValues(cacheKey)
-    } else {
-      smallerCache = new Map()
-    }
-
-    const newCache: CriterionCache = new Map()
-    smallerCache.forEach(([value, criterionLambdas]: [AverageResult, CriterionLambda[]], key: string) => {
-      const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map((arg) => {
-        if (typeof arg === 'number') {
-          return AverageResult.single(arg)
-        } else {
-          return AverageResult.empty
-        }
-      })[Symbol.iterator]())
-      const newCacheValue = cacheBuilder(key, value, filteredValues)
-      newCache.set(key, [newCacheValue, criterionLambdas])
-    })
-
-    return newCache
-  }
-
   /**
    * Computes value of criterion function if no partial result available.
    *
@@ -519,20 +560,6 @@ export class SumifPlugin extends FunctionPlugin {
   private computeCriterionValue2(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<CellValue>) => (CellValue))) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = simpleValuesRange.valuesFromTopLeftCorner()
-    const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
-    const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
-    return valueComputingFunction(filteredValues)
-  }
-
-  private computeCriterionValue3(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<AverageResult>) => (AverageResult))) {
-    const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
-    const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map((arg) => {
-      if (typeof arg === 'number') {
-        return AverageResult.single(arg)
-      } else {
-        return AverageResult.empty
-      }
-    })[Symbol.iterator]()
     const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
     return valueComputingFunction(filteredValues)
