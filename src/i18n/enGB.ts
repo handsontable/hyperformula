@@ -88,6 +88,8 @@ export const enGB: TranslationPackage = {
     DELTA: 'DELTA',
     CHAR: 'CHAR',
     CODE: 'CODE',
+    ERF: 'ERF',
+    ERFC: 'ERFC',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

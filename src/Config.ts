@@ -32,6 +32,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ErrorFunctionPlugin} from "./interpreter/plugin/ErrorFunctionPlugin";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -94,6 +95,7 @@ export class Config {
     DeltaPlugin,
     CharPlugin,
     CodePlugin,
+    ErrorFunctionPlugin
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping

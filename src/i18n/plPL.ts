@@ -88,6 +88,8 @@ export const plPL: TranslationPackage = {
     DELTA: 'DELTA',
     CHAR: 'ZNAK',
     CODE: 'KOD',
+    ERF: 'FUNKCJA.BŁ',
+    ERFC: 'KOMP.FUNKCJA.BŁ',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

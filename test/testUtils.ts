@@ -78,3 +78,11 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
   return dateNumberToMoment(dateNumber as number).format(dateFormat)
 }
+
+export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
+  if (typeof actual !== 'number') {
+    expect(true).toBe(false)
+  } else {
+    expect(Math.abs(actual - expected)).toBeLessThan(precision)
+  }
+}
