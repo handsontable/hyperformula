@@ -67,7 +67,6 @@ export const plPL: TranslationPackage = {
     COT: 'COT',
     SIN: 'SIN',
     TAN: 'TAN',
-    COUNTIFS: 'LICZ.WARUNKI',
     DEGREES: 'STOPNIE',
     EVEN: 'ZAOKR.DO.PARZ',
     INT: 'ZAOKR.DO.CAŁK',

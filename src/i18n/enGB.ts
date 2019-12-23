@@ -67,7 +67,6 @@ export const enGB: TranslationPackage = {
     COT: 'COT',
     SIN: 'SIN',
     TAN: 'TAN',
-    COUNTIFS: 'COUNTIFS',
     DEGREES: 'DEGREES',
     EVEN: 'EVEN',
     INT: 'INT',
