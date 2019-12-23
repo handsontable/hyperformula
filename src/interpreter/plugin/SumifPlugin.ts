@@ -80,7 +80,7 @@ class CriterionFunctionCompute<T> {
         return cachedResult
       }
 
-      const cache = this.buildNewCriterionCache2(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!, this.cacheBuildFunction)
+      const cache = this.buildNewCriterionCache2(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!)
 
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
@@ -95,10 +95,6 @@ class CriterionFunctionCompute<T> {
     } else {
       return this.evaluateRangeValue(simpleValuesRange, conditions)
     }
-  }
-
-  private cacheBuildFunction(cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>): T {
-    return this.composeFunction(cacheCurrentValue, this.reduceFunction(newFilteredValues))
   }
 
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
@@ -140,7 +136,7 @@ class CriterionFunctionCompute<T> {
     return valueComputingFunction(filteredValues)
   }
 
-  private buildNewCriterionCache2(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange, cacheBuilder: CacheBuildingFunction3<T>): CriterionCache {
+  private buildNewCriterionCache2(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
     const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
       const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
 
@@ -154,7 +150,7 @@ class CriterionFunctionCompute<T> {
     const newCache: CriterionCache = new Map()
     smallerCache.forEach(([value, criterionLambdas]: [T, CriterionLambda[]], key: string) => {
       const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map(this.mapFunction)[Symbol.iterator]())
-      const newCacheValue = cacheBuilder(key, value, filteredValues)
+      const newCacheValue = this.composeFunction(value, this.reduceFunction(filteredValues))
       newCache.set(key, [newCacheValue, criterionLambdas])
     })
 
@@ -197,7 +193,6 @@ class Condition {
 }
 
 type CacheBuildingFunction = (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => CellValue
-type CacheBuildingFunction3<T> = (cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>) => T
 
 export class SumifPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -260,7 +255,15 @@ export class SumifPlugin extends FunctionPlugin {
       valuesArg = coerceToRange(valuesArgValue)
     }
 
-    return this.evaluateRangeSumif(valuesArg, [new Condition(conditionArg, criterionPackage)])
+    const result = new CriterionFunctionCompute<CellValue>(
+      this.interpreter,
+      sumifCacheKey,
+      0,
+      (left, right) => add(left, right),
+      (arg) => arg,
+    ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
+
+    return result
   }
 
   public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -293,7 +296,15 @@ export class SumifPlugin extends FunctionPlugin {
       conditions.push(new Condition(conditionArg, criterionPackage))
     }
 
-    return this.evaluateRangeSumif(valuesArg, conditions)
+    const result = new CriterionFunctionCompute<CellValue>(
+      this.interpreter,
+      sumifCacheKey,
+      0,
+      (left, right) => add(left, right),
+      (arg) => arg,
+    ).compute(valuesArg, conditions)
+
+    return result
   }
 
   public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -421,54 +432,6 @@ export class SumifPlugin extends FunctionPlugin {
     }
   }
 
-  private evaluateRangeSumif(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): CellValue {
-    for (const condition of conditions) {
-      if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
-        return new CellError(ErrorType.VALUE)
-      }
-    }
-
-    const valuesRangeVertex = this.tryToGetRangeVertexForRangeValue(simpleValuesRange)
-    const conditionsVertices = conditions.map((c) => this.tryToGetRangeVertexForRangeValue(c.conditionRange))
-
-    if (valuesRangeVertex && conditionsVertices.every((e) => e !== undefined)) {
-      const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
-      const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, sumifCacheKey(conditions), fullCriterionString)
-      if (cachedResult) {
-        this.interpreter.stats.sumifFullCacheUsed++
-        return cachedResult
-      }
-
-      const cache = this.buildNewCriterionCache(sumifCacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!,
-        (cacheKey: string, cacheCurrentValue: CellValue, newFilteredValues: IterableIterator<CellValue>) => {
-          return add(cacheCurrentValue, reduceSum(newFilteredValues))
-        })
-
-      if (!cache.has(fullCriterionString)) {
-        cache.set(fullCriterionString, [
-          this.evaluateRangeSumifValue(simpleValuesRange, conditions),
-          conditions.map((condition) => condition.criterionPackage.lambda),
-        ])
-      }
-
-      valuesRangeVertex.setCriterionFunctionValues(sumifCacheKey(conditions), cache)
-
-      return cache.get(fullCriterionString)![0]
-    } else {
-      return this.evaluateRangeSumifValue(simpleValuesRange, conditions)
-    }
-  }
-
-  private evaluateRangeSumifValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): CellValue {
-    return this.computeCriterionValue2(
-      conditions,
-      simpleValuesRange,
-      (filteredValues: IterableIterator<CellValue>) => {
-        return reduceSum(filteredValues)
-      },
-    )
-  }
-
   /**
    * Computes COUNTIF function for range arguments.
    *
@@ -594,22 +557,6 @@ export function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIte
     }
     conditionalIterables = conditionalSplits.map((cs) => cs.rest)
   }
-}
-
-export function reduceSum(iterable: IterableIterator<CellValue>): CellValue {
-  let acc: CellValue = 0
-  for (const val of iterable) {
-    acc = add(acc, val)
-  }
-  return acc
-}
-
-export function reduceAverage(iterable: IterableIterator<AverageResult>): AverageResult {
-  let acc: AverageResult = AverageResult.empty
-  for (const val of iterable) {
-    acc = acc.compose(val)
-  }
-  return acc
 }
 
 export function zip<T, U>(arr1: T[], arr2: U[]): Array<[T, U]> {
