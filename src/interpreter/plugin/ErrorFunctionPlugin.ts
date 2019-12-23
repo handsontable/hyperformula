@@ -1,7 +1,6 @@
-import {FunctionPlugin} from "./FunctionPlugin";
-import {ProcedureAst} from "../../parser";
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from "../../Cell";
-
+import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {ProcedureAst} from '../../parser'
+import {FunctionPlugin} from './FunctionPlugin'
 
 export class ErrorFunctionPlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -57,7 +56,7 @@ function erfApprox(x: number): number {
     0.0092705272,
     0.0001520143,
     0.0002765672,
-    0.0000430638
+    0.0000430638,
   ]
 
   const poly = coefficients.reduce((acc: number, coefficient: number, index: number) => {
@@ -74,4 +73,4 @@ function erf2(lowerBound: number, upperBound: number): number {
 function erfc(x: number): number {
   return 1 - erf(x)
 }
-
+

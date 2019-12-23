@@ -2,7 +2,7 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceToRange, coerceScalarToMaybeNumber} from '../coerce'
+import {coerceScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {add, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -35,16 +35,16 @@ function zeroForInfinite(value: CellValue) {
 }
 
 class AverageResult {
-  constructor(
-    public readonly sum: number,
-    public readonly count: number,
-  ) { }
 
   public static empty = new AverageResult(0, 0)
 
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
+  constructor(
+    public readonly sum: number,
+    public readonly count: number,
+  ) { }
 
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
@@ -93,7 +93,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     },
     averagea: {
       translationKey: 'AVERAGEA',
-    }
+    },
   }
 
   /**

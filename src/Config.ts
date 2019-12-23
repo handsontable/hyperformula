@@ -12,6 +12,7 @@ import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
 import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
+import {ErrorFunctionPlugin} from './interpreter/plugin/ErrorFunctionPlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
@@ -32,7 +33,6 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {ErrorFunctionPlugin} from "./interpreter/plugin/ErrorFunctionPlugin";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -95,7 +95,7 @@ export class Config {
     DeltaPlugin,
     CharPlugin,
     CodePlugin,
-    ErrorFunctionPlugin
+    ErrorFunctionPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
