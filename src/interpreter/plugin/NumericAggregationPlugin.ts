@@ -2,7 +2,7 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceToRange} from '../coerce'
+import {coerceToRange, coerceScalarToMaybeNumber} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {add, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -63,6 +63,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     counta: {
       translationKey: 'COUNTA',
     },
+    average: {
+      translationKey: 'AVERAGE',
+    },
+    averagea: {
+      translationKey: 'AVERAGEA',
+    }
   }
 
   /**
@@ -176,6 +182,81 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     })
 
     return value
+  }
+
+  public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const result = this.reduce<[number, number] | CellError>(ast, formulaAddress, [0, 0], 'AVERAGE', (left, right) => {
+      if (left instanceof CellError) {
+        return left
+      } else if (right instanceof CellError) {
+        return right
+      } else {
+        return [left[0] + right[0], left[1] + right[1]]
+      }
+    }, (arg): [number, number] | CellError => {
+      if (arg instanceof CellError) {
+        return arg
+      } else if (typeof arg === 'number') {
+        return [arg, 1]
+      } else {
+        return [0, 0]
+      }
+    })
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const [sum, count] = result
+      if (count > 0) {
+        return sum / count
+      } else {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
+    }
+  }
+
+  public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const result = this.reduce<[number, number] | CellError>(ast, formulaAddress, [0, 0], 'AVERAGE', (left, right) => {
+      if (left instanceof CellError) {
+        return left
+      } else if (right instanceof CellError) {
+        return right
+      } else {
+        return [left[0] + right[0], left[1] + right[1]]
+      }
+    }, (arg): [number, number] | CellError => {
+      if (arg === EmptyValue) {
+        return [0, 0]
+      } else {
+        const coercedArg = coerceScalarToMaybeNumber(arg)
+        if (coercedArg === null) {
+          return [0, 0]
+        } else if (coercedArg instanceof CellError) {
+          return coercedArg
+        } else {
+          return [coercedArg, 1]
+        }
+      }
+    })
+
+    if (result instanceof CellError) {
+      return result
+    } else {
+      const [sum, count] = result
+      if (count > 0) {
+        return sum / count
+      } else {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
+    }
   }
 
   /**

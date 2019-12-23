@@ -59,6 +59,21 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
   }
 }
 
+export function coerceScalarToMaybeNumber(arg: CellValue): number | CellError | null {
+  if (arg === EmptyValue) {
+    return 0
+  }
+  if (arg instanceof CellError) {
+    return arg
+  }
+  const coercedNumber = Number(arg)
+  if (isNaN(coercedNumber)) {
+    return null
+  } else {
+    return coercedNumber
+  }
+}
+
 /**
  * Coerce scalar value to boolean if possible, or error if value is an error
  *
