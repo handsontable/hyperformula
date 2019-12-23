@@ -23,7 +23,7 @@ describe('Replace sheet content', () => {
     ])
 
     expect(() => {
-      engine.replaceSheetContent('Sheet2', [['3', '4']])
+      engine.setSheetContent('Sheet2', [['3', '4']])
 
     }).toThrowError("There's no sheet with name 'Sheet2'")
   })
@@ -34,7 +34,7 @@ describe('Replace sheet content', () => {
         ['3', 'foo'],
     ])
 
-    engine.replaceSheetContent('Sheet1', [['3', '4']])
+    engine.setSheetContent('Sheet1', [['3', '4']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -49,7 +49,7 @@ describe('Replace sheet content', () => {
       ['3', 'foo'],
     ])
 
-    const changes = engine.replaceSheetContent('Sheet1', [['3', '4']])
+    const changes = engine.setSheetContent('Sheet1', [['3', '4']])
 
     expect_array_with_same_content(changes, [
       { sheet: 0, col: 0, row: 0, value: 3 },
@@ -64,7 +64,7 @@ describe('Replace sheet content', () => {
       ['3', 'foo'],
     ])
 
-    const changes = engine.replaceSheetContent('Sheet1', [['3', '4']])
+    const changes = engine.setSheetContent('Sheet1', [['3', '4']])
 
     expect(changes.length).toEqual(4)
 
@@ -87,7 +87,7 @@ describe('Replace sheet content', () => {
       ],
     }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
-    engine.replaceSheetContent('Sheet1', [['3']])
+    engine.setSheetContent('Sheet1', [['3']])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(3)
     expect(engine.getCellValue(adr('A2', 1))).toEqual(EmptyValue)
@@ -105,7 +105,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.replaceSheetContent('Sheet1', [
+    engine.setSheetContent('Sheet1', [
         ['3', '4'],
         ['foo', '5'],
     ])
@@ -125,7 +125,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.replaceSheetContent('Sheet1', [
+    engine.setSheetContent('Sheet1', [
       ['3', '4'],
       [null, '5'],
     ])

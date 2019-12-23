@@ -522,7 +522,7 @@ export class HyperFormula {
    * @param sheetName - sheet name
    * @param values - array of new values
    * */
-  public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
+  public setSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
 
     const sheetId = this.getSheetId(sheetName)!
