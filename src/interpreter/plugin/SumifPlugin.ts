@@ -82,7 +82,7 @@ class CriterionFunctionCompute<T> {
         return cachedResult
       }
 
-      const cache = this.buildNewCriterionCache2(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!)
+      const cache = this.buildNewCriterionCache(this.cacheKey(conditions), conditions.map((c) => c.conditionRange.range()!), simpleValuesRange.range()!)
 
       if (!cache.has(fullCriterionString)) {
         cache.set(fullCriterionString, [
@@ -138,7 +138,7 @@ class CriterionFunctionCompute<T> {
     return valueComputingFunction(filteredValues)
   }
 
-  private buildNewCriterionCache2(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
+  private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
     const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
       const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
 
