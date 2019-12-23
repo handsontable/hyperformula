@@ -56,7 +56,8 @@ class CriterionFunctionCompute<T> {
     private readonly interpreter: Interpreter,
     private readonly cacheKey: (conditions: Condition[]) => string,
     private readonly cacheBuildFunction: (cacheKey: string, cacheCurrentValue: T, newFilteredValues: IterableIterator<T>) => T,
-    private readonly reduceFunction: (iterable: IterableIterator<T>) => T,
+    private readonly reduceInitialValue: T,
+    private readonly composeFunction: (left: T, right: T) => T,
     private readonly mapFunction: (arg: CellValue) => T,
   ) {
     this.dependencyGraph = this.interpreter.dependencyGraph
@@ -114,6 +115,14 @@ class CriterionFunctionCompute<T> {
         return this.reduceFunction(filteredValues)
       },
     )
+  }
+
+  private reduceFunction(iterable: IterableIterator<T>): T {
+    let acc = this.reduceInitialValue
+    for (const val of iterable) {
+      acc = this.composeFunction(acc, val)
+    }
+    return acc
   }
 
   private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
@@ -322,7 +331,8 @@ export class SumifPlugin extends FunctionPlugin {
       (cacheKey: string, cacheCurrentValue: AverageResult, newFilteredValues: IterableIterator<AverageResult>) => {
         return cacheCurrentValue.compose(reduceAverage(newFilteredValues))
       },
-      reduceAverage,
+      AverageResult.empty,
+      (left, right) => left.compose(right),
       (arg: CellValue) => {
         if (typeof arg === 'number') {
           return AverageResult.single(arg)
