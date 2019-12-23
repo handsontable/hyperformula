@@ -108,16 +108,6 @@ class CriterionFunctionCompute<T> {
     }
   }
 
-  private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T {
-    return this.computeCriterionValue(
-      conditions,
-      simpleValuesRange,
-      (filteredValues: IterableIterator<T>) => {
-        return this.reduceFunction(filteredValues)
-      },
-    )
-  }
-
   private reduceFunction(iterable: IterableIterator<T>): T {
     let acc = this.reduceInitialValue
     for (const val of iterable) {
@@ -130,17 +120,17 @@ class CriterionFunctionCompute<T> {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 
-  private computeCriterionValue(conditions: Condition[], simpleValuesRange: SimpleRangeValue, valueComputingFunction: ((filteredValues: IterableIterator<T>) => T)) {
+  private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
     const conditionsIterators = conditions.map((condition) => condition.conditionRange.valuesFromTopLeftCorner())
     const filteredValues = ifFilter(criterionLambdas, conditionsIterators, values)
-    return valueComputingFunction(filteredValues)
+    return this.reduceFunction(filteredValues)
   }
 
   private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
     const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
-      const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
+    const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRange(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
 
     let smallerCache
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
