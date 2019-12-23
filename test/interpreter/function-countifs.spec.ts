@@ -27,7 +27,7 @@ describe('Function COUNTIFS', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
-  xit('works for more criteria pairs', () => {
+  it('works for more criteria pairs', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
