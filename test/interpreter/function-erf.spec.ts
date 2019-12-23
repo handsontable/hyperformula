@@ -27,12 +27,16 @@ describe('Function ERF', () => {
 
   it('should work for single argument', () => {
     const engine = HyperFormula.buildFromArray([
+      ['=ERF(0)'],
       ['=ERF(1)'],
       ['=ERF(3.14)'],
+      ['=ERF(-2.56)'],
     ])
 
-    expectCloseTo(engine.getCellValue(adr('A1')), 0.8427007929497148, precision)
-    expectCloseTo(engine.getCellValue(adr('A2')), 0.9999910304344467, precision)
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expectCloseTo(engine.getCellValue(adr('A2')), 0.8427007929497148, precision)
+    expectCloseTo(engine.getCellValue(adr('A3')), 0.9999910304344467, precision)
+    expectCloseTo(engine.getCellValue(adr('A4')), -0.999705836979508, precision)
   })
 
   it('should work with second argument', () => {
