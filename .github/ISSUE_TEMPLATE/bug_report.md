@@ -1,6 +1,6 @@
 ---
-name: Issue
-about: A template for opening new issue
+name: Bug report
+about: A template for reporting bugs
 title: ''
 labels: ''
 assignees: ''
@@ -9,7 +9,7 @@ assignees: ''
 
 ### Description
 
-<!--- [mandatory] Describe the actual behaviour and expected behavior -->
+<!--- [mandatory] Describe the actual behavior and expected behavior -->
 
 ### Steps to reproduce
 <!--- [recommended] Provide steps to reproduce this issue -->
