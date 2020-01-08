@@ -9,7 +9,7 @@ assignees: ''
 
 ### Description
 
-<!--- [mandatory] Describe the actual behavior and expected behavior -->
+<!--- [mandatory] Describe the functionality that should be added to the engine-->
 
 ### Links
 <!--- [optional] Any links that are related  -->
