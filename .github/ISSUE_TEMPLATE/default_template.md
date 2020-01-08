@@ -1,8 +1,8 @@
 ---
-name: Bug report
-about: A template for reporting bugs
+name: Other
+about: A template for questions and issues that do not fit in enlisted types
 title: ''
-labels: Bug
+labels: Question
 assignees: ''
 
 ---
@@ -12,7 +12,7 @@ assignees: ''
 <!--- [mandatory] Describe the actual behavior and expected behavior -->
 
 ### Steps to reproduce
-<!--- [recommended] Provide steps to reproduce this issue -->
+<!--- [optional] Provide steps to reproduce this issue -->
 1.
 2.
 3.
@@ -21,7 +21,7 @@ assignees: ''
 <!--- [optional] Provide a link to a live example  -->
 
 ### Your environment
-<!--- [recommended]  -->
+<!--- [optional]  -->
 
 * HyperFormula version:
 * Browser Name and version:

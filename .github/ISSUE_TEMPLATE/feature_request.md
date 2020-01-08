@@ -1,8 +1,8 @@
 ---
 name: Feature request
-about: A template for requesting new features
+about: A template for a new feature suggestion
 title: ''
-labels: ''
+labels: Feature
 assignees: ''
 
 ---
