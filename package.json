@@ -64,7 +64,7 @@
     "typedoc": "^0.13.0",
     "typescript": "^3.0.3",
     "webpack": "^4.28.4",
-    "webpack-cli": "^3.2.1",
+    "webpack-cli": "^3.3.10",
     "webpackbar": "^4.0.0"
   },
   "dependencies": {
