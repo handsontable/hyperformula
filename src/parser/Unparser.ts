@@ -47,6 +47,10 @@ export class Unparser {
           return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
+      case AstNodeType.PLUS_UNARY_OP: {
+        const unparsedExpr = this.unparseAst(ast.value, address)
+        return '+' + unparsedExpr
+      }
       case AstNodeType.MINUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
         return '-' + unparsedExpr

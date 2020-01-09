@@ -34,6 +34,7 @@ export {
   StringAst,
   PowerOpAst,
   PlusOpAst,
+  PlusUnaryOpAst,
   NumberAst,
   MinusUnaryOpAst,
   MinusOpAst,

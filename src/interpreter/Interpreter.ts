@@ -10,7 +10,7 @@ import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
+import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
 
 export class Interpreter {
@@ -160,6 +160,13 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
         return divide(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+      }
+      case AstNodeType.PLUS_UNARY_OP: {
+        const result = this.evaluateAst(ast.value, formulaAddress)
+        if (result instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        return unaryplus(coerceScalarToNumber(result))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)

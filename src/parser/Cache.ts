@@ -53,6 +53,7 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.CELL_RANGE:
       return false
     case AstNodeType.PERCENT_OP:
+    case AstNodeType.PLUS_UNARY_OP:
     case AstNodeType.MINUS_UNARY_OP: {
       return doesContainFunctions(ast.value, interestingFunctions)
     }

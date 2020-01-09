@@ -22,6 +22,7 @@ import {
   buildNumberAst, buildParenthesisAst,
   buildPercentOpAst,
   buildPlusOpAst,
+  buildPlusUnaryOpAst,
   buildPowerOpAst,
   buildProcedureAst,
   buildStringAst,
@@ -223,13 +224,21 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          this.CONSUME(MinusOp)
+          const op = this.CONSUME(AdditionOp)
           const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
-          return buildMinusUnaryOpAst(value)
+          if (tokenMatcher(op, PlusOp)) {
+            return buildPlusUnaryOpAst(value)
+          }
+          else if (tokenMatcher(op, MinusOp)) {
+            return buildMinusUnaryOpAst(value)
+          }
+          else {
+            return buildErrorAst([])
+          }
         },
       },
       {
-        ALT: () => this.SUBRULE2(this.rightUnaryOpAtomicExpression),
+        ALT: () => this.SUBRULE3(this.rightUnaryOpAtomicExpression),
       },
     ])
   })
