@@ -238,7 +238,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         },
       },
       {
-        ALT: () => this.SUBRULE3(this.rightUnaryOpAtomicExpression),
+        ALT: () => this.SUBRULE2(this.rightUnaryOpAtomicExpression),
       },
     ])
   })
@@ -508,7 +508,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     const rowsArg = args[1]
     let rowShift
-    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
+    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) { //TODO PLUS_UNARY_OP ???
       rowShift = rowsArg.value
     } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
       rowShift = -rowsArg.value.value
@@ -520,7 +520,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     const columnsArg = args[2]
     let colShift
-    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
+    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {  //TODO PLUS_UNARY_OP ???
       colShift = columnsArg.value
     } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
       colShift = -columnsArg.value.value
