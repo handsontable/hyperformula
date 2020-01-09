@@ -1,12 +1,3 @@
----
-name: Pull request
-about: A pull request template
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ### Context
 <!--- Why is this change required? What problem does it solve? -->
 
