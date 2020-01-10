@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
-    "csv-parse": "^4.0.1",
+    "csv-parse": "^4.8.3",
     "csv-stringify": "^5.0.0",
     "gpu.js": "2.0.0-rc.13",
     "moment": "^2.22.2"
