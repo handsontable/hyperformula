@@ -11,3 +11,4 @@ typings/
 *.iml
 dev*.html
 yarn-error.log
+.DS_Store
