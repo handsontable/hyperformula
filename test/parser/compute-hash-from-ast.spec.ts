@@ -3,6 +3,7 @@ import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
+import has = Reflect.has
 
 describe('Compute hash from ast', () => {
   const config = new Config()
@@ -190,5 +191,17 @@ describe('Compute hash from ast', () => {
     const hash = parser.computeHashFromAst(ast)
 
     expect(hash).toEqual(hashFromTokens)
+  })
+
+  it('procedure with error literal', () => {
+    const formula = '=#DIV/0!'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+    const hash = parser.computeHashFromAst(ast)
+
+    expect(hash).toEqual(hashFromTokens)
+    expect(hash).toEqual(formula)
   })
 })

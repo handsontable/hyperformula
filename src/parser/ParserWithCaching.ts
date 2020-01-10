@@ -140,7 +140,11 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + '%'
       }
       case AstNodeType.ERROR: {
-        return '!ERR'
+        if (ast.error) {
+          return this.config.getErrorTranslationFor(ast.error.type)
+        } else {
+          return '#ERR!'
+        }
       }
       case AstNodeType.PARENTHESIS: {
         return '(' + this.computeHashOfAstNode(ast.expression) + ')'
