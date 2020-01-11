@@ -188,7 +188,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           } else {
-            const vertex = new ValueCellVertex(new CellError(parsedCellContent.errorType))
+            const vertex = new ValueCellVertex(parsedCellContent.value)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }

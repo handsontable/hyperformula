@@ -33,7 +33,7 @@ export namespace CellContent {
 
   export class Error {
     public readonly value: CellError
-    constructor(public readonly errorType: ErrorType) {
+    constructor(errorType: ErrorType) {
       this.value = new CellError(errorType)
     }
   }
