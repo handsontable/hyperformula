@@ -115,16 +115,9 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
-          } else if (parsedCellContent instanceof CellContent.String) {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
-            this.columnIndex.add(parsedCellContent.value, address)
-            this.dependencyGraph.addVertex(address, vertex)
-          } else if (parsedCellContent instanceof CellContent.Number) {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
-            this.columnIndex.add(parsedCellContent.value, address)
-            this.dependencyGraph.addVertex(address, vertex)
           } else {
             const vertex = new ValueCellVertex(parsedCellContent.value)
+            this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
@@ -183,12 +176,9 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             /* we don't care about empty cells here */
           } else if (parsedCellContent instanceof CellContent.Number) {
             matrixHeuristic.add(address)
-          } else if (parsedCellContent instanceof CellContent.String) {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
-            this.columnSearch.add(parsedCellContent.value, address)
-            this.dependencyGraph.addVertex(address, vertex)
           } else {
             const vertex = new ValueCellVertex(parsedCellContent.value)
+            this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           }
         }
