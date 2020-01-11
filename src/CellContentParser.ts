@@ -1,4 +1,4 @@
-import {ErrorType} from './Cell'
+import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 
 export type RawCellContent = string | null | undefined
@@ -32,7 +32,10 @@ export namespace CellContent {
   }
 
   export class Error {
-    constructor(public readonly errorType: ErrorType) { }
+    public readonly value: CellError
+    constructor(public readonly errorType: ErrorType) {
+      this.value = new CellError(errorType)
+    }
   }
 
   export type Type = Number | String | Empty | Formula | MatrixFormula | Error
