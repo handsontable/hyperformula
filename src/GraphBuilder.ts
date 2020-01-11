@@ -123,6 +123,9 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             const vertex = new ValueCellVertex(parsedCellContent.value)
             this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
+          } else {
+            const vertex = new ValueCellVertex(new CellError(parsedCellContent.errorType))
+            this.dependencyGraph.addVertex(address, vertex)
           }
         }
       }
@@ -183,6 +186,9 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.String) {
             const vertex = new ValueCellVertex(parsedCellContent.value)
             this.columnSearch.add(parsedCellContent.value, address)
+            this.dependencyGraph.addVertex(address, vertex)
+          } else {
+            const vertex = new ValueCellVertex(new CellError(parsedCellContent.errorType))
             this.dependencyGraph.addVertex(address, vertex)
           }
         }

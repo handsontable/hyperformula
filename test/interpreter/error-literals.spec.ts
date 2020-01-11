@@ -8,9 +8,9 @@ it('Errors should be parsed and propagated', () => {
     ['#DIV/0!', '=A1', '=ISERROR(B1)', '=ISERROR(#DIV/0!)', '=#DIV/0!'],
   ])
 
-  expect(engine.getCellValue(adr('A1'))).toBe(new CellError(ErrorType.DIV_BY_ZERO))
-  expect(engine.getCellValue(adr('B1'))).toBe(new CellError(ErrorType.DIV_BY_ZERO))
-  expect(engine.getCellValue(adr('C1'))).toBe(true)
-  expect(engine.getCellValue(adr('D1'))).toBe(true)
-  expect(engine.getCellValue(adr('E1'))).toBe(new CellError(ErrorType.DIV_BY_ZERO))
+  expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  expect(engine.getCellValue(adr('C1'))).toEqual(true)
+  expect(engine.getCellValue(adr('D1'))).toEqual(true)
+  expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 })
