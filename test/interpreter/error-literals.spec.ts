@@ -17,4 +17,13 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
     expect(engine.getCellValue(adr('C2'))).toEqual(true)
   })
+
+  it('should return error when unknown error literal in formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['#UNKNOWN!', '=#UNKNOWN!']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('#UNKNOWN!')
+    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NAME))
+  })
 })
