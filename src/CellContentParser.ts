@@ -32,11 +32,10 @@ export namespace CellContent {
   }
 
   export class Error {
-    constructor(public readonly error: string) {
-    }
+    constructor(public readonly errorType: ErrorType) { }
   }
 
-  export type Type = Number | String | Empty | Formula | MatrixFormula
+  export type Type = Number | String | Empty | Formula | MatrixFormula | Error
 }
 
 /**
@@ -55,8 +54,10 @@ export function isMatrix(text: RawCellContent): Boolean {
   return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
-export function isError(text: string): Boolean {
-  return false
+export function isError(text: string, errorMapping: Record<string, ErrorType>): Boolean {
+  const upperCased = text.toUpperCase()
+  const errorRegex = /#[A-Za-z0-9\/]+[?!]?/
+  return errorRegex.test(upperCased) && errorMapping.hasOwnProperty(upperCased)
 }
 
 export class CellContentParser {
@@ -70,8 +71,8 @@ export class CellContentParser {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
-    } else if (isError(content)) {
-      return new CellContent.Error(content)
+    } else if (isError(content, this.config.errorMapping)) {
+      return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
