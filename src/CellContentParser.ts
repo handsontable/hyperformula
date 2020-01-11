@@ -1,3 +1,6 @@
+import {ErrorType} from './Cell'
+import {Config} from './Config'
+
 export type RawCellContent = string | null | undefined
 
 export namespace CellContent {
@@ -28,6 +31,11 @@ export namespace CellContent {
     constructor(public readonly formula: string) { }
   }
 
+  export class Error {
+    constructor(public readonly error: string) {
+    }
+  }
+
   export type Type = Number | String | Empty | Formula | MatrixFormula
 }
 
@@ -47,7 +55,13 @@ export function isMatrix(text: RawCellContent): Boolean {
   return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
+export function isError(text: string): Boolean {
+  return false
+}
+
 export class CellContentParser {
+  constructor(private readonly config: Config) {}
+
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
@@ -56,6 +70,8 @@ export class CellContentParser {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
+    } else if (isError(content)) {
+      return new CellContent.Error(content)
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {

@@ -1,7 +1,8 @@
+import {Config} from '../src'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 
 describe('CellContentParser', () => {
-  const cellContentParser = new CellContentParser()
+  const cellContentParser = new CellContentParser(new Config())
 
   it('a matrix', () => {
     expect(cellContentParser.parse('{=FOO()}')).toStrictEqual(new CellContent.MatrixFormula('=FOO()'))

@@ -44,6 +44,8 @@ export class CrudOperations implements IBatchExecutor {
       private readonly columnSearch: IColumnSearchStrategy,
       /** Parser with caching */
       private readonly parser: ParserWithCaching,
+      /** Raw cell input parser */
+      private readonly cellContentParser: CellContentParser,
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
@@ -145,8 +147,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
-    const contentParser = new CellContentParser()
-    const parsedCellContent = contentParser.parse(newCellContent)
+    const parsedCellContent = this.cellContentParser.parse(newCellContent)
 
     let vertex = this.dependencyGraph.getCell(address)
 
