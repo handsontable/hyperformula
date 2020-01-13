@@ -12,7 +12,7 @@
     "license-checker": "^25.0.1",
     "ts-jest": "^23.10.1",
     "ts-loader": "^5.3.3",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.6.1",
     "tslint": "^5.11.0",
     "tslint-etc": "^1.5.2",
     "typedoc": "^0.13.0",
