@@ -7,7 +7,7 @@
     "@microsoft/tsdoc": "^0.12.4",
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
-    "@types/node": "^10.11.2",
+    "@types/node": "^13.1.6",
     "jest": "^23.6.0",
     "license-checker": "^25.0.1",
     "ts-jest": "^23.10.1",
