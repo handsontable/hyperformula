@@ -4,7 +4,7 @@
   "module": "lib/src/index.js",
   "private": true,
   "devDependencies": {
-    "@microsoft/tsdoc": "^0.12.4",
+    "@microsoft/tsdoc": "^0.12.16",
     "@types/csv-parse": "^1.1.11",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
