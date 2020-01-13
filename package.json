@@ -5,7 +5,7 @@
   "private": true,
   "devDependencies": {
     "@microsoft/tsdoc": "^0.12.4",
-    "@types/csv-parse": "^1.1.11",
+    "@types/csv-parse": "^1.2.2",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.2",
     "jest": "^23.6.0",
