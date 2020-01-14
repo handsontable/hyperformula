@@ -31,8 +31,11 @@ export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number
         return parsedDateNumber
       }
     }
+    return new CellError(ErrorType.VALUE)
   }
-  return new CellError(ErrorType.VALUE)
+  else {
+    return ret
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {

@@ -8,7 +8,7 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceNonDateScalarToNumber, coerceDateToNumber} from './coerce'
+import {coerceNonDateScalarToNumber, coerceDateToNumber, coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
@@ -127,7 +127,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
+        return add(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -135,7 +135,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
+        return subtract(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -143,7 +143,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
+        return multiply(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -151,7 +151,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
+        return power(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -159,28 +159,28 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
+        return divide(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return unaryplus(coerceNonDateScalarToNumber(result))
+        return unaryplus(coerceScalarToNumber(result, this.config.dateFormat))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return unaryminus(coerceNonDateScalarToNumber(result))
+        return unaryminus(coerceScalarToNumber(result, this.config.dateFormat))
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return percent(coerceNonDateScalarToNumber(result))
+        return percent(coerceScalarToNumber(result, this.config.dateFormat))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
