@@ -1,37 +1,37 @@
 import {Config} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {coerceBooleanToNumber, coerceScalarToBoolean, coerceScalarToNumber, coerceScalarToString, dateNumberRepresentation, coerceScalarToMaybeNumber} from '../../src/interpreter/coerce'
+import {coerceBooleanToNumber, coerceScalarToBoolean, coerceNonDateScalarToNumber, coerceScalarToString, coerceScalarToNumber, coerceNonDateScalarToMaybeNumber} from '../../src/interpreter/coerce'
 import '../testConfig'
 
-describe('#coerceScalarToNumber', () => {
+describe('#coerceNonDateScalarToNumber', () => {
   it('works', () => {
-    expect(coerceScalarToNumber(42)).toBe(42)
-    expect(coerceScalarToNumber('42')).toBe(42)
-    expect(coerceScalarToNumber(' 42')).toBe(42)
-    expect(coerceScalarToNumber('42 ')).toBe(42)
-    expect(coerceScalarToNumber('0000042')).toBe(42)
-    expect(coerceScalarToNumber('42foo')).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceScalarToNumber('foo42')).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceScalarToNumber(true)).toBe(1)
-    expect(coerceScalarToNumber(false)).toBe(0)
-    expect(coerceScalarToNumber(EmptyValue)).toBe(0)
-    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceNonDateScalarToNumber(42)).toBe(42)
+    expect(coerceNonDateScalarToNumber('42')).toBe(42)
+    expect(coerceNonDateScalarToNumber(' 42')).toBe(42)
+    expect(coerceNonDateScalarToNumber('42 ')).toBe(42)
+    expect(coerceNonDateScalarToNumber('0000042')).toBe(42)
+    expect(coerceNonDateScalarToNumber('42foo')).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceNonDateScalarToNumber('foo42')).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceNonDateScalarToNumber(true)).toBe(1)
+    expect(coerceNonDateScalarToNumber(false)).toBe(0)
+    expect(coerceNonDateScalarToNumber(EmptyValue)).toBe(0)
+    expect(coerceNonDateScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
-describe('#coerceScalarToMaybeNumber', () => {
+describe('#coerceNonDateScalarToMaybeNumber', () => {
   it('works', () => {
-    expect(coerceScalarToMaybeNumber(42)).toBe(42)
-    expect(coerceScalarToMaybeNumber('42')).toBe(42)
-    expect(coerceScalarToMaybeNumber(' 42')).toBe(42)
-    expect(coerceScalarToMaybeNumber('42 ')).toBe(42)
-    expect(coerceScalarToMaybeNumber('0000042')).toBe(42)
-    expect(coerceScalarToMaybeNumber('42foo')).toEqual(null)
-    expect(coerceScalarToMaybeNumber('foo42')).toEqual(null)
-    expect(coerceScalarToMaybeNumber(true)).toBe(1)
-    expect(coerceScalarToMaybeNumber(false)).toBe(0)
-    expect(coerceScalarToMaybeNumber(EmptyValue)).toBe(0)
-    expect(coerceScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceNonDateScalarToMaybeNumber(42)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42')).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber(' 42')).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42 ')).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('0000042')).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42foo')).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber('foo42')).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber(true)).toBe(1)
+    expect(coerceNonDateScalarToMaybeNumber(false)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
@@ -42,8 +42,8 @@ describe('#coerceBooleanToNumber', () => {
   })
 
   it('behaves the same as more general coercion', () => {
-    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true))
-    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false))
+    expect(coerceBooleanToNumber(true)).toBe(coerceNonDateScalarToNumber(true))
+    expect(coerceBooleanToNumber(false)).toBe(coerceNonDateScalarToNumber(false))
   })
 })
 
@@ -72,22 +72,22 @@ describe('#coerceScalarToBoolean', () => {
   })
 })
 
-describe('#dateNumberRepresentation', () => {
+describe('#coerceScalarToNumber', () => {
   it('works', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
-    expect(dateNumberRepresentation(1, defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber(1, defaultFormat)).toEqual(1)
 
-    expect(dateNumberRepresentation(new CellError(ErrorType.DIV_BY_ZERO), defaultFormat)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), defaultFormat)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(dateNumberRepresentation('12/31/1899', defaultFormat)).toEqual(1)
-    expect(dateNumberRepresentation(true, defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber('12/31/1899', defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber(true, defaultFormat)).toEqual(1)
 
-    expect(dateNumberRepresentation('foo42', defaultFormat)).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceScalarToNumber('foo42', defaultFormat)).toEqual(new CellError(ErrorType.VALUE))
   })
 
   xit('incompatibility to fix', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
-    expect(dateNumberRepresentation('1', defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber('1', defaultFormat)).toEqual(1)
   })
 })
 

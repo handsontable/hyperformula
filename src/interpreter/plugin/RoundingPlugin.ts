@@ -1,6 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
+import {coerceNonDateScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -167,12 +167,12 @@ export class RoundingPlugin extends FunctionPlugin {
         if (places instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        coercedPlaces = coerceScalarToNumber(places)
+        coercedPlaces = coerceNonDateScalarToNumber(places)
       } else {
         coercedPlaces = 0
       }
 
-      const coercedNumberToRound = coerceScalarToNumber(numberToRound)
+      const coercedNumberToRound = coerceNonDateScalarToNumber(numberToRound)
       if (coercedNumberToRound instanceof CellError) {
         return coercedNumberToRound
       } else if (coercedPlaces instanceof CellError) {

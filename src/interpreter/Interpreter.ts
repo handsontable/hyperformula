@@ -8,7 +8,7 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceScalarToNumber} from './coerce'
+import {coerceNonDateScalarToNumber, coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
@@ -127,7 +127,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+        return add(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -135,7 +135,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+        return subtract(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -143,7 +143,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+        return multiply(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -151,7 +151,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+        return power(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -159,28 +159,28 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
+        return divide(coerceNonDateScalarToNumber(leftResult), coerceNonDateScalarToNumber(rightResult))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return unaryplus(coerceScalarToNumber(result))
+        return unaryplus(coerceNonDateScalarToNumber(result))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return unaryminus(coerceScalarToNumber(result))
+        return unaryminus(coerceNonDateScalarToNumber(result))
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return percent(coerceScalarToNumber(result))
+        return percent(coerceNonDateScalarToNumber(result))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)

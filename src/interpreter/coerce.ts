@@ -12,14 +12,14 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | CellError {
+export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
   if (typeof arg === 'string') {
     const parsedDateNumber = stringToDateNumber(arg, dateFormat)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }
   }
-  return coerceScalarToNumber(arg)
+  return coerceNonDateScalarToNumber(arg)
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -44,7 +44,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceScalarToNumber(arg: CellValue): number | CellError {
+export function coerceNonDateScalarToNumber(arg: CellValue): number | CellError {
   if (arg === EmptyValue) {
     return 0
   }
@@ -59,7 +59,7 @@ export function coerceScalarToNumber(arg: CellValue): number | CellError {
   }
 }
 
-export function coerceScalarToMaybeNumber(arg: CellValue): number | CellError | null {
+export function coerceNonDateScalarToMaybeNumber(arg: CellValue): number | CellError | null {
   if (arg === EmptyValue) {
     return 0
   }

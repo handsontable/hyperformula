@@ -2,7 +2,7 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceScalarToMaybeNumber, coerceToRange} from '../coerce'
+import {coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {add, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -256,7 +256,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       if (arg === EmptyValue) {
         return AverageResult.empty
       } else {
-        const coercedArg = coerceScalarToMaybeNumber(arg)
+        const coercedArg = coerceNonDateScalarToMaybeNumber(arg)
         if (coercedArg === null) {
           return AverageResult.empty
         } else if (coercedArg instanceof CellError) {

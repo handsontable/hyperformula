@@ -4,7 +4,7 @@ import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
-import {coerceScalarToNumber, coerceScalarToString} from '../coerce'
+import {coerceNonDateScalarToNumber, coerceScalarToString} from '../coerce'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
@@ -67,7 +67,7 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToNumber, fn)
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceNonDateScalarToNumber, fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => CellValue): CellValue {
@@ -82,7 +82,7 @@ export abstract class FunctionPlugin {
     if (left instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedLeft = coerceScalarToNumber(left)
+    const coercedLeft = coerceNonDateScalarToNumber(left)
     if (coercedLeft instanceof CellError) {
       return coercedLeft
     }
@@ -92,7 +92,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedRight = coerceScalarToNumber(right)
+    const coercedRight = coerceNonDateScalarToNumber(right)
     if (coercedRight instanceof CellError) {
       return coercedRight
     }
@@ -111,7 +111,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const value = coerceScalarToNumber(arg)
+    const value = coerceNonDateScalarToNumber(arg)
     if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
       return new CellError(ErrorType.NUM)
     }

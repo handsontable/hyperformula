@@ -1,6 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
+import {coerceNonDateScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -43,12 +43,12 @@ export class LogarithmPlugin extends FunctionPlugin {
         if (logarithmicBase instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        coercedLogarithmicBase = coerceScalarToNumber(logarithmicBase)
+        coercedLogarithmicBase = coerceNonDateScalarToNumber(logarithmicBase)
       } else {
         coercedLogarithmicBase = 10
       }
 
-      const coercedArg = coerceScalarToNumber(arg)
+      const coercedArg = coerceNonDateScalarToNumber(arg)
       if (coercedArg instanceof CellError) {
         return coercedArg
       } else if (coercedLogarithmicBase instanceof CellError) {
