@@ -1,7 +1,7 @@
 import {Config} from '../../src'
 import {HyperFormula} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {coerceScalarToNumber} from '../../src/interpreter/coerce'
+import {coerceDateToNumber} from '../../src/interpreter/coerce'
 import '../testConfig'
 import {adr} from '../testUtils'
 
