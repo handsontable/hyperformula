@@ -82,42 +82,62 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OP: {
-        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
-        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
-
+        let leftResult = this.evaluateAst(ast.left, formulaAddress)
+        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
+          return leftResult > rightResult
+        }
+        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
+        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult > rightResult
-        } else {
+        }
+        else {
           return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.LESS_THAN_OP: {
-        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
-        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
-
+        let leftResult = this.evaluateAst(ast.left, formulaAddress)
+        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
+          return leftResult < rightResult
+        }
+        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
+        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult < rightResult
-        } else {
+        }
+        else {
           return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
-        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
-
+        let leftResult = this.evaluateAst(ast.left, formulaAddress)
+        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
+          return leftResult >= rightResult
+        }
+        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
+        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult >= rightResult
-        } else {
+        }
+        else {
           return new CellError(ErrorType.VALUE)
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
-        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
-
+        let leftResult = this.evaluateAst(ast.left, formulaAddress)
+        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
+          return leftResult <= rightResult
+        }
+        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
+        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult <= rightResult
-        } else {
+        }
+        else {
           return new CellError(ErrorType.VALUE)
         }
       }
