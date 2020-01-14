@@ -1,5 +1,6 @@
 
-import {dateNumberToMonthNumber, toDateNumber} from '../src/Date'
+import {Config} from '../src'
+import {dateNumberToMonthNumber, toDateNumber, stringToDateNumber} from '../src/Date'
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {
@@ -13,5 +14,16 @@ describe('Date helpers', () => {
     expect(dateNumberToMonthNumber(0)).toEqual(12)
     expect(dateNumberToMonthNumber(2)).toEqual(1)
     expect(dateNumberToMonthNumber(43465)).toEqual(12)
+  })
+
+  it('#stringToDateNumber', () => {
+    const defaultFormat = Config.defaultConfig.dateFormat
+    expect(stringToDateNumber('www', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('www1', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('0', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('0/0/1999', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('13/13/2020', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('', defaultFormat)).toBe(null)
+    expect(stringToDateNumber('10/2020', defaultFormat)).toBe(null)
   })
 })
