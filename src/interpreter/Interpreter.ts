@@ -8,7 +8,7 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceScalarToNumber} from './coerce'
+import {coerceScalarToNumber, coerceScalarToNumberOrKeepOld} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
@@ -82,8 +82,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
+        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult > rightResult
@@ -92,8 +92,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
+        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult < rightResult
@@ -102,8 +102,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
+        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult >= rightResult
@@ -112,8 +112,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        const leftResult = this.evaluateAst(ast.left, formulaAddress)
-        const rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.left, formulaAddress), this.config.dateFormat)
+        const rightResult = coerceScalarToNumberOrKeepOld(this.evaluateAst(ast.right, formulaAddress), this.config.dateFormat)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
           return leftResult <= rightResult

@@ -119,12 +119,22 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Less than operator with wrong arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
-        ['=1<"foo"', '="foo"<"bar"', '=TRUE()<FALSE()'],
+        ['=1<"foo"', '="foo"<"bar"', '=TRUE()<"bar"'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('Less than operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()<"2"', '="1"<"2"', '=TRUE()<FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('Greater than operator with number arguments',  () => {
@@ -140,12 +150,22 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Greater than operator with wrong arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>"foo"', '="foo">"bar"', '=TRUE()>FALSE()'],
+      ['=1>"foo"', '="foo">"bar"', '=TRUE()>"bar"'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('Greater than operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()>"2"', '="1">"2"', '=TRUE()>FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe( true)
   })
 
   it('Less than or equal operator with number arguments',  () => {
@@ -160,9 +180,19 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
+  it('Less than or equal operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+  })
+
   it('Less than or equal operator with wrong arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1<="foo"', '="foo"<="bar"', '=TRUE()<=FALSE()'],
+      ['=1<="foo"', '="foo"<="bar"', '=TRUE()<="bar"'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
@@ -184,11 +214,22 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Greater than or equal operator with wrong arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>="foo"', '="foo">="bar"', '=TRUE()>=FALSE()'],
+      ['=1>="foo"', '="foo">="bar"', '=TRUE()>="bar"'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
   })
+
+  it('Greater than or equal operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+  })
 })
+

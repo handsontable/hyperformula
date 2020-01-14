@@ -12,38 +12,39 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function coerceDateToNumber(arg: CellValue, dateFormat: string): number | CellError {
+
+export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
+  let ret = coerceNonDateScalarToMaybeNumber(arg)
+  if(ret != null)
+    return ret
   if (typeof arg === 'string') {
     const parsedDateNumber = stringToDateNumber(arg, dateFormat)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }
   }
-  return coerceNonDateScalarToNumber(arg)
+  return new CellError(ErrorType.VALUE)
 }
 
-export function isDate(arg: CellValue, dateFormat: string): boolean {
-  if (typeof arg === 'string') {
-    const parsedDateNumber = stringToDateNumber(arg, dateFormat)
-    if (parsedDateNumber !== null) {
-      return true
-    }
+export function coerceScalarToNumberOrKeepOld(arg: InterpreterValue, dateFormat: string): number | InterpreterValue | CellError {
+  if (arg === EmptyValue) {
+    return 0
   }
-  return false
-}
-
-export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
-  let ret = coerceNonDateScalarToMaybeNumber(arg)
-  if(ret == null) {
+  if (arg instanceof CellError) {
+    return arg
+  }
+  const coercedNumber = Number(arg)
+  if (isNaN(coercedNumber)) {
     if (typeof arg === 'string') {
       const parsedDateNumber = stringToDateNumber(arg, dateFormat)
       if (parsedDateNumber !== null) {
         return parsedDateNumber
       }
     }
-    return new CellError(ErrorType.VALUE)
+    return arg
+  } else {
+    return coercedNumber
   }
-  return ret
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
