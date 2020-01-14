@@ -4,6 +4,7 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
+import {stringToDateNumber} from './Date'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'
@@ -115,7 +116,14 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
           } else if (parsedCellContent instanceof CellContent.String) {
-            const vertex = new ValueCellVertex(parsedCellContent.value)
+            const parsedDateNumber = stringToDateNumber(parsedCellContent.value, Config.defaultConfig.dateFormat)
+            let vertex
+            if(parsedDateNumber !== null) {
+              vertex = new ValueCellVertex(parsedDateNumber)
+            }
+            else {
+              vertex = new ValueCellVertex(parsedCellContent.value)
+            }
             this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
           } else if (parsedCellContent instanceof CellContent.Number) {
