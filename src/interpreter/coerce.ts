@@ -22,6 +22,16 @@ export function coerceDateToNumber(arg: CellValue, dateFormat: string): number |
   return coerceNonDateScalarToNumber(arg)
 }
 
+export function isDate(arg: CellValue, dateFormat: string): boolean {
+  if (typeof arg === 'string') {
+    const parsedDateNumber = stringToDateNumber(arg, dateFormat)
+    if (parsedDateNumber !== null) {
+      return true
+    }
+  }
+  return false
+}
+
 export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
   let ret = coerceNonDateScalarToMaybeNumber(arg)
   if(ret == null) {
@@ -33,9 +43,7 @@ export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number
     }
     return new CellError(ErrorType.VALUE)
   }
-  else {
-    return ret
-  }
+  return ret
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
