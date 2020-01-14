@@ -1,6 +1,14 @@
 import {Config} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {coerceBooleanToNumber, coerceScalarToBoolean, coerceNonDateScalarToNumber, coerceScalarToString, coerceScalarToNumber, coerceNonDateScalarToMaybeNumber} from '../../src/interpreter/coerce'
+import {
+  coerceBooleanToNumber,
+  coerceScalarToBoolean,
+  coerceNonDateScalarToNumber,
+  coerceScalarToString,
+  coerceScalarToNumber,
+  coerceNonDateScalarToMaybeNumber,
+  coerceScalarToNumberOrKeepOld
+} from '../../src/interpreter/coerce'
 import '../testConfig'
 
 describe('#coerceNonDateScalarToNumber', () => {
@@ -85,6 +93,23 @@ describe('#coerceDateToNumber', () => {
     expect(coerceScalarToNumber('foo42', defaultFormat)).toEqual(new CellError(ErrorType.VALUE))
 
     expect(coerceScalarToNumber('1', defaultFormat)).toEqual(1)
+  })
+
+})
+
+describe('#coerceDateToNumberOrKeepOld', () => {
+  it('works', () => {
+    const defaultFormat = Config.defaultConfig.dateFormat
+    expect(coerceScalarToNumberOrKeepOld(1, defaultFormat)).toEqual(1)
+
+    expect(coerceScalarToNumberOrKeepOld(new CellError(ErrorType.DIV_BY_ZERO), defaultFormat)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+
+    expect(coerceScalarToNumberOrKeepOld('12/31/1899', defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumberOrKeepOld(true, defaultFormat)).toEqual(1)
+
+    expect(coerceScalarToNumberOrKeepOld('foo42', defaultFormat)).toEqual('foo42')
+
+    expect(coerceScalarToNumberOrKeepOld('1', defaultFormat)).toEqual(1)
   })
 
 })
