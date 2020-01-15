@@ -16,7 +16,17 @@ describe('Date helpers', () => {
     expect(dateNumberToMonthNumber(43465)).toEqual(12)
   })
 
-  it('#stringToDateNumber', () => {
+  it('#stringToDateNumber - tests expected to return null', () => {
+    const defaultFormat = Config.defaultConfig.dateFormat
+    expect(stringToDateNumber('08/16/1985', defaultFormat)).toBe(31275)
+    expect(stringToDateNumber('01/15/2020', defaultFormat)).toBe(43845)
+    expect(stringToDateNumber('02/29/2000', defaultFormat)).toBe(36585)
+    expect(stringToDateNumber('12/31/2999', defaultFormat)).toBe(401768)
+    expect(stringToDateNumber('5/29/1453', defaultFormat)).toBe(-163113)
+    expect(stringToDateNumber('1/1/1', defaultFormat)).toBe(-693593)
+  })
+
+  it('#stringToDateNumber - tests expected to return null', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
     expect(stringToDateNumber('www', defaultFormat)).toBe(null)
     expect(stringToDateNumber('0', defaultFormat)).toBe(null)
