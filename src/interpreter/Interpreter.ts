@@ -87,6 +87,9 @@ export class Interpreter {
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult > rightResult
         }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
         leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
         rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
@@ -101,6 +104,9 @@ export class Interpreter {
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult < rightResult
+        }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
         rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
@@ -117,6 +123,9 @@ export class Interpreter {
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult >= rightResult
         }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
         leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
         rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
@@ -131,6 +140,9 @@ export class Interpreter {
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult <= rightResult
+        }
+        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
         rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)

@@ -26,7 +26,7 @@ export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number
   return new CellError(ErrorType.VALUE)
 }
 
-export function coerceScalarToNumberOrKeepOld(arg: InterpreterValue, dateFormat: string): number | InterpreterValue | CellError {
+export function coerceScalarToNumberOrKeepOld(arg: CellValue, dateFormat: string): CellValue | CellError {
   if (arg === EmptyValue) {
     return 0
   }
