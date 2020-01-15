@@ -3,29 +3,12 @@ import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
 import {
   coerceBooleanToNumber,
   coerceScalarToBoolean,
-  coerceNonDateScalarToNumber,
   coerceScalarToString,
   coerceScalarToNumber,
   coerceNonDateScalarToMaybeNumber,
   coerceScalarToNumberOrKeepOld
 } from '../../src/interpreter/coerce'
 import '../testConfig'
-
-describe('#coerceNonDateScalarToNumber', () => {
-  it('works', () => {
-    expect(coerceNonDateScalarToNumber(42)).toBe(42)
-    expect(coerceNonDateScalarToNumber('42')).toBe(42)
-    expect(coerceNonDateScalarToNumber(' 42')).toBe(42)
-    expect(coerceNonDateScalarToNumber('42 ')).toBe(42)
-    expect(coerceNonDateScalarToNumber('0000042')).toBe(42)
-    expect(coerceNonDateScalarToNumber('42foo')).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceNonDateScalarToNumber('foo42')).toEqual(new CellError(ErrorType.VALUE))
-    expect(coerceNonDateScalarToNumber(true)).toBe(1)
-    expect(coerceNonDateScalarToNumber(false)).toBe(0)
-    expect(coerceNonDateScalarToNumber(EmptyValue)).toBe(0)
-    expect(coerceNonDateScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-  })
-})
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   it('works', () => {
@@ -50,8 +33,9 @@ describe('#coerceBooleanToNumber', () => {
   })
 
   it('behaves the same as more general coercion', () => {
-    expect(coerceBooleanToNumber(true)).toBe(coerceNonDateScalarToNumber(true))
-    expect(coerceBooleanToNumber(false)).toBe(coerceNonDateScalarToNumber(false))
+    const defaultFormat = Config.defaultConfig.dateFormat
+    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, defaultFormat))
+    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, defaultFormat))
   })
 })
 
@@ -80,7 +64,7 @@ describe('#coerceScalarToBoolean', () => {
   })
 })
 
-describe('#coerceDateToNumber', () => {
+describe('#coerceScalarToNumber', () => {
   it('works', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
     expect(coerceScalarToNumber(1, defaultFormat)).toEqual(1)
@@ -97,7 +81,7 @@ describe('#coerceDateToNumber', () => {
 
 })
 
-describe('#coerceDateToNumberOrKeepOld', () => {
+describe('#coerceScalarToNumberOrKeepOld', () => {
   it('works', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
     expect(coerceScalarToNumberOrKeepOld(1, defaultFormat)).toEqual(1)

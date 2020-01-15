@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import { ProcedureAst} from '../../parser'
-import {coerceNonDateScalarToNumber, coerceToRange} from '../coerce'
+import {coerceScalarToNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -39,8 +39,8 @@ export class SumprodPlugin extends FunctionPlugin {
       } else if (r.value instanceof CellError) {
         return r.value
       } else {
-        const lval = coerceNonDateScalarToNumber(l.value)
-        const rval = coerceNonDateScalarToNumber(r.value)
+        const lval = coerceScalarToNumber(l.value, this.config.dateFormat)
+        const rval = coerceScalarToNumber(r.value, this.config.dateFormat)
         if (typeof lval === 'number' && typeof rval === 'number') {
           result += lval * rval
         }

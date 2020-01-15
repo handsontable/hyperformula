@@ -10,7 +10,7 @@ import {
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
-import {coerceNonDateScalarToNumber, coerceScalarToNumber} from '../coerce'
+import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -62,9 +62,9 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedYear = coerceNonDateScalarToNumber(year)
-    const coercedMonth = coerceNonDateScalarToNumber(month)
-    const coercedDay = coerceNonDateScalarToNumber(day)
+    const coercedYear = coerceScalarToNumber(year, this.config.dateFormat)
+    const coercedMonth = coerceScalarToNumber(month, this.config.dateFormat)
+    const coercedDay = coerceScalarToNumber(day, this.config.dateFormat)
 
     if (coercedYear instanceof CellError) {
       return coercedYear
@@ -99,7 +99,7 @@ export class DatePlugin extends FunctionPlugin {
     if (numberOfMonthsToShiftValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const numberOfMonthsToShift = coerceNonDateScalarToNumber(numberOfMonthsToShiftValue)
+    const numberOfMonthsToShift = coerceScalarToNumber(numberOfMonthsToShiftValue, this.config.dateFormat)
     if (numberOfMonthsToShift instanceof CellError) {
       return numberOfMonthsToShift
     }

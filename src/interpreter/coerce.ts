@@ -69,20 +69,6 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceNonDateScalarToNumber(arg: CellValue): number | CellError {
-  if (arg === EmptyValue) {
-    return 0
-  }
-  if (arg instanceof CellError) {
-    return arg
-  }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    return new CellError(ErrorType.VALUE)
-  } else {
-    return coercedNumber
-  }
-}
 
 export function coerceNonDateScalarToMaybeNumber(arg: CellValue): number | CellError | null {
   if (arg === EmptyValue) {
