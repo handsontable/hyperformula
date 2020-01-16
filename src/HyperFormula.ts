@@ -425,6 +425,14 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    return []
+  }
+
+  public paste(destination: SimpleCellAddress): CellValueChange[] {
+    return []
+  }
+
   /**
    * Returns information whether its possible to add sheet
    *
