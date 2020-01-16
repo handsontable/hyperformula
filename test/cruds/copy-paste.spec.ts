@@ -6,13 +6,13 @@ describe('Copy - paste integration', () => {
   it('copy should return values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-      ['foo', 'bar'],
+      ['foo', '=A1'],
     ])
 
     const values = engine.copy(adr('A1'), 2, 2)
 
     expect_array_with_same_content([1, 2], values[0])
-    expect_array_with_same_content(['foo', 'bar'], values[1])
+    expect_array_with_same_content(['foo', 1], values[1])
   })
 
   it('should work for single number', () => {

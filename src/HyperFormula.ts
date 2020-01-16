@@ -1,4 +1,5 @@
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
   CellType,
@@ -430,13 +431,18 @@ export class HyperFormula {
 
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.copyPaste.copy(sourceLeftCorner, width, height)
-    return []
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.copyPaste.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
+
+  public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
+    return this.dependencyGraph.getValuesInRange(range)
+  }
+
 
   /**
    * Returns information whether its possible to add sheet
