@@ -12,11 +12,11 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-
 export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
   let ret = coerceNonDateScalarToMaybeNumber(arg)
-  if(ret != null)
+  if (ret != null) {
     return ret
+  }
   if (typeof arg === 'string') {
     const parsedDateNumber = stringToDateNumber(arg, dateFormat)
     if (parsedDateNumber !== null) {
