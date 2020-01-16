@@ -49,7 +49,6 @@ export class CrudOperations implements IBatchExecutor {
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {

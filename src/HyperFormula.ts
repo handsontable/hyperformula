@@ -13,6 +13,7 @@ import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
+import {CopyPaste} from './CopyPaste'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
@@ -111,6 +112,7 @@ export class HyperFormula {
   }
 
   private crudOperations: CrudOperations
+  private copyPaste: CopyPaste
 
   constructor(
       /** Engine config */
@@ -131,6 +133,7 @@ export class HyperFormula {
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    this.copyPaste = new CopyPaste(this.dependencyGraph, this.lazilyTransformingAstService)
   }
 
   /**
@@ -426,6 +429,7 @@ export class HyperFormula {
   }
 
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.copyPaste.copy(sourceLeftCorner, width, height)
     return []
   }
 

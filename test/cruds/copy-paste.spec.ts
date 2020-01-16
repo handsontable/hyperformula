@@ -1,6 +1,20 @@
 import {HyperFormula} from '../../src'
+import {copyAst} from '../../src/CopyPaste'
+import {CellAddress} from '../../src/parser'
+import {buildCellReferenceAst} from '../../src/parser/Ast'
+import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
 import {adr, expect_array_with_same_content} from '../testUtils'
+
+describe('copy ast', () => {
+  it('should be different objects', () => {
+    const formula = buildCellReferenceAst(new CellAddress(0, 0, 0, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    const copied = copyAst(formula)
+
+    expect(formula).toEqual(copied)
+    expect(formula).not.toBe(copied)
+  })
+})
 
 describe('Copy - paste', () => {
   it('copy should return values', () => {
