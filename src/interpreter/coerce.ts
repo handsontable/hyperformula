@@ -3,11 +3,8 @@ import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
- * Converts cell value to date number representation (days after 12th Dec 1899)
- *
- * If value is a number simply returns value
- * If value is a string, it tries to parse it with date format
- *
+ * Coerce scalar value to number if possible
+ * Date like literals will be converted to number representation (days after 12th Dec 1899)
  *
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
