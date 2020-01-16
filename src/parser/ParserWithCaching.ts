@@ -4,12 +4,11 @@ import {RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {Cache, CacheEntry} from './Cache'
+import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import has = Reflect.has
 
 export interface ParsingResult {
   ast: Ast,
