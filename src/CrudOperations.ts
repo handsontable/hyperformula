@@ -15,6 +15,7 @@ import {
   SheetMapping,
   ValueCellVertex,
 } from './DependencyGraph'
+import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -179,22 +180,34 @@ export class CrudOperations implements IBatchExecutor {
         const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (parsedCellContent instanceof CellContent.Empty) {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnSearch.remove(oldValue, address)
-        this.changes.addChange(EmptyValue, address)
-        this.dependencyGraph.setCellEmpty(address)
+        this.setCellEmpty(address)
       } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
         throw new Error('Cant happen')
       } else {
-        const newValue = parsedCellContent.value
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnSearch.change(oldValue, newValue, address)
-        this.changes.addChange(newValue, address)
+        this.setValueToCell(parsedCellContent.value, address)
       }
     } else {
       throw new Error('Illegal operation')
     }
+  }
+
+  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.dependencyGraph.setValueToCell(address, value)
+    this.columnSearch.change(oldValue, value, address)
+    this.changes.addChange(value, address)
+  }
+
+  public setCellEmpty(address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.remove(oldValue, address)
+    this.changes.addChange(EmptyValue, address)
+    this.dependencyGraph.setCellEmpty(address)
+  }
+
+  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {

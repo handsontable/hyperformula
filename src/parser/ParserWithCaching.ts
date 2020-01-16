@@ -4,11 +4,12 @@ import {RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {Cache} from './Cache'
+import {Cache, CacheEntry} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import has = Reflect.has
 
 export interface ParsingResult {
   ast: Ast,
@@ -69,6 +70,16 @@ export class ParserWithCaching {
     const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
 
     return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+  }
+
+  public fetchCachedResult(hash: string): ParsingResult {
+    const cacheResult = this.cache.get(hash)
+    if (cacheResult === null) {
+      throw new Error('There is no AST with such key in the cache')
+    } else {
+      const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
+      return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+    }
   }
 
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {

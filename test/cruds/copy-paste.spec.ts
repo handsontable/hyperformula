@@ -16,7 +16,7 @@ describe('copy ast', () => {
   })
 })
 
-describe('Copy - paste', () => {
+describe('Copy - paste integration', () => {
   it('copy should return values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],

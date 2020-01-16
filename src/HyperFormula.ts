@@ -133,7 +133,7 @@ export class HyperFormula {
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
-    this.copyPaste = new CopyPaste(this.dependencyGraph, this.lazilyTransformingAstService)
+    this.copyPaste = new CopyPaste(this.dependencyGraph, this.crudOperations, this.parser, this.lazilyTransformingAstService)
   }
 
   /**
@@ -433,7 +433,8 @@ export class HyperFormula {
     return []
   }
 
-  public paste(destination: SimpleCellAddress): CellValueChange[] {
+  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+    this.copyPaste.paste(targetLeftCorner)
     return []
   }
 
