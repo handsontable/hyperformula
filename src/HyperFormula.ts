@@ -435,7 +435,7 @@ export class HyperFormula {
 
   public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.copyPaste.paste(targetLeftCorner)
-    return []
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
   /**
