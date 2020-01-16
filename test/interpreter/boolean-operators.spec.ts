@@ -117,14 +117,16 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
-  it('Less than operator with wrong arguments',  () => {
+  it('Less than operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-        ['=1<"foo"', '=02/02/2020<"bar"', '=TRUE()<"bar"'],
+      ['="foo"<1', '="foo"<TRUE()', '=1<"0"', '=2 < TRUE()', '="02/02/2020"<"000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('Less than operator with strings', () => {
@@ -158,14 +160,16 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
-  it('Greater than operator with wrong arguments',  () => {
+  it('Greater than operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>"foo"', '=02/02/2020>"bar"', '=TRUE()>"bar"'],
+      ['="foo">1', '="foo">TRUE()', '=1>"0"', '=2 > TRUE()', '="02/02/2020">"000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
   })
 
   it('Greater than operator with strings', () => {
@@ -219,14 +223,16 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
-  it('Less than or equal operator with wrong arguments',  () => {
+  it('Less than or equal operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1<="foo"', '=02/02/2020<="bar"', '=TRUE()<="bar"'],
+      ['="foo"<=1', '="foo"<=TRUE()', '=1<="0"', '=2 <= TRUE()', '="02/02/2020"<="000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('Greater than or equal operator with number arguments',  () => {
@@ -241,14 +247,16 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
-  it('Greater than or equal operator with wrong arguments',  () => {
+  it('Greater than or equal operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>="foo"', '=02/02/2020>="bar"', '=TRUE()>="bar"'],
+      ['="foo">=1', '="foo">=TRUE()', '=1>="0"', '=2 >= TRUE()', '="02/02/2020">="000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
   })
 
   it('Greater than or equal operator with strings', () => {

@@ -23,27 +23,6 @@ export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number
   return new CellError(ErrorType.VALUE)
 }
 
-export function coerceScalarToNumberOrKeepOld(arg: CellValue, dateFormat: string): CellValue | CellError {
-  if (arg === EmptyValue) {
-    return 0
-  }
-  if (arg instanceof CellError) {
-    return arg
-  }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    if (typeof arg === 'string') {
-      const parsedDateNumber = stringToDateNumber(arg, dateFormat)
-      if (parsedDateNumber !== null) {
-        return parsedDateNumber
-      }
-    }
-    return arg
-  } else {
-    return coercedNumber
-  }
-}
-
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
   if (arg instanceof SimpleRangeValue) {
     return arg

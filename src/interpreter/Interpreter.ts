@@ -1,14 +1,15 @@
 import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, CellValueType, CellValueTypeOrd, ErrorType, getCellValueType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
+import {stringToDateNumber} from '../Date'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceScalarToNumber, coerceScalarToNumberOrKeepOld} from './coerce'
+import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
@@ -90,19 +91,31 @@ export class Interpreter {
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
-          return leftResult > rightResult
-        }
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
-        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult > rightResult
+        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
+          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
+          let rightTmp = Number(rightResult)
+          if(leftTmp != null) {
+            return leftTmp > rightTmp
+          }
+        }
+        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
+          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
+          let leftTmp = Number(leftResult)
+          if(rightTmp != null) {
+            return leftTmp > rightTmp
+          }
+        }
+        if(typeof leftResult != typeof rightResult) {
+          return CellValueTypeOrd(getCellValueType(leftResult)) > CellValueTypeOrd(getCellValueType(rightResult))
         }
         else {
-          return new CellError(ErrorType.VALUE)
+          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
+            return false
+          }
+          return leftResult > rightResult
         }
       }
       case AstNodeType.LESS_THAN_OP: {
@@ -114,19 +127,31 @@ export class Interpreter {
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
-          return leftResult < rightResult
-        }
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
-        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult < rightResult
+        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
+          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
+          let rightTmp = Number(rightResult)
+          if(leftTmp != null) {
+            return leftTmp < rightTmp
+          }
+        }
+        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
+          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
+          let leftTmp = Number(leftResult)
+          if(rightTmp != null) {
+            return leftTmp < rightTmp
+          }
+        }
+        if(typeof leftResult != typeof rightResult) {
+          return CellValueTypeOrd(getCellValueType(leftResult)) < CellValueTypeOrd(getCellValueType(rightResult))
         }
         else {
-          return new CellError(ErrorType.VALUE)
+          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
+            return false
+          }
+          return leftResult < rightResult
         }
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
@@ -138,19 +163,31 @@ export class Interpreter {
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
-          return leftResult >= rightResult
-        }
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
-        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult >= rightResult
+        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
+          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
+          let rightTmp = Number(rightResult)
+          if(leftTmp != null) {
+            return leftTmp >= rightTmp
+          }
+        }
+        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
+          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
+          let leftTmp = Number(leftResult)
+          if(rightTmp != null) {
+            return leftTmp >= rightTmp
+          }
+        }
+        if(typeof leftResult != typeof rightResult) {
+          return CellValueTypeOrd(getCellValueType(leftResult)) >= CellValueTypeOrd(getCellValueType(rightResult))
         }
         else {
-          return new CellError(ErrorType.VALUE)
+          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
+            return false
+          }
+          return leftResult >= rightResult
         }
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
@@ -162,19 +199,31 @@ export class Interpreter {
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (typeof leftResult === 'string' && typeof rightResult === 'string') {
-          return leftResult <= rightResult
-        }
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        leftResult = coerceScalarToNumberOrKeepOld(leftResult, this.config.dateFormat)
-        rightResult = coerceScalarToNumberOrKeepOld(rightResult, this.config.dateFormat)
-        if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult <= rightResult
+        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
+          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
+          let rightTmp = Number(rightResult)
+          if(leftTmp != null) {
+            return leftTmp <= rightTmp
+          }
+        }
+        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
+          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
+          let leftTmp = Number(leftResult)
+          if(rightTmp != null) {
+            return leftTmp <= rightTmp
+          }
+        }
+        if(typeof leftResult != typeof rightResult) {
+          return CellValueTypeOrd(getCellValueType(leftResult)) <= CellValueTypeOrd(getCellValueType(rightResult))
         }
         else {
-          return new CellError(ErrorType.VALUE)
+          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
+            return false
+          }
+          return leftResult <= rightResult
         }
       }
       case AstNodeType.PLUS_OP: {
