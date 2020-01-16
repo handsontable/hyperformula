@@ -270,5 +270,15 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
+
+  it('Propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=(1/0)>2'],
+      ['=2>(1/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
 })
 
