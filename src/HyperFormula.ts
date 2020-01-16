@@ -111,8 +111,8 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  private crudOperations: CrudOperations
-  private copyPaste: CopyPaste
+  private readonly crudOperations: CrudOperations
+  private readonly copyPaste: CopyPaste
 
   constructor(
       /** Engine config */
