@@ -84,6 +84,12 @@ export class Interpreter {
       case AstNodeType.GREATER_THAN_OP: {
         let leftResult = this.evaluateAst(ast.left, formulaAddress)
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult > rightResult
         }
@@ -102,6 +108,12 @@ export class Interpreter {
       case AstNodeType.LESS_THAN_OP: {
         let leftResult = this.evaluateAst(ast.left, formulaAddress)
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult < rightResult
         }
@@ -120,6 +132,12 @@ export class Interpreter {
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         let leftResult = this.evaluateAst(ast.left, formulaAddress)
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult >= rightResult
         }
@@ -138,6 +156,12 @@ export class Interpreter {
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         let leftResult = this.evaluateAst(ast.left, formulaAddress)
         let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
         if (typeof leftResult === 'string' && typeof rightResult === 'string') {
           return leftResult <= rightResult
         }
