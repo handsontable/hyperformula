@@ -1,4 +1,5 @@
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CrudOperations} from './CrudOperations'
 import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
@@ -70,12 +71,14 @@ export class CopyPaste {
     this.clipboard = new CopyPasteClipboard(width, height, content)
   }
 
-  public paste(leftCorner: SimpleCellAddress) {
+  public paste(destinationLeftCorner: SimpleCellAddress) {
+    this.ensureItIsPossibleToPaste(destinationLeftCorner)
+
     if (this.clipboard === undefined) {
       return
     }
 
-    for (const [address, clipboardCell] of this.clipboard.getContent(leftCorner)) {
+    for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
       if (clipboardCell.type === ClipboardCellType.VALUE) {
         this.crudOperations.setValueToCell(clipboardCell.value, address)
       } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
@@ -83,6 +86,23 @@ export class CopyPaste {
       } else {
         this.crudOperations.setFormulaToCellFromCache(clipboardCell.hash, address)
       }
+    }
+  }
+
+  public ensureItIsPossibleToPaste(destinationLeftCorner: SimpleCellAddress): void {
+    if (this.clipboard === undefined) {
+      return
+    }
+
+    if (invalidSimpleCellAddress(destinationLeftCorner) ||
+      !this.dependencyGraph.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)) {
+      throw new Error('Invalid arguments')
+    }
+
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
+      throw new Error('It is not possible to paste onto matrix')
     }
   }
 

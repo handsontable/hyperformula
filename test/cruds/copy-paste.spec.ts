@@ -94,7 +94,7 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('B4'))).toEqual(4)
   })
 
-  it('should be possible to copy numeric matrix onto it self', () => {
+  it('should be possible to copy numeric matrix onto itself', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -131,5 +131,30 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('B5'))).toEqual(3)
     expect(engine.getCellValue(adr('A6'))).toEqual(2)
     expect(engine.getCellValue(adr('B6'))).toEqual(4)
+  })
+
+  it('should not be possible to paste onto formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}']
+    ])
+
+    engine.copy(adr('A1'), 2, 2)
+
+    expect(() => {
+      engine.paste(adr('A3'))
+    }).toThrowError('It is not possible to paste onto matrix')
+  })
+
+  it('should do nothing when empty clipboard', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 })
