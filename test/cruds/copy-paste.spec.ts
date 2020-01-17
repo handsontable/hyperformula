@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {Config, EmptyValue, HyperFormula} from '../../src'
 import '../testConfig'
 import {adr, expect_array_with_same_content} from '../testUtils'
 
@@ -13,6 +13,17 @@ describe('Copy - paste integration', () => {
 
     expect_array_with_same_content([1, 2], values[0])
     expect_array_with_same_content(['foo', 1], values[1])
+  })
+
+  it('should copy empty cell vertex', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, '=A1']
+    ])
+
+    engine.copy(adr('A1'), 1, 1)
+    const changes = engine.paste(adr('A2'))
+
+    expect_array_with_same_content([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
   })
 
   it('should work for single number', () => {

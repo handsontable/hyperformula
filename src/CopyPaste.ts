@@ -1,6 +1,6 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CrudOperations} from './CrudOperations'
-import {CellVertex, DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
@@ -88,7 +88,8 @@ export class CopyPaste {
 
   private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
-    if (vertex === null) {
+
+    if (vertex === null || vertex instanceof EmptyCellVertex) {
       return { type: ClipboardCellType.EMPTY }
     } else if (vertex instanceof ValueCellVertex) {
       /* TODO should we copy errors? */
