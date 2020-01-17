@@ -229,21 +229,27 @@ export function mina(left: CellValue, right: CellValue): CellValue {
 }
 
 export function cmp(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
-
-  if(typeof left === 'string' && (typeof right === 'number' || typeof right === 'boolean')) {
+  if(typeof left === 'string' && typeof right === 'string')
+  {
     let leftTmp = stringToDateNumber(left, dateFormat)
-    let rightTmp = Number(right)
-    if(leftTmp != null) {
-      return comparator(leftTmp,rightTmp)
-    }
-  }
-  if(typeof right === 'string' && (typeof left === 'number' || typeof left === 'boolean')) {
     let rightTmp = stringToDateNumber(right, dateFormat)
-    let leftTmp = Number(left)
-    if(rightTmp != null) {
+    if(left != null && right != null) {
       return comparator(leftTmp, rightTmp)
     }
   }
+  else if(typeof left === 'string' && typeof right === 'number') {
+    let leftTmp = stringToDateNumber(left, dateFormat)
+    if(leftTmp != null) {
+      return comparator(leftTmp,right)
+    }
+  }
+  else if(typeof left === 'number' && typeof right == 'string') {
+    let rightTmp = stringToDateNumber(right, dateFormat)
+    if(rightTmp != null) {
+      return comparator(left, rightTmp)
+    }
+  }
+
   if(typeof left != typeof right) {
     return comparator(CellValueTypeOrd(getCellValueType(left)),CellValueTypeOrd(getCellValueType(right)))
   }

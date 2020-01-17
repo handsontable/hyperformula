@@ -23,6 +23,16 @@ describe('Date arithmetic', () => {
     expect(engine.getCellValue(adr('E1'))).toBe(true)
     expect(engine.getCellValue(adr('F1'))).toBe(false)
   })
+  it('compare two datestrings', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['="02/02/2020"', '="02/06/2019"', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+    expect(engine.getCellValue(adr('F1'))).toBe(false)
+  })
   it('compare date with datestring', () => {
     const engine = HyperFormula.buildFromArray([
       ['="02/02/2020"', '02/06/2019', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1'],
@@ -32,6 +42,16 @@ describe('Date arithmetic', () => {
     expect(engine.getCellValue(adr('D1'))).toBe(false)
     expect(engine.getCellValue(adr('E1'))).toBe(true)
     expect(engine.getCellValue(adr('F1'))).toBe(false)
+  })
+  it('compare date with bool', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['="02/02/2020"', '=TRUE()', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
   it('compare date with number', () => {
     const engine = HyperFormula.buildFromArray([
