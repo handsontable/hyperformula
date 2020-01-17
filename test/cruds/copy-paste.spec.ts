@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import '../testConfig'
 import {adr, expect_array_with_same_content} from '../testUtils'
 
@@ -64,5 +64,41 @@ describe('Copy - paste integration', () => {
       { sheet:0, col: 0, row: 1, value: 1},
       { sheet:0, col: 1, row: 1, value: 1},
     ], changes)
+  })
+
+  it('should copy values from numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    engine.copy(adr('A1'), 2, 2)
+    engine.paste(adr('A3'))
+
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('B3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('B4'))).toEqual(4)
+  })
+
+  it('should be possible to copy numeric matrix onto it self', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    engine.copy(adr('A1'), 2, 2)
+    engine.paste(adr('B1'))
+
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(engine.getCellValue(adr('C1'))).toEqual(2)
+    expect(engine.getCellValue(adr('C2'))).toEqual(4)
   })
 })
