@@ -52,16 +52,68 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('D2'))).toEqual('bar')
   })
 
-  it('should work for simple cell reference', () => {
+  it('should work for cell reference inside copied area', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1'],
     ])
 
-    engine.copy(adr('B1'), 1, 1)
-    engine.paste(adr('C1'))
+    engine.copy(adr('A1'), 2, 1)
+    engine.paste(adr('A2'))
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    const a2 = engine.dependencyGraph.fetchCell(adr('A2'))
+    const b2 = engine.dependencyGraph.fetchCell(adr('B2'))
+
+    expect(engine.dependencyGraph.existsEdge(a2, b2)).toBe(true)
+    expect(engine.dependencyGraph.existsEdge(a1, b2)).toBe(false)
+    expect(engine.getCellValue(adr('B2'))).toEqual(1)
   })
+
+  it('should work for absolute cell reference', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=$A$1'],
+    ])
+
+    engine.copy(adr('B1'), 1, 1)
+    engine.paste(adr('B2'))
+
+    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+    const b1 = engine.dependencyGraph.fetchCell(adr('B1'))
+    const b2 = engine.dependencyGraph.fetchCell(adr('B2'))
+
+    expect(engine.dependencyGraph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.dependencyGraph.existsEdge(a1, b2)).toBe(true)
+    expect(engine.getCellValue(adr('B2'))).toEqual(1)
+  })
+
+  it('should work for cell reference pointing outside copied area', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=A1'],
+      ['2', ''],
+    ])
+
+    engine.copy(adr('B1'), 1, 1)
+    engine.paste(adr('B2'))
+
+    expect(engine.getCellValue(adr('B2'))).toEqual(2)
+  })
+
+  it('should create new range vertix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '3'],
+      ['2', '4'],
+      ['=SUM(A1:A2)']
+    ])
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
+
+    engine.copy(adr('A3'), 1, 1)
+    engine.paste(adr('B3'))
+
+    expect(engine.getCellValue(adr('B3'))).toEqual(7)
+    expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
+    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
+  })
+
 
   it('paste should return newly pasted values', () => {
     const engine = HyperFormula.buildFromArray([
@@ -92,6 +144,21 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
     expect(engine.getCellValue(adr('B4'))).toEqual(4)
+  })
+
+  it('should be possible to paste string onto numeric matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo'],
+      ['3', '4'],
+    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A2'))
+
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
+    expect(engine.getCellValue(adr('B2'))).toEqual(4)
   })
 
   it('should be possible to copy numeric matrix onto itself', () => {
