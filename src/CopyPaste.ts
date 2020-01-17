@@ -78,6 +78,9 @@ export class CopyPaste {
       return
     }
 
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
+    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+
     for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
       if (clipboardCell.type === ClipboardCellType.VALUE) {
         this.crudOperations.setValueToCell(clipboardCell.value, address)
