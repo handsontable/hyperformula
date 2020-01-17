@@ -1,4 +1,5 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {CellError, Config, EmptyValue, HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
@@ -98,6 +99,18 @@ describe('Copy - paste integration', () => {
     engine.paste(adr('B2'))
 
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
+  })
+
+  it('should return ref when pasted reference is out of scope', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+      [null, '=B1'],
+    ])
+
+    engine.copy(adr('B2'), 1, 1)
+    engine.paste(adr('A1'))
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
   })
 
   it('should create new range vertix', () => {
