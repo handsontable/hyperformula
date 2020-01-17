@@ -25,6 +25,7 @@ import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
 import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
 import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
+import {RadiansPlugin} from './interpreter/plugin/RadiansPlugin'
 import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
 import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
@@ -80,6 +81,7 @@ export class Config {
     ExpPlugin,
     AbsPlugin,
     DegreesPlugin,
+    RadiansPlugin,
     RandomPlugin,
     VlookupPlugin,
     IsEvenPlugin,
