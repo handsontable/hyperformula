@@ -1,6 +1,8 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
+import {CellAddress} from '../../src/parser'
+import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
-import {adr, expect_array_with_same_content} from '../testUtils'
+import {adr, expect_array_with_same_content, extractReference} from '../testUtils'
 
 describe('Copy - paste integration', () => {
   it('copy should return values', () => {
@@ -223,5 +225,44 @@ describe('Copy - paste integration', () => {
     engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('should not be possible to paste to not existing sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=Sheet1!A2', '=Sheet2!A2']],
+    })
+
+    engine.copy(adr('A1'), 2, 1)
+
+    expect(() => {
+      engine.paste(adr('A1', 1))
+    }).toThrowError("Invalid arguments")
+  })
+
+  it('should copy references with absolute sheet id', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=Sheet1!A2', '=Sheet2!A2']],
+      'Sheet2': []
+    })
+
+    engine.copy(adr('A1'), 2, 1)
+    engine.paste(adr('A1', 1))
+
+    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(new CellAddress(1, -1, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+  })
+
+  /* Inconsistency with Product 1
+   * We should think about distinction of relative and absolute sheet addresses */
+  it('sheet id should not be adjusted when copying "relative" sheet reference to other sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=A2']],
+      'Sheet2': []
+    })
+
+    engine.copy(adr('A1'), 1, 1)
+    engine.paste(adr('A1', 1))
+
+    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
   })
 })
