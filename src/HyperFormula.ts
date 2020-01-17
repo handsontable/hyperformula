@@ -9,7 +9,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {isMatrix, RawCellContent} from './CellContentParser'
+import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
@@ -124,12 +124,13 @@ export class HyperFormula {
       /** Parser with caching */
       private readonly parser: ParserWithCaching,
       private readonly unparser: Unparser,
+      private readonly cellContentParser: CellContentParser,
       /** Formula evaluator */
       public readonly evaluator: Evaluator,
       /** Service handling postponed CRUD transformations */
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
   }
 
   /**

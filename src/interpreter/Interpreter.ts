@@ -7,7 +7,7 @@ import {stringToDateNumber} from '../Date'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType} from '../parser/Ast'
+import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
@@ -321,7 +321,8 @@ export class Interpreter {
         if (ast.error !== undefined) {
           return ast.error
         }
-        if (ast.args[0].type === 'StaticOffsetOutOfRangeError') {
+        /* TODO tidy up parsing errors */
+        if (ast.args.length > 0 && ast.args[0].type === ParsingErrorType.StaticOffsetOutOfRangeError) {
           return new CellError(ErrorType.REF)
         }
         return new CellError(ErrorType.NAME)

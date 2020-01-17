@@ -39,13 +39,14 @@ export class GraphBuilder {
       private readonly dependencyGraph: DependencyGraph,
       private readonly columnSearch: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
+      private readonly cellContentParser: CellContentParser,
       private readonly config: Config = new Config(),
       private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
-      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold)
+      this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold, this.cellContentParser)
     } else {
-      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats)
+      this.buildStrategy = new SimpleStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, this.cellContentParser)
     }
   }
 
@@ -76,12 +77,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
       private readonly columnIndex: IColumnSearchStrategy,
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
+      private readonly cellContentParser: CellContentParser,
   ) {
   }
 
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
-    const contentParser = new CellContentParser()
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -93,7 +94,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
 
-          const parsedCellContent = contentParser.parse(cellContent)
+          const parsedCellContent = this.cellContentParser.parse(cellContent)
           if (parsedCellContent instanceof CellContent.MatrixFormula) {
             if (this.dependencyGraph.existsVertex(address)) {
               continue
@@ -115,18 +116,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
-          } else if (parsedCellContent instanceof CellContent.String) {
-            const parsedDateNumber = stringToDateNumber(parsedCellContent.value, Config.defaultConfig.dateFormat)
-            let vertex
-            if(parsedDateNumber !== null) {
-              vertex = new ValueCellVertex(parsedDateNumber)
-            }
-            else {
-              vertex = new ValueCellVertex(parsedCellContent.value)
-            }
-            this.columnIndex.add(parsedCellContent.value, address)
-            this.dependencyGraph.addVertex(address, vertex)
-          } else if (parsedCellContent instanceof CellContent.Number) {
+          } else {
             const vertex = new ValueCellVertex(parsedCellContent.value)
             this.columnIndex.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)
@@ -146,13 +136,13 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,
+      private readonly cellContentParser: CellContentParser
   ) {}
 
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
-    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, dependencies, this.threshold)
-    const contentParser = new CellContentParser()
+    const matrixHeuristic = new GraphBuilderMatrixHeuristic(this.dependencyGraph, this.columnSearch, dependencies, this.threshold, this.cellContentParser)
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
@@ -169,7 +159,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
           const cellContent = row[j]
           const address = simpleCellAddress(sheetId, j, i)
 
-          const parsedCellContent = contentParser.parse(cellContent)
+          const parsedCellContent = this.cellContentParser.parse(cellContent)
           if (parsedCellContent instanceof CellContent.MatrixFormula) {
             if (this.dependencyGraph.existsVertex(address)) {
               continue
@@ -187,7 +177,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             /* we don't care about empty cells here */
           } else if (parsedCellContent instanceof CellContent.Number) {
             matrixHeuristic.add(address)
-          } else if (parsedCellContent instanceof CellContent.String) {
+          } else {
             const vertex = new ValueCellVertex(parsedCellContent.value)
             this.columnSearch.add(parsedCellContent.value, address)
             this.dependencyGraph.addVertex(address, vertex)

@@ -61,6 +61,7 @@ export class GraphBuilderMatrixHeuristic {
       private readonly columnSearch: IColumnSearchStrategy,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
       private readonly threshold: number,
+      private readonly cellContentParser: CellContentParser
   ) {
   }
 
@@ -99,7 +100,6 @@ export class GraphBuilderMatrixHeuristic {
 
   public matrixFromPlainValues(range: AbsoluteCellRange, sheet: RawCellContent[][]): Matrix {
     const values = new Array(range.height())
-    const cellContentParser = new CellContentParser()
 
     for (let i = 0; i < range.height(); ++i) {
       values[i] = new Array(range.width())
@@ -107,7 +107,7 @@ export class GraphBuilderMatrixHeuristic {
 
     for (const address of range.addresses()) {
       const cellContent = sheet[address.row][address.col]
-      const parsedCellContent = cellContentParser.parse(cellContent)
+      const parsedCellContent = this.cellContentParser.parse(cellContent)
       if (parsedCellContent instanceof CellContent.Number) {
         values[address.row - range.start.row][address.col - range.start.col] = parsedCellContent.value
       } else {

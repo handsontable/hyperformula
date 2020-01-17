@@ -97,7 +97,7 @@ export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
 /* error literal */
-export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[\?\!]?/})
+export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
 /* skipping whitespaces */
 export const WhiteSpace = createToken({
@@ -122,7 +122,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     name: 'OffsetProcedureName',
     pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
   })
-  const errorMapping = buildErrorMapping(config.language)
+  const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.language)
 
   /* order is important, first pattern is used */
@@ -170,13 +170,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     errorMapping,
     functionMapping,
   }
-}
-
-const buildErrorMapping = (language: TranslationPackage): Record<string, ErrorType> => {
-  return Object.keys(language.errors).reduce((ret, key) => {
-    ret[language.errors[key as ErrorType]] = key as ErrorType
-    return ret
-  }, {} as Record<string, ErrorType>)
 }
 
 const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {

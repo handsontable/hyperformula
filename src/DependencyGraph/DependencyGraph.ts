@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -17,6 +17,7 @@ import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {ValueCellVertexValue} from './ValueCellVertex'
 
 export class DependencyGraph {
   /*
@@ -67,7 +68,7 @@ export class DependencyGraph {
     }
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
+  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 

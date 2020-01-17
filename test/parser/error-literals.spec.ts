@@ -39,4 +39,11 @@ describe('Parsing error literals', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error!.type).toEqual(ErrorType.DIV_BY_ZERO)
   })
+
+  it('should return parser error', () => {
+    const parser = new ParserWithCaching(new Config({language: enGB}), new SheetMapping(enGB).get)
+    const ast = parser.parse('=#UNKNOWN!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error).toBe(undefined)
+  })
 })

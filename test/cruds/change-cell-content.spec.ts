@@ -1,5 +1,5 @@
-import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
+import {CellError, Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
@@ -185,6 +185,26 @@ describe('changing cell content', () => {
     engine.setCellContent(adr('B1'), null)
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
+  })
+
+  it('update value cell to error literal', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+
+    engine.setCellContent(adr('A1'), '#DIV/0!')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('update value cell to error-like literal', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+
+    engine.setCellContent(adr('A1'), '#FOO!')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('#FOO!')
   })
 
   it('rewrite part of sheet with matrix', () => {

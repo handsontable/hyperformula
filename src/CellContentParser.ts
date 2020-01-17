@@ -1,3 +1,7 @@
+import {CellError, ErrorType} from './Cell'
+import {Config} from './Config'
+import {stringToDateNumber} from './Date'
+
 export type RawCellContent = string | null | undefined
 
 export namespace CellContent {
@@ -28,7 +32,14 @@ export namespace CellContent {
     constructor(public readonly formula: string) { }
   }
 
-  export type Type = Number | String | Empty | Formula | MatrixFormula
+  export class Error {
+    public readonly value: CellError
+    constructor(errorType: ErrorType) {
+      this.value = new CellError(errorType)
+    }
+  }
+
+  export type Type = Number | String | Empty | Formula | MatrixFormula | Error
 }
 
 /**
@@ -47,7 +58,15 @@ export function isMatrix(text: RawCellContent): Boolean {
   return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
 }
 
+export function isError(text: string, errorMapping: Record<string, ErrorType>): Boolean {
+  const upperCased = text.toUpperCase()
+  const errorRegex = /#[A-Za-z0-9\/]+[?!]?/
+  return errorRegex.test(upperCased) && errorMapping.hasOwnProperty(upperCased)
+}
+
 export class CellContentParser {
+  constructor(private readonly config: Config) {}
+
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
@@ -56,13 +75,21 @@ export class CellContentParser {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
+    } else if (isError(content, this.config.errorMapping)) {
+      return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
     } else {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
-      } else {
+      }
+      const parsedDateNumber = stringToDateNumber(content, Config.defaultConfig.dateFormat)
+      if(parsedDateNumber !== null) {
+        return new CellContent.Number(parsedDateNumber)
+      }
+      else {
         return new CellContent.String(content)
       }
+
     }
   }
 }

@@ -19,7 +19,8 @@ import {
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
-  buildNumberAst, buildParenthesisAst,
+  buildNumberAst,
+  buildParenthesisAst,
   buildPercentOpAst,
   buildPlusOpAst,
   buildPlusUnaryOpAst,
@@ -298,7 +299,10 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (errorType) {
             return buildCellErrorAst(new CellError(errorType))
           } else {
-            return buildErrorAst([])
+            return buildErrorAst([{
+              type: ParsingErrorType.ParserError,
+              message: 'Unknown error literal'
+            }])
           }
         },
       },

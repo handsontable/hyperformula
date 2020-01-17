@@ -144,7 +144,7 @@ describe('Interpreter - Boolean operators', () => {
       ['=FALSE()<"2"', '="1"<"2"', '=TRUE()<FALSE()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
@@ -187,7 +187,7 @@ describe('Interpreter - Boolean operators', () => {
       ['=FALSE()>"2"', '="1">"2"', '=TRUE()>FALSE()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
     expect(engine.getCellValue(adr('C1'))).toBe( true)
   })
@@ -218,7 +218,7 @@ describe('Interpreter - Boolean operators', () => {
       ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
@@ -271,12 +271,12 @@ describe('Interpreter - Boolean operators', () => {
 
   it('Greater than or equal operator with coercions', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
+      ['=FALSE()>="2"', '="1">="2"', '=TRUE()>=FALSE()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
-    expect(engine.getCellValue(adr('B1'))).toBe(true)
-    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('Propagates errors correctly', () => {
