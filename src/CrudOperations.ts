@@ -113,6 +113,10 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.clipboardOperations.cut(sourceLeftCorner, width, height)
+  }
+
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }

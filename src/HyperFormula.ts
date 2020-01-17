@@ -432,6 +432,11 @@ export class HyperFormula {
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.cut(sourceLeftCorner, width, height)
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+  }
+
   public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
