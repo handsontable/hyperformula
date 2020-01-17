@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -43,7 +43,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       for (const [matrixValue, cellAddress] of value.generateValues(address)) {
         this.addSingleCellValue(matrixValue, cellAddress)
       }
-    } else {
+    } else if (!(value instanceof CellError)) {
       this.addSingleCellValue(value, address)
     }
   }

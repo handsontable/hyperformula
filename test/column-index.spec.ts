@@ -1,10 +1,11 @@
 import {deepStrictEqual} from 'assert'
-import {Config, LazilyTransformingAstService} from '../src'
+import {CellError, Config, LazilyTransformingAstService} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../src/Cell'
+import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Matrix} from '../src/Matrix'
+import {collectDependencies} from '../src/parser'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
 import {adr} from './testUtils'
@@ -47,6 +48,17 @@ describe('ColumnIndex#add', () => {
 
     expect(columnMap.size).toBe(1)
     expect(columnMap.get(1)!.index.length).toBe(2)
+  })
+
+  it('should ignore CellErrors', () => {
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
+    const error = new CellError(ErrorType.DIV_BY_ZERO)
+
+    index.add(error, adr('A1'))
+
+    const columnMap = index.getColumnMap(0, 0)
+    expect(columnMap.size).toBe(0)
+    expect(columnMap.keys()).not.toContain(error)
   })
 })
 
@@ -136,6 +148,17 @@ describe('ColumnIndex change/remove', () => {
       [6, {index: [0], version: 0}],
       [8, {index: [1], version: 0}],
     ]))
+  })
+
+  it('should ignore CellErrors', () => {
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
+    index.add(1, adr('A1'))
+
+    const error = new CellError(ErrorType.DIV_BY_ZERO)
+    index.change(1, error, simpleCellAddress(0, 0, 0))
+
+    expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
+    expect(index.getColumnMap(0, 0).keys()).not.toContain(error)
   })
 })
 

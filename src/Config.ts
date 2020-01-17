@@ -112,6 +112,7 @@ export class Config {
   public readonly matrixDetectionThreshold: number
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
+  public readonly errorMapping: Record<string, ErrorType>
 
   constructor(
       {
@@ -137,6 +138,7 @@ export class Config {
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
+    this.errorMapping = this.buildErrorMapping(this.language)
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
@@ -179,5 +181,12 @@ export class Config {
     }
 
     return structuralChangeFunctions
+  }
+
+  private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
+    return Object.keys(language.errors).reduce((ret, key) => {
+      ret[language.errors[key as ErrorType]] = key as ErrorType
+      return ret
+    }, {} as Record<string, ErrorType>)
   }
 }

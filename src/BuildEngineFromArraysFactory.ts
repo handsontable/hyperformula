@@ -1,4 +1,5 @@
 import {Config, HyperFormula, LazilyTransformingAstService} from './'
+import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
@@ -24,9 +25,10 @@ export class BuildEngineFromArraysFactory {
 
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
+    const cellContentParser = new CellContentParser(config)
 
     stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, config, stats)
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
@@ -44,6 +46,7 @@ export class BuildEngineFromArraysFactory {
       columnIndex,
       parser,
       unparser,
+      cellContentParser,
       evaluator,
       lazilyTransformingAstService,
     )
