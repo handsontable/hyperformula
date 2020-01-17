@@ -11,7 +11,7 @@ import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
+import {add, cmp, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
 
 export class Interpreter {
@@ -83,8 +83,8 @@ export class Interpreter {
         }
       }
       case AstNodeType.GREATER_THAN_OP: {
-        let leftResult = this.evaluateAst(ast.left, formulaAddress)
-        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof CellError) {
           return leftResult
         }
@@ -94,33 +94,11 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
-          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
-          let rightTmp = Number(rightResult)
-          if(leftTmp != null) {
-            return leftTmp > rightTmp
-          }
-        }
-        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
-          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
-          let leftTmp = Number(leftResult)
-          if(rightTmp != null) {
-            return leftTmp > rightTmp
-          }
-        }
-        if(typeof leftResult != typeof rightResult) {
-          return CellValueTypeOrd(getCellValueType(leftResult)) > CellValueTypeOrd(getCellValueType(rightResult))
-        }
-        else {
-          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
-            return false
-          }
-          return leftResult > rightResult
-        }
+        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 > arg2})
       }
       case AstNodeType.LESS_THAN_OP: {
-        let leftResult = this.evaluateAst(ast.left, formulaAddress)
-        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof CellError) {
           return leftResult
         }
@@ -130,33 +108,12 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
-          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
-          let rightTmp = Number(rightResult)
-          if(leftTmp != null) {
-            return leftTmp < rightTmp
-          }
-        }
-        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
-          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
-          let leftTmp = Number(leftResult)
-          if(rightTmp != null) {
-            return leftTmp < rightTmp
-          }
-        }
-        if(typeof leftResult != typeof rightResult) {
-          return CellValueTypeOrd(getCellValueType(leftResult)) < CellValueTypeOrd(getCellValueType(rightResult))
-        }
-        else {
-          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
-            return false
-          }
-          return leftResult < rightResult
-        }
+        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 < arg2})
+
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
-        let leftResult = this.evaluateAst(ast.left, formulaAddress)
-        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof CellError) {
           return leftResult
         }
@@ -166,33 +123,11 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
-          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
-          let rightTmp = Number(rightResult)
-          if(leftTmp != null) {
-            return leftTmp >= rightTmp
-          }
-        }
-        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
-          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
-          let leftTmp = Number(leftResult)
-          if(rightTmp != null) {
-            return leftTmp >= rightTmp
-          }
-        }
-        if(typeof leftResult != typeof rightResult) {
-          return CellValueTypeOrd(getCellValueType(leftResult)) >= CellValueTypeOrd(getCellValueType(rightResult))
-        }
-        else {
-          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
-            return false
-          }
-          return leftResult >= rightResult
-        }
+        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 >= arg2})
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
-        let leftResult = this.evaluateAst(ast.left, formulaAddress)
-        let rightResult = this.evaluateAst(ast.right, formulaAddress)
+        const leftResult = this.evaluateAst(ast.left, formulaAddress)
+        const rightResult = this.evaluateAst(ast.right, formulaAddress)
         if (leftResult instanceof CellError) {
           return leftResult
         }
@@ -202,29 +137,7 @@ export class Interpreter {
         if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        if(typeof leftResult === 'string' && (typeof rightResult === 'number' || typeof rightResult === 'boolean')) {
-          let leftTmp = stringToDateNumber(leftResult, this.config.dateFormat)
-          let rightTmp = Number(rightResult)
-          if(leftTmp != null) {
-            return leftTmp <= rightTmp
-          }
-        }
-        if(typeof rightResult === 'string' && (typeof leftResult === 'number' || typeof leftResult === 'boolean')) {
-          let rightTmp = stringToDateNumber(rightResult, this.config.dateFormat)
-          let leftTmp = Number(leftResult)
-          if(rightTmp != null) {
-            return leftTmp <= rightTmp
-          }
-        }
-        if(typeof leftResult != typeof rightResult) {
-          return CellValueTypeOrd(getCellValueType(leftResult)) <= CellValueTypeOrd(getCellValueType(rightResult))
-        }
-        else {
-          if(typeof leftResult == 'symbol' || typeof rightResult == 'symbol') {
-            return false
-          }
-          return leftResult <= rightResult
-        }
+        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 <= arg2})
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

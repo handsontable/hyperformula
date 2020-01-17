@@ -1,5 +1,8 @@
-import {CellError, CellValue, EmptyValue, EmptyValueType, ErrorType} from '../Cell'
+import {CellError, CellValue, CellValueTypeOrd, EmptyValue, EmptyValueType, ErrorType, getCellValueType} from '../Cell'
+import {stringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
+import {Config} from '../Config'
+
 
 /**
  * Adds two numbers
@@ -222,5 +225,32 @@ export function mina(left: CellValue, right: CellValue): CellValue {
     return right
   } else {
     return Number.POSITIVE_INFINITY
+  }
+}
+
+export function cmp(left: CellValue, right: CellValue, dateFormat: string, cmpfn: (arg1: any, arg2: any) => boolean): boolean {
+
+  if(typeof left === 'string' && (typeof right === 'number' || typeof right === 'boolean')) {
+    let leftTmp = stringToDateNumber(left, dateFormat)
+    let rightTmp = Number(right)
+    if(leftTmp != null) {
+      return cmpfn(leftTmp,rightTmp)
+    }
+  }
+  if(typeof right === 'string' && (typeof left === 'number' || typeof left === 'boolean')) {
+    let rightTmp = stringToDateNumber(right, dateFormat)
+    let leftTmp = Number(left)
+    if(rightTmp != null) {
+      return cmpfn(leftTmp, rightTmp)
+    }
+  }
+  if(typeof left != typeof right) {
+    return cmpfn(CellValueTypeOrd(getCellValueType(left)),CellValueTypeOrd(getCellValueType(right)))
+  }
+  else {
+    if(typeof left == 'symbol' || typeof right == 'symbol') {
+      return false
+    }
+    return cmpfn(left, right)
   }
 }
