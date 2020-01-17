@@ -228,29 +228,29 @@ export function mina(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function cmp(left: CellValue, right: CellValue, dateFormat: string, cmpfn: (arg1: any, arg2: any) => boolean): boolean {
+export function cmp(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
 
   if(typeof left === 'string' && (typeof right === 'number' || typeof right === 'boolean')) {
     let leftTmp = stringToDateNumber(left, dateFormat)
     let rightTmp = Number(right)
     if(leftTmp != null) {
-      return cmpfn(leftTmp,rightTmp)
+      return comparator(leftTmp,rightTmp)
     }
   }
   if(typeof right === 'string' && (typeof left === 'number' || typeof left === 'boolean')) {
     let rightTmp = stringToDateNumber(right, dateFormat)
     let leftTmp = Number(left)
     if(rightTmp != null) {
-      return cmpfn(leftTmp, rightTmp)
+      return comparator(leftTmp, rightTmp)
     }
   }
   if(typeof left != typeof right) {
-    return cmpfn(CellValueTypeOrd(getCellValueType(left)),CellValueTypeOrd(getCellValueType(right)))
+    return comparator(CellValueTypeOrd(getCellValueType(left)),CellValueTypeOrd(getCellValueType(right)))
+  }
+  else if(left == EmptyValue) {
+    return false
   }
   else {
-    if(typeof left == 'symbol' || typeof right == 'symbol') {
-      return false
-    }
-    return cmpfn(left, right)
+    return comparator(left, right)
   }
 }
