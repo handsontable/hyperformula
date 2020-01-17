@@ -94,7 +94,7 @@ export class CopyPaste {
     } else if (vertex instanceof ValueCellVertex) {
       /* TODO should we copy errors? */
       return { type: ClipboardCellType.VALUE, value: vertex.getCellValue() }
-    } else if (vertex instanceof MatrixVertex && !vertex.isFormula()) {
+    } else if (vertex instanceof MatrixVertex) {
       return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
     } else if (vertex instanceof FormulaCellVertex) {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }

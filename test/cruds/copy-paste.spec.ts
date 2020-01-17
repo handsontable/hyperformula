@@ -112,4 +112,24 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(2)
     expect(engine.getCellValue(adr('C2'))).toEqual(4)
   })
+
+  it('should copy values from formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
+      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}']
+    ])
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+
+    engine.copy(adr('A3'), 2, 2)
+    engine.paste(adr('A5'))
+
+    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
+    expect(engine.getCellFormula(adr('A5'))).toBe(undefined)
+    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+    expect(engine.getCellValue(adr('B5'))).toEqual(3)
+    expect(engine.getCellValue(adr('A6'))).toEqual(2)
+    expect(engine.getCellValue(adr('B6'))).toEqual(4)
+  })
 })
