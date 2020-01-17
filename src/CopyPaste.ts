@@ -1,6 +1,6 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CrudOperations} from './CrudOperations'
-import {CellVertex, DependencyGraph, FormulaCellVertex, ValueCellVertex} from './DependencyGraph'
+import {CellVertex, DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
@@ -62,8 +62,7 @@ export class CopyPaste {
       content[y] = []
 
       for (let x = 0; x < width; ++x) {
-        const vertex = this.dependencyGraph.getCell(simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y))
-        const clipboardCell = this.getClipboardCell(vertex)
+        const clipboardCell = this.getClipboardCell(simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y))
         content[y].push(clipboardCell)
       }
     }
@@ -87,15 +86,16 @@ export class CopyPaste {
     }
   }
 
-  private getClipboardCell(vertex: CellVertex | null): ClipboardCell {
+  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
+    const vertex = this.dependencyGraph.getCell(address)
     if (vertex === null) {
       return { type: ClipboardCellType.EMPTY }
-    }
-    if (vertex instanceof ValueCellVertex) {
+    } else if (vertex instanceof ValueCellVertex) {
       /* TODO should we copy errors? */
       return { type: ClipboardCellType.VALUE, value: vertex.getCellValue() }
-    }
-    if (vertex instanceof FormulaCellVertex) {
+    } else if (vertex instanceof MatrixVertex && !vertex.isFormula()) {
+      return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
+    } else if (vertex instanceof FormulaCellVertex) {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
     }
 
