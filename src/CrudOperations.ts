@@ -5,7 +5,8 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import { ContentChanges} from './ContentChanges'
+import {CellValueChange, ContentChanges} from './ContentChanges'
+import {CopyPaste} from './CopyPaste'
 import {
   AddressMapping,
   DependencyGraph,
@@ -33,6 +34,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
+  private readonly copyPaste: CopyPaste
 
   constructor(
       /** Engine config */
@@ -50,6 +52,7 @@ export class CrudOperations implements IBatchExecutor {
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
+    this.copyPaste = new CopyPaste(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -108,6 +111,14 @@ export class CrudOperations implements IBatchExecutor {
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.copyPaste.copy(sourceLeftCorner, width, height)
+  }
+
+  public paste(targetLeftCorner: SimpleCellAddress): void {
+    this.copyPaste.paste(targetLeftCorner)
   }
 
   public addSheet(name?: string): string {

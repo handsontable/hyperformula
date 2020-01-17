@@ -113,7 +113,6 @@ export class HyperFormula {
   }
 
   private readonly crudOperations: CrudOperations
-  private readonly copyPaste: CopyPaste
 
   constructor(
       /** Engine config */
@@ -134,7 +133,6 @@ export class HyperFormula {
       public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
-    this.copyPaste = new CopyPaste(this.dependencyGraph, this.crudOperations, this.parser, this.lazilyTransformingAstService)
   }
 
   /**
@@ -430,12 +428,12 @@ export class HyperFormula {
   }
 
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    this.copyPaste.copy(sourceLeftCorner, width, height)
+    this.crudOperations.copy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
-    this.copyPaste.paste(targetLeftCorner)
+    this.crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
