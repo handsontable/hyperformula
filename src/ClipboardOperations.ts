@@ -8,6 +8,11 @@ import {ParserWithCaching} from './parser'
 
 type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty
 
+enum ClipboardOperationType {
+  COPY,
+  CUT
+}
+
 enum ClipboardCellType {
   VALUE,
   EMPTY,
@@ -28,25 +33,31 @@ interface ClipboardCellFormula {
   hash: string
 }
 
-class CopyPasteClipboard {
+class Clipboard {
   constructor(
+    public readonly sourceLeftCorner: SimpleCellAddress,
     public readonly width: number,
     public readonly height: number,
-    public readonly content: ClipboardCell[][]
+    public readonly type: ClipboardOperationType,
+    public readonly content?: ClipboardCell[][]
   ) {
   }
 
   public* getContent(leftCorner: SimpleCellAddress): IterableIterator<[SimpleCellAddress, ClipboardCell]> {
-    for (let y = 0; y < this.height; ++y) {
-      for (let x = 0; x < this.width; ++x) {
-        yield [simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y), this.content[y][x]]
+    if (this.content === undefined) {
+      return
+    } else {
+      for (let y = 0; y < this.height; ++y) {
+        for (let x = 0; x < this.width; ++x) {
+          yield [simpleCellAddress(leftCorner.sheet, leftCorner.col + x, leftCorner.row + y), this.content[y][x]]
+        }
       }
     }
   }
 }
 
-export class CopyPaste {
-  private clipboard?: CopyPasteClipboard
+export class ClipboardOperations {
+  private clipboard?: Clipboard
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -54,6 +65,10 @@ export class CopyPaste {
     private readonly parser: ParserWithCaching,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService
   ) {
+  }
+
+  public cut(leftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.CUT)
   }
 
   public copy(leftCorner: SimpleCellAddress, width: number, height: number): void {
@@ -68,31 +83,38 @@ export class CopyPaste {
       }
     }
 
-    this.clipboard = new CopyPasteClipboard(width, height, content)
+    this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.COPY, content)
   }
 
   public paste(destinationLeftCorner: SimpleCellAddress) {
-    this.ensureItIsPossibleToPaste(destinationLeftCorner)
-
     if (this.clipboard === undefined) {
       return
     }
 
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
-    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+    switch (this.clipboard.type) {
+      case ClipboardOperationType.COPY: {
+        this.ensureItIsPossibleToCopyPaste(destinationLeftCorner)
+        const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
+        this.dependencyGraph.breakNumericMatricesInRange(targetRange)
 
-    for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
-      if (clipboardCell.type === ClipboardCellType.VALUE) {
-        this.crudOperations.setValueToCell(clipboardCell.value, address)
-      } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
-        this.crudOperations.setCellEmpty(address)
-      } else {
-        this.crudOperations.setFormulaToCellFromCache(clipboardCell.hash, address)
+        for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
+          if (clipboardCell.type === ClipboardCellType.VALUE) {
+            this.crudOperations.setValueToCell(clipboardCell.value, address)
+          } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
+            this.crudOperations.setCellEmpty(address)
+          } else {
+            this.crudOperations.setFormulaToCellFromCache(clipboardCell.hash, address)
+          }
+        }
+        break
+      }
+      case ClipboardOperationType.CUT: {
+        this.crudOperations.moveCells(this.clipboard.sourceLeftCorner, this.clipboard.width, this.clipboard.height, destinationLeftCorner)
       }
     }
   }
 
-  public ensureItIsPossibleToPaste(destinationLeftCorner: SimpleCellAddress): void {
+  public ensureItIsPossibleToCopyPaste(destinationLeftCorner: SimpleCellAddress): void {
     if (this.clipboard === undefined) {
       return
     }

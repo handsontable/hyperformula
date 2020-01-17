@@ -6,7 +6,7 @@ import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
-import {CopyPaste} from './CopyPaste'
+import {ClipboardOperations} from './ClipboardOperations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -34,7 +34,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
-  private readonly copyPaste: CopyPaste
+  private readonly clipboardOperations: ClipboardOperations
 
   constructor(
       /** Engine config */
@@ -52,7 +52,7 @@ export class CrudOperations implements IBatchExecutor {
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-    this.copyPaste = new CopyPaste(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -114,11 +114,11 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
-    this.copyPaste.copy(sourceLeftCorner, width, height)
+    this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
   public paste(targetLeftCorner: SimpleCellAddress): void {
-    this.copyPaste.paste(targetLeftCorner)
+    this.clipboardOperations.paste(targetLeftCorner)
   }
 
   public addSheet(name?: string): string {
