@@ -58,6 +58,7 @@ export class CrudOperations implements IBatchExecutor {
   public addRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
@@ -66,6 +67,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -74,6 +76,7 @@ export class CrudOperations implements IBatchExecutor {
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
@@ -82,6 +85,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -89,6 +93,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.clipboardOperations.abort()
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -136,6 +141,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.clipboardOperations.abort()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -152,6 +158,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public clearSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.clipboardOperations.abort()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -162,6 +169,8 @@ export class CrudOperations implements IBatchExecutor {
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
+    this.clipboardOperations.abort()
+
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
 
     let vertex = this.dependencyGraph.getCell(address)

@@ -114,6 +114,12 @@ export class ClipboardOperations {
     }
   }
 
+  public abort() {
+    if (this.clipboard && this.clipboard.type === ClipboardOperationType.CUT) {
+      this.clipboard = undefined
+    }
+  }
+
   public ensureItIsPossibleToCopyPaste(destinationLeftCorner: SimpleCellAddress): void {
     if (this.clipboard === undefined) {
       return

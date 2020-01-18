@@ -519,6 +519,7 @@ export class HyperFormula {
    * @param name - sheet name
    * */
   public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
