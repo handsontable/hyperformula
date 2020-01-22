@@ -1,9 +1,8 @@
 import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValueType, CellValueTypeOrd, ErrorType, getCellValueType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
-import {stringToDateNumber} from '../Date'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
@@ -11,7 +10,7 @@ import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, cmp, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
+import {add, compare, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
 import {concatenate} from './text'
 
 export class Interpreter {
@@ -111,7 +110,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 > arg2})
+        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 > arg2})
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -130,7 +129,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 < arg2})
+        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 < arg2})
 
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
@@ -150,7 +149,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 >= arg2})
+        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 >= arg2})
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -169,7 +168,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 <= arg2})
+        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 <= arg2})
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

@@ -1,8 +1,6 @@
-import {CellError, CellValue, CellValueTypeOrd, EmptyValue, EmptyValueType, ErrorType, getCellValueType} from '../Cell'
+import {CellError, CellValue, CellValueTypeOrd, EmptyValue, ErrorType, getCellValueType} from '../Cell'
 import {stringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
-import {Config} from '../Config'
-
 
 /**
  * Adds two numbers
@@ -19,8 +17,7 @@ export function nonstrictadd(left: CellValue, right: CellValue): number | CellEr
     return left
   } else if (right instanceof CellError) {
     return right
-  }
-  else if (typeof left === 'number') {
+  } else if (typeof left === 'number') {
     if (typeof right === 'number') {
       return left + right
     } else {
@@ -237,35 +234,30 @@ export function mina(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function cmp(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
-  if(typeof left === 'string' && typeof right === 'string')
-  {
+export function compare(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
+  if (typeof left === 'string' && typeof right === 'string') {
     let leftTmp = stringToDateNumber(left, dateFormat)
     let rightTmp = stringToDateNumber(right, dateFormat)
-    if(leftTmp != null && rightTmp != null) {
+    if (leftTmp != null && rightTmp != null) {
       return comparator(leftTmp, rightTmp)
     }
-  }
-  else if(typeof left === 'string' && typeof right === 'number') {
+  } else if (typeof left === 'string' && typeof right === 'number') {
     let leftTmp = stringToDateNumber(left, dateFormat)
-    if(leftTmp != null) {
-      return comparator(leftTmp,right)
+    if (leftTmp != null) {
+      return comparator(leftTmp, right)
     }
-  }
-  else if(typeof left === 'number' && typeof right == 'string') {
+  } else if (typeof left === 'number' && typeof right == 'string') {
     let rightTmp = stringToDateNumber(right, dateFormat)
-    if(rightTmp != null) {
+    if (rightTmp != null) {
       return comparator(left, rightTmp)
     }
   }
 
-  if(typeof left != typeof right) {
-    return comparator(CellValueTypeOrd(getCellValueType(left)),CellValueTypeOrd(getCellValueType(right)))
-  }
-  else if(left == EmptyValue) {
+  if (typeof left != typeof right) {
+    return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
+  } else if (left == EmptyValue) {
     return false
-  }
-  else {
+  } else {
     return comparator(left, right)
   }
 }
