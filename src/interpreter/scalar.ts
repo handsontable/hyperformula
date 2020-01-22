@@ -224,3 +224,39 @@ export function mina(left: CellValue, right: CellValue): CellValue {
     return Number.POSITIVE_INFINITY
   }
 }
+
+export function greater(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
+  if(ignoreEps)
+    return left > right
+  if(right >= 0)
+    return left > (1+eps) * right
+  else
+    return left*(1+eps) > right
+}
+
+export function less(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
+  if(ignoreEps)
+    return left < right
+  if(right >= 0)
+    return left*(1+eps) < right
+  else
+    return left < (1+eps)*right
+}
+
+export function lesseq(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
+  if(ignoreEps)
+    return left <= right
+  if(right >= 0)
+    return left <= (1+eps) * right
+  else
+    return left*(1+eps) <= right
+}
+
+export function greatereq(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
+  if(ignoreEps)
+    return left >= right
+  if(right >= 0)
+    return left*(1+eps) >= right
+  else
+    return left >= (1+eps)*right
+}

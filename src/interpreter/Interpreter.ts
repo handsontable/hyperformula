@@ -10,7 +10,19 @@ import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
+import {
+  add,
+  divide,
+  greater,
+  greatereq,
+  less, lesseq,
+  multiply,
+  percent,
+  power,
+  subtract,
+  unaryminus,
+  unaryplus
+} from './scalar'
 import {concatenate} from './text'
 
 export class Interpreter {
@@ -86,7 +98,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult > rightResult
+          return greater(leftResult, rightResult, this.config.precisionEpsilon, this.config.ignoreEpsilon)
         } else {
           return new CellError(ErrorType.VALUE)
         }
@@ -96,7 +108,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult < rightResult
+          return less(leftResult, rightResult, this.config.precisionEpsilon, this.config.ignoreEpsilon)
         } else {
           return new CellError(ErrorType.VALUE)
         }
@@ -106,7 +118,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult >= rightResult
+          return greatereq(leftResult, rightResult, this.config.precisionEpsilon, this.config.ignoreEpsilon)
         } else {
           return new CellError(ErrorType.VALUE)
         }
@@ -116,7 +128,7 @@ export class Interpreter {
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
 
         if (typeof leftResult === 'number' && typeof rightResult === 'number') {
-          return leftResult <= rightResult
+          return lesseq(leftResult, rightResult, this.config.precisionEpsilon, this.config.ignoreEpsilon)
         } else {
           return new CellError(ErrorType.VALUE)
         }
