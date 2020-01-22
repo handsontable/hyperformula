@@ -275,6 +275,27 @@ export function greatereq(left: number | string, right: number | string, eps: nu
   }
 }
 
+export function equality(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if (ignoreEps || typeof left === 'string' || typeof right === 'string') {
+    return left === right
+  } else if (right >= 0) {
+    return left * (1 + eps) >= right && left <= right * (1 + eps)
+  } else {
+    return left * (1 + eps) <= right && left >= right * (1 + eps)
+  }
+}
+
+export function nonequality(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if (ignoreEps || typeof left === 'string' || typeof right === 'string') {
+    return left !== right
+  } else if (right >= 0) {
+    return left * (1 + eps) < right || left > right * (1 + eps)
+  } else {
+    return left * (1 + eps) > right || left < right * (1 + eps)
+  }
+}
+
+
 export function compare(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
   if (typeof left === 'string' && typeof right === 'string') {
     const leftTmp = stringToDateNumber(left, dateFormat)

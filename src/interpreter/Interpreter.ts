@@ -13,7 +13,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
   compare,
-  divide,
+  divide, equality, nonequality,
   greater,
   greatereq,
   less, lesseq,
@@ -77,11 +77,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        if (typeof leftResult !== typeof rightResult) {
-          return false
-        } else {
-          return leftResult === rightResult
-        }
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return equality(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -100,11 +97,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        if (typeof leftResult !== typeof rightResult) {
-          return true
-        } else {
-          return leftResult !== rightResult
-        }
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return nonequality(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -123,7 +117,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return greater(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return greater(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -142,7 +137,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return less(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return less(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
 
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
@@ -162,7 +158,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return greatereq(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return greatereq(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -181,7 +178,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return lesseq(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
+        return compare( leftResult, rightResult, this.config.dateFormat,
+          (arg1, arg2) => {return lesseq(arg1, arg2, this.config.precisionEpsilon, this.config.ignoreEpsilon)})
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
