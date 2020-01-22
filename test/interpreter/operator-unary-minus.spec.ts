@@ -24,11 +24,13 @@ describe('Unary operator MINUS', () => {
 
   it('pass error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=-A2'],
-      ['=FOOBAR()'],
+      ['=-B1', '=FOOBAR()'],
+      ['=-B2', '=1/0'],
+
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1

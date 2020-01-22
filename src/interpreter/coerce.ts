@@ -3,23 +3,24 @@ import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
- * Converts cell value to date number representation (days after 12th Dec 1899)
- *
- * If value is a number simply returns value
- * If value is a string, it tries to parse it with date format
- *
+ * Coerce scalar value to number if possible
+ * Date like literals will be converted to number representation (days after 12th Dec 1899)
  *
  * @param arg - cell value
  * @param dateFormat - date format pattern used when argument is a text
  */
-export function dateNumberRepresentation(arg: CellValue, dateFormat: string): number | CellError {
+export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
+  let ret = coerceNonDateScalarToMaybeNumber(arg)
+  if (ret != null) {
+    return ret
+  }
   if (typeof arg === 'string') {
     const parsedDateNumber = stringToDateNumber(arg, dateFormat)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }
   }
-  return coerceScalarToNumber(arg)
+  return new CellError(ErrorType.VALUE)
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -44,22 +45,8 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceScalarToNumber(arg: CellValue): number | CellError {
-  if (arg === EmptyValue) {
-    return 0
-  }
-  if (arg instanceof CellError) {
-    return arg
-  }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    return new CellError(ErrorType.VALUE)
-  } else {
-    return coercedNumber
-  }
-}
 
-export function coerceScalarToMaybeNumber(arg: CellValue): number | CellError | null {
+export function coerceNonDateScalarToMaybeNumber(arg: CellValue): number | CellError | null {
   if (arg === EmptyValue) {
     return 0
   }

@@ -117,14 +117,36 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
-  it('Less than operator with wrong arguments',  () => {
+  it('Less than operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-        ['=1<"foo"', '="foo"<"bar"', '=TRUE()<FALSE()'],
+      ['="foo"<1', '="foo"<TRUE()', '=1<"0"', '=2 < TRUE()', '="02/02/2020"<"000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+  })
+
+  it('Less than operator with strings', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['="abcd"<"abc"', '="11"<"2"', '="02/02/2020"<"true"'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+  })
+
+  it('Less than operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()<"2"', '="1"<"2"', '=TRUE()<FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('Greater than operator with number arguments',  () => {
@@ -138,14 +160,36 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('D1'))).toBe(true)
   })
 
-  it('Greater than operator with wrong arguments',  () => {
+  it('Greater than operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>"foo"', '="foo">"bar"', '=TRUE()>FALSE()'],
+      ['="foo">1', '="foo">TRUE()', '=1>"0"', '=2 > TRUE()', '="02/02/2020">"000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+  })
+
+  it('Greater than operator with strings', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['="abcd">"abc"', '="11">"2"', '="02/02/2020">"true"'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+  })
+
+  it('Greater than operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()>"2"', '="1">"2"', '=TRUE()>FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe( true)
   })
 
   it('Less than or equal operator with number arguments',  () => {
@@ -160,14 +204,35 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
-  it('Less than or equal operator with wrong arguments',  () => {
+  it('Less than or equal operator with strings', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1<="foo"', '="foo"<="bar"', '=TRUE()<=FALSE()'],
+      ['="abcd"<="abc"', '="11"<="2"', '="02/02/2020"<="true"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+  })
+  it('Less than or equal operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+  })
+
+  it('Less than or equal operator with different types',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['="foo"<=1', '="foo"<=TRUE()', '=1<="0"', '=2 <= TRUE()', '="02/02/2020"<="000"'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('Greater than or equal operator with number arguments',  () => {
@@ -182,13 +247,97 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
-  it('Greater than or equal operator with wrong arguments',  () => {
+  it('Greater than or equal operator with different types',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=1>="foo"', '="foo">="bar"', '=TRUE()>=FALSE()'],
+      ['="foo">=1', '="foo">=TRUE()', '=1>="0"', '=2 >= TRUE()', '="02/02/2020">="000"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+  })
+
+  it('Greater than or equal operator with strings', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['="abcd">="abc"', '="11">="2"', '="02/02/2020">="true"'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+  })
+
+  it('Greater than or equal operator with coercions', () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=FALSE()>="2"', '="1">="2"', '=TRUE()>=FALSE()'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+  })
+
+  it('Less than propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)<2','=2<(1/0)', '=(A1:B1)<(1/0)', '=(1/0)<(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Greater than propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)>2','=2>(1/0)', '=(A1:B1)>(1/0)', '=(1/0)>(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Less than or equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)<=2','=2<=(1/0)', '=(A1:B1)<=(1/0)', '=(1/0)<=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Greater than or equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)>=2','=2>=(1/0)', '=(A1:B1)>=(1/0)', '=(1/0)>=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)=2','=2=(1/0)', '=(A1:B1)=(1/0)', '=(1/0)=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Not equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)<>2','=2<>(1/0)', '=(A1:B1)<>(1/0)', '=(1/0)<>(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
+

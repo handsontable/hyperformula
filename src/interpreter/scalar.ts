@@ -1,4 +1,5 @@
-import {CellError, CellValue, ErrorType} from '../Cell'
+import {CellError, CellValue, CellValueTypeOrd, EmptyValue, ErrorType, getCellValueType} from '../Cell'
+import {stringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
 
 /**
@@ -11,14 +12,12 @@ import {coerceBooleanToNumber} from './coerce'
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function add(left: CellValue, right: CellValue): number | CellError {
+export function nonstrictadd(left: CellValue, right: CellValue): number | CellError {
   if (left instanceof CellError) {
     return left
-  }
-  if (right instanceof CellError) {
+  } else if (right instanceof CellError) {
     return right
-  }
-  if (typeof left === 'number') {
+  } else if (typeof left === 'number') {
     if (typeof right === 'number') {
       return left + right
     } else {
@@ -28,6 +27,16 @@ export function add(left: CellValue, right: CellValue): number | CellError {
     return right
   } else {
     return 0
+  }
+}
+
+export function add(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return left + right
   }
 }
 
@@ -222,5 +231,33 @@ export function mina(left: CellValue, right: CellValue): CellValue {
     return right
   } else {
     return Number.POSITIVE_INFINITY
+  }
+}
+
+export function compare(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
+  if (typeof left === 'string' && typeof right === 'string') {
+    let leftTmp = stringToDateNumber(left, dateFormat)
+    let rightTmp = stringToDateNumber(right, dateFormat)
+    if (leftTmp != null && rightTmp != null) {
+      return comparator(leftTmp, rightTmp)
+    }
+  } else if (typeof left === 'string' && typeof right === 'number') {
+    let leftTmp = stringToDateNumber(left, dateFormat)
+    if (leftTmp != null) {
+      return comparator(leftTmp, right)
+    }
+  } else if (typeof left === 'number' && typeof right == 'string') {
+    let rightTmp = stringToDateNumber(right, dateFormat)
+    if (rightTmp != null) {
+      return comparator(left, rightTmp)
+    }
+  }
+
+  if (typeof left != typeof right) {
+    return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
+  } else if (left == EmptyValue) {
+    return false
+  } else {
+    return comparator(left, right)
   }
 }
