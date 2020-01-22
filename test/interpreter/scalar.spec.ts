@@ -1,28 +1,28 @@
 import {CellError, ErrorType} from '../../src/Cell'
-import {add, max, min} from '../../src/interpreter/scalar'
+import {nonstrictadd, max, min, add} from '../../src/interpreter/scalar'
 import '../testConfig'
 
-describe('add', () => {
+describe('nonstrictadd', () => {
   it('adds', () => {
-    expect(add(2, 3)).toEqual(5)
+    expect(nonstrictadd(2, 3)).toEqual(5)
   })
 
   it('return error of right operand', () => {
-    expect(add(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(nonstrictadd(2, new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 
   it('return error of left operand if both present', () => {
-    expect(add(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
+    expect(nonstrictadd(new CellError(ErrorType.NA), new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.NA))
   })
 
   it('ignores non-numerics', () => {
-    expect(add('foo', 5)).toEqual(5)
-    expect(add(5, 'foo')).toEqual(5)
-    expect(add('bar', 'foo')).toEqual(0)
+    expect(nonstrictadd('foo', 5)).toEqual(5)
+    expect(nonstrictadd(5, 'foo')).toEqual(5)
+    expect(nonstrictadd('bar', 'foo')).toEqual(0)
   })
 
   it('returns 0 if only non-numerics', () => {
-    expect(add('bar', 'foo')).toEqual(0)
+    expect(nonstrictadd('bar', 'foo')).toEqual(0)
   })
 })
 

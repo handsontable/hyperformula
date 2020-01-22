@@ -48,11 +48,28 @@ export const getCellType = (vertex: CellVertex | null): CellType => {
 }
 
 export enum CellValueType {
-  BOOLEAN = 'BOOLEAN',
+  EMPTY = 'EMPTY',
   NUMBER = 'NUMBER',
   STRING = 'STRING',
-  EMPTY = 'EMPTY',
+  BOOLEAN = 'BOOLEAN',
   ERROR = 'ERROR',
+}
+
+export const CellValueTypeOrd = (arg: CellValueType): number =>
+{
+  switch(arg)
+  {
+    case CellValueType.EMPTY:
+      return 0
+    case CellValueType.NUMBER:
+      return 1
+    case CellValueType.STRING:
+      return 2
+    case CellValueType.BOOLEAN:
+      return 3
+    case CellValueType.ERROR:
+      return 4
+  }
 }
 
 export const getCellValueType = (cellValue: CellValue): CellValueType => {

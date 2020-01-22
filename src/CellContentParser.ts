@@ -1,5 +1,6 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
+import {stringToDateNumber} from './Date'
 
 export type RawCellContent = string | null | undefined
 
@@ -80,9 +81,15 @@ export class CellContentParser {
       const trimmedContent = content.trim()
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
-      } else {
+      }
+      const parsedDateNumber = stringToDateNumber(content, Config.defaultConfig.dateFormat)
+      if(parsedDateNumber !== null) {
+        return new CellContent.Number(parsedDateNumber)
+      }
+      else {
         return new CellContent.String(content)
       }
+
     }
   }
 }

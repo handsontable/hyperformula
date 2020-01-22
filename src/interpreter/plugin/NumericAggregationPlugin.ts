@@ -2,9 +2,9 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceScalarToMaybeNumber, coerceToRange} from '../coerce'
+import {coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
-import {add, max, maxa, min, mina} from '../scalar'
+import {nonstrictadd, max, maxa, min, mina} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
 
@@ -105,14 +105,14 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
-    return this.reduce(ast, formulaAddress, 0, 'SUM', add, idMap)
+    return this.reduce(ast, formulaAddress, 0, 'SUM', nonstrictadd, idMap)
   }
 
   public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
-    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', add, square)
+    return this.reduce(ast, formulaAddress, 0, 'SUMSQ', nonstrictadd, square)
   }
 
   public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -256,7 +256,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       if (arg === EmptyValue) {
         return AverageResult.empty
       } else {
-        const coercedArg = coerceScalarToMaybeNumber(arg)
+        const coercedArg = coerceNonDateScalarToMaybeNumber(arg)
         if (coercedArg === null) {
           return AverageResult.empty
         } else if (coercedArg instanceof CellError) {

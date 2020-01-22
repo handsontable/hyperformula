@@ -7,7 +7,7 @@ import { ProcedureAst} from '../../parser'
 import {coerceToRange} from '../coerce'
 import { CriterionLambda, CriterionPackage} from '../Criterion'
 import { SimpleRangeValue} from '../InterpreterValue'
-import {add} from '../scalar'
+import {nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {CriterionFunctionCompute, Condition} from '../CriterionFunctionCompute'
 
@@ -117,7 +117,7 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => add(left, right),
+      (left, right) => nonstrictadd(left, right),
       (arg) => arg,
     ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
 
@@ -158,7 +158,7 @@ export class SumifPlugin extends FunctionPlugin {
       this.interpreter,
       sumifCacheKey,
       0,
-      (left, right) => add(left, right),
+      (left, right) => nonstrictadd(left, right),
       (arg) => arg,
     ).compute(valuesArg, conditions)
 

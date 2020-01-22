@@ -39,8 +39,8 @@ export class SumprodPlugin extends FunctionPlugin {
       } else if (r.value instanceof CellError) {
         return r.value
       } else {
-        const lval = coerceScalarToNumber(l.value)
-        const rval = coerceScalarToNumber(r.value)
+        const lval = coerceScalarToNumber(l.value, this.config.dateFormat)
+        const rval = coerceScalarToNumber(r.value, this.config.dateFormat)
         if (typeof lval === 'number' && typeof rval === 'number') {
           result += lval * rval
         }

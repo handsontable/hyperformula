@@ -101,11 +101,11 @@ export class TrigonometryPlugin extends FunctionPlugin {
     if(arg2 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedArg1 = coerceScalarToNumber(arg1)
+    const coercedArg1 = coerceScalarToNumber(arg1, this.config.dateFormat)
     if (coercedArg1 instanceof CellError)  {
       return coercedArg1
     }
-    const coercedArg2 = coerceScalarToNumber(arg2)
+    const coercedArg2 = coerceScalarToNumber(arg2, this.config.dateFormat)
     if(coercedArg2 instanceof CellError) {
       return coercedArg2
     }

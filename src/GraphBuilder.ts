@@ -4,6 +4,7 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {CellDependency} from './CellDependency'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
+import {stringToDateNumber} from './Date'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize, MatrixSizeCheck} from './Matrix'

@@ -44,6 +44,6 @@ export function momentToDateNumber(date: Moment) {
 }
 
 export function stringToDateNumber(dateString: string, dateFormat: string): number | null {
-  const date = moment(dateString, dateFormat)
+  const date = moment(dateString, dateFormat, true)
   return date.isValid() ? momentToDateNumber(date) : null
 }
