@@ -14,14 +14,13 @@ import {Config} from '../Config'
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function add(left: CellValue, right: CellValue): number | CellError {
+export function nonstrictadd(left: CellValue, right: CellValue): number | CellError {
   if (left instanceof CellError) {
     return left
-  }
-  if (right instanceof CellError) {
+  } else if (right instanceof CellError) {
     return right
   }
-  if (typeof left === 'number') {
+  else if (typeof left === 'number') {
     if (typeof right === 'number') {
       return left + right
     } else {
@@ -31,6 +30,16 @@ export function add(left: CellValue, right: CellValue): number | CellError {
     return right
   } else {
     return 0
+  }
+}
+
+export function add(left: number | CellError, right: number | CellError): number | CellError {
+  if (left instanceof CellError) {
+    return left
+  } else if (right instanceof CellError) {
+    return right
+  } else {
+    return left + right
   }
 }
 
@@ -233,7 +242,7 @@ export function cmp(left: CellValue, right: CellValue, dateFormat: string, compa
   {
     let leftTmp = stringToDateNumber(left, dateFormat)
     let rightTmp = stringToDateNumber(right, dateFormat)
-    if(left != null && right != null) {
+    if(leftTmp != null && rightTmp != null) {
       return comparator(leftTmp, rightTmp)
     }
   }

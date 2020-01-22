@@ -28,7 +28,7 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
   })
 
-  xit('string literals - faulty tests', () => {
+  it('string literals - faulty tests', () => {
     const engine = HyperFormula.buildFromArray([
       ['www', '1www', 'www1'],
     ])
@@ -39,7 +39,7 @@ describe('Interpreter', () => {
   })
 
 
-  xit('string literals in formula - faulty tests', () => {
+  it('string literals in formula - faulty tests', () => {
     const engine = HyperFormula.buildFromArray([
       ['="www"', '="1www"', '="www1"'],
     ])

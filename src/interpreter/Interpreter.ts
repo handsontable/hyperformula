@@ -55,8 +55,14 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
         if (rightResult instanceof CellError) {
           return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
 
         if (typeof leftResult !== typeof rightResult) {
@@ -72,8 +78,14 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
         if (rightResult instanceof CellError) {
           return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
 
         if (typeof leftResult !== typeof rightResult) {
@@ -85,72 +97,112 @@ export class Interpreter {
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
         if (leftResult instanceof CellError) {
           return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+
         return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 > arg2})
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
         if (leftResult instanceof CellError) {
           return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+
         return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 < arg2})
 
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
         if (leftResult instanceof CellError) {
           return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+
         return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 >= arg2})
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
+
         if (leftResult instanceof CellError) {
           return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+
         return cmp( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 <= arg2})
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+
         return add(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return subtract(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
@@ -158,7 +210,16 @@ export class Interpreter {
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return multiply(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
@@ -166,7 +227,16 @@ export class Interpreter {
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return power(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
@@ -174,7 +244,16 @@ export class Interpreter {
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        if (leftResult instanceof SimpleRangeValue || rightResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof CellError) {
+          return leftResult
+        }
+        if(leftResult instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        if (rightResult instanceof CellError) {
+          return rightResult
+        }
+        if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return divide(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))

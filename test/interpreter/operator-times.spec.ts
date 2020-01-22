@@ -60,4 +60,15 @@ describe('Operator TIMES', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
   })
+
+  it('Times propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)*2','=2*(1/0)', '=(A1:B1)*(1/0)', '=(1/0)*(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
 })

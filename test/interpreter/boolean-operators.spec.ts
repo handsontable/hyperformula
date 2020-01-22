@@ -279,14 +279,65 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
-  it('Propagates errors correctly', () => {
+  it('Less than propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=(1/0)>2'],
-      ['=2>(1/0)'],
+      ['1','2','=(1/0)<2','=2<(1/0)', '=(A1:B1)<(1/0)', '=(1/0)<(A1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Greater than propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)>2','=2>(1/0)', '=(A1:B1)>(1/0)', '=(1/0)>(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Less than or equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)<=2','=2<=(1/0)', '=(A1:B1)<=(1/0)', '=(1/0)<=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Greater than or equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)>=2','=2>=(1/0)', '=(A1:B1)>=(1/0)', '=(1/0)>=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)=2','=2=(1/0)', '=(A1:B1)=(1/0)', '=(1/0)=(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+  it('Not equal propagates errors correctly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1','2','=(1/0)<>2','=2<>(1/0)', '=(A1:B1)<>(1/0)', '=(1/0)<>(A1:B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
