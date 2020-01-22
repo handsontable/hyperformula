@@ -234,8 +234,8 @@ export function mina(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function greater(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
-  if(ignoreEps) {
+export function greater(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if(ignoreEps || typeof left === 'string' || typeof right === 'string') {
     return left > right
   } else if (right >= 0) {
     return left > (1 + eps) * right
@@ -244,8 +244,8 @@ export function greater(left: number, right: number, eps: number, ignoreEps: boo
   }
 }
 
-export function less(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
-  if (ignoreEps) {
+export function less(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if (ignoreEps || typeof left === 'string' || typeof right === 'string') {
     return left < right
   } else if (right >= 0) {
     return left * (1 + eps) < right
@@ -254,8 +254,8 @@ export function less(left: number, right: number, eps: number, ignoreEps: boolea
   }
 }
 
-export function lesseq(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
-  if (ignoreEps) {
+export function lesseq(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if (ignoreEps || typeof left === 'string' || typeof right === 'string') {
     return left <= right
   } else if (right >= 0) {
     return left <= (1 + eps) * right
@@ -265,8 +265,8 @@ export function lesseq(left: number, right: number, eps: number, ignoreEps: bool
   }
 }
 
-export function greatereq(left: number, right: number, eps: number, ignoreEps: boolean): boolean {
-  if (ignoreEps) {
+export function greatereq(left: number | string, right: number | string, eps: number, ignoreEps: boolean): boolean {
+  if (ignoreEps || typeof left === 'string' || typeof right === 'string') {
     return left >= right
   } else if (right >= 0) {
     return left * (1 + eps) >= right
