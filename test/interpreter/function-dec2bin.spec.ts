@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {CellValueType, ErrorType} from "../../src/Cell";
+import {CellError, HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 
 describe('function DEC2BIN', () => {
   it('should return error when wrong type of argument', () => {
@@ -27,10 +27,10 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(-12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("1")
-    expect(engine.getCellValue(adr('A2'))).toEqual("10")
-    expect(engine.getCellValue(adr('A3'))).toEqual("1100010")
-    expect(engine.getCellValue(adr('A4'))).toEqual("1111110100")
+    expect(engine.getCellValue(adr('A1'))).toEqual('1')
+    expect(engine.getCellValue(adr('A2'))).toEqual('10')
+    expect(engine.getCellValue(adr('A3'))).toEqual('1100010')
+    expect(engine.getCellValue(adr('A4'))).toEqual('1111110100')
   })
 
   it('should work for numeric strings', () => {
@@ -39,8 +39,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("-15")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("1111011")
-    expect(engine.getCellValue(adr('A2'))).toEqual("1111110001")
+    expect(engine.getCellValue(adr('A1'))).toEqual('1111011')
+    expect(engine.getCellValue(adr('A2'))).toEqual('1111110001')
   })
 
   it('should work for reference', () => {
@@ -49,7 +49,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual("1100")
+    expect(engine.getCellValue(adr('A2'))).toEqual('1100')
   })
 
   it('should return string value', () => {

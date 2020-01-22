@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('SUM', () => {
   it('SUM without args',  () => {
@@ -67,7 +67,7 @@ describe('SUM', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['=SUM(MMULT(A1:B2, A1:B2))']
+      ['=SUM(MMULT(A1:B2, A1:B2))'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(54)
@@ -77,7 +77,7 @@ describe('SUM', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
-      ['=SUM(A1:B2)']
+      ['=SUM(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

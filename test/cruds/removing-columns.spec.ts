@@ -1,5 +1,6 @@
 import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
@@ -10,9 +11,8 @@ import {
   expect_reference_to_have_ref_error,
   extractMatrixRange,
   extractRange,
-  extractReference
+  extractReference,
 } from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing columns - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -756,7 +756,7 @@ describe('Removing columns - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 
   it('should throw error when trying to remove non positive number of columns', () => {
     const engine = HyperFormula.buildFromArray([
@@ -764,7 +764,7 @@ describe('Removing columns - sheet dimensions', () => {
     ])
 
     expect(() => engine.removeColumns(0, [1, 0])).toThrowError()
-  });
+  })
 })
 
 describe('Removing columns - column index', () => {

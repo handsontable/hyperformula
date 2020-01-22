@@ -92,6 +92,12 @@ export namespace MoveCellsDependencyTransformer {
           value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
+      case AstNodeType.PLUS_UNARY_OP: {
+        return {
+          type: ast.type,
+          value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
+        }
+      }
       case AstNodeType.MINUS_UNARY_OP: {
         return {
           type: ast.type,
@@ -108,7 +114,7 @@ export namespace MoveCellsDependencyTransformer {
       case AstNodeType.PARENTHESIS: {
         return {
           type: ast.type,
-          expression: transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet)
+          expression: transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       default: {

@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function EVEN", () => {
+describe('Function EVEN', () => {
   it('number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EVEN()', '=EVEN(1, 2)']
+      ['=EVEN()', '=EVEN(1, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -42,7 +42,7 @@ describe("Function EVEN", () => {
   it('propagates error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
-      ['=EVEN(A1)']
+      ['=EVEN(A1)'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

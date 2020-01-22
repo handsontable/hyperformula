@@ -2,8 +2,8 @@ import {EmptyValue, HyperFormula} from '../../src'
 import {Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
-import {adr} from '../testUtils'
 import '../testConfig.ts'
+import {adr} from '../testUtils'
 
 const configWithMatrixPlugin = new Config({functionPlugins: [MatrixPlugin]})
 

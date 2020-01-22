@@ -61,7 +61,7 @@ describe('Disable matrix optimizatoins', () => {
     ]
 
     const engine = HyperFormula.buildFromArray(sheet, config)
-    let matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
+    const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
 
     engine.disableNumericMatrices()
 

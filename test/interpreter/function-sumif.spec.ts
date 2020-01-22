@@ -1,7 +1,7 @@
-import {HyperFormula, Config} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -135,14 +135,14 @@ describe('Function SUMIF - argument validations and combinations', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1'],
       ['2'],
-      ['=SUMIF(A1:A2, ">0", A1:A2)']
+      ['=SUMIF(A1:A2, ">0", A1:A2)'],
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 })
 
-describe("Function SUMIF(S) - calculations and optimizations", () => {
+describe('Function SUMIF(S) - calculations and optimizations', () => {
   it('no coercion when sum', () => {
     const engine =  HyperFormula.buildFromArray([
       ['2', '="3"'],
@@ -222,7 +222,7 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
     expect(engine.getCellValue(adr('A5'))).toEqual(5)
-    expect(engine.stats.sumifFullCacheUsed).toEqual(1)
+    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(1)
   })
 
   it('works with different sheets',  () => {
@@ -245,7 +245,7 @@ describe("Function SUMIF(S) - calculations and optimizations", () => {
     expect(engine.getCellValue(adr('A4', 0))).toEqual(5)
     expect(engine.getCellValue(adr('A5', 0))).toEqual(7)
     expect(engine.getCellValue(adr('A4', 1))).toEqual(70)
-    expect(engine.stats.sumifFullCacheUsed).toEqual(0)
+    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(0)
   })
 
   it('ignore errors', () => {
@@ -382,7 +382,7 @@ describe('Function SUMIFS - argument validations and combinations', () => {
   })
 })
 
-describe("Function SUMIFS - calcultions on more than one criteria", () => {
+describe('Function SUMIFS - calcultions on more than one criteria', () => {
   it('works for more than one criterion/range pair', () => {
     const engine =  HyperFormula.buildFromArray([
       ['0', '100', '3'],

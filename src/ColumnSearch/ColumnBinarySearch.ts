@@ -1,10 +1,10 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
-import {Matrix} from '../Matrix'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {rangeLowerBound} from '../interpreter/binarySearch'
+import {Matrix} from '../Matrix'
 import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 
 export class ColumnBinarySearch implements IColumnSearchStrategy {

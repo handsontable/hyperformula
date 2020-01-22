@@ -1,5 +1,5 @@
+import {ContentChanges} from './ContentChanges'
 import {Vertex} from './DependencyGraph'
-import {ContentChanges} from "./ContentChanges";
 
 export interface Evaluator {
   run(): void,

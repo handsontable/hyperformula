@@ -3,11 +3,10 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
-import {Matrix} from '../../Matrix'
-import {Ast, AstNodeType, ProcedureAst} from '../../parser'
+import {Ast, ProcedureAst} from '../../parser'
+import {coerceScalarToNumber, coerceScalarToString} from '../coerce'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
-import {coerceScalarToNumber} from '../coerce'
 
 interface IImplementedFunctions {
   [functionName: string]: {
@@ -68,6 +67,64 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToNumber, fn)
+  }
+
+  protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => CellValue): CellValue {
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, coerceScalarToString, fn)
+  }
+
+  protected validateTwoNumericArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress): [number, number] | CellError {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const left = this.evaluateAst(ast.args[0], formulaAddress)
+    if (left instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const coercedLeft = coerceScalarToNumber(left)
+    if (coercedLeft instanceof CellError) {
+      return coercedLeft
+    }
+
+    const right = this.evaluateAst(ast.args[1], formulaAddress)
+    if (right instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const coercedRight = coerceScalarToNumber(right)
+    if (coercedRight instanceof CellError) {
+      return coercedRight
+    }
+
+    return [coercedLeft, coercedRight]
+  }
+
+  protected getNumericArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, position: number, min?: number, max?: number): number | CellError {
+    if (position > ast.args.length - 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[position], formulaAddress)
+
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+
+    const value = coerceScalarToNumber(arg)
+    if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    return value
+  }
+
+  private templateWithOneArgumentCoercion(
+      ast: ProcedureAst,
+      formulaAddress: SimpleCellAddress,
+      coerceFunction: (arg: CellValue) => CellValue,
+      fn: (arg: any) => CellValue,
+  ) {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -76,7 +133,7 @@ export abstract class FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedArg = coerceScalarToNumber(arg)
+    const coercedArg = coerceFunction(arg)
     if (coercedArg instanceof CellError) {
       return coercedArg
     } else {

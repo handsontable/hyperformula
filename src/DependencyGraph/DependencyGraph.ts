@@ -1,22 +1,23 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {Ast, AstNodeType} from '../parser'
+import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
+import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
 import {Graph, TopSortResult} from './Graph'
 import {MatrixMapping} from './MatrixMapping'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
-import {collectAddressesDependentToMatrix} from "./collectAddressesDependentToMatrix";
+import {ValueCellVertexValue} from './ValueCellVertex'
 
 export class DependencyGraph {
   /*
@@ -67,7 +68,7 @@ export class DependencyGraph {
     }
   }
 
-  public setValueToCell(address: SimpleCellAddress, newValue: number | string) {
+  public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
     const vertex = this.addressMapping.getCell(address)
     this.ensureThatVertexIsNonMatrixCellVertex(vertex)
 
@@ -511,7 +512,7 @@ export class DependencyGraph {
   }
 
   public getSheetName(sheetId: number): string {
-    return this.sheetMapping.name(sheetId)
+    return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
   public getSheetHeight(sheet: number): number {

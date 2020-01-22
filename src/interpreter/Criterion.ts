@@ -15,11 +15,6 @@ export interface Criterion {
 export const buildCriterion = (operator: CriterionType, value: number | string) => ({ operator, value })
 
 export class CriterionPackage {
-  constructor(
-    public readonly raw: string,
-    public readonly lambda: CriterionLambda,
-  ) {
-  }
 
   public static fromCellValue(raw: CellValue): CriterionPackage | undefined {
     if (typeof raw !== 'string') {
@@ -32,6 +27,11 @@ export class CriterionPackage {
     }
 
     return new CriterionPackage(raw, buildCriterionLambda(criterion))
+  }
+  constructor(
+    public readonly raw: string,
+    public readonly lambda: CriterionLambda,
+  ) {
   }
 }
 

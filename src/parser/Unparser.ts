@@ -1,10 +1,10 @@
+
 import {SimpleCellAddress} from '../Cell'
-import assert from 'assert'
+import {cellAddressToString} from './addressRepresentationConverters'
 import {Ast, AstNodeType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
+import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {cellAddressToString} from "./addressRepresentationConverters";
-import {ILexerConfig, additionalCharactersAllowedInQuotes} from './LexerConfig'
 
 export type SheetMappingFn = (sheetId: number) => string
 
@@ -31,7 +31,7 @@ export class Unparser {
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
         const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        return procedureName + '(' + args + ')'
+        return (procedureName || ast.procedureName) + '(' + args + ')'
       }
       case AstNodeType.CELL_REFERENCE: {
         if (ast.reference.sheet === address.sheet) {
@@ -47,8 +47,12 @@ export class Unparser {
           return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
       }
+      case AstNodeType.PLUS_UNARY_OP: {
+        const unparsedExpr = this.unparseAst(ast.value, address)
+        return '+' + unparsedExpr
+      }
       case AstNodeType.MINUS_UNARY_OP: {
-        let unparsedExpr = this.unparseAst(ast.value, address)
+        const unparsedExpr = this.unparseAst(ast.value, address)
         return '-' + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
@@ -66,8 +70,8 @@ export class Unparser {
         return '(' + expression + ')'
       }
       default: {
-        let left = this.unparseAst(ast.left, address)
-        let right = this.unparseAst(ast.right, address)
+        const left = this.unparseAst(ast.left, address)
+        const right = this.unparseAst(ast.right, address)
         return left + binaryOpTokenMap[ast.type] + right
       }
     }

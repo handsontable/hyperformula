@@ -21,8 +21,8 @@ export class MatrixVertex {
     return new MatrixVertex(range.start, range.width(), range.height(), formula)
   }
   public cellAddress: SimpleCellAddress
-  private formula: Ast | null
   public matrix: IMatrix
+  private formula: Ast | null
 
   constructor(cellAddress: SimpleCellAddress, width: number, height: number, formula?: Ast) {
     this.cellAddress = cellAddress

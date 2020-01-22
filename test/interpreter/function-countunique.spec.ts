@@ -32,7 +32,7 @@ describe('Function COUNTUNIQUE', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 
-  it("theres no coercion", () => {
+  it('theres no coercion', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '="1"'],
       ['=COUNTUNIQUE(A1:B1)'],

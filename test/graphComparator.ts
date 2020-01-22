@@ -10,7 +10,7 @@ import {
   ValueCellVertex,
   Vertex,
 } from '../src/DependencyGraph'
-import {simpleCellAddressToString} from "../src/parser";
+import {simpleCellAddressToString} from '../src/parser'
 
 export class EngineComparator {
 
@@ -82,7 +82,7 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.name, address, 0)} (Sheet '${sheetMapping.name(address.sheet)}') are not same`)
+        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
       }
     }
   }

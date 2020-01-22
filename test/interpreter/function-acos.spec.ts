@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe("Function ACOS", () => {
+describe('Function ACOS', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
 
@@ -50,7 +50,7 @@ describe("Function ACOS", () => {
   it('use number coercion',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['="-1"', '=ACOS(A1)'],
-      ["=TRUE()", '=ACOS(A2)'],
+      ['=TRUE()', '=ACOS(A2)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(3.141592654)

@@ -21,9 +21,8 @@ export enum StatType {
  * Provides tracking performance statistics to the engine
  */
 export class Statistics {
-  public countifFullCacheUsed = 0
-  public countifPartialCacheUsed = 0
-  public sumifFullCacheUsed = 0
+  public criterionFunctionFullCacheUsed = 0
+  public criterionFunctionPartialCacheUsed = 0
   private readonly stats: Map<StatType, number> = new Map<StatType, number>()
   private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
 
@@ -31,9 +30,8 @@ export class Statistics {
    * Resets statistics
    */
   public reset(): void {
-    this.countifFullCacheUsed = 0
-    this.countifPartialCacheUsed = 0
-    this.sumifFullCacheUsed = 0
+    this.criterionFunctionFullCacheUsed = 0
+    this.criterionFunctionPartialCacheUsed = 0
     this.stats.clear()
     this.startTimes.clear()
   }

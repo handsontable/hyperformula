@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Operator MINUS", () => {
+describe('Operator MINUS', () => {
   it('works for obvious case', () => {
     const engine = HyperFormula.buildFromArray([
       ['=8-3'],
@@ -25,7 +25,7 @@ describe("Operator MINUS", () => {
   it('pass error from left operand', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2-3'],
-      ['=4/0']
+      ['=4/0'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -34,7 +34,7 @@ describe("Operator MINUS", () => {
   it('pass error from right operand', () => {
     const engine = HyperFormula.buildFromArray([
       ['=3-A2'],
-      ['=4/0']
+      ['=4/0'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -43,7 +43,7 @@ describe("Operator MINUS", () => {
   it('pass error from left operand if both operands have error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2-B2'],
-      ['=FOOBAR()', '=4/0']
+      ['=FOOBAR()', '=4/0'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))

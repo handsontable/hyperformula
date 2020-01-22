@@ -1,11 +1,18 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {dateNumberToMoment, dateNumberToMonthNumber, dateNumberToYearNumber, momentToDateNumber, toDateNumber} from '../../Date'
+import {
+  dateNumberToDayOfMonth,
+  dateNumberToMoment,
+  dateNumberToMonthNumber,
+  dateNumberToYearNumber, daysBetween,
+  momentToDateNumber,
+  toDateNumber,
+} from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
-import {dateNumberRepresentation, coerceScalarToNumber} from '../coerce'
-import {FunctionPlugin} from './FunctionPlugin'
+import {coerceScalarToNumber, dateNumberRepresentation} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
@@ -26,6 +33,12 @@ export class DatePlugin extends FunctionPlugin {
     },
     eomonth: {
       translationKey: 'EOMONTH',
+    },
+    day: {
+      translationKey: 'DAY',
+    },
+    days: {
+      translationKey: 'DAYS',
     },
   }
 
@@ -101,7 +114,50 @@ export class DatePlugin extends FunctionPlugin {
     return momentToDateNumber(dateMoment)
   }
 
-  /**
+  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const arg = this.evaluateAst(ast.args[0], formulaAddress)
+    if (arg instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const dateNumber = dateNumberRepresentation(arg, this.config.dateFormat)
+    if (dateNumber instanceof CellError) {
+      return dateNumber
+    }
+
+    return dateNumberToDayOfMonth(dateNumber)
+  }
+
+  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const endDate = this.evaluateAst(ast.args[0], formulaAddress)
+    if (endDate instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const endDateNumber = dateNumberRepresentation(endDate, this.config.dateFormat)
+    if (endDateNumber instanceof CellError) {
+      return endDateNumber
+    }
+
+    const startDate = this.evaluateAst(ast.args[1], formulaAddress)
+    if (startDate instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    const startDateNumber = dateNumberRepresentation(startDate, this.config.dateFormat)
+    if (startDateNumber instanceof CellError) {
+      return startDateNumber
+    }
+
+    return daysBetween(endDateNumber, startDateNumber)
+  }
+
+    /**
    * Corresponds to MONTH(date)
    *
    * Returns the month of the year specified by a given date

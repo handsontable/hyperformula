@@ -1,7 +1,7 @@
-import {SheetCellAddress, SimpleCellAddress} from "../../Cell";
-import {CellVertex} from "../Vertex";
-import {RowsSpan} from "../../RowsSpan";
-import {ColumnsSpan} from "../../ColumnsSpan";
+import {SheetCellAddress, SimpleCellAddress} from '../../Cell'
+import {ColumnsSpan} from '../../ColumnsSpan'
+import {RowsSpan} from '../../RowsSpan'
+import {CellVertex} from '../Vertex'
 
 export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 /**

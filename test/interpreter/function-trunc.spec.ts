@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function TRUNC", () => {
+describe('Function TRUNC', () => {
   it('number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=TRUNC()', '=TRUNC(1, 2, 3)']
+      ['=TRUNC()', '=TRUNC(1, 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -60,7 +60,7 @@ describe("Function TRUNC", () => {
   it('propagates error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
-      ['=TRUNC(A1)', '=TRUNC(42, A1)', '=TRUNC(A1, FOO())']
+      ['=TRUNC(A1)', '=TRUNC(42, A1)', '=TRUNC(A1, FOO())'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

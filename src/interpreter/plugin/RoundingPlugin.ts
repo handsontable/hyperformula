@@ -1,8 +1,8 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {FunctionPlugin} from './FunctionPlugin'
-import {SimpleRangeValue} from '../InterpreterValue'
 import {coerceScalarToNumber} from '../coerce'
+import {SimpleRangeValue} from '../InterpreterValue'
+import {FunctionPlugin} from './FunctionPlugin'
 
 type RoundingFunction = (numberToRound: number, places: number) => number
 
@@ -38,7 +38,10 @@ export class RoundingPlugin extends FunctionPlugin {
     },
     odd: {
       translationKey: 'ODD',
-    }
+    },
+    ceiling: {
+      translationKey: 'CEILING',
+    },
   }
 
   public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -106,6 +109,47 @@ export class RoundingPlugin extends FunctionPlugin {
         return findNextOddNumber(coercedNumberToRound)
       }
     })
+  }
+
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+    if (ast.args.length < 1 || ast.args.length > 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const value = this.getNumericArgument(ast, formulaAddress, 0)
+    if (value instanceof CellError) {
+      return value
+    }
+
+    let significance: number | CellError = 1
+    if (ast.args.length >= 2) {
+      significance = this.getNumericArgument(ast, formulaAddress, 1)
+      if (significance instanceof CellError) {
+        return significance
+      }
+    }
+
+    let mode: number | CellError = 0
+    if (ast.args.length === 3) {
+      mode = this.getNumericArgument(ast, formulaAddress, 2)
+      if (mode instanceof CellError) {
+        return mode
+      }
+    }
+
+    if (significance === 0 || value === 0) {
+      return 0
+    }
+
+    if ((value > 0) != (significance > 0) && ast.args.length > 1) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    if (mode === 0) {
+      significance = Math.abs(significance)
+    }
+
+    return Math.ceil(value / significance) * significance
   }
 
   private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): CellValue {

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
 describe('SUMSQ', () => {
   it('SUMSQ without args',  () => {
@@ -12,7 +12,7 @@ describe('SUMSQ', () => {
 
   it('SUMSQ with args', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUMSQ(1, B1)', '2']
+      ['=SUMSQ(1, B1)', '2'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5)
@@ -21,7 +21,7 @@ describe('SUMSQ', () => {
   it('SUMSQ with range args',  () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '5'],
-      ['3', '4', '=SUMSQ(A1:B2)']
+      ['3', '4', '=SUMSQ(A1:B2)'],
     ])
     expect(engine.getCellValue(adr('C2'))).toEqual(30)
   })
@@ -49,7 +49,7 @@ describe('SUMSQ', () => {
 
   it('range only with empty value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['', '=SUMSQ(A1:A1)']
+      ['', '=SUMSQ(A1:A1)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
@@ -57,7 +57,7 @@ describe('SUMSQ', () => {
 
   it('range only with some empty values', () => {
     const engine = HyperFormula.buildFromArray([
-      ['42', '', '13', '=SUMSQ(A1:C1)']
+      ['42', '', '13', '=SUMSQ(A1:C1)'],
     ])
 
     expect(engine.getCellValue(adr('D1'))).toEqual(1933)
@@ -67,7 +67,7 @@ describe('SUMSQ', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-      ['=SUMSQ(MMULT(A1:B2, A1:B2))']
+      ['=SUMSQ(MMULT(A1:B2, A1:B2))'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(858)
@@ -77,7 +77,7 @@ describe('SUMSQ', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
-      ['=SUMSQ(A1:B2)']
+      ['=SUMSQ(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

@@ -1,6 +1,7 @@
 import {Config} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB, plPL} from '../../src/i18n'
 import {
   AstNodeType,
   CellAddress,
@@ -17,8 +18,7 @@ import {
   ProcedureAst,
   StringAst,
 } from '../../src/parser'
-import {enGB, plPL} from "../../src/i18n";
-import {ParenthesisAst} from "../../src/parser/Ast";
+import {ParenthesisAst} from '../../src/parser/Ast'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {
@@ -362,7 +362,7 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(1)
   })
 
-  xit('sheet name is case insensitive', () => {
+  it('sheet name is case insensitive', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')

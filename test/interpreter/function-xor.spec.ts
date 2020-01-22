@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function XOR", () => {
+describe('Function XOR', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([
       ['=XOR(TRUE(), TRUE())'],
@@ -50,7 +50,7 @@ describe("Function XOR", () => {
 
   it('when no coercible to number arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=XOR("foo")']
+      ['=XOR("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
@@ -72,7 +72,7 @@ describe("Function XOR", () => {
     const engine = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['=FOOBAR()', '1'],
-      ['=XOR(A1:B2)']
+      ['=XOR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -82,7 +82,7 @@ describe("Function XOR", () => {
     const engine = HyperFormula.buildFromArray([
       ['0', '0'],
       ['0', '1'],
-      ['=XOR(A1:B2)']
+      ['=XOR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(true)
@@ -92,7 +92,7 @@ describe("Function XOR", () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['0', '1'],
-      ['=XOR(A1:B2)']
+      ['=XOR(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

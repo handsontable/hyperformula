@@ -1,5 +1,5 @@
+import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
-import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from "./DependencyGraph";
 
 /**
  * Possible errors returned by our interpreter.
@@ -29,7 +29,7 @@ export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
   MATRIX = 'MATRIX',
-  EMPTY = 'EMPTY'
+  EMPTY = 'EMPTY',
 }
 
 export const getCellType = (vertex: CellVertex | null): CellType => {
@@ -52,7 +52,7 @@ export enum CellValueType {
   NUMBER = 'NUMBER',
   STRING = 'STRING',
   EMPTY = 'EMPTY',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
 }
 
 export const getCellValueType = (cellValue: CellValue): CellValueType => {
@@ -65,15 +65,15 @@ export const getCellValueType = (cellValue: CellValue): CellValueType => {
   }
 
   switch (typeof cellValue) {
-    case "string":
+    case 'string':
       return CellValueType.STRING
-    case "number":
+    case 'number':
       return CellValueType.NUMBER
-    case "boolean":
+    case 'boolean':
       return CellValueType.BOOLEAN
   }
 
-  throw new Error("Cell value not computed")
+  throw new Error('Cell value not computed')
 }
 
 export class CellError {

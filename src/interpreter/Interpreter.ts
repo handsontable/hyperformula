@@ -1,4 +1,4 @@
-import {GPU} from 'gpu.js'
+import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
@@ -6,15 +6,15 @@ import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType} from '../parser/Ast'
+import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {add, divide, multiply, percent, power, subtract, unaryminus} from './scalar'
 import {coerceScalarToNumber} from './coerce'
-import {concatenate} from './text'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {add, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
+import {concatenate} from './text'
 
 export class Interpreter {
-  private gpu?: GPU
+  private gpu?: GPU.GPU
   private readonly pluginCache: Map<string, [any, string]> = new Map()
 
   constructor(
@@ -161,6 +161,13 @@ export class Interpreter {
         }
         return divide(coerceScalarToNumber(leftResult), coerceScalarToNumber(rightResult))
       }
+      case AstNodeType.PLUS_UNARY_OP: {
+        const result = this.evaluateAst(ast.value, formulaAddress)
+        if (result instanceof SimpleRangeValue) {
+          return new CellError(ErrorType.VALUE)
+        }
+        return unaryplus(coerceScalarToNumber(result))
+      }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
@@ -190,13 +197,13 @@ export class Interpreter {
         if (matrixVertex) {
           const matrix = matrixVertex.matrix
           if (matrix instanceof NotComputedMatrix) {
-            throw "Matrix should be already computed"
+            throw new Error('Matrix should be already computed')
           } else if (matrix instanceof CellError) {
             return matrix
           } else if (matrix instanceof Matrix) {
             return SimpleRangeValue.onlyNumbersDataWithRange(matrix.raw(), matrix.size, range)
           } else {
-            throw "Unknown matrix"
+            throw new Error('Unknown matrix')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -209,7 +216,8 @@ export class Interpreter {
         if (ast.error !== undefined) {
           return ast.error
         }
-        if (ast.args[0].type === 'StaticOffsetOutOfRangeError') {
+        /* TODO tidy up parsing errors */
+        if (ast.args.length > 0 && ast.args[0].type === ParsingErrorType.StaticOffsetOutOfRangeError) {
           return new CellError(ErrorType.REF)
         }
         return new CellError(ErrorType.NAME)
@@ -217,11 +225,12 @@ export class Interpreter {
     }
   }
 
-  public getGpuInstance(): GPU {
+  public getGpuInstance(): GPU.GPU {
     if (!this.gpu) {
-      this.gpu = new GPU({mode: this.config.gpuMode, format: "Float"})
+      const GPUConstructor = GPU.GPU || GPU
+      this.gpu = new GPUConstructor({mode: this.config.gpuMode })
     }
-    return this.gpu;
+    return this.gpu
   }
 
   public destroy() {

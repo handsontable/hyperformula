@@ -1,6 +1,6 @@
-import {Index} from "./HyperFormula";
-import {SimpleCellAddress} from "./Cell";
-import {RawCellContent} from "./CellContentParser";
+import {SimpleCellAddress} from './Cell'
+import {RawCellContent} from './CellContentParser'
+import {Index} from './HyperFormula'
 
 export interface IBatchExecutor {
   addRows: (sheet: number, ...indexes: Index[]) => void
@@ -11,4 +11,3 @@ export interface IBatchExecutor {
   setCellContent: (address: SimpleCellAddress, newCellContent: RawCellContent) => void
   clearSheet: (sheet: string) => void
 }
-

@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function AND", () => {
+describe('Function AND', () => {
   it('usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())'],
@@ -37,7 +37,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '1'],
-      ['=AND(A1:B2)']
+      ['=AND(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -47,7 +47,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
-      ['=AND(A1:B2)']
+      ['=AND(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(true)
@@ -65,7 +65,7 @@ describe("Function AND", () => {
     const engine = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['1', '1'],
-      ['=AND(A1:B2)']
+      ['=AND(A1:B2)'],
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

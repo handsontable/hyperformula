@@ -50,4 +50,3 @@ describe('Function TAN', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })
-

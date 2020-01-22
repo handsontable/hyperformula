@@ -1,7 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
+import {ErrorType} from '../Cell'
+import {TranslationPackage} from '../i18n'
 import {ParserConfig} from './ParserConfig'
-import {ErrorType} from "../Cell";
-import {TranslationPackage} from "../i18n";
 
 /* arithmetic */
 // abstract for + -
@@ -39,47 +39,47 @@ export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
 export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
-export const additionalCharactersAllowedInQuotes = " " // It's included in regexps, so escape characters which have special regexp semantics
+export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
 export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
 export const RelativeCell = createToken({
   name: 'RelativeCell',
   pattern: /[A-Za-z]+[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const AbsoluteColCell = createToken({
   name: 'AbsoluteColCell',
   pattern: /\$[A-Za-z]+[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const AbsoluteRowCell = createToken({
   name: 'AbsoluteRowCell',
   pattern: /[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const AbsoluteCell = createToken({
   name: 'AbsoluteCell',
   pattern: /\$[A-Za-z]+\$[0-9]+/,
-  categories: CellReference
+  categories: CellReference,
 })
 export const SheetRelativeCell = createToken({
   name: 'SheetRelativeCell',
   pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+[0-9]+`),
-  categories: CellReference
+  categories: CellReference,
 })
 export const SheetAbsoluteColCell = createToken({
   name: 'SheetAbsoluteColCell',
   pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+[0-9]+`),
-  categories: CellReference
+  categories: CellReference,
 })
 export const SheetAbsoluteRowCell = createToken({
   name: 'SheetAbsoluteRowCell',
   pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference
+  categories: CellReference,
 })
 export const SheetAbsoluteCell = createToken({
   name: 'SheetAbsoluteCell',
   pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference
+  categories: CellReference,
 })
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
@@ -97,7 +97,7 @@ export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
 /* error literal */
-export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z\/]+[\?\!]?/})
+export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
 /* skipping whitespaces */
 export const WhiteSpace = createToken({
@@ -117,12 +117,12 @@ export interface ILexerConfig {
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   /* separator */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
-  const offsetProcedureNameLiteral = config.language.functions['OFFSET'] || 'OFFSET'
+  const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
   const OffsetProcedureName = createToken({
     name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
+    pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
   })
-  const errorMapping = buildErrorMapping(config.language)
+  const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.language)
 
   /* order is important, first pattern is used */
@@ -168,15 +168,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     OffsetProcedureName,
     allTokens,
     errorMapping,
-    functionMapping
+    functionMapping,
   }
-}
-
-const buildErrorMapping = (language: TranslationPackage): Record<string, ErrorType> => {
-  return Object.keys(language.errors).reduce((ret, key) => {
-    ret[language.errors[key as ErrorType]] = key as ErrorType
-    return ret
-  }, {} as Record<string, ErrorType>)
 }
 
 const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {

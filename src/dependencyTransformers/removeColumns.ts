@@ -2,7 +2,7 @@ import {ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {fixFormulaVertexColumn, transformAddressesInFormula, CellAddressTransformerFunction, CellRangeTransformerFunction} from './common'
+import {CellAddressTransformerFunction, CellRangeTransformerFunction, fixFormulaVertexColumn, transformAddressesInFormula} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(removedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {

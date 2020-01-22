@@ -1,4 +1,4 @@
-import {count, empty, first, split} from '../src/generatorUtils'
+import {empty, first, split} from '../src/generatorUtils'
 
 describe('empty', () => {
   it('works', () => {
@@ -48,14 +48,5 @@ describe('first', () => {
     const arr = [42, 43]
 
     expect(first(arr[Symbol.iterator]())).toEqual(42)
-  })
-})
-
-describe('count', () => {
-  it('works', () => {
-    expect(count([][Symbol.iterator]())).toBe(0)
-    expect(count([42][Symbol.iterator]())).toBe(1)
-    expect(count([42, 42][Symbol.iterator]())).toBe(2)
-    expect(count([42, 42, 42][Symbol.iterator]())).toBe(3)
   })
 })

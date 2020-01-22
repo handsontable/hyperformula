@@ -1,7 +1,7 @@
 import {Config} from '../src'
 import {dateNumberToString} from './testUtils'
 
-describe("test utils", () => {
+describe('test utils', () => {
   it ('#dateNumberToString should return properly formatted  date', () => {
     expect(dateNumberToString(0, Config.defaultConfig.dateFormat)).toEqual('12/30/1899')
     expect(dateNumberToString(2, Config.defaultConfig.dateFormat)).toEqual('01/01/1900')

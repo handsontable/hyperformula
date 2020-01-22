@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe("Function COS", () => {
+describe('Function COS', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=COS(0)']])
 

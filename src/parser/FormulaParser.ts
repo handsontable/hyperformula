@@ -1,6 +1,7 @@
 import {EmbeddedActionsParser, ILexingResult, IOrAlt, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -18,9 +19,11 @@ import {
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNotEqualOpAst,
-  buildNumberAst, buildParenthesisAst,
+  buildNumberAst,
+  buildParenthesisAst,
   buildPercentOpAst,
   buildPlusOpAst,
+  buildPlusUnaryOpAst,
   buildPowerOpAst,
   buildProcedureAst,
   buildStringAst,
@@ -29,7 +32,6 @@ import {
   ParsingErrorType,
 } from './Ast'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   AdditionOp,
   BooleanOp,
@@ -77,6 +79,14 @@ import {
  * P -> SUM(..) <br/>
  */
 export class FormulaParser extends EmbeddedActionsParser {
+
+  /**
+   * Entry rule
+   */
+  public formula: AstRule = this.RULE('formula', () => {
+    this.CONSUME(EqualsOp)
+    return this.SUBRULE(this.booleanExpression)
+  })
   private lexerConfig: ILexerConfig
 
   /**
@@ -90,55 +100,6 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Cache for positiveAtomicExpression alternatives
    */
   private atomicExpCache: OrArg | undefined
-
-  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
-    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
-    this.lexerConfig = lexerConfig
-    this.sheetMapping = sheetMapping
-    this.performSelfAnalysis()
-  }
-
-  /**
-   * Parses tokenized formula and builds abstract syntax tree
-   *
-   * @param lexResult - tokenized formula
-   * @param formulaAddress - address of the cell in which formula is located
-   */
-  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
-    this.input = lexResult.tokens
-
-    const ast = this.formulaWithContext(formulaAddress)
-    const errors = this.errors
-
-    if (errors.length > 0) {
-      return buildErrorAst(errors.map((e) =>
-          ({
-            type: ParsingErrorType.ParserError,
-            message: e.message,
-          }),
-      ))
-    }
-
-    return ast
-  }
-
-  /**
-   * Entry rule
-   */
-  public formula: AstRule = this.RULE('formula', () => {
-    this.CONSUME(EqualsOp)
-    return this.SUBRULE(this.booleanExpression)
-  })
-
-  /**
-   * Entry rule wrapper that sets formula address
-   *
-   * @param address - address of the cell in which formula is located
-   */
-  private formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
-  }
 
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
@@ -264,9 +225,17 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          this.CONSUME(MinusOp)
+          const op = this.CONSUME(AdditionOp)
           const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
-          return buildMinusUnaryOpAst(value)
+          if (tokenMatcher(op, PlusOp)) {
+            return buildPlusUnaryOpAst(value)
+          }
+          else if (tokenMatcher(op, MinusOp)) {
+            return buildMinusUnaryOpAst(value)
+          }
+          else {
+            return buildErrorAst([])
+          }
         },
       },
       {
@@ -330,7 +299,10 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (errorType) {
             return buildCellErrorAst(new CellError(errorType))
           } else {
-            return buildErrorAst([])
+            return buildErrorAst([{
+              type: ParsingErrorType.ParserError,
+              message: 'Unknown error literal'
+            }])
           }
         },
       },
@@ -484,6 +456,47 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParenthesisAst(expression)
   })
 
+  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
+    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
+    this.lexerConfig = lexerConfig
+    this.sheetMapping = sheetMapping
+    this.performSelfAnalysis()
+  }
+
+  /**
+   * Parses tokenized formula and builds abstract syntax tree
+   *
+   * @param lexResult - tokenized formula
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
+    this.input = lexResult.tokens
+
+    const ast = this.formulaWithContext(formulaAddress)
+    const errors = this.errors
+
+    if (errors.length > 0) {
+      return buildErrorAst(errors.map((e) =>
+          ({
+            type: ParsingErrorType.ParserError,
+            message: e.message,
+          }),
+      ))
+    }
+
+    return ast
+  }
+
+  /**
+   * Entry rule wrapper that sets formula address
+   *
+   * @param address - address of the cell in which formula is located
+   */
+  private formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
+  }
+
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
    *
@@ -501,6 +514,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     let rowShift
     if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
       rowShift = rowsArg.value
+    } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
+      rowShift = rowsArg.value.value
     } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
       rowShift = -rowsArg.value.value
     } else {
@@ -513,6 +528,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     let colShift
     if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
       colShift = columnsArg.value
+    } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
+      colShift = columnsArg.value.value
     } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
       colShift = -columnsArg.value.value
     } else {
@@ -608,7 +625,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 }
 
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
-type OrArg = Array<IOrAlt> | OrMethodOpts
+type OrArg = IOrAlt[] | OrMethodOpts
 
 export class FormulaLexer {
   private readonly lexer: Lexer

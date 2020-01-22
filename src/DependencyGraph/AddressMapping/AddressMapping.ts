@@ -4,9 +4,9 @@ import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'
-import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {CellVertex} from '../Vertex'
-import {IAddressMappingStrategy} from "./IAddressMappingStrategy";
+import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
+import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
 /**
  * Returns actual width, height and fill ratio of a sheet
@@ -231,7 +231,7 @@ export class AddressMapping {
     if (sheetMapping) {
       yield* sheetMapping.getEntries(sheet)
     } else {
-      throw new Error("Sheet does not exists")
+      throw new Error('Sheet does not exists')
     }
   }
 

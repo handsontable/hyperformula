@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Percent operator", () => {
+describe('Percent operator', () => {
   it('works for obvious case', () => {
     const engine = HyperFormula.buildFromArray([
       ['=3%'],
@@ -27,7 +27,7 @@ describe("Percent operator", () => {
   it('pass reference', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2%'],
-      ['=42']
+      ['=42'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0.42)
@@ -36,7 +36,7 @@ describe("Percent operator", () => {
   it('pass error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=A2%'],
-      ['=FOOBAR()']
+      ['=FOOBAR()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))

@@ -6,7 +6,7 @@ import {adr, dateNumberToString} from '../testUtils'
 describe('Function DATE', () => {
   it('with 3 numerical arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)']
+      ['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)

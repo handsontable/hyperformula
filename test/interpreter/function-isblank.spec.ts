@@ -15,7 +15,7 @@ describe('Function ISBLANK', () => {
 
   it('should return false for empty string', () => {
     const engine = HyperFormula.buildFromArray([['', '=ISBLANK(A1)']])
-    expect(engine.getCellValue(adr("B1"))).toEqual(false)
+    expect(engine.getCellValue(adr('B1'))).toEqual(false)
   })
 
   it('should return false if it is not reference to empty cell', () => {

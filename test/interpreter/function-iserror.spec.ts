@@ -3,7 +3,7 @@ import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
-describe("Function ISERROR", () => {
+describe('Function ISERROR', () => {
   it('should return true for common errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],

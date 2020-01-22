@@ -1,10 +1,10 @@
 import {Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
 import {adr, expect_array_with_same_content, extractMatrixRange} from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -301,7 +301,7 @@ describe('Adding row - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 })
 
 describe('Adding row - column index', () => {

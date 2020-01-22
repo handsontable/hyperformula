@@ -1,6 +1,6 @@
 import {CellError} from '../Cell'
 
-type ValueCellVertexValue = number | boolean | string | CellError
+export type ValueCellVertexValue = number | boolean | string | CellError
 
 /**
  * Represents vertex which keeps static cell value

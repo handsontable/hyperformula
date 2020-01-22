@@ -1,3 +1,4 @@
+
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
   CellType,
@@ -6,10 +7,13 @@ import {
   getCellType,
   getCellValueType,
   simpleCellAddress,
-  SimpleCellAddress
+  SimpleCellAddress,
 } from './Cell'
+import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
+import {CellValueChange, ContentChanges} from './ContentChanges'
+import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -19,19 +23,15 @@ import {
   MatrixVertex,
   RangeMapping,
   SheetMapping,
-  Vertex
+  Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
+import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser,} from './parser'
+import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {CellValueChange, ContentChanges} from "./ContentChanges";
-import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from "./CrudOperations";
-import {IBatchExecutor} from "./IBatchExecutor";
-import {isMatrix, RawCellContent} from './CellContentParser'
-import {type} from "os";
 
 export class NoSheetWithIdError extends Error {
   constructor(sheetId: number) {
@@ -58,26 +58,27 @@ export type Index = [number, number]
  */
 export class HyperFormula {
 
-  private crudOperations: CrudOperations
+  public static version = (process.env.HT_VERSION || '')
+  public static buildDate = (process.env.HT_BUILD_DATE || '')
 
-  constructor(
-      /** Engine config */
-      public readonly config: Config,
-      /** Statistics module for benchmarking */
-      public readonly stats: Statistics,
-      /** Dependency graph storing sheets structure */
-      public readonly dependencyGraph: DependencyGraph,
-      /** Column search strategy used by VLOOKUP plugin */
-      public readonly columnSearch: IColumnSearchStrategy,
-      /** Parser with caching */
-      private readonly parser: ParserWithCaching,
-      private readonly unparser: Unparser,
-      /** Formula evaluator */
-      public readonly evaluator: Evaluator,
-      /** Service handling postponed CRUD transformations */
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-  ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, lazilyTransformingAstService)
+  public get graph(): Graph<Vertex> {
+    return this.dependencyGraph.graph
+  }
+
+  public get rangeMapping(): RangeMapping {
+    return this.dependencyGraph.rangeMapping
+  }
+
+  public get matrixMapping(): MatrixMapping {
+    return this.dependencyGraph.matrixMapping
+  }
+
+  public get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  public get addressMapping(): AddressMapping {
+    return this.dependencyGraph.addressMapping
   }
 
   /**
@@ -109,24 +110,27 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  public get graph(): Graph<Vertex> {
-    return this.dependencyGraph.graph
-  }
+  private crudOperations: CrudOperations
 
-  public get rangeMapping(): RangeMapping {
-    return this.dependencyGraph.rangeMapping
-  }
-
-  public get matrixMapping(): MatrixMapping {
-    return this.dependencyGraph.matrixMapping
-  }
-
-  public get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
-  }
-
-  public get addressMapping(): AddressMapping {
-    return this.dependencyGraph.addressMapping
+  constructor(
+      /** Engine config */
+      public readonly config: Config,
+      /** Statistics module for benchmarking */
+      public readonly stats: Statistics,
+      /** Dependency graph storing sheets structure */
+      public readonly dependencyGraph: DependencyGraph,
+      /** Column search strategy used by VLOOKUP plugin */
+      public readonly columnSearch: IColumnSearchStrategy,
+      /** Parser with caching */
+      private readonly parser: ParserWithCaching,
+      private readonly unparser: Unparser,
+      private readonly cellContentParser: CellContentParser,
+      /** Formula evaluator */
+      public readonly evaluator: Evaluator,
+      /** Service handling postponed CRUD transformations */
+      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+  ) {
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
   }
 
   /**
@@ -137,7 +141,6 @@ export class HyperFormula {
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.dependencyGraph.getCellValue(address)
   }
-
 
   /**
    * Returns normalized formula string from the cell with the given address.
@@ -152,7 +155,7 @@ export class HyperFormula {
     } else if (formulaVertex instanceof MatrixVertex) {
       const formula = formulaVertex.getFormula()
       if (formula) {
-        return "{" + this.unparser.unparse(formula, formulaVertex.getAddress()) + "}"
+        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
       }
     }
     return undefined
@@ -186,7 +189,7 @@ export class HyperFormula {
    */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
     const sheetDimensions = new Map<string, { width: number, height: number }>()
-    for (const sheetName of this.sheetMapping.names()) {
+    for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions.set(sheetName, {
         width: this.dependencyGraph.getSheetWidth(sheetId),
@@ -520,10 +523,10 @@ export class HyperFormula {
    * @param sheetName - sheet name
    * @param values - array of new values
    * */
-  public replaceSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
+  public setSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
 
-    const sheetId = this.sheetId(sheetName)!
+    const sheetId = this.getSheetId(sheetName)!
 
     return this.batch((e) => {
       e.clearSheet(sheetName)
@@ -574,7 +577,7 @@ export class HyperFormula {
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
-    return simpleCellAddressToString(this.sheetMapping.name, address, sheet)
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
   /**
@@ -585,8 +588,8 @@ export class HyperFormula {
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
    */
-  public sheetName(sheetId: number): string | undefined {
-    return this.sheetMapping.getName(sheetId)
+  public getSheetName(sheetId: number): string | undefined {
+    return this.sheetMapping.getDisplayName(sheetId)
   }
 
   /**
@@ -597,7 +600,7 @@ export class HyperFormula {
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
    */
-  public sheetId(sheetName: string): number | undefined {
+  public getSheetId(sheetName: string): number | undefined {
     return this.sheetMapping.get(sheetName)
   }
 
@@ -670,7 +673,7 @@ export class HyperFormula {
   /**
    * Returns number of existing sheets
    */
-  public numberOfSheets(): number {
+  public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
   }
 

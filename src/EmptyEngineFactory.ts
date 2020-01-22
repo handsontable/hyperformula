@@ -1,7 +1,8 @@
 import {Config, HyperFormula, LazilyTransformingAstService} from './'
+import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph} from './DependencyGraph'
-import {ParserWithCaching, Unparser, buildLexerConfig} from './parser'
+import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics} from './statistics/Statistics'
 
@@ -12,8 +13,9 @@ export class EmptyEngineFactory {
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
-    const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.fetchDisplayName)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats)
+    const cellContentParser = new CellContentParser(config)
     lazilyTransformingAstService.parser = parser
     const engine = new HyperFormula(
       config,
@@ -22,6 +24,7 @@ export class EmptyEngineFactory {
       columnIndex,
       parser,
       unparser,
+      cellContentParser,
       evaluator,
       lazilyTransformingAstService,
     )

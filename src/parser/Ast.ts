@@ -8,6 +8,7 @@ export type Ast =
   | CellRangeAst
   | ConcatenateOpAst
   | MinusUnaryOpAst
+  | PlusUnaryOpAst
   | PercentOpAst
   | EqualsOpAst
   | NotEqualOpAst
@@ -42,6 +43,7 @@ export enum AstNodeType {
   STRING = 'STRING',
 
   MINUS_UNARY_OP = 'MINUS_UNARY_OP',
+  PLUS_UNARY_OP = 'PLUS_UNARY_OP',
 
   PERCENT_OP = 'PERCENT_OP',
 
@@ -212,6 +214,16 @@ export const buildMinusUnaryOpAst = (value: Ast): MinusUnaryOpAst => ({
   value,
 })
 
+export interface PlusUnaryOpAst {
+  type: AstNodeType.PLUS_UNARY_OP,
+  value: Ast,
+}
+
+export const buildPlusUnaryOpAst = (value: Ast): PlusUnaryOpAst => ({
+  type: AstNodeType.PLUS_UNARY_OP,
+  value,
+})
+
 export interface TimesOpAst extends BinaryOpAst {
   type: AstNodeType.TIMES_OP,
 }
@@ -249,7 +261,7 @@ export interface PercentOpAst {
 
 export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
   type: AstNodeType.PERCENT_OP,
-  value: value
+  value,
 })
 
 export interface ProcedureAst {
@@ -271,7 +283,7 @@ export interface ParenthesisAst {
 
 export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
   type: AstNodeType.PARENTHESIS,
-  expression
+  expression,
 })
 
 export interface ErrorAst {

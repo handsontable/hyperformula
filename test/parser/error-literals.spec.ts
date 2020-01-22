@@ -1,8 +1,8 @@
-import {AstNodeType, CellAddress, ErrorAst, ParserWithCaching, StringAst} from "../../src/parser";
-import {Config} from "../../src";
-import {SheetMapping} from "../../src/DependencyGraph";
-import {enGB, plPL} from "../../src/i18n";
-import {ErrorType} from "../../src/Cell";
+import {Config} from '../../src'
+import {ErrorType} from '../../src/Cell'
+import {SheetMapping} from '../../src/DependencyGraph'
+import {enGB, plPL} from '../../src/i18n'
+import {AstNodeType, CellAddress, ErrorAst, ParserWithCaching} from '../../src/parser'
 
 describe('Parsing error literals', () => {
   it('should parse error literals', () => {
@@ -31,5 +31,19 @@ describe('Parsing error literals', () => {
     const ast = parser.parse('=#ARG!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error!.type).toEqual(ErrorType.VALUE)
+  })
+
+  it('should parse #DIV/0!', () => {
+    const parser = new ParserWithCaching(new Config({language: enGB}), new SheetMapping(enGB).get)
+    const ast = parser.parse('=#DIV/0!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error!.type).toEqual(ErrorType.DIV_BY_ZERO)
+  })
+
+  it('should return parser error', () => {
+    const parser = new ParserWithCaching(new Config({language: enGB}), new SheetMapping(enGB).get)
+    const ast = parser.parse('=#UNKNOWN!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error).toBe(undefined)
   })
 })

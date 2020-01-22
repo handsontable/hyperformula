@@ -1,9 +1,9 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Unary operator MINUS", () => {
+describe('Unary operator MINUS', () => {
   it('works for obvious case', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-3'],
@@ -25,7 +25,7 @@ describe("Unary operator MINUS", () => {
   it('pass error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-A2'],
-      ['=FOOBAR()']
+      ['=FOOBAR()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))

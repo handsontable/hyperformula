@@ -1,6 +1,6 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
+import {plPL} from '../../src/i18n'
 import '../testConfig'
-import {plPL} from "../../src/i18n";
 import {adr} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
@@ -12,8 +12,8 @@ describe('Adding sheet - checking if its possible', () => {
 
   it('no', () => {
     const engine = HyperFormula.buildFromSheets({
-      'Sheet1': [],
-      'Foo': [],
+      Sheet1: [],
+      Foo: [],
     })
 
     expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(false)
@@ -28,7 +28,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1'])
   })
 
   it('should add sheet to engine with one sheet', function() {
@@ -39,7 +39,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(2)
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Sheet1', 'Sheet2'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet2'])
   })
 
   it('should be possible to fetch empty cell from newly added sheet', function() {
@@ -56,7 +56,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['Arkusz1'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Arkusz1'])
   })
 
   it('should add sheet with given name', function() {
@@ -65,7 +65,18 @@ describe('add sheet to engine', () => {
     engine.addSheet('foo')
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.names())).toEqual(['foo'])
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
+  })
+
+  it('cannot add another sheet with same lowercased name', function() {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet('foo')
+
+    expect(() => {
+      engine.addSheet('FOO')
+    }).toThrow(/already exists/)
+    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
   })
 
   it('should return given name', function() {
@@ -73,7 +84,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet('foo')
 
-    expect(sheetName).toEqual("foo")
+    expect(sheetName).toEqual('foo')
 
   })
 
@@ -82,6 +93,6 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet()
 
-    expect(sheetName).toEqual("Sheet1")
+    expect(sheetName).toEqual('Sheet1')
   })
 })

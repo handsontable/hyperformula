@@ -1,5 +1,6 @@
 import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { MatrixVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
@@ -11,7 +12,6 @@ import {
   extractRange,
   extractReference,
 } from '../testUtils'
-import {ColumnIndex} from "../../src/ColumnSearch/ColumnIndex";
 
 describe('Removing rows - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -802,7 +802,7 @@ describe('Removing rows - sheet dimensions', () => {
       width: 1,
       height: 1,
     })
-  });
+  })
 
   it('should throw error when trying to remove non positive number of rows', () => {
     const engine = HyperFormula.buildFromArray([
@@ -811,13 +811,13 @@ describe('Removing rows - sheet dimensions', () => {
     ])
 
     expect(() => engine.removeRows(0, [1, 0])).toThrowError('Wrong indexes')
-  });
+  })
 
   it('returns changed values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
-      ['=SUM(A1:A2)']
+      ['=SUM(A1:A2)'],
     ])
 
     const changes = engine.removeRows(0, [0, 1])
@@ -843,4 +843,3 @@ describe('Removing rows - column index', () => {
     expect_array_with_same_content([1], index.getValueIndex(0, 0, 2).index)
   })
 })
-

@@ -1,8 +1,8 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {CellValueType, ErrorType} from "../../src/Cell";
+import {CellError, HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 
-describe("function BIN2DEC", () => {
+describe('function BIN2DEC', () => {
   it('should work only for one argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],

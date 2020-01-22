@@ -12,7 +12,7 @@ describe('Function COT', () => {
 
   it('DIV/0 for zero', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=COT(0)']
+      ['=COT(0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

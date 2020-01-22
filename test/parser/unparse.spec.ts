@@ -1,10 +1,10 @@
 import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {ParserWithCaching, buildLexerConfig} from '../../src/parser'
+import {enGB, plPL} from '../../src/i18n'
+import {buildLexerConfig, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
-import {enGB, plPL} from "../../src/i18n";
 
 describe('Unparse', () => {
   const config = new Config()
@@ -14,7 +14,7 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet2')
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
-  const unparser = new Unparser(config, lexerConfig, sheetMapping.name)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
 
   it('#unparse',  () => {
     const formula = '=1+SUM(1,2,3)*3'
@@ -122,7 +122,7 @@ describe('Unparse', () => {
   it('#unparse with known error with translation', () => {
     const config = new Config({ language: plPL })
     const parser = new ParserWithCaching(config, sheetMapping.get)
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.name)
+    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -270,8 +270,8 @@ describe('Unparse', () => {
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 
-    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.name)
-    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.name)
+    const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName)
+    const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName)
 
     const formula = '=SUMA(1,2)'
 
@@ -295,5 +295,23 @@ describe('Unparse', () => {
     const unparsed = unparser.unparse(ast, adr('A1', 0))
 
     expect(unparsed).toEqual(formula)
+  })
+
+  it('unparsing sheet name always returns its original name', () => {
+    const formula = '=shEET2!A1:B1'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1', 0))
+
+    expect(unparsed).toEqual('=Sheet2!A1:B1')
+  })
+
+  it('unparsing function without translation should unparse to canonical name', () => {
+    const formula = '=FOOBAR(1,2,3)'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=FOOBAR(1,2,3)')
   })
 })

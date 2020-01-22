@@ -1,8 +1,8 @@
 import {Config, HyperFormula} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
+import {CellAddress} from '../src/parser'
 import './testConfig.ts'
-import {adr, extractReference} from "./testUtils";
-import {CellAddress} from "../src/parser";
+import {adr, extractReference} from './testUtils'
 
 describe('i18n', () => {
   it('using functions in different languages', () => {
@@ -22,7 +22,7 @@ describe('i18n', () => {
       ['0'],
       ['1'],
       ['2'],
-      ['=LICZ.JEŻELI(A1:A3, ">=1")']
+      ['=LICZ.JEŻELI(A1:A3, ">=1")'],
     ], new Config({language: plPL}))
     const engineEN = HyperFormula.buildFromArray([
       ['0'],
@@ -37,15 +37,14 @@ describe('i18n', () => {
 
   it('translation works for parser hardcoded offset procedure', () => {
     const enginePL = HyperFormula.buildFromArray([
-      ['=PRZESUNIĘCIE(A1, 1, 1)']
+      ['=PRZESUNIĘCIE(A1, 1, 1)'],
     ], new Config({language: plPL}))
     const engineEN = HyperFormula.buildFromArray([
-      ['=OFFSET(A1, 1, 1)']
+      ['=OFFSET(A1, 1, 1)'],
     ])
 
-
-    expect(extractReference(enginePL, adr("A1"))).toEqual(CellAddress.relative(0, 1, 1))
-    expect(extractReference(engineEN, adr("A1"))).toEqual(CellAddress.relative(0, 1, 1))
+    expect(extractReference(enginePL, adr('A1'))).toEqual(CellAddress.relative(0, 1, 1))
+    expect(extractReference(engineEN, adr('A1'))).toEqual(CellAddress.relative(0, 1, 1))
   })
 
   it('all function translation keys has to be upper cased', () => {

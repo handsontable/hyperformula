@@ -1,5 +1,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
+import {SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast, collectDependencies} from '../parser'
@@ -7,7 +8,6 @@ import {FormulaCellVertex, MatrixVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {IGetDependenciesQuery} from './Graph'
 import {RangeMapping} from './RangeMapping'
-import {SimpleCellAddress} from "../Cell";
 
 export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
   constructor(

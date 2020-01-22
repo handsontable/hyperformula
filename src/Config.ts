@@ -1,28 +1,40 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {ErrorType} from './Cell'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
+import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
+import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
+import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
+import {CharPlugin} from './interpreter/plugin/CharPlugin'
+import {CodePlugin} from './interpreter/plugin/CodePlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
-import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
-import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
+import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
+import {ErrorFunctionPlugin} from './interpreter/plugin/ErrorFunctionPlugin'
+import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
+import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
+import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
+import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
+import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
+import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
+import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
+import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
+import {RadiansPlugin} from './interpreter/plugin/RadiansPlugin'
+import {RadixConversionPlugin} from './interpreter/plugin/RadixConversionPlugin'
 import {RandomPlugin} from './interpreter/plugin/RandomPlugin'
+import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
+import {SqrtPlugin} from './interpreter/plugin/SqrtPlugin'
 import {SumifPlugin} from './interpreter/plugin/SumifPlugin'
 import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
-import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
-import {RoundingPlugin} from './interpreter/plugin/RoundingPlugin'
-import {LogarithmPlugin} from './interpreter/plugin/LogarithmPlugin'
-import {ErrorType} from "./Cell";
-import {RadixConversionPlugin} from "./interpreter/plugin/RadixConversionPlugin";
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -69,6 +81,7 @@ export class Config {
     ExpPlugin,
     AbsPlugin,
     DegreesPlugin,
+    RadiansPlugin,
     RandomPlugin,
     VlookupPlugin,
     IsEvenPlugin,
@@ -76,6 +89,17 @@ export class Config {
     RoundingPlugin,
     RadixConversionPlugin,
     LogarithmPlugin,
+    BitwiseLogicOperationsPlugin,
+    BitShiftPlugin,
+    PowerPlugin,
+    MathConstantsPlugin,
+    SqrtPlugin,
+    ModuloPlugin,
+    DeltaPlugin,
+    CharPlugin,
+    CodePlugin,
+    ErrorFunctionPlugin,
+    CorrelPlugin,
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
@@ -88,6 +112,7 @@ export class Config {
   public readonly matrixDetectionThreshold: number
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
+  public readonly errorMapping: Record<string, ErrorType>
 
   constructor(
       {
@@ -113,6 +138,7 @@ export class Config {
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
+    this.errorMapping = this.buildErrorMapping(this.language)
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
@@ -155,5 +181,12 @@ export class Config {
     }
 
     return structuralChangeFunctions
+  }
+
+  private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
+    return Object.keys(language.errors).reduce((ret, key) => {
+      ret[language.errors[key as ErrorType]] = key as ErrorType
+      return ret
+    }, {} as Record<string, ErrorType>)
   }
 }

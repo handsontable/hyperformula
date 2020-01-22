@@ -1,11 +1,11 @@
 import {IToken, tokenMatcher} from 'chevrotain'
 import {SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
+import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -87,7 +87,7 @@ export class ParserWithCaching {
       } else if (tokenMatcher(token, ProcedureName)) {
         const procedureName = token.image.toUpperCase().slice(0, -1)
         const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
-        hash = hash.concat(canonicalProcedureName, "(")
+        hash = hash.concat(canonicalProcedureName, '(')
         idx++
       } else {
         hash = hash.concat(token.image)
@@ -133,11 +133,18 @@ export class ParserWithCaching {
       case AstNodeType.MINUS_UNARY_OP: {
         return '-' + this.computeHashOfAstNode(ast.value)
       }
+      case AstNodeType.PLUS_UNARY_OP: {
+        return '+' + this.computeHashOfAstNode(ast.value)
+      }
       case AstNodeType.PERCENT_OP: {
         return this.computeHashOfAstNode(ast.value) + '%'
       }
       case AstNodeType.ERROR: {
-        return '!ERR'
+        if (ast.error) {
+          return this.config.getErrorTranslationFor(ast.error.type)
+        } else {
+          return '#ERR!'
+        }
       }
       case AstNodeType.PARENTHESIS: {
         return '(' + this.computeHashOfAstNode(ast.expression) + ')'

@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
 import '../testConfig'
+import {adr} from '../testUtils'
 
-describe("Function ROUND", () => {
+describe('Function ROUND', () => {
   it('number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ROUND()', '=ROUND(1, 2, 3)']
+      ['=ROUND()', '=ROUND(1, 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
@@ -60,7 +60,7 @@ describe("Function ROUND", () => {
   it('propagates error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/0'],
-      ['=ROUND(A1)', '=ROUND(42, A1)', '=ROUND(A1, FOO())']
+      ['=ROUND(A1)', '=ROUND(42, A1)', '=ROUND(A1, FOO())'],
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
@@ -88,4 +88,3 @@ describe("Function ROUND", () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
   })
 })
-

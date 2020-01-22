@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {CellValueType, ErrorType} from "../../src/Cell";
+import {CellError, HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr} from '../testUtils'
 
 describe('function BIN2HEX', () => {
   it('should return error when wrong number of argument', () => {
@@ -34,13 +34,13 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(111111111)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("1")
-    expect(engine.getCellValue(adr('A2'))).toEqual("2")
-    expect(engine.getCellValue(adr('A3'))).toEqual("2")
-    expect(engine.getCellValue(adr('A4'))).toEqual("2E")
-    expect(engine.getCellValue(adr('A5'))).toEqual("FFFFFFFE00")
-    expect(engine.getCellValue(adr('A6'))).toEqual("FFFFFFFFFF")
-    expect(engine.getCellValue(adr('A7'))).toEqual("1FF")
+    expect(engine.getCellValue(adr('A1'))).toEqual('1')
+    expect(engine.getCellValue(adr('A2'))).toEqual('2')
+    expect(engine.getCellValue(adr('A3'))).toEqual('2')
+    expect(engine.getCellValue(adr('A4'))).toEqual('2E')
+    expect(engine.getCellValue(adr('A5'))).toEqual('FFFFFFFE00')
+    expect(engine.getCellValue(adr('A6'))).toEqual('FFFFFFFFFF')
+    expect(engine.getCellValue(adr('A7'))).toEqual('1FF')
   })
 
   it('should work for binary strings', () => {
@@ -48,7 +48,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX("1101")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual("D")
+    expect(engine.getCellValue(adr('A1'))).toEqual('D')
   })
 
   it('should work for reference', () => {
@@ -57,7 +57,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual("B")
+    expect(engine.getCellValue(adr('A2'))).toEqual('B')
   })
 
   it('should return string value', () => {
@@ -75,9 +75,8 @@ describe('function BIN2HEX', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual("FFFFFFFEAA")
+    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
   })
-
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
     const engine = HyperFormula.buildFromArray([

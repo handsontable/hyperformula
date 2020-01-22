@@ -1,7 +1,6 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {ProcedureAst, Ast} from '../../parser'
+import { ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
-import {SimpleRangeValue} from '../InterpreterValue'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -35,7 +34,7 @@ export class MedianPlugin extends FunctionPlugin {
         values.push(scalarValue)
       }
     }
-    
+
     if (values.length === 0) {
       return new CellError(ErrorType.NUM)
     }
