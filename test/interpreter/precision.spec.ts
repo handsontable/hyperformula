@@ -5,7 +5,7 @@ import {adr} from '../testUtils'
 describe('Imprecise comparisons', () => {
 
   it('less-than', () => {
-    const config = new Config({ ignoreEpsilon : false})
+    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1<1.0000000001', '=1<1.0000000000001'],
       ['=1.0000000001<1', '=1.0000000000001<1'],
@@ -36,7 +36,7 @@ describe('Imprecise comparisons', () => {
   })
 
   it('greater-than', () => {
-    const config = new Config({ ignoreEpsilon : false})
+    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1>1.0000000001', '=1>1.0000000000001'],
       ['=1.0000000001>1', '=1.0000000000001>1'],
@@ -67,7 +67,7 @@ describe('Imprecise comparisons', () => {
   })
 
   it('greater-equal', () => {
-    const config = new Config({ ignoreEpsilon : false})
+    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1>=1.0000000001', '=1>=1.0000000000001'],
       ['=1.0000000001>=1', '=1.0000000000001>=1'],
@@ -98,7 +98,7 @@ describe('Imprecise comparisons', () => {
   })
 
   it('less-equal', () => {
-    const config = new Config({ ignoreEpsilon : false})
+    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1<=1.0000000001', '=1<=1.0000000000001'],
       ['=1.0000000001<=1', '=1.0000000000001<=1'],
@@ -133,7 +133,7 @@ describe('Imprecise comparisons', () => {
 describe('Snap to zero', () => {
 
   it('minus', () => {
-    const config = new Config({ignoreEpsilon: false})
+    const config = new Config({smartRounding: false})
     const engine = HyperFormula.buildFromArray([
       ['=1-1.0000000001', '=1-1.0000000000001'],
       ['=1.0000000001-1', '=1.0000000000001-1'],
@@ -164,7 +164,7 @@ describe('Snap to zero', () => {
   })
 
   it('plus', () => {
-    const config = new Config({ignoreEpsilon: false})
+    const config = new Config({smartRounding: false})
     const engine = HyperFormula.buildFromArray([
       ['=1+-1.0000000001', '=1+-1.0000000000001'],
       ['=1.0000000001+-1', '=1.0000000000001+-1'],
@@ -195,3 +195,12 @@ describe('Snap to zero', () => {
   })
 })
 
+describe( 'Value-fixed', () => {
+  it('should correctly calculate 0.2 + 0.1 as 0.3', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=0.2+0.1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0.3)
+  })
+})

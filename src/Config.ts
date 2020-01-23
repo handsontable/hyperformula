@@ -45,10 +45,11 @@ export interface ConfigParams {
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
-  ignoreEpsilon: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   precisionEpsilon: number,
+  precisionRounding: number,
+  smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number
 }
@@ -62,10 +63,11 @@ export class Config {
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
-    ignoreEpsilon: false,
+    smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     precisionEpsilon: 1e-12,
+    precisionRounding: 12,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
@@ -112,10 +114,10 @@ export class Config {
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
-  public readonly ignoreEpsilon: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly precisionEpsilon: number
+  public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
@@ -128,7 +130,7 @@ export class Config {
         language,
         functionPlugins,
         gpuMode,
-        ignoreEpsilon,
+        smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
         precisionEpsilon,
@@ -142,7 +144,7 @@ export class Config {
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
-    this.ignoreEpsilon = ignoreEpsilon || Config.defaultConfig.ignoreEpsilon
+    this.smartRounding = smartRounding || Config.defaultConfig.smartRounding
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
     this.precisionEpsilon = precisionEpsilon || Config.defaultConfig.precisionEpsilon
