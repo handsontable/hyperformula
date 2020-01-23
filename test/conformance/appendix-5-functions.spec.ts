@@ -89,7 +89,21 @@ describe('Quality Assurance tests', () => {
     expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.NAME))
   });
 
-  
+  it('SUM should support big numbers', () => {
+    const engine = createEngine([
+      ['=SUM(999999999999999000000, 999999999999999)'],
+      ['=SUM(B17:C17)'],
+      ['=SUM(B18:C18)'],
+      ...data
+    ]);
+
+    expect(engine.getCellValue('A1')).toEqual('1.0000009999999989e+21');
+    expect(engine.getCellValue('A2')).toEqual('1.0000009999999989e+21');
+    expect(engine.getCellValue('A3')).toEqual('1.0000009999999989e+21');
+  });
+
+
+
 });
 
 
