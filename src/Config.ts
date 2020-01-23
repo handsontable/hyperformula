@@ -66,7 +66,7 @@ export class Config {
     smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
-    precisionEpsilon: 1e-12,
+    precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
