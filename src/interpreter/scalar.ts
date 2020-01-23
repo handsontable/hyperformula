@@ -30,13 +30,18 @@ export function nonstrictadd(left: CellValue, right: CellValue): number | CellEr
   }
 }
 
-export function add(left: number | CellError, right: number | CellError): number | CellError {
+export function add(left: number | CellError, right: number | CellError, eps: number, ignoreEps: boolean): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
-    return left + right
+    const ret = left + right
+    if ( !ignoreEps && Math.abs(ret) < eps*Math.abs(left)  ) {
+      return 0
+    } else {
+      return ret
+    }
   }
 }
 
@@ -50,13 +55,18 @@ export function add(left: number | CellError, right: number | CellError): number
  * @param left - left operand of subtraction
  * @param right - right operand of subtraction
  */
-export function subtract(left: number | CellError, right: number | CellError): number | CellError {
+export function subtract(left: number | CellError, right: number | CellError, eps: number, ignoreEps: boolean): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
-    return left - right
+    const ret = left - right
+    if ( !ignoreEps && Math.abs(ret) < eps*Math.abs(left)  ) {
+      return 0
+    } else {
+      return ret
+    }
   }
 }
 

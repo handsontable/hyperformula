@@ -129,3 +129,69 @@ describe('Imprecise comparisons', () => {
   })
 })
 
+
+describe('Snap to zero', () => {
+
+  it('minus', () => {
+    const config = new Config({ignoreEpsilon: false})
+    const engine = HyperFormula.buildFromArray([
+      ['=1-1.0000000001', '=1-1.0000000000001'],
+      ['=1.0000000001-1', '=1.0000000000001-1'],
+      ['=-1.0000000001--1', '=-1.0000000000001--1'],
+      ['=-1--1.0000000001', '=-1--1.0000000000001'],
+      ['=0-0.0000000001', '=0-0.0000000000001'],
+      ['=0.0000000001-0', '=0.0000000000001-0'],
+      ['=-0.0000000001-0', '=-0.0000000000001-0'],
+      ['=0--0.0000000001', '=0--0.0000000000001'],
+    ], config)
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B5'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(0.0000000000001, 5)
+  })
+
+  it('plus', () => {
+    const config = new Config({ignoreEpsilon: false})
+    const engine = HyperFormula.buildFromArray([
+      ['=1+-1.0000000001', '=1+-1.0000000000001'],
+      ['=1.0000000001+-1', '=1.0000000000001+-1'],
+      ['=-1.0000000001+1', '=-1.0000000000001+1'],
+      ['=-1+1.0000000001', '=-1+1.0000000000001'],
+      ['=0+-0.0000000001', '=0+-0.0000000000001'],
+      ['=0.0000000001+-0', '=0.0000000000001+-0'],
+      ['=-0.0000000001+-0', '=-0.0000000000001+-0'],
+      ['=0+0.0000000001', '=0+0.0000000000001'],
+    ], config)
+
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B5'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B6'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B7'))).toBeCloseTo(0.0000000000001, 5)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(0.0000000001, 5)
+    expect(engine.getCellValue(adr('B8'))).toBeCloseTo(0.0000000000001, 5)
+  })
+})
+
