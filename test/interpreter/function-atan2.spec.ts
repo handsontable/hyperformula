@@ -1,11 +1,11 @@
-import {HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr} from '../testUtils'
 
 describe('Function ATAN2', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ATAN2(1,1)']])
+    const engine = HyperFormula.buildFromArray([['=ATAN2(1,1)']], new Config({ smartRounding : false}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.7853981633974483)
   })

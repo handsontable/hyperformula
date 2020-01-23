@@ -139,7 +139,11 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.dependencyGraph.getCellValue(address)
+    const val = this.dependencyGraph.getCellValue(address)
+    if(this.config.smartRounding && typeof val == 'number' && !Number.isInteger(val))
+      return parseFloat(val.toPrecision(this.config.precisionRounding))
+    else
+      return val
   }
 
   /**

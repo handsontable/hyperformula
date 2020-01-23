@@ -67,7 +67,7 @@ export class Config {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     precisionEpsilon: 1e-12,
-    precisionRounding: 12,
+    precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
@@ -117,6 +117,7 @@ export class Config {
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly precisionEpsilon: number
+  public readonly precisionRounding: number
   public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
@@ -134,6 +135,7 @@ export class Config {
         matrixDetection,
         matrixDetectionThreshold,
         precisionEpsilon,
+        precisionRounding,
         useColumnIndex,
         vlookupThreshold,
       }: Partial<ConfigParams> = {},
@@ -144,10 +146,11 @@ export class Config {
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
-    this.smartRounding = smartRounding || Config.defaultConfig.smartRounding
+    this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
     this.precisionEpsilon = precisionEpsilon || Config.defaultConfig.precisionEpsilon
+    this.precisionRounding = precisionRounding || Config.defaultConfig.precisionRounding
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)

@@ -5,7 +5,6 @@ import {adr} from '../testUtils'
 describe('Imprecise comparisons', () => {
 
   it('less-than', () => {
-    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1<1.0000000001', '=1<1.0000000000001'],
       ['=1.0000000001<1', '=1.0000000000001<1'],
@@ -15,7 +14,7 @@ describe('Imprecise comparisons', () => {
       ['=0.0000000001<0', '=0.0000000000001<0'],
       ['=-0.0000000001<0', '=-0.0000000000001<0'],
       ['=0<-0.0000000001', '=0<-0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
@@ -36,7 +35,6 @@ describe('Imprecise comparisons', () => {
   })
 
   it('greater-than', () => {
-    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1>1.0000000001', '=1>1.0000000000001'],
       ['=1.0000000001>1', '=1.0000000000001>1'],
@@ -46,7 +44,7 @@ describe('Imprecise comparisons', () => {
       ['=0.0000000001>0', '=0.0000000000001>0'],
       ['=-0.0000000001>0', '=-0.0000000000001>0'],
       ['=0>-0.0000000001', '=0>-0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
@@ -67,7 +65,6 @@ describe('Imprecise comparisons', () => {
   })
 
   it('greater-equal', () => {
-    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1>=1.0000000001', '=1>=1.0000000000001'],
       ['=1.0000000001>=1', '=1.0000000000001>=1'],
@@ -77,7 +74,7 @@ describe('Imprecise comparisons', () => {
       ['=0.0000000001>=0', '=0.0000000000001>=0'],
       ['=-0.0000000001>=0', '=-0.0000000000001>=0'],
       ['=0>=-0.0000000001', '=0>=-0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
@@ -98,7 +95,6 @@ describe('Imprecise comparisons', () => {
   })
 
   it('less-equal', () => {
-    const config = new Config({ smartRounding : false})
     const engine = HyperFormula.buildFromArray([
       ['=1<=1.0000000001', '=1<=1.0000000000001'],
       ['=1.0000000001<=1', '=1.0000000000001<=1'],
@@ -108,7 +104,7 @@ describe('Imprecise comparisons', () => {
       ['=0.0000000001<=0', '=0.0000000000001<=0'],
       ['=-0.0000000001<=0', '=-0.0000000000001<=0'],
       ['=0<=-0.0000000001', '=0<=-0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
@@ -133,7 +129,6 @@ describe('Imprecise comparisons', () => {
 describe('Snap to zero', () => {
 
   it('minus', () => {
-    const config = new Config({smartRounding: false})
     const engine = HyperFormula.buildFromArray([
       ['=1-1.0000000001', '=1-1.0000000000001'],
       ['=1.0000000001-1', '=1.0000000000001-1'],
@@ -143,7 +138,7 @@ describe('Snap to zero', () => {
       ['=0.0000000001-0', '=0.0000000000001-0'],
       ['=-0.0000000001-0', '=-0.0000000000001-0'],
       ['=0--0.0000000001', '=0--0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
@@ -164,7 +159,6 @@ describe('Snap to zero', () => {
   })
 
   it('plus', () => {
-    const config = new Config({smartRounding: false})
     const engine = HyperFormula.buildFromArray([
       ['=1+-1.0000000001', '=1+-1.0000000000001'],
       ['=1.0000000001+-1', '=1.0000000000001+-1'],
@@ -174,7 +168,7 @@ describe('Snap to zero', () => {
       ['=0.0000000001+-0', '=0.0000000000001+-0'],
       ['=-0.0000000001+-0', '=-0.0000000000001+-0'],
       ['=0+0.0000000001', '=0+0.0000000000001'],
-    ], config)
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
@@ -199,7 +193,7 @@ describe( 'Value-fixed', () => {
   it('should correctly calculate 0.2 + 0.1 as 0.3', () => {
     const engine = HyperFormula.buildFromArray([
       ['=0.2+0.1'],
-    ])
+    ], new Config({ smartRounding : true}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.3)
   })
