@@ -78,7 +78,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return equality(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return equality(arg1, arg2, this.config.precisionEpsilon)})
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -98,7 +98,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return nonequality(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return nonequality(arg1, arg2, this.config.precisionEpsilon)})
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -118,7 +118,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return greater(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return greater(arg1, arg2, this.config.precisionEpsilon)})
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -138,7 +138,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return less(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return less(arg1, arg2, this.config.precisionEpsilon)})
 
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
@@ -159,7 +159,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return greatereq(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return greatereq(arg1, arg2, this.config.precisionEpsilon)})
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -179,7 +179,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return lesseq(arg1, arg2, this.config.precisionEpsilon, this.config.smartRounding)})
+          (arg1, arg2) => {return lesseq(arg1, arg2, this.config.precisionEpsilon)})
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -199,7 +199,7 @@ export class Interpreter {
         }
 
         return add(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat),
-          this.config.precisionEpsilon, this.config.smartRounding)
+          this.config.precisionEpsilon)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -217,7 +217,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
         return subtract(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat),
-          this.config.precisionEpsilon, this.config.smartRounding)
+          this.config.precisionEpsilon)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

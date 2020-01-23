@@ -30,14 +30,14 @@ export function nonstrictadd(left: CellValue, right: CellValue): number | CellEr
   }
 }
 
-export function add(left: number | CellError, right: number | CellError, eps: number, smartRounding: boolean): number | CellError {
+export function add(left: number | CellError, right: number | CellError, eps: number): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
     const ret = left + right
-    if ( smartRounding && Math.abs(ret) < eps*Math.abs(left)  ) {
+    if (Math.abs(ret) < eps*Math.abs(left)  ) {
       return 0
     } else {
       return ret
@@ -54,15 +54,16 @@ export function add(left: number | CellError, right: number | CellError, eps: nu
  *
  * @param left - left operand of subtraction
  * @param right - right operand of subtraction
+ * @param eps - precision of comparison
  */
-export function subtract(left: number | CellError, right: number | CellError, eps: number, smartRounding: boolean): number | CellError {
+export function subtract(left: number | CellError, right: number | CellError, eps: number): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
     const ret = left - right
-    if ( smartRounding && Math.abs(ret) < eps*Math.abs(left)  ) {
+    if ( Math.abs(ret) < eps*Math.abs(left)  ) {
       return 0
     } else {
       return ret
@@ -244,8 +245,8 @@ export function mina(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function greater(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if(!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function greater(left: number | string, right: number | string, eps: number): boolean {
+  if(typeof left === 'string' || typeof right === 'string') {
     return left > right
   } else if (right >= 0) {
     return left > (1 + eps) * right
@@ -254,8 +255,8 @@ export function greater(left: number | string, right: number | string, eps: numb
   }
 }
 
-export function less(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if (!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function less(left: number | string, right: number | string, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left < right
   } else if (right >= 0) {
     return left * (1 + eps) < right
@@ -264,8 +265,8 @@ export function less(left: number | string, right: number | string, eps: number,
   }
 }
 
-export function lesseq(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if (!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function lesseq(left: number | string, right: number | string, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left <= right
   } else if (right >= 0) {
     return left <= (1 + eps) * right
@@ -275,8 +276,8 @@ export function lesseq(left: number | string, right: number | string, eps: numbe
   }
 }
 
-export function greatereq(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if (!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function greatereq(left: number | string, right: number | string, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left >= right
   } else if (right >= 0) {
     return left * (1 + eps) >= right
@@ -285,8 +286,8 @@ export function greatereq(left: number | string, right: number | string, eps: nu
   }
 }
 
-export function equality(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if (!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function equality(left: number | string, right: number | string, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left === right
   } else if (right >= 0) {
     return left * (1 + eps) >= right && left <= right * (1 + eps)
@@ -295,8 +296,8 @@ export function equality(left: number | string, right: number | string, eps: num
   }
 }
 
-export function nonequality(left: number | string, right: number | string, eps: number, smartRounding: boolean): boolean {
-  if (!smartRounding || typeof left === 'string' || typeof right === 'string') {
+export function nonequality(left: number | string, right: number | string, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left !== right
   } else if (right >= 0) {
     return left * (1 + eps) < right || left > right * (1 + eps)
