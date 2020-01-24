@@ -149,7 +149,9 @@ export class HyperFormula {
         return Math.round(val * placesMultiplier) / placesMultiplier
       }
     }
-    else
+    else {
+      return val
+    }
       return val
   }
 
