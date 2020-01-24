@@ -24,7 +24,7 @@ describe('Function ACOS', () => {
 
   it('for -1 (edge)', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(-1)']],
-      new Config({ smartRounding : false}))
+      new Config({ smartRounding : false }))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(Math.PI)
   })
