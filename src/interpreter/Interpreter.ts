@@ -78,7 +78,7 @@ export class Interpreter {
         }
 
         return compare( leftResult, rightResult, this.config.dateFormat,
-          (arg1, arg2) => {return equality(arg1, arg2, this.config.precisionEpsilon)})
+          (arg1, arg2) => equality(arg1, arg2, this.config.precisionEpsilon))
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
