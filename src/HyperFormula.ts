@@ -152,7 +152,6 @@ export class HyperFormula {
     else {
       return val
     }
-      return val
   }
 
   /**
