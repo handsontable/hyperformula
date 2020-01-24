@@ -38,7 +38,7 @@ export function add(left: number | CellError, right: number | CellError, eps: nu
     return right
   } else {
     const ret = left + right
-    if (Math.abs(ret) < eps*Math.abs(left)  ) {
+    if (Math.abs(ret) < eps * Math.abs(left)  ) {
       return 0
     } else {
       return ret
@@ -64,7 +64,7 @@ export function subtract(left: number | CellError, right: number | CellError, ep
     return right
   } else {
     const ret = left - right
-    if ( Math.abs(ret) < eps*Math.abs(left)  ) {
+    if ( Math.abs(ret) < eps * Math.abs(left)  ) {
       return 0
     } else {
       return ret
@@ -247,7 +247,7 @@ export function mina(left: CellValue, right: CellValue): CellValue {
 }
 
 export function greater(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if(typeof left === 'string' || typeof right === 'string') {
+  if (typeof left === 'string' || typeof right === 'string') {
     return left > right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left > right
@@ -329,7 +329,6 @@ export function nonequality(left: number | string | boolean, right: number | str
     return left * mod > right || left < right * mod
   }
 }
-
 
 export function compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
                         comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean, config: Config): boolean {
