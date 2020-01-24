@@ -290,7 +290,8 @@ export function equality(left: number | string, right: number | string, eps: num
   if (typeof left === 'string' || typeof right === 'string') {
     return left === right
   } else if (right >= 0) {
-    return left * (1 + eps) >= right && left <= right * (1 + eps)
+    const mod = (1 + eps);
+    return left * mod >= right && left <= right * mod
   } else {
     return left * (1 + eps) <= right && left >= right * (1 + eps)
   }
