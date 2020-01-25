@@ -1,4 +1,5 @@
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
   CellType,
@@ -13,6 +14,7 @@ import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
+import {ClipboardOperations} from './ClipboardOperations'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
@@ -110,7 +112,7 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  private crudOperations: CrudOperations
+  private readonly crudOperations: CrudOperations
 
   constructor(
       /** Engine config */
@@ -425,6 +427,26 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.copy(sourceLeftCorner, width, height)
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+  }
+
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.cut(sourceLeftCorner, width, height)
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+  }
+
+  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+    this.crudOperations.paste(targetLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
+    return this.dependencyGraph.getValuesInRange(range)
+  }
+
+
   /**
    * Returns information whether its possible to add sheet
    *
@@ -497,6 +519,7 @@ export class HyperFormula {
    * @param name - sheet name
    * */
   public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }

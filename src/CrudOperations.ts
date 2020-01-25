@@ -5,7 +5,8 @@ import {CellContent, CellContentParser, RawCellContent} from './CellContentParse
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import { ContentChanges} from './ContentChanges'
+import {CellValueChange, ContentChanges} from './ContentChanges'
+import {ClipboardOperations} from './ClipboardOperations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -15,6 +16,7 @@ import {
   SheetMapping,
   ValueCellVertex,
 } from './DependencyGraph'
+import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
@@ -32,6 +34,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
+  private readonly clipboardOperations: ClipboardOperations
 
   constructor(
       /** Engine config */
@@ -49,12 +52,13 @@ export class CrudOperations implements IBatchExecutor {
       /** Service handling postponed CRUD transformations */
       private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
-
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
@@ -63,6 +67,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -71,6 +76,7 @@ export class CrudOperations implements IBatchExecutor {
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
@@ -79,6 +85,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abort()
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -86,6 +93,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.clipboardOperations.abort()
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -110,6 +118,18 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.clipboardOperations.cut(sourceLeftCorner, width, height)
+  }
+
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+    this.clipboardOperations.copy(sourceLeftCorner, width, height)
+  }
+
+  public paste(targetLeftCorner: SimpleCellAddress): void {
+    this.clipboardOperations.paste(targetLeftCorner)
+  }
+
   public addSheet(name?: string): string {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
@@ -121,6 +141,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.clipboardOperations.abort()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -137,6 +158,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public clearSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
+    this.clipboardOperations.abort()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -147,6 +169,8 @@ export class CrudOperations implements IBatchExecutor {
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
+    this.clipboardOperations.abort()
+
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
 
     let vertex = this.dependencyGraph.getCell(address)
@@ -180,22 +204,34 @@ export class CrudOperations implements IBatchExecutor {
         const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (parsedCellContent instanceof CellContent.Empty) {
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.columnSearch.remove(oldValue, address)
-        this.changes.addChange(EmptyValue, address)
-        this.dependencyGraph.setCellEmpty(address)
+        this.setCellEmpty(address)
       } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
         throw new Error('Cant happen')
       } else {
-        const newValue = parsedCellContent.value
-        const oldValue = this.dependencyGraph.getCellValue(address)
-        this.dependencyGraph.setValueToCell(address, newValue)
-        this.columnSearch.change(oldValue, newValue, address)
-        this.changes.addChange(newValue, address)
+        this.setValueToCell(parsedCellContent.value, address)
       }
     } else {
       throw new Error('Illegal operation')
     }
+  }
+
+  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.dependencyGraph.setValueToCell(address, value)
+    this.columnSearch.change(oldValue, value, address)
+    this.changes.addChange(value, address)
+  }
+
+  public setCellEmpty(address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.remove(oldValue, address)
+    this.changes.addChange(EmptyValue, address)
+    this.dependencyGraph.setCellEmpty(address)
+  }
+
+  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
