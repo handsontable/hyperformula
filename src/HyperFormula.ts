@@ -762,6 +762,7 @@ export class HyperFormula {
     this.parser.destroy()
     this.lazilyTransformingAstService.destroy()
     this.stats.destroy()
+    this.crudOperations.clipboardClear()
   }
 
   /**
