@@ -427,18 +427,18 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    this.crudOperations.copy(sourceLeftCorner, width, height)
+  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.clipboardCopy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
-    this.crudOperations.cut(sourceLeftCorner, width, height)
+  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.clipboardCut(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
-  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
-    this.crudOperations.paste(targetLeftCorner)
+  public clipboardPaste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+    this.crudOperations.clipboardPaste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 

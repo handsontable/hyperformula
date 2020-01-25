@@ -118,15 +118,15 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.cut(sourceLeftCorner, width, height)
   }
 
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
-  public paste(targetLeftCorner: SimpleCellAddress): void {
+  public clipboardPaste(targetLeftCorner: SimpleCellAddress): void {
     this.clipboardOperations.paste(targetLeftCorner)
   }
 

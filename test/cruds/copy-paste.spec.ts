@@ -12,7 +12,7 @@ describe('Copy - paste integration', () => {
       ['foo', '=A1'],
     ])
 
-    const values = engine.copy(adr('A1'), 2, 2)
+    const values = engine.clipboardCopy(adr('A1'), 2, 2)
 
     expect_array_with_same_content([1, 2], values[0])
     expect_array_with_same_content(['foo', 1], values[1])
@@ -23,8 +23,8 @@ describe('Copy - paste integration', () => {
       [null, '=A1']
     ])
 
-    engine.copy(adr('A1'), 1, 1)
-    const changes = engine.paste(adr('A2'))
+    engine.clipboardCopy(adr('A1'), 1, 1)
+    const changes = engine.clipboardPaste(adr('A2'))
 
     expect_array_with_same_content([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
   })
@@ -34,8 +34,8 @@ describe('Copy - paste integration', () => {
       ['1']
     ])
 
-    engine.copy(adr('A1'), 1, 1)
-    engine.paste(adr('B1'))
+    engine.clipboardCopy(adr('A1'), 1, 1)
+    engine.clipboardPaste(adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
@@ -46,8 +46,8 @@ describe('Copy - paste integration', () => {
       ['foo', 'bar'],
     ])
 
-    engine.copy(adr('A1'), 2, 2)
-    engine.paste(adr('C1'))
+    engine.clipboardCopy(adr('A1'), 2, 2)
+    engine.clipboardPaste(adr('C1'))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(1)
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
@@ -60,8 +60,8 @@ describe('Copy - paste integration', () => {
       ['1', '=A1'],
     ])
 
-    engine.copy(adr('A1'), 2, 1)
-    engine.paste(adr('A2'))
+    engine.clipboardCopy(adr('A1'), 2, 1)
+    engine.clipboardPaste(adr('A2'))
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     const a2 = engine.dependencyGraph.fetchCell(adr('A2'))
@@ -77,8 +77,8 @@ describe('Copy - paste integration', () => {
       ['1', '=$A$1'],
     ])
 
-    engine.copy(adr('B1'), 1, 1)
-    engine.paste(adr('B2'))
+    engine.clipboardCopy(adr('B1'), 1, 1)
+    engine.clipboardPaste(adr('B2'))
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     const b1 = engine.dependencyGraph.fetchCell(adr('B1'))
@@ -95,8 +95,8 @@ describe('Copy - paste integration', () => {
       ['2', ''],
     ])
 
-    engine.copy(adr('B1'), 1, 1)
-    engine.paste(adr('B2'))
+    engine.clipboardCopy(adr('B1'), 1, 1)
+    engine.clipboardPaste(adr('B2'))
 
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
   })
@@ -107,8 +107,8 @@ describe('Copy - paste integration', () => {
       [null, '=B1'],
     ])
 
-    engine.copy(adr('B2'), 1, 1)
-    engine.paste(adr('A1'))
+    engine.clipboardCopy(adr('B2'), 1, 1)
+    engine.clipboardPaste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
   })
@@ -121,8 +121,8 @@ describe('Copy - paste integration', () => {
     ])
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
 
-    engine.copy(adr('A3'), 1, 1)
-    engine.paste(adr('B3'))
+    engine.clipboardCopy(adr('A3'), 1, 1)
+    engine.clipboardPaste(adr('B3'))
 
     expect(engine.getCellValue(adr('B3'))).toEqual(7)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
@@ -135,8 +135,8 @@ describe('Copy - paste integration', () => {
       ['1', '=A1'],
     ])
 
-    engine.copy(adr('A1'), 2, 1)
-    const changes = engine.paste(adr('A2'))
+    engine.clipboardCopy(adr('A1'), 2, 1)
+    const changes = engine.clipboardPaste(adr('A2'))
 
     expect_array_with_same_content([
       { sheet:0, col: 0, row: 1, value: 1},
@@ -151,8 +151,8 @@ describe('Copy - paste integration', () => {
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    engine.copy(adr('A1'), 2, 2)
-    engine.paste(adr('A3'))
+    engine.clipboardCopy(adr('A1'), 2, 2)
+    engine.clipboardPaste(adr('A3'))
 
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
@@ -168,8 +168,8 @@ describe('Copy - paste integration', () => {
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    engine.copy(adr('A1'), 1, 1)
-    engine.paste(adr('A2'))
+    engine.clipboardCopy(adr('A1'), 1, 1)
+    engine.clipboardPaste(adr('A2'))
 
     expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual('foo')
@@ -183,8 +183,8 @@ describe('Copy - paste integration', () => {
     ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    engine.copy(adr('A1'), 2, 2)
-    engine.paste(adr('B1'))
+    engine.clipboardCopy(adr('A1'), 2, 2)
+    engine.clipboardPaste(adr('B1'))
 
     expect(engine.matrixMapping.matrixMapping.size).toEqual(0)
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -204,8 +204,8 @@ describe('Copy - paste integration', () => {
     ])
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    engine.copy(adr('A3'), 2, 2)
-    engine.paste(adr('A5'))
+    engine.clipboardCopy(adr('A3'), 2, 2)
+    engine.clipboardPaste(adr('A5'))
 
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
     expect(engine.getCellFormula(adr('A5'))).toBe(undefined)
@@ -223,10 +223,10 @@ describe('Copy - paste integration', () => {
       ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}']
     ])
 
-    engine.copy(adr('A1'), 2, 2)
+    engine.clipboardCopy(adr('A1'), 2, 2)
 
     expect(() => {
-      engine.paste(adr('A3'))
+      engine.clipboardPaste(adr('A3'))
     }).toThrowError('It is not possible to paste onto matrix')
   })
 
@@ -235,7 +235,7 @@ describe('Copy - paste integration', () => {
       ['1']
     ])
 
-    engine.paste(adr('A1'))
+    engine.clipboardPaste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
@@ -245,10 +245,10 @@ describe('Copy - paste integration', () => {
       'Sheet1': [['=Sheet1!A2', '=Sheet2!A2']],
     })
 
-    engine.copy(adr('A1'), 2, 1)
+    engine.clipboardCopy(adr('A1'), 2, 1)
 
     expect(() => {
-      engine.paste(adr('A1', 1))
+      engine.clipboardPaste(adr('A1', 1))
     }).toThrowError("Invalid arguments")
   })
 
@@ -258,8 +258,8 @@ describe('Copy - paste integration', () => {
       'Sheet2': []
     })
 
-    engine.copy(adr('A1'), 2, 1)
-    engine.paste(adr('A1', 1))
+    engine.clipboardCopy(adr('A1'), 2, 1)
+    engine.clipboardPaste(adr('A1', 1))
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
     expect(extractReference(engine, adr('B1', 1))).toEqual(new CellAddress(1, -1, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
@@ -273,8 +273,8 @@ describe('Copy - paste integration', () => {
       'Sheet2': []
     })
 
-    engine.copy(adr('A1'), 1, 1)
-    engine.paste(adr('A1', 1))
+    engine.clipboardCopy(adr('A1'), 1, 1)
+    engine.clipboardPaste(adr('A1', 1))
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
   })
