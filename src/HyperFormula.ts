@@ -13,7 +13,6 @@ import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
-import {ClipboardOperations} from './ClipboardOperations'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
