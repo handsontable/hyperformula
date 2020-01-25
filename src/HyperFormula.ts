@@ -426,25 +426,58 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Stores copy of cell block in internal clipboard for further paste.</br>
+   * Returns values of cells for use in external clipboard.
+   *
+   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param width - width of the cell block being copied
+   * @param height - height of the cell block being copied
+  * */
   public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.clipboardCopy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
+  /**
+   * Stores information of cell block in internal clipboard for further paste. </br>
+   * Calling {@link clipboardPaste} right after this method is equivalent to call {@link moveCells}.</br>
+   * Almost any CRUD operation called after this method will abort cut operation.</br>
+   * Returns values of cells for use in external clipboard.
+   *
+   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param width - width of the cell block being copied
+   * @param height - height of the cell block being copied
+   * */
   public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.clipboardCut(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
+  /**
+   * When called after {@link clipboardCopy} it will paste copied values and formulas into cell block.</br>
+   * When called after {@link clipboardPaste} it will perform {@link moveCells} operation into the cell block.</br>
+   * Does nothing if clipboard is empty.
+   *
+   * @param targetLeftCorner - upper left address of the target cell block
+   * */
   public clipboardPaste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.clipboardPaste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  /**
+   * Clears clipboard content.
+   * */
   public clipboardClear(): void {
     this.crudOperations.clipboardClear()
   }
 
+  /**
+   * Returns cell content of cells in given range
+   *
+   * @param range
+   */
   public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
     return this.dependencyGraph.getValuesInRange(range)
   }
