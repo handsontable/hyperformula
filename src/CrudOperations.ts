@@ -364,7 +364,7 @@ export class CrudOperations implements IBatchExecutor {
     return changes
   }
 
-  public ensureSheetExists(sheetName: string) {
+  public ensureSheetExists(sheetName: string): void {
     if (!this.sheetMapping.hasSheetWithName(sheetName)) {
       throw new NoSheetWithNameError(sheetName)
     }

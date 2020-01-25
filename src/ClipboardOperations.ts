@@ -86,7 +86,7 @@ export class ClipboardOperations {
     this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.COPY, content)
   }
 
-  public paste(destinationLeftCorner: SimpleCellAddress) {
+  public paste(destinationLeftCorner: SimpleCellAddress): void {
     if (this.clipboard === undefined) {
       return
     }
@@ -114,13 +114,13 @@ export class ClipboardOperations {
     }
   }
 
-  public abort() {
+  public abort(): void {
     if (this.clipboard && this.clipboard.type === ClipboardOperationType.CUT) {
       this.clear()
     }
   }
 
-  public clear() {
+  public clear(): void {
     this.clipboard = undefined
   }
 
