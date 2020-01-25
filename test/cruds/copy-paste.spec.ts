@@ -278,4 +278,17 @@ describe('Copy - paste integration', () => {
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
   })
+
+  it('should do nothing when clipboard is cleard after copy', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '=A1'],
+    ])
+
+    engine.clipboardCopy(adr('A1'), 2, 1)
+    engine.clipboardClear()
+    engine.clipboardPaste(adr('A2'))
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B2'))).toEqual(EmptyValue)
+  })
 })

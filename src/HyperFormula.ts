@@ -1,4 +1,3 @@
-
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
@@ -115,22 +114,22 @@ export class HyperFormula {
   private readonly crudOperations: CrudOperations
 
   constructor(
-      /** Engine config */
-      public readonly config: Config,
-      /** Statistics module for benchmarking */
-      public readonly stats: Statistics,
-      /** Dependency graph storing sheets structure */
-      public readonly dependencyGraph: DependencyGraph,
-      /** Column search strategy used by VLOOKUP plugin */
-      public readonly columnSearch: IColumnSearchStrategy,
-      /** Parser with caching */
-      private readonly parser: ParserWithCaching,
-      private readonly unparser: Unparser,
-      private readonly cellContentParser: CellContentParser,
-      /** Formula evaluator */
-      public readonly evaluator: Evaluator,
-      /** Service handling postponed CRUD transformations */
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    /** Engine config */
+    public readonly config: Config,
+    /** Statistics module for benchmarking */
+    public readonly stats: Statistics,
+    /** Dependency graph storing sheets structure */
+    public readonly dependencyGraph: DependencyGraph,
+    /** Column search strategy used by VLOOKUP plugin */
+    public readonly columnSearch: IColumnSearchStrategy,
+    /** Parser with caching */
+    private readonly parser: ParserWithCaching,
+    private readonly unparser: Unparser,
+    private readonly cellContentParser: CellContentParser,
+    /** Formula evaluator */
+    public readonly evaluator: Evaluator,
+    /** Service handling postponed CRUD transformations */
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
   }
@@ -442,10 +441,13 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
 
+  public clipboardClear(): void {
+    this.crudOperations.clipboardClear()
+  }
+
   public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
     return this.dependencyGraph.getValuesInRange(range)
   }
-
 
   /**
    * Returns information whether its possible to add sheet

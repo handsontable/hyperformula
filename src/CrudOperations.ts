@@ -130,6 +130,10 @@ export class CrudOperations implements IBatchExecutor {
     this.clipboardOperations.paste(targetLeftCorner)
   }
 
+  public clipboardClear(): void {
+    this.clipboardOperations.clear()
+  }
+
   public addSheet(name?: string): string {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
