@@ -31,6 +31,7 @@ import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
+import {cellValueRounding} from './CellValueRounding'
 import {Statistics, StatType} from './statistics/Statistics'
 
 export class NoSheetWithIdError extends Error {
@@ -141,17 +142,7 @@ export class HyperFormula {
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
     const val = this.dependencyGraph.getCellValue(address)
-    if(this.config.smartRounding && typeof val == 'number' && !Number.isInteger(val)) { //CUSTOM ROUNDING
-      const placesMultiplier = Math.pow(10, this.config.precisionRounding)
-      if (val < 0) {
-        return -Math.round(-val * placesMultiplier) / placesMultiplier
-      } else {
-        return Math.round(val * placesMultiplier) / placesMultiplier
-      }
-    }
-    else {
-      return val
-    }
+    return cellValueRounding(val, this.config)
   }
 
   /**
