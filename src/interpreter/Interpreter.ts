@@ -1,6 +1,6 @@
 import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -49,6 +49,9 @@ export class Interpreter {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(formulaAddress)
+        if (invalidSimpleCellAddress(address)) {
+          return new CellError(ErrorType.REF)
+        }
         return this.dependencyGraph.getCellValue(address)
       }
       case AstNodeType.NUMBER:

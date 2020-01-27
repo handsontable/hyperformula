@@ -1,4 +1,4 @@
-
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
   CellType,
@@ -110,25 +110,25 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  private crudOperations: CrudOperations
+  private readonly crudOperations: CrudOperations
 
   constructor(
-      /** Engine config */
-      public readonly config: Config,
-      /** Statistics module for benchmarking */
-      public readonly stats: Statistics,
-      /** Dependency graph storing sheets structure */
-      public readonly dependencyGraph: DependencyGraph,
-      /** Column search strategy used by VLOOKUP plugin */
-      public readonly columnSearch: IColumnSearchStrategy,
-      /** Parser with caching */
-      private readonly parser: ParserWithCaching,
-      private readonly unparser: Unparser,
-      private readonly cellContentParser: CellContentParser,
-      /** Formula evaluator */
-      public readonly evaluator: Evaluator,
-      /** Service handling postponed CRUD transformations */
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    /** Engine config */
+    public readonly config: Config,
+    /** Statistics module for benchmarking */
+    public readonly stats: Statistics,
+    /** Dependency graph storing sheets structure */
+    public readonly dependencyGraph: DependencyGraph,
+    /** Column search strategy used by VLOOKUP plugin */
+    public readonly columnSearch: IColumnSearchStrategy,
+    /** Parser with caching */
+    private readonly parser: ParserWithCaching,
+    private readonly unparser: Unparser,
+    private readonly cellContentParser: CellContentParser,
+    /** Formula evaluator */
+    public readonly evaluator: Evaluator,
+    /** Service handling postponed CRUD transformations */
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
   }
@@ -438,6 +438,62 @@ export class HyperFormula {
   }
 
   /**
+   * Stores copy of cell block in internal clipboard for further paste.</br>
+   * Returns values of cells for use in external clipboard.
+   *
+   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param width - width of the cell block being copied
+   * @param height - height of the cell block being copied
+  * */
+  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.clipboardCopy(sourceLeftCorner, width, height)
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+  }
+
+  /**
+   * Stores information of cell block in internal clipboard for further paste. </br>
+   * Calling {@link clipboardPaste} right after this method is equivalent to call {@link moveCells}.</br>
+   * Almost any CRUD operation called after this method will abort cut operation.</br>
+   * Returns values of cells for use in external clipboard.
+   *
+   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param width - width of the cell block being copied
+   * @param height - height of the cell block being copied
+   * */
+  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+    this.crudOperations.clipboardCut(sourceLeftCorner, width, height)
+    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+  }
+
+  /**
+   * When called after {@link clipboardCopy} it will paste copied values and formulas into cell block.</br>
+   * When called after {@link clipboardPaste} it will perform {@link moveCells} operation into the cell block.</br>
+   * Does nothing if clipboard is empty.
+   *
+   * @param targetLeftCorner - upper left address of the target cell block
+   * */
+  public clipboardPaste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+    this.crudOperations.clipboardPaste(targetLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+  }
+
+  /**
+   * Clears clipboard content.
+   * */
+  public clipboardClear(): void {
+    this.crudOperations.clipboardClear()
+  }
+
+  /**
+   * Returns cell content of cells in given range
+   *
+   * @param range
+   */
+  public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
+    return this.dependencyGraph.getValuesInRange(range)
+  }
+
+  /**
    * Returns information whether its possible to add sheet
    *
    * If returns true, doing this operation won't throw any errors
@@ -509,6 +565,7 @@ export class HyperFormula {
    * @param name - sheet name
    * */
   public clearSheet(name: string): CellValueChange[] {
+    this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
     return this.recomputeIfDependencyGraphNeedsIt().getChanges()
   }
@@ -717,6 +774,7 @@ export class HyperFormula {
     this.parser.destroy()
     this.lazilyTransformingAstService.destroy()
     this.stats.destroy()
+    this.crudOperations.clipboardClear()
   }
 
   /**
