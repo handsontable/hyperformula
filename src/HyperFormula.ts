@@ -179,7 +179,7 @@ export class HyperFormula {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.dependencyGraph.getCellValue(address)
+        arr[i][j] = cellValueRounding(this.dependencyGraph.getCellValue(address), this.config)
       }
     }
 
