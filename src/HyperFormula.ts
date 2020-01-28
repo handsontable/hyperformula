@@ -245,7 +245,7 @@ export class HyperFormula {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -303,7 +303,7 @@ export class HyperFormula {
    */
   public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -333,7 +333,7 @@ export class HyperFormula {
    * */
   public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -363,7 +363,7 @@ export class HyperFormula {
    * */
   public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -393,7 +393,7 @@ export class HyperFormula {
    * */
   public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -425,7 +425,7 @@ export class HyperFormula {
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -465,7 +465,7 @@ export class HyperFormula {
    * */
   public clipboardPaste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.clipboardPaste(targetLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -531,7 +531,7 @@ export class HyperFormula {
    */
   public removeSheet(name: string): CellValueChange[] {
     this.crudOperations.removeSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -558,7 +558,7 @@ export class HyperFormula {
   public clearSheet(name: string): CellValueChange[] {
     this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**
@@ -752,7 +752,7 @@ export class HyperFormula {
     } catch (e) {
       /* TODO we should be able to return error information along with changes */
     }
-    return this.recomputeIfDependencyGraphNeedsIt().getChanges()
+    return this.recomputeIfDependencyGraphNeedsIt().applyMap( (arg) => cellValueRounding(arg, this.config)).getChanges()
   }
 
   /**

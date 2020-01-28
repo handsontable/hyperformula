@@ -34,6 +34,12 @@ export class ContentChanges {
     this.changes.push(...change)
   }
 
+  public applyMap(fnMap: (arg: CellValue) => CellValue ) {
+    for(let i in this.changes)
+      this.changes[i].value = fnMap(this.changes[i].value)
+    return this
+  }
+
   public getChanges() {
     return this.changes
   }
