@@ -141,8 +141,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    const val = this.dependencyGraph.getCellValue(address)
-    return cellValueRounding(val, this.config)
+    return cellValueRounding(this.dependencyGraph.getCellValue(address), this.config)
   }
 
   /**
@@ -481,7 +480,11 @@ export class HyperFormula {
    * @param range
    */
   public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
-    return this.dependencyGraph.getValuesInRange(range)
+    return this.dependencyGraph.getValuesInRange(range).map(
+      (subarray: CellValue[]) => subarray.map(
+        (arg) => cellValueRounding(arg, this.config)
+      )
+    )
   }
 
   /**
