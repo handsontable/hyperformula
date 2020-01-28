@@ -19,7 +19,8 @@ const prefSumDays: number[] =
     31 + 28 + 31 + 30 + 31 + 30 + 31 + 31,
     31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
     31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30]
+    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
+    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31]
 /*
  * counts the number of leap years so far, including this year
  */
@@ -28,16 +29,54 @@ function leapYearsCount(year: number): number {
 }
 
 
-export function toDateNumberFromZero(year: number, month: number, day: number): number {
+function toDateNumberFromZero(year: number, month: number, day: number): number {
   return 365*year + prefSumDays[month-1] + day-1 + (month<=2 ? leapYearsCount(year - 1) : leapYearsCount(year))
+}
+
+function isLeapYear(year: number): boolean {
+  if(year%4) {
+    return true
+  } else if(year%100) {
+    return false
+  } else if(year%400) {
+    return true
+  } else {
+    return false
+  }
 }
 
 export function toDateNumber(year: number, month: number, day: number): number {
   return toDateNumberFromZero(year,month,day) - toDateNumberFromZero(1899,12,30)
 }
 
-export function dateNumberToMoment(dateNumber: number): Moment {
-  return DATE_ZERO.clone().add(dateNumber, 'days')
+export function dateNumberToMoment(arg: number): Moment {
+  let dateNumber = arg + toDateNumberFromZero(1899,12,30)
+  let year = Math.floor(dateNumber/365.2425)
+  if(toDateNumber(year,1,1) <= dateNumber){
+    year++
+  }
+  else if(toDateNumber(year-1,1,1) > dateNumber){
+    year--
+  }
+
+  let dayOfYear = dateNumber - toDateNumber(year, 1, 1)
+  let month = 0
+  if(isLeapYear(year) && dayOfYear >= 59) {
+    while(prefSumDays[month+1] <= dayOfYear-1) {
+      month++
+    }
+  } else {
+    while(prefSumDays[month+1] <= dayOfYear) {
+      month++
+    }
+  }
+  let day = dayOfYear - prefSumDays[month]
+  return moment({
+    year: year,
+    month: month+1,
+    day: day+1,
+  })
+  //return DATE_ZERO.clone().add(dateNumber, 'days')
 }
 
 export function dateNumberToDayOfMonth(dateNumber: number): number {
