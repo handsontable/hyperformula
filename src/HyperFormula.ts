@@ -137,6 +137,7 @@ export class HyperFormula {
 
   /**
    * Returns value of the cell with the given address.
+   * Applies rounding and post-processing.
    *
    * @param address - cell coordinates
    */
