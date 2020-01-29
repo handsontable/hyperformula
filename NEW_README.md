@@ -1,6 +1,3 @@
-<!-- # ![Logo](./HF_logo.png "Logo_HF") -->
-
-
 <h1><img src="./HF_logo.png" alt="HF_Logo" style="max-width:500px"></h1>
 
 **HyperFormula** is an open-source high-performance calculation engine for JavaScript with GPU-acceleration, spreadsheet-like syntax, and support for CRUD operations. 
@@ -12,11 +9,10 @@ The concept of HyperFormula originates from the need of efficient and flexible m
 
 ## Documentation
 
-* API reference
+* API reference {{LINK}}
 * Quick start
 * How it works
 * Core features
-* Demos
 * Benchmarks and demos
 * Browser compatibility
 * Contributing
@@ -66,7 +62,7 @@ console.log('Calculated value for', cellFormula, 'is', cellValue);
 
 * Purely client-side, typescript code with static types
 * Spreadsheet formulas syntax
-* n / 484 built-in functions (see the list)
+* 55 of 484 built-in functions (see the list)
 * High speed parser and evaluator
 * Undo/redo stack
 * Ready for localization
@@ -141,7 +137,7 @@ Do not hesitate to contact us at hyperformula@handsontable.com to get more detai
 
 ## Roadmap
 
-A plan for HyperFormula is to grow it to become a fully developed engine that covers 100% of formulas available in spreadsheets on the market such as offered by Microsoft Excel, Google Sheets or Libre Office Calc. Apart from being functional, HyperFormula is planned to be OpenFormula standard-compliant, that is, to meet all the requirements of Evaluators.
+A plan for HyperFormula is to grow it to become a fully developed engine that covers 100% of formulas available in spreadsheets on the market such as offered by Microsoft Excel, Google Sheets or Libre Office Calc. Apart from being functional, HyperFormula is planned to be OpenFormula standard-compliant, that is, to meet all the requirements of its Evaluators. A todo list:
 
 
 
@@ -152,7 +148,7 @@ A plan for HyperFormula is to grow it to become a fully developed engine that co
 * Optimize AST by implementing B-trees
 * Optimize some calculations using WebWorkers
 * Allow cross-sheet references
-* Extended localization for more languages
+* Extend localization for more languages
 * Support for named ranges
 * Support for DAX formulas
 
