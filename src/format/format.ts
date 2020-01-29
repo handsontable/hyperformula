@@ -70,7 +70,7 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
 function dateFormat(tokens: FormatToken[], value: number): CellValue {
   let result = ''
   const date = dateNumberToMoment(value)
-  let minutes: boolean = false
+//  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
@@ -81,14 +81,14 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
 
     switch (token.value) {
         /* hours*/
-      case 'h':
-      case 'H':
-      case 'hh':
-      case 'HH': {
-        minutes = true
-        result += date.format(token.value)
-        break
-      }
+//      case 'h':
+//      case 'H':
+//      case 'hh':
+//      case 'HH': {
+//        minutes = true
+//        result += date.format(token.value)
+//        break
+//      }
 
         /* days */
       case 'd':
@@ -98,44 +98,44 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
         result += padLeft(date.date(), token.value.length)
         break
       }
-      case 'ddd':
-      case 'DDD':
-        result += date.format('ddd')
-        break
-      case 'dddd':
-      case 'DDDD': {
-        result += date.format('dddd')
-        break
-      }
+//      case 'ddd':
+//      case 'DDD':
+//        result += date.format('ddd')
+//        break
+//      case 'dddd':
+//      case 'DDDD': {
+//        result += date.format('dddd')
+//        break
+//      }
 
         /* minutes / months */
       case 'M':
       case 'm':
       case 'MM':
       case 'mm': {
-        if (minutes) {
-          result += padLeft(date.minute(), token.value.length)
-          break
-        } else {
+//        if (minutes) {
+//          result += padLeft(date.minute(), token.value.length)
+//          break
+//        } else {
           result += padLeft(date.month() + 1, token.value.length)
           break
-        }
+//        }
       }
-      case 'mmm':
-      case 'MMM': {
-        result += date.format('MMM')
-        break
-      }
-      case 'mmmm':
-      case 'MMMM': {
-        result += date.format('MMMM')
-        break
-      }
-      case 'mmmmm':
-      case 'MMMMM': {
-        result += date.format('MMMM')[0]
-        break
-      }
+      // case 'mmm':
+      // case 'MMM': {
+      //   result += date.format('MMM')
+      //   break
+      // }
+      // case 'mmmm':
+      // case 'MMMM': {
+      //   result += date.format('MMMM')
+      //   break
+      // }
+      // case 'mmmmm':
+      // case 'MMMMM': {
+      //   result += date.format('MMMM')[0]
+      //   break
+      // }
 
         /* years */
       case 'yy':
@@ -149,11 +149,11 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
         break
       }
 
-      /* AM / PM */
-      case 'AM/PM': {
-        result += date.format('A')
-        break
-      }
+      // /* AM / PM */
+      // case 'AM/PM': {
+      //  result += date.format('A')
+      //  break
+      // }
       default:
         throw new Error('Mismatched token type')
     }
