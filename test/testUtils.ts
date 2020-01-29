@@ -1,3 +1,4 @@
+import moment from 'moment'
 import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
@@ -76,7 +77,9 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 }
 
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
-  return dateNumberToMoment(dateNumber as number).format(dateFormat)
+  const date = dateNumberToMoment(dateNumber as number)
+  const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
+  return  dateMoment.format(dateFormat)
 }
 
 export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {

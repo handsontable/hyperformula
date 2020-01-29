@@ -42,11 +42,18 @@ function isLeapYear(year: number): boolean {
 }
 
 
+export interface HFDate {
+  year: number,
+  month: number,
+  day: number
+}
+
+
 export function toDateNumber(year: number, month: number, day: number): number {
   return toDateNumberFromZero(year,month,day) - 693958 //toDateNumberFromZero(1899,12,30)
 }
 
-export function dateNumberToMoment(arg: number): Moment {
+export function dateNumberToMoment(arg: number): HFDate {
   let dateNumber = arg + 693958 //toDateNumberFromZero(1899,12,30)
   let year = Math.floor(dateNumber/365.2425)
   if(toDateNumberFromZero(year+1,1,1) <= dateNumber){
@@ -61,23 +68,19 @@ export function dateNumberToMoment(arg: number): Moment {
     (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear-1 : dayOfYear
   )
   let day = dayOfYear - prefSumDays[month]
-  return moment({
-    year: year,
-    month: month,
-    day: day+1,
-  })
+  return {year: year, month: month, day: day}
 }
 
 export function dateNumberToDayOfMonth(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).date()
+  return dateNumberToMoment(dateNumber).day + 1
 }
 
 export function dateNumberToMonthNumber(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).month() + 1
+  return dateNumberToMoment(dateNumber).month + 1
 }
 
 export function dateNumberToYearNumber(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).year()
+  return dateNumberToMoment(dateNumber).year
 }
 
 export function momentToDateNumber(date: Moment) {

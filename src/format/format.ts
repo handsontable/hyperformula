@@ -95,7 +95,7 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
       case 'D':
       case 'dd':
       case 'DD': {
-        result += padLeft(date.date(), token.value.length)
+        result += padLeft(date.day+1, token.value.length)
         break
       }
 //      case 'ddd':
@@ -117,7 +117,7 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
 //          result += padLeft(date.minute(), token.value.length)
 //          break
 //        } else {
-          result += padLeft(date.month() + 1, token.value.length)
+          result += padLeft(date.month + 1, token.value.length)
           break
 //        }
       }
@@ -140,12 +140,12 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
         /* years */
       case 'yy':
       case 'YY': {
-        result += date.format('YY')
+        result += padLeft(date.year % 100, token.value.length)
         break
       }
       case 'yyyy':
       case 'YYYY': {
-        result += date.year()
+        result += date.year
         break
       }
 

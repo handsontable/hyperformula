@@ -1,3 +1,4 @@
+import moment from 'moment'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   dateNumberToDayOfMonth,
@@ -104,7 +105,8 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const dateMoment = dateNumberToMoment(dateNumber)
+    const date = dateNumberToMoment(dateNumber)
+    const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
     if (numberOfMonthsToShift > 0) {
       dateMoment.add(numberOfMonthsToShift, 'months')
     } else {
