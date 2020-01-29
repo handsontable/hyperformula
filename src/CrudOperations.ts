@@ -121,7 +121,8 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
-    /* TODO ensure it is valid operation */
+    this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTragetRow)
+
     const width = this.dependencyGraph.getSheetWidth(sheet)
     this.addRows(sheet, [beforeTragetRow, numberOfRows])
 
@@ -354,6 +355,17 @@ export class CrudOperations implements IBatchExecutor {
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
       throw new Error('It is not possible to replace cells with matrix')
+    }
+  }
+
+  public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
+    if (
+      !this.sheetMapping.hasSheetWithId(sheet)
+      || invalidSimpleCellAddress(simpleCellAddress(sheet, 0, startRow))
+      || invalidSimpleCellAddress(simpleCellAddress(sheet, 0, beforeTragetRow))
+      || (beforeTragetRow <= startRow + numberOfRows && beforeTragetRow >= startRow)
+    ) {
+      throw new Error('Invalid arguments')
     }
   }
 

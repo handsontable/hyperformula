@@ -428,6 +428,16 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 
+
+  public isItPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTargetRow)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): CellValueChange[] {
     this.crudOperations.moveRows(sheet, startRow, numberOfRows, beforeTargetRow)
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
