@@ -10,12 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Core functionality of the engine;
-- Support for function types: basic, mathematics, statistics, finance, date and time;
-- Support for data types: String, Error, Number;
-- Support for logical operators;
-- Support for arithmetic operators;
-- CRUD operations;
+- Support for data types: String, Error, Number, Date;
+- Support for logical operators: =, <>, >, <, >=, <=;
+- Support for arithmetic operators: +, -, *, /, %;
+- Support for text operator: &;
+- CRUD operations: 
+  - modifying the value of a single cell, 
+  - adding/deleting row/column, 
+  - reading the value or formula from the selected cell, 
+  - moving a cell or a block of cells, 
+  - deleting a subset of rows or columns, 
+  - updating a set of cells at the same time by using a fill handle feature, 
+  - deleting a subset of rows or columns, 
+  - recalculating and refreshing of a worksheet;
 - Following formulas: DATE(), DAYS(), ASIN(), COS(), E(), ERFC(), LOG(), PI(), SIN(), TAN(), AND(), AVERAGEA(), BASE(), BIN2HEX(), BITAND(), BITOR(), BITXOR(), CHAR(), CONCATENATE(), COUNTBLANK(), COUNTIFS(), COUNTIF(), DEC2BIN(), DEC2OCT(), DEGREES(), EVEN(), INT(), ISODD(), MAXA(), MIN(), MOD(), ODD(), ROUND(), ROUNDUP(), SUM(), SUMIFS(), SUMSQ(), XOR(), FALSE(), DAY(), ACOS(), ATAN(), COT(), ERF(), LN(), LOG10(), POWER(), SQRT(), ABS(), AVERAGE(), AVERAGEIF(), BIN2DEC(), BIN2OCT(), BITLSHIFT(), BITRSHIFT(), CEILING(), CODE(), CORREL(), COUNTA(), COUNTUNIQUE(), DEC2HEX(), DECIMAL(), DELTA(), IF(), ISEVEN(), MAX(), MEDIAN(), MINA(), NOT(), OR(), ROUNDDOWN(), SPLIT(), SUMIF(), SUMPRODUCT(), TRUNC(), TRUE();
 - Set http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part2.html as a standard to follow;
-- Basic error handling;
-- Basic language support.
+- Error handling: 
+  - Division by zero: DIV_BY_ZERO,
+  - Unknown function name: NAME, VALUE, NUM, NA,
+  - Cyclic dependency: CYCLE,
+  - Wrong address reference: REF;
+- Built-in formula translations support for enGB and plPL. To add new language check contribution guidelines.
+
