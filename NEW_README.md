@@ -1,4 +1,7 @@
-# ![Logo](./HF_logo.png "Logo_HF")
+<!-- # ![Logo](./HF_logo.png "Logo_HF") -->
+
+
+<h1><img src="./HF_logo.png" alt="HF_Logo" style="max-width:500px"></h1>
 
 **HyperFormula** is an open-source high-performance calculation engine for JavaScript with GPU-acceleration, spreadsheet-like syntax, and support for CRUD operations. 
 
