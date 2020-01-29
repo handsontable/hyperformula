@@ -66,7 +66,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('R1')).toEqual(0); // PERCENTAGE  
     })
 
-    it('BLANK and TRUE should be supported by all comparison operators', () => {
+    xit('BLANK and TRUE should be supported by all comparison operators', () => {
         const engine = createEngine([
             [null, 'true', ...data],
         ]);
