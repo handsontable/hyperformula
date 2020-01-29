@@ -43,7 +43,6 @@ function isLeapYear(year: number): boolean {
 
 
 export function toDateNumber(year: number, month: number, day: number): number {
-  let val = toDateNumberFromZero(1899,12,30)
   return toDateNumberFromZero(year,month,day) - 693958 //toDateNumberFromZero(1899,12,30)
 }
 
@@ -82,7 +81,7 @@ export function dateNumberToYearNumber(dateNumber: number): number {
 }
 
 export function momentToDateNumber(date: Moment) {
-  return Math.round(date.diff(DATE_ZERO, 'days', true))
+  return toDateNumber(date.year(), date.month()+1, date.date()) //Math.round(date.diff(DATE_ZERO, 'days', true))
 }
 
 export function stringToDateNumber(dateString: string, dateFormat: string): number | null {

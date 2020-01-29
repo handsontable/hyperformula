@@ -16,7 +16,7 @@ describe('Date helpers', () => {
     expect(dateNumberToMonthNumber(43465)).toEqual(12)
   })
 
-  it('#stringToDateNumber - tests expected to return null', () => {
+  it('#stringToDateNumber - tests expected to return not null', () => {
     const defaultFormat = Config.defaultConfig.dateFormat
     expect(stringToDateNumber('08/16/1985', defaultFormat)).toBe(31275)
     expect(stringToDateNumber('01/15/2020', defaultFormat)).toBe(43845)
