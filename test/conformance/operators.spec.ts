@@ -46,7 +46,7 @@ describe('Quality assurance of operators', () => {
 
     xit('TRUE and BLANK should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['true', null, ...data],
+            ['true', null, ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -68,7 +68,7 @@ describe('Quality assurance of operators', () => {
 
     xit('BLANK and TRUE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            [null, 'true', ...data],
+            [null, 'true', ...data]
         ]);
 
         expect(engine.getCellValue('D1')).toEqual(false); // GT    
@@ -82,7 +82,7 @@ describe('Quality assurance of operators', () => {
 
     xit('TRUE and TRUE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['true', 'true', ...data],
+            ['true', 'true', ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(true);  // EQUAL
@@ -104,7 +104,7 @@ describe('Quality assurance of operators', () => {
 
     xit('TRUE and FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['true', 'false', ...data],
+            ['true', 'false', ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -123,7 +123,7 @@ describe('Quality assurance of operators', () => {
 
     xit('FALSE and FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['false', 'false', ...data],
+            ['false', 'false', ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(true);  // EQUAL
@@ -142,6 +142,25 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS
         expect(engine.getCellValue('R1')).toEqual(0); // PERCENTAGE
     })
+
+    it('FALSE and TRUE should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['false', 'true', ...data]
+        ]);
+
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        expect(engine.getCellValue('E1')).toEqual(true); // LT   
+        expect(engine.getCellValue('F1')).toEqual(false); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('J1')).toEqual(-1); // SUB  
+        expect(engine.getCellValue('L1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO)); // DIV   
+        expect(engine.getCellValue('M1')).toEqual(1); // EXP  
+        
+    })
+
+
+
+   
 
 
 })
