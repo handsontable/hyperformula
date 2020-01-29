@@ -5,7 +5,6 @@ import {
   dateNumberToMoment,
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
-  momentToDateNumber,
   toDateNumber,
 } from '../../Date'
 import {format} from '../../format/format'
@@ -113,7 +112,7 @@ export class DatePlugin extends FunctionPlugin {
       dateMoment.subtract(-numberOfMonthsToShift, 'months')
     }
     dateMoment.endOf('month').startOf('date')
-    return momentToDateNumber(dateMoment)
+    return toDateNumber(dateMoment.year(), dateMoment.month()+1, dateMoment.date())
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

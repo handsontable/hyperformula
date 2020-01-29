@@ -1,11 +1,5 @@
 import moment, {Moment} from 'moment'
 
-const DATE_ZERO = moment({
-  year: 1899,
-  month: 11,
-  day: 30,
-})
-
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
 
 function dayToMonth(dayOfYear: number): number {
@@ -83,11 +77,7 @@ export function dateNumberToYearNumber(dateNumber: number): number {
   return dateNumberToMoment(dateNumber).year
 }
 
-export function momentToDateNumber(date: Moment) {
-  return toDateNumber(date.year(), date.month()+1, date.date()) //Math.round(date.diff(DATE_ZERO, 'days', true))
-}
-
 export function stringToDateNumber(dateString: string, dateFormat: string): number | null {
   const date = moment(dateString, dateFormat, true)
-  return date.isValid() ? momentToDateNumber(date) : null
+  return date.isValid() ? toDateNumber(date.year(), date.month()+1, date.date()) : null
 }
