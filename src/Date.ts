@@ -8,19 +8,7 @@ const DATE_ZERO = moment({
 
 const days: number[] = [31,28,31,30,31,30,31,31,30,31,30,31]
 const prefSumDays: number[] =
-  [0,
-    31,
-    31 + 28,
-    31 + 28 + 31,
-    31 + 28 + 31 + 30,
-    31 + 28 + 31 + 30 + 31,
-    31 + 28 + 31 + 30 + 31 + 30,
-    31 + 28 + 31 + 30 + 31 + 30 + 31,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
-    31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31]
+  [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334, 365]
 /*
  * counts the number of leap years so far, including this year
  */
@@ -51,6 +39,8 @@ export function toDateNumber(year: number, month: number, day: number): number {
   return var1-var2
 }
 
+
+
 export function dateNumberToMoment(arg: number): Moment {
   let dateNumber = arg + toDateNumberFromZero(1899,12,30)
   let year = Math.floor(dateNumber/365.2425)
@@ -78,7 +68,6 @@ export function dateNumberToMoment(arg: number): Moment {
     month: month,
     day: day+1,
   })
-  //return DATE_ZERO.clone().add(dateNumber, 'days')
 }
 
 export function dateNumberToDayOfMonth(dateNumber: number): number {
