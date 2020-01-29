@@ -16,7 +16,6 @@ function leapYearsCount(year: number): number {
   return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)
 }
 
-
 function toDateNumberFromZero(year: number, month: number, day: number): number {
   return 365*year + prefSumDays[month-1] + day-1 + (month<=2 ? leapYearsCount(year - 1) : leapYearsCount(year))
 }
@@ -33,13 +32,17 @@ function isLeapYear(year: number): boolean {
   }
 }
 
-export function toDateNumber(year: number, month: number, day: number): number {
-  const var1 = toDateNumberFromZero(year,month,day)
-  const var2 = toDateNumberFromZero(1899,12,30)
-  return var1-var2
+function dayToMonth(dayOfYear: number): number {
+  let month = 0
+  while(prefSumDays[month+1] <= dayOfYear) {
+    month++
+  }
+  return month
 }
 
-
+export function toDateNumber(year: number, month: number, day: number): number {
+  return toDateNumberFromZero(year,month,day) - toDateNumberFromZero(1899,12,30)
+}
 
 export function dateNumberToMoment(arg: number): Moment {
   let dateNumber = arg + toDateNumberFromZero(1899,12,30)
@@ -52,16 +55,9 @@ export function dateNumberToMoment(arg: number): Moment {
   }
 
   let dayOfYear = dateNumber - toDateNumberFromZero(year, 1, 1)
-  let month = 0
-  if(isLeapYear(year) && dayOfYear >= 59) {
-    while(prefSumDays[month+1] <= dayOfYear-1) {
-      month++
-    }
-  } else {
-    while(prefSumDays[month+1] <= dayOfYear) {
-      month++
-    }
-  }
+  let month = dayToMonth(
+    (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear-1 : dayOfYear
+  )
   let day = dayOfYear - prefSumDays[month]
   return moment({
     year: year,
