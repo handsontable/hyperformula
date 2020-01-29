@@ -71,6 +71,16 @@ export class ParserWithCaching {
     return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
   }
 
+  public fetchCachedResult(hash: string): ParsingResult {
+    const cacheResult = this.cache.get(hash)
+    if (cacheResult === null) {
+      throw new Error('There is no AST with such key in the cache')
+    } else {
+      const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
+      return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+    }
+  }
+
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
     let hash = ''
     let idx = 0

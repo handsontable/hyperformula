@@ -1,6 +1,7 @@
 import {Config, HyperFormula} from '../src'
 import {CellError, CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
+import {FormulaCellVertex} from '../src/DependencyGraph'
 import {adr, expect_reference_to_have_ref_error} from './testUtils'
 
 describe('Integration', () => {
