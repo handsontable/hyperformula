@@ -428,6 +428,11 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): CellValueChange[] {
+    this.crudOperations.moveRows(sheet, startRow, numberOfRows, beforeTargetRow)
+    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+  }
+
   /**
    * Stores copy of cell block in internal clipboard for further paste.</br>
    * Returns values of cells for use in external clipboard.

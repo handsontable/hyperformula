@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, EmptyValue, invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
@@ -116,6 +116,15 @@ export class CrudOperations implements IBatchExecutor {
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
+    /* TODO ensure it is valid operation */
+    const width = this.dependencyGraph.getSheetWidth(sheet)
+    this.addRows(sheet, [beforeTragetRow, numberOfRows])
+    this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+    this.removeRows(sheet, [startRow, numberOfRows])
+    /* TODO correctTransformHistory */
   }
 
   public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
