@@ -6,12 +6,21 @@ const DATE_ZERO = moment({
   day: 30,
 })
 
-const days: number[] = [31,28,31,30,31,30,31,31,30,31,30,31]
-const prefSumDays: number[] =
-  [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334, 365]
-/*
- * counts the number of leap years so far, including this year
- */
+const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
+
+function dayToMonth(dayOfYear: number): number {
+  let month = 0
+  if(prefSumDays[month+6] <= dayOfYear)
+    month+=6
+  if(prefSumDays[month+3] <= dayOfYear)
+    month+=3
+  if(prefSumDays[month+2] <= dayOfYear)
+    month+=2
+  else if(prefSumDays[month+1] <= dayOfYear)
+    month+=1
+  return month
+}
+
 function leapYearsCount(year: number): number {
   return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)
 }
@@ -32,13 +41,6 @@ function isLeapYear(year: number): boolean {
   }
 }
 
-function dayToMonth(dayOfYear: number): number {
-  let month = 0
-  while(prefSumDays[month+1] <= dayOfYear) {
-    month++
-  }
-  return month
-}
 
 export function toDateNumber(year: number, month: number, day: number): number {
   return toDateNumberFromZero(year,month,day) - toDateNumberFromZero(1899,12,30)
