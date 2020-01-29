@@ -32,9 +32,8 @@ describe('#coerceBooleanToNumber', () => {
   })
 
   it('behaves the same as more general coercion', () => {
-    const defaultFormat = Config.defaultConfig.dateFormat
-    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, defaultFormat))
-    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, defaultFormat))
+    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, new Config()))
+    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, new Config()))
   })
 })
 
@@ -65,17 +64,16 @@ describe('#coerceScalarToBoolean', () => {
 
 describe('#coerceScalarToNumber', () => {
   it('works', () => {
-    const defaultFormat = Config.defaultConfig.dateFormat
-    expect(coerceScalarToNumber(1, defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber(1, new Config())).toEqual(1)
 
-    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), defaultFormat)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), new Config())).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(coerceScalarToNumber('12/31/1899', defaultFormat)).toEqual(1)
-    expect(coerceScalarToNumber(true, defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber('12/31/1899', new Config())).toEqual(1)
+    expect(coerceScalarToNumber(true, new Config())).toEqual(1)
 
-    expect(coerceScalarToNumber('foo42', defaultFormat)).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceScalarToNumber('foo42', new Config())).toEqual(new CellError(ErrorType.VALUE))
 
-    expect(coerceScalarToNumber('1', defaultFormat)).toEqual(1)
+    expect(coerceScalarToNumber('1', new Config())).toEqual(1)
   })
 
 })

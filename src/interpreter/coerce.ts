@@ -1,4 +1,5 @@
 import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
+import {Config} from '../Config'
 import {stringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -7,15 +8,15 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * Date like literals will be converted to number representation (days after 12th Dec 1899)
  *
  * @param arg - cell value
- * @param dateFormat - date format pattern used when argument is a text
+ * @param config
  */
-export function coerceScalarToNumber(arg: CellValue, dateFormat: string): number | CellError {
+export function coerceScalarToNumber(arg: CellValue, config: Config): number | CellError {
   let ret = coerceNonDateScalarToMaybeNumber(arg)
   if (ret != null) {
     return ret
   }
   if (typeof arg === 'string') {
-    const parsedDateNumber = stringToDateNumber(arg, dateFormat)
+    const parsedDateNumber = stringToDateNumber(arg, config.dateFormat)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }
