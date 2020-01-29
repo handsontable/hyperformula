@@ -1,3 +1,5 @@
+import {worker} from 'cluster'
+import {start} from 'repl'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
@@ -122,8 +124,15 @@ export class CrudOperations implements IBatchExecutor {
     /* TODO ensure it is valid operation */
     const width = this.dependencyGraph.getSheetWidth(sheet)
     this.addRows(sheet, [beforeTragetRow, numberOfRows])
-    this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
-    this.removeRows(sheet, [startRow, numberOfRows])
+
+    if (beforeTragetRow < startRow) {
+      this.moveCells(simpleCellAddress(sheet, 0 , startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+      this.removeRows(sheet, [startRow + numberOfRows, numberOfRows])
+    } else {
+      this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+      this.removeRows(sheet, [startRow, numberOfRows])
+    }
+
     /* TODO correctTransformHistory */
   }
 
