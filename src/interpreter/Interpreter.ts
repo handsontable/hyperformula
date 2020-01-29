@@ -10,7 +10,20 @@ import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {add, compare, divide, multiply, percent, power, subtract, unaryminus, unaryplus} from './scalar'
+import {
+  add,
+  compare,
+  divide, equality, nonequality,
+  greater,
+  greatereq,
+  less, lesseq,
+  multiply,
+  percent,
+  power,
+  subtract,
+  unaryminus,
+  unaryplus
+} from './scalar'
 import {concatenate} from './text'
 
 export class Interpreter {
@@ -67,11 +80,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        if (typeof leftResult !== typeof rightResult) {
-          return false
-        } else {
-          return leftResult === rightResult
-        }
+        return compare( leftResult, rightResult, equality, this.config)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -90,11 +99,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        if (typeof leftResult !== typeof rightResult) {
-          return true
-        } else {
-          return leftResult !== rightResult
-        }
+        return compare( leftResult, rightResult, nonequality, this.config)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -113,7 +118,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 > arg2})
+        return compare( leftResult, rightResult, greater, this.config)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -132,8 +137,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 < arg2})
-
+        return compare( leftResult, rightResult, less, this.config)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -152,7 +156,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 >= arg2})
+        return compare( leftResult, rightResult, greatereq, this.config)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -171,7 +175,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, this.config.dateFormat, (arg1, arg2) => {return arg1 <= arg2})
+        return compare( leftResult, rightResult, lesseq, this.config)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -190,7 +194,8 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return add(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
+        return add(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat),
+          this.config.precisionEpsilon)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -207,7 +212,8 @@ export class Interpreter {
         if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat))
+        return subtract(coerceScalarToNumber(leftResult, this.config.dateFormat), coerceScalarToNumber(rightResult, this.config.dateFormat),
+          this.config.precisionEpsilon)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)

@@ -1,4 +1,5 @@
-import {CellError, CellValue, CellValueTypeOrd, EmptyValue, ErrorType, getCellValueType} from '../Cell'
+import {CellError, CellValue, CellValueTypeOrd, EmptyValue, EmptyValueType, ErrorType, getCellValueType} from '../Cell'
+import {Config} from '../Config'
 import {stringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
 
@@ -30,13 +31,18 @@ export function nonstrictadd(left: CellValue, right: CellValue): number | CellEr
   }
 }
 
-export function add(left: number | CellError, right: number | CellError): number | CellError {
+export function add(left: number | CellError, right: number | CellError, eps: number): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
-    return left + right
+    const ret = left + right
+    if (Math.abs(ret) < eps * Math.abs(left)  ) {
+      return 0
+    } else {
+      return ret
+    }
   }
 }
 
@@ -49,14 +55,20 @@ export function add(left: number | CellError, right: number | CellError): number
  *
  * @param left - left operand of subtraction
  * @param right - right operand of subtraction
+ * @param eps - precision of comparison
  */
-export function subtract(left: number | CellError, right: number | CellError): number | CellError {
+export function subtract(left: number | CellError, right: number | CellError, eps: number): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
     return right
   } else {
-    return left - right
+    const ret = left - right
+    if ( Math.abs(ret) < eps * Math.abs(left)  ) {
+      return 0
+    } else {
+      return ret
+    }
   }
 }
 
@@ -234,30 +246,115 @@ export function mina(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function compare(left: CellValue, right: CellValue, dateFormat: string, comparator: (arg1: any, arg2: any) => boolean): boolean {
+export function greater(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left > right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left > right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left > mod * right
+  } else {
+    const mod = (1 + eps)
+    return left * mod > right
+  }
+}
+
+export function less(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left < right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left < right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left * mod < right
+  } else {
+    const mod = (1 + eps)
+    return left < mod * right
+  }
+}
+
+export function lesseq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left <= right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left <= right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left <= mod * right
+  } else {
+    const mod = (1 + eps)
+    return left * mod <= right
+  }
+}
+
+export function greatereq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left >= right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left >= right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left * mod >= right
+  } else {
+    const mod = (1 + eps)
+    return left >= mod * right
+  }
+}
+
+export function equality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left === right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left === right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left * mod >= right && left <= right * mod
+  } else {
+    const mod = (1 + eps)
+    return left * mod <= right && left >= right * mod
+  }
+}
+
+export function nonequality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
+  if (typeof left === 'string' || typeof right === 'string') {
+    return left !== right
+  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
+    return left !== right
+  } else if (right >= 0) {
+    const mod = (1 + eps)
+    return left * mod < right || left > right * mod
+  } else {
+    const mod = (1 + eps)
+    return left * mod > right || left < right * mod
+  }
+}
+
+export function compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
+                        comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean, config: Config): boolean {
   if (typeof left === 'string' && typeof right === 'string') {
-    let leftTmp = stringToDateNumber(left, dateFormat)
-    let rightTmp = stringToDateNumber(right, dateFormat)
+    const leftTmp = stringToDateNumber(left, config.dateFormat)
+    const rightTmp = stringToDateNumber(right, config.dateFormat)
     if (leftTmp != null && rightTmp != null) {
-      return comparator(leftTmp, rightTmp)
+      return comparator(leftTmp, rightTmp, config.precisionEpsilon)
     }
   } else if (typeof left === 'string' && typeof right === 'number') {
-    let leftTmp = stringToDateNumber(left, dateFormat)
+    const leftTmp = stringToDateNumber(left, config.dateFormat)
     if (leftTmp != null) {
-      return comparator(leftTmp, right)
+      return comparator(leftTmp, right, config.precisionEpsilon)
     }
-  } else if (typeof left === 'number' && typeof right == 'string') {
-    let rightTmp = stringToDateNumber(right, dateFormat)
+  } else if (typeof left === 'number' && typeof right === 'string') {
+    const rightTmp = stringToDateNumber(right, config.dateFormat)
     if (rightTmp != null) {
-      return comparator(left, rightTmp)
+      return comparator(left, rightTmp, config.precisionEpsilon)
     }
   }
 
-  if (typeof left != typeof right) {
-    return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
-  } else if (left == EmptyValue) {
+  if (typeof left !== typeof right) {
+    return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
+  } else if (left === EmptyValue || right === EmptyValue) {
     return false
   } else {
-    return comparator(left, right)
+    return comparator(left, right, config.precisionEpsilon)
   }
 }

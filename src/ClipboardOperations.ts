@@ -155,6 +155,6 @@ export class ClipboardOperations {
       return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
     }
 
-    throw Error("Trying to copy unsupported type")
+    throw Error('Trying to copy unsupported type')
   }
 }
