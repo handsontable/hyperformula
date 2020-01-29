@@ -35,31 +35,33 @@ function toDateNumberFromZero(year: number, month: number, day: number): number 
 
 function isLeapYear(year: number): boolean {
   if(year%4) {
-    return true
+    return false
   } else if(year%100) {
-    return false
-  } else if(year%400) {
     return true
-  } else {
+  } else if(year%400) {
     return false
+  } else {
+    return true
   }
 }
 
 export function toDateNumber(year: number, month: number, day: number): number {
-  return toDateNumberFromZero(year,month,day) - toDateNumberFromZero(1899,12,30)
+  const var1 = toDateNumberFromZero(year,month,day)
+  const var2 = toDateNumberFromZero(1899,12,30)
+  return var1-var2
 }
 
 export function dateNumberToMoment(arg: number): Moment {
   let dateNumber = arg + toDateNumberFromZero(1899,12,30)
   let year = Math.floor(dateNumber/365.2425)
-  if(toDateNumber(year,1,1) <= dateNumber){
+  if(toDateNumberFromZero(year+1,1,1) <= dateNumber){
     year++
   }
-  else if(toDateNumber(year-1,1,1) > dateNumber){
+  else if(toDateNumberFromZero(year-1,1,1) > dateNumber){
     year--
   }
 
-  let dayOfYear = dateNumber - toDateNumber(year, 1, 1)
+  let dayOfYear = dateNumber - toDateNumberFromZero(year, 1, 1)
   let month = 0
   if(isLeapYear(year) && dayOfYear >= 59) {
     while(prefSumDays[month+1] <= dayOfYear-1) {
@@ -73,7 +75,7 @@ export function dateNumberToMoment(arg: number): Moment {
   let day = dayOfYear - prefSumDays[month]
   return moment({
     year: year,
-    month: month+1,
+    month: month,
     day: day+1,
   })
   //return DATE_ZERO.clone().add(dateNumber, 'days')
