@@ -3,7 +3,7 @@ import {
   dateNumberToDayOfMonth,
   dateNumberToMoment,
   dateNumberToMonthNumber,
-  dateNumberToYearNumber, daysBetween,
+  dateNumberToYearNumber,
   momentToDateNumber,
   toDateNumber,
 } from '../../Date'
@@ -154,7 +154,7 @@ export class DatePlugin extends FunctionPlugin {
       return startDateNumber
     }
 
-    return daysBetween(endDateNumber, startDateNumber)
+    return endDateNumber - startDateNumber
   }
 
     /**

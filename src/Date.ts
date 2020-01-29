@@ -93,13 +93,6 @@ export function dateNumberToYearNumber(dateNumber: number): number {
   return dateNumberToMoment(dateNumber).year()
 }
 
-export function daysBetween(endDateNumber: number, startDateNumber: number): number {
-  const endDate = dateNumberToMoment(endDateNumber)
-  const startDate = dateNumberToMoment(startDateNumber)
-
-  return endDate.diff(startDate, 'day')
-}
-
 export function momentToDateNumber(date: Moment) {
   return Math.round(date.diff(DATE_ZERO, 'days', true))
 }
