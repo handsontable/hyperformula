@@ -1,4 +1,6 @@
 import {CellValue, SimpleCellAddress} from './Cell'
+import {cellValueRounding} from './CellValueRounding'
+import {Config} from './Config'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {
@@ -34,13 +36,19 @@ export class ContentChanges {
     this.changes.push(...change)
   }
 
-  public applyMap(fnMap: (arg: CellValue) => CellValue ) {
-    for(let i in this.changes)
-      this.changes[i].value = fnMap(this.changes[i].value)
-    return this
+  public getRoundedChanges(config: Config): CellValueChange[]
+  {
+    let ret: CellValueChange[] = []
+    for(let i in this.changes) {
+      ret[i] = {sheet: this.changes[i].sheet,
+                col: this.changes[i].col,
+                row: this.changes[i].row,
+                value: cellValueRounding( this.changes[i].value, config)}
+    }
+    return ret
   }
 
-  public getChanges() {
+  public getChanges(): CellValueChange[] {
     return this.changes
   }
 
