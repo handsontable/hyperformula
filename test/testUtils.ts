@@ -2,7 +2,7 @@ import moment from 'moment'
 import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {dateNumberToMoment} from '../src/Date'
+import {numberToDate} from '../src/Date'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {
   AstNodeType,
@@ -77,7 +77,7 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 }
 
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
-  const date = dateNumberToMoment(dateNumber as number)
+  const date = numberToDate(dateNumber as number)
   const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
   return  dateMoment.format(dateFormat)
 }

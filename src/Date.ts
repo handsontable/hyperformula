@@ -1,4 +1,5 @@
 import moment, {Moment} from 'moment'
+import {Config} from './Config'
 
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
 
@@ -36,48 +37,57 @@ function isLeapYear(year: number): boolean {
 }
 
 
-export interface HFDate {
+export interface IDate {
   year: number,
   month: number,
   day: number
 }
 
+/*
+ * counting of day and month starts here from 1
+ */
 
 export function toDateNumber(year: number, month: number, day: number): number {
-  return toDateNumberFromZero(year,month,day) - 693958 //toDateNumberFromZero(1899,12,30)
+  return toDateNumberFromZero(year, month, day) - 693958 // toDateNumberFromZero(1899,12,30)
 }
 
-export function dateNumberToMoment(arg: number): HFDate {
-  let dateNumber = arg + 693958 //toDateNumberFromZero(1899,12,30)
-  let year = Math.floor(dateNumber/365.2425)
-  if(toDateNumberFromZero(year+1,1,1) <= dateNumber){
+export function numberToDate(arg: number): IDate {
+  const dateNumber = arg + 693958 // toDateNumberFromZero(1899,12,30)
+  let year = Math.floor(dateNumber / 365.2425)
+  if(toDateNumberFromZero(year + 1,1,1) <= dateNumber){
     year++
   }
-  else if(toDateNumberFromZero(year-1,1,1) > dateNumber){
+  else if(toDateNumberFromZero(year - 1,1,1) > dateNumber){
     year--
   }
 
-  let dayOfYear = dateNumber - toDateNumberFromZero(year, 1, 1)
-  let month = dayToMonth(
-    (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear-1 : dayOfYear
+  const dayOfYear = dateNumber - toDateNumberFromZero(year, 1, 1)
+  const month = dayToMonth(
+    (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
   )
-  let day = dayOfYear - prefSumDays[month]
+  const day = dayOfYear - prefSumDays[month]
   return {year: year, month: month, day: day}
 }
 
-export function dateNumberToDayOfMonth(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).day + 1
+export function dateNumberToDayNumber(dateNumber: number): number {
+  return numberToDate(dateNumber).day + 1
 }
 
 export function dateNumberToMonthNumber(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).month + 1
+  return numberToDate(dateNumber).month + 1
 }
 
 export function dateNumberToYearNumber(dateNumber: number): number {
-  return dateNumberToMoment(dateNumber).year
+  return numberToDate(dateNumber).year
 }
 
-export function stringToDateNumber(dateString: string, dateFormat: string): number | null {
+export function parseDateWithMoment(dateString: string, dateFormat: string): IDate | null
+{
   const date = moment(dateString, dateFormat, true)
-  return date.isValid() ? toDateNumber(date.year(), date.month()+1, date.date()) : null
+  return date.isValid() ? {year: date.year(), month: date.month()+1, day: date.date()} : null
+}
+
+export function dateStringToDateNumber(dateString: string, config: Config): number | null {
+  const date = config.parseDate(dateString, config.dateFormat)
+  return date ? toDateNumber(date.year, date.month, date.day) : null
 }

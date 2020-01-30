@@ -1,5 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
+import {IDate, parseDateWithMoment} from './Date'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -47,8 +48,10 @@ export interface ConfigParams {
   gpuMode: PossibleGPUMode,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
+  parseDate: (dateString: string, dateFormat: string) => IDate | null
   useColumnIndex: boolean,
   vlookupThreshold: number
+//  stringifyDate: (dateNumber: number, dateFormat: string) => string
 }
 
 export class Config {
@@ -62,6 +65,7 @@ export class Config {
     gpuMode: 'gpu',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    parseDate: parseDateWithMoment,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
@@ -110,6 +114,7 @@ export class Config {
   public readonly gpuMode: PossibleGPUMode
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
+  public readonly parseDate: (dateString: string, dateFormat: string) => IDate | null
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
@@ -124,6 +129,7 @@ export class Config {
         gpuMode,
         matrixDetection,
         matrixDetectionThreshold,
+        parseDate,
         useColumnIndex,
         vlookupThreshold,
       }: Partial<ConfigParams> = {},
@@ -139,6 +145,7 @@ export class Config {
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
+    this.parseDate = parseDate || Config.defaultConfig.parseDate
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {

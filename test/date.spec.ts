@@ -1,6 +1,6 @@
 
 import {Config} from '../src'
-import {dateNumberToMonthNumber, toDateNumber, stringToDateNumber} from '../src/Date'
+import {dateNumberToMonthNumber, toDateNumber, dateStringToDateNumber} from '../src/Date'
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {
@@ -17,25 +17,22 @@ describe('Date helpers', () => {
   })
 
   it('#stringToDateNumber - tests expected to return not null', () => {
-    const defaultFormat = Config.defaultConfig.dateFormat
-    expect(stringToDateNumber('08/16/1985', defaultFormat)).toBe(31275)
-    expect(stringToDateNumber('01/15/2020', defaultFormat)).toBe(43845)
-    expect(stringToDateNumber('02/29/2000', defaultFormat)).toBe(36585)
-    expect(stringToDateNumber('12/31/2999', defaultFormat)).toBe(401768)
+    expect(dateStringToDateNumber('08/16/1985', new Config())).toBe(31275)
+    expect(dateStringToDateNumber('01/15/2020', new Config())).toBe(43845)
+    expect(dateStringToDateNumber('02/29/2000', new Config())).toBe(36585)
+    expect(dateStringToDateNumber('12/31/2999', new Config())).toBe(401768)
   })
 
   it('#stringToDateNumber - tests expected to return null', () => {
-    const defaultFormat = Config.defaultConfig.dateFormat
-    expect(stringToDateNumber('1/1/1', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('5/29/1453', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('www', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('0', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('0/0/1999', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('13/13/2020', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('w8', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('www1', defaultFormat)).toBe(null)
-    expect(stringToDateNumber('10/2020', defaultFormat)).toBe(null)
+    expect(dateStringToDateNumber('1/1/1', new Config())).toBe(null)
+    expect(dateStringToDateNumber('5/29/1453', new Config())).toBe(null)
+    expect(dateStringToDateNumber('www', new Config())).toBe(null)
+    expect(dateStringToDateNumber('0', new Config())).toBe(null)
+    expect(dateStringToDateNumber('0/0/1999', new Config())).toBe(null)
+    expect(dateStringToDateNumber('13/13/2020', new Config())).toBe(null)
+    expect(dateStringToDateNumber('', new Config())).toBe(null)
+    expect(dateStringToDateNumber('w8', new Config())).toBe(null)
+    expect(dateStringToDateNumber('www1', new Config())).toBe(null)
+    expect(dateStringToDateNumber('10/2020', new Config())).toBe(null)
   })
-
 })

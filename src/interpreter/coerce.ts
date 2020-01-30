@@ -1,6 +1,6 @@
 import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
 import {Config} from '../Config'
-import {stringToDateNumber} from '../Date'
+import {dateStringToDateNumber} from '../Date'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
@@ -16,7 +16,7 @@ export function coerceScalarToNumber(arg: CellValue, config: Config): number | C
     return ret
   }
   if (typeof arg === 'string') {
-    const parsedDateNumber = stringToDateNumber(arg, config.dateFormat)
+    const parsedDateNumber = dateStringToDateNumber(arg, config)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }

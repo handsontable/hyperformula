@@ -1,8 +1,8 @@
 import moment from 'moment'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
-  dateNumberToDayOfMonth,
-  dateNumberToMoment,
+  dateNumberToDayNumber,
+  numberToDate,
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
   toDateNumber,
@@ -104,7 +104,7 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const date = dateNumberToMoment(dateNumber)
+    const date = numberToDate(dateNumber)
     const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
     if (numberOfMonthsToShift > 0) {
       dateMoment.add(numberOfMonthsToShift, 'months')
@@ -129,7 +129,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToDayOfMonth(dateNumber)
+    return dateNumberToDayNumber(dateNumber)
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

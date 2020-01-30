@@ -1,5 +1,5 @@
 import {CellValue} from '../Cell'
-import {dateNumberToMoment} from '../Date'
+import {numberToDate} from '../Date'
 import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './parser'
 
 export function format(expression: FormatExpression, value: number): CellValue {
@@ -69,7 +69,7 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
 
 function dateFormat(tokens: FormatToken[], value: number): CellValue {
   let result = ''
-  const date = dateNumberToMoment(value)
+  const date = numberToDate(value)
 //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {

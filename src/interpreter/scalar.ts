@@ -1,6 +1,6 @@
 import {CellError, CellValue, CellValueTypeOrd, EmptyValue, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
-import {stringToDateNumber} from '../Date'
+import {dateStringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
 
 /**
@@ -237,18 +237,18 @@ export function mina(left: CellValue, right: CellValue): CellValue {
 
 export function compare(left: CellValue, right: CellValue, config: Config, comparator: (arg1: any, arg2: any) => boolean): boolean {
   if (typeof left === 'string' && typeof right === 'string') {
-    let leftTmp = stringToDateNumber(left, config.dateFormat)
-    let rightTmp = stringToDateNumber(right, config.dateFormat)
+    let leftTmp = dateStringToDateNumber(left, config)
+    let rightTmp = dateStringToDateNumber(right, config)
     if (leftTmp != null && rightTmp != null) {
       return comparator(leftTmp, rightTmp)
     }
   } else if (typeof left === 'string' && typeof right === 'number') {
-    let leftTmp = stringToDateNumber(left, config.dateFormat)
+    let leftTmp = dateStringToDateNumber(left, config)
     if (leftTmp != null) {
       return comparator(leftTmp, right)
     }
   } else if (typeof left === 'number' && typeof right == 'string') {
-    let rightTmp = stringToDateNumber(right, config.dateFormat)
+    let rightTmp = dateStringToDateNumber(right, config)
     if (rightTmp != null) {
       return comparator(left, rightTmp)
     }
