@@ -22,26 +22,67 @@ describe('Acceptance tests DATE function', () => {
       ['=DATE(2005,1,31)'],
     ])
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('01/31/2005');
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('31/01/2005');
   });
 
-  it('should support nonleap year 1900 ', () => {
+  it('should support nonleap year 2001 ', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(1900,02,29)'],
+      ['=DATE(2001,02,29)'],
     ]);
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('12/30/1899');
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('28/02/2001');
   });
 
-  //bug to report
-  xit('should suport leap years', () => {
+
+  it('should suport leap year 2016', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2016,29,02)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('29/02/2016');
+
+  });
+
+  it('should suport leap year 2020', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2020,29,02)'],
     ]);
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('29/02/2020');
+    expect(dateNumberToString(engine.getCellValue(adr('A2')))).toEqual('29/02/2020');
   });
 
+  it('should suport leap year 2024', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2024,29,02)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A3')))).toEqual('29/02/2024');
+
+  });
+
+  it('should suport leap year 2028', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2028,29,02)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A4')))).toEqual('29/02/2028');
+  });
+
+  it('should suport leap year 2032', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2032,29,02)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A4')))).toEqual('29/02/2032');
+  });
+
+  it('should suport leap year 2040', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2040,29,02)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('29/02/2040');
+  });
 
 });
 
