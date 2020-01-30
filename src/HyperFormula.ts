@@ -449,6 +449,20 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 
+  public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): CellValueChange[] {
+    this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
+    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+  }
+
   /**
    * Stores copy of cell block in internal clipboard for further paste.</br>
    * Returns values of cells for use in external clipboard.

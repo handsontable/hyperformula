@@ -120,18 +120,35 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
-    this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTragetRow)
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): void {
+    this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTargetRow)
 
     const width = this.dependencyGraph.getSheetWidth(sheet)
-    this.addRows(sheet, [beforeTragetRow, numberOfRows])
+    this.addRows(sheet, [beforeTargetRow, numberOfRows])
 
-    if (beforeTragetRow < startRow) {
-      this.moveCells(simpleCellAddress(sheet, 0, startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+    if (beforeTargetRow < startRow) {
+      this.moveCells(simpleCellAddress(sheet, 0, startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTargetRow))
       this.removeRows(sheet, [startRow + numberOfRows, numberOfRows])
     } else {
-      this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+      this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTargetRow))
       this.removeRows(sheet, [startRow, numberOfRows])
+    }
+
+    /* TODO correctTransformHistory */
+  }
+
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): void {
+    this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
+
+    const height = this.dependencyGraph.getSheetHeight(sheet)
+    this.addColumns(sheet, [beforeTargetColumn, numberOfColumns])
+
+    if (beforeTargetColumn < startColumn) {
+      this.moveCells(simpleCellAddress(sheet, startColumn + numberOfColumns, 0), numberOfColumns, height, simpleCellAddress(sheet, beforeTargetColumn, 0))
+      this.removeColumns(sheet, [startColumn + numberOfColumns, numberOfColumns])
+    } else {
+      this.moveCells(simpleCellAddress(sheet, startColumn, 0), numberOfColumns, height, simpleCellAddress(sheet, beforeTargetColumn, 0))
+      this.removeColumns(sheet, [startColumn, numberOfColumns])
     }
 
     /* TODO correctTransformHistory */
@@ -362,28 +379,54 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
-    this.ensureItIsPossibleToAddRows(sheet, [beforeTragetRow, numberOfRows])
+  public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): void {
+    this.ensureItIsPossibleToAddRows(sheet, [beforeTargetRow, numberOfRows])
 
-    const sourceLeftCorner = simpleCellAddress(sheet, 0, startRow)
-    const targetLeftCorner = simpleCellAddress(sheet, 0, beforeTragetRow)
+    const sourceStart = simpleCellAddress(sheet, 0, startRow)
+    const targetStart = simpleCellAddress(sheet, 0, beforeTargetRow)
+
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(sourceLeftCorner)
-      || invalidSimpleCellAddress(targetLeftCorner)
+      || invalidSimpleCellAddress(sourceStart)
+      || invalidSimpleCellAddress(targetStart)
       || !isPositiveInteger(numberOfRows)
-      || (beforeTragetRow <= startRow + numberOfRows && beforeTragetRow >= startRow)
+      || (beforeTargetRow <= startRow + numberOfRows && beforeTargetRow >= startRow)
     ) {
       throw new InvalidArguments()
     }
 
     const width = this.dependencyGraph.getSheetWidth(sheet)
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, numberOfRows)
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, width, numberOfRows)
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new Error('It is not possible to move matrix')
     }
   }
+
+  public ensureItIsPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): void {
+    this.ensureItIsPossibleToAddColumns(sheet, [beforeTargetColumn, numberOfColumns])
+
+    const sourceStart = simpleCellAddress(sheet, startColumn, 0)
+    const targetStart = simpleCellAddress(sheet, beforeTargetColumn, 0)
+
+    if (
+      !this.sheetMapping.hasSheetWithId(sheet)
+      || invalidSimpleCellAddress(sourceStart)
+      || invalidSimpleCellAddress(targetStart)
+      || !isPositiveInteger(numberOfColumns)
+      || (beforeTargetColumn <= startColumn + numberOfColumns && beforeTargetColumn >= startColumn)
+    ) {
+      throw new InvalidArguments()
+    }
+
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, numberOfColumns, sheetHeight)
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new Error('It is not possible to move matrix')
+    }
+  }
+
 
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
