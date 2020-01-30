@@ -43,7 +43,7 @@ describe('COUNTBLANK', () => {
   })
 
   /* inconsistency with Product 1 */
-  it('should count blank even if range vertex is in cycle', () => {
+  it('should return CYCLE when range vertex is in cycle', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['=SUM(A1:A3)'],
