@@ -434,7 +434,16 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 
-
+  /**
+   * Returns information whether its possible to move rows.
+   *
+   * If returns true, doing this operation won't throw any errors.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startRow - number of the first row to move
+   * @param numberOfRows - number of rows to move
+   * @param beforeTargetRow - row number before which rows will be moved
+   */
   public isItPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): boolean {
     try {
       this.crudOperations.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTargetRow)
@@ -444,11 +453,29 @@ export class HyperFormula {
     }
   }
 
+  /**
+   * Moves selected rows before target row.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startRow - number of the first row to move
+   * @param numberOfRows - number of rows to move
+   * @param beforeTargetRow - row number before which rows will be moved
+   */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): CellValueChange[] {
     this.crudOperations.moveRows(sheet, startRow, numberOfRows, beforeTargetRow)
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 
+  /**
+   * Returns information whether its possible to move columns.
+   *
+   * If returns true, doing this operation won't throw any errors.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startColumn - number of the first column to move
+   * @param numberOfColumns - number of columns to move
+   * @param beforeTargetColumn - column number before which columns will be moved
+   */
   public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): boolean {
     try {
       this.crudOperations.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
@@ -458,6 +485,14 @@ export class HyperFormula {
     }
   }
 
+  /**
+   * Moves selected columns before target column.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startColumn - number of the first column to move
+   * @param numberOfColumns - number of columns to move
+   * @param beforeTargetColumn - column number before which columns will be moved
+   */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): CellValueChange[] {
     this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
