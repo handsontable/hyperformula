@@ -1,7 +1,7 @@
-import {EmptyValue, HyperFormula} from '../../src'
-import {CellAddress, Unparser} from '../../src/parser'
+import {CellError, EmptyValue, HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
+import {CellAddress} from '../../src/parser'
 import {adr, extractRange, extractReference} from '../testUtils'
-
 
 describe("Ensure it is possible to move rows", () => {
   it('should not be possible to move rows onto same place', () => {
@@ -111,6 +111,17 @@ describe("Move rows", () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
+  it('should adjust absolute references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=$A$2', '=B2']
+    ])
+
+    engine.moveRows(0, 0, 1, 2)
+
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absolute(0, 0, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, 0, -1))
+  })
+
   it('should adjust range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
@@ -135,5 +146,20 @@ describe("Move rows", () => {
 
     expect(changes.length).toEqual(1)
     expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
+  })
+
+  it('should return #CYCLE when moving formula onto referred range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['=SUM(A1:A3)'],
+      ['=AVERAGE(A1:A3)'],
+    ])
+
+    engine.moveRows(0, 3, 1, 1)
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.CYCLE))
   })
 })

@@ -41,4 +41,16 @@ describe('COUNTBLANK', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
+
+  /* inconsistency with Product 1 */
+  it('should count blank even if range vertex is in cycle', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['=SUM(A1:A3)'],
+      ['3'],
+      ['=COUNTBLANK(A1:A3)']
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.CYCLE))
+  })
 })
