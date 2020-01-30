@@ -39,20 +39,20 @@ export class CrudOperations implements IBatchExecutor {
   private readonly clipboardOperations: ClipboardOperations
 
   constructor(
-      /** Engine config */
-      private readonly config: Config,
-      /** Statistics module for benchmarking */
-      private readonly stats: Statistics,
-      /** Dependency graph storing sheets structure */
-      private readonly dependencyGraph: DependencyGraph,
-      /** Column search strategy used by VLOOKUP plugin */
-      private readonly columnSearch: IColumnSearchStrategy,
-      /** Parser with caching */
-      private readonly parser: ParserWithCaching,
-      /** Raw cell input parser */
-      private readonly cellContentParser: CellContentParser,
-      /** Service handling postponed CRUD transformations */
-      private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    /** Engine config */
+    private readonly config: Config,
+    /** Statistics module for benchmarking */
+    private readonly stats: Statistics,
+    /** Dependency graph storing sheets structure */
+    private readonly dependencyGraph: DependencyGraph,
+    /** Column search strategy used by VLOOKUP plugin */
+    private readonly columnSearch: IColumnSearchStrategy,
+    /** Parser with caching */
+    private readonly parser: ParserWithCaching,
+    /** Raw cell input parser */
+    private readonly cellContentParser: CellContentParser,
+    /** Service handling postponed CRUD transformations */
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
   }
@@ -127,7 +127,7 @@ export class CrudOperations implements IBatchExecutor {
     this.addRows(sheet, [beforeTragetRow, numberOfRows])
 
     if (beforeTragetRow < startRow) {
-      this.moveCells(simpleCellAddress(sheet, 0 , startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
+      this.moveCells(simpleCellAddress(sheet, 0, startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
       this.removeRows(sheet, [startRow + numberOfRows, numberOfRows])
     } else {
       this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTragetRow))
@@ -262,13 +262,15 @@ export class CrudOperations implements IBatchExecutor {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
         throw Error('Wrong indexes')
       }
-      const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRows(rowsToAdd.firstRow())) {
+      if (isPositiveInteger(row)
+        && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row - 1)
+        && this.dependencyGraph.matrixMapping.isFormulaMatrixInRow(sheet, row)
+      ) {
         throw Error('It is not possible to add row in row with matrix')
       }
     }
@@ -300,13 +302,15 @@ export class CrudOperations implements IBatchExecutor {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw Error('Wrong indexes')
       }
-      const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, column, numberOfColumnsToAdd)
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToAdd.firstColumn())) {
+      if (isPositiveInteger(column)
+        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
+        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
+      ) {
         throw Error('It is not possible to add column in column with matrix')
       }
     }
@@ -336,12 +340,12 @@ export class CrudOperations implements IBatchExecutor {
 
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
-        invalidSimpleCellAddress(sourceLeftCorner) ||
-        !isPositiveInteger(width) ||
-        !isPositiveInteger(height) ||
-        invalidSimpleCellAddress(destinationLeftCorner) ||
-        !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-        !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+      invalidSimpleCellAddress(sourceLeftCorner) ||
+      !isPositiveInteger(width) ||
+      !isPositiveInteger(height) ||
+      invalidSimpleCellAddress(destinationLeftCorner) ||
+      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
       throw new Error('Invalid arguments')
     }
