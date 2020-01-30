@@ -1,6 +1,6 @@
 import {EmptyValue, HyperFormula} from '../../src'
 import {CellAddress, Unparser} from '../../src/parser'
-import {adr, extractReference} from '../testUtils'
+import {adr, extractRange, extractReference} from '../testUtils'
 
 
 describe("Ensure it is possible to move rows", () => {
@@ -109,5 +109,31 @@ describe("Move rows", () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
+  })
+
+  it('should adjust range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2', '=COUNTBLANK(A1:A2)'],
+    ])
+
+    engine.moveRows(0, 1, 1, 3)
+    const range = extractRange(engine, adr('B3'))
+
+    expect(range.start.row).toEqual(0)
+    expect(range.end.row).toEqual(2)
+    expect(engine.getCellValue(adr('B3'))).toEqual(1)
+  })
+
+  it('should return changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2', '=COUNTBLANK(A1:A2)'],
+    ])
+
+    const changes = engine.moveRows(0, 1, 1, 3)
+
+    expect(changes.length).toEqual(1)
+    expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
   })
 })
