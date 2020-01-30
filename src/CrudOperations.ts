@@ -26,7 +26,7 @@ import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/remov
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {buildMatrixVertex} from './GraphBuilder'
-import {Index, InvalidAddressError, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
+import {Index, InvalidAddressError, InvalidArguments, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
@@ -260,7 +260,7 @@ export class CrudOperations implements IBatchExecutor {
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
@@ -280,10 +280,10 @@ export class CrudOperations implements IBatchExecutor {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
       if (rowEnd < rowStart) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
@@ -300,7 +300,7 @@ export class CrudOperations implements IBatchExecutor {
   public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
@@ -321,10 +321,10 @@ export class CrudOperations implements IBatchExecutor {
       const columnEnd = columnStart + numberOfColumns - 1
 
       if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
       if (columnEnd < columnStart) {
-        throw Error('Wrong indexes')
+        throw new InvalidArguments()
       }
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
@@ -347,7 +347,7 @@ export class CrudOperations implements IBatchExecutor {
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
-      throw new Error('Invalid arguments')
+      throw new InvalidArguments()
     }
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -363,13 +363,25 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTragetRow: number): void {
+    this.ensureItIsPossibleToAddRows(sheet, [beforeTragetRow, numberOfRows])
+
+    const sourceLeftCorner = simpleCellAddress(sheet, 0, startRow)
+    const targetLeftCorner = simpleCellAddress(sheet, 0, beforeTragetRow)
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(simpleCellAddress(sheet, 0, startRow))
-      || invalidSimpleCellAddress(simpleCellAddress(sheet, 0, beforeTragetRow))
+      || invalidSimpleCellAddress(sourceLeftCorner)
+      || invalidSimpleCellAddress(targetLeftCorner)
+      || !isPositiveInteger(numberOfRows)
       || (beforeTragetRow <= startRow + numberOfRows && beforeTragetRow >= startRow)
     ) {
-      throw new Error('Invalid arguments')
+      throw new InvalidArguments()
+    }
+
+    const width = this.dependencyGraph.getSheetWidth(sheet)
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, numberOfRows)
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new Error('It is not possible to move matrix')
     }
   }
 

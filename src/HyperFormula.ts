@@ -52,6 +52,12 @@ export class InvalidAddressError extends Error {
   }
 }
 
+export class InvalidArguments extends Error {
+  constructor() {
+    super(`Invalid arguments`)
+  }
+}
+
 export type Index = [number, number]
 
 /**

@@ -1,16 +1,22 @@
 import {CellError, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
+import {InvalidArguments} from '../../src/HyperFormula'
 import {CellAddress} from '../../src/parser'
 import {adr, extractRange, extractReference} from '../testUtils'
 
 describe("Ensure it is possible to move rows", () => {
-  it('should not be possible to move rows onto same place', () => {
+  it('should return false when target makes no sense', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1']
+      ['1'],
+      ['2']
     ])
 
-    expect(engine.isItPossibleToMoveRows(0, 0, 1, 0)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 1, -1)).toEqual(false)
     expect(engine.isItPossibleToMoveRows(0, 0, 1, 1)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 1, 0)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 2, 0)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 2, 1)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 2, 2)).toEqual(false)
   })
 
   it('should not be possible to move rows when sheet does not exists', () => {
@@ -22,18 +28,70 @@ describe("Ensure it is possible to move rows", () => {
     expect(engine.isItPossibleToMoveRows(1, 0, 1, 2)).toEqual(false)
   })
 
+  it('should not be possible to move rows when number of rows is non-positive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+
+    expect(engine.isItPossibleToMoveRows(0, 0, 0, 1)).toEqual(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, -5, 1)).toEqual(false)
+  })
 
   it('should be possible to move rows', () => {
     const engine = HyperFormula.buildFromArray([
+      ['0'],
       ['1'],
       ['2'],
     ])
 
-    expect(engine.isItPossibleToMoveRows(0, 0, 1, 2)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 1, 0)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 1, 3)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 1, 4)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 2, 0)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 2, 4)).toEqual(true)
+    expect(engine.isItPossibleToMoveRows(0, 1, 2, 5)).toEqual(true)
+  })
+
+  it('should not be possible to move row with formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(engine.isItPossibleToMoveRows(0, 1, 1, 5)).toBe(false)
+    expect(engine.isItPossibleToMoveRows(0, 1, 2, 5)).toBe(false)
+  })
+
+  it('should not be possible to move row inside formula matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      [''],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
+    ])
+
+    expect(engine.isItPossibleToMoveRows(0, 0, 1, 2)).toBe(true)
+    expect(engine.isItPossibleToMoveRows(0, 0, 1, 3)).toBe(false)
+    expect(engine.isItPossibleToMoveRows(0, 0, 1, 4)).toBe(true)
   })
 })
 
 describe("Move rows", () => {
+  it('should throw error when target makes no sense', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2']
+    ])
+
+    expect(() => engine.moveRows(0, 0, 1, -1)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveRows(0, 0, 1, 1)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveRows(0, 0, 1, 0)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveRows(0, 0, 2, 0)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveRows(0, 0, 2, 1)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveRows(0, 0, 2, 2)).toThrowError(new InvalidArguments())
+  })
+
   it('should move one row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
