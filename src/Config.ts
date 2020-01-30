@@ -49,9 +49,9 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   parseDate: (dateString: string, dateFormat: string) => IDate | null
+//  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
   useColumnIndex: boolean,
   vlookupThreshold: number
-//  stringifyDate: (dateNumber: number, dateFormat: string) => string
 }
 
 export class Config {

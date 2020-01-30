@@ -1,14 +1,17 @@
 import {CellValue} from '../Cell'
 import {numberToDate} from '../Date'
-import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './parser'
+import {FormatExpression, FormatExpressionType, FormatToken, parse, TokenType} from './parser'
 
-export function format(expression: FormatExpression, value: number): CellValue {
-  switch (expression.type) {
-    case FormatExpressionType.DATE:
-      return dateFormat(expression.tokens, value)
-    case FormatExpressionType.NUMBER:
-      return numberFormat(expression.tokens, value)
-    case FormatExpressionType.STRING:
+export function format(formatArg: string, value: number): CellValue {
+  const tryString = dateFormat(formatArg, value)
+  if(tryString != null)
+    return tryString
+
+  const expression: FormatExpression = parse(formatArg)
+
+  if(expression.type === FormatExpressionType.NUMBER) {
+    return numberFormat(expression.tokens, value)
+  } else {
       return expression.tokens[0].value
   }
 }
@@ -67,7 +70,11 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-function dateFormat(tokens: FormatToken[], value: number): CellValue {
+function dateFormat(formatArg: string, value: number): string | null {
+  const expression: FormatExpression = parse(formatArg)
+  if(expression.type != FormatExpressionType.DATE)
+    return null
+  const tokens = expression.tokens
   let result = ''
   const date = numberToDate(value)
 //  let minutes: boolean = false
