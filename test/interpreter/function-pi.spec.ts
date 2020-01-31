@@ -1,5 +1,5 @@
 import {Config, HyperFormula} from '../../src'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function PI', () => {
   it('should return PI with proper precision', () => {

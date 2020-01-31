@@ -1,7 +1,7 @@
 import {Config, HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function AVERAGEIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -10,8 +10,8 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(C1, ">0", C1, C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('error when 2nd arg is not a string',  () => {
@@ -19,7 +19,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(C1:C2, 78, B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -27,7 +27,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, "><foo", C1:C2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -37,9 +37,9 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:D1, ">0", B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -49,9 +49,9 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, ">0", C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when number of elements match but dimensions doesnt',  () => {
@@ -59,7 +59,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(B1:B2, ">0", B1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('scalars are treated like singular arrays', () => {
@@ -69,7 +69,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('no coercion', () => {
@@ -80,7 +80,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(A1:A3, "<>42")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('error propagation', () => {
@@ -92,11 +92,11 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(4/0, FOOBAR(), 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works when arguments are just references',  () => {

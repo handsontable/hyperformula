@@ -1,12 +1,12 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue} from '../Cell'
+import {InternalCellValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MatrixSize} from '../Matrix'
 
 export class ArrayData {
   constructor(
     public readonly size: MatrixSize,
-    public readonly data: CellValue[][],
+    public readonly data: InternalCellValue[][],
     public _hasOnlyNumbers: boolean,
   ) {
   }
@@ -19,7 +19,7 @@ export class ArrayData {
     return this._hasOnlyNumbers
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
         yield this.data[i][j]
@@ -27,7 +27,7 @@ export class ArrayData {
     }
   }
 
-  public raw(): CellValue[][] {
+  public raw(): InternalCellValue[][] {
     return this.data
   }
 
@@ -41,7 +41,7 @@ export class ArrayData {
 }
 
 export class OnlyRangeData {
-  public data: CellValue[][] | undefined
+  public data: InternalCellValue[][] | undefined
   public _hasOnlyNumbers?: boolean
 
   constructor(
@@ -55,7 +55,7 @@ export class OnlyRangeData {
     return this._range
   }
 
-  public raw(): CellValue[][] {
+  public raw(): InternalCellValue[][] {
     this.ensureThatComputed()
 
     return this.data!
@@ -85,7 +85,7 @@ export class OnlyRangeData {
     return this._hasOnlyNumbers
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
     this.ensureThatComputed()
 
     for (let i = 0; i < this.size.height; i++) {
@@ -101,8 +101,8 @@ export class OnlyRangeData {
     }
   }
 
-  private computeDataFromDependencyGraph(): CellValue[][] {
-    const result: CellValue[][] = []
+  private computeDataFromDependencyGraph(): InternalCellValue[][] {
+    const result: InternalCellValue[][] = []
 
     let i = 0
     let row = []
@@ -147,7 +147,7 @@ export class SimpleRangeValue {
     return new SimpleRangeValue(new OnlyRangeData({ width: range.width(), height: range.height() }, range, dependencyGraph))
   }
 
-  public static fromScalar(scalar: CellValue): SimpleRangeValue {
+  public static fromScalar(scalar: InternalCellValue): SimpleRangeValue {
     const hasOnlyNumbers = (typeof scalar === 'number')
     return new SimpleRangeValue(new ArrayData({ width: 1, height: 1 }, [[scalar]], hasOnlyNumbers))
   }
@@ -164,11 +164,11 @@ export class SimpleRangeValue {
     return this.data.size.height
   }
 
-  public raw(): CellValue[][] {
+  public raw(): InternalCellValue[][] {
     return this.data.raw()
   }
 
-  public* valuesFromTopLeftCorner(): IterableIterator<CellValue> {
+  public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
     yield *this.data.valuesFromTopLeftCorner()
   }
 
@@ -193,4 +193,4 @@ export class SimpleRangeValue {
   }
 }
 
-export type InterpreterValue = CellValue | SimpleRangeValue
+export type InterpreterValue = InternalCellValue | SimpleRangeValue

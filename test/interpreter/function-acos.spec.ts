@@ -1,7 +1,7 @@
 import {Config, HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOS', () => {
   it('happy path', () => {
@@ -13,11 +13,11 @@ describe('Function ACOS', () => {
   it('when value not numeric', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS("foo")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('for 1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
+    const engine = HyperFormula.buildFromArray([["=ACOS(1)"]])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
@@ -32,20 +32,20 @@ describe('Function ACOS', () => {
   it('when value too large', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('when value too small', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(-1.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS()', '=ACOS(1,-1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('use number coercion',  () => {
@@ -63,7 +63,7 @@ describe('Function ACOS', () => {
       ['=ACOS(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1
@@ -74,6 +74,6 @@ describe('Function ACOS', () => {
       ['-1'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

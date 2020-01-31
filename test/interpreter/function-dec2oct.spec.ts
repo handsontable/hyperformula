@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('function DEC2OCT', () => {
   it('should return error when wrong type of argument', () => {
@@ -8,7 +8,7 @@ describe('function DEC2OCT', () => {
         ['=DEC2OCT("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should return error when wrong number of argument', () => {
@@ -16,7 +16,7 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should work', () => {
@@ -68,10 +68,10 @@ describe('function DEC2OCT', () => {
       [`=DEC2OCT(536870912)`],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A2'))).toEqual('4000000000')
     expect(engine.getCellValue(adr('A3'))).toEqual('3777777777')
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -100,8 +100,8 @@ describe('function DEC2OCT', () => {
       ['=DEC2OCT(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   // Inconsistency with Product 1
@@ -111,6 +111,6 @@ describe('function DEC2OCT', () => {
       ['=2', '=DEC2OCT(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

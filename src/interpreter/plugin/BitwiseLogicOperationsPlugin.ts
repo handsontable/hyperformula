@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -15,25 +15,25 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin {
     },
   }
 
-  public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public bitand(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left & right
     })
   }
 
-  public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public bitor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left | right
     })
   }
 
-  public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public bitxor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithTwoPositiveIntegerArguments(ast, formulaAddress, (left: number, right: number) => {
       return left ^ right
     })
   }
 
-  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => CellValue): CellValue {
+  private templateWithTwoPositiveIntegerArguments(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (left: number, right: number) => InternalCellValue): InternalCellValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

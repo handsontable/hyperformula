@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function IF', () => {
   it('when value is true', () => {
@@ -19,7 +19,7 @@ describe('Function IF', () => {
   it('when condition is weird type', () => {
     const engine = HyperFormula.buildFromArray([['=IF("foo", "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('use coercion', () => {
@@ -31,7 +31,7 @@ describe('Function IF', () => {
   it('returns error if condition is an error', () => {
     const engine = HyperFormula.buildFromArray([['=IF(4/0, "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('when condition is number', () => {
@@ -66,7 +66,7 @@ describe('Function IF', () => {
       ['3'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

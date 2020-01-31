@@ -1,13 +1,13 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('AVERAGE', () => {
   it('AVERAGE with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=AVERAGE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('AVERAGE with args', () => {
@@ -48,7 +48,7 @@ describe('AVERAGE', () => {
       ['=AVERAGE(A1:A2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('over a range value', () => {
@@ -68,6 +68,6 @@ describe('AVERAGE', () => {
       ['=AVERAGE(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

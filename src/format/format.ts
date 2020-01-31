@@ -1,14 +1,9 @@
-import {CellValue} from '../Cell'
+import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
-import {
-  FormatToken,
-  parseForDateFormat,
-  parseForNumberFormat,
-  TokenType
-} from './parser'
+import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 
-export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): CellValue {
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
   const tryString = config.stringifyDate(value, formatArg, dateHelper) //default points to defaultStringifyDate()
   if(tryString != null) {
     return tryString
@@ -43,7 +38,7 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): CellValue {
+function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {

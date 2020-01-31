@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -9,7 +9,7 @@ export class PowerPlugin extends FunctionPlugin {
     },
   }
 
-  public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public power(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

@@ -2,15 +2,15 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
 import {
   CellType,
-  CellValue,
   CellValueType,
   getCellType,
   getCellValueType,
   simpleCellAddress,
   SimpleCellAddress,
+  InternalCellValue,
 } from './Cell'
 import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {cellValueRounding} from './CellValueRounding'
+import {CellValue, CellValueExporter} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
@@ -118,6 +118,7 @@ export class HyperFormula {
   }
 
   private readonly crudOperations: CrudOperations
+  private readonly cellValueExporter: CellValueExporter
 
   constructor(
     /** Engine config */
@@ -138,6 +139,7 @@ export class HyperFormula {
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    this.cellValueExporter = new CellValueExporter(config)
   }
 
 
@@ -148,7 +150,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return cellValueRounding(this.dependencyGraph.getCellValue(address), this.config)
+    return this.cellValueExporter.export(this.dependencyGraph.getCellValue(address))
   }
 
   /**
@@ -175,17 +177,17 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getValues(sheet: number): CellValue[][] {
+  public getValues(sheet: number): InternalCellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
-    const arr: CellValue[][] = new Array(sheetHeight)
+    const arr: InternalCellValue[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = cellValueRounding(this.dependencyGraph.getCellValue(address), this.config)
+        arr[i][j] = this.cellValueExporter.export(this.dependencyGraph.getCellValue(address))
       }
     }
 
@@ -251,7 +253,7 @@ export class HyperFormula {
    */
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): CellValueChange[] {
     this.crudOperations.setCellContent(address, newCellContent)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -309,7 +311,7 @@ export class HyperFormula {
    */
   public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -339,7 +341,7 @@ export class HyperFormula {
    * */
   public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -369,7 +371,7 @@ export class HyperFormula {
    * */
   public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.addColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -399,7 +401,7 @@ export class HyperFormula {
    * */
   public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
     this.crudOperations.removeColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -431,7 +433,7 @@ export class HyperFormula {
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -463,7 +465,7 @@ export class HyperFormula {
    */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): CellValueChange[] {
     this.crudOperations.moveRows(sheet, startRow, numberOfRows, targetRow)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -495,7 +497,7 @@ export class HyperFormula {
    */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): CellValueChange[] {
     this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -506,7 +508,7 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
-  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.clipboardCopy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
@@ -521,7 +523,7 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
-  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
+  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.clipboardCut(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
@@ -535,7 +537,7 @@ export class HyperFormula {
    * */
   public clipboardPaste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.clipboardPaste(targetLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -550,10 +552,10 @@ export class HyperFormula {
    *
    * @param range
    */
-  public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
+  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
     return this.dependencyGraph.getValuesInRange(range).map(
-      (subarray: CellValue[]) => subarray.map(
-        (arg) => cellValueRounding(arg, this.config)
+      (subarray: InternalCellValue[]) => subarray.map(
+        (arg) => this.cellValueExporter.export(arg)
       )
     )
   }
@@ -605,7 +607,7 @@ export class HyperFormula {
    */
   public removeSheet(name: string): CellValueChange[] {
     this.crudOperations.removeSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -632,7 +634,7 @@ export class HyperFormula {
   public clearSheet(name: string): CellValueChange[] {
     this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
@@ -800,7 +802,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    * */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
-    const value = this.getCellValue(address)
+    const value = this.dependencyGraph.getCellValue(address)
     return getCellValueType(value)
   }
 
@@ -826,7 +828,7 @@ export class HyperFormula {
     } catch (e) {
       /* TODO we should be able to return error information along with changes */
     }
-    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**

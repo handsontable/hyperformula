@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {ErrorType} from "../../src/Cell";
+import {HyperFormula} from "../../src"
+import {ErrorType} from "../../src/Cell"
+import {adr, detailedError} from "../testUtils"
 
 describe('Function CEILING', () => {
   it('should return error for wrong number of arguments', () => {
@@ -9,8 +9,8 @@ describe('Function CEILING', () => {
       ['=CEILING(1, 2, 3, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should return error for arguments of wrong type', () => {
@@ -20,9 +20,9 @@ describe('Function CEILING', () => {
       ['=CEILING(1, 2, "baz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should ensure that value and significance have same sign', () => {
@@ -31,8 +31,8 @@ describe('Function CEILING', () => {
       ['=CEILING(-2, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('should work', () => {

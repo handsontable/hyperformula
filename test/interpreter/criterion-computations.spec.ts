@@ -1,6 +1,6 @@
-import { HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Criterions - operators computations', () => {
   it('usage of greater than operator',  () => {

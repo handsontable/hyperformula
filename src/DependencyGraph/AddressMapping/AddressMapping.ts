@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellValue, EmptyValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
+import {InternalCellValue, EmptyValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
@@ -89,7 +89,7 @@ export class AddressMapping {
     this.addSheet(sheetId, new strategyConstructor(width, height))
   }
 
-  public getCellValue(address: SimpleCellAddress): CellValue {
+  public getCellValue(address: SimpleCellAddress): InternalCellValue {
     const vertex = this.getCell(address)
 
     if (vertex === null) {
@@ -198,14 +198,14 @@ export class AddressMapping {
     yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan)
   }
 
-  public* valuesFromSheet(sheet: number): IterableIterator<[CellValue, SimpleCellAddress]> {
+  public* valuesFromSheet(sheet: number): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
     const sheetMapping = this.mapping.get(sheet)
     if (sheetMapping) {
       yield* this.valuesFromRange(AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, 0, 0), sheetMapping.getWidth(), sheetMapping.getHeight()))
     }
   }
 
-  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[CellValue, SimpleCellAddress]> {
+  public* valuesFromRange(range: AbsoluteCellRange): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
     for (const address of range.addresses()) {
       const value = this.getCellValue(address)
       if (value !== EmptyValue) {

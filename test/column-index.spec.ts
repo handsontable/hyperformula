@@ -8,7 +8,7 @@ import {Matrix} from '../src/Matrix'
 import {collectDependencies} from '../src/parser'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('ColumnIndex#add', () => {
   const statistics = new Statistics()

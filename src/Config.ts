@@ -186,11 +186,11 @@ export class Config {
     this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
-  public getFunctionTranslationFor(functionTranslationKey: string): string {
+  public getFunctionTranslationFor = (functionTranslationKey: string): string => {
     return this.language.functions[functionTranslationKey]
   }
 
-  public getErrorTranslationFor(functionTranslationKey: ErrorType): string {
+  public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
   }
 

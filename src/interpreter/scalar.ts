@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType} from '../Cell'
+import {CellError, ErrorType, InternalCellValue} from '../Cell'
 import {coerceBooleanToNumber} from './coerce'
 
 /**
@@ -11,7 +11,7 @@ import {coerceBooleanToNumber} from './coerce'
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function nonstrictadd(left: CellValue, right: CellValue): number | CellError {
+export function nonstrictadd(left: InternalCellValue, right: InternalCellValue): number | CellError {
   if (left instanceof CellError) {
     return left
   } else if (right instanceof CellError) {
@@ -142,7 +142,7 @@ export function percent(value: number | CellError): number | CellError {
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function max(left: CellValue, right: CellValue): CellValue {
+export function max(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
   if (left instanceof CellError) {
     return left
   }
@@ -162,7 +162,7 @@ export function max(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function maxa(left: CellValue, right: CellValue): CellValue {
+export function maxa(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
   if (left instanceof CellError) {
     return left
   }
@@ -198,7 +198,7 @@ export function maxa(left: CellValue, right: CellValue): CellValue {
  * @param left - left operand of addition
  * @param right - right operand of addition
  */
-export function min(left: CellValue, right: CellValue): CellValue {
+export function min(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
   if (left instanceof CellError) {
     return left
   }
@@ -218,7 +218,7 @@ export function min(left: CellValue, right: CellValue): CellValue {
   }
 }
 
-export function mina(left: CellValue, right: CellValue): CellValue {
+export function mina(left: InternalCellValue, right: InternalCellValue): InternalCellValue {
   if (left instanceof CellError) {
     return left
   }

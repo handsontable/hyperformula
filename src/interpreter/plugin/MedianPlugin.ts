@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import { ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -21,7 +21,7 @@ export class MedianPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public median(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length === 0) {
       return new CellError(ErrorType.NA)
     }

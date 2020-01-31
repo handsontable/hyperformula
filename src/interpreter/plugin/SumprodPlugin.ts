@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import { ProcedureAst} from '../../parser'
 import {coerceScalarToNumber, coerceToRange} from '../coerce'
@@ -13,7 +13,7 @@ export class SumprodPlugin extends FunctionPlugin {
     },
   }
 
-  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     const [left, right] = ast.args
 
     const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))

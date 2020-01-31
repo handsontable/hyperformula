@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
-import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
@@ -10,13 +10,13 @@ import {findSmallerRange} from './SumprodPlugin'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
-export type MapOperation<T> = (arg: CellValue) => T
+export type MapOperation<T> = (arg: InternalCellValue) => T
 
-function idMap(arg: CellValue): CellValue {
+function idMap(arg: InternalCellValue): InternalCellValue {
   return arg
 }
 
-function square(arg: CellValue): CellValue {
+function square(arg: InternalCellValue): InternalCellValue {
   if (arg instanceof CellError) {
     return arg
   } else if (typeof arg === 'number') {
@@ -26,7 +26,7 @@ function square(arg: CellValue): CellValue {
   }
 }
 
-function zeroForInfinite(value: CellValue) {
+function zeroForInfinite(value: InternalCellValue) {
   if (typeof value === 'number' && !Number.isFinite(value)) {
     return 0
   } else {
@@ -104,18 +104,18 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.reduce(ast, formulaAddress, 0, 'SUM', nonstrictadd, idMap)
   }
 
-  public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sumsq(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
     return this.reduce(ast, formulaAddress, 0, 'SUMSQ', nonstrictadd, square)
   }
 
-  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -139,7 +139,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public max(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -148,7 +148,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public maxa(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -165,7 +165,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public min(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -174,7 +174,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public mina(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -183,7 +183,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return zeroForInfinite(value)
   }
 
-  public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public count(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -196,7 +196,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return value
   }
 
-  public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public counta(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -209,7 +209,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     return value
   }
 
-  public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public average(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
@@ -239,7 +239,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
   }
 
-  public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public averagea(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }

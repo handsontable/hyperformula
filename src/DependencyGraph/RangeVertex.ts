@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 
 /**

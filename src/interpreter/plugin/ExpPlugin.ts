@@ -1,4 +1,4 @@
-import { CellValue, SimpleCellAddress} from '../../Cell'
+import { InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -17,7 +17,7 @@ export class ExpPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public exp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       return Math.exp(arg)
     })

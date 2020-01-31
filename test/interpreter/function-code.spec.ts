@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {CellValueType, ErrorType} from "../../src/Cell";
+import {HyperFormula} from "../../src"
+import {CellValueType, ErrorType} from "../../src/Cell"
+import {adr, detailedError} from "../testUtils"
 
 describe('Function CODE', () => {
   it('should not work for wrong number of arguments', () => {
@@ -9,8 +9,8 @@ describe('Function CODE', () => {
       ['=CODE("foo", "bar")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should not work for empty strings', () => {
@@ -18,7 +18,7 @@ describe('Function CODE', () => {
       ['=CODE("")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should work for single chars', () => {

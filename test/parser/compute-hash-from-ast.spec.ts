@@ -2,7 +2,7 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 import has = Reflect.has
 
 describe('Compute hash from ast', () => {

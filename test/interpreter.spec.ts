@@ -1,7 +1,7 @@
 import {HyperFormula} from '../src'
-import {CellError, ErrorType} from '../src/Cell'
+import {ErrorType} from '../src/Cell'
 import './testConfig'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('Interpreter', () => {
   it('relative addressing formula', () => {
@@ -25,7 +25,7 @@ describe('Interpreter', () => {
   it('negative number literal - non numeric value', () => {
     const engine = HyperFormula.buildFromArray([['=-"foo"']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('string literals - faulty tests', () => {
@@ -37,7 +37,6 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('B1'))).toBe('1www')
     expect(engine.getCellValue(adr('C1'))).toBe('www1')
   })
-
 
   it('string literals in formula - faulty tests', () => {
     const engine = HyperFormula.buildFromArray([
@@ -51,7 +50,7 @@ describe('Interpreter', () => {
 
   it('ranges - VALUE error when evaluating without context', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['2'], ['=A1:A2']])
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('procedures - SUM with bad args', () => {
@@ -63,17 +62,17 @@ describe('Interpreter', () => {
   it('procedures - not known procedure', () => {
     const engine = HyperFormula.buildFromArray([['=FOO()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   it('errors - parsing errors', () => {
     const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo', '=)(asdf']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('E1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   it('function OFFSET basic use', () => {
@@ -86,8 +85,8 @@ describe('Interpreter', () => {
   it('function OFFSET out of range', () => {
     const engine = HyperFormula.buildFromArray([['=OFFSET(A1, -1, 0)', '=OFFSET(A1, 0, -1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF))
   })
 
   it('function OFFSET returns bigger range', () => {
@@ -104,7 +103,7 @@ describe('Interpreter', () => {
         ['=OFFSET(A1, 0, 1,2,1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   it('function OFFSET used twice in a range', () => {
@@ -149,7 +148,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('expression with parenthesis', () => {

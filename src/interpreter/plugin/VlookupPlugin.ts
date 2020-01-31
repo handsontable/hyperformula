@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics/Statistics'
 import {InterpreterValue} from '../InterpreterValue'
@@ -21,7 +21,7 @@ export class VlookupPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public vlookup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3 || ast.args.length > 4) {
       return new CellError(ErrorType.NA)
     }
@@ -42,7 +42,7 @@ export class VlookupPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    let sorted: CellValue = true
+    let sorted: InternalCellValue = true
     if (ast.args.length === 4) {
       const computedSorted = this.evaluateAst(ast.args[3], formulaAddress)
       if (typeof computedSorted === 'boolean') {
@@ -60,7 +60,7 @@ export class VlookupPlugin extends FunctionPlugin {
     return this.doVlookup(key, range, index - 1, sorted)
   }
 
-  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public match(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -105,7 +105,7 @@ export class VlookupPlugin extends FunctionPlugin {
     }
   }
 
-  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): CellValue {
+  private doVlookup(key: any, range: AbsoluteCellRange, index: number, sorted: boolean): InternalCellValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
 
     const searchedRange = AbsoluteCellRange.spanFrom(range.start, 1, range.height())

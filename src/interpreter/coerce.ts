@@ -1,4 +1,4 @@
-import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
+import {CellError, InternalCellValue, EmptyValue, ErrorType} from '../Cell'
 import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -9,7 +9,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param config
  */
-export function coerceScalarToNumber(arg: CellValue, dateHelper: DateHelper): number | CellError {
+export function coerceScalarToNumber(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
   let ret = coerceNonDateScalarToMaybeNumber(arg)
   if (ret != null) {
     return ret
@@ -46,7 +46,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
 }
 
 
-export function coerceNonDateScalarToMaybeNumber(arg: CellValue): number | CellError | null {
+export function coerceNonDateScalarToMaybeNumber(arg: InternalCellValue): number | CellError | null {
   if (arg === EmptyValue) {
     return 0
   }
@@ -66,7 +66,7 @@ export function coerceNonDateScalarToMaybeNumber(arg: CellValue): number | CellE
  *
  * @param arg
  */
-export function coerceScalarToBoolean(arg: CellValue): boolean | CellError | null {
+export function coerceScalarToBoolean(arg: InternalCellValue): boolean | CellError | null {
   if (arg instanceof CellError || typeof arg === 'boolean') {
     return arg
   } else if (arg === EmptyValue) {
@@ -85,7 +85,7 @@ export function coerceScalarToBoolean(arg: CellValue): boolean | CellError | nul
   }
 }
 
-export function coerceScalarToString(arg: CellValue): string | CellError {
+export function coerceScalarToString(arg: InternalCellValue): string | CellError {
   if (arg instanceof CellError || typeof arg === 'string') {
     return arg
   } else if (arg === EmptyValue) {

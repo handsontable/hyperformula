@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -44,7 +44,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public acos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (-1 <= coercedArg && coercedArg <= 1) {
         return Math.acos(coercedArg)
@@ -54,7 +54,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
     })
   }
 
-  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public asin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (-1 <= coercedArg && coercedArg <= 1) {
         return Math.asin(coercedArg)
@@ -64,31 +64,31 @@ export class TrigonometryPlugin extends FunctionPlugin {
     })
   }
 
-  public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public cos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.cos(coercedArg)
     })
   }
 
-  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.sin(coercedArg)
     })
   }
 
-  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public tan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.tan(coercedArg)
     })
   }
 
-  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public atan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       return Math.atan(coercedArg)
     })
   }
 
-  public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public atan2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -113,7 +113,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
   }
 
 
-  public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {
       if (coercedArg === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)

@@ -6,7 +6,7 @@ import {checkMatrixSize, MatrixSize} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('Matrix size check tests', () => {
   it('check', () => {

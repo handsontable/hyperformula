@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -13,11 +13,11 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
       private config: Config,
   ) {}
 
-  public add(value: CellValue | Matrix, address: SimpleCellAddress): void {}
+  public add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void {}
 
-  public remove(value: CellValue | Matrix | null, address: SimpleCellAddress): void {}
+  public remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress): void {}
 
-  public change(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress): void {}
+  public change(oldValue: InternalCellValue | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress): void {}
 
   public addColumns(columnsSpan: ColumnsSpan): void {}
 
@@ -25,9 +25,9 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
 
   public removeSheet(sheetId: number): void {}
 
-  public moveValues(sourceRange: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
+  public moveValues(sourceRange: IterableIterator<[InternalCellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
 
-  public removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void {}
+  public removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void {}
 
   public destroy(): void {}
 
@@ -41,8 +41,8 @@ export class ColumnBinarySearch implements IColumnSearchStrategy {
     }
   }
 
-  private computeListOfValuesInRange(range: AbsoluteCellRange): CellValue[] {
-    const values: CellValue[] = []
+  private computeListOfValuesInRange(range: AbsoluteCellRange): InternalCellValue[] {
+    const values: InternalCellValue[] = []
     for (const cellFromRange of range.addresses()) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       values.push(value)

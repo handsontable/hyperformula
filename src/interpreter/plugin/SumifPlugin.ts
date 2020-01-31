@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, InternalCellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import {Interpreter} from '../Interpreter'
 import {split} from '../../generatorUtils'
@@ -81,7 +81,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -113,7 +113,7 @@ export class SumifPlugin extends FunctionPlugin {
       valuesArg = coerceToRange(valuesArgValue)
     }
 
-    const result = new CriterionFunctionCompute<CellValue>(
+    const result = new CriterionFunctionCompute<InternalCellValue>(
       this.interpreter,
       sumifCacheKey,
       0,
@@ -124,7 +124,7 @@ export class SumifPlugin extends FunctionPlugin {
     return result
   }
 
-  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 3 || ast.args.length % 2 === 0) {
       return new CellError(ErrorType.NA)
     }
@@ -154,7 +154,7 @@ export class SumifPlugin extends FunctionPlugin {
       conditions.push(new Condition(conditionArg, criterionPackage))
     }
 
-    const result = new CriterionFunctionCompute<CellValue>(
+    const result = new CriterionFunctionCompute<InternalCellValue>(
       this.interpreter,
       sumifCacheKey,
       0,
@@ -165,7 +165,7 @@ export class SumifPlugin extends FunctionPlugin {
     return result
   }
 
-  public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -202,7 +202,7 @@ export class SumifPlugin extends FunctionPlugin {
       averageifCacheKey,
       AverageResult.empty,
       (left, right) => left.compose(right),
-      (arg: CellValue) => {
+      (arg: InternalCellValue) => {
         if (typeof arg === 'number') {
           return AverageResult.single(arg)
         } else {
@@ -228,7 +228,7 @@ export class SumifPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -261,7 +261,7 @@ export class SumifPlugin extends FunctionPlugin {
     return result
   }
 
-  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 2 || ast.args.length % 2 === 1) {
       return new CellError(ErrorType.NA)
     }

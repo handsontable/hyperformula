@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, CellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -487,7 +487,7 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
-  public getCellValue(address: SimpleCellAddress): CellValue {
+  public getCellValue(address: SimpleCellAddress): InternalCellValue {
     return this.addressMapping.getCellValue(address)
   }
 
@@ -527,8 +527,8 @@ export class DependencyGraph {
     return this.rangeMapping.getRange(start, end)
   }
 
-  public getValuesInRange(range: AbsoluteCellRange): CellValue[][] {
-    const result: CellValue[][] = []
+  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
+    const result: InternalCellValue[][] = []
 
     for (let y = 0; y < range.height(); ++y) {
       result[y] = []

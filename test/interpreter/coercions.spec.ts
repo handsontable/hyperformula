@@ -3,10 +3,10 @@ import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
 import {DateHelper} from '../../src/DateHelper'
 import {
   coerceBooleanToNumber,
+  coerceNonDateScalarToMaybeNumber,
   coerceScalarToBoolean,
-  coerceScalarToString,
   coerceScalarToNumber,
-  coerceNonDateScalarToMaybeNumber
+  coerceScalarToString
 } from '../../src/interpreter/coerce'
 import '../testConfig'
 

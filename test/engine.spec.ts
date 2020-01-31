@@ -1,8 +1,8 @@
-import {Config, HyperFormula} from '../src'
-import {CellError, CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
+import {Config, DetailedCellError, HyperFormula} from '../src'
+import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
+import {enGB, plPL} from '../src/i18n'
 import './testConfig.ts'
-import {FormulaCellVertex} from '../src/DependencyGraph'
-import {adr, expect_reference_to_have_ref_error} from './testUtils'
+import {adr, detailedError, expect_reference_to_have_ref_error} from './testUtils'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -46,19 +46,19 @@ describe('Integration', () => {
   it('loadSheet with a loop', () => {
     const engine = HyperFormula.buildFromArray([['=B1', '=C1', '=A1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside plus operator', () => {
     const engine = HyperFormula.buildFromArray([['5', '=A1+B1']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 
   it('#loadSheet with a loop inside minus operator', () => {
     const engine = HyperFormula.buildFromArray([['5', '=A1-B1']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 
   it('loadSheet with operator precedence', () => {
@@ -79,7 +79,7 @@ describe('Integration', () => {
   it('#loadSheet - it should build graph without cycle but with formula with error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   it('#loadSheet - dependency before value', () => {
@@ -368,5 +368,25 @@ describe('Integration', () => {
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('C1'))).toBe(CellValueType.ERROR)
+  })
+
+  it('exporting translated errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=#VALUE!'],
+    ], new Config({language: enGB}))
+
+    const error = engine.getCellValue(adr('A1')) as DetailedCellError
+    expect(error.type).toEqual(ErrorType.VALUE)
+    expect(error.value).toEqual('#VALUE!')
+  })
+
+  it('exporting detailed errors with translations', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=#ARG!'],
+    ], new Config({language: plPL}))
+
+    const error = engine.getCellValue(adr('A1')) as DetailedCellError
+    expect(error.type).toEqual(ErrorType.VALUE)
+    expect(error.value).toEqual('#ARG!')
   })
 })
