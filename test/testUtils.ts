@@ -1,9 +1,8 @@
-import moment from 'moment'
 import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {numberToDate} from '../src/Date'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {stringifyDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -77,9 +76,8 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 }
 
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
-  const date = numberToDate(dateNumber as number)
-  const dateMoment = moment({year: date.year, month: date.month-1, date: date.day})
-  return  dateMoment.format(dateFormat)
+  const dateString = stringifyDate(dateNumber as number, dateFormat)
+  return dateString ? dateString : ''
 }
 
 export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
