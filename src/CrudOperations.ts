@@ -1,14 +1,12 @@
-import {worker} from 'cluster'
-import {start} from 'repl'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {ClipboardOperations} from './ClipboardOperations'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
-import {CellValueChange, ContentChanges} from './ContentChanges'
-import {ClipboardOperations} from './ClipboardOperations'
+import {ContentChanges} from './ContentChanges'
 import {
   AddressMapping,
   DependencyGraph,
@@ -120,38 +118,36 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): void {
-    this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, beforeTargetRow)
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+    this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
 
     const width = this.dependencyGraph.getSheetWidth(sheet)
-    this.addRows(sheet, [beforeTargetRow, numberOfRows])
+    this.addRows(sheet, [targetRow, numberOfRows])
 
-    if (beforeTargetRow < startRow) {
-      this.moveCells(simpleCellAddress(sheet, 0, startRow + numberOfRows), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTargetRow))
-      this.removeRows(sheet, [startRow + numberOfRows, numberOfRows])
-    } else {
-      this.moveCells(simpleCellAddress(sheet, 0, startRow), width, numberOfRows, simpleCellAddress(sheet, 0, beforeTargetRow))
-      this.removeRows(sheet, [startRow, numberOfRows])
+    if (targetRow < startRow) {
+      startRow += numberOfRows
     }
 
-    /* TODO correctTransformHistory */
+    const startAddress = simpleCellAddress(sheet, 0, startRow)
+    const targetAddress = simpleCellAddress(sheet, 0, targetRow)
+    this.moveCells(startAddress, width, numberOfRows, targetAddress)
+    this.removeRows(sheet, [startRow, numberOfRows])
   }
 
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): void {
-    this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, beforeTargetColumn)
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+    this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
 
     const height = this.dependencyGraph.getSheetHeight(sheet)
-    this.addColumns(sheet, [beforeTargetColumn, numberOfColumns])
+    this.addColumns(sheet, [targetColumn, numberOfColumns])
 
-    if (beforeTargetColumn < startColumn) {
-      this.moveCells(simpleCellAddress(sheet, startColumn + numberOfColumns, 0), numberOfColumns, height, simpleCellAddress(sheet, beforeTargetColumn, 0))
-      this.removeColumns(sheet, [startColumn + numberOfColumns, numberOfColumns])
-    } else {
-      this.moveCells(simpleCellAddress(sheet, startColumn, 0), numberOfColumns, height, simpleCellAddress(sheet, beforeTargetColumn, 0))
-      this.removeColumns(sheet, [startColumn, numberOfColumns])
+    if (targetColumn < startColumn) {
+      startColumn += numberOfColumns
     }
 
-    /* TODO correctTransformHistory */
+    const startAddress = simpleCellAddress(sheet, startColumn, 0)
+    const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
+    this.moveCells(startAddress, numberOfColumns, height, targetAddress)
+    this.removeColumns(sheet, [startColumn, numberOfColumns])
   }
 
   public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
@@ -379,18 +375,18 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, beforeTargetRow: number): void {
-    this.ensureItIsPossibleToAddRows(sheet, [beforeTargetRow, numberOfRows])
+  public ensureItIsPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+    this.ensureItIsPossibleToAddRows(sheet, [targetRow, numberOfRows])
 
     const sourceStart = simpleCellAddress(sheet, 0, startRow)
-    const targetStart = simpleCellAddress(sheet, 0, beforeTargetRow)
+    const targetStart = simpleCellAddress(sheet, 0, targetRow)
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
       || invalidSimpleCellAddress(sourceStart)
       || invalidSimpleCellAddress(targetStart)
       || !isPositiveInteger(numberOfRows)
-      || (beforeTargetRow <= startRow + numberOfRows && beforeTargetRow >= startRow)
+      || (targetRow <= startRow + numberOfRows && targetRow >= startRow)
     ) {
       throw new InvalidArguments()
     }
@@ -403,18 +399,18 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  public ensureItIsPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, beforeTargetColumn: number): void {
-    this.ensureItIsPossibleToAddColumns(sheet, [beforeTargetColumn, numberOfColumns])
+  public ensureItIsPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
+    this.ensureItIsPossibleToAddColumns(sheet, [targetColumn, numberOfColumns])
 
     const sourceStart = simpleCellAddress(sheet, startColumn, 0)
-    const targetStart = simpleCellAddress(sheet, beforeTargetColumn, 0)
+    const targetStart = simpleCellAddress(sheet, targetColumn, 0)
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
       || invalidSimpleCellAddress(sourceStart)
       || invalidSimpleCellAddress(targetStart)
       || !isPositiveInteger(numberOfColumns)
-      || (beforeTargetColumn <= startColumn + numberOfColumns && beforeTargetColumn >= startColumn)
+      || (targetColumn <= startColumn + numberOfColumns && targetColumn >= startColumn)
     ) {
       throw new InvalidArguments()
     }
