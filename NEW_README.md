@@ -1,4 +1,4 @@
-<h1><img src="./HF_logo.png" alt="HF_Logo" style="max-width:500px"></h1>
+<h1><img src="./resources/HF_logo.png" alt="HF_Logo" style="max-width:500px"></h1>
 
 **HyperFormula** is an open-source high-performance calculation engine for JavaScript with GPU-acceleration, spreadsheet-like syntax, and support for CRUD operations. 
 
@@ -185,7 +185,7 @@ You should know that this project wouldn’t exist without co-financing from Eur
 * Amount of grant: PLN 774 742.00 (USD ~204 000)
 * Duration: 2018-2019
 
-![Logo_NCBR](./NCBR_logo.png "Logo_NCBR")
+![Logo_NCBR](./resources/NCBR_logo.png "Logo_NCBR")
 
 Created by [Handsoncode](https://handsoncode.net/) with ❤ and ☕ in [Tricity](https://en.wikipedia.org/wiki/Tricity,_Poland).
 
