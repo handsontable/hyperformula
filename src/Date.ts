@@ -1,6 +1,7 @@
-import moment, {Moment} from 'moment'
+import moment from 'moment'
 import {Config} from './Config'
 
+const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30 , 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
 
 function dayToMonth(dayOfYear: number): number {
@@ -81,10 +82,43 @@ export function dateNumberToYearNumber(dateNumber: number): number {
   return numberToDate(dateNumber).year
 }
 
+export function isValidDate(year: number, month: number, day: number): boolean {
+  if(isNaN(year) || isNaN(month) || isNaN(day)) {
+    return false
+  } else if(day !== Math.round(day) || month !== Math.round(month) || year !== Math.round(year)) {
+    return false
+  } else if( year < 1582) {  //Gregorian calendar start
+    return false
+  } else if(month < 1 || month > 12) {
+    return false
+  } else if(day < 1) {
+    return false
+  } else if(isLeapYear(year) && month===2) {
+    return day <= 29
+  } else {
+    return day <= numDays[month - 1]
+  }
+}
+
 export function parseDate(dateString: string, dateFormat: string): IDate | null
 {
-  const date = moment(dateString, dateFormat, true)
-  return date.isValid() ? {year: date.year(), month: date.month()+1, day: date.date()} : null
+  const normalizedDateString = dateString.replace(/[^a-zA-Z0-9]/g, '-')
+  const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
+  const formatItems     = normalizedFormat.split('-')
+  const dateItems       = normalizedDateString.split('-')
+
+  const monthIndex  = formatItems.indexOf('mm')
+  const dayIndex    = formatItems.indexOf('dd')
+  const yearIndex   = formatItems.indexOf('yyyy')
+
+  if(!(monthIndex in dateItems) || !(dayIndex in dateItems) || !(yearIndex in dateItems))
+    return null
+
+  const year  = Number(dateItems[yearIndex])
+  const month = Number(dateItems[monthIndex])
+  const day   = Number(dateItems[dayIndex])
+
+  return isValidDate(year, month, day) ? {year: year, month: month, day: day} : null
 }
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
