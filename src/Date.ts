@@ -81,13 +81,13 @@ export function dateNumberToYearNumber(dateNumber: number): number {
   return numberToDate(dateNumber).year
 }
 
-export function parseDateWithMoment(dateString: string, dateFormat: string): IDate | null
+export function parseDate(dateString: string, dateFormat: string): IDate | null
 {
   const date = moment(dateString, dateFormat, true)
   return date.isValid() ? {year: date.year(), month: date.month()+1, day: date.date()} : null
 }
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormat)
+  const date = config.parseDate(dateString, config.dateFormat) //should point to parseDate()
   return date ? toDateNumber(date.year, date.month, date.day) : null
 }

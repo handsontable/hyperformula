@@ -1,6 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {IDate, parseDateWithMoment} from './Date'
+import {IDate, parseDate} from './Date'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -36,7 +36,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {dateFormat} from './format/format'
+import {stringifyDate} from './format/format'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -66,8 +66,8 @@ export class Config {
     gpuMode: 'gpu',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
-    parseDate: parseDateWithMoment,
-    stringifyDate: dateFormat,
+    parseDate: parseDate,
+    stringifyDate: stringifyDate,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
