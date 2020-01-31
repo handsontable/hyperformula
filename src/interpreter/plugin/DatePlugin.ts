@@ -1,11 +1,10 @@
-import moment from 'moment'
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   dateNumberToDayNumber,
   numberToDate,
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
-  toDateNumber,
+  toDateNumber, endOfMonth, offsetMonth,
 } from '../../Date'
 import {format} from '../../format/format'
 import {parse} from '../../format/parser'
@@ -105,14 +104,7 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const date = numberToDate(dateNumber)
-    const dateMoment = moment({year: date.year, month: date.month-1, date: date.day})
-    if (numberOfMonthsToShift > 0) {
-      dateMoment.add(numberOfMonthsToShift, 'months')
-    } else {
-      dateMoment.subtract(-numberOfMonthsToShift, 'months')
-    }
-    dateMoment.endOf('month').startOf('date')
-    return toDateNumber({year: dateMoment.year(), month: dateMoment.month()+1, day: dateMoment.date()} )
+    return toDateNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

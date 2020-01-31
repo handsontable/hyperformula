@@ -96,6 +96,15 @@ export function isValidDate(date: IDate): boolean {
   }
 }
 
+export function endOfMonth(date: IDate): IDate {
+  return {year: date.year, month: date.month, day: numDays[date.month-1]}
+}
+
+export function offsetMonth(date: IDate, offset: number): IDate {
+  const totalM = 12*date.year + date.month-1 + offset
+  return {year: Math.floor(totalM/12), month: totalM % 12 + 1, day: date.day}
+}
+
 export function parseDate(dateString: string, dateFormat: string): IDate | null
 {
   const normalizedDateString = dateString.replace(/[^a-zA-Z0-9]/g, '-')
