@@ -1,8 +1,13 @@
-import moment from 'moment'
 import {Config} from './Config'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30 , 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
+
+export interface IDate {
+  year: number,
+  month: number,
+  day: number
+}
 
 function dayToMonth(dayOfYear: number): number {
   let month = 0
@@ -21,8 +26,8 @@ function leapYearsCount(year: number): number {
   return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)
 }
 
-function toDateNumberFromZero(year: number, month: number, day: number): number {
-  return 365*year + prefSumDays[month-1] + day-1 + (month<=2 ? leapYearsCount(year - 1) : leapYearsCount(year))
+function toDateNumberFromZero(date: IDate): number {
+  return 365*date.year + prefSumDays[date.month-1] + date.day-1 + (date.month<=2 ? leapYearsCount(date.year - 1) : leapYearsCount(date.year))
 }
 
 function isLeapYear(year: number): boolean {
@@ -38,65 +43,56 @@ function isLeapYear(year: number): boolean {
 }
 
 
-export interface IDate {
-  year: number,
-  month: number,
-  day: number
-}
 
-/*
- * counting of day and month starts here from 1
- */
-
-export function toDateNumber(year: number, month: number, day: number): number {
-  return toDateNumberFromZero(year, month, day) - 693958 // toDateNumberFromZero(1899,12,30)
+export function toDateNumber(date: IDate): number {
+  return toDateNumberFromZero(date) - 693958 // toDateNumberFromZero(1899,12,30)
 }
 
 export function numberToDate(arg: number): IDate {
   const dateNumber = arg + 693958 // toDateNumberFromZero(1899,12,30)
   let year = Math.floor(dateNumber / 365.2425)
-  if(toDateNumberFromZero(year + 1,1,1) <= dateNumber){
+  if(toDateNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber){
     year++
   }
-  else if(toDateNumberFromZero(year - 1,1,1) > dateNumber){
+  else if(toDateNumberFromZero({year: year - 1, month: 1, day: 1}) > dateNumber){
     year--
   }
 
-  const dayOfYear = dateNumber - toDateNumberFromZero(year, 1, 1)
+  const dayOfYear = dateNumber - toDateNumberFromZero( {year: year, month: 1, day: 1})
   const month = dayToMonth(
     (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
   )
   const day = dayOfYear - prefSumDays[month]
-  return {year: year, month: month, day: day}
+  return {year: year, month: month+1, day: day+1}
 }
 
 export function dateNumberToDayNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).day + 1
+  return numberToDate(dateNumber).day
 }
 
 export function dateNumberToMonthNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).month + 1
+  return numberToDate(dateNumber).month
 }
 
 export function dateNumberToYearNumber(dateNumber: number): number {
   return numberToDate(dateNumber).year
 }
 
-export function isValidDate(year: number, month: number, day: number): boolean {
-  if(isNaN(year) || isNaN(month) || isNaN(day)) {
+export function isValidDate(date: IDate): boolean {
+  if(isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
     return false
-  } else if(day !== Math.round(day) || month !== Math.round(month) || year !== Math.round(year)) {
+  } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
     return false
-  } else if( year < 1582) {  //Gregorian calendar start
+  } else if( date.year < 1582) {  //Gregorian calendar start
     return false
-  } else if(month < 1 || month > 12) {
+  } else if(date.month < 1 || date.month > 12) {
     return false
-  } else if(day < 1) {
+  } else if(date.day < 1) {
     return false
-  } else if(isLeapYear(year) && month===2) {
-    return day <= 29
+  } else if(isLeapYear(date.year) && date.month===2) {
+    return date.day <= 29
   } else {
-    return day <= numDays[month - 1]
+    return date.day <= numDays[date.month - 1]
   }
 }
 
@@ -118,10 +114,12 @@ export function parseDate(dateString: string, dateFormat: string): IDate | null
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
 
-  return isValidDate(year, month, day) ? {year: year, month: month, day: day} : null
+  const date : IDate = {year: year, month: month, day: day}
+
+  return isValidDate( date ) ? date : null
 }
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
   const date = config.parseDate(dateString, config.dateFormat) //should point to parseDate()
-  return date ? toDateNumber(date.year, date.month, date.day) : null
+  return date ? toDateNumber(date) : null
 }

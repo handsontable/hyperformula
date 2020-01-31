@@ -78,7 +78,7 @@ export class DatePlugin extends FunctionPlugin {
       return coercedDay
     }
 
-    return toDateNumber(coercedYear, coercedMonth, coercedDay)
+    return toDateNumber( {year: coercedYear, month: coercedMonth, day: coercedDay} )
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -105,14 +105,14 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const date = numberToDate(dateNumber)
-    const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
+    const dateMoment = moment({year: date.year, month: date.month-1, date: date.day})
     if (numberOfMonthsToShift > 0) {
       dateMoment.add(numberOfMonthsToShift, 'months')
     } else {
       dateMoment.subtract(-numberOfMonthsToShift, 'months')
     }
     dateMoment.endOf('month').startOf('date')
-    return toDateNumber(dateMoment.year(), dateMoment.month()+1, dateMoment.date())
+    return toDateNumber({year: dateMoment.year(), month: dateMoment.month()+1, day: dateMoment.date()} )
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

@@ -78,7 +78,7 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
   const date = numberToDate(dateNumber as number)
-  const dateMoment = moment({year: date.year, month: date.month, date: date.day+1})
+  const dateMoment = moment({year: date.year, month: date.month-1, date: date.day})
   return  dateMoment.format(dateFormat)
 }
 

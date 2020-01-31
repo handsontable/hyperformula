@@ -4,10 +4,10 @@ import {dateNumberToMonthNumber, toDateNumber, dateStringToDateNumber} from '../
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {
-    expect(toDateNumber(1900, 1, 1)).toBe(2)
-    expect(toDateNumber(1899, 12, 30)).toBe(0)
-    expect(toDateNumber(1900, 12, 31)).toBe(366)
-    expect(toDateNumber(2018, 12, 31)).toBe(43465)
+    expect(toDateNumber({year: 1900, month: 1, day: 1})).toBe(2)
+    expect(toDateNumber({year: 1899, month: 12, day: 30})).toBe(0)
+    expect(toDateNumber({year: 1900, month: 12, day: 31})).toBe(366)
+    expect(toDateNumber({year: 2018, month: 12, day: 31})).toBe(43465)
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {

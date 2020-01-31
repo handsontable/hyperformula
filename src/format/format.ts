@@ -103,7 +103,7 @@ export function stringifyDate(value: number, formatArg: string): string | null {
       case 'D':
       case 'dd':
       case 'DD': {
-        result += padLeft(date.day+1, token.value.length)
+        result += padLeft(date.day, token.value.length)
         break
       }
 //      case 'ddd':
@@ -125,7 +125,7 @@ export function stringifyDate(value: number, formatArg: string): string | null {
 //          result += padLeft(date.minute(), token.value.length)
 //          break
 //        } else {
-          result += padLeft(date.month + 1, token.value.length)
+          result += padLeft(date.month, token.value.length)
           break
 //        }
       }
