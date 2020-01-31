@@ -1,9 +1,10 @@
 import {CellValue} from '../Cell'
+import {Config} from '../Config'
 import {numberToDate} from '../Date'
 import {FormatExpression, FormatExpressionType, FormatToken, parse, TokenType} from './parser'
 
-export function format(formatArg: string, value: number): CellValue {
-  const tryString = dateFormat(formatArg, value)
+export function format(value: number, formatArg: string, config: Config): CellValue {
+  const tryString = config.stringifyDate(value, formatArg) //default points to dateFormat()
   if(tryString != null)
     return tryString
 
@@ -70,7 +71,7 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-function dateFormat(formatArg: string, value: number): string | null {
+export function dateFormat(value: number, formatArg: string): string | null {
   const expression: FormatExpression = parse(formatArg)
   if(expression.type != FormatExpressionType.DATE)
     return null

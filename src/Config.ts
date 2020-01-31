@@ -36,6 +36,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {dateFormat} from './format/format'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -49,7 +50,7 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   parseDate: (dateString: string, dateFormat: string) => IDate | null
-//  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
+  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
   useColumnIndex: boolean,
   vlookupThreshold: number
 }
@@ -66,6 +67,7 @@ export class Config {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     parseDate: parseDateWithMoment,
+    stringifyDate: dateFormat,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
@@ -115,6 +117,7 @@ export class Config {
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly parseDate: (dateString: string, dateFormat: string) => IDate | null
+  public readonly stringifyDate: (value: number, formatArg: string) => string | null
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
@@ -130,6 +133,7 @@ export class Config {
         matrixDetection,
         matrixDetectionThreshold,
         parseDate,
+        stringifyDate,
         useColumnIndex,
         vlookupThreshold,
       }: Partial<ConfigParams> = {},
@@ -146,6 +150,7 @@ export class Config {
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = parseDate || Config.defaultConfig.parseDate
+    this.stringifyDate = stringifyDate || Config.defaultConfig.stringifyDate
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {

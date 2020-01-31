@@ -236,6 +236,6 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    return format(formatArg, numberRepresentation)
+    return format(numberRepresentation, formatArg, this.config)
   }
 }
