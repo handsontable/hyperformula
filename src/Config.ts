@@ -51,6 +51,9 @@ export interface ConfigParams {
   matrixDetectionThreshold: number,
   parseDate: (dateString: string, dateFormat: string) => IDate | null
   stringifyDate: (dateNumber: number, dateFormat: string) => string | null
+  precisionEpsilon: number,
+  precisionRounding: number,
+  smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number
 }
@@ -64,10 +67,13 @@ export class Config {
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
+    smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     parseDate: parseDate,
     stringifyDate: stringifyDate,
+    precisionEpsilon: 1e-13,
+    precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
   }
@@ -118,6 +124,9 @@ export class Config {
   public readonly matrixDetectionThreshold: number
   public readonly parseDate: (dateString: string, dateFormat: string) => IDate | null
   public readonly stringifyDate: (value: number, formatArg: string) => string | null
+  public readonly precisionEpsilon: number
+  public readonly precisionRounding: number
+  public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
@@ -130,10 +139,13 @@ export class Config {
         language,
         functionPlugins,
         gpuMode,
+        smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
         parseDate,
         stringifyDate,
+        precisionEpsilon,
+        precisionRounding,
         useColumnIndex,
         vlookupThreshold,
       }: Partial<ConfigParams> = {},
@@ -144,8 +156,14 @@ export class Config {
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
+    this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
+    this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
+    this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
+    if(!this.smartRounding) {
+      this.precisionEpsilon = 0
+    }
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)

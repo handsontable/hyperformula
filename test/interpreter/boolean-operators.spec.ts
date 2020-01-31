@@ -7,8 +7,6 @@ describe('Interpreter - Boolean operators', () => {
   it('Equals operator - numbers',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=1=2', '=1=1', '=1+2=3'],
-      ['="abc"="abc"', '="foo"="bar"', '="a"="foo"'],
-      ['=TRUE()=TRUE()', '=FALSE()=FALSE()', '=TRUE()=FALSE()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)

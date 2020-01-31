@@ -18,6 +18,16 @@ describe('Copy - paste integration', () => {
     expect_array_with_same_content(['foo', 1], values[1])
   })
 
+  it('copy should round return values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1.0000000001', '1.000000000000001'],
+    ])
+
+    const values = engine.clipboardCopy(adr('A1'), 2, 1)
+
+    expect_array_with_same_content([1.0000000001, 1], values[0])
+  })
+
   it('should copy empty cell vertex', () => {
     const engine = HyperFormula.buildFromArray([
       [null, '=A1']
@@ -53,6 +63,18 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
     expect(engine.getCellValue(adr('C2'))).toEqual('foo')
     expect(engine.getCellValue(adr('D2'))).toEqual('bar')
+  })
+
+  it('should not round here', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1.0000000001', '1.000000000000001'],
+    ])
+
+    engine.clipboardCopy(adr('A1'), 2, 1)
+    engine.clipboardPaste(adr('A2'))
+
+    expect(engine.dependencyGraph.getCellValue(adr('A2'))).toEqual(1.0000000001)
+    expect(engine.dependencyGraph.getCellValue(adr('B2'))).toEqual(1.000000000000001)
   })
 
   it('should work for cell reference inside copied area', () => {
@@ -249,7 +271,7 @@ describe('Copy - paste integration', () => {
 
     expect(() => {
       engine.clipboardPaste(adr('A1', 1))
-    }).toThrowError("Invalid arguments")
+    }).toThrowError('Invalid arguments')
   })
 
   it('should copy references with absolute sheet id', () => {
