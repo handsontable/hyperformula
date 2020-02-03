@@ -223,7 +223,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual(new CellError(ErrorType.REF)); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(new CellError(ErrorType.REF)); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.REF)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.REF)); // PERCNAME
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.REF)); // PERCNAME
 
     });
 
@@ -246,7 +246,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual(new CellError(ErrorType.VALUE)); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(new CellError(ErrorType.VALUE)); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.VALUE)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
     });
 
     xit('error #NUM! with every combination should be supported by all comparison operators', () => {
@@ -268,7 +268,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual(new CellError(ErrorType.NUM)); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(new CellError(ErrorType.NUM)); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.NUM)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.NUM)); // PERCENTAGE
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.NUM)); // PERCENTAGE
     });
 
     xit('error #NUM! with every combination should be supported by all comparison operators', () => {
@@ -290,7 +290,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual(new CellError(ErrorType.NUM)); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(new CellError(ErrorType.NUM)); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.NUM)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.NUM)); // PERCENTAGE
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.NUM)); // PERCENTAGE
     });
 
     xit('string and null should be supported by all comparison operators', () => {
@@ -312,7 +312,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual('Liz'); // CONCAT
         expect(engine.getCellValue('O1')).toEqual('Liz'); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.VALUE)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
     });
 
     xit('string and TRUE should be supported by all comparison operators', () => {
@@ -334,7 +334,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual('Liztrue'); // CONCAT
         expect(engine.getCellValue('O1')).toEqual('Liz'); // UNARY PLUS
         expect(engine.getCellValue('P1')).toEqual(new CellError(ErrorType.VALUE)); // UNARY MINUS
-        expect(engine.getCellValue('R1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
+        expect(engine.getCellValue('Q1')).toEqual(new CellError(ErrorType.VALUE)); // PERCENTAGE
     });
 
     xit('string and false should be supported by all comparison operators', () => {
@@ -373,7 +373,6 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('L1')).toEqual(new CellError(ErrorType.VALUE)); // DIV
         expect(engine.getCellValue('M1')).toEqual(new CellError(ErrorType.VALUE)); // EXP
         expect(engine.getCellValue('N1')).toEqual(new CellError(ErrorType.DIV_BY_ZERO)); // CONCAT
-
     });
 
 
