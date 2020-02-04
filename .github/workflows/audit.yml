@@ -1,10 +1,10 @@
-name: Linter
+name: Security
 
 on: [push]
 
 jobs:
   build:
-    name: TS
+    name: NPM audit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
@@ -14,14 +14,10 @@ jobs:
         with:
           node-version: '10.x'
 
-      - name: Install Yarn
+      - name: NPM install
         run: |
-          npm install -g yarn@legacy
+          npm install
 
-      - name: Install dependencies
+      - name: NPM audit
         run: |
-          make setup
-
-      - name: JavaScript lint
-        run: |
-          make lint
+          npm audit
