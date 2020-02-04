@@ -168,7 +168,7 @@ export class Config {
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = typeof parseDate === 'function' || Config.defaultConfig.parseDate
-    this.stringifyDate = stringifyDate || Config.defaultConfig.stringifyDate
+    this.stringifyDate = typeof stringifyDate === 'function' || Config.defaultConfig.stringifyDate
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
