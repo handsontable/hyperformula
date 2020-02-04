@@ -42,14 +42,14 @@ function isLeapYear(year: number): boolean {
   }
 }
 
-
+const magicConstant : number = toDateNumberFromZero({year: 1899, month: 12, day: 30} )
 
 export function toDateNumber(date: IDate): number {
-  return toDateNumberFromZero(date) - 693958 // toDateNumberFromZero(1899,12,30)
+  return toDateNumberFromZero(date) - magicConstant
 }
 
 export function numberToDate(arg: number): IDate {
-  const dateNumber = arg + 693958 // toDateNumberFromZero(1899,12,30)
+  const dateNumber = arg + magicConstant
   let year = Math.floor(dateNumber / 365.2425)
   if(toDateNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber){
     year++
