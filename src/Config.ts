@@ -167,7 +167,7 @@ export class Config {
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = parseDate || Config.defaultConfig.parseDate
+    this.parseDate = typeof parseDate === 'function' || Config.defaultConfig.parseDate
     this.stringifyDate = stringifyDate || Config.defaultConfig.stringifyDate
   }
 
