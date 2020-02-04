@@ -86,7 +86,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
   return tokens
 }
 
-export function parse(str: string): FormatExpression {
+export function parseForDateFormat(str: string): FormatExpression | null {
   const dateFormatTokens = matchDateFormat(str)
 
   if (dateFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
@@ -95,6 +95,12 @@ export function parse(str: string): FormatExpression {
       tokens: createTokens(dateFormatTokens, str),
     }
   }
+  else {
+    return null
+  }
+}
+
+export function parseForNumberFormat(str: string): FormatExpression | null {
 
   const numberFormatTokens = matchNumberFormat(str)
   if (numberFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
@@ -102,6 +108,20 @@ export function parse(str: string): FormatExpression {
       type: FormatExpressionType.NUMBER,
       tokens: createTokens(numberFormatTokens, str),
     }
+  }
+  else {
+    return null
+  }
+}
+
+export function parse(str: string): FormatExpression {
+  const asDate = parseForDateFormat(str)
+  if(asDate !== null) {
+    return asDate
+  }
+  const asNumber = parseForNumberFormat(str)
+  if(asNumber !== null) {
+    return asNumber
   }
 
   return {
