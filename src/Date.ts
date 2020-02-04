@@ -89,7 +89,7 @@ export function isValidDate(date: IDate): boolean {
     return false
   } else if(date.day < 1) {
     return false
-  } else if(isLeapYear(date.year) && date.month===2) {
+  } else if(isLeapYear(date.year) && date.month === 2) {
     return date.day <= 29
   } else {
     return date.day <= numDays[date.month - 1]
