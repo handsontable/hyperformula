@@ -10,6 +10,7 @@ import {
   SimpleCellAddress,
 } from './Cell'
 import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {cellValueRounding} from './CellValueRounding'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CellValueChange, ContentChanges} from './ContentChanges'
@@ -31,7 +32,6 @@ import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
-import {cellValueRounding} from './CellValueRounding'
 import {Statistics, StatType} from './statistics/Statistics'
 
 export class NoSheetWithIdError extends Error {
@@ -49,6 +49,12 @@ export class NoSheetWithNameError extends Error {
 export class InvalidAddressError extends Error {
   constructor(address: SimpleCellAddress) {
     super(`Address (row = ${address.row}, col = ${address.col}) is invalid`)
+  }
+}
+
+export class InvalidArgumentsError extends Error {
+  constructor() {
+    super(`Invalid arguments`)
   }
 }
 
@@ -425,6 +431,70 @@ export class HyperFormula {
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
     this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+  }
+
+  /**
+   * Returns information whether its possible to move rows.
+   *
+   * If returns true, doing this operation won't throw any errors.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startRow - number of the first row to move
+   * @param numberOfRows - number of rows to move
+   * @param targetRow - row number before which rows will be moved
+   */
+  public isItPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Moves selected rows before target row.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startRow - number of the first row to move
+   * @param numberOfRows - number of rows to move
+   * @param targetRow - row number before which rows will be moved
+   */
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): CellValueChange[] {
+    this.crudOperations.moveRows(sheet, startRow, numberOfRows, targetRow)
+    return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
+  }
+
+  /**
+   * Returns information whether its possible to move columns.
+   *
+   * If returns true, doing this operation won't throw any errors.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startColumn - number of the first column to move
+   * @param numberOfColumns - number of columns to move
+   * @param targetColumn - column number before which columns will be moved
+   */
+  public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
+    try {
+      this.crudOperations.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Moves selected columns before target column.
+   *
+   * @param sheet - number of sheet in which the operation will be performed
+   * @param startColumn - number of the first column to move
+   * @param numberOfColumns - number of columns to move
+   * @param targetColumn - column number before which columns will be moved
+   */
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): CellValueChange[] {
+    this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
     return this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)
   }
 

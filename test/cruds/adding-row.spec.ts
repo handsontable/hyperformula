@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {Config, EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -68,7 +68,7 @@ describe('Adding row - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(true)
     expect(engine.isItPossibleToAddRows(0, [3, 1])).toEqual(false)
     expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
   })
@@ -105,10 +105,38 @@ describe('Adding row - matrix check', () => {
     expect(() => {
       engine.addRows(0, [3, 1])
     }).toThrow(new Error('It is not possible to add row in row with matrix'))
+  })
 
-    expect(() => {
-      engine.addRows(0, [2, 1])
-    }).toThrow(new Error('It is not possible to add row in row with matrix'))
+  it('should be possible to add row right above matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addRows(0, [0, 1])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+  })
+
+  it('should be possible to add row right after matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['1', '2'],
+      ['3', '4'],
+    ])
+
+    engine.addRows(0, [2, 1])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })
 
