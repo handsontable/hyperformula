@@ -73,10 +73,11 @@ export class SingleThreadEvaluator implements Evaluator {
         }
       })
       cycled.forEach((vertex: Vertex) => {
-        const formulaVertex = vertex as FormulaCellVertex
-        const error = new CellError(ErrorType.CYCLE)
-        formulaVertex.setCellValue(error)
-        changes.addChange(error, formulaVertex.address)
+        if (vertex instanceof FormulaCellVertex) {
+          const error = new CellError(ErrorType.CYCLE)
+          vertex.setCellValue(error)
+          changes.addChange(error, vertex.address)
+        }
       })
     })
     return changes
@@ -91,7 +92,9 @@ export class SingleThreadEvaluator implements Evaluator {
    */
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]) {
     cycled.forEach((vertex: Vertex) => {
-      (vertex as FormulaCellVertex).setCellValue(new CellError(ErrorType.CYCLE))
+      if (vertex instanceof  FormulaCellVertex) {
+        vertex.setCellValue(new CellError(ErrorType.CYCLE))
+      }
     })
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaCellVertex) {

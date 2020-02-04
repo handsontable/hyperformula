@@ -3,6 +3,7 @@ import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './
 import {CrudOperations} from './CrudOperations'
 import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {InvalidArgumentsError} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 
@@ -131,7 +132,7 @@ export class ClipboardOperations {
 
     if (invalidSimpleCellAddress(destinationLeftCorner) ||
       !this.dependencyGraph.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)) {
-      throw new Error('Invalid arguments')
+      throw new InvalidArgumentsError()
     }
 
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)

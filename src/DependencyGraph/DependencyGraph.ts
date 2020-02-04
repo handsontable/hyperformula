@@ -277,10 +277,6 @@ export class DependencyGraph {
   }
 
   public addRows(addedRows: RowsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInRows(addedRows.firstRow())) {
-      throw Error('It is not possible to add row in row with matrix')
-    }
-
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
     })
@@ -303,10 +299,6 @@ export class DependencyGraph {
   }
 
   public addColumns(addedColumns: ColumnsSpan) {
-    if (this.matrixMapping.isFormulaMatrixInColumns(addedColumns.firstColumn())) {
-      throw Error('It is not possible to add column in column with matrix')
-    }
-
     this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
       this.addressMapping.addColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
     })

@@ -19,12 +19,28 @@ export class MatrixMapping {
     this.matrixMapping.delete(range.toString())
   }
 
+  public isFormulaMatrixInRow(sheet: number, row: number): boolean {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.spansThroughSheetRows(sheet, row) && mtx.isFormula()) {
+        return true
+      }
+    }
+    return false
+  }
+
   public isFormulaMatrixInRows(span: RowsSpan) {
     for (const row of span.rows()) {
-      for (const mtx of this.matrixMapping.values()) {
-        if (mtx.spansThroughSheetRows(span.sheet, row) && mtx.isFormula()) {
-          return true
-        }
+      if (this.isFormulaMatrixInRow(span.sheet, row)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  public isFormulaMatrixInColumn(sheet: number, column: number): boolean {
+    for (const mtx of this.matrixMapping.values()) {
+      if (mtx.spansThroughSheetColumn(sheet, column) && mtx.isFormula()) {
+        return true
       }
     }
     return false
@@ -32,10 +48,8 @@ export class MatrixMapping {
 
   public isFormulaMatrixInColumns(span: ColumnsSpan) {
     for (const col of span.columns()) {
-      for (const mtx of this.matrixMapping.values()) {
-        if (mtx.spansThroughSheetColumn(span.sheet, col) && mtx.isFormula()) {
-          return true
-        }
+      if (this.isFormulaMatrixInColumn(span.sheet, col)) {
+        return true
       }
     }
     return false

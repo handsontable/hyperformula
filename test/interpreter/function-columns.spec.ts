@@ -46,4 +46,15 @@ describe('Function COLUMNS', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
   })
+
+  it('should work when adding column', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['=COLUMNS(A1:B1)']
+    ])
+
+    engine.addColumns(0, [1, 1])
+
+    console.log(engine.getCellValue(adr('A2')))
+  })
 })
