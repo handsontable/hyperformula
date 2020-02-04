@@ -5,15 +5,20 @@ import {FormatExpression, FormatExpressionType, FormatToken, parse, TokenType} f
 
 export function format(value: number, formatArg: string, config: Config): CellValue {
   const tryString = config.stringifyDate(value, formatArg) //default points to stringifyDate()
-  if(tryString != null)
+  if(tryString != null) {
     return tryString
+  } else {
+    return tryToParseAnythingElse(value, formatArg, config)
+  }
+}
 
+function tryToParseAnythingElse(value: number, formatArg: string, config: Config): CellValue {
   const expression: FormatExpression = parse(formatArg)
 
   if(expression.type === FormatExpressionType.NUMBER) {
     return numberFormat(expression.tokens, value)
   } else {
-      return expression.tokens[0].value
+    return expression.tokens[0].value
   }
 }
 
