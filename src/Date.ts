@@ -83,7 +83,7 @@ export function isValidDate(date: IDate): boolean {
     return false
   } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
     return false
-  } else if( date.year < 1582) {  //Gregorian calendar start
+  } else if(date.year < 1582) {  //Gregorian calendar start
     return false
   } else if(date.month < 1 || date.month > 12) {
     return false
