@@ -83,13 +83,13 @@ export function isValidDate(date: IDate): boolean {
     return false
   } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
     return false
-  } else if( date.year < 1582) {  //Gregorian calendar start
+  } else if(date.year < 1582) {  //Gregorian calendar start
     return false
   } else if(date.month < 1 || date.month > 12) {
     return false
   } else if(date.day < 1) {
     return false
-  } else if(isLeapYear(date.year) && date.month===2) {
+  } else if(isLeapYear(date.year) && date.month === 2) {
     return date.day <= 29
   } else {
     return date.day <= numDays[date.month - 1]
@@ -101,8 +101,8 @@ export function endOfMonth(date: IDate): IDate {
 }
 
 export function offsetMonth(date: IDate, offset: number): IDate {
-  const totalM = 12*date.year + date.month-1 + offset
-  return {year: Math.floor(totalM/12), month: totalM % 12 + 1, day: date.day}
+  const totalM = 12 * date.year + date.month - 1 + offset
+  return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
 export function parseDate(dateString: string, dateFormat: string): IDate | null
@@ -117,7 +117,9 @@ export function parseDate(dateString: string, dateFormat: string): IDate | null
   const yearIndex   = formatItems.indexOf('yyyy')
 
   if(!(monthIndex in dateItems) || !(dayIndex in dateItems) || !(yearIndex in dateItems))
+{
     return null
+}
 
   const year  = Number(dateItems[yearIndex])
   const month = Number(dateItems[monthIndex])
