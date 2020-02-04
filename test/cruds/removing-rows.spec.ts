@@ -2,7 +2,7 @@ import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { MatrixVertex} from '../../src/DependencyGraph'
-import {InvalidArguments} from '../../src/HyperFormula'
+import {InvalidArgumentsError} from '../../src/HyperFormula'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
@@ -811,7 +811,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['2'],
     ])
 
-    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArguments())
+    expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError())
   })
 
   it('returns changed values', () => {

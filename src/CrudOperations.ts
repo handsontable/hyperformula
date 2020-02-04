@@ -24,7 +24,7 @@ import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/remov
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {buildMatrixVertex} from './GraphBuilder'
-import {Index, InvalidAddressError, InvalidArguments, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
+import {Index, InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
@@ -273,7 +273,7 @@ export class CrudOperations implements IBatchExecutor {
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
     for (const [row, numberOfRowsToAdd] of indexes) {
       if (!isNonnegativeInteger(row) || !isPositiveInteger(numberOfRowsToAdd)) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
@@ -293,10 +293,10 @@ export class CrudOperations implements IBatchExecutor {
     for (const [rowStart, numberOfRows] of indexes) {
       const rowEnd = rowStart + numberOfRows - 1
       if (!isNonnegativeInteger(rowStart) || !isNonnegativeInteger(rowEnd)) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
       if (rowEnd < rowStart) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
@@ -313,7 +313,7 @@ export class CrudOperations implements IBatchExecutor {
   public ensureItIsPossibleToAddColumns(sheet: number, ...indexes: Index[]): void {
     for (const [column, numberOfColumnsToAdd] of indexes) {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
 
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
@@ -334,10 +334,10 @@ export class CrudOperations implements IBatchExecutor {
       const columnEnd = columnStart + numberOfColumns - 1
 
       if (!isNonnegativeInteger(columnStart) || !isNonnegativeInteger(columnEnd)) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
       if (columnEnd < columnStart) {
-        throw new InvalidArguments()
+        throw new InvalidArgumentsError()
       }
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
@@ -360,7 +360,7 @@ export class CrudOperations implements IBatchExecutor {
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
-      throw new InvalidArguments()
+      throw new InvalidArgumentsError()
     }
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
@@ -388,7 +388,7 @@ export class CrudOperations implements IBatchExecutor {
       || !isPositiveInteger(numberOfRows)
       || (targetRow <= startRow + numberOfRows && targetRow >= startRow)
     ) {
-      throw new InvalidArguments()
+      throw new InvalidArgumentsError()
     }
 
     const width = this.dependencyGraph.getSheetWidth(sheet)
@@ -412,7 +412,7 @@ export class CrudOperations implements IBatchExecutor {
       || !isPositiveInteger(numberOfColumns)
       || (targetColumn <= startColumn + numberOfColumns && targetColumn >= startColumn)
     ) {
-      throw new InvalidArguments()
+      throw new InvalidArgumentsError()
     }
 
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)

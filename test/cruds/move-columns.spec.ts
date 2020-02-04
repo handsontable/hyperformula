@@ -1,6 +1,6 @@
 import {CellError, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {InvalidArguments} from '../../src/HyperFormula'
+import {InvalidArgumentsError} from '../../src/HyperFormula'
 import {CellAddress} from '../../src/parser'
 import {adr, extractRange, extractReference} from '../testUtils'
 
@@ -76,12 +76,12 @@ describe("Move columns", () => {
       ['1', '2'],
     ])
 
-    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrowError(new InvalidArguments())
-    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrowError(new InvalidArguments())
-    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrowError(new InvalidArguments())
-    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrowError(new InvalidArguments())
-    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrowError(new InvalidArguments())
-    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrowError(new InvalidArguments())
+    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrowError(new InvalidArgumentsError())
+    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrowError(new InvalidArgumentsError())
   })
 
   it('should move one column', () => {
