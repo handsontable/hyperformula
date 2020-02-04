@@ -101,7 +101,7 @@ export function endOfMonth(date: IDate): IDate {
 }
 
 export function offsetMonth(date: IDate, offset: number): IDate {
-  const totalM = 12*date.year + date.month-1 + offset
+  const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM/12), month: totalM % 12 + 1, day: date.day}
 }
 
