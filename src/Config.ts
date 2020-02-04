@@ -50,12 +50,13 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   parseDate: (dateString: string, dateFormat: string) => IDate | null
-  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
   precisionEpsilon: number,
   precisionRounding: number,
+  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
   smartRounding: boolean,
   useColumnIndex: boolean,
-  vlookupThreshold: number
+  vlookupThreshold: number,
+  zeroDate: IDate,
 }
 
 export class Config {
@@ -76,6 +77,7 @@ export class Config {
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
+    zeroDate: {year: 1899, month: 12, day: 30}
   }
 
   private static defaultPlugins: any[] = [
@@ -130,6 +132,7 @@ export class Config {
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
+  public readonly zeroDate: IDate
 
   constructor(
       {
@@ -148,6 +151,7 @@ export class Config {
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
+        zeroDate
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
@@ -169,6 +173,7 @@ export class Config {
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
+    this.zeroDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
