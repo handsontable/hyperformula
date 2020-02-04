@@ -117,7 +117,9 @@ export function parseDate(dateString: string, dateFormat: string): IDate | null
   const yearIndex   = formatItems.indexOf('yyyy')
 
   if(!(monthIndex in dateItems) || !(dayIndex in dateItems) || !(yearIndex in dateItems))
+{
     return null
+}
 
   const year  = Number(dateItems[yearIndex])
   const month = Number(dateItems[monthIndex])
