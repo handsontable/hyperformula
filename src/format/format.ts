@@ -78,8 +78,9 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
 
 export function stringifyDate(value: number, formatArg: string): string | null {
   const expression: FormatExpression = parse(formatArg)
-  if(expression.type != FormatExpressionType.DATE)
+  if(expression.type != FormatExpressionType.DATE) {
     return null
+  }
   const tokens = expression.tokens
   let result = ''
   const date = numberToDate(value)
