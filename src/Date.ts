@@ -42,14 +42,12 @@ function isLeapYear(year: number): boolean {
   }
 }
 
-const magicConstant : number = toDateNumberFromZero({year: 1899, month: 12, day: 30} )
-
-export function toDateNumber(date: IDate): number {
-  return toDateNumberFromZero(date) - magicConstant
+export function toDateNumber(date: IDate, config: Config): number {
+  return toDateNumberFromZero(date) - toDateNumberFromZero(config.zeroDate)
 }
 
-export function numberToDate(arg: number): IDate {
-  const dateNumber = arg + magicConstant
+export function numberToDate(arg: number, config: Config): IDate {
+  const dateNumber = arg + toDateNumberFromZero(config.zeroDate)
   let year = Math.floor(dateNumber / 365.2425)
   if(toDateNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber){
     year++
@@ -66,16 +64,16 @@ export function numberToDate(arg: number): IDate {
   return {year: year, month: month+1, day: day+1}
 }
 
-export function dateNumberToDayNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).day
+export function dateNumberToDayNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).day
 }
 
-export function dateNumberToMonthNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).month
+export function dateNumberToMonthNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).month
 }
 
-export function dateNumberToYearNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).year
+export function dateNumberToYearNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).year
 }
 
 export function isValidDate(date: IDate): boolean {
@@ -132,5 +130,5 @@ export function parseDate(dateString: string, dateFormat: string): IDate | null
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
   const date = config.parseDate(dateString, config.dateFormat) //should point to parseDate()
-  return date ? toDateNumber(date) : null
+  return date ? toDateNumber(date, config) : null
 }

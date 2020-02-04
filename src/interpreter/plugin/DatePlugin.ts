@@ -77,7 +77,7 @@ export class DatePlugin extends FunctionPlugin {
       return coercedDay
     }
 
-    return toDateNumber( {year: coercedYear, month: coercedMonth, day: coercedDay} )
+    return toDateNumber( {year: coercedYear, month: coercedMonth, day: coercedDay}, this.config)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -103,8 +103,8 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const date = numberToDate(dateNumber)
-    return toDateNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+    const date = numberToDate(dateNumber, this.config)
+    return toDateNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -121,7 +121,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToDayNumber(dateNumber)
+    return dateNumberToDayNumber(dateNumber, this.config)
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -172,7 +172,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToMonthNumber(dateNumber)
+    return dateNumberToMonthNumber(dateNumber, this.config)
   }
 
   /**
@@ -197,7 +197,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToYearNumber(dateNumber)
+    return dateNumberToYearNumber(dateNumber, this.config)
   }
 
   /**

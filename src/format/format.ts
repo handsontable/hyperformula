@@ -12,7 +12,7 @@ import {
 } from './parser'
 
 export function format(value: number, formatArg: string, config: Config): CellValue {
-  const tryString = config.stringifyDate(value, formatArg) //default points to stringifyDate()
+  const tryString = config.stringifyDate(value, formatArg, config) //default points to stringifyDate()
   if(tryString != null) {
     return tryString
   } else {
@@ -80,14 +80,14 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-export function stringifyDate(value: number, formatArg: string): string | null {
+export function stringifyDate(value: number, formatArg: string, config: Config): string | null {
   const expression = parseForDateFormat(formatArg)
   if(expression === null) {
     return null
   }
   const tokens = expression.tokens
   let result = ''
-  const date = numberToDate(value)
+  const date = numberToDate(value, config)
 //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {

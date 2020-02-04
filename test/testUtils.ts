@@ -76,7 +76,7 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
 }
 
 export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
-  const dateString = stringifyDate(dateNumber as number, dateFormat)
+  const dateString = stringifyDate(dateNumber as number, dateFormat, new Config())
   return dateString ? dateString : ''
 }
 

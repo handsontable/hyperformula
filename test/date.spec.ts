@@ -4,16 +4,16 @@ import {dateNumberToMonthNumber, toDateNumber, dateStringToDateNumber} from '../
 
 describe('Date helpers', () => {
   it('#toDateNumber should return number representation of a date', () => {
-    expect(toDateNumber({year: 1900, month: 1, day: 1})).toBe(2)
-    expect(toDateNumber({year: 1899, month: 12, day: 30})).toBe(0)
-    expect(toDateNumber({year: 1900, month: 12, day: 31})).toBe(366)
-    expect(toDateNumber({year: 2018, month: 12, day: 31})).toBe(43465)
+    expect(toDateNumber({year: 1900, month: 1, day: 1}, new Config())).toBe(2)
+    expect(toDateNumber({year: 1899, month: 12, day: 30}, new Config())).toBe(0)
+    expect(toDateNumber({year: 1900, month: 12, day: 31}, new Config())).toBe(366)
+    expect(toDateNumber({year: 2018, month: 12, day: 31}, new Config())).toBe(43465)
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
-    expect(dateNumberToMonthNumber(0)).toEqual(12)
-    expect(dateNumberToMonthNumber(2)).toEqual(1)
-    expect(dateNumberToMonthNumber(43465)).toEqual(12)
+    expect(dateNumberToMonthNumber(0, new Config())).toEqual(12)
+    expect(dateNumberToMonthNumber(2, new Config())).toEqual(1)
+    expect(dateNumberToMonthNumber(43465, new Config())).toEqual(12)
   })
 
   it('#stringToDateNumber - tests expected to return not null', () => {
