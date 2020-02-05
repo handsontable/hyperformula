@@ -65,7 +65,7 @@ describe('Date helpers', () => {
 
 describe('Date helpers, other zero date', () => {
   it('#dateToNumber should return number representation of a date, different zero date', () => {
-    const config = new Config({zeroDate: {year: 1950, month: 6, day: 15}})
+    const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
     expect(dateToNumber({year: 1900, month: 1, day: 1}, config)).toBe(-18427)
     expect(dateToNumber({year: 1899, month: 12, day: 30}, config)).toBe(-18429)
     expect(dateToNumber({year: 1900, month: 12, day: 31}, config)).toBe(-18063)
@@ -73,14 +73,14 @@ describe('Date helpers, other zero date', () => {
   })
 
   it('#dateNumberToMonthNumber should return proper month number, different zero date', () => {
-    const config = new Config({zeroDate: {year: 1950, month: 6, day: 15}})
+    const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
     expect(dateNumberToMonthNumber(0, config)).toEqual(6)
     expect(dateNumberToMonthNumber(2, config)).toEqual(6)
     expect(dateNumberToMonthNumber(43465, config)).toEqual(6)
   })
 
   it('#stringToDateNumber - tests expected to return not null, different zero date', () => {
-    const config = new Config({zeroDate: {year: 1950, month: 6, day: 15}})
+    const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
     expect(dateStringToDateNumber('08/16/1985', config)).toBe(12846)
     expect(dateStringToDateNumber('01/15/2020', config)).toBe(25416)
     expect(dateStringToDateNumber('02/29/2000', config)).toBe(18156)
