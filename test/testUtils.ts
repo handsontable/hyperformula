@@ -75,8 +75,10 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: CellValue, dateFormat: string[] = Config.defaultConfig.dateFormats): string {
-  const dateString = stringifyDate(dateNumber as number, dateFormat[0], new Config())
+export function dateNumberToString(dateNumber: CellValue, config = new Config()): string {
+  if(dateNumber instanceof CellError)
+    return 'ERROR'
+  const dateString = stringifyDate(dateNumber as number, config.dateFormats[0], config)
   return dateString ? dateString : ''
 }
 

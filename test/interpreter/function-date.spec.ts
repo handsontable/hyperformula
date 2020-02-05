@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, dateNumberToString} from '../testUtils'
@@ -82,58 +82,42 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2001,02,29)'],
     ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/28/2001');
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('ERROR')
   })
-
 
   it('should suport leap year 2016', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2016,02,29)'],
     ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2016');
-
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2016')
   })
 
-  it('should suport leap year 2020', () => {
+  it('should suport leap year 1920', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(2020,02,29)'],
+      ['=DATE(1920,02,29)'],
     ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A2')))).toEqual('02/29/2020');
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/1920')
   })
 
-  it('should suport leap year 2024', () => {
+  it('should suport nonleap year 1900', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(2024,02,29)'],
+      ['=DATE(1900,02,29)'],
     ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A3')))).toEqual('02/29/2024');
-
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('ERROR')
   })
 
-  it('should suport leap year 2028', () => {
+  it('should suport nonleap year 1900 with excel compatibility', () => {
+    const config = new Config({excelDateCompatibility: true})
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(2028,02,29)'],
-    ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A4')))).toEqual('02/29/2028');
+      ['=DATE(1900,02,29)'],
+    ], config )
+    expect(dateNumberToString(engine.getCellValue(adr('A1')),config)).toEqual('02/29/1900')
   })
 
-  it('should suport leap year 2032', () => {
+  it('should suport leap year 2400', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(2032,02,29)'],
+      ['=DATE(2400,02,29)'],
     ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A4')))).toEqual('02/29/2032');
-  })
-
-  it('should suport leap year 2040', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2040,02,29)'],
-    ])
-
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2040');
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2400')
   })
 })
