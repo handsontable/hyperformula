@@ -47,7 +47,7 @@ export interface ConfigParams {
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
-  excelDateCompatibility: boolean,
+  leapYear1900: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
@@ -70,7 +70,7 @@ export class Config {
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
-    excelDateCompatibility: false,
+    leapYear1900: false,
     smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
@@ -126,7 +126,7 @@ export class Config {
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
-  public readonly excelDateCompatibility: boolean
+  public readonly leapYear1900: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
@@ -148,7 +148,7 @@ export class Config {
         language,
         functionPlugins,
         gpuMode,
-        excelDateCompatibility,
+        leapYear1900,
         smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
@@ -183,7 +183,7 @@ export class Config {
     this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
     this.zeroDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
-    this.excelDateCompatibility = typeof excelDateCompatibility === 'boolean' ? excelDateCompatibility : Config.defaultConfig.excelDateCompatibility
+    this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
