@@ -1,8 +1,16 @@
 import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  CellError,
+  CellValueTypeOrd, EmptyValue,
+  EmptyValueType,
+  ErrorType, getCellValueType,
+  invalidSimpleCellAddress,
+  SimpleCellAddress
+} from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
+import {DateHelper, dateStringToDateNumber} from '../Date'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
@@ -12,7 +20,6 @@ import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
-  compare,
   divide, equality, nonequality,
   greater,
   greatereq,
@@ -35,6 +42,7 @@ export class Interpreter {
     public readonly columnSearch: IColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
+    public readonly dateHelper: DateHelper
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
@@ -80,7 +88,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, equality, this.config)
+        return this.compare( leftResult, rightResult, equality)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -99,7 +107,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, nonequality, this.config)
+        return this.compare( leftResult, rightResult, nonequality)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -118,7 +126,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
 
-        return compare( leftResult, rightResult, greater, this.config)
+        return this.compare( leftResult, rightResult, greater)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -136,7 +144,7 @@ export class Interpreter {
         if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return compare( leftResult, rightResult, less, this.config)
+        return this.compare( leftResult, rightResult, less)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -154,7 +162,7 @@ export class Interpreter {
         if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return compare( leftResult, rightResult, greatereq, this.config)
+        return this.compare( leftResult, rightResult, greatereq)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -172,7 +180,7 @@ export class Interpreter {
         if(rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return compare( leftResult, rightResult, lesseq, this.config)
+        return this.compare( leftResult, rightResult, lesseq)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -354,6 +362,34 @@ export class Interpreter {
         const functionName = pluginFunctionData.translationKey.toUpperCase()
         this.pluginCache.set(functionName, [pluginInstance, pluginFunction])
       })
+    }
+  }
+  private compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
+                          comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean): boolean {
+    if (typeof left === 'string' && typeof right === 'string') {
+      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
+      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
+      if (leftTmp != null && rightTmp != null) {
+        return comparator(leftTmp, rightTmp, this.config.precisionEpsilon)
+      }
+    } else if (typeof left === 'string' && typeof right === 'number') {
+      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
+      if (leftTmp != null) {
+        return comparator(leftTmp, right, this.config.precisionEpsilon)
+      }
+    } else if (typeof left === 'number' && typeof right === 'string') {
+      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
+      if (rightTmp != null) {
+        return comparator(left, rightTmp, this.config.precisionEpsilon)
+      }
+    }
+
+    if (typeof left !== typeof right) {
+      return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
+    } else if (left === EmptyValue || right === EmptyValue) {
+      return false
+    } else {
+      return comparator(left, right, this.config.precisionEpsilon)
     }
   }
 }

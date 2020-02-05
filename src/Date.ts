@@ -9,6 +9,24 @@ export interface IDate {
   day: number
 }
 
+export class DateHelper {
+  private readonly config : Config
+  constructor( config: Config)
+  {
+    this.config = config
+  }
+
+  public dateStringToDateNumber(dateString: string): number | null {
+    const date = this.config.parseDate(dateString, this.config.dateFormats, this.config) //should point to parseDate()
+    return date ? dateToNumber(date, this.config) : null
+  }
+}
+
+export function dateStringToDateNumber(dateString: string, config: Config): number | null {
+  const date = config.parseDate(dateString, config.dateFormats, config) //should point to parseDate()
+  return date ? dateToNumber(date, config) : null
+}
+
 function dayToMonth(dayOfYear: number): number {
   let month = 0
   if(prefSumDays[month+6] <= dayOfYear)
@@ -155,7 +173,3 @@ export function parseDate(dateString: string, dateFormats: string[], config: Con
   return null
 }
 
-export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormats, config) //should point to parseDate()
-  return date ? dateToNumber(date, config) : null
-}

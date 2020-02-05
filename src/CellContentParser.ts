@@ -1,6 +1,6 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
-import {dateStringToDateNumber} from './Date'
+import {DateHelper} from './Date'
 
 export type RawCellContent = string | null | undefined
 
@@ -65,7 +65,7 @@ export function isError(text: string, errorMapping: Record<string, ErrorType>): 
 }
 
 export class CellContentParser {
-  constructor(private readonly config: Config) {}
+  constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {}
 
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null) {
@@ -82,7 +82,7 @@ export class CellContentParser {
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
       }
-      const parsedDateNumber = dateStringToDateNumber(content, this.config)
+      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content)
       if(parsedDateNumber !== null) {
         return new CellContent.Number(parsedDateNumber)
       }

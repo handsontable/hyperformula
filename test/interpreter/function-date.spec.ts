@@ -107,7 +107,7 @@ describe( 'Function DATE + leap years', () =>{
   })
 
   it('should suport nonleap year 1900 with excel compatibility', () => {
-    const config = new Config({excelDateCompatibility: true})
+    const config = new Config({leapYear1900: true})
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1900,02,29)'],
     ], config )
