@@ -103,23 +103,39 @@ export function offsetMonth(date: IDate, offset: number): IDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-export function parseDate(dateString: string, dateFormat: string): IDate | null
+function parseDateSingleFormat(dateString: string, dateFormat: string, config: Config): IDate | null
 {
-  const normalizedDateString = dateString.replace(/[^a-zA-Z0-9]/g, '-')
+  const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
-  const dateItems       = normalizedDateString.split('-')
-
   const monthIndex  = formatItems.indexOf('mm')
   const dayIndex    = formatItems.indexOf('dd')
-  const yearIndex   = formatItems.indexOf('yyyy')
-
-  if(!(monthIndex in dateItems) || !(dayIndex in dateItems) || !(yearIndex in dateItems))
-{
+  const yearIndexLong   = formatItems.indexOf('yyyy')
+  const yearIndexShort  = formatItems.indexOf('yy')
+  if(!(monthIndex in dateItems) || !(dayIndex in dateItems) ||
+    (!(yearIndexLong in dateItems) && !(yearIndexShort in dateItems))) {
     return null
-}
-
-  const year  = Number(dateItems[yearIndex])
+  }
+  if(yearIndexLong in dateItems && yearIndexShort in dateItems) {
+    return null
+  }
+  var year
+  if(yearIndexLong in dateItems) {
+    year = Number(dateItems[yearIndexLong])
+    if(year < 1000 || year > 9999) {
+      return null
+    }
+  } else {
+    year = Number(dateItems[yearIndexShort])
+    if(year < 0 || year > 99) {
+      return null
+    }
+  if(year < config.nullYear) {
+    year += 2000
+  } else {
+    year += 1900
+  }
+  }
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
 
@@ -128,7 +144,18 @@ export function parseDate(dateString: string, dateFormat: string): IDate | null
   return isValidDate( date ) ? date : null
 }
 
+export function parseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+{
+  for(let dateFormat of dateFormats)
+  {
+    const date = parseDateSingleFormat(dateString, dateFormat, config)
+    if(date !== null)
+      return date
+  }
+  return null
+}
+
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormat) //should point to parseDate()
+  const date = config.parseDate(dateString, config.dateFormats, config) //should point to parseDate()
   return date ? toDateNumber(date, config) : null
 }

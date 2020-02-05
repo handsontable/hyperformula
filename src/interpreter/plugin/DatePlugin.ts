@@ -1,13 +1,15 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   dateNumberToDayNumber,
-  numberToDate,
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
-  toDateNumber, endOfMonth, offsetMonth,
+  endOfMonth,
+  isValidDate,
+  numberToDate,
+  offsetMonth,
+  toDateNumber,
 } from '../../Date'
 import {format} from '../../format/format'
-import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -76,8 +78,8 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-
-    return toDateNumber( {year: coercedYear, month: coercedMonth, day: coercedDay}, this.config)
+    const date = {year: coercedYear, month: coercedMonth, day: coercedDay}
+    return isValidDate(date) ? toDateNumber(date, this.config) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
