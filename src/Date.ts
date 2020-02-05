@@ -23,7 +23,7 @@ function dayToMonth(dayOfYear: number): number {
 }
 
 function leapYearsCount(year: number, config: Config): number {
-  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (config.excelDateCompatibility && year >= 1900? 1 : 0)
+  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (config.leapYear1900 && year >= 1900? 1 : 0)
 }
 
 function dateToNumberFromZero(date: IDate, config: Config): number {
@@ -36,18 +36,18 @@ function isLeapYear(year: number, config: Config): boolean {
   } else if(year%100) {
     return true
   } else if(year%400) {
-    return year === 1900 && config.excelDateCompatibility
+    return year === 1900 && config.leapYear1900
   } else {
     return true
   }
 }
 
 export function dateToNumber(date: IDate, config: Config): number {
-  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.zeroDate, config)
+  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.nullDate, config)
 }
 
 export function numberToDate(arg: number, config: Config): IDate {
-  const dateNumber = arg + dateToNumberFromZero(config.zeroDate, config)
+  const dateNumber = arg + dateToNumberFromZero(config.nullDate, config)
   let year = Math.floor(dateNumber / 365.2425)
   if(dateToNumberFromZero({year: year + 1, month: 1, day: 1}, config) <= dateNumber){
     year++
@@ -150,7 +150,7 @@ export function parseDate(dateString: string, dateFormats: string[], config: Con
   {
     const date = parseDateSingleFormat(dateString, dateFormat, config)
     if(date !== null)
-      return date
+     { return date }
   }
   return null
 }

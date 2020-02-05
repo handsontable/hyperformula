@@ -47,7 +47,7 @@ export interface ConfigParams {
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
-  excelDateCompatibility: boolean,
+  leapYear1900: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
@@ -58,7 +58,7 @@ export interface ConfigParams {
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
-  zeroDate: IDate,
+  nullDate: IDate,
 }
 
 export class Config {
@@ -70,7 +70,7 @@ export class Config {
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
-    excelDateCompatibility: false,
+    leapYear1900: false,
     smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
@@ -81,7 +81,7 @@ export class Config {
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
-    zeroDate: {year: 1899, month: 12, day: 30}
+    nullDate: {year: 1899, month: 12, day: 30}
   }
 
   private static defaultPlugins: any[] = [
@@ -126,7 +126,7 @@ export class Config {
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
-  public readonly excelDateCompatibility: boolean
+  public readonly leapYear1900: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
@@ -138,7 +138,7 @@ export class Config {
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
-  public readonly zeroDate: IDate
+  public readonly nullDate: IDate
 
   constructor(
       {
@@ -148,7 +148,7 @@ export class Config {
         language,
         functionPlugins,
         gpuMode,
-        excelDateCompatibility,
+        leapYear1900,
         smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
@@ -159,7 +159,7 @@ export class Config {
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
-        zeroDate
+        nullDate
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
@@ -182,8 +182,8 @@ export class Config {
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
-    this.zeroDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
-    this.excelDateCompatibility = typeof excelDateCompatibility === 'boolean' ? excelDateCompatibility : Config.defaultConfig.excelDateCompatibility
+    this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
+    this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {
