@@ -43,11 +43,11 @@ function isLeapYear(year: number, config: Config): boolean {
 }
 
 export function dateToNumber(date: IDate, config: Config): number {
-  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.zeroDate, config)
+  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.nullDate, config)
 }
 
 export function numberToDate(arg: number, config: Config): IDate {
-  const dateNumber = arg + dateToNumberFromZero(config.zeroDate, config)
+  const dateNumber = arg + dateToNumberFromZero(config.nullDate, config)
   let year = Math.floor(dateNumber / 365.2425)
   if(dateToNumberFromZero({year: year + 1, month: 1, day: 1}, config) <= dateNumber){
     year++

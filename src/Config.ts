@@ -138,7 +138,7 @@ export class Config {
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
-  public readonly zeroDate: IDate
+  public readonly nullDate: IDate
 
   constructor(
       {
@@ -182,7 +182,7 @@ export class Config {
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
-    this.zeroDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
+    this.nullDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
     this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
