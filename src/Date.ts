@@ -150,7 +150,7 @@ export function parseDate(dateString: string, dateFormats: string[], config: Con
   {
     const date = parseDateSingleFormat(dateString, dateFormat, config)
     if(date !== null)
-      return date
+     { return date }
   }
   return null
 }
