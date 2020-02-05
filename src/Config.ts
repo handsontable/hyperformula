@@ -42,40 +42,46 @@ type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
   chooseAddressMappingPolicy: IChooseAddressMapping,
-  dateFormat: string,
+  dateFormats: string[],
   functionArgSeparator: string,
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
+  excelDateCompatibility: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
-  parseDate: (dateString: string, dateFormat: string) => IDate | null
-  stringifyDate: (dateNumber: number, dateFormat: string) => string | null
+  nullYear: number,
+  parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
   precisionEpsilon: number,
   precisionRounding: number,
+  stringifyDate: (dateNumber: number, dateFormat: string, config: Config) => string | null
   smartRounding: boolean,
   useColumnIndex: boolean,
-  vlookupThreshold: number
+  vlookupThreshold: number,
+  zeroDate: IDate,
 }
 
 export class Config {
 
   public static defaultConfig: ConfigParams = {
     chooseAddressMappingPolicy: new AlwaysDense(),
-    dateFormat: 'MM/DD/YYYY',
+    dateFormats: ['MM/DD/YYYY','MM/DD/YY'],
     functionArgSeparator: ',',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
+    excelDateCompatibility: false,
     smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    nullYear: 30,
     parseDate: parseDate,
     stringifyDate: stringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
+    zeroDate: {year: 1899, month: 12, day: 30}
   }
 
   private static defaultPlugins: any[] = [
@@ -115,43 +121,49 @@ export class Config {
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
-  public readonly dateFormat: string
+  public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
+  public readonly excelDateCompatibility: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
-  public readonly parseDate: (dateString: string, dateFormat: string) => IDate | null
-  public readonly stringifyDate: (value: number, formatArg: string) => string | null
+  public readonly nullYear: number
+  public readonly parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
+  public readonly stringifyDate: (value: number, formatArg: string, config: Config) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
   public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
+  public readonly zeroDate: IDate
 
   constructor(
       {
         chooseAddressMappingPolicy,
-        dateFormat,
+        dateFormats,
         functionArgSeparator,
         language,
         functionPlugins,
         gpuMode,
+        excelDateCompatibility,
         smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
+        nullYear,
         parseDate,
         stringifyDate,
         precisionEpsilon,
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
+        zeroDate
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
+    this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
@@ -159,6 +171,7 @@ export class Config {
     this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
+    this.nullYear = typeof nullYear === 'number' ? nullYear : Config.defaultConfig.nullYear
     this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
     this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
     if(!this.smartRounding) {
@@ -167,8 +180,10 @@ export class Config {
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = parseDate || Config.defaultConfig.parseDate
-    this.stringifyDate = stringifyDate || Config.defaultConfig.stringifyDate
+    this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
+    this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
+    this.zeroDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
+    this.excelDateCompatibility = typeof excelDateCompatibility === 'boolean' ? excelDateCompatibility : Config.defaultConfig.excelDateCompatibility
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {

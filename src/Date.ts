@@ -22,74 +22,72 @@ function dayToMonth(dayOfYear: number): number {
   return month
 }
 
-function leapYearsCount(year: number): number {
-  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)
+function leapYearsCount(year: number, config: Config): number {
+  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (config.excelDateCompatibility && year >= 1900? 1 : 0)
 }
 
-function toDateNumberFromZero(date: IDate): number {
-  return 365*date.year + prefSumDays[date.month-1] + date.day-1 + (date.month<=2 ? leapYearsCount(date.year - 1) : leapYearsCount(date.year))
+function dateToNumberFromZero(date: IDate, config: Config): number {
+  return 365*date.year + prefSumDays[date.month-1] + date.day-1 + (date.month<=2 ? leapYearsCount(date.year - 1, config) : leapYearsCount(date.year, config))
 }
 
-function isLeapYear(year: number): boolean {
+function isLeapYear(year: number, config: Config): boolean {
   if(year%4) {
     return false
   } else if(year%100) {
     return true
   } else if(year%400) {
-    return false
+    return year === 1900 && config.excelDateCompatibility
   } else {
     return true
   }
 }
 
-const magicConstant : number = toDateNumberFromZero({year: 1899, month: 12, day: 30} )
-
-export function toDateNumber(date: IDate): number {
-  return toDateNumberFromZero(date) - magicConstant
+export function dateToNumber(date: IDate, config: Config): number {
+  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.zeroDate, config)
 }
 
-export function numberToDate(arg: number): IDate {
-  const dateNumber = arg + magicConstant
+export function numberToDate(arg: number, config: Config): IDate {
+  const dateNumber = arg + dateToNumberFromZero(config.zeroDate, config)
   let year = Math.floor(dateNumber / 365.2425)
-  if(toDateNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber){
+  if(dateToNumberFromZero({year: year + 1, month: 1, day: 1}, config) <= dateNumber){
     year++
   }
-  else if(toDateNumberFromZero({year: year - 1, month: 1, day: 1}) > dateNumber){
+  else if(dateToNumberFromZero({year: year - 1, month: 1, day: 1}, config) > dateNumber){
     year--
   }
 
-  const dayOfYear = dateNumber - toDateNumberFromZero( {year: year, month: 1, day: 1})
+  const dayOfYear = dateNumber - dateToNumberFromZero( {year: year, month: 1, day: 1}, config)
   const month = dayToMonth(
-    (isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
+    (isLeapYear(year, config) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
   )
   const day = dayOfYear - prefSumDays[month]
   return {year: year, month: month+1, day: day+1}
 }
 
-export function dateNumberToDayNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).day
+export function dateNumberToDayNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).day
 }
 
-export function dateNumberToMonthNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).month
+export function dateNumberToMonthNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).month
 }
 
-export function dateNumberToYearNumber(dateNumber: number): number {
-  return numberToDate(dateNumber).year
+export function dateNumberToYearNumber(dateNumber: number, config: Config): number {
+  return numberToDate(dateNumber, config).year
 }
 
-export function isValidDate(date: IDate): boolean {
+export function isValidDate(date: IDate, config: Config): boolean {
   if(isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
     return false
   } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
     return false
-  } else if( date.year < 1582) {  //Gregorian calendar start
+  } else if(date.year < 1582) {  //Gregorian calendar start
     return false
   } else if(date.month < 1 || date.month > 12) {
     return false
   } else if(date.day < 1) {
     return false
-  } else if(isLeapYear(date.year) && date.month===2) {
+  } else if(isLeapYear(date.year, config) && date.month === 2) {
     return date.day <= 29
   } else {
     return date.day <= numDays[date.month - 1]
@@ -101,34 +99,63 @@ export function endOfMonth(date: IDate): IDate {
 }
 
 export function offsetMonth(date: IDate, offset: number): IDate {
-  const totalM = 12*date.year + date.month-1 + offset
-  return {year: Math.floor(totalM/12), month: totalM % 12 + 1, day: date.day}
+  const totalM = 12 * date.year + date.month - 1 + offset
+  return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-export function parseDate(dateString: string, dateFormat: string): IDate | null
+function parseDateSingleFormat(dateString: string, dateFormat: string, config: Config): IDate | null
 {
-  const normalizedDateString = dateString.replace(/[^a-zA-Z0-9]/g, '-')
+  const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
-  const dateItems       = normalizedDateString.split('-')
-
   const monthIndex  = formatItems.indexOf('mm')
   const dayIndex    = formatItems.indexOf('dd')
-  const yearIndex   = formatItems.indexOf('yyyy')
-
-  if(!(monthIndex in dateItems) || !(dayIndex in dateItems) || !(yearIndex in dateItems))
+  const yearIndexLong   = formatItems.indexOf('yyyy')
+  const yearIndexShort  = formatItems.indexOf('yy')
+  if(!(monthIndex in dateItems) || !(dayIndex in dateItems) ||
+    (!(yearIndexLong in dateItems) && !(yearIndexShort in dateItems))) {
     return null
-
-  const year  = Number(dateItems[yearIndex])
+  }
+  if(yearIndexLong in dateItems && yearIndexShort in dateItems) {
+    return null
+  }
+  var year
+  if(yearIndexLong in dateItems) {
+    year = Number(dateItems[yearIndexLong])
+    if(year < 1000 || year > 9999) {
+      return null
+    }
+  } else {
+    year = Number(dateItems[yearIndexShort])
+    if(year < 0 || year > 99) {
+      return null
+    }
+    if(year < config.nullYear) {
+      year += 2000
+    } else {
+      year += 1900
+    }
+  }
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
 
   const date : IDate = {year: year, month: month, day: day}
 
-  return isValidDate( date ) ? date : null
+  return isValidDate( date, config) ? date : null
+}
+
+export function parseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+{
+  for(let dateFormat of dateFormats)
+  {
+    const date = parseDateSingleFormat(dateString, dateFormat, config)
+    if(date !== null)
+      return date
+  }
+  return null
 }
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormat) //should point to parseDate()
-  return date ? toDateNumber(date) : null
+  const date = config.parseDate(dateString, config.dateFormats, config) //should point to parseDate()
+  return date ? dateToNumber(date, config) : null
 }

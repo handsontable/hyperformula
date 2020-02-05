@@ -1,24 +1,28 @@
 import {CellValue} from '../Cell'
 import {Config} from '../Config'
 import {numberToDate} from '../Date'
-import {FormatExpression, FormatExpressionType, FormatToken, parse, TokenType} from './parser'
+import {
+  FormatExpression,
+  FormatExpressionType,
+  FormatToken,
+  parse,
+  parseForDateFormat,
+  parseForNumberFormat,
+  TokenType
+} from './parser'
 
 export function format(value: number, formatArg: string, config: Config): CellValue {
-  const tryString = config.stringifyDate(value, formatArg) //default points to stringifyDate()
+  const tryString = config.stringifyDate(value, formatArg, config) //default points to stringifyDate()
   if(tryString != null) {
     return tryString
   } else {
-    return tryToParseAnythingElse(value, formatArg, config)
-  }
-}
+    const expression = parseForNumberFormat(formatArg)
 
-function tryToParseAnythingElse(value: number, formatArg: string, config: Config): CellValue {
-  const expression: FormatExpression = parse(formatArg)
-
-  if(expression.type === FormatExpressionType.NUMBER) {
-    return numberFormat(expression.tokens, value)
-  } else {
-    return expression.tokens[0].value
+    if(expression !== null) {
+      return numberFormat(expression.tokens, value)
+    } else {
+      return formatArg
+    }
   }
 }
 
@@ -76,14 +80,14 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-export function stringifyDate(value: number, formatArg: string): string | null {
-  const expression: FormatExpression = parse(formatArg)
-  if(expression.type != FormatExpressionType.DATE) {
+export function stringifyDate(value: number, formatArg: string, config: Config): string | null {
+  const expression = parseForDateFormat(formatArg)
+  if(expression === null) {
     return null
   }
   const tokens = expression.tokens
   let result = ''
-  const date = numberToDate(value)
+  const date = numberToDate(value, config)
 //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {

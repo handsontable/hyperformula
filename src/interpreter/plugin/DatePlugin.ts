@@ -1,13 +1,15 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   dateNumberToDayNumber,
-  numberToDate,
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
-  toDateNumber, endOfMonth, offsetMonth,
+  endOfMonth,
+  isValidDate,
+  numberToDate,
+  offsetMonth,
+  dateToNumber,
 } from '../../Date'
 import {format} from '../../format/format'
-import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -76,8 +78,8 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-
-    return toDateNumber( {year: coercedYear, month: coercedMonth, day: coercedDay} )
+    const date = {year: coercedYear, month: coercedMonth, day: coercedDay}
+    return isValidDate(date, this.config) ? dateToNumber(date, this.config) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -103,8 +105,8 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const date = numberToDate(dateNumber)
-    return toDateNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+    const date = numberToDate(dateNumber, this.config)
+    return dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -121,7 +123,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToDayNumber(dateNumber)
+    return dateNumberToDayNumber(dateNumber, this.config)
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -172,7 +174,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToMonthNumber(dateNumber)
+    return dateNumberToMonthNumber(dateNumber, this.config)
   }
 
   /**
@@ -197,7 +199,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToYearNumber(dateNumber)
+    return dateNumberToYearNumber(dateNumber, this.config)
   }
 
   /**
