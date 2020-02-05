@@ -23,7 +23,7 @@ function dayToMonth(dayOfYear: number): number {
 }
 
 function leapYearsCount(year: number, config: Config): number {
-  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400)
+  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (config.excelDateCompatibility && year >= 1900? 1 : 0)
 }
 
 function dateToNumberFromZero(date: IDate, config: Config): number {

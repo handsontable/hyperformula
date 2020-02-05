@@ -9,6 +9,12 @@ describe('Date helpers', () => {
     expect(dateToNumber({year: 1900, month: 12, day: 31}, new Config())).toBe(366)
     expect(dateToNumber({year: 2018, month: 12, day: 31}, new Config())).toBe(43465)
   })
+  it('#dateToNumber should return number representation of a date, excel compatibility', () => {
+    expect(dateToNumber({year: 1900, month: 1, day: 1}, new Config({excelDateCompatibility: true}))).toBe(2)
+    expect(dateToNumber({year: 1899, month: 12, day: 30}, new Config({excelDateCompatibility: true}))).toBe(0)
+    expect(dateToNumber({year: 1900, month: 12, day: 31}, new Config({excelDateCompatibility: true}))).toBe(367)
+    expect(dateToNumber({year: 2018, month: 12, day: 31}, new Config({excelDateCompatibility: true}))).toBe(43466)
+  })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
     expect(dateNumberToMonthNumber(0, new Config())).toEqual(12)
@@ -21,6 +27,11 @@ describe('Date helpers', () => {
     expect(dateStringToDateNumber('01/15/2020', new Config())).toBe(43845)
     expect(dateStringToDateNumber('02/29/2000', new Config())).toBe(36585)
     expect(dateStringToDateNumber('12/31/2999', new Config())).toBe(401768)
+  })
+
+  it('#stringToDateNumber - excel compatibility', () => {
+    expect(dateStringToDateNumber('02/29/1900', new Config())).toBe(null)
+    expect(dateStringToDateNumber('02/29/1900', new Config({excelDateCompatibility: true}))).toBe(61)
   })
 
   it('stringToDateNumber - 00 year parsing', () => {
