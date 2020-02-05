@@ -1,13 +1,13 @@
 
 import {Config} from '../src'
-import {dateNumberToMonthNumber, toDateNumber, dateStringToDateNumber} from '../src/Date'
+import {dateNumberToMonthNumber, dateToNumber, dateStringToDateNumber} from '../src/Date'
 
 describe('Date helpers', () => {
-  it('#toDateNumber should return number representation of a date', () => {
-    expect(toDateNumber({year: 1900, month: 1, day: 1}, new Config())).toBe(2)
-    expect(toDateNumber({year: 1899, month: 12, day: 30}, new Config())).toBe(0)
-    expect(toDateNumber({year: 1900, month: 12, day: 31}, new Config())).toBe(366)
-    expect(toDateNumber({year: 2018, month: 12, day: 31}, new Config())).toBe(43465)
+  it('#dateToNumber should return number representation of a date', () => {
+    expect(dateToNumber({year: 1900, month: 1, day: 1}, new Config())).toBe(2)
+    expect(dateToNumber({year: 1899, month: 12, day: 30}, new Config())).toBe(0)
+    expect(dateToNumber({year: 1900, month: 12, day: 31}, new Config())).toBe(366)
+    expect(dateToNumber({year: 2018, month: 12, day: 31}, new Config())).toBe(43465)
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
@@ -53,12 +53,12 @@ describe('Date helpers', () => {
 })
 
 describe('Date helpers, other zero date', () => {
-  it('#toDateNumber should return number representation of a date, different zero date', () => {
+  it('#dateToNumber should return number representation of a date, different zero date', () => {
     const config = new Config({zeroDate: {year: 1950, month: 6, day: 15}})
-    expect(toDateNumber({year: 1900, month: 1, day: 1}, config)).toBe(-18427)
-    expect(toDateNumber({year: 1899, month: 12, day: 30}, config)).toBe(-18429)
-    expect(toDateNumber({year: 1900, month: 12, day: 31}, config)).toBe(-18063)
-    expect(toDateNumber({year: 2018, month: 12, day: 31}, config)).toBe(25036)
+    expect(dateToNumber({year: 1900, month: 1, day: 1}, config)).toBe(-18427)
+    expect(dateToNumber({year: 1899, month: 12, day: 30}, config)).toBe(-18429)
+    expect(dateToNumber({year: 1900, month: 12, day: 31}, config)).toBe(-18063)
+    expect(dateToNumber({year: 2018, month: 12, day: 31}, config)).toBe(25036)
   })
 
   it('#dateNumberToMonthNumber should return proper month number, different zero date', () => {

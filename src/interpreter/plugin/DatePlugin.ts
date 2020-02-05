@@ -7,7 +7,7 @@ import {
   isValidDate,
   numberToDate,
   offsetMonth,
-  toDateNumber,
+  dateToNumber,
 } from '../../Date'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -79,7 +79,7 @@ export class DatePlugin extends FunctionPlugin {
       return coercedDay
     }
     const date = {year: coercedYear, month: coercedMonth, day: coercedDay}
-    return isValidDate(date) ? toDateNumber(date, this.config) : new CellError(ErrorType.VALUE)
+    return isValidDate(date, this.config) ? dateToNumber(date, this.config) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -106,7 +106,7 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const date = numberToDate(dateNumber, this.config)
-    return toDateNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
+    return dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
