@@ -58,7 +58,7 @@ export interface ConfigParams {
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
-  zeroDate: IDate,
+  nullDate: IDate,
 }
 
 export class Config {
@@ -81,7 +81,7 @@ export class Config {
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
-    zeroDate: {year: 1899, month: 12, day: 30}
+    nullDate: {year: 1899, month: 12, day: 30}
   }
 
   private static defaultPlugins: any[] = [
@@ -159,7 +159,7 @@ export class Config {
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
-        zeroDate
+        nullDate
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
@@ -182,7 +182,7 @@ export class Config {
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
-    this.nullDate = typeof zeroDate === 'undefined' ? Config.defaultConfig.zeroDate : zeroDate
+    this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
     this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
