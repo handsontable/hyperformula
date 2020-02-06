@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, dateNumberToString} from '../testUtils'
@@ -14,6 +14,41 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('01/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('10/24/1915')
+  })
+
+  it('truncation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(1900.9, 1, 1)', '=DATE(1900, 1.9, 2)', '=DATE(1915, 10, 24.9)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('01/01/1900')
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('01/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('10/24/1915')
+  })
+
+  it('negative', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(-1900, 1, 1)', '=DATE(1901, -1, 2)', '=DATE(2000,-13,2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)'],
+    ])
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(new CellError(ErrorType.VALUE))
+    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('11/02/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('11/02/1998')
+    expect(dateNumberToString(engine.getCellValue(adr('D1')))).toEqual('09/06/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('E1')))).toEqual(new CellError(ErrorType.VALUE))
+    expect(dateNumberToString(engine.getCellValue(adr('F1')))).toEqual(new CellError(ErrorType.VALUE))
+  })
+
+  it('rollover', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(1900, 14, 28)', '=DATE(1900, 14, 29)', '=DATE(1915, 100, 1000)'],
+    ])
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/28/1901')
+    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('03/01/1901')
+    expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('12/25/1925')
   })
 
   it('number of arguments', () => {
@@ -74,5 +109,50 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('D2'))).toEqual(new CellError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('E2'))).toEqual(new CellError(ErrorType.VALUE))
+  })
+})
+
+describe( 'Function DATE + leap years', () =>{
+  it('should support nonleap year 2001 ', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2001,02,29)'],
+    ])
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('03/01/2001')
+  })
+
+  it('should suport leap year 2016', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2016,02,29)'],
+    ])
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2016')
+  })
+
+  it('should suport leap year 1920', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(1920,02,29)'],
+    ])
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/1920')
+  })
+
+  it('should suport nonleap year 1900', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(1900,02,29)'],
+    ])
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('03/01/1900')
+  })
+
+  it('should suport nonleap year 1900 with excel compatibility', () => {
+    const config = new Config({leapYear1900: true})
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(1900,02,29)'],
+    ], config )
+    expect(dateNumberToString(engine.getCellValue(adr('A1')),config)).toEqual('02/29/1900')
+  })
+
+  it('should suport leap year 2400', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2400,02,29)'],
+    ])
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2400')
   })
 })
