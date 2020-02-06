@@ -9,7 +9,6 @@ export interface IDate {
   day: number
 }
 
-export const minDate = {year: 1582, month: 10, day: 15}
 export const maxDate = {year: 9999, month: 12, day: 31}
 
 export class DateHelper {
@@ -17,7 +16,7 @@ export class DateHelper {
   private maxDateValue : number
   constructor(private readonly config: Config) {
     this.config = config
-    this.minDateValue = this.dateToNumber(minDate)
+    this.minDateValue = this.dateToNumber(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
   }
 

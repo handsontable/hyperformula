@@ -75,12 +75,13 @@ export class DatePlugin extends FunctionPlugin {
     var d = Math.trunc(coercedDay)
     var m = Math.trunc(coercedMonth)
     var y = Math.trunc(coercedYear)
-    y += Math.floor((m-1) / 12)
-    m = (m-1)%12 + 1
-    if(m<0) {
-      m += 12
-      y -= 1
-    }
+    const delta = Math.floor( (m-1)/12 )
+    y += delta
+    m -= delta*12
+//    if(m<0) {
+//      m += 12
+//      y -= 1
+//    }
 
     const date = {year: y, month: m, day: 1}
     if( this.interpreter.dateHelper.isValidDate(date) ) {
