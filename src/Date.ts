@@ -9,6 +9,9 @@ export interface IDate {
   day: number
 }
 
+export const minDate = {year: 1582, month: 10, day: 15}
+export const maxDate = {year: 9999, month: 12, day: 31}
+
 function dayToMonth(dayOfYear: number): number {
   let month = 0
   if(prefSumDays[month+6] <= dayOfYear) {

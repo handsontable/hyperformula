@@ -1,4 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {Config} from '../../Config'
 import {
   dateNumberToDayNumber,
   dateNumberToMonthNumber,
@@ -7,7 +8,7 @@ import {
   isValidDate,
   numberToDate,
   offsetMonth,
-  dateToNumber,
+  dateToNumber,  minDate, maxDate,
 } from '../../Date'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -86,8 +87,15 @@ export class DatePlugin extends FunctionPlugin {
       m = (m-1)%12 + 1
     }
     const date = {year: y, month: m, day: 1}
+    if( isValidDate(date, this.config) ) {
+      const ret = dateToNumber(date, this.config)+(d-1)
 
-    return (isValidDate(date, this.config)) ? dateToNumber(date, this.config)+(d-1) : new CellError(ErrorType.VALUE)
+      const minDateValue = dateToNumber(minDate, new Config())
+      const maxDateValue = dateToNumber(maxDate, new Config())
+      if(ret >= minDateValue && ret <= maxDateValue)
+      return ret
+    }
+    return new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

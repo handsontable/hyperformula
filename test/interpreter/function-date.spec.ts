@@ -30,12 +30,14 @@ describe('Function DATE', () => {
 
   it('negative', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(-1900, 1, 1)', '=DATE(1900, -1, 2)', '=DATE(1915, 10, -24)'],
+      ['=DATE(-1900, 1, 1)', '=DATE(1900, -1, 2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)'],
     ])
 
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(new CellError(ErrorType.VALUE))
     expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual(new CellError(ErrorType.VALUE))
     expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('09/06/1915')
+    expect(dateNumberToString(engine.getCellValue(adr('D1')))).toEqual('03/17/1626')
+    expect(dateNumberToString(engine.getCellValue(adr('E1')))).toEqual(new CellError(ErrorType.VALUE))
   })
 
   it('rollover', () => {
