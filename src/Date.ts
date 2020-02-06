@@ -11,14 +11,17 @@ export interface IDate {
 
 function dayToMonth(dayOfYear: number): number {
   let month = 0
-  if(prefSumDays[month+6] <= dayOfYear)
-    month+=6
-  if(prefSumDays[month+3] <= dayOfYear)
-    month+=3
-  if(prefSumDays[month+2] <= dayOfYear)
-    month+=2
-  else if(prefSumDays[month+1] <= dayOfYear)
-    month+=1
+  if(prefSumDays[month+6] <= dayOfYear) {
+    month += 6
+  }
+  if(prefSumDays[month+3] <= dayOfYear) {
+    month += 3
+  }
+  if(prefSumDays[month+2] <= dayOfYear) {
+    month += 2
+  } else if(prefSumDays[month+1] <= dayOfYear) {
+    month += 1
+  }
   return month
 }
 
