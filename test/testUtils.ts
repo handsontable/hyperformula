@@ -75,7 +75,7 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: CellValue, config = new Config()): string {
+export function dateNumberToString(dateNumber: CellValue, config = new Config()): string | CellError {
   if(dateNumber instanceof CellError) {
     return dateNumber
   }
