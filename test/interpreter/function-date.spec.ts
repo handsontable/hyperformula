@@ -34,7 +34,7 @@ describe('Function DATE', () => {
     ])
 
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(new CellError(ErrorType.VALUE))
-    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual(new CellError(ErrorType.VALUE))
+    expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('11/02/1898')
     expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('09/06/1915')
     expect(dateNumberToString(engine.getCellValue(adr('D1')))).toEqual('03/17/1626')
     expect(dateNumberToString(engine.getCellValue(adr('E1')))).toEqual(new CellError(ErrorType.VALUE))

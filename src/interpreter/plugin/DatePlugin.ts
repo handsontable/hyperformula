@@ -82,10 +82,13 @@ export class DatePlugin extends FunctionPlugin {
     var d = Math.trunc(coercedDay)
     var m = Math.trunc(coercedMonth)
     var y = Math.trunc(coercedYear)
-    if(m>12){
-      y += Math.floor((m-1) / 12)
-      m = (m-1)%12 + 1
+    y += Math.floor((m-1) / 12)
+    m = (m-1)%12 + 1
+    if(m<0) {
+      m += 12
+      y -= 1
     }
+
     const date = {year: y, month: m, day: 1}
     if( isValidDate(date, this.config) ) {
       const ret = dateToNumber(date, this.config)+(d-1)
