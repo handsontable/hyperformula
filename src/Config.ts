@@ -1,5 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
+import {IDate, parseDate} from './Date'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -35,41 +36,52 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {stringifyDate} from './format/format'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
   chooseAddressMappingPolicy: IChooseAddressMapping,
-  dateFormat: string,
+  dateFormats: string[],
   functionArgSeparator: string,
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
+  leapYear1900: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
+  nullYear: number,
+  parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
   precisionEpsilon: number,
   precisionRounding: number,
+  stringifyDate: (dateNumber: number, dateFormat: string, config: Config) => string | null
   smartRounding: boolean,
   useColumnIndex: boolean,
-  vlookupThreshold: number
+  vlookupThreshold: number,
+  nullDate: IDate,
 }
 
 export class Config {
 
   public static defaultConfig: ConfigParams = {
     chooseAddressMappingPolicy: new AlwaysDense(),
-    dateFormat: 'MM/DD/YYYY',
+    dateFormats: ['MM/DD/YYYY','MM/DD/YY'],
     functionArgSeparator: ',',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
+    leapYear1900: false,
     smartRounding: true,
     matrixDetection: true,
     matrixDetectionThreshold: 100,
+    nullYear: 30,
+    parseDate: parseDate,
+    stringifyDate: stringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
+    nullDate: {year: 1899, month: 12, day: 30}
   }
 
   private static defaultPlugins: any[] = [
@@ -109,39 +121,49 @@ export class Config {
   ]
 
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
-  public readonly dateFormat: string
+  public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
+  public readonly leapYear1900: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
+  public readonly nullYear: number
+  public readonly parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
+  public readonly stringifyDate: (value: number, formatArg: string, config: Config) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
   public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
+  public readonly nullDate: IDate
 
   constructor(
       {
         chooseAddressMappingPolicy,
-        dateFormat,
+        dateFormats,
         functionArgSeparator,
         language,
         functionPlugins,
         gpuMode,
+        leapYear1900,
         smartRounding,
         matrixDetection,
         matrixDetectionThreshold,
+        nullYear,
+        parseDate,
+        stringifyDate,
         precisionEpsilon,
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
+        nullDate
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormat = dateFormat || Config.defaultConfig.dateFormat
+    this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
@@ -149,6 +171,7 @@ export class Config {
     this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
     this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
     this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
+    this.nullYear = typeof nullYear === 'number' ? nullYear : Config.defaultConfig.nullYear
     this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
     this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
     if(!this.smartRounding) {
@@ -157,6 +180,10 @@ export class Config {
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
     this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
     this.errorMapping = this.buildErrorMapping(this.language)
+    this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
+    this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
+    this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
+    this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
   public getFunctionTranslationFor(functionTranslationKey: string): string {

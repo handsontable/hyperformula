@@ -1,15 +1,28 @@
 import {CellValue} from '../Cell'
-import {dateNumberToMoment} from '../Date'
-import {FormatExpression, FormatExpressionType, FormatToken, TokenType} from './parser'
+import {Config} from '../Config'
+import {numberToDate} from '../Date'
+import {
+  FormatExpression,
+  FormatExpressionType,
+  FormatToken,
+  parse,
+  parseForDateFormat,
+  parseForNumberFormat,
+  TokenType
+} from './parser'
 
-export function format(expression: FormatExpression, value: number): CellValue {
-  switch (expression.type) {
-    case FormatExpressionType.DATE:
-      return dateFormat(expression.tokens, value)
-    case FormatExpressionType.NUMBER:
+export function format(value: number, formatArg: string, config: Config): CellValue {
+  const tryString = config.stringifyDate(value, formatArg, config) //default points to stringifyDate()
+  if(tryString != null) {
+    return tryString
+  } else {
+    const expression = parseForNumberFormat(formatArg)
+
+    if(expression !== null) {
       return numberFormat(expression.tokens, value)
-    case FormatExpressionType.STRING:
-      return expression.tokens[0].value
+    } else {
+      return formatArg
+    }
   }
 }
 
@@ -67,10 +80,15 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-function dateFormat(tokens: FormatToken[], value: number): CellValue {
+export function stringifyDate(value: number, formatArg: string, config: Config): string | null {
+  const expression = parseForDateFormat(formatArg)
+  if(expression === null) {
+    return null
+  }
+  const tokens = expression.tokens
   let result = ''
-  const date = dateNumberToMoment(value)
-  let minutes: boolean = false
+  const date = numberToDate(value, config)
+//  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
@@ -81,79 +99,79 @@ function dateFormat(tokens: FormatToken[], value: number): CellValue {
 
     switch (token.value) {
         /* hours*/
-      case 'h':
-      case 'H':
-      case 'hh':
-      case 'HH': {
-        minutes = true
-        result += date.format(token.value)
-        break
-      }
+//      case 'h':
+//      case 'H':
+//      case 'hh':
+//      case 'HH': {
+//        minutes = true
+//        result += date.format(token.value)
+//        break
+//      }
 
         /* days */
       case 'd':
       case 'D':
       case 'dd':
       case 'DD': {
-        result += padLeft(date.date(), token.value.length)
+        result += padLeft(date.day, token.value.length)
         break
       }
-      case 'ddd':
-      case 'DDD':
-        result += date.format('ddd')
-        break
-      case 'dddd':
-      case 'DDDD': {
-        result += date.format('dddd')
-        break
-      }
+//      case 'ddd':
+//      case 'DDD':
+//        result += date.format('ddd')
+//        break
+//      case 'dddd':
+//      case 'DDDD': {
+//        result += date.format('dddd')
+//        break
+//      }
 
         /* minutes / months */
       case 'M':
       case 'm':
       case 'MM':
       case 'mm': {
-        if (minutes) {
-          result += padLeft(date.minute(), token.value.length)
+//        if (minutes) {
+//          result += padLeft(date.minute(), token.value.length)
+//          break
+//        } else {
+          result += padLeft(date.month, token.value.length)
           break
-        } else {
-          result += padLeft(date.month() + 1, token.value.length)
-          break
-        }
+//        }
       }
-      case 'mmm':
-      case 'MMM': {
-        result += date.format('MMM')
-        break
-      }
-      case 'mmmm':
-      case 'MMMM': {
-        result += date.format('MMMM')
-        break
-      }
-      case 'mmmmm':
-      case 'MMMMM': {
-        result += date.format('MMMM')[0]
-        break
-      }
+      // case 'mmm':
+      // case 'MMM': {
+      //   result += date.format('MMM')
+      //   break
+      // }
+      // case 'mmmm':
+      // case 'MMMM': {
+      //   result += date.format('MMMM')
+      //   break
+      // }
+      // case 'mmmmm':
+      // case 'MMMMM': {
+      //   result += date.format('MMMM')[0]
+      //   break
+      // }
 
         /* years */
       case 'yy':
       case 'YY': {
-        result += date.format('YY')
+        result += padLeft(date.year % 100, token.value.length)
         break
       }
       case 'yyyy':
       case 'YYYY': {
-        result += date.year()
+        result += date.year
         break
       }
 
-      /* AM / PM */
-      case 'AM/PM': {
-        result += date.format('A')
-        break
-      }
+      // /* AM / PM */
+      // case 'AM/PM': {
+      //  result += date.format('A')
+      //  break
+      // }
       default:
         throw new Error('Mismatched token type')
     }

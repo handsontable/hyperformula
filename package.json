@@ -57,6 +57,7 @@
     "env-cmd": "^9.0.3",
     "jest": "^23.6.0",
     "license-checker": "^25.0.1",
+    "moment": "^2.22.2",
     "ts-jest": "^23.10.1",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
@@ -71,7 +72,6 @@
     "chevrotain": "^6.5.0",
     "core-js": "^3.6.0",
     "gpu.js": "2.3.0",
-    "moment": "^2.22.2",
     "regenerator-runtime": "^0.13.3"
   }
 }

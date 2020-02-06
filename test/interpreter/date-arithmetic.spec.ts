@@ -1,7 +1,4 @@
-import {Config} from '../../src'
-import {HyperFormula} from '../../src'
-import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {coerceScalarToNumber} from '../../src/interpreter/coerce'
+import {Config, HyperFormula} from '../../src'
 import '../testConfig'
 import {adr} from '../testUtils'
 

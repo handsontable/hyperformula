@@ -1,8 +1,8 @@
 import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
-import {dateNumberToMoment} from '../src/Date'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
+import {stringifyDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -75,8 +75,9 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: CellValue, dateFormat: string = Config.defaultConfig.dateFormat): string {
-  return dateNumberToMoment(dateNumber as number).format(dateFormat)
+export function dateNumberToString(dateNumber: CellValue, dateFormat: string[] = Config.defaultConfig.dateFormats): string {
+  const dateString = stringifyDate(dateNumber as number, dateFormat[0], new Config())
+  return dateString ? dateString : ''
 }
 
 export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {

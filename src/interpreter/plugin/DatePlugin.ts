@@ -1,14 +1,15 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
-  dateNumberToDayOfMonth,
-  dateNumberToMoment,
+  dateNumberToDayNumber,
   dateNumberToMonthNumber,
-  dateNumberToYearNumber, daysBetween,
-  momentToDateNumber,
-  toDateNumber,
+  dateNumberToYearNumber,
+  endOfMonth,
+  isValidDate,
+  numberToDate,
+  offsetMonth,
+  dateToNumber,
 } from '../../Date'
 import {format} from '../../format/format'
-import {parse} from '../../format/parser'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -62,9 +63,9 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedYear = coerceScalarToNumber(year, this.config.dateFormat)
-    const coercedMonth = coerceScalarToNumber(month, this.config.dateFormat)
-    const coercedDay = coerceScalarToNumber(day, this.config.dateFormat)
+    const coercedYear = coerceScalarToNumber(year, this.config)
+    const coercedMonth = coerceScalarToNumber(month, this.config)
+    const coercedDay = coerceScalarToNumber(day, this.config)
 
     if (coercedYear instanceof CellError) {
       return coercedYear
@@ -77,8 +78,8 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-
-    return toDateNumber(coercedYear, coercedMonth, coercedDay)
+    const date = {year: coercedYear, month: coercedMonth, day: coercedDay}
+    return isValidDate(date, this.config) ? dateToNumber(date, this.config) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -90,7 +91,7 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumber(arg, this.config.dateFormat)
+    const dateNumber = coerceScalarToNumber(arg, this.config)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
@@ -99,19 +100,13 @@ export class DatePlugin extends FunctionPlugin {
     if (numberOfMonthsToShiftValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const numberOfMonthsToShift = coerceScalarToNumber(numberOfMonthsToShiftValue, this.config.dateFormat)
+    const numberOfMonthsToShift = coerceScalarToNumber(numberOfMonthsToShiftValue, this.config)
     if (numberOfMonthsToShift instanceof CellError) {
       return numberOfMonthsToShift
     }
 
-    const dateMoment = dateNumberToMoment(dateNumber)
-    if (numberOfMonthsToShift > 0) {
-      dateMoment.add(numberOfMonthsToShift, 'months')
-    } else {
-      dateMoment.subtract(-numberOfMonthsToShift, 'months')
-    }
-    dateMoment.endOf('month').startOf('date')
-    return momentToDateNumber(dateMoment)
+    const date = numberToDate(dateNumber, this.config)
+    return dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -123,12 +118,12 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumber(arg, this.config.dateFormat)
+    const dateNumber = coerceScalarToNumber(arg, this.config)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
 
-    return dateNumberToDayOfMonth(dateNumber)
+    return dateNumberToDayNumber(dateNumber, this.config)
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -140,7 +135,7 @@ export class DatePlugin extends FunctionPlugin {
     if (endDate instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const endDateNumber = coerceScalarToNumber(endDate, this.config.dateFormat)
+    const endDateNumber = coerceScalarToNumber(endDate, this.config)
     if (endDateNumber instanceof CellError) {
       return endDateNumber
     }
@@ -149,12 +144,12 @@ export class DatePlugin extends FunctionPlugin {
     if (startDate instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const startDateNumber = coerceScalarToNumber(startDate, this.config.dateFormat)
+    const startDateNumber = coerceScalarToNumber(startDate, this.config)
     if (startDateNumber instanceof CellError) {
       return startDateNumber
     }
 
-    return daysBetween(endDateNumber, startDateNumber)
+    return endDateNumber - startDateNumber
   }
 
     /**
@@ -174,12 +169,12 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumber(arg, this.config.dateFormat)
+    const dateNumber = coerceScalarToNumber(arg, this.config)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
 
-    return dateNumberToMonthNumber(dateNumber)
+    return dateNumberToMonthNumber(dateNumber, this.config)
   }
 
   /**
@@ -199,12 +194,12 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumber(arg, this.config.dateFormat)
+    const dateNumber = coerceScalarToNumber(arg, this.config)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
 
-    return dateNumberToYearNumber(dateNumber)
+    return dateNumberToYearNumber(dateNumber, this.config)
   }
 
   /**
@@ -226,7 +221,7 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const numberRepresentation = coerceScalarToNumber(dateArg, this.config.dateFormat)
+    const numberRepresentation = coerceScalarToNumber(dateArg, this.config)
     if (numberRepresentation instanceof CellError) {
       return numberRepresentation
     }
@@ -235,7 +230,6 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const expression = parse(formatArg)
-    return format(expression, numberRepresentation)
+    return format(numberRepresentation, formatArg, this.config)
   }
 }
