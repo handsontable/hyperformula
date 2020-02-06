@@ -9,9 +9,24 @@ export interface IDate {
   day: number
 }
 
+export const minDate = {year: 1582, month: 10, day: 15}
+export const maxDate = {year: 9999, month: 12, day: 31}
+
 export class DateHelper {
+  private minDateValue : number
+  private maxDateValue : number
   constructor(private readonly config: Config) {
     this.config = config
+    this.minDateValue = this.dateToNumber(minDate)
+    this.maxDateValue = this.dateToNumber(maxDate)
+  }
+
+  public getMinDateValue(): number {
+    return this.minDateValue
+  }
+
+  public getMaxDateValue(): number {
+    return this.maxDateValue
   }
 
   public dateStringToDateNumber(dateString: string): number | null {

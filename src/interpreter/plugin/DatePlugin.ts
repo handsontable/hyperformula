@@ -1,7 +1,7 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
   endOfMonth,
-  offsetMonth
+  offsetMonth,
 } from '../../Date'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -75,13 +75,21 @@ export class DatePlugin extends FunctionPlugin {
     var d = Math.trunc(coercedDay)
     var m = Math.trunc(coercedMonth)
     var y = Math.trunc(coercedYear)
-    if(m>12){
-      y += Math.floor((m-1) / 12)
-      m = (m-1)%12 + 1
+    y += Math.floor((m-1) / 12)
+    m = (m-1)%12 + 1
+    if(m<0) {
+      m += 12
+      y -= 1
     }
-    const date = {year: y, month: m, day: 1}
 
-    return (d>=1 && this.interpreter.dateHelper.isValidDate(date)) ? this.interpreter.dateHelper.dateToNumber(date)+(d-1) : new CellError(ErrorType.VALUE)
+    const date = {year: y, month: m, day: 1}
+    if( this.interpreter.dateHelper.isValidDate(date) ) {
+      const ret = this.interpreter.dateHelper.dateToNumber(date)+(d-1)
+      if(ret >= this.interpreter.dateHelper.getMinDateValue() && ret <= this.interpreter.dateHelper.getMaxDateValue()) {
+        return ret
+      }
+    }
+    return new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
