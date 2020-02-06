@@ -1,6 +1,6 @@
-
 import {Config} from '../src'
-import {dateNumberToMonthNumber, dateToNumber, dateStringToDateNumber} from '../src/Date'
+import {dateNumberToMonthNumber, dateToNumber, dateStringToDateNumber, IDate} from '../src/Date'
+import moment, {Moment} from 'moment'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
@@ -85,5 +85,28 @@ describe('Date helpers, other zero date', () => {
     expect(dateStringToDateNumber('01/15/2020', config)).toBe(25416)
     expect(dateStringToDateNumber('02/29/2000', config)).toBe(18156)
     expect(dateStringToDateNumber('12/31/2999', config)).toBe(383339)
+  })
+})
+
+
+
+describe('Custom date parsing', () => {
+
+  function customParseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+  {
+    for(let dateFormat of dateFormats)
+    {
+      const momentDate = moment(dateString, dateFormat, true)
+      if(momentDate.isValid()){
+        return {year: momentDate.year(), month: momentDate.month()+1, day: momentDate.date()}
+      }
+    }
+    return null
+  }
+
+  it( 'moment-based custom parsing', () => {
+    const config = new Config({parseDate: customParseDate, dateFormats: ['Do MMM YY', 'DDD YYYY']})
+    expect(dateStringToDateNumber('31st Jan 00', config)).toBe(36556)
+    expect(dateStringToDateNumber('365 1900', config)).toBe(366)
   })
 })
