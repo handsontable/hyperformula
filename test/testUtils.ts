@@ -2,7 +2,7 @@ import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {stringifyDate} from '../src/format/format'
+import {defaultStringifyDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -79,7 +79,7 @@ export function dateNumberToString(dateNumber: CellValue, config = new Config())
   if(dateNumber instanceof CellError) {
     return dateNumber
   }
-  const dateString = stringifyDate(dateNumber as number, config.dateFormats[0], config)
+  const dateString = defaultStringifyDate(dateNumber as number, config.dateFormats[0], config)
   return dateString ? dateString : ''
 }
 

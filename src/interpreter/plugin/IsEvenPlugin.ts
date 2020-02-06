@@ -20,7 +20,7 @@ export class IsEvenPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
 
-      const coercedValue = coerceScalarToNumber(arg, this.config)
+      const coercedValue = coerceScalarToNumber(arg, this.interpreter.dateHelper)
       if (coercedValue instanceof CellError) {
         return coercedValue
       } else {

@@ -1,5 +1,6 @@
 import {Config} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
+import {DateHelper} from '../../src/Date'
 import {
   coerceBooleanToNumber,
   coerceScalarToBoolean,
@@ -32,8 +33,9 @@ describe('#coerceBooleanToNumber', () => {
   })
 
   it('behaves the same as more general coercion', () => {
-    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, new Config()))
-    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, new Config()))
+    const dateHelper = new DateHelper(new Config())
+    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, dateHelper))
+    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, dateHelper))
   })
 })
 
@@ -64,16 +66,17 @@ describe('#coerceScalarToBoolean', () => {
 
 describe('#coerceScalarToNumber', () => {
   it('works', () => {
-    expect(coerceScalarToNumber(1, new Config())).toEqual(1)
+    const dateHelper = new DateHelper(new Config())
+    expect(coerceScalarToNumber(1, dateHelper)).toEqual(1)
 
-    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), new Config())).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), dateHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(coerceScalarToNumber('12/31/1899', new Config())).toEqual(1)
-    expect(coerceScalarToNumber(true, new Config())).toEqual(1)
+    expect(coerceScalarToNumber('12/31/1899', dateHelper)).toEqual(1)
+    expect(coerceScalarToNumber(true, dateHelper)).toEqual(1)
 
-    expect(coerceScalarToNumber('foo42', new Config())).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceScalarToNumber('foo42', dateHelper)).toEqual(new CellError(ErrorType.VALUE))
 
-    expect(coerceScalarToNumber('1', new Config())).toEqual(1)
+    expect(coerceScalarToNumber('1', dateHelper)).toEqual(1)
   })
 
 })

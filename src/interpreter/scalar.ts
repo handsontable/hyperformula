@@ -1,6 +1,5 @@
 import {CellError, CellValue, CellValueTypeOrd, EmptyValue, EmptyValueType, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
-import {dateStringToDateNumber} from '../Date'
 import {coerceBooleanToNumber} from './coerce'
 
 /**

@@ -10,20 +10,18 @@ export interface IDate {
 }
 
 export class DateHelper {
-  private readonly config : Config
-  constructor( config: Config)
-  {
+  constructor( private readonly config: Config) {
     this.config = config
   }
 
   public dateStringToDateNumber(dateString: string): number | null {
-    const date = this.config.parseDate(dateString, this.config.dateFormats, this.config) //should point to parseDate()
+    const date = this.config.parseDate(dateString, this.config.dateFormats, this.config) //should point to defaultParseDate()
     return date ? dateToNumber(date, this.config) : null
   }
 }
 
 export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormats, config) //should point to parseDate()
+  const date = config.parseDate(dateString, config.dateFormats, config) //should point to defaultParseDate()
   return date ? dateToNumber(date, config) : null
 }
 
@@ -162,7 +160,7 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, config: C
   return isValidDate( date, config) ? date : null
 }
 
-export function parseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+export function defaultParseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
 {
   for(let dateFormat of dateFormats)
   {
