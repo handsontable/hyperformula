@@ -1,5 +1,5 @@
 import {Config} from '../src'
-import {dateNumberToMonthNumber, DateHelper, IDate} from '../src/Date'
+import {DateHelper, IDate} from '../src/Date'
 import moment, {Moment} from 'moment'
 
 describe('Date helpers', () => {
@@ -19,9 +19,10 @@ describe('Date helpers', () => {
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
-    expect(dateNumberToMonthNumber(0, new Config())).toEqual(12)
-    expect(dateNumberToMonthNumber(2, new Config())).toEqual(1)
-    expect(dateNumberToMonthNumber(43465, new Config())).toEqual(12)
+    const dateHelper = new DateHelper(new Config())
+    expect(dateHelper.dateNumberToMonthNumber(0)).toEqual(12)
+    expect(dateHelper.dateNumberToMonthNumber(2)).toEqual(1)
+    expect(dateHelper.dateNumberToMonthNumber(43465)).toEqual(12)
   })
 
   it('#stringToDateNumber - tests expected to return not null', () => {
@@ -86,9 +87,10 @@ describe('Date helpers, other zero date', () => {
 
   it('#dateNumberToMonthNumber should return proper month number, different zero date', () => {
     const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
-    expect(dateNumberToMonthNumber(0, config)).toEqual(6)
-    expect(dateNumberToMonthNumber(2, config)).toEqual(6)
-    expect(dateNumberToMonthNumber(43465, config)).toEqual(6)
+    const dateHelper = new DateHelper(config)
+    expect(dateHelper.dateNumberToMonthNumber(0)).toEqual(6)
+    expect(dateHelper.dateNumberToMonthNumber(2)).toEqual(6)
+    expect(dateHelper.dateNumberToMonthNumber(43465)).toEqual(6)
   })
 
   it('#stringToDateNumber - tests expected to return not null, different zero date', () => {

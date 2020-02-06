@@ -1,8 +1,5 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
 import {
-  dateNumberToDayNumber,
-  dateNumberToMonthNumber,
-  dateNumberToYearNumber,
   endOfMonth,
   offsetMonth
 } from '../../Date'
@@ -127,7 +124,7 @@ export class DatePlugin extends FunctionPlugin {
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
-    return dateNumberToDayNumber(dateNumber, this.config)
+    return this.interpreter.dateHelper.dateNumberToDayNumber(dateNumber)
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -178,7 +175,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToMonthNumber(dateNumber, this.config)
+    return this.interpreter.dateHelper.dateNumberToMonthNumber(dateNumber)
   }
 
   /**
@@ -203,7 +200,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return dateNumberToYearNumber(dateNumber, this.config)
+    return this.interpreter.dateHelper.dateNumberToYearNumber(dateNumber)
   }
 
   /**

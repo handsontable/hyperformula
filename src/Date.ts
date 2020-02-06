@@ -82,6 +82,18 @@ export class DateHelper {
     const day = dayOfYear - prefSumDays[month]
     return {year: year, month: month+1, day: day+1}
   }
+
+  public dateNumberToDayNumber(dateNumber: number): number {
+    return this.numberToDate(dateNumber).day
+  }
+
+  public dateNumberToMonthNumber(dateNumber: number): number {
+    return this.numberToDate(dateNumber).month
+  }
+
+  public dateNumberToYearNumber(dateNumber: number): number {
+    return this.numberToDate(dateNumber).year
+  }
 }
 
 function dayToMonth(dayOfYear: number): number {
@@ -136,18 +148,6 @@ export function numberToDate(arg: number, config: Config): IDate {
   )
   const day = dayOfYear - prefSumDays[month]
   return {year: year, month: month+1, day: day+1}
-}
-
-export function dateNumberToDayNumber(dateNumber: number, config: Config): number {
-  return numberToDate(dateNumber, config).day
-}
-
-export function dateNumberToMonthNumber(dateNumber: number, config: Config): number {
-  return numberToDate(dateNumber, config).month
-}
-
-export function dateNumberToYearNumber(dateNumber: number, config: Config): number {
-  return numberToDate(dateNumber, config).year
 }
 
 export function endOfMonth(date: IDate): IDate {
