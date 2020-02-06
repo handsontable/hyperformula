@@ -8,7 +8,7 @@ import {
   isValidDate,
   numberToDate,
   offsetMonth,
-  dateToNumber,  minDate, maxDate,
+  dateToNumber,  maxDate,
 } from '../../Date'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -82,21 +82,22 @@ export class DatePlugin extends FunctionPlugin {
     var d = Math.trunc(coercedDay)
     var m = Math.trunc(coercedMonth)
     var y = Math.trunc(coercedYear)
-    y += Math.floor((m-1) / 12)
-    m = (m-1)%12 + 1
-    if(m<0) {
-      m += 12
-      y -= 1
-    }
+    const delta = Math.floor( (m-1)/12 )
+    y += delta
+    m -= delta*12
+//    if(m<0) {
+//      m += 12
+//      y -= 1
+//    }
 
     const date = {year: y, month: m, day: 1}
     if( isValidDate(date, this.config) ) {
       const ret = dateToNumber(date, this.config)+(d-1)
 
-      const minDateValue = dateToNumber(minDate, new Config())
-      const maxDateValue = dateToNumber(maxDate, new Config())
+      const minDateValue = dateToNumber(this.config.nullDate, this.config)
+      const maxDateValue = dateToNumber(maxDate, this.config)
       if(ret >= minDateValue && ret <= maxDateValue)
-      return ret
+        return ret
     }
     return new CellError(ErrorType.VALUE)
   }
