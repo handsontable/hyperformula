@@ -78,8 +78,16 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-    const date = {year: coercedYear, month: coercedMonth, day: coercedDay}
-    return isValidDate(date, this.config) ? dateToNumber(date, this.config) : new CellError(ErrorType.VALUE)
+    var d = Math.trunc(coercedDay)
+    var m = Math.trunc(coercedMonth)
+    var y = Math.trunc(coercedYear)
+    if(m>12){
+      y += Math.floor((m-1) / 12)
+      m = (m-1)%12 + 1
+    }
+    const date = {year: y, month: m, day: 1}
+
+    return (d>=1 && isValidDate(date, this.config)) ? dateToNumber(date, this.config)+(d-1) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
