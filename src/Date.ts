@@ -20,11 +20,6 @@ export class DateHelper {
   }
 }
 
-export function dateStringToDateNumber(dateString: string, config: Config): number | null {
-  const date = config.parseDate(dateString, config.dateFormats, config) //should point to defaultParseDate()
-  return date ? dateToNumber(date, config) : null
-}
-
 function dayToMonth(dayOfYear: number): number {
   let month = 0
   if(prefSumDays[month+6] <= dayOfYear) {
