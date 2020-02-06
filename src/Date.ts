@@ -64,6 +64,24 @@ export class DateHelper {
   public dateToNumber(date: IDate): number {
     return this.dateToNumberFromZero(date) - this.dateToNumberFromZero(this.config.nullDate)
   }
+
+  public numberToDate(arg: number): IDate {
+    const dateNumber = arg + this.dateToNumberFromZero(this.config.nullDate)
+    let year = Math.floor(dateNumber / 365.2425)
+    if(this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber){
+      year++
+    }
+    else if(this.dateToNumberFromZero({year: year - 1, month: 1, day: 1}) > dateNumber){
+      year--
+    }
+
+    const dayOfYear = dateNumber - this.dateToNumberFromZero( {year: year, month: 1, day: 1})
+    const month = dayToMonth(
+      (this.isLeapYear(year) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
+    )
+    const day = dayOfYear - prefSumDays[month]
+    return {year: year, month: month+1, day: day+1}
+  }
 }
 
 function dayToMonth(dayOfYear: number): number {

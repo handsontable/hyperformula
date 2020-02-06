@@ -4,7 +4,6 @@ import {
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
   endOfMonth,
-  numberToDate,
   offsetMonth
 } from '../../Date'
 import {format} from '../../format/format'
@@ -111,7 +110,7 @@ export class DatePlugin extends FunctionPlugin {
       return numberOfMonthsToShift
     }
 
-    const date = numberToDate(dateNumber, this.config)
+    const date = this.interpreter.dateHelper.numberToDate(dateNumber)
     return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
@@ -235,6 +234,6 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    return format(numberRepresentation, formatArg, this.config)
+    return format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
   }
 }

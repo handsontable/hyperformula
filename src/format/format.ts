@@ -1,18 +1,15 @@
 import {CellValue} from '../Cell'
 import {Config} from '../Config'
-import {numberToDate} from '../Date'
+import {DateHelper} from '../Date'
 import {
-  FormatExpression,
-  FormatExpressionType,
   FormatToken,
-  parse,
   parseForDateFormat,
   parseForNumberFormat,
   TokenType
 } from './parser'
 
-export function format(value: number, formatArg: string, config: Config): CellValue {
-  const tryString = config.stringifyDate(value, formatArg, config) //default points to defaultStringifyDate()
+export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): CellValue {
+  const tryString = config.stringifyDate(value, formatArg, dateHelper) //default points to defaultStringifyDate()
   if(tryString != null) {
     return tryString
   } else {
@@ -80,14 +77,14 @@ function numberFormat(tokens: FormatToken[], value: number): CellValue {
   return result
 }
 
-export function defaultStringifyDate(value: number, formatArg: string, config: Config): string | null {
+export function defaultStringifyDate(value: number, formatArg: string, dateHelper: DateHelper): string | null {
   const expression = parseForDateFormat(formatArg)
   if(expression === null) {
     return null
   }
   const tokens = expression.tokens
   let result = ''
-  const date = numberToDate(value, config)
+  const date = dateHelper.numberToDate(value)
 //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {

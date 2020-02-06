@@ -54,7 +54,7 @@ export interface ConfigParams {
   parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, config: Config) => string | null
+  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -131,7 +131,7 @@ export class Config {
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
-  public readonly stringifyDate: (value: number, formatArg: string, config: Config) => string | null
+  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
   public readonly smartRounding: boolean
