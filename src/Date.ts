@@ -35,7 +35,7 @@ export class DateHelper {
       return false
     } else if(date.day < 1) {
       return false
-    } else if(isLeapYear(date.year, this.config) && date.month === 2) {
+    } else if(this.isLeapYear(date.year) && date.month === 2) {
       return date.day <= 29
     } else {
       return date.day <= numDays[date.month - 1]
@@ -110,44 +110,6 @@ function dayToMonth(dayOfYear: number): number {
     month += 1
   }
   return month
-}
-
-function leapYearsCount(year: number, config: Config): number {
-  return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (config.leapYear1900 && year >= 1900? 1 : 0)
-}
-
-function dateToNumberFromZero(date: IDate, config: Config): number {
-  return 365*date.year + prefSumDays[date.month-1] + date.day-1 + (date.month<=2 ? leapYearsCount(date.year - 1, config) : leapYearsCount(date.year, config))
-}
-
-function isLeapYear(year: number, config: Config): boolean {
-  if(year%4) {
-    return false
-  } else if(year%100) {
-    return true
-  } else if(year%400) {
-    return year === 1900 && config.leapYear1900
-  } else {
-    return true
-  }
-}
-
-export function numberToDate(arg: number, config: Config): IDate {
-  const dateNumber = arg + dateToNumberFromZero(config.nullDate, config)
-  let year = Math.floor(dateNumber / 365.2425)
-  if(dateToNumberFromZero({year: year + 1, month: 1, day: 1}, config) <= dateNumber){
-    year++
-  }
-  else if(dateToNumberFromZero({year: year - 1, month: 1, day: 1}, config) > dateNumber){
-    year--
-  }
-
-  const dayOfYear = dateNumber - dateToNumberFromZero( {year: year, month: 1, day: 1}, config)
-  const month = dayToMonth(
-    (isLeapYear(year, config) && dayOfYear >= 59) ? dayOfYear - 1 : dayOfYear
-  )
-  const day = dayOfYear - prefSumDays[month]
-  return {year: year, month: month+1, day: day+1}
 }
 
 export function endOfMonth(date: IDate): IDate {
