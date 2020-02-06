@@ -1,19 +1,21 @@
 import {Config} from '../src'
-import {dateNumberToMonthNumber, dateToNumber, DateHelper, IDate} from '../src/Date'
+import {dateNumberToMonthNumber, DateHelper, IDate} from '../src/Date'
 import moment, {Moment} from 'moment'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
-    expect(dateToNumber({year: 1900, month: 1, day: 1}, new Config())).toBe(2)
-    expect(dateToNumber({year: 1899, month: 12, day: 30}, new Config())).toBe(0)
-    expect(dateToNumber({year: 1900, month: 12, day: 31}, new Config())).toBe(366)
-    expect(dateToNumber({year: 2018, month: 12, day: 31}, new Config())).toBe(43465)
+    const dateHelper = new DateHelper(new Config())
+    expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(2)
+    expect(dateHelper.dateToNumber({year: 1899, month: 12, day: 30})).toBe(0)
+    expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(366)
+    expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43465)
   })
   it('#dateToNumber should return number representation of a date, excel compatibility', () => {
-    expect(dateToNumber({year: 1900, month: 1, day: 1}, new Config({leapYear1900: true}))).toBe(2)
-    expect(dateToNumber({year: 1899, month: 12, day: 30}, new Config({leapYear1900: true}))).toBe(0)
-    expect(dateToNumber({year: 1900, month: 12, day: 31}, new Config({leapYear1900: true}))).toBe(367)
-    expect(dateToNumber({year: 2018, month: 12, day: 31}, new Config({leapYear1900: true}))).toBe(43466)
+    const dateHelper = new DateHelper(new Config({leapYear1900: true}))
+    expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(2)
+    expect(dateHelper.dateToNumber({year: 1899, month: 12, day: 30})).toBe(0)
+    expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(367)
+    expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43466)
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {
@@ -75,11 +77,11 @@ describe('Date helpers', () => {
 
 describe('Date helpers, other zero date', () => {
   it('#dateToNumber should return number representation of a date, different zero date', () => {
-    const config = new Config({nullDate: {year: 1950, month: 6, day: 15}})
-    expect(dateToNumber({year: 1900, month: 1, day: 1}, config)).toBe(-18427)
-    expect(dateToNumber({year: 1899, month: 12, day: 30}, config)).toBe(-18429)
-    expect(dateToNumber({year: 1900, month: 12, day: 31}, config)).toBe(-18063)
-    expect(dateToNumber({year: 2018, month: 12, day: 31}, config)).toBe(25036)
+    const dateHelper = new DateHelper(new Config({nullDate: {year: 1950, month: 6, day: 15}}))
+    expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(-18427)
+    expect(dateHelper.dateToNumber({year: 1899, month: 12, day: 30})).toBe(-18429)
+    expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(-18063)
+    expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(25036)
   })
 
   it('#dateNumberToMonthNumber should return proper month number, different zero date', () => {
@@ -102,7 +104,7 @@ describe('Date helpers, other zero date', () => {
 
 describe('Custom date parsing', () => {
 
-  function customParseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+  function customParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): IDate | null
   {
     for(let dateFormat of dateFormats)
     {

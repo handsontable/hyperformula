@@ -10,13 +10,59 @@ export interface IDate {
 }
 
 export class DateHelper {
-  constructor( private readonly config: Config) {
+  constructor(private readonly config: Config) {
     this.config = config
   }
 
   public dateStringToDateNumber(dateString: string): number | null {
-    const date = this.config.parseDate(dateString, this.config.dateFormats, this.config) //should point to defaultParseDate()
-    return date ? dateToNumber(date, this.config) : null
+    const date = this.config.parseDate(dateString, this.config.dateFormats, this) //should point to defaultParseDate()
+    return date ? this.dateToNumber(date) : null
+  }
+
+  public getNullYear()
+  {
+    return this.config.nullYear
+  }
+
+  public isValidDate(date: IDate): boolean {
+    if(isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
+      return false
+    } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
+      return false
+    } else if(date.year < 1582) {  //Gregorian calendar start
+      return false
+    } else if(date.month < 1 || date.month > 12) {
+      return false
+    } else if(date.day < 1) {
+      return false
+    } else if(isLeapYear(date.year, this.config) && date.month === 2) {
+      return date.day <= 29
+    } else {
+      return date.day <= numDays[date.month - 1]
+    }
+  }
+  private leapYearsCount(year: number): number {
+    return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900? 1 : 0)
+  }
+
+  private dateToNumberFromZero(date: IDate): number {
+    return 365*date.year + prefSumDays[date.month-1] + date.day-1 + (date.month<=2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
+  }
+
+  private isLeapYear(year: number): boolean {
+    if(year%4) {
+      return false
+    } else if(year%100) {
+      return true
+    } else if(year%400) {
+      return year === 1900 && this.config.leapYear1900
+    } else {
+      return true
+    }
+  }
+
+  public dateToNumber(date: IDate): number {
+    return this.dateToNumberFromZero(date) - this.dateToNumberFromZero(this.config.nullDate)
   }
 }
 
@@ -56,10 +102,6 @@ function isLeapYear(year: number, config: Config): boolean {
   }
 }
 
-export function dateToNumber(date: IDate, config: Config): number {
-  return dateToNumberFromZero(date, config) - dateToNumberFromZero(config.nullDate, config)
-}
-
 export function numberToDate(arg: number, config: Config): IDate {
   const dateNumber = arg + dateToNumberFromZero(config.nullDate, config)
   let year = Math.floor(dateNumber / 365.2425)
@@ -90,24 +132,6 @@ export function dateNumberToYearNumber(dateNumber: number, config: Config): numb
   return numberToDate(dateNumber, config).year
 }
 
-export function isValidDate(date: IDate, config: Config): boolean {
-  if(isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
-    return false
-  } else if(date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
-    return false
-  } else if(date.year < 1582) {  //Gregorian calendar start
-    return false
-  } else if(date.month < 1 || date.month > 12) {
-    return false
-  } else if(date.day < 1) {
-    return false
-  } else if(isLeapYear(date.year, config) && date.month === 2) {
-    return date.day <= 29
-  } else {
-    return date.day <= numDays[date.month - 1]
-  }
-}
-
 export function endOfMonth(date: IDate): IDate {
   return {year: date.year, month: date.month, day: numDays[date.month-1]}
 }
@@ -117,7 +141,7 @@ export function offsetMonth(date: IDate, offset: number): IDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-function parseDateSingleFormat(dateString: string, dateFormat: string, config: Config): IDate | null
+function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): IDate | null
 {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
@@ -144,7 +168,7 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, config: C
     if(year < 0 || year > 99) {
       return null
     }
-    if(year < config.nullYear) {
+    if(year < dateHelper.getNullYear()) {
       year += 2000
     } else {
       year += 1900
@@ -155,14 +179,14 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, config: C
 
   const date : IDate = {year: year, month: month, day: day}
 
-  return isValidDate( date, config) ? date : null
+  return dateHelper.isValidDate( date) ? date : null
 }
 
-export function defaultParseDate(dateString: string, dateFormats: string[], config: Config): IDate | null
+export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): IDate | null
 {
   for(let dateFormat of dateFormats)
   {
-    const date = parseDateSingleFormat(dateString, dateFormat, config)
+    const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
     if(date !== null)
      { return date }
   }

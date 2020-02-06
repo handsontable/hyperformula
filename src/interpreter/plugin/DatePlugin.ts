@@ -4,10 +4,8 @@ import {
   dateNumberToMonthNumber,
   dateNumberToYearNumber,
   endOfMonth,
-  isValidDate,
   numberToDate,
-  offsetMonth,
-  dateToNumber,
+  offsetMonth
 } from '../../Date'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
@@ -87,7 +85,7 @@ export class DatePlugin extends FunctionPlugin {
     }
     const date = {year: y, month: m, day: 1}
 
-    return (d>=1 && isValidDate(date, this.config)) ? dateToNumber(date, this.config)+(d-1) : new CellError(ErrorType.VALUE)
+    return (d>=1 && this.interpreter.dateHelper.isValidDate(date)) ? this.interpreter.dateHelper.dateToNumber(date)+(d-1) : new CellError(ErrorType.VALUE)
   }
 
   public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
@@ -114,7 +112,7 @@ export class DatePlugin extends FunctionPlugin {
     }
 
     const date = numberToDate(dateNumber, this.config)
-    return dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)), this.config)
+    return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
   public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {

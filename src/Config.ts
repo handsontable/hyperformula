@@ -1,6 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {IDate, defaultParseDate} from './Date'
+import {IDate, defaultParseDate, DateHelper} from './Date'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -51,7 +51,7 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
   precisionEpsilon: number,
   precisionRounding: number,
   stringifyDate: (dateNumber: number, dateFormat: string, config: Config) => string | null
@@ -130,7 +130,7 @@ export class Config {
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
-  public readonly parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
   public readonly stringifyDate: (value: number, formatArg: string, config: Config) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
