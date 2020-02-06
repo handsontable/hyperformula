@@ -78,10 +78,6 @@ export class DatePlugin extends FunctionPlugin {
     const delta = Math.floor( (m-1)/12 )
     y += delta
     m -= delta*12
-//    if(m<0) {
-//      m += 12
-//      y -= 1
-//    }
 
     const date = {year: y, month: m, day: 1}
     if( this.interpreter.dateHelper.isValidDate(date) ) {
