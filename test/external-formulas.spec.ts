@@ -25,6 +25,18 @@ describe("External formulas", () => {
     expect(engine.getCellValue(externalFormulaAddress)).toEqual(30)
   })
 
+  it('works for more formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+
+    const [externalFormulaAddress1, _changes1] = engine.calculateFormula('=Sheet1!A1+10')
+    const [externalFormulaAddress2, _changes2] = engine.calculateFormula('=Sheet1!A1+11')
+
+    expect(engine.getCellValue(externalFormulaAddress1)).toEqual(52)
+    expect(engine.getCellValue(externalFormulaAddress2)).toEqual(53)
+  })
+
   it('is possible to change external formula to other', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
