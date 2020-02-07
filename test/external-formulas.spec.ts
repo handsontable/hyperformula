@@ -35,4 +35,12 @@ describe("External formulas", () => {
 
     expect(engine.getCellValue(externalFormulaAddress)).toEqual(53)
   })
+
+  it('normalization works', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    const normalizedFormula = engine.normalizeFormula('=SHEET1!A1+10')
+
+    expect(normalizedFormula).toEqual('=Sheet1!A1+10')
+  })
 })

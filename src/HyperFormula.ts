@@ -844,6 +844,16 @@ export class HyperFormula {
     return [address, this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)]
   }
 
+  public normalizeFormula(formulaString: string): string {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error("This is not a formula")
+    }
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    return this.unparser.unparse(ast, exampleExternalFormulaAddress)
+  }
+
   /**
    *  Destroys instance of HyperFormula
    * */
