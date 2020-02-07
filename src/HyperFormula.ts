@@ -844,6 +844,13 @@ export class HyperFormula {
     return [address, this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)]
   }
 
+  /**
+   * Normalizes formula
+   *
+   * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @returns normalized formula
+   */
   public normalizeFormula(formulaString: string): string {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
@@ -854,6 +861,13 @@ export class HyperFormula {
     return this.unparser.unparse(ast, exampleExternalFormulaAddress)
   }
 
+  /**
+   * Validates formula
+   *
+   * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @returns whether formula can be executed outside of regular worksheet
+   */
   public validateFormula(formulaString: string): boolean {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     return parsedCellContent instanceof CellContent.Formula
