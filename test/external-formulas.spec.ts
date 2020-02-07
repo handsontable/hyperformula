@@ -80,4 +80,10 @@ describe("External formulas - validation", () => {
 
     expect(engine.validateFormula("=SOME SYNTAX ERROR")).toBe(false)
   })
+
+  it("ok when literal error", () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.validateFormula("=#N/A")).toBe(true)
+  })
 })

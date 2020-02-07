@@ -875,7 +875,7 @@ export class HyperFormula {
     }
     const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
     const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
-    if (ast.type === AstNodeType.ERROR) {
+    if (ast.type === AstNodeType.ERROR && !ast.error) {
       return false
     }
     return true
