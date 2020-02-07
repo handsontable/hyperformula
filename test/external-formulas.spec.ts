@@ -58,3 +58,20 @@ describe("External formulas - normalization", () => {
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
   })
 })
+
+describe("External formulas - validation", () => {
+  it("ok for formulas", () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    const formula = '=Sheet1!A1+10'
+
+    expect(engine.validateFormula(formula)).toBe(true)
+  })
+
+  it("fail for simple values", () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.validateFormula("42")).toBe(false)
+    expect(engine.validateFormula("some text")).toBe(false)
+  })
+})

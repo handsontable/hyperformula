@@ -854,6 +854,11 @@ export class HyperFormula {
     return this.unparser.unparse(ast, exampleExternalFormulaAddress)
   }
 
+  public validateFormula(formulaString: string): boolean {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    return parsedCellContent instanceof CellContent.Formula
+  }
+
   /**
    *  Destroys instance of HyperFormula
    * */
