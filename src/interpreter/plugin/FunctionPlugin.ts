@@ -67,7 +67,7 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => CellValue): CellValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: CellValue) => coerceScalarToNumber(arg,this.config), fn)
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: CellValue) => coerceScalarToNumber(arg,this.interpreter.dateHelper), fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => CellValue): CellValue {
@@ -82,7 +82,7 @@ export abstract class FunctionPlugin {
     if (left instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedLeft = coerceScalarToNumber(left, this.config)
+    const coercedLeft = coerceScalarToNumber(left, this.interpreter.dateHelper)
     if (coercedLeft instanceof CellError) {
       return coercedLeft
     }
@@ -92,7 +92,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedRight = coerceScalarToNumber(right, this.config)
+    const coercedRight = coerceScalarToNumber(right, this.interpreter.dateHelper)
     if (coercedRight instanceof CellError) {
       return coercedRight
     }
@@ -111,7 +111,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const value = coerceScalarToNumber(arg, this.config)
+    const value = coerceScalarToNumber(arg, this.interpreter.dateHelper)
     if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
       return new CellError(ErrorType.NUM)
     }

@@ -1,6 +1,5 @@
 import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
-import {Config} from '../Config'
-import {dateStringToDateNumber} from '../Date'
+import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
@@ -10,13 +9,13 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param config
  */
-export function coerceScalarToNumber(arg: CellValue, config: Config): number | CellError {
+export function coerceScalarToNumber(arg: CellValue, dateHelper: DateHelper): number | CellError {
   let ret = coerceNonDateScalarToMaybeNumber(arg)
   if (ret != null) {
     return ret
   }
   if (typeof arg === 'string') {
-    const parsedDateNumber = dateStringToDateNumber(arg, config)
+    const parsedDateNumber = dateHelper.dateStringToDateNumber(arg)
     if (parsedDateNumber !== null) {
       return parsedDateNumber
     }

@@ -1,9 +1,10 @@
 import {Config} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
+import {DateHelper} from '../src/DateHelper'
 
 describe('CellContentParser', () => {
-  const cellContentParser = new CellContentParser(new Config())
+  const cellContentParser = new CellContentParser(new Config(), new DateHelper(new Config()))
 
   it('a matrix', () => {
     expect(cellContentParser.parse('{=FOO()}')).toStrictEqual(new CellContent.MatrixFormula('=FOO()'))

@@ -1,6 +1,4 @@
-import {CellError, CellValue, CellValueTypeOrd, EmptyValue, EmptyValueType, ErrorType, getCellValueType} from '../Cell'
-import {Config} from '../Config'
-import {dateStringToDateNumber} from '../Date'
+import {CellError, CellValue, ErrorType} from '../Cell'
 import {coerceBooleanToNumber} from './coerce'
 
 /**
@@ -330,31 +328,3 @@ export function nonequality(left: number | string | boolean, right: number | str
   }
 }
 
-export function compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
-                        comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean, config: Config): boolean {
-  if (typeof left === 'string' && typeof right === 'string') {
-    const leftTmp = dateStringToDateNumber(left, config)
-    const rightTmp = dateStringToDateNumber(right, config)
-    if (leftTmp != null && rightTmp != null) {
-      return comparator(leftTmp, rightTmp, config.precisionEpsilon)
-    }
-  } else if (typeof left === 'string' && typeof right === 'number') {
-    const leftTmp = dateStringToDateNumber(left, config)
-    if (leftTmp != null) {
-      return comparator(leftTmp, right, config.precisionEpsilon)
-    }
-  } else if (typeof left === 'number' && typeof right === 'string') {
-    const rightTmp = dateStringToDateNumber(right, config)
-    if (rightTmp != null) {
-      return comparator(left, rightTmp, config.precisionEpsilon)
-    }
-  }
-
-  if (typeof left !== typeof right) {
-    return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
-  } else if (left === EmptyValue || right === EmptyValue) {
-    return false
-  } else {
-    return comparator(left, right, config.precisionEpsilon)
-  }
-}

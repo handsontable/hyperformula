@@ -2,6 +2,7 @@ import {CellError, CellValue, ErrorType, SimpleCellAddress} from './Cell'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
+import {DateHelper} from './DateHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
@@ -18,8 +19,9 @@ export class SingleThreadEvaluator implements Evaluator {
     private readonly columnSearch: IColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
+    private readonly dateHelper: DateHelper
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper)
   }
 
   public run() {

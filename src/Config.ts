@@ -1,6 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {IDate, parseDate} from './Date'
+import {IDate, defaultParseDate, DateHelper} from './DateHelper'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -36,7 +36,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {stringifyDate} from './format/format'
+import {defaultStringifyDate} from './format/format'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -51,10 +51,10 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, config: Config) => string | null
+  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -75,8 +75,8 @@ export class Config {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: parseDate,
-    stringifyDate: stringifyDate,
+    parseDate: defaultParseDate,
+    stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -130,8 +130,8 @@ export class Config {
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
-  public readonly parseDate: (dateString: string, dateFormats: string[], config: Config) => IDate | null
-  public readonly stringifyDate: (value: number, formatArg: string, config: Config) => string | null
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
   public readonly smartRounding: boolean
