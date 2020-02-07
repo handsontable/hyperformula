@@ -32,7 +32,7 @@ import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
+import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 
 export class NoSheetWithIdError extends Error {
@@ -870,7 +870,15 @@ export class HyperFormula {
    */
   public validateFormula(formulaString: string): boolean {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
-    return parsedCellContent instanceof CellContent.Formula
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      return false
+    }
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    if (ast.type === AstNodeType.ERROR) {
+      return false
+    }
+    return true
   }
 
   /**
