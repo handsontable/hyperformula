@@ -1,5 +1,5 @@
 import {Config} from '../src'
-import {DateHelper, IDate} from '../src/Date'
+import {DateHelper, IDate} from '../src/DateHelper'
 import moment, {Moment} from 'moment'
 
 describe('Date helpers', () => {

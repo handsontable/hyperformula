@@ -1,5 +1,5 @@
 import {Config} from '../../src'
-import {DateHelper} from '../../src/Date'
+import {DateHelper} from '../../src/DateHelper'
 import {format} from '../../src/format/format'
 import {FormatExpression, FormatExpressionType, formatToken, TokenType} from '../../src/format/parser'
 

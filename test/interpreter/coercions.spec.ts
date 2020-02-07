@@ -1,6 +1,6 @@
 import {Config} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
-import {DateHelper} from '../../src/Date'
+import {DateHelper} from '../../src/DateHelper'
 import {
   coerceBooleanToNumber,
   coerceScalarToBoolean,

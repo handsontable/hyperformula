@@ -20,12 +20,9 @@ export class DateHelper {
     this.maxDateValue = this.dateToNumber(maxDate)
   }
 
-  public getMinDateValue(): number {
-    return this.minDateValue
-  }
-
-  public getMaxDateValue(): number {
-    return this.maxDateValue
+  public getWithinBounds(dayNumber: number)
+  {
+    return (dayNumber <= this.maxDateValue) && (dayNumber >= this.minDateValue)
   }
 
   public dateStringToDateNumber(dateString: string): number | null {

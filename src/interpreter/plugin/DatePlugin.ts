@@ -3,7 +3,7 @@ import {Config} from '../../Config'
 import {
   endOfMonth,
   offsetMonth,
-} from '../../Date'
+} from '../../DateHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
@@ -83,7 +83,7 @@ export class DatePlugin extends FunctionPlugin {
     const date = {year: y, month: m, day: 1}
     if( this.interpreter.dateHelper.isValidDate(date) ) {
       const ret = this.interpreter.dateHelper.dateToNumber(date)+(d-1)
-      if(ret >= this.interpreter.dateHelper.getMinDateValue() && ret <= this.interpreter.dateHelper.getMaxDateValue()) {
+      if(this.interpreter.dateHelper.getWithinBounds(ret)) {
         return ret
       }
     }

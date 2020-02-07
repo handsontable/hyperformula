@@ -1,6 +1,6 @@
 import {CellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateHelper} from '../Date'
+import {DateHelper} from '../DateHelper'
 import {
   FormatToken,
   parseForDateFormat,

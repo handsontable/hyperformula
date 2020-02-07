@@ -1,6 +1,6 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
-import {DateHelper} from './Date'
+import {DateHelper} from './DateHelper'
 
 export type RawCellContent = string | null | undefined
 

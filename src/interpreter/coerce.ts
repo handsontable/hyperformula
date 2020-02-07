@@ -1,5 +1,5 @@
 import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
-import {DateHelper} from '../Date'
+import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
