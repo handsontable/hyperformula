@@ -1,5 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {
   CellType,
   CellValueType,
@@ -9,7 +10,7 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, CellValueExporter} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
@@ -119,6 +120,7 @@ export class HyperFormula {
 
   private readonly crudOperations: CrudOperations
   private readonly cellValueExporter: CellValueExporter
+  private nextExternalFormulaId: number = 0
 
   constructor(
     /** Engine config */
@@ -140,6 +142,7 @@ export class HyperFormula {
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
+    this.addressMapping.autoAddSheet(-1, [])
   }
 
   /**
@@ -813,7 +816,7 @@ export class HyperFormula {
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
-   * */
+   */
   public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
     try {
       batchOperations(this.crudOperations)
@@ -821,6 +824,23 @@ export class HyperFormula {
       /* TODO we should be able to return error information along with changes */
     }
     return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+  }
+
+  /**
+   * Calculate formula
+   *
+   * @param batchOperations
+   */
+  public calculateFormula(formulaString: string): [SimpleCellAddress, CellValueChange[]] {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error("This is not a formula")
+    }
+    const address = { sheet: -1, col: 0, row: this.nextExternalFormulaId }
+    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    this.nextExternalFormulaId++
+    return [address, this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)]
   }
 
   /**
