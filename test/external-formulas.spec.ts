@@ -3,7 +3,7 @@ import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
 import {adr} from './testUtils'
 
-describe("External formulas", () => {
+describe("External formulas - calculation", () => {
   it('basic usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
@@ -47,8 +47,10 @@ describe("External formulas", () => {
 
     expect(engine.getCellValue(externalFormulaAddress)).toEqual(53)
   })
+})
 
-  it('normalization works', () => {
+describe("External formulas - normalization", () => {
+  it('works', () => {
     const engine = HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=SHEET1!A1+10')
