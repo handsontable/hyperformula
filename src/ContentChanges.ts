@@ -9,13 +9,15 @@ export interface CellValueChange {
   value: InternalCellValue,
 }
 
+export type ChangeList = Array<CellValueChange>
+
 export class ContentChanges {
 
   public static empty() {
     return new ContentChanges()
   }
 
-  private changes: CellValueChange[] = []
+  private changes: ChangeList = []
 
   public addAll(other: ContentChanges): ContentChanges {
     this.changes.push(...other.changes)
@@ -32,12 +34,12 @@ export class ContentChanges {
     this.addSingleCellValue(newValue, address)
   }
 
-  public add(...change: CellValueChange[]) {
+  public add(...change: ChangeList) {
     this.changes.push(...change)
   }
 
-  public exportChanges(exporter: CellValueExporter): CellValueChange[] {
-    const ret: CellValueChange[] = []
+  public exportChanges(exporter: CellValueExporter): ChangeList {
+    const ret: ChangeList = []
     for (const i in this.changes) {
       ret[i] = {
         sheet: this.changes[i].sheet,
@@ -49,7 +51,7 @@ export class ContentChanges {
     return ret
   }
 
-  public getChanges(): CellValueChange[] {
+  public getChanges(): ChangeList {
     return this.changes
   }
 
