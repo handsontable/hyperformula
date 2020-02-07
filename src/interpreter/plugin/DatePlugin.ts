@@ -1,5 +1,4 @@
 import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
-import {Config} from '../../Config'
 import {
   endOfMonth,
   offsetMonth,
