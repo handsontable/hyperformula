@@ -38,6 +38,17 @@ export class SheetMapping {
     return sheet.id
   }
 
+  public addForeverSheetWithId(id: number): void {
+    if (this.mappingFromId.has(id)) {
+      throw new Error(`Sheet with ID ${id} already exists`)
+    }
+    if (id >= 0) {
+      throw new Error(`Forever sheets need to be negative`)
+    }
+    const sheet = new Sheet(id, "")
+    this.mappingFromId.set(sheet.id, sheet)
+  }
+
   public removeSheet(sheetId: number) {
     const sheet = this.fetchSheetById(sheetId)
     if (sheetId == this.lastSheetId) {
@@ -79,7 +90,9 @@ export class SheetMapping {
 
   public* displayNames(): IterableIterator<string> {
     for (const sheet of this.mappingFromCanonicalName.values()) {
-      yield sheet.displayName
+      if (sheet.id >= 0) {
+        yield sheet.displayName
+      }
     }
   }
 

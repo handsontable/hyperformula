@@ -143,6 +143,7 @@ export class HyperFormula {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
     this.addressMapping.autoAddSheet(-1, [])
+    this.sheetMapping.addForeverSheetWithId(-1)
   }
 
   /**
