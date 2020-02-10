@@ -327,4 +327,3 @@ export function nonequality(left: number | string | boolean, right: number | str
     return left * mod > right || left < right * mod
   }
 }
-

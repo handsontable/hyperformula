@@ -6,7 +6,7 @@ export type CellValue = number | string | boolean | DetailedCellError | EmptyVal
 export class DetailedCellError {
   constructor(
     public readonly error: CellError,
-    public readonly value: string
+    public readonly value: string,
   ) {
   }
 
@@ -21,7 +21,7 @@ export class DetailedCellError {
 
 export class CellValueExporter {
   constructor(
-    private readonly config: Config
+    private readonly config: Config,
   ) {
   }
 

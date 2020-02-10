@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, EmptyValue, ErrorType} from '../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue} from '../Cell'
 import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -10,7 +10,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param config
  */
 export function coerceScalarToNumber(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
-  let ret = coerceNonDateScalarToMaybeNumber(arg)
+  const ret = coerceNonDateScalarToMaybeNumber(arg)
   if (ret != null) {
     return ret
   }
@@ -44,7 +44,6 @@ export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeV
 export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
-
 
 export function coerceNonDateScalarToMaybeNumber(arg: InternalCellValue): number | CellError | null {
   if (arg === EmptyValue) {

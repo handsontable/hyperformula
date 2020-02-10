@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'

@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, EmptyValue, ErrorType} from '../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue} from '../Cell'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**

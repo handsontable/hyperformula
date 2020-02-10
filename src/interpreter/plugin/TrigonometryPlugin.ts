@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -98,7 +98,7 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
     const arg2 = this.evaluateAst(ast.args[1], formulaAddress)
-    if(arg2 instanceof SimpleRangeValue) {
+    if (arg2 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
     const coercedArg1 = coerceScalarToNumber(arg1, this.interpreter.dateHelper)
@@ -106,12 +106,11 @@ export class TrigonometryPlugin extends FunctionPlugin {
       return coercedArg1
     }
     const coercedArg2 = coerceScalarToNumber(arg2, this.interpreter.dateHelper)
-    if(coercedArg2 instanceof CellError) {
+    if (coercedArg2 instanceof CellError) {
       return coercedArg2
     }
     return Math.atan2(coercedArg1, coercedArg2)
   }
-
 
   public ctg(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedArg) => {

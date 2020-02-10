@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {
   endOfMonth,
   offsetMonth,
@@ -72,17 +72,17 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-    var d = Math.trunc(coercedDay)
-    var m = Math.trunc(coercedMonth)
-    var y = Math.trunc(coercedYear)
-    const delta = Math.floor( (m-1)/12 )
+    let d = Math.trunc(coercedDay)
+    let m = Math.trunc(coercedMonth)
+    let y = Math.trunc(coercedYear)
+    const delta = Math.floor( (m - 1) / 12 )
     y += delta
-    m -= delta*12
+    m -= delta * 12
 
     const date = {year: y, month: m, day: 1}
-    if( this.interpreter.dateHelper.isValidDate(date) ) {
-      const ret = this.interpreter.dateHelper.dateToNumber(date)+(d-1)
-      if(this.interpreter.dateHelper.getWithinBounds(ret)) {
+    if ( this.interpreter.dateHelper.isValidDate(date) ) {
+      const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
+      if (this.interpreter.dateHelper.getWithinBounds(ret)) {
         return ret
       }
     }

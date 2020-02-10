@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
@@ -67,7 +67,7 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalCellValue): InternalCellValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalCellValue) => coerceScalarToNumber(arg,this.interpreter.dateHelper), fn)
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalCellValue) => coerceScalarToNumber(arg, this.interpreter.dateHelper), fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalCellValue): InternalCellValue {
@@ -141,4 +141,3 @@ export abstract class FunctionPlugin {
     }
   }
 }
-

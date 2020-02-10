@@ -5,9 +5,9 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
+  InternalCellValue,
   simpleCellAddress,
   SimpleCellAddress,
-  InternalCellValue,
 } from './Cell'
 import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, CellValueExporter} from './CellValue'
@@ -141,7 +141,6 @@ export class HyperFormula {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
   }
-
 
   /**
    * Returns value of the cell with the given address.
@@ -555,8 +554,8 @@ export class HyperFormula {
   public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
     return this.dependencyGraph.getValuesInRange(range).map(
       (subarray: InternalCellValue[]) => subarray.map(
-        (arg) => this.cellValueExporter.export(arg)
-      )
+        (arg) => this.cellValueExporter.export(arg),
+      ),
     )
   }
 

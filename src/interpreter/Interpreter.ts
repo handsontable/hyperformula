@@ -6,7 +6,7 @@ import {
   EmptyValueType,
   ErrorType, getCellValueType,
   invalidSimpleCellAddress,
-  SimpleCellAddress
+  SimpleCellAddress,
 } from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
@@ -20,16 +20,16 @@ import {coerceScalarToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
-  divide, equality, nonequality,
-  greater,
+  divide, equality, greater,
   greatereq,
-  less, lesseq,
-  multiply,
+  less,
+  lesseq, multiply,
+  nonequality,
   percent,
   power,
   subtract,
   unaryminus,
-  unaryplus
+  unaryplus,
 } from './scalar'
 import {concatenate} from './text'
 
@@ -42,7 +42,7 @@ export class Interpreter {
     public readonly columnSearch: IColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
-    public readonly dateHelper: DateHelper
+    public readonly dateHelper: DateHelper,
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
@@ -78,13 +78,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
 
@@ -97,13 +97,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
 
@@ -116,13 +116,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
 
@@ -135,13 +135,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return this.compare( leftResult, rightResult, less)
@@ -153,13 +153,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return this.compare( leftResult, rightResult, greatereq)
@@ -171,13 +171,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return this.compare( leftResult, rightResult, lesseq)
@@ -189,13 +189,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return add(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
@@ -207,13 +207,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return subtract(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
@@ -225,13 +225,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return multiply(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
@@ -242,13 +242,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return power(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
@@ -259,13 +259,13 @@ export class Interpreter {
         if (leftResult instanceof CellError) {
           return leftResult
         }
-        if(leftResult instanceof SimpleRangeValue) {
+        if (leftResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         if (rightResult instanceof CellError) {
           return rightResult
         }
-        if(rightResult instanceof SimpleRangeValue) {
+        if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
         return divide(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
@@ -365,7 +365,7 @@ export class Interpreter {
     }
   }
   private compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
-                          comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean): boolean {
+                  comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean): boolean {
     if (typeof left === 'string' && typeof right === 'string') {
       const leftTmp = this.dateHelper.dateStringToDateNumber(left)
       const rightTmp = this.dateHelper.dateStringToDateNumber(right)

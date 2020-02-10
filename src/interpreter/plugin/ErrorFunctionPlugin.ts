@@ -1,4 +1,4 @@
-import {CellError, InternalCellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -73,4 +73,4 @@ function erf2(lowerBound: number, upperBound: number): number {
 function erfc(x: number): number {
   return 1 - erf(x)
 }
-
+

@@ -11,13 +11,13 @@ type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEm
 
 enum ClipboardOperationType {
   COPY,
-  CUT
+  CUT,
 }
 
 enum ClipboardCellType {
   VALUE,
   EMPTY,
-  FORMULA
+  FORMULA,
 }
 
 interface ClipboardCellValue {
@@ -40,7 +40,7 @@ class Clipboard {
     public readonly width: number,
     public readonly height: number,
     public readonly type: ClipboardOperationType,
-    public readonly content?: ClipboardCell[][]
+    public readonly content?: ClipboardCell[][],
   ) {
   }
 
@@ -64,7 +64,7 @@ export class ClipboardOperations {
     private readonly dependencyGraph: DependencyGraph,
     private readonly crudOperations: CrudOperations,
     private readonly parser: ParserWithCaching,
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 

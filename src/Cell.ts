@@ -55,10 +55,8 @@ export enum CellValueType {
   ERROR = 'ERROR',
 }
 
-export const CellValueTypeOrd = (arg: CellValueType): number =>
-{
-  switch(arg)
-  {
+export const CellValueTypeOrd = (arg: CellValueType): number => {
+  switch (arg) {
     case CellValueType.EMPTY:
       return 0
     case CellValueType.NUMBER:
@@ -94,9 +92,9 @@ export const getCellValueType = (cellValue: InternalCellValue): CellValueType =>
 }
 
 export class CellError {
-  constructor (
+  constructor(
     public readonly type: ErrorType,
-    public readonly message?: string
+    public readonly message?: string,
   ) {
   }
 }

@@ -1,27 +1,24 @@
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, InternalCellValue, EmptyValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
-import {CriterionCache, DependencyGraph, RangeVertex} from '../../DependencyGraph'
-import {Interpreter} from '../Interpreter'
-import {split} from '../../generatorUtils'
+
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import { ProcedureAst} from '../../parser'
 import {coerceToRange} from '../coerce'
-import { CriterionLambda, CriterionPackage} from '../Criterion'
+import { CriterionPackage} from '../Criterion'
+import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
-import {CriterionFunctionCompute, Condition} from '../CriterionFunctionCompute'
 
 class AverageResult {
-  constructor(
-    public readonly sum: number,
-    public readonly count: number,
-  ) { }
 
   public static empty = new AverageResult(0, 0)
 
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
+  constructor(
+    public readonly sum: number,
+    public readonly count: number,
+  ) { }
 
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
@@ -208,7 +205,7 @@ export class SumifPlugin extends FunctionPlugin {
         } else {
           return AverageResult.empty
         }
-      }
+      },
     ).compute(valuesArg, [new Condition(conditionArg, criterionPackage)])
     if (averageResult instanceof CellError) {
       return averageResult

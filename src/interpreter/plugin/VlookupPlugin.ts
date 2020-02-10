@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, InternalCellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics/Statistics'
 import {InterpreterValue} from '../InterpreterValue'

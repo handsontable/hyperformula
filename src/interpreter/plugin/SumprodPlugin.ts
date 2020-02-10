@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, InternalCellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {DependencyGraph, RangeVertex} from '../../DependencyGraph'
 import { ProcedureAst} from '../../parser'
 import {coerceScalarToNumber, coerceToRange} from '../coerce'

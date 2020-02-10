@@ -11,7 +11,7 @@ export class RadiansPlugin extends FunctionPlugin {
 
   public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
-      return arg * (Math.PI/180)
+      return arg * (Math.PI / 180)
     })
   }
 }

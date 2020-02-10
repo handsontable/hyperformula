@@ -135,7 +135,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
       private readonly parser: ParserWithCaching,
       private readonly stats: Statistics,
       private readonly threshold: number,
-      private readonly cellContentParser: CellContentParser
+      private readonly cellContentParser: CellContentParser,
   ) {}
 
   public run(sheets: Sheets): Dependencies {

@@ -1,6 +1,5 @@
 import {InternalCellValue, SimpleCellAddress} from './Cell'
 import {CellValueExporter} from './CellValue'
-import {Config} from './Config'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {
@@ -38,13 +37,13 @@ export class ContentChanges {
   }
 
   public exportChanges(exporter: CellValueExporter): CellValueChange[] {
-    let ret: CellValueChange[] = []
-    for (let i in this.changes) {
+    const ret: CellValueChange[] = []
+    for (const i in this.changes) {
       ret[i] = {
         sheet: this.changes[i].sheet,
         col: this.changes[i].col,
         row: this.changes[i].row,
-        value: exporter.export(this.changes[i].value)
+        value: exporter.export(this.changes[i].value),
       }
     }
     return ret

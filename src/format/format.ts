@@ -4,13 +4,13 @@ import {DateHelper} from '../DateHelper'
 import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
-  const tryString = config.stringifyDate(value, formatArg, dateHelper) //default points to defaultStringifyDate()
-  if(tryString != null) {
+  const tryString = config.stringifyDate(value, formatArg, dateHelper) // default points to defaultStringifyDate()
+  if (tryString != null) {
     return tryString
   } else {
     const expression = parseForNumberFormat(formatArg)
 
-    if(expression !== null) {
+    if (expression !== null) {
       return numberFormat(expression.tokens, value)
     } else {
       return formatArg
@@ -74,7 +74,7 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
 
 export function defaultStringifyDate(value: number, formatArg: string, dateHelper: DateHelper): string | null {
   const expression = parseForDateFormat(formatArg)
-  if(expression === null) {
+  if (expression === null) {
     return null
   }
   const tokens = expression.tokens

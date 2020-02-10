@@ -1,9 +1,9 @@
+import { CellError, EmptyValue } from './Cell'
+import { CellValue, DetailedCellError } from './CellValue'
 import {Config} from './Config'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula, InvalidAddressError, NoSheetWithIdError} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import { EmptyValue, CellError } from './Cell';
-import { DetailedCellError, CellValue } from './CellValue';
 
 class HyperFormulaNS extends HyperFormula {
   public static Config = Config

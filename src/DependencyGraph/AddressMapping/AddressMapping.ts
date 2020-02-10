@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {InternalCellValue, EmptyValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
+import {EmptyValue, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../../Cell'
 import {ColumnsSpan} from '../../ColumnsSpan'
 import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'

@@ -229,11 +229,9 @@ export class FormulaParser extends EmbeddedActionsParser {
           const value = this.SUBRULE(this.rightUnaryOpAtomicExpression)
           if (tokenMatcher(op, PlusOp)) {
             return buildPlusUnaryOpAst(value)
-          }
-          else if (tokenMatcher(op, MinusOp)) {
+          } else if (tokenMatcher(op, MinusOp)) {
             return buildMinusUnaryOpAst(value)
-          }
-          else {
+          } else {
             return buildErrorAst([])
           }
         },
@@ -301,7 +299,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           } else {
             return buildErrorAst([{
               type: ParsingErrorType.ParserError,
-              message: 'Unknown error literal'
+              message: 'Unknown error literal',
             }])
           }
         },
