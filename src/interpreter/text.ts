@@ -1,4 +1,4 @@
-import {CellError, CellValue, EmptyValue, ErrorType} from '../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue} from '../Cell'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
 /**
@@ -10,8 +10,8 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  *
  * @param args - list of cell values to concatenate
  */
-export function concatenate(args: InterpreterValue[]): CellValue {
-  return args.reduce((acc: CellValue, arg: InterpreterValue) => {
+export function concatenate(args: InterpreterValue[]): InternalCellValue {
+  return args.reduce((acc: InternalCellValue, arg: InterpreterValue) => {
     if (acc instanceof CellError) {
       return acc
     } else if (arg instanceof CellError) {

@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -9,7 +9,7 @@ export class SqrtPlugin extends  FunctionPlugin {
     },
   }
 
-  public sqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public sqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (input: number) => {
       if (input < 0) {
         return new CellError(ErrorType.NUM)

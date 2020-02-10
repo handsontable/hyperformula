@@ -1,7 +1,8 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {IDate, defaultParseDate, DateHelper} from './DateHelper'
+import {DateHelper, defaultParseDate, IDate} from './DateHelper'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -9,6 +10,7 @@ import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOpe
 import {BooleanPlugin} from './interpreter/plugin/BooleanPlugin'
 import {CharPlugin} from './interpreter/plugin/CharPlugin'
 import {CodePlugin} from './interpreter/plugin/CodePlugin'
+import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
 import {CountUniquePlugin} from './interpreter/plugin/CountUniquePlugin'
 import {DatePlugin} from './interpreter/plugin/DatePlugin'
 import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
@@ -23,7 +25,6 @@ import {MathConstantsPlugin} from './interpreter/plugin/MathConstantsPlugin'
 import {MatrixPlugin} from './interpreter/plugin/MatrixPlugin'
 import {MedianPlugin} from './interpreter/plugin/MedianPlugin'
 import {ModuloPlugin} from './interpreter/plugin/ModuloPlugin'
-import {CorrelPlugin} from './interpreter/plugin/CorrelPlugin'
 import {NumericAggregationPlugin} from './interpreter/plugin/NumericAggregationPlugin'
 import {PowerPlugin} from './interpreter/plugin/PowerPlugin'
 import {RadiansPlugin} from './interpreter/plugin/RadiansPlugin'
@@ -36,7 +37,6 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {defaultStringifyDate} from './format/format'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -65,7 +65,7 @@ export class Config {
 
   public static defaultConfig: ConfigParams = {
     chooseAddressMappingPolicy: new AlwaysDense(),
-    dateFormats: ['MM/DD/YYYY','MM/DD/YY'],
+    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
     language: enGB,
     functionPlugins: [],
@@ -81,7 +81,7 @@ export class Config {
     precisionRounding: 14,
     useColumnIndex: false,
     vlookupThreshold: 20,
-    nullDate: {year: 1899, month: 12, day: 30}
+    nullDate: {year: 1899, month: 12, day: 30},
   }
 
   private static defaultPlugins: any[] = [
@@ -159,7 +159,7 @@ export class Config {
         precisionRounding,
         useColumnIndex,
         vlookupThreshold,
-        nullDate
+        nullDate,
       }: Partial<ConfigParams> = {},
   ) {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
@@ -174,7 +174,7 @@ export class Config {
     this.nullYear = typeof nullYear === 'number' ? nullYear : Config.defaultConfig.nullYear
     this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
     this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
-    if(!this.smartRounding) {
+    if (!this.smartRounding) {
       this.precisionEpsilon = 0
     }
     this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
@@ -186,11 +186,11 @@ export class Config {
     this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
   }
 
-  public getFunctionTranslationFor(functionTranslationKey: string): string {
+  public getFunctionTranslationFor = (functionTranslationKey: string): string => {
     return this.language.functions[functionTranslationKey]
   }
 
-  public getErrorTranslationFor(functionTranslationKey: ErrorType): string {
+  public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
   }
 

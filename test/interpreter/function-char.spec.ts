@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr} from "../testUtils";
-import {ErrorType} from "../../src/Cell";
+import {HyperFormula} from "../../src"
+import {ErrorType} from "../../src/Cell"
+import {adr, detailedError} from "../testUtils"
 
 describe('Function CHAR', () => {
   it('should not work for wrong number of arguments', () => {
@@ -9,8 +9,8 @@ describe('Function CHAR', () => {
       ['=CHAR(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should not work for wrong type of arguments', () => {
@@ -18,7 +18,7 @@ describe('Function CHAR', () => {
       ['=CHAR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should work', () => {
@@ -59,9 +59,9 @@ describe('Function CHAR', () => {
       ['=CHAR(256)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A2'))).toEqual('')
     expect(engine.getCellValue(adr('A3'))).toEqual('ÿ')
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NUM))
   })
 })

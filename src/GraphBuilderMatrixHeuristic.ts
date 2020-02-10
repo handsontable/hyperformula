@@ -61,7 +61,7 @@ export class GraphBuilderMatrixHeuristic {
       private readonly columnSearch: IColumnSearchStrategy,
       private readonly dependencies: Map<Vertex, CellDependency[]>,
       private readonly threshold: number,
-      private readonly cellContentParser: CellContentParser
+      private readonly cellContentParser: CellContentParser,
   ) {
   }
 

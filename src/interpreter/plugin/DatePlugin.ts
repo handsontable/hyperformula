@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {
   endOfMonth,
   offsetMonth,
@@ -45,7 +45,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 3) {
       return new CellError(ErrorType.NA)
     }
@@ -72,24 +72,24 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-    var d = Math.trunc(coercedDay)
-    var m = Math.trunc(coercedMonth)
-    var y = Math.trunc(coercedYear)
-    const delta = Math.floor( (m-1)/12 )
+    let d = Math.trunc(coercedDay)
+    let m = Math.trunc(coercedMonth)
+    let y = Math.trunc(coercedYear)
+    const delta = Math.floor( (m - 1) / 12 )
     y += delta
-    m -= delta*12
+    m -= delta * 12
 
     const date = {year: y, month: m, day: 1}
-    if( this.interpreter.dateHelper.isValidDate(date) ) {
-      const ret = this.interpreter.dateHelper.dateToNumber(date)+(d-1)
-      if(this.interpreter.dateHelper.getWithinBounds(ret)) {
+    if ( this.interpreter.dateHelper.isValidDate(date) ) {
+      const ret = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
+      if (this.interpreter.dateHelper.getWithinBounds(ret)) {
         return ret
       }
     }
     return new CellError(ErrorType.VALUE)
   }
 
-  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -116,7 +116,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.interpreter.dateHelper.dateToNumber(endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
   }
 
-  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -132,7 +132,7 @@ export class DatePlugin extends FunctionPlugin {
     return this.interpreter.dateHelper.dateNumberToDayNumber(dateNumber)
   }
 
-  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }
@@ -166,7 +166,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -191,7 +191,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -216,7 +216,7 @@ export class DatePlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 2) {
       return new CellError(ErrorType.NA)
     }

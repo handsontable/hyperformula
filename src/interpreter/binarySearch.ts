@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, simpleCellAddress} from '../Cell'
+import {InternalCellValue, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 
 /*
@@ -33,7 +33,7 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGr
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted array
 * */
-export function lowerBound(values: CellValue[], key: any): number {
+export function lowerBound(values: InternalCellValue[], key: any): number {
   let start = 0
   let end = values.length - 1
 

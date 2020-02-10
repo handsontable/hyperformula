@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToString} from '../coerce'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -24,7 +24,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param args
    * @param formulaAddress
    */
-  public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length == 0) {
       return new CellError(ErrorType.NA)
     }
@@ -49,7 +49,7 @@ export class TextPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     const stringArg = ast.args[0]
     const indexArg = ast.args[1]
 

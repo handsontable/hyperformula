@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -40,7 +40,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -56,7 +56,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -101,12 +101,12 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public and(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
 
-    let result: CellValue = true
+    let result: InternalCellValue = true
     let anyReasonableValue = false
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
@@ -132,12 +132,12 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public or(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }
 
-    let result: CellValue | null = null
+    let result: InternalCellValue | null = null
     for (const scalarValue of this.iterateOverScalarValues(ast.args, formulaAddress)) {
       const coercedValue = coerceScalarToBoolean(scalarValue)
       if (coercedValue instanceof CellError) {
@@ -153,7 +153,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public not(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -171,7 +171,7 @@ export class BooleanPlugin extends FunctionPlugin {
     }
   }
 
-  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public xor(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1) {
       return new CellError(ErrorType.NA)
     }

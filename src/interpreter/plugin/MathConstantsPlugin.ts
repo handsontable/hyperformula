@@ -1,4 +1,4 @@
-import {CellValue, SimpleCellAddress} from '../../Cell'
+import {InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -15,11 +15,11 @@ export class MathConstantsPlugin extends FunctionPlugin {
     },
   }
 
-  public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return PI
   }
 
-  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return E
   }
 }

@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -18,7 +18,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     },
   }
 
-  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public log10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       if (arg > 0) {
         return Math.log10(arg)
@@ -28,7 +28,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     })
   }
 
-  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public log(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     } else {
@@ -63,7 +63,7 @@ export class LogarithmPlugin extends FunctionPlugin {
     }
   }
 
-  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public ln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg) => {
       if (arg > 0) {
         return Math.log(arg)

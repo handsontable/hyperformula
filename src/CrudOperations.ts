@@ -423,7 +423,6 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-
   public ensureItIsPossibleToAddSheet(name: string): void {
     if (this.sheetMapping.hasSheetWithName(name)) {
       throw Error(`Sheet with name ${name} already exists`)

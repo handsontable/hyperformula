@@ -1,5 +1,5 @@
 import {CellError, ErrorType} from '../../src/Cell'
-import {nonstrictadd, max, min} from '../../src/interpreter/scalar'
+import {max, min, nonstrictadd} from '../../src/interpreter/scalar'
 import '../testConfig'
 
 describe('nonstrictadd', () => {

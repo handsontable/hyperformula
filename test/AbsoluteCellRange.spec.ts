@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import './testConfig'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('AbsoluteCellRange', () => {
   describe('#addressInRange', () => {

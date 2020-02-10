@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function LOG', () => {
   it('happy path', () => {
@@ -22,39 +22,39 @@ describe('Function LOG', () => {
       ['=LOG(42, "foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('for zero', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(0, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('for negative value', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(-42, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('for zero base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, 0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('for negative base', () => {
     const engine = HyperFormula.buildFromArray([['=LOG(42, -42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=LOG()', '=LOG(42, 42, 42)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('use number coercion',  () => {
@@ -65,8 +65,8 @@ describe('Function LOG', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     expect(engine.getCellValue(adr('C1'))).toBe(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('errors propagation', () => {
@@ -76,9 +76,9 @@ describe('Function LOG', () => {
       ['=LOG(4/0, FOOBAR())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1
@@ -89,6 +89,6 @@ describe('Function LOG', () => {
       ['-1'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

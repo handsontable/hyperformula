@@ -2,7 +2,7 @@ import {CellError, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {InvalidArgumentsError} from '../../src/HyperFormula'
 import {CellAddress} from '../../src/parser'
-import {adr, extractRange, extractReference} from '../testUtils'
+import {adr, detailedError, extractRange, extractReference} from '../testUtils'
 
 describe("Ensure it is possible to move rows", () => {
   it('should return false when target makes no sense', () => {
@@ -217,7 +217,7 @@ describe("Move rows", () => {
 
     engine.moveRows(0, 3, 1, 1)
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.CYCLE))
   })
 })

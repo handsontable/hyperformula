@@ -1,7 +1,7 @@
-import {CellError, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Error literals', () => {
   it('Errors should be parsed and propagated', () => {
@@ -10,9 +10,9 @@ describe('Error literals', () => {
       ['=ISERROR(A1)', '=ISERROR(B1)', '=ISERROR(C1)', '=ISERROR(#DIV/0!)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A2'))).toEqual(true)
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
     expect(engine.getCellValue(adr('C2'))).toEqual(true)
@@ -24,6 +24,6 @@ describe('Error literals', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('#UNKNOWN!')
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NAME))
   })
 })

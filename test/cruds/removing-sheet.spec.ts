@@ -7,7 +7,7 @@ import {NoSheetWithNameError} from '../../src/HyperFormula'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr,
+  adr, detailedError,
   expect_array_with_same_content,
   expect_reference_to_have_ref_error,
   expectEngineToBeTheSameAs,
@@ -221,7 +221,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const changes = engine.removeSheet('Sheet2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 0, value: new CellError(ErrorType.REF) })
+    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 0, value: detailedError(ErrorType.REF) })
   })
 })
 

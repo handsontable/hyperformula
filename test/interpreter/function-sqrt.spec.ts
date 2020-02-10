@@ -1,6 +1,6 @@
-import {CellError, Config, HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SQRT', () => {
   it('should return error for negative numbers', () => {
@@ -8,7 +8,7 @@ describe('Function SQRT', () => {
       ['=SQRT(-2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('should return error for wrong number of arguments', () => {
@@ -17,8 +17,8 @@ describe('Function SQRT', () => {
       ['=SQRT(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should return error for arguments of wrong type', () => {
@@ -26,7 +26,7 @@ describe('Function SQRT', () => {
       ['=SQRT("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should work', () => {
