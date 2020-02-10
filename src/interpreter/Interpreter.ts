@@ -5,7 +5,7 @@ import {
   CellValueTypeOrd, EmptyValue,
   EmptyValueType,
   ErrorType, getCellValueType,
-  invalidSimpleCellAddress,
+  invalidSimpleCellAddress, NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
 import {DetailedCellError} from '../CellValue'
@@ -24,7 +24,7 @@ import {
   divide, equality, greater,
   greatereq,
   less,
-  lesseq, multiply, NoErrorCellValue,
+  lesseq, multiply,
   nonequality,
   percent,
   power,
@@ -275,6 +275,9 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        }
+        if (typeof result === 'boolean') {
+          return result
         }
         return unaryplus(coerceScalarToNumber(result, this.dateHelper))
       }

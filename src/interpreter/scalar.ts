@@ -1,7 +1,5 @@
-import {CellError, EmptyValue, EmptyValueType, ErrorType, InternalCellValue} from '../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
 import {coerceBooleanToNumber} from './coerce'
-
-export type NoErrorCellValue = number | string | boolean | EmptyValueType
 
 /**
  * Adds two numbers
