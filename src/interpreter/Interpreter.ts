@@ -373,7 +373,7 @@ export class Interpreter {
       const leftTmp = this.dateHelper.dateStringToDateNumber(left)
       const rightTmp = this.dateHelper.dateStringToDateNumber(right)
       if (leftTmp != null && rightTmp != null) {
-        return comparator(leftTmp, rightTmp, this.config.precisionEpsilon)
+          return comparator(leftTmp, rightTmp, this.config.precisionEpsilon)
       }
     } else if (typeof left === 'string' && typeof right === 'number') {
       const leftTmp = this.dateHelper.dateStringToDateNumber(left)
@@ -390,7 +390,11 @@ export class Interpreter {
     if (typeof left !== typeof right) {
       return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
     } else {
-      return comparator(left, right, this.config.precisionEpsilon)
+      if( !this.config.caseSensitive && typeof left === 'string' && typeof right === 'string' ) {
+        return comparator(left.toLowerCase(), right.toLowerCase(), this.config.precisionEpsilon)
+      } else {
+        return comparator(left, right, this.config.precisionEpsilon)
+      }
     }
   }
 }
