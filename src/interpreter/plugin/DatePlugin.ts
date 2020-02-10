@@ -72,7 +72,7 @@ export class DatePlugin extends FunctionPlugin {
     if (coercedDay instanceof CellError) {
       return coercedDay
     }
-    let d = Math.trunc(coercedDay)
+    const d = Math.trunc(coercedDay)
     let m = Math.trunc(coercedMonth)
     let y = Math.trunc(coercedYear)
     const delta = Math.floor( (m - 1) / 12 )

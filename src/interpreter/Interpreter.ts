@@ -2,13 +2,11 @@ import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  CellValueTypeOrd, EmptyValue,
-  EmptyValueType,
+  CellValueTypeOrd,
   ErrorType, getCellValueType,
   invalidSimpleCellAddress, NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
-import {DetailedCellError} from '../CellValue'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
@@ -368,8 +366,6 @@ export class Interpreter {
       })
     }
   }
-
-
 
   private compare(left: NoErrorCellValue, right: NoErrorCellValue,
                   comparator: (arg1: NoErrorCellValue, arg2: NoErrorCellValue, eps: number) => boolean): boolean {
