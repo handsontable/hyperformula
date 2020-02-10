@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
@@ -9,11 +9,11 @@ import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
 export interface IColumnSearchStrategy {
-  add(value: CellValue | Matrix, address: SimpleCellAddress): void
+  add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void
 
-  remove(value: CellValue | Matrix | null, address: SimpleCellAddress): void
+  remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress): void
 
-  change(oldValue: CellValue | Matrix | null, newValue: CellValue | Matrix, address: SimpleCellAddress): void
+  change(oldValue: InternalCellValue | Matrix | null, newValue: InternalCellValue | Matrix, address: SimpleCellAddress): void
 
   addColumns(columnsSpan: ColumnsSpan): void
 
@@ -21,9 +21,9 @@ export interface IColumnSearchStrategy {
 
   removeSheet(sheetId: number): void
 
-  moveValues(range: IterableIterator<[CellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void
+  moveValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void
 
-  removeValues(range: IterableIterator<[CellValue, SimpleCellAddress]>): void
+  removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void
 
   find(key: any, range: AbsoluteCellRange, sorted: boolean): number
 

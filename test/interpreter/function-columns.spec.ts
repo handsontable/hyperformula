@@ -1,14 +1,14 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function COLUMNS', () => {
   it('accepts exactly one argument', () => {
     const engine = HyperFormula.buildFromArray([['=COLUMNS()', '=COLUMNS(A1:B1, A2:B2)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('works for range', () => {
@@ -21,7 +21,7 @@ describe('Function COLUMNS', () => {
   it('doesnt work with scalars', () => {
     const engine = HyperFormula.buildFromArray([['=COLUMNS(A1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   // Inconsistency with Product 1
@@ -32,8 +32,8 @@ describe('Function COLUMNS', () => {
       ['=COLUMNS(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   // Inconsistency with Product 1
@@ -44,7 +44,7 @@ describe('Function COLUMNS', () => {
       ['=COLUMNS(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should work when adding column', () => {

@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from "../../src";
-import {adr, expectCloseTo} from "../testUtils";
-import {ErrorType} from "../../src/Cell";
+import {HyperFormula} from "../../src"
+import {ErrorType} from "../../src/Cell"
+import {adr, detailedError, expectCloseTo} from "../testUtils"
 
 describe('Function ERFC', () => {
   const precision = 0.0000003
@@ -11,8 +11,8 @@ describe('Function ERFC', () => {
         ['=ERFC(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should return error for arguments of wrong type', () => {
@@ -20,7 +20,7 @@ describe('Function ERFC', () => {
       ['=ERFC("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('should work', () => {

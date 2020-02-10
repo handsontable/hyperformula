@@ -1,9 +1,8 @@
-import {EmptyValue, HyperFormula} from '../../src'
-import {Config} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {Config, EmptyValue, HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 const configWithMatrixPlugin = new Config({functionPlugins: [MatrixPlugin]})
 
@@ -37,7 +36,7 @@ describe('Matrix plugin', () => {
       ['{=mmult(A1:B3,A4:C6)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue(adr('A7'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A7'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('B7'))).toEqual(EmptyValue)
   })
 
@@ -49,14 +48,14 @@ describe('Matrix plugin', () => {
       ['3', '4'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C3'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D4'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D4'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('nested matrix multiplication', () => {
@@ -209,7 +208,7 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE(4/0)}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('transpose returns VALUE when wrong type', () => {
@@ -217,6 +216,6 @@ describe('Function TRANSPOSE', () => {
       ['{=TRANSPOSE("fdsa")}'],
     ], configWithMatrixPlugin)
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

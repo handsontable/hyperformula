@@ -3,7 +3,7 @@ import {Config} from '../src'
 import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
 import './testConfig.ts'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 class FooPlugin extends FunctionPlugin {
   public static implementedFunctions = {

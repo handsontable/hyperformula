@@ -94,8 +94,7 @@ export function parseForDateFormat(str: string): FormatExpression | null {
       type: FormatExpressionType.DATE,
       tokens: createTokens(dateFormatTokens, str),
     }
-  }
-  else {
+  } else {
     return null
   }
 }
@@ -108,19 +107,18 @@ export function parseForNumberFormat(str: string): FormatExpression | null {
       type: FormatExpressionType.NUMBER,
       tokens: createTokens(numberFormatTokens, str),
     }
-  }
-  else {
+  } else {
     return null
   }
 }
 
 export function parse(str: string): FormatExpression {
   const asDate = parseForDateFormat(str)
-  if(asDate !== null) {
+  if (asDate !== null) {
     return asDate
   }
   const asNumber = parseForNumberFormat(str)
-  if(asNumber !== null) {
+  if (asNumber !== null) {
     return asNumber
   }
 

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function YEAR', () => {
   it('validate arguments', () => {
@@ -11,9 +11,9 @@ describe('Function YEAR', () => {
       ['=YEAR("foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('with numerical arguments', () => {
@@ -47,7 +47,7 @@ describe('Function YEAR', () => {
       ['=YEAR(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1
@@ -58,7 +58,7 @@ describe('Function YEAR', () => {
       ['=DATE(2017, 3, 31)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

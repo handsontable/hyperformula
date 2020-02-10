@@ -1,6 +1,6 @@
-import {CellError, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {CellValueType, ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2HEX', () => {
   it('should return error when wrong number of argument', () => {
@@ -8,7 +8,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX("foo", 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('should not work for non-binary arguments', () => {
@@ -18,9 +18,9 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   it('should work', () => {
@@ -74,7 +74,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(1010101010)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
   })
 
@@ -104,8 +104,8 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(-2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NUM))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
   })
 
   // Inconsistency with Product 1
@@ -115,6 +115,6 @@ describe('function BIN2HEX', () => {
       ['=2', '=BIN2HEX(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

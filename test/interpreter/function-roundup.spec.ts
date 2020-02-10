@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function ROUNDUP', () => {
   it('number of arguments', () => {
@@ -9,8 +9,8 @@ describe('Function ROUNDUP', () => {
       ['=ROUNDUP()', '=ROUNDUP(1, 2, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('works for positive numbers', () => {
@@ -63,9 +63,9 @@ describe('Function ROUNDUP', () => {
       ['=ROUNDUP(A1)', '=ROUNDUP(42, A1)', '=ROUNDUP(A1, FOO())'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   // Inconsistency with Product 1
@@ -75,7 +75,7 @@ describe('Function ROUNDUP', () => {
       ['=2', '=ROUNDUP(A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   // Inconsistency with Product 1
@@ -85,6 +85,6 @@ describe('Function ROUNDUP', () => {
       ['=2', '=ROUNDUP(42.234, A1:A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

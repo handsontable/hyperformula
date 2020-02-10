@@ -1,13 +1,12 @@
-import {CellValue, SimpleCellAddress} from './Cell'
-import {cellValueRounding} from './CellValueRounding'
-import {Config} from './Config'
+import {InternalCellValue, SimpleCellAddress} from './Cell'
+import {CellValueExporter} from './CellValue'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {
   sheet: number,
   row: number,
   col: number,
-  value: CellValue,
+  value: InternalCellValue,
 }
 
 export class ContentChanges {
@@ -15,6 +14,7 @@ export class ContentChanges {
   public static empty() {
     return new ContentChanges()
   }
+
   private changes: CellValueChange[] = []
 
   public addAll(other: ContentChanges): ContentChanges {
@@ -28,7 +28,7 @@ export class ContentChanges {
     }
   }
 
-  public addChange(newValue: CellValue, address: SimpleCellAddress): void {
+  public addChange(newValue: InternalCellValue, address: SimpleCellAddress): void {
     this.addSingleCellValue(newValue, address)
   }
 
@@ -36,14 +36,15 @@ export class ContentChanges {
     this.changes.push(...change)
   }
 
-  public getRoundedChanges(config: Config): CellValueChange[]
-  {
-    let ret: CellValueChange[] = []
-    for(let i in this.changes) {
-      ret[i] = {sheet: this.changes[i].sheet,
-                col: this.changes[i].col,
-                row: this.changes[i].row,
-                value: cellValueRounding( this.changes[i].value, config)}
+  public exportChanges(exporter: CellValueExporter): CellValueChange[] {
+    const ret: CellValueChange[] = []
+    for (const i in this.changes) {
+      ret[i] = {
+        sheet: this.changes[i].sheet,
+        col: this.changes[i].col,
+        row: this.changes[i].row,
+        value: exporter.export(this.changes[i].value),
+      }
     }
     return ret
   }
@@ -52,7 +53,7 @@ export class ContentChanges {
     return this.changes
   }
 
-  private addSingleCellValue(value: CellValue, address: SimpleCellAddress) {
+  private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
     this.add({
       sheet: address.sheet,
       col: address.col,

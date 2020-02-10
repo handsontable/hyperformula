@@ -1,9 +1,9 @@
-import {CellError, Config, HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
 import '../testConfig.ts'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
@@ -12,7 +12,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3)'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
     it('to many parameters', function() {
@@ -20,7 +20,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     })
 
     it('wrong type of first argument', function() {
@@ -28,7 +28,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
     it('wrong type of second argument', function() {
@@ -36,7 +36,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
     it('wrong type of third argument', function() {
@@ -44,7 +44,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
     it('wrong type of fourth argument', function() {
@@ -52,7 +52,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 2, "bar")'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     })
 
     it('should return error when index argument greater that range width', () => {
@@ -60,7 +60,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(1, A2:B3, 3)'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
     })
   })
 
@@ -162,7 +162,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
       ], {vlookupThreshold: 1})
 
-      expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
     })
 
     it('should return error when value not present using linear search', () => {
@@ -173,7 +173,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A1:B3, 2, FALSE())'],
       ])
 
-      expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.NA))
     })
 
     it('should find value if index build during evaluation', () => {
@@ -229,7 +229,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['{=TRANSPOSE(A2:C3)}'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+      expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
 
       engine.setCellContent(adr('C2'), '4')
 

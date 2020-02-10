@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -44,7 +44,7 @@ export class RoundingPlugin extends FunctionPlugin {
     },
   }
 
-  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public roundup(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -55,7 +55,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public rounddown(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -66,7 +66,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public round(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.commonArgumentsHandling2(ast, formulaAddress, (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -77,11 +77,11 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public trunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.rounddown(ast, formulaAddress)
   }
 
-  public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
@@ -91,7 +91,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public even(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
@@ -101,7 +101,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public odd(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
@@ -111,7 +111,7 @@ export class RoundingPlugin extends FunctionPlugin {
     })
   }
 
-  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public ceiling(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)
     }
@@ -152,7 +152,7 @@ export class RoundingPlugin extends FunctionPlugin {
     return Math.ceil(value / significance) * significance
   }
 
-  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): CellValue {
+  private commonArgumentsHandling2(ast: ProcedureAst, formulaAddress: SimpleCellAddress, roundingFunction: RoundingFunction): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     } else {

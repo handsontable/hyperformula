@@ -1,4 +1,4 @@
-import {CellValue, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, SimpleCellAddress} from '../Cell'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
 
@@ -7,7 +7,7 @@ import {Ast} from '../parser'
  */
 export class FormulaCellVertex {
   /** Most recently computed value of this formula. */
-  private cachedCellValue: CellValue | null
+  private cachedCellValue: InternalCellValue | null
 
   constructor(
     /** Formula in AST format */
@@ -55,14 +55,14 @@ export class FormulaCellVertex {
   /**
    * Sets computed cell value stored in this vertex
    */
-  public setCellValue(cellValue: CellValue) {
+  public setCellValue(cellValue: InternalCellValue) {
     this.cachedCellValue = cellValue
   }
 
   /**
    * Returns cell value stored in vertex
    */
-  public getCellValue(): CellValue {
+  public getCellValue(): InternalCellValue {
     if (this.cachedCellValue !== null) {
       return this.cachedCellValue
     } else {

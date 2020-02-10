@@ -83,10 +83,9 @@ export class CellContentParser {
         return new CellContent.Number(Number(trimmedContent))
       }
       const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content)
-      if(parsedDateNumber !== null) {
+      if (parsedDateNumber !== null) {
         return new CellContent.Number(parsedDateNumber)
-      }
-      else {
+      } else {
         return new CellContent.String(content)
       }
 

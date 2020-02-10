@@ -3,7 +3,7 @@ import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
-import {adr, expect_array_with_same_content, extractReference} from '../testUtils'
+import {adr, detailedError, expect_array_with_same_content, extractReference} from '../testUtils'
 
 describe('Copy - paste integration', () => {
   it('copy should return values', () => {
@@ -132,7 +132,7 @@ describe('Copy - paste integration', () => {
     engine.clipboardCopy(adr('B2'), 1, 1)
     engine.clipboardPaste(adr('A1'))
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
   })
 
   it('should create new range vertix', () => {

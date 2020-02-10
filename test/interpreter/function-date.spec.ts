@@ -1,7 +1,7 @@
 import {Config, HyperFormula} from '../../src'
 import {CellError, ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr, dateNumberToString} from '../testUtils'
+import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 describe('Function DATE', () => {
   it('with 3 numerical arguments', () => {
@@ -33,12 +33,12 @@ describe('Function DATE', () => {
       ['=DATE(-1900, 1, 1)', '=DATE(1901, -1, 2)', '=DATE(2000,-13,2)', '=DATE(1915, 10, -24)', '=DATE(1900, 1, -100000)', '=DATE(1900, 1, -200000)'],
     ])
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(dateNumberToString(engine.getCellValue(adr('B1')))).toEqual('11/02/1900')
     expect(dateNumberToString(engine.getCellValue(adr('C1')))).toEqual('11/02/1998')
     expect(dateNumberToString(engine.getCellValue(adr('D1')))).toEqual('09/06/1915')
-    expect(dateNumberToString(engine.getCellValue(adr('E1')))).toEqual(new CellError(ErrorType.VALUE))
-    expect(dateNumberToString(engine.getCellValue(adr('F1')))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('rollover', () => {
@@ -57,8 +57,8 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('with incoercible argument', () => {
@@ -68,9 +68,9 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1, "foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('with coercible argument', () => {
@@ -93,9 +93,9 @@ describe('Function DATE', () => {
       ['=DATE(2000, 1, FOOBAR())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NAME))
   })
 
   // Inconsistency with Product 1
@@ -106,9 +106,9 @@ describe('Function DATE', () => {
       ['3', '2002'],
     ])
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('D2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('E2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('D2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('E2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })
 

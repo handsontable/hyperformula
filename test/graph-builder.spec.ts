@@ -6,7 +6,7 @@ import {
   ValueCellVertex,
 } from '../src/DependencyGraph'
 import './testConfig.ts'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {

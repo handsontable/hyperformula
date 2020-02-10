@@ -5,7 +5,7 @@ import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 class SquarePlugin extends FunctionPlugin {
   public static implementedFunctions = {
@@ -21,7 +21,7 @@ class SquarePlugin extends FunctionPlugin {
 
     // If there was no argument, return NA error
     if (!arg) {
-      return new CellError(ErrorType.NA)
+      return detailedError(ErrorType.NA)
     }
 
     // Compute value of argument
@@ -35,7 +35,7 @@ class SquarePlugin extends FunctionPlugin {
       return (argValue * argValue)
     } else {
       // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
-      return new CellError(ErrorType.VALUE)
+      return detailedError(ErrorType.VALUE)
     }
   }
 }
@@ -53,8 +53,8 @@ describe('Documentation example spec', () => {
       ['=SQUARE(1/0)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

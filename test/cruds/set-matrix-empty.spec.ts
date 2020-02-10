@@ -1,6 +1,6 @@
 import {EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Set matrix empty', () => {
   it('should set matrix empty', () => {

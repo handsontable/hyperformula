@@ -23,7 +23,7 @@ export enum ErrorType {
 
 export const EmptyValue = Symbol()
 export type EmptyValueType = typeof EmptyValue
-export type CellValue = boolean | string | number | CellError | EmptyValueType
+export type InternalCellValue = boolean | string | number | CellError | EmptyValueType
 
 export enum CellType {
   FORMULA = 'FORMULA',
@@ -55,10 +55,8 @@ export enum CellValueType {
   ERROR = 'ERROR',
 }
 
-export const CellValueTypeOrd = (arg: CellValueType): number =>
-{
-  switch(arg)
-  {
+export const CellValueTypeOrd = (arg: CellValueType): number => {
+  switch (arg) {
     case CellValueType.EMPTY:
       return 0
     case CellValueType.NUMBER:
@@ -72,7 +70,7 @@ export const CellValueTypeOrd = (arg: CellValueType): number =>
   }
 }
 
-export const getCellValueType = (cellValue: CellValue): CellValueType => {
+export const getCellValueType = (cellValue: InternalCellValue): CellValueType => {
   if (cellValue === EmptyValue) {
     return CellValueType.EMPTY
   }
@@ -94,7 +92,10 @@ export const getCellValueType = (cellValue: CellValue): CellValueType => {
 }
 
 export class CellError {
-  constructor(public readonly type: ErrorType) {
+  constructor(
+    public readonly type: ErrorType,
+    public readonly message?: string,
+  ) {
   }
 }
 

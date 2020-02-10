@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function ISBLANK', () => {
   it('should return true for references to empty cells', () => {
@@ -31,8 +31,8 @@ describe('Function ISBLANK', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISBLANK(A3, A2)', '=ISBLANK()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('no error propagation', () => {
@@ -51,7 +51,7 @@ describe('Function ISBLANK', () => {
       [null],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('B2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

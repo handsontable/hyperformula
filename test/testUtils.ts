@@ -1,13 +1,14 @@
-import {Config, HyperFormula} from '../src'
+import {Config, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, CellValue, ErrorType, simpleCellAddress, SimpleCellAddress} from '../src/Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress, InternalCellValue} from '../src/Cell'
 import {DateHelper} from '../src/DateHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
-  buildLexerConfig, CellAddress,
+  buildLexerConfig,
+  CellAddress,
   cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
@@ -71,12 +72,18 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
   return simpleCellAddress(sheet, col, row)
 }
 
+export function detailedError(errorType: ErrorType, config?: Config): DetailedCellError {
+  config = config || new Config()
+  const error = new CellError(errorType)
+  return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
+}
+
 export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperFormula) => {
   const comparator = new EngineComparator(expected, actual)
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: CellValue, config = new Config()): string | CellError {
+export function dateNumberToString(dateNumber: InternalCellValue, config = new Config()): string | CellError {
   if(dateNumber instanceof CellError) {
     return dateNumber
   }
@@ -85,7 +92,7 @@ export function dateNumberToString(dateNumber: CellValue, config = new Config())
   return dateString ? dateString : ''
 }
 
-export function expectCloseTo(actual: CellValue, expected: number, precision: number = 0.000001) {
+export function expectCloseTo(actual: InternalCellValue, expected: number, precision: number = 0.000001) {
   if (typeof actual !== 'number') {
     expect(true).toBe(false)
   } else {

@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -16,15 +16,15 @@ export class BitShiftPlugin extends FunctionPlugin {
     },
   }
 
-  public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public bitlshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.bitshiftTemplate(ast, formulaAddress, shiftLeft)
   }
 
-  public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public bitrshift(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.bitshiftTemplate(ast, formulaAddress, shiftRight)
   }
 
-  private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): CellValue {
+  private bitshiftTemplate(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (value: number, positions: number) => number): InternalCellValue {
     const validationResult = this.validateTwoNumericArguments(ast, formulaAddress)
 
     if (validationResult instanceof CellError) {

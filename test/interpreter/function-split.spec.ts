@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SPLIT', () => {
   it('happy path', () => {
@@ -26,19 +26,19 @@ describe('Function SPLIT', () => {
   it('coerce first argument to string', () => {
     const engine = HyperFormula.buildFromArray([['42', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('when 2nd arg not a number', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, "foo")']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('when index arg is not value within bounds', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 17)', '=SPLIT(A1, -1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('C1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 })

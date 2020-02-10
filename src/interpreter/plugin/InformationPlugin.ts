@@ -1,5 +1,5 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, CellValue, EmptyValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -32,7 +32,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public iserror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     } else {
@@ -52,7 +52,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public isblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     }
@@ -72,7 +72,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
     }
@@ -84,7 +84,7 @@ export class InformationPlugin extends FunctionPlugin {
     }
   }
 
-  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public index(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     const rangeArg = ast.args[0]
     if (ast.args.length < 1 || ast.args.length > 3) {
       return new CellError(ErrorType.NA)

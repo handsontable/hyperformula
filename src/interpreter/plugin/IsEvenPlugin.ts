@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
@@ -11,7 +11,7 @@ export class IsEvenPlugin extends FunctionPlugin {
     },
   }
 
-  public iseven(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public iseven(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length != 1) {
       return new CellError(ErrorType.NA)
     } else {

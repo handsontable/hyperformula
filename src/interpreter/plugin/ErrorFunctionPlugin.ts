@@ -1,4 +1,4 @@
-import {CellError, CellValue, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -12,7 +12,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
     },
   }
 
-  public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length < 1 || ast.args.length > 2) {
       return new CellError(ErrorType.NA)
     }
@@ -33,7 +33,7 @@ export class ErrorFunctionPlugin extends FunctionPlugin {
     return erf(lowerBound)
   }
 
-  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): CellValue {
+  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (arg: number) => {
       return erfc(arg)
     })

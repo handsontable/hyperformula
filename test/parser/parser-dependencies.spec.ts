@@ -5,7 +5,7 @@ import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {

@@ -1,7 +1,7 @@
 import {Config, HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -10,8 +10,8 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(C1, ">0", C1, C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('error when 2nd arg is not a string',  () => {
@@ -19,7 +19,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(C1:C2, 78, B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -27,7 +27,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:B2, "><foo", C1:C2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -37,9 +37,9 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:D1, ">0", B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -49,9 +49,9 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:B2, ">0", C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when number of elements match but dimensions doesnt',  () => {
@@ -59,7 +59,7 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(B1:B2, ">0", B1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('scalars are treated like singular arrays', () => {
@@ -81,11 +81,11 @@ describe('Function SUMIF - argument validations and combinations', () => {
       ['=SUMIF(4/0, FOOBAR(), 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works when arguments are just references',  () => {
@@ -268,8 +268,8 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(C1, ">0", B1, B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('error when criterion arg is not a string or number',  () => {
@@ -278,8 +278,8 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(C1:C2, B1:B2, "=1", B1:B2, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when criterion unparsable',  () => {
@@ -288,8 +288,8 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:B2, C1:C2, "=1", C1:C2, "><foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different width dimension of arguments',  () => {
@@ -300,10 +300,10 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:D1, B2:D2, ">0", B2:E2, ">0")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('error when different height dimension of arguments',  () => {
@@ -314,10 +314,10 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(B1:B2, C1:C2, ">0", C1:C3, ">0")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.VALUE))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('scalars are treated like singular arrays', () => {
@@ -339,11 +339,11 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIFS(4/0, FOOBAR(), ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A4'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A5'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+    expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
   it('works when arguments are just references',  () => {
