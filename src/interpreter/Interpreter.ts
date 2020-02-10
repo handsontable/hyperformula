@@ -8,6 +8,7 @@ import {
   invalidSimpleCellAddress,
   SimpleCellAddress,
 } from '../Cell'
+import {DetailedCellError} from '../CellValue'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
@@ -23,7 +24,7 @@ import {
   divide, equality, greater,
   greatereq,
   less,
-  lesseq, multiply,
+  lesseq, multiply, NoErrorCellValue,
   nonequality,
   percent,
   power,
@@ -364,8 +365,11 @@ export class Interpreter {
       })
     }
   }
-  private compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
-                  comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean): boolean {
+
+
+
+  private compare(left: NoErrorCellValue, right: NoErrorCellValue,
+                  comparator: (arg1: NoErrorCellValue, arg2: NoErrorCellValue, eps: number) => boolean): boolean {
     if (typeof left === 'string' && typeof right === 'string') {
       const leftTmp = this.dateHelper.dateStringToDateNumber(left)
       const rightTmp = this.dateHelper.dateStringToDateNumber(right)
@@ -386,8 +390,6 @@ export class Interpreter {
 
     if (typeof left !== typeof right) {
       return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
-    } else if (left === EmptyValue || right === EmptyValue) {
-      return false
     } else {
       return comparator(left, right, this.config.precisionEpsilon)
     }

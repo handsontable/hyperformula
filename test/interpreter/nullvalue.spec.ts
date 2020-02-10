@@ -1,6 +1,6 @@
 import {CellError, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('BLANK tests', () => {
   it('BLANK should be supported by all comparison operators', () => {
@@ -18,11 +18,11 @@ describe('BLANK tests', () => {
     expect(engine.getCellValue(adr('I1'))).toEqual(0) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(0) // SUB
     expect(engine.getCellValue(adr('K1'))).toEqual(0) // MULT
-    expect(engine.getCellValue(adr('L1'))).toEqual(new CellError(ErrorType.DIV_BY_ZERO)) // DIV
-    expect(engine.getCellValue(adr('M1'))).toEqual(new CellError(ErrorType.NUM)) // EXP
-    expect(engine.getCellValue(adr('N1'))).toEqual(EmptyValue) // CONCAT
+    expect(engine.getCellValue(adr('L1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(1) // EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('') // CONCAT
     expect(engine.getCellValue(adr('O1'))).toEqual(0) // UNARY PLUS
-    expect(engine.getCellValue(adr('P1'))).toEqual(0) // UNARY MINUS
-    expect(engine.getCellValue(adr('R1'))).toEqual(0) // PERCENTAGE
+    expect(engine.getCellValue(adr('P1'))).toEqual(-0) // UNARY MINUS
+    expect(engine.getCellValue(adr('Q1'))).toEqual(0) // PERCENTAGE
   })
 })

@@ -1,5 +1,7 @@
-import {CellError, ErrorType, InternalCellValue} from '../Cell'
+import {CellError, EmptyValue, EmptyValueType, ErrorType, InternalCellValue} from '../Cell'
 import {coerceBooleanToNumber} from './coerce'
+
+export type NoErrorCellValue = number | string | boolean | EmptyValueType
 
 /**
  * Adds two numbers
@@ -244,8 +246,10 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function greater(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function greater(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return false
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left > right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left > right
@@ -258,8 +262,10 @@ export function greater(left: number | string | boolean, right: number | string 
   }
 }
 
-export function less(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function less(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return false
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left < right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left < right
@@ -272,8 +278,10 @@ export function less(left: number | string | boolean, right: number | string | b
   }
 }
 
-export function lesseq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function lesseq(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return true
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left <= right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left <= right
@@ -286,8 +294,10 @@ export function lesseq(left: number | string | boolean, right: number | string |
   }
 }
 
-export function greatereq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function greatereq(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return true
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left >= right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left >= right
@@ -300,8 +310,10 @@ export function greatereq(left: number | string | boolean, right: number | strin
   }
 }
 
-export function equality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function equality(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return true
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left === right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left === right
@@ -314,8 +326,10 @@ export function equality(left: number | string | boolean, right: number | string
   }
 }
 
-export function nonequality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
+export function nonequality(left: NoErrorCellValue, right: NoErrorCellValue, eps: number): boolean {
+  if (left === EmptyValue || right === EmptyValue) {
+    return false
+  } else if (typeof left === 'string' || typeof right === 'string') {
     return left !== right
   } else if (typeof left === 'boolean' || typeof right === 'boolean') {
     return left !== right
