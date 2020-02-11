@@ -41,6 +41,7 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
+  caseSensitive: boolean,
   chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
@@ -64,6 +65,7 @@ export interface ConfigParams {
 export class Config {
 
   public static defaultConfig: ConfigParams = {
+    caseSensitive: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
@@ -120,6 +122,7 @@ export class Config {
     CorrelPlugin,
   ]
 
+  public readonly caseSensitive: boolean
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
@@ -142,6 +145,7 @@ export class Config {
 
   constructor(
       {
+        caseSensitive,
         chooseAddressMappingPolicy,
         dateFormats,
         functionArgSeparator,
@@ -162,6 +166,7 @@ export class Config {
         nullDate,
       }: Partial<ConfigParams> = {},
   ) {
+    this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
