@@ -18,7 +18,7 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceScalarToNumber} from './coerce'
+import {coerceBooleanToNumber,  coerceToNumber} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
@@ -120,7 +120,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
+        return add(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.MINUS_OP: {
@@ -138,7 +138,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
+        return subtract(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.TIMES_OP: {
@@ -156,7 +156,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return multiply(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -173,7 +173,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return power(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -190,31 +190,33 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return divide(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
-        }
-        if (typeof result === 'boolean') {
+        } else if (typeof result === 'boolean') {
           return result
+        } else {
+          return unaryplus(coerceToNumber(result, this.dateHelper))
         }
-        return unaryplus(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        } else {
+          return unaryminus(coerceToNumber(result, this.dateHelper))
         }
-        return unaryminus(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        } else {
+          return percent(coerceToNumber(result, this.dateHelper))
         }
-        return percent(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
@@ -303,21 +305,12 @@ export class Interpreter {
       return new CellError(ErrorType.VALUE)
     }
 
-    if (typeof left === 'string' && typeof right === 'string') {
-      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
-      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
-      if (leftTmp != null && rightTmp != null) {
-          return cmpNumber(leftTmp, rightTmp, this.config.precisionEpsilon)
-      }
-    } else if (typeof left === 'string' && typeof right === 'number') {
-      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
-      if (leftTmp != null) {
-        return cmpNumber(leftTmp, right, this.config.precisionEpsilon)
-      }
-    } else if (typeof left === 'number' && typeof right === 'string') {
-      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
-      if (rightTmp != null) {
-        return cmpNumber(left, rightTmp, this.config.precisionEpsilon)
+    if (typeof left === 'string' || typeof right === 'string')
+    {
+      const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
+      const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
+      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+        return cmpNumber(leftTmp, rightTmp, this.config.precisionEpsilon)
       }
     }
 
@@ -328,7 +321,7 @@ export class Interpreter {
         return cmpString(left.toLowerCase(), right.toLowerCase())
       }
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
-      return cmpNumber(Number(left), Number(right), 0)
+      return cmpNumber(coerceBooleanToNumber(left), coerceBooleanToNumber(right), 0)
     } else if ( typeof left === 'number' && typeof right === 'number' ) {
       return cmpNumber(left, right, this.config.precisionEpsilon)
     } else if ( left === EmptyValue && right === EmptyValue ) {

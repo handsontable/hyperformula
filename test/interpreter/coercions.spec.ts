@@ -5,7 +5,7 @@ import {
   coerceBooleanToNumber,
   coerceNonDateScalarToMaybeNumber,
   coerceScalarToBoolean,
-  coerceScalarToNumber,
+  coerceToNumber,
   coerceScalarToString
 } from '../../src/interpreter/coerce'
 import '../testConfig'
@@ -22,7 +22,6 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(coerceNonDateScalarToMaybeNumber(true)).toBe(1)
     expect(coerceNonDateScalarToMaybeNumber(false)).toBe(0)
     expect(coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
-    expect(coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
@@ -34,8 +33,8 @@ describe('#coerceBooleanToNumber', () => {
 
   it('behaves the same as more general coercion', () => {
     const dateHelper = new DateHelper(new Config())
-    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumber(true, dateHelper))
-    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumber(false, dateHelper))
+    expect(coerceBooleanToNumber(true)).toBe(coerceToNumber(true, dateHelper))
+    expect(coerceBooleanToNumber(false)).toBe(coerceToNumber(false, dateHelper))
   })
 })
 
@@ -64,19 +63,19 @@ describe('#coerceScalarToBoolean', () => {
   })
 })
 
-describe('#coerceScalarToNumber', () => {
+describe('#coerceToNumber', () => {
   it('works', () => {
     const dateHelper = new DateHelper(new Config())
-    expect(coerceScalarToNumber(1, dateHelper)).toEqual(1)
+    expect(coerceToNumber(1, dateHelper)).toEqual(1)
 
-    expect(coerceScalarToNumber(new CellError(ErrorType.DIV_BY_ZERO), dateHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceToNumber(new CellError(ErrorType.DIV_BY_ZERO), dateHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(coerceScalarToNumber('12/31/1899', dateHelper)).toEqual(1)
-    expect(coerceScalarToNumber(true, dateHelper)).toEqual(1)
+    expect(coerceToNumber('12/31/1899', dateHelper)).toEqual(1)
+    expect(coerceToNumber(true, dateHelper)).toEqual(1)
 
-    expect(coerceScalarToNumber('foo42', dateHelper)).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceToNumber('foo42', dateHelper)).toEqual(new CellError(ErrorType.VALUE))
 
-    expect(coerceScalarToNumber('1', dateHelper)).toEqual(1)
+    expect(coerceToNumber('1', dateHelper)).toEqual(1)
   })
 
 })

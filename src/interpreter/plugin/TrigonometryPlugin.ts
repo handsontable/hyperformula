@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumber} from '../coerce'
+import {coerceToNumber} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -101,11 +101,11 @@ export class TrigonometryPlugin extends FunctionPlugin {
     if (arg2 instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedArg1 = coerceScalarToNumber(arg1, this.interpreter.dateHelper)
+    const coercedArg1 = coerceToNumber(arg1, this.interpreter.dateHelper)
     if (coercedArg1 instanceof CellError)  {
       return coercedArg1
     }
-    const coercedArg2 = coerceScalarToNumber(arg2, this.interpreter.dateHelper)
+    const coercedArg2 = coerceToNumber(arg2, this.interpreter.dateHelper)
     if (coercedArg2 instanceof CellError) {
       return coercedArg2
     }

@@ -1,4 +1,4 @@
-import {CellError, EmptyValue, ErrorType, InternalCellValue} from '../Cell'
+import {CellError, EmptyValue, EmptyValueType, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
 import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 
@@ -9,7 +9,19 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param config
  */
-export function coerceScalarToNumber(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
+export function coerceToNumber(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
+  if(arg instanceof CellError) {
+    return arg
+  }
+  const ret = coerceToMaybeNumber(arg, dateHelper)
+  if (ret != null) {
+    return ret
+  } else {
+    return new CellError(ErrorType.VALUE)
+  }
+}
+
+export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper): number | null {
   const ret = coerceNonDateScalarToMaybeNumber(arg)
   if (ret != null) {
     return ret
@@ -20,7 +32,19 @@ export function coerceScalarToNumber(arg: InternalCellValue, dateHelper: DateHel
       return parsedDateNumber
     }
   }
-  return new CellError(ErrorType.VALUE)
+  return null
+}
+
+export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): number | null {
+  if (arg === EmptyValue) {
+    return 0
+  }
+  const coercedNumber = Number(arg)
+  if (isNaN(coercedNumber)) {
+    return null
+  } else {
+    return coercedNumber
+  }
 }
 
 export function coerceToRange(arg: InterpreterValue): SimpleRangeValue {
@@ -45,20 +69,6 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
-export function coerceNonDateScalarToMaybeNumber(arg: InternalCellValue): number | CellError | null {
-  if (arg === EmptyValue) {
-    return 0
-  }
-  if (arg instanceof CellError) {
-    return arg
-  }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    return null
-  } else {
-    return coercedNumber
-  }
-}
 
 /**
  * Coerce scalar value to boolean if possible, or error if value is an error
