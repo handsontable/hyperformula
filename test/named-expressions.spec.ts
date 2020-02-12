@@ -72,14 +72,14 @@ describe("Named expressions", () => {
     expect(engine.setCellContent(adr('A1'), '43').length).toBe(1)
   })
 
-  xit('is possible to change named expression formula to other', () => {
-    // const engine = HyperFormula.buildFromArray([
-    //   ['42'],
-    // ])
-    // engine.addNamedExpression('myName', '=Sheet1!A1+10')
+  it('is possible to change named expression formula to other', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+    engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    // engine.setCellContent(namedExpressionAddress, '=Sheet1!A1+11')
+    engine.changeNamedExpressionFormula('myName', '=Sheet1!A1+11')
 
-    // expect(engine.getNamedExpressionValue('myName')).toEqual(53)
+    expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
 })

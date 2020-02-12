@@ -60,6 +60,17 @@ export class NamedExpressions {
     this.workbookNamedExpressions.delete(expressionName)
   }
 
+  public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
+    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)!
+    const address = this.buildAddress(namedExpressionRow)
+    const parsedCellContent = this.cellContentParser.parse(newFormulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error("This is not a formula")
+    }
+    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+  }
+
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
