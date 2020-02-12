@@ -17,7 +17,7 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceBooleanToNumber,  coerceToNumber} from './coerce'
+import {coerceBooleanToNumber,  coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
@@ -119,7 +119,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper),
+        return add(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.MINUS_OP: {
@@ -137,7 +137,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper),
+        return subtract(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.TIMES_OP: {
@@ -155,7 +155,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
+        return multiply(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -172,7 +172,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
+        return power(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -189,7 +189,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceToNumber(leftResult, this.dateHelper), coerceToNumber(rightResult, this.dateHelper))
+        return divide(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
@@ -198,7 +198,7 @@ export class Interpreter {
         } else if (typeof result === 'boolean') {
           return result
         } else {
-          return unaryplus(coerceToNumber(result, this.dateHelper))
+          return unaryplus(coerceScalarToNumberOrError(result, this.dateHelper))
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -206,7 +206,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return unaryminus(coerceToNumber(result, this.dateHelper))
+          return unaryminus(coerceScalarToNumberOrError(result, this.dateHelper))
         }
       }
       case AstNodeType.PERCENT_OP: {
@@ -214,7 +214,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return percent(coerceToNumber(result, this.dateHelper))
+          return percent(coerceScalarToNumberOrError(result, this.dateHelper))
         }
       }
       case AstNodeType.FUNCTION_CALL: {

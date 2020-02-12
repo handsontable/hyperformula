@@ -9,7 +9,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param config
  */
-export function coerceToNumber(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
+export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
   if(arg instanceof CellError) {
     return arg
   }

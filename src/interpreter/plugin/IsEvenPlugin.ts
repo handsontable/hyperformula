@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceToNumber} from '../coerce'
+import {coerceScalarToNumberOrError} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -20,7 +20,7 @@ export class IsEvenPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
 
-      const coercedValue = coerceToNumber(arg, this.interpreter.dateHelper)
+      const coercedValue = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
       if (coercedValue instanceof CellError) {
         return coercedValue
       } else {
