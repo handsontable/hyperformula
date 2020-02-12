@@ -73,7 +73,10 @@ export class NamedExpressions {
   }
 
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
-    const namedExpression = this.workbookNamedExpressions.get(expressionName)!
+    const namedExpression = this.workbookNamedExpressions.get(expressionName)
+    if (!namedExpression) {
+      throw new Error("Requested Named Expression does not exist")
+    }
     const address = this.buildAddress(namedExpression.row)
     const parsedCellContent = this.cellContentParser.parse(newFormulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
