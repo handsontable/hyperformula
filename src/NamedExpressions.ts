@@ -55,7 +55,7 @@ export class NamedExpressions {
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
-    const namedExpression = this.workbookNamedExpressions.get(expressionName)!
+    const namedExpression = this.workbookNamedExpressions.get(expressionName)
     if (namedExpression === undefined) {
       return null
     } else {
