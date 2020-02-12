@@ -43,7 +43,7 @@ describe("Named expressions", () => {
 
     expect(() => {
       engine.addNamedExpression('myName', '=Sheet1!A1+10')
-    }).toThrowError(`Named expression 'myName' is already present in the workbook`)
+    }).toThrowError(`Name of Named Expression 'myName' is already present in the workbook`)
   })
 
   it('named expressions is validated when added', () => {

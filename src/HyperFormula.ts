@@ -60,9 +60,9 @@ export class InvalidArgumentsError extends Error {
   }
 }
 
-export class NamedExpressionAlreadyTaken extends Error {
+export class NamedExpressionNameIsAlreadyTaken extends Error {
   constructor(expressionName: string) {
-    super(`Named expression '${expressionName}' is already present in the workbook`)
+    super(`Name of Named Expression '${expressionName}' is already present in the workbook`)
   }
 }
 
@@ -851,7 +851,7 @@ export class HyperFormula {
       throw new NamedExpressionNameIsInvalid(expressionName)
     }
     if (!this.namedExpressions.isNameAvailable(expressionName)) {
-      throw new NamedExpressionAlreadyTaken(expressionName)
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
     const namedExpressionAddress = this.namedExpressions.addNamedExpression(expressionName, formulaString)
     return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
