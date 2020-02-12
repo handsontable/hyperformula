@@ -834,9 +834,14 @@ export class HyperFormula {
    *
    * @param batchOperations
    */
-  public addNamedExpression(formulaString: string): [SimpleCellAddress, CellValueChange[]] {
-    const namedExpressionAddress = this.namedExpressions.addNamedExpression(formulaString)
-    return [namedExpressionAddress, this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)]
+  public addNamedExpression(expressionName: string, formulaString: string): CellValueChange[] {
+    const namedExpressionAddress = this.namedExpressions.addNamedExpression(expressionName, formulaString)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+  }
+
+  public getNamedExpressionValue(expressionName: string): CellValue {
+    const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    return this.cellValueExporter.export(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
   }
 
   /**

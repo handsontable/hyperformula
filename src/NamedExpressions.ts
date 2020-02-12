@@ -6,6 +6,7 @@ import {SimpleCellAddress} from './Cell'
 
 export class NamedExpressions {
   private nextExternalFormulaId: number = 0
+  private workbookNamedExpressions = new Map<string, number>()
 
   constructor(
     private readonly cellContentParser: CellContentParser,
@@ -14,15 +15,21 @@ export class NamedExpressions {
   ) {
   }
 
-  public addNamedExpression(formulaString: string): SimpleCellAddress {
+  public addNamedExpression(expressionName: string, formulaString: string): SimpleCellAddress {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
     }
-    const address = { sheet: -1, col: 0, row: this.nextExternalFormulaId }
+    const namedExpressionId = ++this.nextExternalFormulaId;
+    const address = { sheet: -1, col: 0, row: namedExpressionId }
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.nextExternalFormulaId++
+    this.workbookNamedExpressions.set(expressionName, namedExpressionId);
     return address
+  }
+
+  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress {
+    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)!
+    return { sheet: -1, col: 0, row: namedExpressionRow }
   }
 }
