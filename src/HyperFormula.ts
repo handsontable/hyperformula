@@ -66,6 +66,12 @@ export class NamedExpressionAlreadyTaken extends Error {
   }
 }
 
+export class NamedExpressionNameIsInvalid extends Error {
+  constructor(expressionName: string) {
+    super(`Name of Named Expression '${expressionName}' is invalid`)
+  }
+}
+
 export type Index = [number, number]
 
 /**
@@ -841,6 +847,9 @@ export class HyperFormula {
    * @param batchOperations
    */
   public addNamedExpression(expressionName: string, formulaString: string): CellValueChange[] {
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
     if (!this.namedExpressions.isNameAvailable(expressionName)) {
       throw new NamedExpressionAlreadyTaken(expressionName)
     }

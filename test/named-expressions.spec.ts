@@ -46,6 +46,14 @@ describe("Named expressions", () => {
     }).toThrowError(`Named expression 'myName' is already present in the workbook`)
   })
 
+  it('named expressions is validated when added', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.addNamedExpression('1definitelyIncorrectName', '=42')
+    }).toThrowError("Name of Named Expression '1definitelyIncorrectName' is invalid")
+  })
+
   xit('is possible to change named expression formula to other', () => {
     // const engine = HyperFormula.buildFromArray([
     //   ['42'],

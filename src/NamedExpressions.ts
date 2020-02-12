@@ -19,6 +19,10 @@ export class NamedExpressions {
     return !(this.workbookNamedExpressions.has(expressionName))
   }
 
+  public isNameValid(expressionName: string): boolean {
+    return !expressionName.match(/^\d/)
+  }
+
   public addNamedExpression(expressionName: string, formulaString: string): SimpleCellAddress {
     if (!this.isNameAvailable(expressionName)) {
       throw new Error("Name of Named Expression already taken")
