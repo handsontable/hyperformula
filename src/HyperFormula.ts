@@ -818,7 +818,7 @@ export class HyperFormula {
     if (!this.namedExpressions.isNameAvailable(expressionName)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    const namedExpressionAddress = this.namedExpressions.addNamedExpression(expressionName, formulaString)
+    this.namedExpressions.addNamedExpression(expressionName, formulaString)
     return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 

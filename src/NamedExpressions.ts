@@ -23,7 +23,10 @@ export class NamedExpressions {
     return !expressionName.match(/^\d/)
   }
 
-  public addNamedExpression(expressionName: string, formulaString: string): SimpleCellAddress {
+  public addNamedExpression(expressionName: string, formulaString: string): void {
+    if (!this.isNameValid(expressionName)) {
+      throw new Error("Name of Named Expression is invalid")
+    }
     if (!this.isNameAvailable(expressionName)) {
       throw new Error("Name of Named Expression already taken")
     }
@@ -36,7 +39,6 @@ export class NamedExpressions {
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     this.workbookNamedExpressions.set(expressionName, namedExpressionId);
-    return address
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress {
