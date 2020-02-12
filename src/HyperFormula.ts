@@ -822,9 +822,13 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
-  public getNamedExpressionValue(expressionName: string): CellValue {
+  public getNamedExpressionValue(expressionName: string): CellValue | null {
     const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    return this.cellValueExporter.export(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
+    if (internalNamedExpressionAddress === null) {
+      return null
+    } else {
+      return this.cellValueExporter.export(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
+    }
   }
 
   /**

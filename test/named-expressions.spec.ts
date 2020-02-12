@@ -54,6 +54,12 @@ describe("Named expressions", () => {
     }).toThrowError("Name of Named Expression '1definitelyIncorrectName' is invalid")
   })
 
+  it('retrieving non-existing named expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.getNamedExpressionValue('nonExistentNameExpression')).toBe(null)
+  })
+
   xit('is possible to change named expression formula to other', () => {
     // const engine = HyperFormula.buildFromArray([
     //   ['42'],

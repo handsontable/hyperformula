@@ -41,8 +41,12 @@ export class NamedExpressions {
     this.workbookNamedExpressions.set(expressionName, namedExpressionId);
   }
 
-  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress {
+  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
     const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)!
-    return { sheet: -1, col: 0, row: namedExpressionRow }
+    if (namedExpressionRow === undefined) {
+      return null
+    } else {
+      return { sheet: -1, col: 0, row: namedExpressionRow }
+    }
   }
 }
