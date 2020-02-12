@@ -12,10 +12,42 @@ class NamedExpression {
   }
 }
 
+class NamedExpressionsStore {
+  private readonly mapping = new Map<string, NamedExpression>()
+
+  public has(expressionName: string): boolean {
+    return this.mapping.has(this.normalizeExpressionName(expressionName))
+  }
+
+  public isNameAvailable(expressionName: string): boolean {
+    return !(this.mapping.has(this.normalizeExpressionName(expressionName)))
+  }
+  
+  public add(namedExpression: NamedExpression): void {
+    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression);
+  }
+
+  public get(expressionName: string): NamedExpression | undefined {
+    return this.mapping.get(this.normalizeExpressionName(expressionName))
+  }
+
+  public remove(expressionName: string): void {
+    this.mapping.delete(this.normalizeExpressionName(expressionName))
+  }
+
+  public getAllNamedExpressions(): NamedExpression[] {
+    return Array.from(this.mapping.values())
+  }
+
+  private normalizeExpressionName(expressionName: string): string {
+    return expressionName.toLowerCase()
+  }
+}
+
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
-  private workbookNamedExpressions = new Map<string, NamedExpression>()
+  private workbookStore = new NamedExpressionsStore()
 
   constructor(
     private readonly cellContentParser: CellContentParser,
@@ -25,11 +57,11 @@ export class NamedExpressions {
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {
-    return this.workbookNamedExpressions.has(this.normalizeExpressionName(expressionName))
+    return this.workbookStore.has(expressionName)
   }
 
   public isNameAvailable(expressionName: string): boolean {
-    return !(this.workbookNamedExpressions.has(this.normalizeExpressionName(expressionName)))
+    return this.workbookStore.isNameAvailable(expressionName)
   }
 
   public isNameValid(expressionName: string): boolean {
@@ -51,11 +83,11 @@ export class NamedExpressions {
     const address = this.buildAddress(namedExpression.row)
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.workbookNamedExpressions.set(this.normalizeExpressionName(namedExpression.name), namedExpression);
+    this.workbookStore.add(namedExpression)
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
-    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
+    const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       return null
     } else {
@@ -64,16 +96,16 @@ export class NamedExpressions {
   }
 
   public removeNamedExpression(expressionName: string): void {
-    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
+    const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       return
     }
     this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
-    this.workbookNamedExpressions.delete(this.normalizeExpressionName(expressionName))
+    this.workbookStore.remove(expressionName)
   }
 
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
-    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
+    const namedExpression = this.workbookStore.get(expressionName)
     if (!namedExpression) {
       throw new Error("Requested Named Expression does not exist")
     }
@@ -87,14 +119,10 @@ export class NamedExpressions {
   }
 
   public getAllNamedExpressionsNames(): string[] {
-    return Array.from(this.workbookNamedExpressions.values()).map((ne) => ne.name)
+    return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
   }
 
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
-  }
-
-  private normalizeExpressionName(expressionName: string): string {
-    return expressionName.toLowerCase()
   }
 }
