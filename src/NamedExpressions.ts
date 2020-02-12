@@ -15,6 +15,10 @@ export class NamedExpressions {
   ) {
   }
 
+  public isNameAvailable(expressionName: string): boolean {
+    return !(this.workbookNamedExpressions.has(expressionName))
+  }
+
   public addNamedExpression(expressionName: string, formulaString: string): SimpleCellAddress {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {

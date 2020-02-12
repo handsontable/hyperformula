@@ -37,6 +37,15 @@ describe("Named expressions", () => {
     expect(engine.getNamedExpressionValue('myName2')).toEqual(53)
   })
 
+  it('adding the same named expression twice is forbidden', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+
+    expect(() => {
+      engine.addNamedExpression('myName', '=Sheet1!A1+10')
+    }).toThrowError(`Named expression 'myName' is already present in the workbook`)
+  })
+
   xit('is possible to change named expression formula to other', () => {
     // const engine = HyperFormula.buildFromArray([
     //   ['42'],
