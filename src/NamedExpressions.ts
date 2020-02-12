@@ -2,7 +2,7 @@ import {AstNodeType, ParserWithCaching} from './parser'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {DependencyGraph} from './DependencyGraph'
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress, simpleCellAddress} from './Cell'
 
 export class NamedExpressions {
   private nextNamedExpressionRow: number = 0
@@ -34,11 +34,11 @@ export class NamedExpressions {
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
     }
-    const namedExpressionId = ++this.nextNamedExpressionRow;
-    const address = { sheet: -1, col: 0, row: namedExpressionId }
+    const namedExpressionRow = ++this.nextNamedExpressionRow;
+    const address = this.buildAddress(namedExpressionRow)
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.workbookNamedExpressions.set(expressionName, namedExpressionId);
+    this.workbookNamedExpressions.set(expressionName, namedExpressionRow);
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
@@ -46,7 +46,7 @@ export class NamedExpressions {
     if (namedExpressionRow === undefined) {
       return null
     } else {
-      return { sheet: -1, col: 0, row: namedExpressionRow }
+      return this.buildAddress(namedExpressionRow)
     }
   }
 
@@ -55,7 +55,11 @@ export class NamedExpressions {
     if (namedExpressionRow === undefined) {
       return
     }
-    this.dependencyGraph.setCellEmpty({ sheet: -1, col: 0, row: namedExpressionRow })
+    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpressionRow))
     this.workbookNamedExpressions.delete(expressionName)
+  }
+
+  private buildAddress(namedExpressionRow: number) {
+    return simpleCellAddress(-1, 0, namedExpressionRow)
   }
 }
