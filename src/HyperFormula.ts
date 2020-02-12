@@ -830,11 +830,11 @@ export class HyperFormula {
   }
 
   /**
-   * Calculate formula
+   * Add named expression
    *
    * @param batchOperations
    */
-  public calculateFormula(formulaString: string): [SimpleCellAddress, CellValueChange[]] {
+  public addNamedExpression(formulaString: string): [SimpleCellAddress, CellValueChange[]] {
     const namedExpressionAddress = this.namedExpressions.addNamedExpression(formulaString)
     return [namedExpressionAddress, this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)]
   }
