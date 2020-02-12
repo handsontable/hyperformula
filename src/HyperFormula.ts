@@ -34,6 +34,7 @@ import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import {NamedExpressions} from './NamedExpressions'
 
 export class NoSheetWithIdError extends Error {
   constructor(sheetId: number) {
@@ -120,7 +121,7 @@ export class HyperFormula {
 
   private readonly crudOperations: CrudOperations
   private readonly cellValueExporter: CellValueExporter
-  private nextExternalFormulaId: number = 0
+  private readonly namedExpressions: NamedExpressions
 
   constructor(
     /** Engine config */
@@ -142,6 +143,7 @@ export class HyperFormula {
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
+    this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
     this.addressMapping.autoAddSheet(-1, [])
     this.sheetMapping.addForeverSheetWithId(-1)
   }
@@ -833,15 +835,8 @@ export class HyperFormula {
    * @param batchOperations
    */
   public calculateFormula(formulaString: string): [SimpleCellAddress, CellValueChange[]] {
-    const parsedCellContent = this.cellContentParser.parse(formulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error("This is not a formula")
-    }
-    const address = { sheet: -1, col: 0, row: this.nextExternalFormulaId }
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.nextExternalFormulaId++
-    return [address, this.recomputeIfDependencyGraphNeedsIt().getRoundedChanges(this.config)]
+    const namedExpressionAddress = this.namedExpressions.addNamedExpression(formulaString)
+    return [namedExpressionAddress, this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)]
   }
 
   /**
