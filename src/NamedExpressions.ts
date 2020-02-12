@@ -20,6 +20,9 @@ export class NamedExpressions {
   }
 
   public addNamedExpression(expressionName: string, formulaString: string): SimpleCellAddress {
+    if (!this.isNameAvailable(expressionName)) {
+      throw new Error("Name of Named Expression already taken")
+    }
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
