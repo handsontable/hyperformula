@@ -831,6 +831,11 @@ export class HyperFormula {
     }
   }
 
+  public removeNamedExpression(expressionName: string): CellValueChange[] {
+    this.namedExpressions.removeNamedExpression(expressionName)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+  }
+
   /**
    * Normalizes formula
    *

@@ -49,4 +49,13 @@ export class NamedExpressions {
       return { sheet: -1, col: 0, row: namedExpressionRow }
     }
   }
+
+  public removeNamedExpression(expressionName: string): void {
+    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)
+    if (namedExpressionRow === undefined) {
+      return
+    }
+    this.dependencyGraph.setCellEmpty({ sheet: -1, col: 0, row: namedExpressionRow })
+    this.workbookNamedExpressions.delete(expressionName)
+  }
 }

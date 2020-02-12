@@ -60,6 +60,18 @@ describe("Named expressions", () => {
     expect(engine.getNamedExpressionValue('nonExistentNameExpression')).toBe(null)
   })
 
+  it('removing named expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+    engine.addNamedExpression('myName', '=Sheet1!A1')
+
+    engine.removeNamedExpression('myName')
+
+    expect(engine.getNamedExpressionValue('myName')).toBe(null)
+    expect(engine.setCellContent(adr('A1'), '43').length).toBe(1)
+  })
+
   xit('is possible to change named expression formula to other', () => {
     // const engine = HyperFormula.buildFromArray([
     //   ['42'],
