@@ -1,4 +1,4 @@
-import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
+import {CellError, ErrorType, InternalCellValue} from '../Cell'
 import {coerceBooleanToNumber} from './coerce'
 
 /**

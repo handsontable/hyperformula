@@ -1,4 +1,4 @@
-import {CellError, EmptyValue, EmptyValueType, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
+import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
 import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 

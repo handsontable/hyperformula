@@ -7,7 +7,6 @@ import {
   ErrorType,
   getCellValueType,
   invalidSimpleCellAddress,
-  NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
 import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
