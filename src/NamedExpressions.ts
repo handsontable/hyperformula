@@ -4,10 +4,18 @@ import {CellContent, CellContentParser} from './CellContentParser'
 import {DependencyGraph} from './DependencyGraph'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 
+class NamedExpression {
+  constructor(
+    public readonly name: string,
+    public readonly row: number
+  ) {
+  }
+}
+
 export class NamedExpressions {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
-  private workbookNamedExpressions = new Map<string, number>()
+  private workbookNamedExpressions = new Map<string, NamedExpression>()
 
   constructor(
     private readonly cellContentParser: CellContentParser,
@@ -39,34 +47,34 @@ export class NamedExpressions {
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
     }
-    const namedExpressionRow = ++this.nextNamedExpressionRow;
-    const address = this.buildAddress(namedExpressionRow)
+    const namedExpression = new NamedExpression(expressionName, ++this.nextNamedExpressionRow)
+    const address = this.buildAddress(namedExpression.row)
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.workbookNamedExpressions.set(expressionName, namedExpressionRow);
+    this.workbookNamedExpressions.set(namedExpression.name, namedExpression);
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
-    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)!
-    if (namedExpressionRow === undefined) {
+    const namedExpression = this.workbookNamedExpressions.get(expressionName)!
+    if (namedExpression === undefined) {
       return null
     } else {
-      return this.buildAddress(namedExpressionRow)
+      return this.buildAddress(namedExpression.row)
     }
   }
 
   public removeNamedExpression(expressionName: string): void {
-    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)
-    if (namedExpressionRow === undefined) {
+    const namedExpression = this.workbookNamedExpressions.get(expressionName)
+    if (namedExpression === undefined) {
       return
     }
-    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpressionRow))
+    this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
     this.workbookNamedExpressions.delete(expressionName)
   }
 
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
-    const namedExpressionRow = this.workbookNamedExpressions.get(expressionName)!
-    const address = this.buildAddress(namedExpressionRow)
+    const namedExpression = this.workbookNamedExpressions.get(expressionName)!
+    const address = this.buildAddress(namedExpression.row)
     const parsedCellContent = this.cellContentParser.parse(newFormulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
