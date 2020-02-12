@@ -3,7 +3,7 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
-import {NoSheetWithNameError} from '../../src/HyperFormula'
+import {NoSheetWithNameError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {

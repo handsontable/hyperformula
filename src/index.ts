@@ -2,7 +2,13 @@ import { CellError, EmptyValue } from './Cell'
 import { CellValue, DetailedCellError } from './CellValue'
 import {Config} from './Config'
 import {Sheets} from './GraphBuilder'
-import {HyperFormula, InvalidAddressError, NoSheetWithIdError} from './HyperFormula'
+import {HyperFormula} from './HyperFormula'
+import {
+  NoSheetWithIdError,
+  InvalidAddressError,
+  InvalidArgumentsError,
+  NoSheetWithNameError,
+} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 class HyperFormulaNS extends HyperFormula {
@@ -23,6 +29,8 @@ export {
   HyperFormula,
   NoSheetWithIdError,
   InvalidAddressError,
+  InvalidArgumentsError,
+  NoSheetWithNameError,
   CellValue,
   EmptyValue,
   CellError,
