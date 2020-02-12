@@ -35,3 +35,9 @@ export class NamedExpressionNameIsInvalid extends Error {
     super(`Name of Named Expression '${expressionName}' is invalid`)
   }
 }
+
+export class NamedExpressionDoesNotExist extends Error {
+  constructor(expressionName: string) {
+    super(`Named Expression '${expressionName}' does not exist`)
+  }
+}

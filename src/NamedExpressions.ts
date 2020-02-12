@@ -16,6 +16,10 @@ export class NamedExpressions {
   ) {
   }
 
+  public doesNamedExpressionExist(expressionName: string): boolean {
+    return this.workbookNamedExpressions.has(expressionName)
+  }
+
   public isNameAvailable(expressionName: string): boolean {
     return !(this.workbookNamedExpressions.has(expressionName))
   }

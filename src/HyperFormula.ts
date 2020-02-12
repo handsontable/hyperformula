@@ -36,7 +36,7 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {NamedExpressions} from './NamedExpressions'
-import {NoSheetWithIdError, NoSheetWithNameError, InvalidAddressError, InvalidArgumentsError, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
+import {NoSheetWithIdError, NoSheetWithNameError, InvalidAddressError, InvalidArgumentsError, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NamedExpressionDoesNotExist} from './errors'
 
 export type Index = [number, number]
 
@@ -833,6 +833,9 @@ export class HyperFormula {
   }
 
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): CellValueChange[] {
+    if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
     this.namedExpressions.changeNamedExpressionFormula(expressionName, newFormulaString)
     return this.recomputeIfDependencyGraphNeedsIt()
   }

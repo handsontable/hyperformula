@@ -82,4 +82,12 @@ describe("Named expressions", () => {
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
+
+  it('changing not existing named expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.changeNamedExpressionFormula('myName', '=42')
+    }).toThrowError("Named Expression 'myName' does not exist")
+  })
 })
