@@ -25,6 +25,7 @@ import {
   MatrixVertex,
   RangeMapping,
   SheetMapping,
+  SparseStrategy,
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
@@ -121,7 +122,7 @@ export class HyperFormula {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
     this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
-    this.addressMapping.autoAddSheet(-1, [])
+    this.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
     this.sheetMapping.addForeverSheetWithId(-1)
   }
 
