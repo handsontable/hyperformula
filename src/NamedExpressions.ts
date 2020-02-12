@@ -5,7 +5,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {SimpleCellAddress} from './Cell'
 
 export class NamedExpressions {
-  private nextExternalFormulaId: number = 0
+  private nextNamedExpressionRow: number = 0
   private workbookNamedExpressions = new Map<string, number>()
 
   constructor(
@@ -34,7 +34,7 @@ export class NamedExpressions {
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       throw new Error("This is not a formula")
     }
-    const namedExpressionId = ++this.nextExternalFormulaId;
+    const namedExpressionId = ++this.nextNamedExpressionRow;
     const address = { sheet: -1, col: 0, row: namedExpressionId }
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
