@@ -2,9 +2,10 @@ import GPU from 'gpu.js'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {
   CellError,
-  CellValueTypeOrd, EmptyValue,
-  EmptyValueType,
-  ErrorType, getCellValueType,
+  CellValueTypeOrd,
+  EmptyValue,
+  ErrorType,
+  getCellValueType, InternalCellValue,
   invalidSimpleCellAddress,
   SimpleCellAddress,
 } from '../Cell'
@@ -16,17 +17,15 @@ import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceScalarToNumber} from './coerce'
+import {coerceBooleanToNumber,  coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
-  divide, equality, greater,
-  greatereq,
-  less,
-  lesseq, multiply,
-  nonequality,
+  divide,
+  floatCmp,
+  multiply, numberCmp,
   percent,
-  power,
+  power, strCmp,
   subtract,
   unaryminus,
   unaryplus,
@@ -74,113 +73,38 @@ export class Interpreter {
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-
-        return this.compare( leftResult, rightResult, equality)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) === 0 : err
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-
-        return this.compare( leftResult, rightResult, nonequality)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) !== 0 : err
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-
-        return this.compare( leftResult, rightResult, greater)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) > 0: err
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return this.compare( leftResult, rightResult, less)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) < 0: err
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return this.compare( leftResult, rightResult, greatereq)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) >= 0: err
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-
-        if (leftResult instanceof CellError) {
-          return leftResult
-        }
-        if (leftResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        if (rightResult instanceof CellError) {
-          return rightResult
-        }
-        if (rightResult instanceof SimpleRangeValue) {
-          return new CellError(ErrorType.VALUE)
-        }
-        return this.compare( leftResult, rightResult, lesseq)
+        const err = this.passErrors(leftResult, rightResult)
+        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) <= 0: err
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -198,7 +122,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
+        return add(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.MINUS_OP: {
@@ -216,7 +140,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper),
+        return subtract(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
           this.config.precisionEpsilon)
       }
       case AstNodeType.TIMES_OP: {
@@ -234,7 +158,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return multiply(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -251,7 +175,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return power(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -268,28 +192,33 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceScalarToNumber(leftResult, this.dateHelper), coerceScalarToNumber(rightResult, this.dateHelper))
+        return divide(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        } else if (typeof result === 'boolean') {
+          return result
+        } else {
+          return unaryplus(coerceScalarToNumberOrError(result, this.dateHelper))
         }
-        return unaryplus(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        } else {
+          return unaryminus(coerceScalarToNumberOrError(result, this.dateHelper))
         }
-        return unaryminus(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
+        } else {
+          return percent(coerceScalarToNumberOrError(result, this.dateHelper))
         }
-        return percent(coerceScalarToNumber(result, this.dateHelper))
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
@@ -364,32 +293,45 @@ export class Interpreter {
       })
     }
   }
-  private compare(left: string | number | boolean | EmptyValueType, right: string | number | boolean | EmptyValueType,
-                  comparator: (arg1: number | string | boolean, arg2: number | string | boolean, eps: number) => boolean): boolean {
-    if (typeof left === 'string' && typeof right === 'string') {
-      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
-      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
-      if (leftTmp != null && rightTmp != null) {
-        return comparator(leftTmp, rightTmp, this.config.precisionEpsilon)
-      }
-    } else if (typeof left === 'string' && typeof right === 'number') {
-      const leftTmp = this.dateHelper.dateStringToDateNumber(left)
-      if (leftTmp != null) {
-        return comparator(leftTmp, right, this.config.precisionEpsilon)
-      }
-    } else if (typeof left === 'number' && typeof right === 'string') {
-      const rightTmp = this.dateHelper.dateStringToDateNumber(right)
-      if (rightTmp != null) {
-        return comparator(left, rightTmp, this.config.precisionEpsilon)
+
+  private passErrors(left: InterpreterValue, right: InterpreterValue): CellError | null {
+    if (left instanceof CellError) {
+      return left
+    } else if (left instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else if (right instanceof CellError) {
+      return right
+    } else if (right instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    } else {
+      return null
+    }
+  }
+  private compare(left: InternalCellValue, right: InternalCellValue): number {
+
+    if (typeof left === 'string' || typeof right === 'string')
+    {
+      const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
+      const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
+      if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
+        return floatCmp(leftTmp, rightTmp, this.config.precisionEpsilon)
       }
     }
 
-    if (typeof left !== typeof right) {
-      return comparator(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)), 0)
-    } else if (left === EmptyValue || right === EmptyValue) {
-      return false
+    if ( typeof left === 'string' && typeof right === 'string') {
+      if ( this.config.caseSensitive) {
+        return strCmp(left, right)
+      } else {
+        return strCmp(left.toLowerCase(), right.toLowerCase())
+      }
+    } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
+      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
+    } else if ( typeof left === 'number' && typeof right === 'number' ) {
+      return floatCmp(left, right, this.config.precisionEpsilon)
+    } else if ( left === EmptyValue && right === EmptyValue ) {
+      return 0
     } else {
-      return comparator(left, right, this.config.precisionEpsilon)
+      return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
     }
   }
 }

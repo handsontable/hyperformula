@@ -73,4 +73,3 @@ function erf2(lowerBound: number, upperBound: number): number {
 function erfc(x: number): number {
   return 1 - erf(x)
 }
-

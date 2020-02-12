@@ -244,86 +244,45 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function greater(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left > right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left > right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left > mod * right
+
+export function equalString(left: string, right: string): boolean
+{
+  return left.localeCompare(right) === 0
+}
+
+export function strCmp(left: string, right: string): number
+{
+  if(left > right) {
+    return 1
+  } else if(left < right){
+    return -1
   } else {
-    const mod = (1 + eps)
-    return left * mod > right
+    return 0
   }
 }
 
-export function less(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left < right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left < right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left * mod < right
+export function floatCmp(left: number, right: number, eps: number): number
+{
+  const mod = (1 + eps)
+  if ( (right >= 0) && (left * mod >= right) && (left <= right * mod) ) {
+    return 0
+  } else if ( (right <= 0) && (left * mod <= right) && (left >= right * mod) ) {
+    return 0
+  }
+  else if ( left > right ) {
+    return 1
   } else {
-    const mod = (1 + eps)
-    return left < mod * right
+    return -1
   }
 }
 
-export function lesseq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left <= right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left <= right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left <= mod * right
+export function numberCmp(left: number, right: number): number
+{
+  if(left > right) {
+    return 1
+  } else if(left < right){
+    return -1
   } else {
-    const mod = (1 + eps)
-    return left * mod <= right
-  }
-}
-
-export function greatereq(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left >= right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left >= right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left * mod >= right
-  } else {
-    const mod = (1 + eps)
-    return left >= mod * right
-  }
-}
-
-export function equality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left === right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left === right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left * mod >= right && left <= right * mod
-  } else {
-    const mod = (1 + eps)
-    return left * mod <= right && left >= right * mod
-  }
-}
-
-export function nonequality(left: number | string | boolean, right: number | string | boolean, eps: number): boolean {
-  if (typeof left === 'string' || typeof right === 'string') {
-    return left !== right
-  } else if (typeof left === 'boolean' || typeof right === 'boolean') {
-    return left !== right
-  } else if (right >= 0) {
-    const mod = (1 + eps)
-    return left * mod < right || left > right * mod
-  } else {
-    const mod = (1 + eps)
-    return left * mod > right || left < right * mod
+    return 0
   }
 }

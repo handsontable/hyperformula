@@ -255,12 +255,13 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }, (arg): AverageResult | CellError => {
       if (arg === EmptyValue) {
         return AverageResult.empty
-      } else {
+      } else if(arg instanceof CellError) {
+        return arg
+      }
+        else {
         const coercedArg = coerceNonDateScalarToMaybeNumber(arg)
         if (coercedArg === null) {
           return AverageResult.empty
-        } else if (coercedArg instanceof CellError) {
-          return coercedArg
         } else {
           return AverageResult.single(coercedArg)
         }

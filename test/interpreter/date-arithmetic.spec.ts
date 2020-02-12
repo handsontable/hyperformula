@@ -1,6 +1,6 @@
 import {Config, HyperFormula} from '../../src'
 import '../testConfig'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Date arithmetic', () => {
   it('subtract two dates', () => {
