@@ -845,6 +845,10 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public listNamedExpressions(): string[] {
+    return this.namedExpressions.getAllNamedExpressionsNames()
+  }
+
   /**
    * Normalizes formula
    *

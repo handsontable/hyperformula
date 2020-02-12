@@ -90,4 +90,17 @@ describe("Named expressions", () => {
       engine.changeNamedExpressionFormula('myName', '=42')
     }).toThrowError("Named Expression 'myName' does not exist")
   })
+
+  it('listing named expressions', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addNamedExpression('myName1', '=42')
+    engine.addNamedExpression('myName2', '=42')
+
+    const namedExpressions = engine.listNamedExpressions()
+
+    expect(namedExpressions).toEqual([
+      'myName1',
+      'myName2',
+    ])
+  })
 })

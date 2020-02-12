@@ -75,6 +75,10 @@ export class NamedExpressions {
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
+  public getAllNamedExpressionsNames(): string[] {
+    return Array.from(this.workbookNamedExpressions.keys())
+  }
+
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
