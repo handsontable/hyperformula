@@ -103,4 +103,18 @@ describe("Named expressions", () => {
       'myName2',
     ])
   })
+
+  it('adding named expressions is case insensitive', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('myName', '=42')
+
+    expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
+    expect(() => {
+      engine.changeNamedExpressionFormula('MYname', '=43')
+    }).not.toThrow()
+    expect(() => {
+      engine.removeNamedExpression('MYname')
+    }).not.toThrow()
+  })
 })

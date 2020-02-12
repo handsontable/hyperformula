@@ -25,11 +25,11 @@ export class NamedExpressions {
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {
-    return this.workbookNamedExpressions.has(expressionName)
+    return this.workbookNamedExpressions.has(this.normalizeExpressionName(expressionName))
   }
 
   public isNameAvailable(expressionName: string): boolean {
-    return !(this.workbookNamedExpressions.has(expressionName))
+    return !(this.workbookNamedExpressions.has(this.normalizeExpressionName(expressionName)))
   }
 
   public isNameValid(expressionName: string): boolean {
@@ -51,11 +51,11 @@ export class NamedExpressions {
     const address = this.buildAddress(namedExpression.row)
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-    this.workbookNamedExpressions.set(namedExpression.name, namedExpression);
+    this.workbookNamedExpressions.set(this.normalizeExpressionName(namedExpression.name), namedExpression);
   }
 
   public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
-    const namedExpression = this.workbookNamedExpressions.get(expressionName)
+    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
     if (namedExpression === undefined) {
       return null
     } else {
@@ -64,16 +64,16 @@ export class NamedExpressions {
   }
 
   public removeNamedExpression(expressionName: string): void {
-    const namedExpression = this.workbookNamedExpressions.get(expressionName)
+    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
     if (namedExpression === undefined) {
       return
     }
     this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
-    this.workbookNamedExpressions.delete(expressionName)
+    this.workbookNamedExpressions.delete(this.normalizeExpressionName(expressionName))
   }
 
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
-    const namedExpression = this.workbookNamedExpressions.get(expressionName)
+    const namedExpression = this.workbookNamedExpressions.get(this.normalizeExpressionName(expressionName))
     if (!namedExpression) {
       throw new Error("Requested Named Expression does not exist")
     }
@@ -87,10 +87,14 @@ export class NamedExpressions {
   }
 
   public getAllNamedExpressionsNames(): string[] {
-    return Array.from(this.workbookNamedExpressions.keys())
+    return Array.from(this.workbookNamedExpressions.values()).map((ne) => ne.name)
   }
 
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
+  }
+
+  private normalizeExpressionName(expressionName: string): string {
+    return expressionName.toLowerCase()
   }
 }
