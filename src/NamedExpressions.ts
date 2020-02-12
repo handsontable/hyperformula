@@ -5,6 +5,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 
 export class NamedExpressions {
+  public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
   private workbookNamedExpressions = new Map<string, number>()
 
@@ -60,6 +61,6 @@ export class NamedExpressions {
   }
 
   private buildAddress(namedExpressionRow: number) {
-    return simpleCellAddress(-1, 0, namedExpressionRow)
+    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
 }
