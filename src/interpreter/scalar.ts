@@ -244,89 +244,45 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function greaterString(left: string, right: string): boolean {
-  return left > right
-}
-
-export function greaterEqString(left: string, right: string): boolean {
-  return left >= right
-}
-
-export function lessString(left: string, right: string): boolean {
-  return left < right
-}
-
-export function lessEqString(left: string, right: string): boolean {
-  return left <= right
-}
 
 export function equalString(left: string, right: string): boolean
 {
-  return left === right
+  return left.localeCompare(right) === 0
 }
 
-export function notequalString(left: string, right: string): boolean
+export function strCmp(left: string, right: string): number
 {
-  return left !== right
-}
-
-export function greaterNumbers(left: number, right: number, eps: number): boolean
-{
-  const mod = (1 + eps)
-  if (right >= 0) {
-    return left > mod * right
+  if(left > right) {
+    return 1
+  } else if(left < right){
+    return -1
   } else {
-    return left * mod > right
+    return 0
   }
 }
 
-export function greaterEqNumbers(left: number, right: number, eps: number): boolean
+export function floatCmp(left: number, right: number, eps: number): number
 {
   const mod = (1 + eps)
-  if (right >= 0) {
-    return left * mod >= right
+  if ( (right >= 0) && (left * mod >= right) && (left <= right * mod) ) {
+    return 0
+  } else if ( (right <= 0) && (left * mod <= right) && (left >= right * mod) ) {
+    return 0
+  }
+  else if ( left > right ) {
+    return 1
   } else {
-    return left >= mod * right
+    return -1
   }
 }
 
-export function lessNumbers(left: number, right: number, eps: number): boolean
+export function numberCmp(left: number, right: number): number
 {
-  const mod = (1 + eps)
-  if (right >= 0) {
-  return left * mod < right
+  if(left > right) {
+    return 1
+  } else if(left < right){
+    return -1
   } else {
-    return left < mod * right
-  }
-}
-
-
-export function lessEqNumbers(left: number, right: number, eps: number): boolean
-{
-  const mod = (1 + eps)
-  if (right >= 0) {
-    return left <= mod * right
-  } else {
-    return left * mod <= right
-  }
-}
-
-export function equalNumbers(left: number, right: number, eps: number): boolean
-{
-  const mod = (1 + eps)
-  if (right >= 0) {
-    return left * mod >= right && left <= right * mod
-  } else {
-    return left * mod <= right && left >= right * mod
-  }
-}
-
-export function notequalNumbers(left: number, right: number, eps: number): boolean
-{
-  const mod = (1 + eps)
-  if (right >= 0) {
-    return left * mod < right || left > right * mod
-  } else {
-    return left * mod > right || left < right * mod
+    return 0
   }
 }
