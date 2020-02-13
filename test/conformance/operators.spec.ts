@@ -38,7 +38,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('J1')).toEqual(0); // SUB
         expect(engine.getCellValue('K1')).toEqual(0); // MULT
         expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!'));
-        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //EXP
+        //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //EXP 1
         expect(engine.getCellValue('N1')).toEqual(""); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(0); // UNARY PLUS
         //expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS -0 in E and GS
@@ -62,8 +62,8 @@ describe('Quality assurance of operators', () => {
         //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')); // DIV   value, in GS div
         //expect(engine.getCellValue('M1')).toEqual(1); // EXP  value
         expect(engine.getCellValue('N1')).toEqual('true'); // CONCAT    
-        //expect(engine.getCellValue('O1')).toEqual(0); // UNARY PLUS   value
-        //expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS  value
+        //expect(engine.getCellValue('O1')).toEqual(true); // UNARY PLUS   value
+        //expect(engine.getCellValue('P1')).toEqual(-1); // UNARY MINUS  value
         //expect(engine.getCellValue('Q1')).toEqual(0.01); // PERCENTAGE  value
     });
 
@@ -79,6 +79,19 @@ describe('Quality assurance of operators', () => {
         //expect(engine.getCellValue('J1')).toEqual(-1); // SUB  value
         //expect(engine.getCellValue('L1')).toEqual(0); // DIV   value
         //expect(engine.getCellValue('M1')).toEqual(0); // EXP  value
+    });
+
+    xit('BLANK and FALSE should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            [null, 'false', ...data]
+        ]);
+
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        //expect(engine.getCellValue('E1')).toEqual(false); // LT   true
+        //expect(engine.getCellValue('F1')).toEqual(true); // GTE  //false 
+        //expect(engine.getCellValue('G1')).toEqual(true); // LTE  //false
+        //expect(engine.getCellValue('J1')).toEqual(0); // SUB  value
+        //expect(engine.getCellValue('M1')).toEqual(1); // EXP  value
     });
 
     it('TRUE and TRUE should be supported by all comparison operators', () => {
