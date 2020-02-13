@@ -1,6 +1,7 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {TranslationPackage} from '../i18n'
+import {numberRegex} from './IntegerParsing'
 import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
@@ -91,7 +92,7 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
 /* terminals */
-export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
+export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: numberRegex})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})

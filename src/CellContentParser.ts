@@ -1,6 +1,7 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
+import {IsNumberRegex} from './parser/IntegerParsing'
 
 export type RawCellContent = string | null | undefined
 
@@ -79,7 +80,7 @@ export class CellContentParser {
       return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
     } else {
       const trimmedContent = content.startsWith('\'') ? content.slice(1) : content.trim()
-      if (/^[-+]?[\d]*[.]?[\d]+$/.test(trimmedContent) && !isNaN(Number(trimmedContent))) {
+      if (IsNumberRegex.test(trimmedContent) && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
       }
       const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content.trim())
