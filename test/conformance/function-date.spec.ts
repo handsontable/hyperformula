@@ -25,6 +25,15 @@ describe('Acceptance tests DATE function', () => {
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('01/31/2005');
   });
 
+  it('should support date with small case', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=date(8755,12,25)'],
+    ])
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('12/25/8755');
+  });
+
+
   it('should support MIN date 1899/12/30', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1899,12,30)'],
@@ -155,6 +164,24 @@ describe('Acceptance tests DATE function', () => {
 
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2400');
   });
+
+  it('should throw a error in the absence of arguments?', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE()'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(new CellError(ErrorType.NA));
+  });
+
+  it('should show nullYear instead of null ', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null],
+      ['=DATE(A1, 2, 3)'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A2')))).toEqual('03/02/1900');
+  });
+
 
 });
 
