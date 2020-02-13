@@ -53,7 +53,7 @@ describe('Quality Assurance tests', () => {
 
   });
 
-  xit('SUM function should suport ; as separator', () => {
+  xit('SUM function should support ; as separator', () => {
     const engine = createEngine([
       ['=SUM(1;2;3)'],
       ['=SUM(TRUE();2;3)'],

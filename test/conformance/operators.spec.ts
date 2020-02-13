@@ -38,7 +38,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('J1')).toEqual(0); // SUB
         expect(engine.getCellValue('K1')).toEqual(0); // MULT
         expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!'));
-        //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //EXP
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //EXP
         expect(engine.getCellValue('N1')).toEqual(""); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(0); // UNARY PLUS
         //expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS -0 in E and GS
