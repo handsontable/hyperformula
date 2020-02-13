@@ -384,6 +384,28 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')) // CONCAT
     });
 
+    it('string and other string should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['Liz', 'Bob', ...data]
+        ]);
+
+        expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(true); // GT    
+        expect(engine.getCellValue('E1')).toEqual(false); // LT   
+        expect(engine.getCellValue('F1')).toEqual(true); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(false); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL
+        expect(engine.getCellValue('I1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // ADD  
+        expect(engine.getCellValue('J1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // SUB  
+        expect(engine.getCellValue('K1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // MULT 
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // DIV   
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // EXP  value
+        expect(engine.getCellValue('N1')).toEqual('LizBob'); // CONCAT    
+        expect(engine.getCellValue('O1')).toEqual('Liz'); // UNARY PLUS   value
+        expect(engine.getCellValue('P1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // UNARY MINUS  value
+        expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // PERCENTAGE  value
+    });
+
 
 })
 
