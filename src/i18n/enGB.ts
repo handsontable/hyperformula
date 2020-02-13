@@ -97,6 +97,7 @@ export const enGB: TranslationPackage = {
     ERFC: 'ERFC',
     RADIANS: 'RADIANS',
     E: 'E',
+    OFFSET: 'OFFSET'
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

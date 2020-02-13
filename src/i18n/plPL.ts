@@ -96,7 +96,8 @@ export const plPL: TranslationPackage = {
     CODE: 'KOD',
     ERF: 'FUNKCJA.BŁ',
     ERFC: 'KOMP.FUNKCJA.BŁ',
-    ABS: 'WART.BEZWGL'
+    ABS: 'WART.BEZWGL',
+    OFFSET: 'PRZESUNIĘCIE'
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

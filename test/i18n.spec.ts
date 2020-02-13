@@ -61,8 +61,9 @@ describe('i18n', () => {
     const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
 
     const implementedFunctions = (new Config()).getRegisteredFunctions()
+    implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
-   for (const lang in languages) {
+    for (const lang in languages) {
       const translatedFunctionsIn_lang = new Set(Object.keys(languages[lang].functions))
       expect(translatedFunctionsIn_lang).toEqual(implementedFunctions)
     }
