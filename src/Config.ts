@@ -230,9 +230,9 @@ export class Config {
         }
       }
     }
-
     return structuralChangeFunctions
   }
+
   public getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {
