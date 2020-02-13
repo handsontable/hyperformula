@@ -1,4 +1,4 @@
-import { HyperFormula } from '../../src';
+import { HyperFormula, DetailedCellError } from '../../src';
 import { CellError, ErrorType } from '../../src/Cell'
 import '../testConfig'
 import { adr } from '../testUtils';
@@ -92,9 +92,9 @@ describe('Quality Assurance tests', () => {
       ['=SUM(test)']
     ]);
 
-    expect(engine.getCellValue('A1')).toEqual(new CellError(ErrorType.NAME));
-    expect(engine.getCellValue('A2')).toEqual(new CellError(ErrorType.NAME));
-    expect(engine.getCellValue('A3')).toEqual(new CellError(ErrorType.NAME))
+    expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.NAME), '#NAME?'));
+    expect(engine.getCellValue('A2')).toEqual(new DetailedCellError(new CellError(ErrorType.NAME), '#NAME?'));
+    expect(engine.getCellValue('A3')).toEqual(new DetailedCellError(new CellError(ErrorType.NAME), '#NAME?'));
   });
 
   it('SUM should support big numbers', () => {
