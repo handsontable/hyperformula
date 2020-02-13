@@ -27,7 +27,7 @@ describe('Acceptance tests DATE function', () => {
 
   it('should support MIN date 1899/12/30', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(1990,09,10)'],
+      ['=DATE(1899,12,30)'],
     ])
 
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('12/30/1899');
@@ -41,9 +41,9 @@ describe('Acceptance tests DATE function', () => {
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('12/31/9999');
   });
 
-  it('should handle "0X" in month number', () => {
+  it('should handle "00X" in month number', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATE(1990,09,10)'],
+      ['=DATE(1990,009,10)'],
     ])
 
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('09/10/1990');
