@@ -1,5 +1,6 @@
 import {Config, HyperFormula} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
+import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
@@ -59,14 +60,16 @@ describe('i18n', () => {
   it('all translation packages should translate all enGB functions', () => {
     const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
 
-    for (const lang in languages) {
-      if (lang === 'enGB') {
-        continue
-      }
+    const implementedFunctions = (new Config()).getRegisteredFunctions()
 
-      const translationPackage = languages[lang]
+   for (const lang in languages) {
+//      if (lang === 'enGB') {
+//        continue
+//      }
+
+//      const translationPackage = languages[lang]
       const translatedFunctionsIn_lang = new Set(Object.keys(languages[lang].functions))
-      expect(translatedFunctionsIn_lang).toEqual(translatedFunctionsIn_enGB)
+      expect(translatedFunctionsIn_lang).toEqual(implementedFunctions)
     }
   })
 })

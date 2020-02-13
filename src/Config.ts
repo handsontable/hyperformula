@@ -17,6 +17,7 @@ import {DegreesPlugin} from './interpreter/plugin/DegreesPlugin'
 import {DeltaPlugin} from './interpreter/plugin/DeltaPlugin'
 import {ErrorFunctionPlugin} from './interpreter/plugin/ErrorFunctionPlugin'
 import {ExpPlugin} from './interpreter/plugin/ExpPlugin'
+import {FunctionPlugin} from './interpreter/plugin/FunctionPlugin'
 import {InformationPlugin} from './interpreter/plugin/InformationPlugin'
 import {IsEvenPlugin} from './interpreter/plugin/IsEvenPlugin'
 import {IsOddPlugin} from './interpreter/plugin/IsOddPlugin'
@@ -231,6 +232,15 @@ export class Config {
     }
 
     return structuralChangeFunctions
+  }
+  public getRegisteredFunctions(): Set<String> {
+    const ret = new Set<String>()
+    for (const pluginClass of Config.defaultPlugins) {
+      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+        ret.add(pluginClass.implementedFunctions[pluginFunction].translationKey.toUpperCase())
+      })
+    }
+    return ret
   }
 
   private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
