@@ -78,17 +78,18 @@ export class CellContentParser {
     } else if (isError(content, this.config.errorMapping)) {
       return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
     } else {
-      const trimmedContent = content.trim()
-      if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
+      const trimmedContent = content.startsWith('\'') ? content.slice(1) : content.trim()
+      if (/^[-+]?[\d]*[.]?[\d]+$/.test(trimmedContent) && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
       }
-      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content)
+      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content.trim())
       if (parsedDateNumber !== null) {
         return new CellContent.Number(parsedDateNumber)
       } else {
-        return new CellContent.String(content)
+        return new CellContent.String(
+          content.startsWith('\'') ? content.slice(1) : content
+        )
       }
-
     }
   }
 }
