@@ -1,4 +1,4 @@
-import {Config} from '../src'
+import {Config, EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {DateHelper} from '../src/DateHelper'
@@ -33,6 +33,12 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('42 ')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse('42.13')).toStrictEqual(new CellContent.Number(42.13))
     expect(cellContentParser.parse('-42.13')).toStrictEqual(new CellContent.Number(-42.13))
+  })
+
+  it( 'non-string', () => {
+    expect(cellContentParser.parse(42)).toStrictEqual(new CellContent.Number(42))
+    expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean( true))
+    expect(cellContentParser.parse(EmptyValue)).toStrictEqual(new CellContent.Empty())
   })
 
   it('string', () => {
