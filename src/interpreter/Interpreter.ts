@@ -294,7 +294,6 @@ export class Interpreter {
     }
   }
 
-
   private passErrors(left: InterpreterValue, right: InterpreterValue): CellError | null {
     if (left instanceof CellError) {
       return left

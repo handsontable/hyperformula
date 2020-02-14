@@ -1,6 +1,5 @@
 import {Config, HyperFormula} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
-import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
@@ -58,14 +57,12 @@ describe('i18n', () => {
   })
 
   it('all translation packages should translate all implemented functions', () => {
-    const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
-
     const implementedFunctions = (new Config()).getRegisteredFunctions()
     implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
     for (const lang in languages) {
-      const translatedFunctionsIn_lang = new Set(Object.keys(languages[lang].functions))
-      expect(translatedFunctionsIn_lang).toEqual(implementedFunctions)
+      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+      expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
   })
 })
