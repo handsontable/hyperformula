@@ -277,7 +277,7 @@ export class CrudOperations implements IBatchExecutor {
         throw new InvalidArgumentsError()
       }
 
-      if (!this.sheetMapping.hasSheetWithId(sheet) || sheet < 0) {
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 
@@ -301,7 +301,7 @@ export class CrudOperations implements IBatchExecutor {
       }
       const rowsToRemove = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
-      if (!this.sheetMapping.hasSheetWithId(sheet) || sheet < 0) {
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 
@@ -317,7 +317,7 @@ export class CrudOperations implements IBatchExecutor {
         throw new InvalidArgumentsError()
       }
 
-      if (!this.sheetMapping.hasSheetWithId(sheet) || sheet < 0) {
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 
@@ -342,7 +342,7 @@ export class CrudOperations implements IBatchExecutor {
       }
       const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
 
-      if (!this.sheetMapping.hasSheetWithId(sheet) || sheet < 0) {
+      if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
 

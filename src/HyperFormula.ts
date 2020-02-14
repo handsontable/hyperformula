@@ -123,7 +123,6 @@ export class HyperFormula {
     this.cellValueExporter = new CellValueExporter(config)
     this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
     this.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
-    this.sheetMapping.addForeverSheetWithId(-1)
   }
 
   /**
