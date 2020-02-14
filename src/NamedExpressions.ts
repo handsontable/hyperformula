@@ -1,13 +1,13 @@
-import {AstNodeType, ParserWithCaching} from './parser'
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {DependencyGraph} from './DependencyGraph'
-import {SimpleCellAddress, simpleCellAddress} from './Cell'
+import { ParserWithCaching} from './parser'
 
 class NamedExpression {
   constructor(
     public readonly name: string,
-    public readonly row: number
+    public readonly row: number,
   ) {
   }
 }
@@ -22,9 +22,9 @@ class NamedExpressionsStore {
   public isNameAvailable(expressionName: string): boolean {
     return !(this.mapping.has(this.normalizeExpressionName(expressionName)))
   }
-  
+
   public add(namedExpression: NamedExpression): void {
-    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression);
+    this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
   }
 
   public get(expressionName: string): NamedExpression | undefined {
@@ -70,10 +70,10 @@ export class NamedExpressions {
 
   public addNamedExpression(expressionName: string, formulaString: string): void {
     if (!this.isNameValid(expressionName)) {
-      throw new Error("Name of Named Expression is invalid")
+      throw new Error('Name of Named Expression is invalid')
     }
     if (!this.isNameAvailable(expressionName)) {
-      throw new Error("Name of Named Expression already taken")
+      throw new Error('Name of Named Expression already taken')
     }
     const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
     this.storeFormulaInCell(namedExpression, formulaString)
@@ -102,7 +102,7 @@ export class NamedExpressions {
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (!namedExpression) {
-      throw new Error("Requested Named Expression does not exist")
+      throw new Error('Requested Named Expression does not exist')
     }
     this.storeFormulaInCell(namedExpression, newFormulaString)
   }
@@ -118,7 +118,7 @@ export class NamedExpressions {
   private storeFormulaInCell(namedExpression: NamedExpression, formula: string) {
     const parsedCellContent = this.cellContentParser.parse(formula)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error("This is not a formula")
+      throw new Error('This is not a formula')
     }
     const address = this.buildAddress(namedExpression.row)
     const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)

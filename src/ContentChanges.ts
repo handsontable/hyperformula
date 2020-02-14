@@ -9,7 +9,7 @@ export interface CellValueChange {
   value: InternalCellValue,
 }
 
-export type ChangeList = Array<CellValueChange>
+export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
 

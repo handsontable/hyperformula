@@ -1,6 +1,5 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {BuildEngineFromArraysFactory} from './BuildEngineFromArraysFactory'
-import {absolutizeDependencies} from './absolutizeDependencies'
 import {
   CellType,
   CellValueType,
@@ -14,7 +13,7 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {CellValue, CellValueExporter} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
-import {ChangeList, ContentChanges} from './ContentChanges'
+import {ChangeList} from './ContentChanges'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
@@ -29,14 +28,14 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-import {NamedExpressions} from './NamedExpressions'
-import {NoSheetWithIdError, NoSheetWithNameError, InvalidAddressError, InvalidArgumentsError, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NamedExpressionDoesNotExist} from './errors'
 
 export type Index = [number, number]
 
@@ -858,7 +857,7 @@ export class HyperFormula {
   public normalizeFormula(formulaString: string): string {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
     if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error("This is not a formula")
+      throw new Error('This is not a formula')
     }
     const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
     const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)

@@ -244,43 +244,37 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-
-export function equalString(left: string, right: string): boolean
-{
+export function equalString(left: string, right: string): boolean {
   return left.localeCompare(right) === 0
 }
 
-export function strCmp(left: string, right: string): number
-{
-  if(left > right) {
+export function strCmp(left: string, right: string): number {
+  if (left > right) {
     return 1
-  } else if(left < right){
+  } else if (left < right) {
     return -1
   } else {
     return 0
   }
 }
 
-export function floatCmp(left: number, right: number, eps: number): number
-{
+export function floatCmp(left: number, right: number, eps: number): number {
   const mod = (1 + eps)
   if ( (right >= 0) && (left * mod >= right) && (left <= right * mod) ) {
     return 0
   } else if ( (right <= 0) && (left * mod <= right) && (left >= right * mod) ) {
     return 0
-  }
-  else if ( left > right ) {
+  } else if ( left > right ) {
     return 1
   } else {
     return -1
   }
 }
 
-export function numberCmp(left: number, right: number): number
-{
-  if(left > right) {
+export function numberCmp(left: number, right: number): number {
+  if (left > right) {
     return 1
-  } else if(left < right){
+  } else if (left < right) {
     return -1
   } else {
     return 0
