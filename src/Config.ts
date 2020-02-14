@@ -229,8 +229,17 @@ export class Config {
         }
       }
     }
-
     return structuralChangeFunctions
+  }
+
+  public getRegisteredFunctions(): Set<String> {
+    const ret = new Set<String>()
+    for (const pluginClass of Config.defaultPlugins) {
+      Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
+        ret.add(pluginClass.implementedFunctions[pluginFunction].translationKey.toUpperCase())
+      })
+    }
+    return ret
   }
 
   private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
