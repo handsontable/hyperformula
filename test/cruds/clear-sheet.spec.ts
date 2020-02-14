@@ -1,5 +1,5 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
-import {NoSheetWithNameError} from '../../src/HyperFormula'
+import {NoSheetWithNameError} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {
