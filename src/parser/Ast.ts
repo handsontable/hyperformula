@@ -1,5 +1,7 @@
+import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
 import {CellAddress} from './CellAddress'
+import {IExtendedToken} from './FormulaParser'
 
 export type Ast =
   NumberAst
@@ -73,12 +75,20 @@ export enum AstNodeType {
   ERROR = 'ERROR',
 }
 
-export interface NumberAst {
+export interface AstWithWhitespace {
+  trailingWhitespace?: string
+}
+
+export interface NumberAst extends AstWithWhitespace {
   type: AstNodeType.NUMBER,
   value: number,
 }
 
-export const buildNumberAst = (value: number): NumberAst => ({type: AstNodeType.NUMBER, value})
+export const buildNumberAst = (token: IExtendedToken): NumberAst => ({
+  type: AstNodeType.NUMBER,
+  value: parseFloat(token.image),
+  trailingWhitespace: token.trailingWhitespace !== undefined ? token.trailingWhitespace.image : ""
+})
 
 export interface StringAst {
   type: AstNodeType.STRING,

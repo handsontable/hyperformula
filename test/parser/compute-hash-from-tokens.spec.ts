@@ -75,19 +75,19 @@ describe('computeHashFromTokens', () => {
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3R-1:#0#14R0')
   })
 
-  it('ignores whitespace', () => {
+  it('do not ignores whitespace', () => {
     const code = '= 42'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=42')
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('= 42')
   })
 
-  it('same hash for formulas with different namespace', () => {
+  it('different hash for formulas with different namespace', () => {
     const code1 = '= 42 '
-    const code2 = '   =42'
+    const code2 = '=42'
 
     const result1 = computeFunc(code1, CellAddress.absolute(0, 1, 1))
     const result2 = computeFunc(code2, CellAddress.absolute(0, 1, 1))
-    expect(result1).toEqual(result2)
+    expect(result1).not.toEqual(result2)
   })
 
   it('support sheets', () => {

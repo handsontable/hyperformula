@@ -103,7 +103,6 @@ export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-
 export const WhiteSpace = createToken({
   name: 'WhiteSpace',
   pattern: /[ \t\n\r]+/,
-  group: Lexer.SKIPPED,
 })
 
 export interface ILexerConfig {

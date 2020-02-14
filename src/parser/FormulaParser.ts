@@ -1,4 +1,4 @@
-import {EmbeddedActionsParser, ILexingResult, IOrAlt, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
+import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
@@ -57,7 +57,7 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
-  TimesOp,
+  TimesOp, WhiteSpace,
 } from './LexerConfig'
 
 /**
@@ -79,7 +79,6 @@ import {
  * P -> SUM(..) <br/>
  */
 export class FormulaParser extends EmbeddedActionsParser {
-
   /**
    * Entry rule
    */
@@ -280,8 +279,8 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
       {
         ALT: () => {
-          const number = this.CONSUME(NumberLiteral)
-          return buildNumberAst(parseFloat(number.image))
+          const number = this.CONSUME(NumberLiteral) as IExtendedToken
+          return buildNumberAst(number)
         },
       },
       {
@@ -467,8 +466,8 @@ export class FormulaParser extends EmbeddedActionsParser {
    * @param lexResult - tokenized formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public parseFromTokens(lexResult: ILexingResult, formulaAddress: SimpleCellAddress): Ast {
-    this.input = lexResult.tokens
+  public parseFromTokens(lexResult: LexingResult, formulaAddress: SimpleCellAddress): Ast {
+    this.input = lexResult.processedTokens
 
     const ast = this.formulaWithContext(formulaAddress)
     const errors = this.errors
@@ -625,6 +624,13 @@ export class FormulaParser extends EmbeddedActionsParser {
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = IOrAlt[] | OrMethodOpts
 
+export interface IExtendedToken extends IToken {
+  trailingWhitespace: IToken
+}
+export interface LexingResult extends ILexingResult {
+  processedTokens: IExtendedToken[]
+}
+
 export class FormulaLexer {
   private readonly lexer: Lexer
 
@@ -637,7 +643,43 @@ export class FormulaLexer {
    *
    * @param text - string representation of a formula
    */
-  public tokenizeFormula(text: string): ILexingResult {
-    return this.lexer.tokenize(text)
+  public tokenizeFormula(text: string): LexingResult {
+    return this.processWhitespaces(this.lexer.tokenize(text))
+  }
+
+  private processWhitespaces(lexingResult: ILexingResult): LexingResult {
+    if (lexingResult.errors.length === 0) {
+      const tokens = lexingResult.tokens
+      const processedTokens: any[] = []
+
+      for (let i=0; i<tokens.length-1; ++i) {
+        const current = tokens[i]
+        const next = tokens[i + 1]
+        if (tokenMatcher(next, WhiteSpace)) {
+          // @ts-ignore
+          current.trailingWhitespace = next
+          ++i
+        } else {
+          // @ts-ignore
+          current.trailingWhitespace = ""
+        }
+        processedTokens.push(current)
+      }
+
+      const last = tokens[tokens.length - 1]
+      if (!tokenMatcher(last, WhiteSpace)) {
+        processedTokens.push(last)
+      }
+
+      return {
+        ...lexingResult,
+        processedTokens: processedTokens
+      }
+    }
+
+    return {
+      ...lexingResult,
+      processedTokens: []
+    }
   }
 }

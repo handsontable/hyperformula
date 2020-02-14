@@ -1,7 +1,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType} from './Ast'
+import {Ast, AstNodeType, AstWithWhitespace} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -23,7 +23,7 @@ export class Unparser {
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return ast.value.toString()
+        return ast.value.toString() + (ast.trailingWhitespace ? ast.trailingWhitespace : "")
       }
       case AstNodeType.STRING: {
         return '"' + ast.value + '"'

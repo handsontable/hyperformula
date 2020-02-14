@@ -139,13 +139,13 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=SUM(1,2,3)')
   })
 
-  it('#unparse forgets about spaces', () => {
-    const formula = '= 1 + sum(1,2,   3)'
+  it('#unparse should not forget about spaces', () => {
+    const formula = '= 1 + sum(1,2,   3)+A1 / 2'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=1+SUM(1,2,3)')
+    expect(unparsed).toEqual('= 1 + sum(1,2,   3)+A1 / 2')
   })
 
   it('#unparse forgets about OFFSET', () => {
