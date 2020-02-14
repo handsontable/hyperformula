@@ -23,8 +23,9 @@ import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
+import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
-import {Index, InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './HyperFormula'
+import {Index} from './HyperFormula'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
@@ -58,7 +59,7 @@ export class CrudOperations implements IBatchExecutor {
   public addRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doAddRows(sheet, index[0], index[1])
     }
@@ -67,7 +68,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -76,7 +77,7 @@ export class CrudOperations implements IBatchExecutor {
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
     }
@@ -85,7 +86,7 @@ export class CrudOperations implements IBatchExecutor {
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
     }
@@ -93,7 +94,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
 
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
@@ -150,19 +151,19 @@ export class CrudOperations implements IBatchExecutor {
     this.removeColumns(sheet, [startColumn, numberOfColumns])
   }
 
-  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.cut(sourceLeftCorner, width, height)
   }
 
-  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboardOperations.copy(sourceLeftCorner, width, height)
   }
 
-  public clipboardPaste(targetLeftCorner: SimpleCellAddress): void {
+  public paste(targetLeftCorner: SimpleCellAddress): void {
     this.clipboardOperations.paste(targetLeftCorner)
   }
 
-  public clipboardClear(): void {
+  public clearClipboard(): void {
     this.clipboardOperations.clear()
   }
 
@@ -177,7 +178,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -194,7 +195,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public clearSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
 
     const sheetId = this.sheetMapping.fetch(sheetName)
 
@@ -205,7 +206,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
-    this.clipboardOperations.abort()
+    this.clipboardOperations.abortCut()
 
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
 

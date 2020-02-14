@@ -2,7 +2,7 @@ import { Config, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { MatrixVertex} from '../../src/DependencyGraph'
-import {InvalidArgumentsError} from '../../src/HyperFormula'
+import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
