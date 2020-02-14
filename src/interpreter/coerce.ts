@@ -10,7 +10,7 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param config
  */
 export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
-  if(arg instanceof CellError) {
+  if (arg instanceof CellError) {
     return arg
   }
   const ret = coerceToMaybeNumber(arg, dateHelper)
@@ -68,7 +68,6 @@ export function coerceToRangeNumbersOrError(arg: InterpreterValue): SimpleRangeV
 export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
-
 
 /**
  * Coerce scalar value to boolean if possible, or error if value is an error
