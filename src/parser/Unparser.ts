@@ -1,7 +1,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType, AstWithWhitespace} from './Ast'
+import {Ast, AstNodeType, AstWithWhitespace, BinaryOpAst} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -23,15 +23,16 @@ export class Unparser {
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return ast.value.toString() + (ast.trailingWhitespace ? ast.trailingWhitespace : "")
+        return withWhitespace(ast.value.toString(), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return '"' + ast.value + '"'
+        return withWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        return (procedureName || ast.procedureName) + '(' + (ast.leadingWhitespace ? ast.leadingWhitespace : "") + args + ')' + (ast.trailingWhitespace ? ast.trailingWhitespace : "")
+        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName) || ast.procedureName
+        const rightPart = procedureName + '(' + args + withWhitespace(')', ast.internalWhitespace)
+        return withWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
         if (ast.reference.sheet === address.sheet) {
@@ -49,11 +50,11 @@ export class Unparser {
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '+' + unparsedExpr
+        return withWhitespace('+', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '-' + unparsedExpr
+        return withWhitespace('-', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
         return this.unparseAst(ast.value, address) + '%'
@@ -67,12 +68,13 @@ export class Unparser {
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.unparseAst(ast.expression, address)
-        return '(' + expression + ')'
+        const rightPart = '(' + expression + withWhitespace(')', ast.internalWhitespace)
+        return withWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)
-        return left + binaryOpTokenMap[ast.type] + right
+        return left + withWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + right
       }
     }
   }
@@ -85,4 +87,8 @@ export class Unparser {
       return sheet
     }
   }
+}
+
+export function withWhitespace(image: string, leadingWhitespace?: string) {
+  return (leadingWhitespace ? leadingWhitespace : '') + image
 }

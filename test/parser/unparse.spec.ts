@@ -145,7 +145,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('= 1 + sum( 1,2,   3) +A1 / 2')
+    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2')
   })
 
   it('#unparse forgets about OFFSET', () => {

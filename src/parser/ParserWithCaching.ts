@@ -9,6 +9,7 @@ import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {withWhitespace} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
@@ -123,31 +124,32 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return ast.value.toString()
+        return withWhitespace(ast.value.toString(), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return '"' + ast.value + '"'
+        return withWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
-        return ast.procedureName + '(' + args + ')'
+        const rightPart = ast.procedureName + '(' + args + withWhitespace(')', ast.internalWhitespace)
+        return withWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return cellHashFromToken(ast.reference)
+        return withWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
         const start = cellHashFromToken(ast.start)
         const end = cellHashFromToken(ast.end)
-        return start + ':' + end
+        return withWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.computeHashOfAstNode(ast.value)
+        return withWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
-        return '+' + this.computeHashOfAstNode(ast.value)
+        return withWhitespace('+' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PERCENT_OP: {
-        return this.computeHashOfAstNode(ast.value) + '%'
+        return withWhitespace(this.computeHashOfAstNode(ast.value) + '%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
         if (ast.error) {
@@ -157,10 +159,12 @@ export class ParserWithCaching {
         }
       }
       case AstNodeType.PARENTHESIS: {
-        return '(' + this.computeHashOfAstNode(ast.expression) + ')'
+        const expression = this.computeHashOfAstNode(ast.expression)
+        const rightPart = '(' + expression + withWhitespace(')', ast.internalWhitespace)
+        return withWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
-        return this.computeHashOfAstNode(ast.left) + binaryOpTokenMap[ast.type] + this.computeHashOfAstNode(ast.right)
+        return this.computeHashOfAstNode(ast.left) + withWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
     }
   }
