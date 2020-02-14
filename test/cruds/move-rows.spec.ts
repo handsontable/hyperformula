@@ -1,6 +1,6 @@
 import {CellError, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
-import {InvalidArgumentsError} from '../../src/HyperFormula'
+import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {adr, detailedError, extractRange, extractReference} from '../testUtils'
 
