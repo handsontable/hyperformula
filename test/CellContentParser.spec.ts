@@ -39,7 +39,7 @@ describe('CellContentParser', () => {
 
   it( 'non-string', () => {
     expect(cellContentParser.parse(42)).toStrictEqual(new CellContent.Number(42))
-    expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean( true))
+    expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean(true))
     expect(cellContentParser.parse(EmptyValue)).toStrictEqual(new CellContent.Empty())
   })
 
