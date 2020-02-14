@@ -821,6 +821,13 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Get named expression value
+   *
+   * @param expressionName - an expression name
+   *
+   * @returns CellValue | null
+   */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
     const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
     if (internalNamedExpressionAddress === null) {
@@ -830,6 +837,12 @@ export class HyperFormula {
     }
   }
 
+  /**
+   * Change named expression formula
+   *
+   * @param expressionName - an expression name
+   * @param newFormulaString - a new formula
+   */
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): ChangeList {
     if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
       throw new NamedExpressionDoesNotExist(expressionName)
@@ -838,11 +851,21 @@ export class HyperFormula {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Remove named expression
+   *
+   * @param expressionName - an expression name
+   */
   public removeNamedExpression(expressionName: string): ChangeList {
     this.namedExpressions.removeNamedExpression(expressionName)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * List all named expression
+   *
+   * @param expressionName - an expression name
+   */
   public listNamedExpressions(): string[] {
     return this.namedExpressions.getAllNamedExpressionsNames()
   }
