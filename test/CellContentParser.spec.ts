@@ -69,7 +69,7 @@ describe('CellContentParser', () => {
   })
 
   it( 'starts with \'', () => {
-    expect(cellContentParser.parse('\'123')).toStrictEqual(new CellContent.Number(123))
+    expect(cellContentParser.parse('\'123')).toStrictEqual(new CellContent.String('123'))
     expect(cellContentParser.parse('\'=1+1')).toStrictEqual(new CellContent.String('=1+1'))
     expect(cellContentParser.parse('\'\'1')).toStrictEqual(new CellContent.String('\'1'))
     expect(cellContentParser.parse('\' 1')).toStrictEqual(new CellContent.String(' 1'))
