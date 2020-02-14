@@ -76,6 +76,7 @@ export enum AstNodeType {
 }
 
 export interface AstWithWhitespace {
+  leadingWhitespace?: string
   trailingWhitespace?: string
 }
 
@@ -274,16 +275,18 @@ export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
   value,
 })
 
-export interface ProcedureAst {
+export interface ProcedureAst  extends AstWithWhitespace{
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[]
 }
 
-export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
+export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace: IToken, trailingWhitespace: IToken): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
+  leadingWhitespace: leadingWhitespace !== undefined ? leadingWhitespace.image: undefined,
+  trailingWhitespace: trailingWhitespace !== undefined ? leadingWhitespace.image: undefined
 })
 
 export interface ParenthesisAst {

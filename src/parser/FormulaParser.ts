@@ -310,7 +310,8 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for procedure expressions: SUM(1,A1)
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
-    const procedureName = this.CONSUME(ProcedureName).image.toUpperCase().slice(0, -1)
+    const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
+    const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
     const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
     const args: Ast[] = []
     this.MANY_SEP({
@@ -319,8 +320,8 @@ export class FormulaParser extends EmbeddedActionsParser {
         args.push(this.SUBRULE(this.booleanExpression))
       },
     })
-    this.CONSUME(RParen)
-    return buildProcedureAst(canonicalProcedureName, args)
+    const rParenToken = this.CONSUME(RParen) as IExtendedToken
+    return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.trailingWhitespace, rParenToken.trailingWhitespace)
   })
 
   /**
