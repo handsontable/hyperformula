@@ -509,9 +509,9 @@ export class HyperFormula {
    *
    * @param targetLeftCorner - upper left address of the target cell block
    * */
-  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+  public paste(targetLeftCorner: SimpleCellAddress): ChangeList {
     this.crudOperations.paste(targetLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
