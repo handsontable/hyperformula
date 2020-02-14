@@ -10,7 +10,7 @@ describe('Interpreter - function RAND', () => {
     ])
     const valueBeforeRecomputation = engine.getCellValue(adr('A1'))
 
-    engine.setCellContent(adr('B1'), '35')
+    engine.setCellContents(adr('B1'), '35')
 
     expect(engine.getCellValue(adr('A1'))).not.toEqual(valueBeforeRecomputation)
   })
@@ -21,7 +21,7 @@ describe('Interpreter - function RAND', () => {
     ])
     const valueBeforeRecomputation = engine.getCellValue(adr('C1'))
 
-    engine.setCellContent(adr('B1'), '35')
+    engine.setCellContents(adr('B1'), '35')
 
     expect(engine.getCellValue(adr('C1'))).not.toEqual(valueBeforeRecomputation)
   })
@@ -31,7 +31,7 @@ describe('Interpreter - function RAND', () => {
       ['=A2+A3', '42'],
     ])
 
-    engine.setCellContent(simpleCellAddress(0, 0, 0), '=RAND()')
+    engine.setCellContents(simpleCellAddress(0, 0, 0), '=RAND()')
 
     const a1 = engine.addressMapping.getCell(simpleCellAddress(0, 0, 0))
     expect(engine.dependencyGraph.volatileVertices()).toEqual(new Set([a1]))
@@ -42,7 +42,7 @@ describe('Interpreter - function RAND', () => {
       ['=RAND()', '42'],
     ])
 
-    engine.setCellContent(adr('A1'), '35')
+    engine.setCellContents(adr('A1'), '35')
 
     expect(engine.dependencyGraph.verticesToRecompute()).toEqual(new Set())
   })
