@@ -75,14 +75,9 @@ export class NamedExpressions {
     if (!this.isNameAvailable(expressionName)) {
       throw new Error("Name of Named Expression already taken")
     }
-    const parsedCellContent = this.cellContentParser.parse(formulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error("This is not a formula")
-    }
-    const namedExpression = new NamedExpression(expressionName, ++this.nextNamedExpressionRow)
-    const address = this.buildAddress(namedExpression.row)
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
+    this.storeFormulaInCell(namedExpression, formulaString)
+    this.nextNamedExpressionRow++
     this.workbookStore.add(namedExpression)
   }
 
@@ -109,13 +104,7 @@ export class NamedExpressions {
     if (!namedExpression) {
       throw new Error("Requested Named Expression does not exist")
     }
-    const address = this.buildAddress(namedExpression.row)
-    const parsedCellContent = this.cellContentParser.parse(newFormulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error("This is not a formula")
-    }
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    this.storeFormulaInCell(namedExpression, newFormulaString)
   }
 
   public getAllNamedExpressionsNames(): string[] {
@@ -124,5 +113,15 @@ export class NamedExpressions {
 
   private buildAddress(namedExpressionRow: number) {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
+  }
+
+  private storeFormulaInCell(namedExpression: NamedExpression, formula: string) {
+    const parsedCellContent = this.cellContentParser.parse(formula)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error("This is not a formula")
+    }
+    const address = this.buildAddress(namedExpression.row)
+    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 }
