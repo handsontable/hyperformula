@@ -9,11 +9,11 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
-import {CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, CellValueExporter} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
-import {CellValueChange, ContentChanges} from './ContentChanges'
+import {ChangeList} from './ContentChanges'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
@@ -24,39 +24,18 @@ import {
   MatrixVertex,
   RangeMapping,
   SheetMapping,
+  SparseStrategy,
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
+import {NamedExpressions} from './NamedExpressions'
+import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
-
-export class NoSheetWithIdError extends Error {
-  constructor(sheetId: number) {
-    super(`There's no sheet with id = ${sheetId}`)
-  }
-}
-
-export class NoSheetWithNameError extends Error {
-  constructor(sheetName: string) {
-    super(`There's no sheet with name '${sheetName}'`)
-  }
-}
-
-export class InvalidAddressError extends Error {
-  constructor(address: SimpleCellAddress) {
-    super(`Address (row = ${address.row}, col = ${address.col}) is invalid`)
-  }
-}
-
-export class InvalidArgumentsError extends Error {
-  constructor() {
-    super(`Invalid arguments`)
-  }
-}
 
 export type Index = [number, number]
 
@@ -119,6 +98,7 @@ export class HyperFormula {
 
   private readonly crudOperations: CrudOperations
   private readonly cellValueExporter: CellValueExporter
+  private readonly namedExpressions: NamedExpressions
 
   constructor(
     /** Engine config */
@@ -140,6 +120,8 @@ export class HyperFormula {
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
     this.cellValueExporter = new CellValueExporter(config)
+    this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
+    this.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   /**
@@ -250,10 +232,10 @@ export class HyperFormula {
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
    */
-  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): CellValueChange[] {
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ChangeList {
     if(!(cellContents instanceof Array)) {
       this.crudOperations.setCellContent(topLeftCornerAddress, cellContents)
-      return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+      return this.recomputeIfDependencyGraphNeedsIt()
     }
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
@@ -301,9 +283,9 @@ export class HyperFormula {
    * @param sheet - sheet id in which rows will be added
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
-  public addRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+  public addRows(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.addRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -331,9 +313,9 @@ export class HyperFormula {
    * @param sheet - sheet id from which rows will be removed
    * @param indexes - non-contiguous indexes with format [row, amount]
    * */
-  public removeRows(sheet: number, ...indexes: Index[]): CellValueChange[] {
+  public removeRows(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeRows(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -361,9 +343,9 @@ export class HyperFormula {
    * @param sheet - sheet id in which columns will be added
    * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
    * */
-  public addColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+  public addColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.addColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -391,9 +373,9 @@ export class HyperFormula {
    * @param sheet - sheet id from which columns will be removed
    * @param indexes - non-contiguous indexes with format [column, amount]
    * */
-  public removeColumns(sheet: number, ...indexes: Index[]): CellValueChange[] {
+  public removeColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeColumns(sheet, ...indexes)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -423,9 +405,9 @@ export class HyperFormula {
    * @param height - height of the cell block being moved
    * @param destinationLeftCorner - upper left address of the target cell block
    */
-  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): CellValueChange[] {
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ChangeList {
     this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -455,9 +437,9 @@ export class HyperFormula {
    * @param numberOfRows - number of rows to move
    * @param targetRow - row number before which rows will be moved
    */
-  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): CellValueChange[] {
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): ChangeList {
     this.crudOperations.moveRows(sheet, startRow, numberOfRows, targetRow)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -487,9 +469,9 @@ export class HyperFormula {
    * @param numberOfColumns - number of columns to move
    * @param targetColumn - column number before which columns will be moved
    */
-  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): CellValueChange[] {
+  public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): ChangeList {
     this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -527,9 +509,9 @@ export class HyperFormula {
    *
    * @param targetLeftCorner - upper left address of the target cell block
    * */
-  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+  public paste(targetLeftCorner: SimpleCellAddress): ChangeList {
     this.crudOperations.paste(targetLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -597,9 +579,9 @@ export class HyperFormula {
    *
    * @param name - sheet name
    */
-  public removeSheet(name: string): CellValueChange[] {
+  public removeSheet(name: string): ChangeList {
     this.crudOperations.removeSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -623,10 +605,10 @@ export class HyperFormula {
    *
    * @param name - sheet name
    * */
-  public clearSheet(name: string): CellValueChange[] {
+  public clearSheet(name: string): ChangeList {
     this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -651,7 +633,7 @@ export class HyperFormula {
    * @param sheetName - sheet name
    * @param values - array of new values
    * */
-  public setSheetContent(sheetName: string, values: RawCellContent[][]): CellValueChange[] {
+  public setSheetContent(sheetName: string, values: RawCellContent[][]): ChangeList {
     this.crudOperations.ensureSheetExists(sheetName)
 
     const sheetId = this.getSheetId(sheetName)!
@@ -813,14 +795,116 @@ export class HyperFormula {
    * Run multiple operations and recompute formulas at the end
    *
    * @param batchOperations
-   * */
-  public batch(batchOperations: (e: IBatchExecutor) => void): CellValueChange[] {
+   */
+  public batch(batchOperations: (e: IBatchExecutor) => void): ChangeList {
     try {
       batchOperations(this.crudOperations)
     } catch (e) {
       /* TODO we should be able to return error information along with changes */
     }
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Add named expression
+   *
+   * @param batchOperations
+   */
+  public addNamedExpression(expressionName: string, formulaString: string): ChangeList {
+    if (!this.namedExpressions.isNameValid(expressionName)) {
+      throw new NamedExpressionNameIsInvalid(expressionName)
+    }
+    if (!this.namedExpressions.isNameAvailable(expressionName)) {
+      throw new NamedExpressionNameIsAlreadyTaken(expressionName)
+    }
+    this.namedExpressions.addNamedExpression(expressionName, formulaString)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Get named expression value
+   *
+   * @param expressionName - an expression name
+   *
+   * @returns CellValue | null
+   */
+  public getNamedExpressionValue(expressionName: string): CellValue | null {
+    const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
+    if (internalNamedExpressionAddress === null) {
+      return null
+    } else {
+      return this.cellValueExporter.export(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
+    }
+  }
+
+  /**
+   * Change named expression formula
+   *
+   * @param expressionName - an expression name
+   * @param newFormulaString - a new formula
+   */
+  public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): ChangeList {
+    if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
+      throw new NamedExpressionDoesNotExist(expressionName)
+    }
+    this.namedExpressions.changeNamedExpressionFormula(expressionName, newFormulaString)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * Remove named expression
+   *
+   * @param expressionName - an expression name
+   */
+  public removeNamedExpression(expressionName: string): ChangeList {
+    this.namedExpressions.removeNamedExpression(expressionName)
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  /**
+   * List all named expression
+   *
+   * @param expressionName - an expression name
+   */
+  public listNamedExpressions(): string[] {
+    return this.namedExpressions.getAllNamedExpressionsNames()
+  }
+
+  /**
+   * Normalizes formula
+   *
+   * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @returns normalized formula
+   */
+  public normalizeFormula(formulaString: string): string {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error('This is not a formula')
+    }
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    return this.unparser.unparse(ast, exampleExternalFormulaAddress)
+  }
+
+  /**
+   * Validates formula
+   *
+   * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @returns whether formula can be executed outside of regular worksheet
+   */
+  public validateFormula(formulaString: string): boolean {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      return false
+    }
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    if (ast.type === AstNodeType.ERROR && !ast.error) {
+      return false
+    }
+    return true
   }
 
   /**
@@ -839,7 +923,7 @@ export class HyperFormula {
   /**
    * Runs recomputation starting from recently changed vertices.
    */
-  private recomputeIfDependencyGraphNeedsIt(): ContentChanges {
+  private recomputeIfDependencyGraphNeedsIt(): ChangeList {
     const changes = this.crudOperations.getAndClearContentChanges()
     const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
     this.dependencyGraph.clearRecentlyChangedVertices()
@@ -848,6 +932,6 @@ export class HyperFormula {
       changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
     }
 
-    return changes
+    return changes.exportChanges(this.cellValueExporter)
   }
 }

@@ -3,7 +3,7 @@ import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './
 import {CrudOperations} from './CrudOperations'
 import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {InvalidArgumentsError} from './HyperFormula'
+import {InvalidArgumentsError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 
