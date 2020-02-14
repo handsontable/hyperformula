@@ -115,7 +115,7 @@ export class ClipboardOperations {
     }
   }
 
-  public abort(): void {
+  public abortCut(): void {
     if (this.clipboard && this.clipboard.type === ClipboardOperationType.CUT) {
       this.clear()
     }

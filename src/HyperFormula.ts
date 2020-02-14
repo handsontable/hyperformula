@@ -482,43 +482,43 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
-  public clipboardCopy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
-    this.crudOperations.clipboardCopy(sourceLeftCorner, width, height)
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+    this.crudOperations.copy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
    * Stores information of cell block in internal clipboard for further paste. </br>
-   * Calling {@link clipboardPaste} right after this method is equivalent to call {@link moveCells}.</br>
-   * Almost any CRUD operation called after this method will abort cut operation.</br>
+   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.</br>
+   * Almost any CRUD operation called after this method will abortCut cut operation.</br>
    * Returns values of cells for use in external clipboard.
    *
    * @param sourceLeftCorner - address of the upper left corner of copied block
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
-  public clipboardCut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
-    this.crudOperations.clipboardCut(sourceLeftCorner, width, height)
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+    this.crudOperations.cut(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
-   * When called after {@link clipboardCopy} it will paste copied values and formulas into cell block.</br>
-   * When called after {@link clipboardPaste} it will perform {@link moveCells} operation into the cell block.</br>
+   * When called after {@link copy} it will paste copied values and formulas into cell block.</br>
+   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.</br>
    * Does nothing if clipboard is empty.
    *
    * @param targetLeftCorner - upper left address of the target cell block
    * */
-  public clipboardPaste(targetLeftCorner: SimpleCellAddress): ChangeList {
-    this.crudOperations.clipboardPaste(targetLeftCorner)
-    return this.recomputeIfDependencyGraphNeedsIt()
+  public paste(targetLeftCorner: SimpleCellAddress): CellValueChange[] {
+    this.crudOperations.paste(targetLeftCorner)
+    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
   }
 
   /**
    * Clears clipboard content.
    * */
-  public clipboardClear(): void {
-    this.crudOperations.clipboardClear()
+  public clearClipboard(): void {
+    this.crudOperations.clearClipboard()
   }
 
   /**
@@ -917,7 +917,7 @@ export class HyperFormula {
     this.parser.destroy()
     this.lazilyTransformingAstService.destroy()
     this.stats.destroy()
-    this.crudOperations.clipboardClear()
+    this.crudOperations.clearClipboard()
   }
 
   /**
