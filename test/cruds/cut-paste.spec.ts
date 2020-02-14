@@ -988,13 +988,13 @@ describe('aborting cut paste', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
   })
 
-  it('should be aborted when setCellContent is done', () => {
+  it('should be aborted when setCellContents is done', () => {
     const engine = HyperFormula.buildFromArray([
       ['1']
     ])
 
     engine.clipboardCut(adr('A1'), 1, 1)
-    engine.setCellContent(adr('B1'), 'foo')
+    engine.setCellContents(adr('B1'), 'foo')
     engine.clipboardPaste(adr('A2'))
 
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)

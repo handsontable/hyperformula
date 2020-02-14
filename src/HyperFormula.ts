@@ -245,23 +245,16 @@ export class HyperFormula {
   }
 
   /**
-   * Sets content of a cell with given address.
-   *
-   * @param address - cell coordinates
-   * @param newCellContent - new cell content
-   */
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): CellValueChange[] {
-    this.crudOperations.setCellContent(address, newCellContent)
-    return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
-  }
-
-  /**
    * Sets content of a block of cells.
    *
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
    */
-  public setMultipleCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][]): CellValueChange[] {
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): CellValueChange[] {
+    if(!(cellContents instanceof Array)) {
+      this.crudOperations.setCellContent(topLeftCornerAddress, cellContents)
+      return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+    }
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
