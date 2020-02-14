@@ -20,7 +20,7 @@ describe("Named expressions", () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.setCellContent(adr('A1'), '20')
+    engine.setCellContents(adr('A1'), '20')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
@@ -69,7 +69,7 @@ describe("Named expressions", () => {
     engine.removeNamedExpression('myName')
 
     expect(engine.getNamedExpressionValue('myName')).toBe(null)
-    expect(engine.setCellContent(adr('A1'), '43').length).toBe(1)
+    expect(engine.setCellContents(adr('A1'), '43').length).toBe(1)
   })
 
   it('is possible to change named expression formula to other', () => {

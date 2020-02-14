@@ -235,7 +235,7 @@ export class HyperFormula {
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ChangeList {
     if(!(cellContents instanceof Array)) {
       this.crudOperations.setCellContent(topLeftCornerAddress, cellContents)
-      return this.recomputeIfDependencyGraphNeedsIt().exportChanges(this.cellValueExporter)
+      return this.recomputeIfDependencyGraphNeedsIt()
     }
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
