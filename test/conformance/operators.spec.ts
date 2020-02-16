@@ -402,11 +402,11 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // EXP  value
         expect(engine.getCellValue('N1')).toEqual('LizBob'); // CONCAT    
         //expect(engine.getCellValue('O1')).toEqual('Liz'); // UNARY PLUS   value
-        expect(engine.getCellValue('P1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // UNARY MINUS  value
-        expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // PERCENTAGE  value
+        expect(engine.getCellValue('P1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // UNARY MINUS  
+        expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // PERCENTAGE  
     });
 
-    xit('Str Num and other Str Num be supported by all comparison operators', () => {
+    it('Str Num and other Str Num be supported by all comparison operators', () => {
         const engine = createEngine([
             ['2.7', '3.54', ...data]
         ]);
@@ -417,20 +417,20 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('F1')).toEqual(false); // GTE   
         expect(engine.getCellValue('G1')).toEqual(true); // LTE  
         expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL
-        //expect(engine.getCellValue('I1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // ADD  6.24
-        //expect(engine.getCellValue('J1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // SUB   -0.84
-        //expect(engine.getCellValue('K1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // MULT   9.558
-        //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // DIV   0.76271186440678
-        //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // EXP  33.65330527762482
+        expect(engine.getCellValue('I1')).toEqual(6.24); // ADD 
+        expect(engine.getCellValue('J1')).toEqual(-0.84); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(9.558); // MULT   
+        expect(engine.getCellValue('L1')).toEqual(0.76271186440678); // DIV   
+        expect(engine.getCellValue('M1')).toEqual(33.65330527762482); // EXP 
         expect(engine.getCellValue('N1')).toEqual('2.73.54'); // CONCAT    
-        expect(engine.getCellValue('O1')).toEqual(2.7); // UNARY PLUS   value
-        expect(engine.getCellValue('P1')).toEqual(-2.7); // UNARY MINUS  value
-        //expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // PERCENTAGE  0.027
+        expect(engine.getCellValue('O1')).toEqual(2.7); // UNARY PLUS   
+        expect(engine.getCellValue('P1')).toEqual(-2.7); // UNARY MINUS  
+        expect(engine.getCellValue('Q1')).toEqual(0.027); // PERCENTAGE  
     });
 
-    xit('Integer and other Integer be supported by all comparison operators', () => {
+    it('Integer and other Integer be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['01/02/1999', '02/02/1999', ...data]
+            ['02/01/1999', '02/02/1999', ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -438,21 +438,43 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('E1')).toEqual(true); // LT   
         expect(engine.getCellValue('F1')).toEqual(false); // GTE   
         expect(engine.getCellValue('G1')).toEqual(true); // LTE  
-        //expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL true
-        //expect(engine.getCellValue('I1')).toEqual(72386); // ADD  72355
-        //expect(engine.getCellValue('J1')).toEqual(0); // SUB   -31
-        //expect(engine.getCellValue('K1')).toEqual('1,31E+09'); // MULT  1308811266
-        //expect(engine.getCellValue('L1')).toEqual(0.9999724); // DIV   0.99914348078358
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        expect(engine.getCellValue('I1')).toEqual(72385); // ADD  
+        expect(engine.getCellValue('J1')).toEqual(-1); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(1309897056); // MULT  
+        expect(engine.getCellValue('L1')).toEqual(0.99997237034786); // DIV  
         //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP  Infinity
-        expect(engine.getCellValue('N1')).toEqual('3616236193'); // CONCAT    
-        //expect(engine.getCellValue('O1')).toEqual(36192); // UNARY PLUS   //36162
-        //expect(engine.getCellValue('P1')).toEqual(-36192); // UNARY MINUS  //-36162
-        expect(engine.getCellValue('Q1')).toEqual('361.92'); // PERCENTAGE  //361,62 typ
+        expect(engine.getCellValue('N1')).toEqual('3619236193'); // CONCAT    
+        expect(engine.getCellValue('O1')).toEqual(36192); // UNARY PLUS   
+        expect(engine.getCellValue('P1')).toEqual(-36192); // UNARY MINUS  
+        expect(engine.getCellValue('Q1')).toEqual(361.92); // PERCENTAGE  
     });
 
-    xit('Integer and other Integer be supported by all comparison operators', () => {
+    xit('Zero with BLANK should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['01/02/1999', '02/02/1999', ...data]
+            ['0', 'null', ...data]
+        ]);
+
+        //expect(engine.getCellValue('C1')).toEqual(true);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        //expect(engine.getCellValue('E1')).toEqual(false); // LT   true
+        //expect(engine.getCellValue('F1')).toEqual(true); // GTE   false
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL true
+        expect(engine.getCellValue('I1')).toEqual(0); // ADD 
+        expect(engine.getCellValue('J1')).toEqual(0); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(0); // MULT  
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')); // DIV  
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP  
+        expect(engine.getCellValue('N1')).toEqual(0); // CONCAT    
+        expect(engine.getCellValue('O1')).toEqual(0); // UNARY PLUS   
+        expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS  
+        expect(engine.getCellValue('Q1')).toEqual(0); // PERCENTAGE  
+    });
+
+    xit('Zero with TRUE should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['0', 'true', ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -460,18 +482,91 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('E1')).toEqual(true); // LT   
         expect(engine.getCellValue('F1')).toEqual(false); // GTE   
         expect(engine.getCellValue('G1')).toEqual(true); // LTE  
-        //expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL true
-        //expect(engine.getCellValue('I1')).toEqual(72386); // ADD  72355
-        //expect(engine.getCellValue('J1')).toEqual(0); // SUB   -31
-        //expect(engine.getCellValue('K1')).toEqual('1,31E+09'); // MULT  1308811266
-        //expect(engine.getCellValue('L1')).toEqual(0.9999724); // DIV   0.99914348078358
-        //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP  Infinity
-        expect(engine.getCellValue('N1')).toEqual('3616236193'); // CONCAT    
-        //expect(engine.getCellValue('O1')).toEqual(36192); // UNARY PLUS   //36162
-        //expect(engine.getCellValue('P1')).toEqual(-36192); // UNARY MINUS  //-36162
-        expect(engine.getCellValue('Q1')).toEqual('361.92'); // PERCENTAGE  //361,62 typ
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        //expect(engine.getCellValue('I1')).toEqual(1); // ADD value
+        //expect(engine.getCellValue('J1')).toEqual(-1); // SUB   value
+        //expect(engine.getCellValue('K1')).toEqual(0); // MULT  value 
+        expect(engine.getCellValue('L1')).toEqual(0); // DIV  
+        expect(engine.getCellValue('M1')).toEqual(0); // EXP  
+        expect(engine.getCellValue('N1')).toEqual('0true'); // CONCAT     
     });
-  
+
+    xit('Zero with FALSE should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['0', 'false', ...data]
+        ]);
+
+        expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        expect(engine.getCellValue('E1')).toEqual(true); // LT   
+        expect(engine.getCellValue('F1')).toEqual(false); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        //expect(engine.getCellValue('I1')).toEqual(0); // ADD value
+        //expect(engine.getCellValue('J1')).toEqual(0); // SUB   value
+        //expect(engine.getCellValue('K1')).toEqual(0); // MULT  value
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')); // DIV  
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP  
+        expect(engine.getCellValue('N1')).toEqual('0false'); // CONCAT     
+    });
+
+    xit('Zero with string should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['0', 'Liz', ...data]
+        ]);
+
+        expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        expect(engine.getCellValue('E1')).toEqual(true); // LT   
+        expect(engine.getCellValue('F1')).toEqual(false); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        expect(engine.getCellValue('I1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // ADD 
+        expect(engine.getCellValue('J1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // MULT  
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // DIV  
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // EXP  
+        expect(engine.getCellValue('N1')).toEqual('0Liz'); // CONCAT     
+    });
+
+    
+xit('Zero with Number should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['0', '2.7', ...data]
+        ]);
+
+        expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        expect(engine.getCellValue('E1')).toEqual(true); // LT   
+        expect(engine.getCellValue('F1')).toEqual(false); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        expect(engine.getCellValue('I1')).toEqual(2.7); // ADD 
+        expect(engine.getCellValue('J1')).toEqual(-2.7); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(0); // MULT  
+        //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')); // DIV  0
+        expect(engine.getCellValue('M1')).toEqual(0); // EXP  
+        expect(engine.getCellValue('N1')).toEqual('02.7'); // CONCAT     
+    });
+
+    it('Zero with Integer in date format should be supported by all comparison operators', () => {
+        const engine = createEngine([
+            ['0', '02/01/1999', ...data]
+        ]);
+
+        expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
+        expect(engine.getCellValue('D1')).toEqual(false); // GT    
+        expect(engine.getCellValue('E1')).toEqual(true); // LT   
+        expect(engine.getCellValue('F1')).toEqual(false); // GTE   
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  
+        expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL 
+        expect(engine.getCellValue('I1')).toEqual(36192); // ADD 
+        expect(engine.getCellValue('J1')).toEqual(-36192); // SUB   
+        expect(engine.getCellValue('K1')).toEqual(0); // MULT  
+        expect(engine.getCellValue('L1')).toEqual(0); // DIV  0
+        expect(engine.getCellValue('M1')).toEqual(0); // EXP  
+        expect(engine.getCellValue('N1')).toEqual('036192'); // CONCAT     
+    });
 })
 
 
