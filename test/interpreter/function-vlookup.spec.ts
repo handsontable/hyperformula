@@ -231,7 +231,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
 
-      engine.setCellContent(adr('C2'), '4')
+      engine.setCellContents(adr('C2'), '4')
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
     })
