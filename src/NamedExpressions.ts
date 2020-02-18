@@ -65,7 +65,10 @@ export class NamedExpressions {
   }
 
   public isNameValid(expressionName: string): boolean {
-    return !expressionName.match(/^\d/)
+    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
+      return false
+    }
+    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
   public addNamedExpression(expressionName: string, formulaString: string): void {
