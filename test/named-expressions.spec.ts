@@ -116,4 +116,15 @@ describe('Named expressions', () => {
       engine.removeNamedExpression('MYname')
     }).not.toThrow()
   })
+
+  it('allow even 255 character named expressions', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const longExpressionName = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+    expect(longExpressionName.length).toBe(255)
+    expect(() => {
+      engine.addNamedExpression(longExpressionName, '=42')
+    }).not.toThrow()
+  })
 })
