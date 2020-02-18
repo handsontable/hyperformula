@@ -10,7 +10,7 @@ import {
   SimpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {CellValue, CellValueExporter, ExportedChange} from './CellValue'
+import {CellValue, Exporter, ExportedChange} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
@@ -96,7 +96,7 @@ export class HyperFormula {
   }
 
   private readonly crudOperations: CrudOperations
-  private readonly cellValueExporter: CellValueExporter
+  private readonly exporter: Exporter
   private readonly namedExpressions: NamedExpressions
 
   constructor(
@@ -118,7 +118,7 @@ export class HyperFormula {
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
-    this.cellValueExporter = new CellValueExporter(config)
+    this.exporter = new Exporter(config)
     this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
     this.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
@@ -130,7 +130,7 @@ export class HyperFormula {
    * @param address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.cellValueExporter.export(this.dependencyGraph.getCellValue(address))
+    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
   }
 
   /**
@@ -167,7 +167,7 @@ export class HyperFormula {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.cellValueExporter.export(this.dependencyGraph.getCellValue(address))
+        arr[i][j] = this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
       }
     }
 
@@ -537,7 +537,7 @@ export class HyperFormula {
   public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
     return this.dependencyGraph.getValuesInRange(range).map(
       (subarray: InternalCellValue[]) => subarray.map(
-        (arg) => this.cellValueExporter.export(arg),
+        (arg) => this.exporter.exportValue(arg),
       ),
     )
   }
@@ -848,7 +848,7 @@ export class HyperFormula {
     if (internalNamedExpressionAddress === null) {
       return null
     } else {
-      return this.cellValueExporter.export(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
+      return this.exporter.exportValue(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
     }
   }
 
@@ -947,6 +947,6 @@ export class HyperFormula {
       changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
     }
 
-    return changes.exportChanges(this.cellValueExporter)
+    return changes.exportChanges(this.exporter)
   }
 }

@@ -1,5 +1,4 @@
 import {InternalCellValue, SimpleCellAddress} from './Cell'
-import {CellValueExporter} from './CellValue'
 import {Matrix} from './Matrix'
 
 export interface CellValueChange {

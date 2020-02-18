@@ -46,7 +46,7 @@ export class DetailedCellError {
   }
 }
 
-export class CellValueExporter {
+export class Exporter {
   constructor(
     private readonly config: Config,
   ) {
@@ -55,11 +55,11 @@ export class CellValueExporter {
   public exportChange(change: CellValueChange): ExportedChange {
     return new ExportedCellChange(
       simpleCellAddress(change.sheet, change.col, change.row),
-      this.export(change.value),
+      this.exportValue(change.value),
     )
   }
 
-  public export(value: InternalCellValue): CellValue {
+  public exportValue(value: InternalCellValue): CellValue {
     if (this.config.smartRounding && typeof value == 'number' && !Number.isInteger(value)) {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {
