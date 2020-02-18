@@ -1,8 +1,6 @@
-import { Config, HyperFormula } from '../../src';
-import {CellError, ErrorType} from '../../src/Cell'
+import { Config, HyperFormula } from '../../src'
 import '../testConfig'
 import {adr} from '../testUtils'
-import { plPL } from '../../src/i18n';
 
 // Data and test scenarios were part of the working draft for OpenFormula standard
 // https://www.oasis-open.org/committees/download.php/16826/openformula-spec-20060221.html
@@ -24,58 +22,76 @@ const data = [
   [null, '2', '3'],
   [null, '3', '2'],
   [null, '4', '1'],
-];
+]
 
-function createEngine(data: any[][]) {
-    let engine = HyperFormula.buildFromArray(data, new Config({ language: plPL }));
+function createEngine(sheetData: any[][], config?: Config) {
+    const engine = HyperFormula.buildFromArray(sheetData, config)
 
     return {
       getCellValue(cellAddress: string) {
         return engine.getCellValue(adr(cellAddress));
-      }
+      },
+      getCellFormula(cellAddress: string) {
+        return engine.getCellFormula(adr(cellAddress));
+      },
     }
 }
 
-xdescribe("ODFF 1.3 Small Group Evaluator", () => {
-  describe("Basic Limits", () => {
+describe('ODFF 1.3 Small Group Evaluator', () => {
+  describe('Basic Limits', () => {
     it('support functions with 30 parameters', () => {
       const engine = createEngine([
         ['=SUM(B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5,B4,B5)'],
-        ...data
-      ]);
+        ...data,
+      ])
 
-      expect(engine.getCellValue('A1')).toBe(75);
-    });
+      expect(engine.getCellValue('A1')).toBe(75)
+    })
 
     it('support formulas up to 1024 characters long', () => {
       const engine = createEngine([
         ['=B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+B4+B5+1111'],
-        ...data
-      ]);
+        ...data,
+      ])
 
-      expect(engine.getCellValue('A1')).toBe(1961);
-    });
+      expect(engine.getCellValue('A1')).toBe(1961)
+    })
 
     it('can handle strings of ASCII characters can be up to 32767+ characters', () => {
-      const engine = createEngine([
-        ['=LEN(REPT("x";2^15-1))'],
-        ...data
-      ]);
+      const str = 'x'.repeat(32767)
 
-      expect(engine.getCellValue('A1')).toBe(32767);
+      const engine = createEngine([
+        ['="' + str + '"'],
+      ])
+
+      expect((engine.getCellValue('A1') as string).length).toBe(32767)
     });
 
     it('support at least 7 levels of nesting functions', () => {
       const engine = createEngine([
         ['=SIN(SIN(SIN(SIN(SIN(SIN(SIN(0)))))))'],
-        ...data
-      ]);
+        ...data,
+      ])
 
-      expect(engine.getCellValue('A1')).toBe(0);
-    });
-  });
+      expect(engine.getCellValue('A1')).toBe(0)
+    })
 
-  it('Functions should support ommiting optional parameters', () => {
+    it('support up to 64 levels of nesting functions', () => {
+      function generateNestedFunction(depth: number) {
+        return (new Array(depth)).fill('0').reduce((val) => `SIN(${val})`, '0')
+      }
+
+      const depth = 64
+      const engine = createEngine([
+        ['=' + generateNestedFunction(depth)],
+      ])
+
+      expect(engine.getCellValue('A1')).toBe(0)
+      expect((engine.getCellFormula('A1') as string).length).toBe(depth * 5 + 2)
+    })
+  })
+
+  xit('Functions should support ommiting optional parameters', () => {
     const engine = createEngine([
       ['=PV(0.05,10,100,0,1)','=PV(0.05,10,100,,1)'],
       ['=CONCATENATE("A","","B")', '=CONCATENATE("A",,"B")']
@@ -86,7 +102,7 @@ xdescribe("ODFF 1.3 Small Group Evaluator", () => {
     //expect(engine.getCellValue('B2')).toBe("AB");
   });
 
-  it('Errors should be parsed and propagated', () => {
+  xit('Errors should be parsed and propagated', () => {
     const engine = createEngine([
       ['=TRUE'],
     ]);
@@ -94,7 +110,7 @@ xdescribe("ODFF 1.3 Small Group Evaluator", () => {
     expect(engine.getCellValue('A1')).toBe(true);
    });
 
-  describe("Math", () => {
+  xdescribe("Math", () => {
     it('Precision', () => {
       const engine = createEngine([
         ['=0.1', '=0.2', '=0.3', '=1/3', '=2^(-3)'],
@@ -132,7 +148,7 @@ xdescribe("ODFF 1.3 Small Group Evaluator", () => {
     });
   });
 
-  describe("Section C", () => {
+  xdescribe("Section C", () => {
     it('6.3.12 Conversion to Logical', () => {
       const engine = createEngine([
         ['=0=TRUE()', '=0=FALSE()', '=-1=TRUE()', '=-1=FALSE()'],
@@ -180,7 +196,7 @@ xdescribe("ODFF 1.3 Small Group Evaluator", () => {
     });
   });
 
-  describe("Section D", () => {
+  xdescribe("Section D", () => {
     it('6.3.5 Infix Operator Ordered Comparison ("<", "<=", ">", ">=")',  () => {
       const engine =  createEngine([
         ['=1<2', '=2<2'],
