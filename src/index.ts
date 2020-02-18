@@ -1,5 +1,5 @@
 import { CellError, EmptyValue } from './Cell'
-import { CellValue, DetailedCellError } from './CellValue'
+import { CellValue, DetailedCellError, ExportedCellChange } from './CellValue'
 import {Config} from './Config'
 import {
   InvalidAddressError,
@@ -36,4 +36,5 @@ export {
   CellError,
   DetailedCellError,
   LazilyTransformingAstService,
+  ExportedCellChange,
 }

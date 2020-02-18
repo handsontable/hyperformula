@@ -9,6 +9,9 @@ export interface CellValueChange {
   value: InternalCellValue,
 }
 
+export interface IChangeExporter<T> {
+  exportChange: (arg: CellValueChange) => T,
+}
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
@@ -38,15 +41,10 @@ export class ContentChanges {
     this.changes.push(...change)
   }
 
-  public exportChanges(exporter: CellValueExporter): ChangeList {
-    const ret: ChangeList = []
+  public exportChanges<T>(exporter: IChangeExporter<T>): T[] {
+    const ret: T[] = []
     this.changes.forEach((e, i) => {
-      ret[i] = {
-        sheet: this.changes[i].sheet,
-        col: this.changes[i].col,
-        row: this.changes[i].row,
-        value: exporter.export(this.changes[i].value),
-      }
+      ret[i] = exporter.exportChange(this.changes[i])
     })
     return ret
   }

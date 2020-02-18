@@ -1,7 +1,34 @@
-import {CellError, ErrorType, InternalCellValue, NoErrorCellValue} from './Cell'
+import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValueChange} from './ContentChanges'
 import {Config} from './Config'
 
 export type CellValue = NoErrorCellValue | DetailedCellError
+
+export type ExportedChange = ExportedCellChange
+
+export class ExportedCellChange {
+  constructor(
+    public readonly address: SimpleCellAddress,
+    public readonly newValue: CellValue
+  ) {
+  }
+
+  public get col() {
+    return this.address.col
+  }
+
+  public get row() {
+    return this.address.row
+  }
+
+  public get sheet() {
+    return this.address.sheet
+  }
+
+  public get value() {
+    return this.newValue
+  }
+}
 
 export class DetailedCellError {
   constructor(
@@ -23,6 +50,13 @@ export class CellValueExporter {
   constructor(
     private readonly config: Config,
   ) {
+  }
+
+  public exportChange(change: CellValueChange): ExportedChange {
+    return new ExportedCellChange(
+      simpleCellAddress(change.sheet, change.col, change.row),
+      this.export(change.value),
+    )
   }
 
   public export(value: InternalCellValue): CellValue {

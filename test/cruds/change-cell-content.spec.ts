@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -430,12 +430,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 0,
-      row: 0,
-      value: 2,
-    })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
   })
 
   it('returns dependent formula value change', () => {
@@ -448,18 +443,8 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 0,
-      row: 0,
-      value: 2,
-    })
-    expect(changes).toContainEqual({
-      sheet: 0,
-      col: 1,
-      row: 0,
-      value: 2,
-    })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 2))
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 0), 2))
   })
 
   it('returns dependent matrix value changes', () => {
@@ -486,13 +471,7 @@ describe('changing cell content', () => {
     const changes = engine.setCellContents(adr('A1'), '7')
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({
-      sheet: 0,
-      row: 0,
-      col: 0,
-      value: 7,
-    })
-
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 ))
   })
 })
 
