@@ -179,7 +179,7 @@ export class Graph<T> {
   }
 
   /*
-   * returns a map from vertex to representative vertex for its SCC
+   * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
     const disc: Map<T, number> = new Map()
@@ -215,7 +215,7 @@ export class Graph<T> {
           DFSstack.pop()
           onStack.delete(u)
         } else {
-          this.edges.get(u)!.forEach( (t: T) => {
+          this.adjacentNodes(u).forEach( (t: T) => {
               if(disc.get(t) !== undefined) { //forward edge or backward edge
                 if(onStack.has(t)) { //backward edge
                   low.set(u, Math.min(low.get(u)!, disc.get(t)!))
