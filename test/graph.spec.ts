@@ -277,7 +277,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 
     const fn = jest.fn((node: string) => true)
     const fn2 = jest.fn( (node: string) => {})
-    graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
+    graph.getTopSortedWithSccSubgraphFrom(new Set([node0]), fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn).toHaveBeenNthCalledWith(1, node0)
