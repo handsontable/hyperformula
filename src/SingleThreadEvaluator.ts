@@ -39,7 +39,8 @@ export class SingleThreadEvaluator implements Evaluator {
     const changes = new ContentChanges()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
+      const cycled = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(new Set(vertices),
+        (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex) {
           const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
           const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -74,14 +75,17 @@ export class SingleThreadEvaluator implements Evaluator {
         } else {
           return true
         }
-      })
-      cycled.forEach((vertex: Vertex) => {
-        if (vertex instanceof FormulaCellVertex) {
-          const error = new CellError(ErrorType.CYCLE)
-          vertex.setCellValue(error)
-          changes.addChange(error, vertex.address)
+      },
+        (vertex: Vertex) => {
+          if (vertex instanceof RangeVertex) {
+            vertex.clearCache()
+          } else if (vertex instanceof FormulaCellVertex) {
+            const error = new CellError(ErrorType.CYCLE)
+            vertex.setCellValue(error)
+            changes.addChange(error, vertex.address)
+          }
         }
-      })
+        )
     })
     return changes
   }

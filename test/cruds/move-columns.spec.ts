@@ -4,7 +4,7 @@ import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {adr, detailedError, extractRange, extractReference} from '../testUtils'
 
-describe("Ensure it is possible to move columns", () => {
+describe('Ensure it is possible to move columns', () => {
   it('should return false when target makes no sense', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -70,7 +70,7 @@ describe("Ensure it is possible to move columns", () => {
   })
 })
 
-describe("Move columns", () => {
+describe('Move columns', () => {
   it('should throw error when target makes no sense', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -189,12 +189,22 @@ describe("Move columns", () => {
 
   it('should return #CYCLE when moving formula onto referred range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '3', '=SUM(A1:C1)', '=AVERAGE(A1:C1)']
+      ['1', '2', '3', '=AVERAGE(A1:C1)', '=SUM(A1:C1)']
     ])
 
     engine.moveColumns(0, 3, 1, 1)
 
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.CYCLE))
+  })
+
+  it('should work with moving formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '4', '=SUM(A1:C1)']
+    ])
+
+    engine.moveColumns(0, 3, 1, 1)
+
+    expect(engine.getCellValue(adr('E1'))).toEqual(10)
   })
 })
