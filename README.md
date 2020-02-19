@@ -296,4 +296,4 @@ Our engine currently depends on the following packages:
 
 ## License
 
-NO LICENSE or permissions given to any third party. Contact contact@navalgo.com or contact@handsontable.com in case of any queries.
+The project is under GPLv3 license. Contact contact@navalgo.com or contact@handsontable.com in case of any queries.
