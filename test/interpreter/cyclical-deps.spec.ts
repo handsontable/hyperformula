@@ -11,7 +11,7 @@ describe('Error literals', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.CYCLE))
-    expect(engine.getCellValue(adr('A2'))).toEqual(true)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
   })
 })

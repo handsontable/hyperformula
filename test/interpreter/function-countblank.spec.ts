@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
@@ -43,14 +43,15 @@ describe('COUNTBLANK', () => {
   })
 
   /* inconsistency with Product 1 */
-  it('should return CYCLE when range vertex is in cycle', () => {
+  it('works even when range vertex is in cycle', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-      ['=SUM(A1:A3)'],
-      ['3'],
+      ['=COUNTBLANK(A1:A3)'],
+      [EmptyValue],
       ['=COUNTBLANK(A1:A3)']
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 })
