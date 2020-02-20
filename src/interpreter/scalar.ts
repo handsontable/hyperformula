@@ -244,10 +244,6 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function equalString(left: string, right: string): boolean {
-  return left.localeCompare(right) === 0
-}
-
 export function strCmp(left: string, right: string): number {
   if (left > right) {
     return 1
