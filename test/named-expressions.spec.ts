@@ -22,7 +22,7 @@ describe('Named expressions', () => {
     const changes = engine.setCellContents(adr('A1'), '20')
 
     expect(changes.length).toBe(2)
-    expect(changes).toContainEqual(new ExportedNamedExpressionChange("myName", 30))
+    expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
 
@@ -140,7 +140,7 @@ describe('Named expressions', () => {
   it('allow even 255 character named expressions', () => {
     const engine = HyperFormula.buildEmpty()
 
-    const longExpressionName = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    const longExpressionName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 
     expect(longExpressionName.length).toBe(255)
     expect(() => {
@@ -151,16 +151,16 @@ describe('Named expressions', () => {
   it('validates characters which are allowed in name', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(() => engine.addNamedExpression("1CantStartWithNumber", "=42")).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression("Spaces Are Not Allowed", "=42")).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression(".CantStartWithDot", "=42")).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression("_CanStartWithUnderscore", "=42")).not.toThrowError()
-    expect(() => engine.addNamedExpression("dots.are.fine", "=42")).not.toThrowError()
-    expect(() => engine.addNamedExpression("underscores_are_fine", "=42")).not.toThrowError()
-    expect(() => engine.addNamedExpression("ś.zażółć.gęślą.jaźń.unicode.is.fine", "=42")).not.toThrowError()
-    expect(() => engine.addNamedExpression("If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100", "=42")).not.toThrowError()
-    expect(() => engine.addNamedExpression("A100", "=42")).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression("$A$50", "=42")).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression("SheetName!$A$50", "=42")).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('1CantStartWithNumber', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('Spaces Are Not Allowed', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('.CantStartWithDot', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
   })
 })

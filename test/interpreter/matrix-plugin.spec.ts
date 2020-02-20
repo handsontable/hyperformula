@@ -219,7 +219,7 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
-  it("transpose without braces", () => {
+  it('transpose without braces', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
