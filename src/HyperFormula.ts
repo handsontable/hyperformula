@@ -158,11 +158,11 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getValues(sheet: number): InternalCellValue[][] {
+  public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
-    const arr: InternalCellValue[][] = new Array(sheetHeight)
+    const arr: CellValue[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
       arr[i] = new Array(sheetWidth)
 
