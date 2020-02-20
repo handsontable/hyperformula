@@ -42,7 +42,6 @@ describe('COUNTBLANK', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
-  /* inconsistency with Product 1 */
   it('works even when range vertex is in cycle', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
