@@ -2,7 +2,7 @@ import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 
-export type RawCellContent = string | number | boolean | EmptyValueType | null | undefined
+export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
 export namespace CellContent {
   export class Number {
@@ -78,6 +78,8 @@ export class CellContentParser {
       return new CellContent.Number(content)
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
+    } else if (content instanceof Date) {
+      return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth()+1, year: content.getFullYear()}))
     } else if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
