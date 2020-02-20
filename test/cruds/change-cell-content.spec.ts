@@ -28,6 +28,9 @@ describe('Changing cell content - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'),1,1)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'),2,2)).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'),2,2)).toBe(false)
   })
 
   it('yes if numeric matrix', () => {
@@ -45,13 +48,6 @@ describe('Changing cell content - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
-  })
-
-  it('multiple parameters', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-
-    expect(engine.isItPossibleToSetCellContents(adr('A1'), adr('A1'))).toEqual(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A1'), adr('A1', 1))).toEqual(false)
   })
 })
 
