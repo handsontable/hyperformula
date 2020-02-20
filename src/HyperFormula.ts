@@ -211,19 +211,21 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to change content in given address
+   * Returns information whether its possible to change content in given addresses
    *
    * If returns true, doing this operation won't throw any errors
    *
-   * @param address - cell coordinates
+   * @param addresses - list of cell coordinates
    */
-  public isItPossibleToSetCellContents(address: SimpleCellAddress): boolean {
-    try {
-      this.crudOperations.ensureItIsPossibleToChangeContent(address)
-      return true
-    } catch (e) {
-      return false
-    }
+  public isItPossibleToSetCellContents(...addresses: SimpleCellAddress[]): boolean {
+    return addresses.every( (address: SimpleCellAddress) => {
+      try {
+        this.crudOperations.ensureItIsPossibleToChangeContent(address)
+        return true
+      } catch (e) {
+        return false
+      }
+    })
   }
 
   /**

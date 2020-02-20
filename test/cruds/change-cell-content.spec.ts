@@ -46,6 +46,13 @@ describe('Changing cell content - checking if its possible', () => {
 
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
   })
+
+  it('multiple parameters', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    expect(engine.isItPossibleToSetCellContents(adr('A1'), adr('A1'))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'), adr('A1', 1))).toEqual(false)
+  })
 })
 
 describe('changing cell content', () => {
