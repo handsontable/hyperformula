@@ -57,7 +57,8 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
-  TimesOp, WhiteSpace,
+  TimesOp,
+  WhiteSpace,
 } from './LexerConfig'
 
 /**
@@ -642,13 +643,30 @@ export class FormulaLexer {
    */
   public tokenizeFormula(text: string): ILexingResult {
     const tokens = this.lexer.tokenize(text)
+    this.skipWhitespacesInsideRanges(tokens)
     this.trimTrailingWhitespaces(tokens)
     return tokens
   }
 
+  private skipWhitespacesInsideRanges(lexingResult: ILexingResult): void {
+    const tokens = lexingResult.tokens
+    if (tokens.length < 3) {
+      return
+    }
+    let i = 0
+    while (i < tokens.length - 2) {
+      if ((tokenMatcher(tokens[i], CellReference) || tokenMatcher(tokens[i], RangeSeparator))
+        && tokenMatcher(tokens[i + 1], WhiteSpace)
+        && (tokenMatcher(tokens[i + 2], CellReference) || tokenMatcher(tokens[i + 2], RangeSeparator))) {
+        tokens.splice(i + 1, 1)
+      }
+      ++i
+    }
+  }
+
   private trimTrailingWhitespaces(lexingResult: ILexingResult): void {
     const tokens = lexingResult.tokens
-    if (lexingResult.errors.length === 0 && tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
+    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
       tokens.pop()
     }
   }

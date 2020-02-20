@@ -113,4 +113,22 @@ describe('computeHashFromTokens', () => {
 
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=FOOBAR()')
   })
+
+  it('should work with whitespaces', () => {
+    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( A1, A1:A2 )'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 )')
+  })
+
+  it('should skip whitespaces inside range ', () => {
+    const formula = '=SUM( A1 : A2 )'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=SUM( #0#0R0:#0#1R0 )')
+  })
+
+  it('should skip trailing whitespace', () => {
+    const formula = '=1 '
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=1')
+  })
 })

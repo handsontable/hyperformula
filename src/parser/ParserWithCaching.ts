@@ -150,14 +150,16 @@ export class ParserWithCaching {
         return withWhitespace('+' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PERCENT_OP: {
-        return withWhitespace(this.computeHashOfAstNode(ast.value) + '%', ast.leadingWhitespace)
+        return this.computeHashOfAstNode(ast.value) + withWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
+        let image
         if (ast.error) {
-          return this.config.getErrorTranslationFor(ast.error.type)
+          image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          return '#ERR!'
+          image = '#ERR!'
         }
+        return withWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)

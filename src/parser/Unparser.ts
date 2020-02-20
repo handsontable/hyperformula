@@ -1,4 +1,3 @@
-
 import {SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
 import {Ast, AstNodeType, AstWithWhitespace, BinaryOpAst} from './Ast'
