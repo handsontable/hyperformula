@@ -142,7 +142,7 @@ function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteC
 function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalCellValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
-    if (!conditionalSplits.every((cs) => cs.hasOwnProperty('value'))) {
+    if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
     const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalCellValue))
