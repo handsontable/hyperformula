@@ -31,7 +31,7 @@ describe('Error literals', () => {
     const engine = HyperFormula.buildFromArray([
       [ '#N/A', 0, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA))  // EQUAL
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NA)) // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NA)) // GT
     expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NA)) // LT
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.NA)) // GTE
