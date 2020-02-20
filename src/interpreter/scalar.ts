@@ -96,7 +96,12 @@ export function power(left: number | CellError, right: number | CellError): numb
   } else if (right instanceof CellError) {
     return right
   } else {
-    return Math.pow(left, right)
+    const ret = Math.pow(left, right)
+    if(isNaN(ret) || ret === Infinity || ret === -Infinity){
+      return new CellError(ErrorType.NUM)
+    } else {
+      return ret
+    }
   }
 }
 
