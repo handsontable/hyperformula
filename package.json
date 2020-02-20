@@ -61,7 +61,7 @@
     "license-checker": "^25.0.1",
     "moment": "^2.22.2",
     "ts-jest": "^23.10.1",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.0.1",
     "typedoc": "^0.13.0",
     "typescript": "^3.0.3",
     "webpack": "^4.28.4",
