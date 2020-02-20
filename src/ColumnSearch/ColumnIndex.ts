@@ -30,9 +30,9 @@ export class ColumnIndex implements IColumnSearchStrategy {
   private readonly binarySearchStrategy: ColumnBinarySearch
 
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly config: Config,
-      private readonly stats: Statistics,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly config: Config,
+    private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)

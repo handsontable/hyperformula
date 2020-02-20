@@ -216,7 +216,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow(`Sheet with id 0 doesn't exist`)
+    }).toThrow('Sheet with id 0 doesn\'t exist')
   })
 
   it('#renameSheet when new sheet name is already taken', () => {
@@ -226,7 +226,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow(`Sheet 'bar' already exists`)
+    }).toThrow('Sheet \'bar\' already exists')
   })
 
   it('#renameSheet for the same name', () => {
@@ -393,7 +393,7 @@ describe('Integration', () => {
   it('should correctly parse all JS types', () => {
     const engine = HyperFormula.buildFromArray([
       [1, true, EmptyValue],
-    ]);
+    ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(true)

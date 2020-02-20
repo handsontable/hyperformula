@@ -475,10 +475,10 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (errors.length > 0) {
       return buildErrorAst(errors.map((e) =>
-          ({
-            type: ParsingErrorType.ParserError,
-            message: e.message,
-          }),
+        ({
+          type: ParsingErrorType.ParserError,
+          message: e.message,
+        }),
       ))
     }
 
@@ -584,10 +584,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
-        this.formulaAddress!.sheet,
-        cellArg.reference.col + colShift,
-        cellArg.reference.row + rowShift,
-        cellArg.reference.type,
+      this.formulaAddress!.sheet,
+      cellArg.reference.col + colShift,
+      cellArg.reference.row + rowShift,
+      cellArg.reference.type,
     )
 
     let absoluteCol = topLeftCorner.col
@@ -612,10 +612,10 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-          this.formulaAddress!.sheet,
-          topLeftCorner.col + width - 1,
-          topLeftCorner.row + height - 1,
-          topLeftCorner.type,
+        this.formulaAddress!.sheet,
+        topLeftCorner.col + width - 1,
+        topLeftCorner.row + height - 1,
+        topLeftCorner.type,
       )
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }

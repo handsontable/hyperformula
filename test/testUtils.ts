@@ -67,7 +67,7 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
     }, 0) - 1
   }
 
-  const row = Number(result[6] as string) - 1
+  const row = Number(result[6]) - 1
 
   return simpleCellAddress(sheet, col, row)
 }

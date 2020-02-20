@@ -6,10 +6,10 @@ import {adr, expectArrayWithSameContent} from '../testUtils'
 describe('batch cruds', () => {
   it('should run batch cruds and call recompute only once', () => {
     const engine = HyperFormula.buildFromArray([
-        //
-        ['foo'],
-        //
-        ['bar'],
+      //
+      ['foo'],
+      //
+      ['bar'],
     ])
 
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')

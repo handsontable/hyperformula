@@ -94,8 +94,8 @@ describe('remove sheet', () => {
   it('should remove sheet with matrix', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-          ['1'],
-          ['{=TRANSPOSE(A1:A1)}'],
+        ['1'],
+        ['{=TRANSPOSE(A1:A1)}'],
       ],
     })
 
@@ -239,8 +239,8 @@ describe('remove sheet - adjust range mapping', () => {
   it('should remove ranges from range mapping when removing sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-          ['=SUM(B1:B2)'],
-          ['=SUM(C1:C2)'],
+        ['=SUM(B1:B2)'],
+        ['=SUM(C1:C2)'],
       ],
       Sheet2: [
         ['=SUM(B1:B2)'],
@@ -287,7 +287,7 @@ describe('remove sheet - adjust matrix mapping', () => {
 describe('remove sheet - adjust column index', () => {
   it('should remove sheet from index', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1'],
+      ['1'],
     ], new Config({ useColumnIndex: true }))
     const index = engine.columnSearch as ColumnIndex
     const removeSheetSpy = jest.spyOn(index, 'removeSheet')

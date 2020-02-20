@@ -72,7 +72,7 @@ export class LazilyTransformingAstService {
   private transformations: Transformation[] = []
 
   constructor(
-      private readonly stats: Statistics,
+    private readonly stats: Statistics,
   ) {
   }
 

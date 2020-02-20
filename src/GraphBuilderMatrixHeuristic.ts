@@ -57,11 +57,11 @@ export class GraphBuilderMatrixHeuristic {
   private mapping: Map<number, Array2d<boolean>> = new Map()
 
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly columnSearch: IColumnSearchStrategy,
-      private readonly dependencies: Map<Vertex, CellDependency[]>,
-      private readonly threshold: number,
-      private readonly cellContentParser: CellContentParser,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly dependencies: Map<Vertex, CellDependency[]>,
+    private readonly threshold: number,
+    private readonly cellContentParser: CellContentParser,
   ) {
   }
 

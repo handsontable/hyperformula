@@ -93,7 +93,7 @@ describe('Removing columns - checking if its possible', () => {
 describe('Address dependencies, Case 1: same sheet', () => {
   it('case Aa: absolute dependency before removed column should not be affected', () => {
     const engine = HyperFormula.buildFromArray([
-        ['', '1', '', '=$B1'],
+      ['', '1', '', '=$B1'],
     ])
 
     engine.removeColumns(0, [2, 1])
@@ -183,7 +183,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
   it('case Rca, range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(B1:C1)', '1' , '2'],
+      ['=SUM(B1:C1)', '1', '2'],
     ])
 
     engine.removeColumns(0, [1, 2])
@@ -701,7 +701,7 @@ describe('Removing columns - ranges', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=SUM(A1:C1)', '', ''],
-                     /*   */
+      /*   */
     ])
 
     engine.removeColumns(0, [1, 2])

@@ -120,10 +120,10 @@ export abstract class FunctionPlugin {
   }
 
   private templateWithOneArgumentCoercion(
-      ast: ProcedureAst,
-      formulaAddress: SimpleCellAddress,
-      coerceFunction: (arg: InternalCellValue) => InternalCellValue,
-      fn: (arg: any) => InternalCellValue,
+    ast: ProcedureAst,
+    formulaAddress: SimpleCellAddress,
+    coerceFunction: (arg: InternalCellValue) => InternalCellValue,
+    fn: (arg: any) => InternalCellValue,
   ) {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)

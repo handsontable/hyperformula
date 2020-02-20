@@ -30,8 +30,8 @@ describe('Replace sheet content', () => {
 
   it('should replace sheet content with new values', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['3', 'foo'],
+      ['1', '2'],
+      ['3', 'foo'],
     ])
 
     engine.setSheetContent('Sheet1', [['3', '4']])
@@ -106,8 +106,8 @@ describe('Replace sheet content', () => {
     })
 
     engine.setSheetContent('Sheet1', [
-        ['3', '4'],
-        ['foo', '5'],
+      ['3', '4'],
+      ['foo', '5'],
     ])
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual('foo')

@@ -9,8 +9,8 @@ import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 
 export class ColumnBinarySearch implements IColumnSearchStrategy {
   constructor(
-      private dependencyGraph: DependencyGraph,
-      private config: Config,
+    private dependencyGraph: DependencyGraph,
+    private config: Config,
   ) {}
 
   public add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void {}

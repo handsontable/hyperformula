@@ -90,17 +90,17 @@ describe('Interpreter', () => {
   })
 
   it('function OFFSET returns bigger range', () => {
-      const engine = HyperFormula.buildFromArray([
-          ['=SUM(OFFSET(A1, 0, 1,2,1))', '5', '6'],
-          ['2', '3', '4'],
-      ])
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(OFFSET(A1, 0, 1,2,1))', '5', '6'],
+      ['2', '3', '4'],
+    ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(8)
+    expect(engine.getCellValue(adr('A1'))).toEqual(8)
   })
 
   it('function OFFSET returns rectangular range and fails', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=OFFSET(A1, 0, 1,2,1))'],
+      ['=OFFSET(A1, 0, 1,2,1))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
@@ -108,20 +108,20 @@ describe('Interpreter', () => {
 
   it('function OFFSET used twice in a range', () => {
     const engine = HyperFormula.buildFromArray([
-        ['5', '6', '=SUM(OFFSET(A2,-1,0):OFFSET(A2,0,1))'],
-        ['2', '3', '4'],
+      ['5', '6', '=SUM(OFFSET(A2,-1,0):OFFSET(A2,0,1))'],
+      ['2', '3', '4'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(16)
   })
 
   it('function OFFSET as a reference inside SUM', () => {
-      const engine = HyperFormula.buildFromArray([
-          ['0', '0', '10'],
-          ['5', '6', '=SUM(SUM(OFFSET(C2,-1,0),A2),-B2)'],
-      ])
+    const engine = HyperFormula.buildFromArray([
+      ['0', '0', '10'],
+      ['5', '6', '=SUM(SUM(OFFSET(C2,-1,0),A2),-B2)'],
+    ])
 
-      expect(engine.getCellValue(adr('C2'))).toEqual(9)
+    expect(engine.getCellValue(adr('C2'))).toEqual(9)
   })
 
   it('initializing engine with multiple sheets', () => {
@@ -153,7 +153,7 @@ describe('Interpreter', () => {
 
   it('expression with parenthesis', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=(1+2)*3'],
+      ['=(1+2)*3'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(9)

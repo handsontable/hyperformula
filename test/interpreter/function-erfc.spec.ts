@@ -1,14 +1,14 @@
-import {HyperFormula} from "../../src"
-import {ErrorType} from "../../src/Cell"
-import {adr, detailedError, expectCloseTo} from "../testUtils"
+import {HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
+import {adr, detailedError, expectCloseTo} from '../testUtils'
 
 describe('Function ERFC', () => {
   const precision = 0.0000003
 
   it('should return error for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=ERFC()'],
-        ['=ERFC(1, 2)'],
+      ['=ERFC()'],
+      ['=ERFC(1, 2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

@@ -144,27 +144,27 @@ export class Config {
   public readonly nullDate: IDate
 
   constructor(
-      {
-        caseSensitive,
-        chooseAddressMappingPolicy,
-        dateFormats,
-        functionArgSeparator,
-        language,
-        functionPlugins,
-        gpuMode,
-        leapYear1900,
-        smartRounding,
-        matrixDetection,
-        matrixDetectionThreshold,
-        nullYear,
-        parseDate,
-        stringifyDate,
-        precisionEpsilon,
-        precisionRounding,
-        useColumnIndex,
-        vlookupThreshold,
-        nullDate,
-      }: Partial<ConfigParams> = {},
+    {
+      caseSensitive,
+      chooseAddressMappingPolicy,
+      dateFormats,
+      functionArgSeparator,
+      language,
+      functionPlugins,
+      gpuMode,
+      leapYear1900,
+      smartRounding,
+      matrixDetection,
+      matrixDetectionThreshold,
+      nullYear,
+      parseDate,
+      stringifyDate,
+      precisionEpsilon,
+      precisionRounding,
+      useColumnIndex,
+      vlookupThreshold,
+      nullDate,
+    }: Partial<ConfigParams> = {},
   ) {
     this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy

@@ -335,8 +335,8 @@ describe('Adding row - sheet dimensions', () => {
 describe('Adding row - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-        ['2'],
+      ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
+      ['2'],
     ], new Config({ useColumnIndex: true }))
 
     engine.addRows(0, [1, 1])
