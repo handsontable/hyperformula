@@ -57,7 +57,7 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
-  TimesOp,
+  TimesOp, WhiteSpace,
 } from './LexerConfig'
 
 /**
@@ -640,6 +640,15 @@ export class FormulaLexer {
    * @param text - string representation of a formula
    */
   public tokenizeFormula(text: string): ILexingResult {
-    return this.lexer.tokenize(text)
+    const tokens = this.lexer.tokenize(text)
+    this.trimTrailingWhitespaces(tokens)
+    return tokens
+  }
+
+  private trimTrailingWhitespaces(lexingResult: ILexingResult): void {
+    const tokens = lexingResult.tokens
+    if (lexingResult.errors.length === 0 && tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
+      tokens.pop()
+    }
   }
 }
