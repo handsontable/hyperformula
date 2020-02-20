@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, ExportedNamedExpressionChange} from '../src'
 import './testConfig'
 import {adr} from './testUtils'
 
@@ -19,8 +19,10 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.setCellContents(adr('A1'), '20')
+    const changes = engine.setCellContents(adr('A1'), '20')
 
+    expect(changes.length).toBe(2)
+    expect(changes).toContainEqual(new ExportedNamedExpressionChange("myName", 30))
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
 

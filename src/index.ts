@@ -1,5 +1,5 @@
 import { CellError, EmptyValue } from './Cell'
-import { CellValue, DetailedCellError, ExportedCellChange } from './CellValue'
+import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
 import {Config} from './Config'
 import {
   InvalidAddressError,
@@ -19,6 +19,8 @@ class HyperFormulaNS extends HyperFormula {
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
   public static LazilyTransformingAstService = LazilyTransformingAstService
+  public static ExportedCellChange = ExportedCellChange
+  public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
 }
 
 export default HyperFormulaNS
@@ -37,4 +39,5 @@ export {
   DetailedCellError,
   LazilyTransformingAstService,
   ExportedCellChange,
+  ExportedNamedExpressionChange,
 }
