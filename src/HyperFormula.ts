@@ -900,6 +900,13 @@ export class HyperFormula {
     return this.unparser.unparse(ast, address)
   }
 
+  /**
+   * Calculates fire-and-forget formula
+   *
+   * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   *
+   * @returns value of the formula
+   */
   public calculateFormula(formulaString: string): CellValue {
     const [ast, address] = this.extractExternalFormula(formulaString)
     if (!ast) {
