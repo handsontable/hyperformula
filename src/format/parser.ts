@@ -8,7 +8,7 @@ export enum TokenType {
 
 export interface FormatToken {
   type: TokenType,
-  value: string
+  value: string,
 }
 
 export function formatToken(type: TokenType, value: string): FormatToken {
@@ -26,7 +26,7 @@ export enum FormatExpressionType {
 
 export interface FormatExpression {
   type: FormatExpressionType,
-  tokens: FormatToken[]
+  tokens: FormatToken[],
 }
 
 function matchDateFormat(str: string): RegExpExecArray[] {

@@ -67,7 +67,7 @@ export class GraphBuilder {
 }
 
 export interface GraphBuilderStrategy {
-  run(sheets: Sheets): Dependencies
+  run(sheets: Sheets): Dependencies,
 }
 
 export class SimpleStrategy implements GraphBuilderStrategy {

@@ -21,41 +21,41 @@ export enum TransformationType {
 }
 
 export interface AddColumnsTransformation {
-  type: TransformationType.ADD_COLUMNS
-  addedColumns: ColumnsSpan
-  sheet: number
+  type: TransformationType.ADD_COLUMNS,
+  addedColumns: ColumnsSpan,
+  sheet: number,
 }
 
 export interface AddRowsTransformation {
-  type: TransformationType.ADD_ROWS
-  addedRows: RowsSpan
-  sheet: number
+  type: TransformationType.ADD_ROWS,
+  addedRows: RowsSpan,
+  sheet: number,
 }
 
 export interface RemoveRowsTransformation {
-  type: TransformationType.REMOVE_ROWS
-  removedRows: RowsSpan
-  sheet: number
+  type: TransformationType.REMOVE_ROWS,
+  removedRows: RowsSpan,
+  sheet: number,
 }
 
 export interface RemoveColumnsTransformation {
-  type: TransformationType.REMOVE_COLUMNS
-  removedColumns: ColumnsSpan
-  sheet: number
+  type: TransformationType.REMOVE_COLUMNS,
+  removedColumns: ColumnsSpan,
+  sheet: number,
 }
 
 export interface MoveCellsTransformation {
-  type: TransformationType.MOVE_CELLS
-  sourceRange: AbsoluteCellRange
-  toRight: number
-  toBottom: number
-  toSheet: number
-  sheet: number
+  type: TransformationType.MOVE_CELLS,
+  sourceRange: AbsoluteCellRange,
+  toRight: number,
+  toBottom: number,
+  toSheet: number,
+  sheet: number,
 }
 
 export interface RemoveSheetTransformation {
-  type: TransformationType.REMOVE_SHEET
-  sheet: number
+  type: TransformationType.REMOVE_SHEET,
+  sheet: number,
 }
 
 export type Transformation =

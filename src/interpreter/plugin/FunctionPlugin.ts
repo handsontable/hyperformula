@@ -12,7 +12,7 @@ interface IImplementedFunctions {
   [functionName: string]: {
     translationKey: string,
     isVolatile?: boolean,
-  }
+  },
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, formulaAddress: SimpleCellAddress) => InternalCellValue

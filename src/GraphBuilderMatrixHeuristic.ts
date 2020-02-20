@@ -50,7 +50,7 @@ export class Array2d<T> {
 export interface PossibleMatrix {
   isMatrix: boolean,
   range: AbsoluteCellRange,
-  cells: SimpleCellAddress[]
+  cells: SimpleCellAddress[],
 }
 
 export class GraphBuilderMatrixHeuristic {

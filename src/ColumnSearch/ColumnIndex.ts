@@ -13,8 +13,8 @@ import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
 interface ValueIndex {
-  version: number
-  index: number[]
+  version: number,
+  index: number[],
 }
 
 type SheetIndex = ColumnMap[]

@@ -52,10 +52,10 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null,
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null
+  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,

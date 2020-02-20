@@ -1,6 +1,6 @@
 
 export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T> | null
+  call(node: T): Set<T> | null,
 }
 
 export interface TopSortResult<T> { sorted: T[], cycled: T[] }

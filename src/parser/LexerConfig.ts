@@ -108,10 +108,10 @@ export const WhiteSpace = createToken({
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
-  OffsetProcedureName: TokenType
+  OffsetProcedureName: TokenType,
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
-  functionMapping: Record<string, string>
+  functionMapping: Record<string, string>,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {

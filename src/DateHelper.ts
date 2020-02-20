@@ -6,7 +6,7 @@ const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303
 export interface IDate {
   year: number,
   month: number,
-  day: number
+  day: number,
 }
 
 export const maxDate = {year: 9999, month: 12, day: 31}
