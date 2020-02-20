@@ -97,7 +97,7 @@ export const plPL: TranslationPackage = {
     ERF: 'FUNKCJA.BŁ',
     ERFC: 'KOMP.FUNKCJA.BŁ',
     ABS: 'WART.BEZWGL',
-    OFFSET: 'PRZESUNIĘCIE'
+    OFFSET: 'PRZESUNIĘCIE',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
