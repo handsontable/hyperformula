@@ -65,7 +65,7 @@ export function isMatrix(text: RawCellContent): Boolean {
 export function isError(text: string, errorMapping: Record<string, ErrorType>): Boolean {
   const upperCased = text.toUpperCase()
   const errorRegex = /#[A-Za-z0-9\/]+[?!]?/
-  return errorRegex.test(upperCased) && errorMapping.hasOwnProperty(upperCased)
+  return errorRegex.test(upperCased) && Object.prototype.hasOwnProperty.call(errorMapping, upperCased)
 }
 
 export class CellContentParser {
