@@ -38,7 +38,7 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('G1'))).toEqual(detailedError(ErrorType.NA)) // LTE 
     expect(engine.getCellValue(adr('H1'))).toEqual(detailedError(ErrorType.NA)) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(detailedError(ErrorType.NA)) // ADD
-    expect(engine.getCellValue(adr('J1'))).toEqual(detailedError(ErrorType.NA)) //SUB
+    expect(engine.getCellValue(adr('J1'))).toEqual(detailedError(ErrorType.NA)) // SUB
     expect(engine.getCellValue(adr('K1'))).toEqual(detailedError(ErrorType.NA)) // MULT
     expect(engine.getCellValue(adr('L1'))).toEqual(detailedError(ErrorType.NA)) // DIV
     expect(engine.getCellValue(adr('M1'))).toEqual(detailedError(ErrorType.NA)) // EXP
