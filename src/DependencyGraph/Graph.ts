@@ -198,7 +198,7 @@ export class Graph<T> {
     let time: number = 0
 
     vertices.forEach( (v: T) => {
-      if(processed.has(v)) {
+      if (processed.has(v)) {
         return
       }
       const shortOrder: T[] = []
@@ -212,17 +212,17 @@ export class Graph<T> {
       onStack.add(v)
       while ( DFSstack.length > 0 ) {
         const u = DFSstack[ DFSstack.length - 1 ]
-        if( processed.has(u) ) { // leaving this DFS subtree
+        if ( processed.has(u) ) { // leaving this DFS subtree
           const pu = parent.get(u)
-          if( pu !==  null ) {
+          if ( pu !==  null ) {
             low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
           DFSstack.pop()
           onStack.delete(u)
         } else {
           this.adjacentNodes(u).forEach( (t: T) => {
-            if(disc.get(t) !== undefined) { // forward edge or backward edge
-              if(onStack.has(t)) { // backward edge
+            if (disc.get(t) !== undefined) { // forward edge or backward edge
+              if (onStack.has(t)) { // backward edge
                 low.set(u, Math.min(low.get(u)!, disc.get(t)!))
               }
             } else {
@@ -242,23 +242,23 @@ export class Graph<T> {
       deepOrder.push(shortOrder)
     })
 
-    const sccMap: Map<T,T> = new Map()
-    const sccInnerEdgeCnt: Map<T,number> = new Map()
+    const sccMap: Map<T, T> = new Map()
+    const sccInnerEdgeCnt: Map<T, number> = new Map()
     flatOrder.forEach( (v: T) => {
-      if(disc.get(v) === low.get(v)){
-        sccMap.set(v,v)
-        sccInnerEdgeCnt.set(v,0)
+      if (disc.get(v) === low.get(v)) {
+        sccMap.set(v, v)
+        sccInnerEdgeCnt.set(v, 0)
       } else {
         sccMap.set(v, sccMap.get(parent.get(v) as T)!)
       }
     })
 
     this.edges.forEach( (targets: Set<T>, v: T) => {
-      targets.forEach( (u:T) => {
+      targets.forEach( (u: T) => {
         const uRepr = sccMap.get(u)!
         const vRepr = sccMap.get(v)!
-        if(uRepr === vRepr) {
-          sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)!+1)
+        if (uRepr === vRepr) {
+          sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)! + 1)
         }
       })
     })
@@ -270,22 +270,21 @@ export class Graph<T> {
     deepOrder.reverse().forEach( (arr: T[]) =>
       arr.forEach( (t: T) => {
         const tRepr = sccMap.get(t)!
-        if(sccInnerEdgeCnt.get(tRepr) === 0){
+        if (sccInnerEdgeCnt.get(tRepr) === 0) {
           sorted.push(t)
-          if( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
+          if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
             this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
           }
         } else {
           cycled.push(t)
-          //operatingFunction(t)
+          // operatingFunction(t)
           onCycle(t)
           this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         }
-      })
+      }),
     )
     return { sorted, cycled }
   }
-
 
   public getDependencies(vertex: T): T[] {
     const result: T[] = []
