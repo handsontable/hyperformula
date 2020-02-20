@@ -190,7 +190,7 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge(node2, node3)
     graph.addEdge(node4, node3)
 
-    expect(graph.topSortWithScc().sorted).toEqual([node4, node1, node0, node2, node3])
+    expect(graph.topSortWithScc().sorted).toEqual([node0, node1, node2, node4, node3])
     expect(graph.topSortWithScc().cycled).toEqual([])
   })
 
@@ -207,7 +207,7 @@ describe('Basic Graph manipulation', () => {
     graph.addEdge(node0, node2)
     graph.addEdge(node1, node3)
 
-    expect(graph.topSortWithScc().sorted).toEqual([node1, node3, node0, node2])
+    expect(graph.topSortWithScc().sorted).toEqual([node0, node1, node2, node3])
     expect(graph.topSortWithScc().cycled).toEqual([])
   })
 
