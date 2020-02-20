@@ -10,7 +10,7 @@ import {
   SimpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {CellValue, Exporter, ExportedChange} from './CellValue'
+import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'

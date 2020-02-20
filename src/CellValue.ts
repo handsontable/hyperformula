@@ -10,7 +10,7 @@ export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 export class ExportedCellChange {
   constructor(
     public readonly address: SimpleCellAddress,
-    public readonly newValue: CellValue
+    public readonly newValue: CellValue,
   ) {
   }
 
@@ -34,7 +34,7 @@ export class ExportedCellChange {
 export class ExportedNamedExpressionChange {
   constructor(
     public readonly name: string,
-    public readonly newValue: CellValue
+    public readonly newValue: CellValue,
   ) {
   }
 }
@@ -58,7 +58,7 @@ export class DetailedCellError {
 export class Exporter {
   constructor(
     private readonly config: Config,
-    private readonly namedExpressions: NamedExpressions
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
