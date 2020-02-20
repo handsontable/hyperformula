@@ -217,7 +217,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
+  public isItPossibleToSetCellContents(address: SimpleCellAddress): boolean {
     try {
       this.crudOperations.ensureItIsPossibleToChangeContent(address)
       return true
