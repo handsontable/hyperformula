@@ -230,7 +230,7 @@ export class HyperFormula {
       return false
     }
     return true
-}
+  }
 
   /**
    * Sets content of a block of cells.
@@ -245,9 +245,9 @@ export class HyperFormula {
     }
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
-          if (isMatrix(cellContents[i][j])) {
-            throw new Error('Cant change matrices in batch operation')
-          }
+        if (isMatrix(cellContents[i][j])) {
+          throw new Error('Cant change matrices in batch operation')
+        }
       }
     }
 
