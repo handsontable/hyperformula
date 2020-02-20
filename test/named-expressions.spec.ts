@@ -55,6 +55,14 @@ describe('Named expressions', () => {
     }).toThrowError("Name of Named Expression '1definitelyIncorrectName' is invalid")
   })
 
+  it('when adding named expression, only formulas are accepted', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.addNamedExpression('myName', '42')
+    }).toThrowError(/not a formula/)
+  })
+
   it('retrieving non-existing named expression', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -82,6 +90,16 @@ describe('Named expressions', () => {
     engine.changeNamedExpressionFormula('myName', '=Sheet1!A1+11')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
+  })
+
+  it('when changing named expression, only formulas are accepted', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    engine.addNamedExpression('myName', '=42')
+
+    expect(() => {
+      engine.changeNamedExpressionFormula('myName', '42')
+    }).toThrowError(/not a formula/)
   })
 
   it('changing not existing named expression', () => {
