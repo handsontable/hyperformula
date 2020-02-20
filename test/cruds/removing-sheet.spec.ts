@@ -163,13 +163,13 @@ describe('remove sheet - adjust edges', () => {
       ],
     })
 
-    const a1_1 = engine.addressMapping.fetchCell(adr('A1'))
-    const a1_2 = engine.addressMapping.fetchCell(adr('A1', 1))
-    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(true)
+    const a1From0 = engine.addressMapping.fetchCell(adr('A1'))
+    const a1From1 = engine.addressMapping.fetchCell(adr('A1', 1))
+    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(true)
 
     engine.removeSheet('Sheet2')
 
-    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(false)
+    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(false)
   })
 })
 
