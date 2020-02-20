@@ -27,7 +27,6 @@ export class SingleThreadEvaluator implements Evaluator {
   public run() {
     this.stats.start(StatType.TOP_SORT)
     const { sorted, cycled } = this.dependencyGraph.topSortWithScc()
-    // const { sorted, cycled } = this.dependencyGraph.topologicalSort()
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
