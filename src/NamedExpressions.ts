@@ -14,6 +14,7 @@ class NamedExpression {
 
 class NamedExpressionsStore {
   private readonly mapping = new Map<string, NamedExpression>()
+  private readonly rowMapping = new Map<number, NamedExpression>()
 
   public has(expressionName: string): boolean {
     return this.mapping.has(this.normalizeExpressionName(expressionName))
@@ -25,14 +26,24 @@ class NamedExpressionsStore {
 
   public add(namedExpression: NamedExpression): void {
     this.mapping.set(this.normalizeExpressionName(namedExpression.name), namedExpression)
+    this.rowMapping.set(namedExpression.row, namedExpression)
   }
 
   public get(expressionName: string): NamedExpression | undefined {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
+  public getByRow(row: number): NamedExpression | undefined {
+    return this.rowMapping.get(row)
+  }
+
   public remove(expressionName: string): void {
-    this.mapping.delete(this.normalizeExpressionName(expressionName))
+    const normalizedExpressionName = this.normalizeExpressionName(expressionName)
+    const namedExpression = this.mapping.get(normalizedExpressionName)
+    if (namedExpression) {
+      this.mapping.delete(normalizedExpressionName)
+      this.rowMapping.delete(namedExpression.row)
+    }
   }
 
   public getAllNamedExpressions(): NamedExpression[] {
@@ -62,6 +73,14 @@ export class NamedExpressions {
 
   public isNameAvailable(expressionName: string): boolean {
     return this.workbookStore.isNameAvailable(expressionName)
+  }
+
+  public fetchNameForNamedExpressionRow(row: number): string {
+    const namedExpression = this.workbookStore.getByRow(row)
+    if (!namedExpression) {
+      throw new Error('Requested Named Expression does not exist')
+    }
+    return namedExpression.name
   }
 
   public isNameValid(expressionName: string): boolean {

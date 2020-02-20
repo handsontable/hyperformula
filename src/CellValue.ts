@@ -1,10 +1,11 @@
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellValueChange} from './ContentChanges'
 import {Config} from './Config'
+import {NamedExpressions} from './NamedExpressions'
 
 export type CellValue = NoErrorCellValue | DetailedCellError
 
-export type ExportedChange = ExportedCellChange
+export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
 export class ExportedCellChange {
   constructor(
@@ -30,6 +31,14 @@ export class ExportedCellChange {
   }
 }
 
+export class ExportedNamedExpressionChange {
+  constructor(
+    public readonly name: string,
+    public readonly newValue: CellValue
+  ) {
+  }
+}
+
 export class DetailedCellError {
   constructor(
     public readonly error: CellError,
@@ -49,14 +58,22 @@ export class DetailedCellError {
 export class Exporter {
   constructor(
     private readonly config: Config,
+    private readonly namedExpressions: NamedExpressions
   ) {
   }
 
   public exportChange(change: CellValueChange): ExportedChange {
-    return new ExportedCellChange(
-      simpleCellAddress(change.sheet, change.col, change.row),
-      this.exportValue(change.value),
-    )
+    if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      return new ExportedNamedExpressionChange(
+        this.namedExpressions.fetchNameForNamedExpressionRow(change.row),
+        this.exportValue(change.value),
+      )
+    } else {
+      return new ExportedCellChange(
+        simpleCellAddress(change.sheet, change.col, change.row),
+        this.exportValue(change.value),
+      )
+    }
   }
 
   public exportValue(value: InternalCellValue): CellValue {
