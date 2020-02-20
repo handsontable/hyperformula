@@ -1,8 +1,8 @@
-import {CellError, ErrorType} from './Cell'
+import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 
-export type RawCellContent = string | null | undefined
+export type RawCellContent = string | number | boolean | EmptyValueType | null | undefined
 
 export namespace CellContent {
   export class Number {
@@ -11,6 +11,10 @@ export namespace CellContent {
 
   export class String {
     constructor(public readonly value: string) { }
+  }
+
+  export class Boolean {
+    constructor(public readonly value: boolean) { }
   }
 
   export class Empty {
@@ -39,7 +43,7 @@ export namespace CellContent {
     }
   }
 
-  export type Type = Number | String | Empty | Formula | MatrixFormula | Error
+  export type Type = Number | String | Boolean | Empty | Formula | MatrixFormula | Error
 }
 
 /**
@@ -68,10 +72,13 @@ export class CellContentParser {
   constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {}
 
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null) {
+    if (content === undefined || content === null || content === EmptyValue) {
       return CellContent.Empty.getSingletonInstance()
-    }
-    if (isMatrix(content)) {
+    } else if (typeof content === 'number') {
+      return new CellContent.Number(content)
+    } else if (typeof content === 'boolean') {
+      return new CellContent.Boolean(content)
+    } else if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
@@ -87,7 +94,7 @@ export class CellContentParser {
         return new CellContent.Number(parsedDateNumber)
       } else {
         return new CellContent.String(
-          content.startsWith('\'') ? content.slice(1) : content
+          content.startsWith('\'') ? content.slice(1) : content,
         )
       }
     }

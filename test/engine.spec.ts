@@ -389,4 +389,14 @@ describe('Integration', () => {
     expect(error.type).toEqual(ErrorType.VALUE)
     expect(error.value).toEqual('#ARG!')
   })
+
+  it('should correctly parse all JS types', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, true, EmptyValue],
+    ]);
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
+  })
 })
