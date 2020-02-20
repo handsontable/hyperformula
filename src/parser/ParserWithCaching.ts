@@ -6,8 +6,8 @@ import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
+import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
+import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {withWhitespace} from './Unparser'
 
@@ -50,12 +50,12 @@ export class ParserWithCaching {
 
     if (lexerResult.errors.length > 0) {
       const ast = buildErrorAst(lexerResult.errors.map((e) =>
-          ({
-            type: ParsingErrorType.LexingError,
-            message: e.message,
-          }),
+        ({
+          type: ParsingErrorType.LexingError,
+          message: e.message,
+        }),
       ))
-      return { ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
+      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: []}
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -64,12 +64,13 @@ export class ParserWithCaching {
     if (cacheResult) {
       ++this.statsCacheUsed
     } else {
-      const parsingResult = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
+      const processedTokens = processWhitespaces(lexerResult.tokens)
+      const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
       cacheResult = this.cache.set(hash, parsingResult)
     }
-    const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+    return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -77,8 +78,8 @@ export class ParserWithCaching {
     if (cacheResult === null) {
       throw new Error('There is no AST with such key in the cache')
     } else {
-      const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
-      return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
+      return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
     }
   }
 
@@ -185,4 +186,28 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
       return `#${cellAddress.sheet}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
+}
+
+export function processWhitespaces(tokens: IToken[]): IExtendedToken[] {
+  const processedTokens: any[] = []
+
+  const first = tokens[0]
+  if (!tokenMatcher(first, WhiteSpace)) {
+    processedTokens.push(first)
+  }
+
+  for (let i = 1; i < tokens.length; ++i) {
+    const current = tokens[i] as IExtendedToken
+    if (tokenMatcher(current, WhiteSpace)) {
+      continue
+    }
+
+    const previous = tokens[i - 1]
+    if (tokenMatcher(previous, WhiteSpace)) {
+      current.leadingWhitespace = previous
+    }
+    processedTokens.push(current)
+  }
+
+  return processedTokens
 }

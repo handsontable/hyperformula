@@ -57,7 +57,7 @@ import {
   RangeSeparator,
   RParen,
   StringLiteral,
-  TimesOp, WhiteSpace,
+  TimesOp,
 } from './LexerConfig'
 
 /**
@@ -462,11 +462,11 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Parses tokenized formula and builds abstract syntax tree
    *
-   * @param lexResult - tokenized formula
+   * @param tokens - tokenized formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public parseFromTokens(lexResult: LexingResult, formulaAddress: SimpleCellAddress): Ast {
-    this.input = lexResult.processedTokens
+  public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): Ast {
+    this.input = tokens
 
     const ast = this.formulaWithContext(formulaAddress)
     const errors = this.errors
@@ -627,10 +627,6 @@ export interface IExtendedToken extends IToken {
   leadingWhitespace?: IToken
 }
 
-export interface LexingResult extends ILexingResult {
-  processedTokens: IExtendedToken[]
-}
-
 export class FormulaLexer {
   private readonly lexer: Lexer
 
@@ -643,42 +639,7 @@ export class FormulaLexer {
    *
    * @param text - string representation of a formula
    */
-  public tokenizeFormula(text: string): LexingResult {
-    return this.processWhitespaces(this.lexer.tokenize(text))
-  }
-
-  private processWhitespaces(lexingResult: ILexingResult): LexingResult {
-    if (lexingResult.errors.length === 0) {
-      const tokens = lexingResult.tokens
-      const processedTokens: any[] = []
-
-      const first = tokens[0]
-      if (!tokenMatcher(first, WhiteSpace)) {
-        processedTokens.push(first)
-      }
-
-      for (let i = 1; i < tokens.length; ++i) {
-        const current = tokens[i] as IExtendedToken
-        if (tokenMatcher(current, WhiteSpace)) {
-          continue
-        }
-
-        const previous = tokens[i - 1]
-        if (tokenMatcher(previous, WhiteSpace)) {
-          current.leadingWhitespace = previous
-        }
-        processedTokens.push(current)
-      }
-
-      return {
-        ...lexingResult,
-        processedTokens: processedTokens
-      }
-    }
-
-    return {
-      ...lexingResult,
-      processedTokens: []
-    }
+  public tokenizeFormula(text: string): ILexingResult {
+    return this.lexer.tokenize(text)
   }
 }
