@@ -38,7 +38,7 @@ export class SingleThreadEvaluator implements Evaluator {
     const changes = new ContentChanges()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      const cycled = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(new Set(vertices),
+      const cycled = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
         if (vertex instanceof FormulaCellVertex) {
           const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)

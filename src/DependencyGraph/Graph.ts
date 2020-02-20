@@ -182,10 +182,10 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(this.nodes, (node: T) => true, (node: T) => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (node: T) => true, (node: T) => {})
   }
 
-  public getTopSortedWithSccSubgraphFrom(vertices: Set<T>, operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+  public getTopSortedWithSccSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
 
     const disc: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
@@ -197,7 +197,7 @@ export class Graph<T> {
 
     let time: number = 0
 
-    vertices.forEach( (v: T) => {
+    vertices.reverse().forEach( (v: T) => {
       if (processed.has(v)) {
         return
       }
