@@ -76,7 +76,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
     start = token.index + token[0].length
   }
 
-  const lastToken = regexTokens[regexTokens.length - 1] as RegExpExecArray
+  const lastToken = regexTokens[regexTokens.length - 1]
 
   if (lastToken.index + lastToken[0].length < str.length) {
     const afterLastToken = str.substr(lastToken.index + lastToken[0].length, str.length)

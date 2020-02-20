@@ -129,7 +129,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       this.index.set(sheet, [])
     }
     const sheetMap = this.index.get(sheet)!
-    let columnMap = sheetMap![col]
+    let columnMap = sheetMap[col]
 
     if (!columnMap) {
       columnMap = new Map()

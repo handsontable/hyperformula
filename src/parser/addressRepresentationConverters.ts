@@ -35,7 +35,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     return undefined
   }
 
-  const row = Number(result[8] as string) - 1
+  const row = Number(result[8]) - 1
   if (result[5] === '$' && result[7] === '$') {
     return CellAddress.absolute(sheet, col, row)
   } else if (result[5] === '$') {
@@ -82,7 +82,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
     return undefined
   }
 
-  const row = Number(result[8] as string) - 1
+  const row = Number(result[8]) - 1
   return simpleCellAddress(sheet, col, row)
 }
 

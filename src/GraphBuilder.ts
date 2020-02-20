@@ -85,7 +85,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
-      const sheet = sheets[sheetName] as Sheet
+      const sheet = sheets[sheetName]
 
       for (let i = 0; i < sheet.length; ++i) {
         const row = sheet[i]
@@ -145,7 +145,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
-      const sheet = sheets[sheetName] as Sheet
+      const sheet = sheets[sheetName]
 
       matrixHeuristic.addSheet(sheetId, {
         width: this.dependencyGraph.getSheetWidth(sheetId),
