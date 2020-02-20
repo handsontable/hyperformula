@@ -96,7 +96,7 @@ export function power(left: number | CellError, right: number | CellError): numb
   } else if (right instanceof CellError) {
     return right
   } else {
-      return Math.pow(left, right)
+    return Math.pow(left, right)
   }
 }
 
