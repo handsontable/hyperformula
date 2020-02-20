@@ -41,6 +41,13 @@ describe('tokenizeFormula', () => {
     expect_array_with_same_content(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
   })
 
+  it('should skip whitespace before function args separator', () => {
+    const tokens = lexer.tokenizeFormula('=SUM(A1 , A2)').tokens
+    const tokenTypes = tokens.map(token => token.tokenType.name)
+    console.log(tokenTypes)
+    expect_array_with_same_content(tokenTypes, ['EqualsOp', 'ProcedureName', 'RelativeCell', 'ArgSeparator', 'WhiteSpace', 'RelativeCell', 'RParen'])
+  })
+
   it('should treat space as whitespace', () => {
     const tokens = lexer.tokenizeFormula('= 1').tokens
     expect(tokens[1].tokenType).toEqual(WhiteSpace)

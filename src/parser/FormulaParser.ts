@@ -632,7 +632,7 @@ export interface IExtendedToken extends IToken {
 export class FormulaLexer {
   private readonly lexer: Lexer
 
-  constructor(lexerConfig: ILexerConfig) {
+  constructor(private lexerConfig: ILexerConfig) {
     this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 
@@ -644,6 +644,7 @@ export class FormulaLexer {
   public tokenizeFormula(text: string): ILexingResult {
     const tokens = this.lexer.tokenize(text)
     this.skipWhitespacesInsideRanges(tokens)
+    this.skipWhitespacesBeforeArgSeparators(tokens)
     this.trimTrailingWhitespaces(tokens)
     return tokens
   }
@@ -662,6 +663,22 @@ export class FormulaLexer {
         tokens.splice(i + 1, 1)
       }
       ++i
+    }
+  }
+
+  private skipWhitespacesBeforeArgSeparators(lexingResult: ILexingResult): void {
+    const tokens = lexingResult.tokens
+    if (tokens.length < 2) {
+      return
+    }
+
+    let i = 0
+    while (i < tokens.length - 2) {
+      if (tokenMatcher(tokens[i], WhiteSpace) && tokenMatcher(tokens[i + 1], this.lexerConfig.ArgSeparator)) {
+        tokens.splice(i, 1)
+      } else {
+        ++i
+      }
     }
   }
 

@@ -131,4 +131,10 @@ describe('computeHashFromTokens', () => {
     const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
     expect(hash).toEqual('=1')
   })
+
+  it('should skip whitespaces before function args separators', () => {
+    const formula = '=SUM(A1 , A2)'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
+  })
 })
