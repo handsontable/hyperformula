@@ -35,18 +35,22 @@ export class Unparser {
         return withWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
+        let image
         if (ast.reference.sheet === address.sheet) {
-          return cellAddressToString(ast.reference, address)
+          image = cellAddressToString(ast.reference, address)
         } else {
-          return this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+          image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
         }
+        return withWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
+        let image
         if (ast.start.sheet === address.sheet) {
-          return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          image = cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
-          return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          image = this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
+        return withWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
@@ -57,14 +61,16 @@ export class Unparser {
         return withWhitespace('-', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
-        return this.unparseAst(ast.value, address) + '%'
+        return this.unparseAst(ast.value, address) + withWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
+        let image
         if (ast.error) {
-          return this.config.getErrorTranslationFor(ast.error.type)
+          image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          return '#ERR!'
+          image = '#ERR!'
         }
+        return withWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.unparseAst(ast.expression, address)

@@ -289,10 +289,11 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
       {
         ALT: () => {
-          const errString = this.CONSUME(ErrorLiteral).image.toUpperCase()
+          const token = this.CONSUME(ErrorLiteral) as IExtendedToken
+          const errString = token.image.toUpperCase()
           const errorType = this.lexerConfig.errorMapping[errString]
           if (errorType) {
-            return buildCellErrorAst(new CellError(errorType))
+            return buildCellErrorAst(new CellError(errorType), token.leadingWhitespace)
           } else {
             return buildErrorAst([{
               type: ParsingErrorType.ParserError,
@@ -449,7 +450,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const lParenToken = this.CONSUME(LParen) as IExtendedToken
     const expression = this.SUBRULE(this.booleanExpression)
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
-    return buildParenthesisAst(expression, lParenToken.leadingWhitespace)
+    return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
 
   constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {

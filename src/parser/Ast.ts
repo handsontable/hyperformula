@@ -325,7 +325,7 @@ export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken,
   internalWhitespace: extractImage(internalWhitespace)
 })
 
-export interface ErrorAst {
+export interface ErrorAst extends AstWithWhitespace{
   type: AstNodeType.ERROR,
   args: ParsingError[]
   error?: CellError
@@ -333,7 +333,11 @@ export interface ErrorAst {
 
 export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
 
-export const buildCellErrorAst = (error: CellError): ErrorAst => ({type: AstNodeType.ERROR, args: [], error})
+export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken): ErrorAst => ({
+  type: AstNodeType.ERROR,
+  args: [], error,
+  leadingWhitespace: extractImage(leadingWhitespace)
+})
 
 function extractImage(token: IToken | undefined): string | undefined {
   return token !== undefined ? token.image: undefined
