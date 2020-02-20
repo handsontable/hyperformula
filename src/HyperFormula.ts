@@ -219,7 +219,7 @@ export class HyperFormula {
    * @param width - width of the box
    * @param height - height of the box
    */
-  public isItPossibleToSetCellContents(address: SimpleCellAddress,  width: number = 1, height: number = 1): boolean {
+  public isItPossibleToSetCellContents(address: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
       for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
