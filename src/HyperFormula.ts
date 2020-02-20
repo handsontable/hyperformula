@@ -220,17 +220,17 @@ export class HyperFormula {
    * @param height - height of the box
    */
   public isItPossibleToSetCellContents(address: SimpleCellAddress,  width: number = 1, height: number = 1): boolean {
-    for(let i = 0; i<width; i++) {
-      for(let j = 0; j<height; j++) {
-        try {
-          this.crudOperations.ensureItIsPossibleToChangeContent({col: address.col+i, row: address.row+j, sheet: address.sheet})
-        } catch (e) {
-          return false
+    try {
+      for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+          this.crudOperations.ensureItIsPossibleToChangeContent({col: address.col + i, row: address.row + j, sheet: address.sheet})
         }
       }
+    } catch (e) {
+      return false
     }
     return true
-  }
+}
 
   /**
    * Sets content of a block of cells.
