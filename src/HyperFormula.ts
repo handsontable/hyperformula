@@ -902,6 +902,17 @@ export class HyperFormula {
     return this.unparser.unparse(ast, exampleExternalFormulaAddress)
   }
 
+  public calculateFormula(formulaString: string): CellValue {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      throw new Error('This is not a formula')
+    }
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    const internalCellValue = this.evaluator.runAndForget(ast, exampleExternalFormulaAddress)
+    return this.exporter.exportValue(internalCellValue)
+  }
+
   /**
    * Validates formula
    *
