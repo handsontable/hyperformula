@@ -79,7 +79,7 @@ export class CellContentParser {
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
-      return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth()+1, year: content.getFullYear()}))
+      return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth() + 1, year: content.getFullYear()}))
     } else if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
