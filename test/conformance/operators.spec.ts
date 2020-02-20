@@ -22,7 +22,7 @@ function createEngine(data: any[][]) {
     }
 };
 
-describe('Qualxity assurance of operators', () => {
+describe('Quality assurance of operators', () => {
     xit('BLANK should be supported by all comparison operators', () => { //pending on #127
         const engine = createEngine([
             [null, null, ...data]
@@ -450,7 +450,7 @@ describe('Qualxity assurance of operators', () => {
         expect(engine.getCellValue('Q1')).toEqual(361.92); // PERCENTAGE  
     });
 
-    xit('Zero with BLANK should be supported by all comparison operators', () => {
+    it('Zero with BLANK should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', 'null', ...data]
         ]);
@@ -491,7 +491,7 @@ describe('Qualxity assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual('0true'); // CONCAT     
     });
 
-    xit('Zero with FALSE should be supported by all comparison operators', () => {
+    it('Zero with FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', 'false', ...data]
         ]);
@@ -530,7 +530,7 @@ describe('Qualxity assurance of operators', () => {
     });
 
 
-    xit('Zero with Number should be supported by all comparison operators', () => {
+    it('Zero with Number should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', '2.7', ...data]
         ]);
@@ -568,7 +568,7 @@ describe('Qualxity assurance of operators', () => {
         expect(engine.getCellValue('N1')).toEqual('036192'); // CONCAT     
     });
 
-    xit('Zero with empty string should be supported by all comparison operators', () => {
+    it('Zero with empty string should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', '', ...data]
         ]);
@@ -577,7 +577,7 @@ describe('Qualxity assurance of operators', () => {
         expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL true
     });
 
-    xit('Zero with null should be supported by all comparison operators', () => {
+    it('Zero with null should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', 'null', ...data]
         ]);
@@ -586,7 +586,7 @@ describe('Qualxity assurance of operators', () => {
         expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL true
     });
 
-    xit('Zero with Zero should be supported by all comparison operators', () => {
+    it('Zero with Zero should be supported by all comparison operators', () => {
         const engine = createEngine([
             ['0', '0', ...data]
         ]);
