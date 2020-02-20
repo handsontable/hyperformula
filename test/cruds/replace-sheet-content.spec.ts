@@ -1,5 +1,5 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
-import {adr, expect_array_with_same_content} from '../testUtils'
+import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Replace sheet content - checking if its possible', () => {
   it('no if theres no such sheet', () => {
@@ -51,7 +51,7 @@ describe('Replace sheet content', () => {
 
     const changes = engine.setSheetContent('Sheet1', [['3', '4']])
 
-    expect_array_with_same_content(changes, [
+    expectArrayWithSameContent(changes, [
       { sheet: 0, col: 0, row: 0, value: 3 },
       { sheet: 0, col: 1, row: 0, value: 4 },
     ])
@@ -68,7 +68,7 @@ describe('Replace sheet content', () => {
 
     expect(changes.length).toEqual(4)
 
-    expect_array_with_same_content(changes, [
+    expectArrayWithSameContent(changes, [
       { sheet: 0, col: 0, row: 0, value: 3 },
       { sheet: 0, col: 1, row: 0, value: 4 },
       { sheet: 0, col: 0, row: 1, value: EmptyValue },

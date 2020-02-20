@@ -8,8 +8,8 @@ import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
   adr, detailedError,
-  expect_array_with_same_content,
-  expect_reference_to_have_ref_error,
+  expectArrayWithSameContent,
+  expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
   extractReference,
 } from '../testUtils'
@@ -204,7 +204,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
     engine.removeSheet('Sheet2')
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=Sheet2!A1']]))
   })
 
@@ -295,6 +295,6 @@ describe('remove sheet - adjust column index', () => {
     engine.removeSheet('Sheet1')
 
     expect(removeSheetSpy).toHaveBeenCalled()
-    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
   })
 })

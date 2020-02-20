@@ -9,13 +9,13 @@ import {FunctionPlugin} from './FunctionPlugin'
  */
 export class BooleanPlugin extends FunctionPlugin {
   public static implementedFunctions = {
-    literal_true: {
+    literalTrue: {
       translationKey: 'TRUE',
     },
-    literal_false: {
+    literalFalse: {
       translationKey: 'FALSE',
     },
-    conditional_if: {
+    conditionalIf: {
       translationKey: 'IF',
     },
     and: {
@@ -40,7 +40,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_true(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -56,7 +56,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public literal_false(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
     } else {
@@ -72,7 +72,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
-  public conditional_if(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+  public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
