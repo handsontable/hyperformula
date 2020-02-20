@@ -18,10 +18,10 @@ check: typecheck test ## Check whether code is working correctly (types + specs)
 full: check lint-fix ## Check whether code is ready to commit (types + specs + lint)
 
 lint: ## Show linting errors
-	@yarn tslint --project tsconfig.json
+	@yarn eslint . --ext .js,.jsx,.ts,.tsx
 
 lint-fix: ## Fix linting errors
-	@yarn tslint --fix --project tsconfig.json > /dev/null
+	@yarn eslint . --ext .js,.jsx,.ts,.tsx --fix
 
 coverage: ## Run tests and show coverage
 	@yarn jest --coverage

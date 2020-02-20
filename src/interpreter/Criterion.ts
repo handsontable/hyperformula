@@ -10,7 +10,7 @@ export enum CriterionType {
 }
 export interface Criterion {
   operator: CriterionType,
-  value: number | string
+  value: number | string,
 }
 export const buildCriterion = (operator: CriterionType, value: number | string) => ({ operator, value })
 

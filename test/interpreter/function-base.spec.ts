@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 describe('function BASE', () => {
   it('should return error when argument of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=BASE("foo", 2, 3)'],
+      ['=BASE("foo", 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))

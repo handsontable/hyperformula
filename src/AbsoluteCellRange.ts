@@ -11,15 +11,15 @@ export class AbsoluteCellRange {
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
-        new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-        new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
     )
   }
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     return new AbsoluteCellRange(
-        topLeftCorner,
-        simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
+      topLeftCorner,
+      simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
     )
   }
 

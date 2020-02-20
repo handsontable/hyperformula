@@ -27,7 +27,7 @@ export type Ast =
 
 export interface ParsingError {
   type: ParsingErrorType,
-  message: string
+  message: string,
 }
 
 export enum ParsingErrorType {
@@ -89,7 +89,7 @@ export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.
 
 export interface CellReferenceAst {
   type: AstNodeType.CELL_REFERENCE,
-  reference: CellAddress
+  reference: CellAddress,
 }
 
 export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
@@ -100,7 +100,7 @@ export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst 
 export interface CellRangeAst {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
-  end: CellAddress
+  end: CellAddress,
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({
@@ -115,7 +115,7 @@ export interface BinaryOpAst {
 }
 
 export interface ConcatenateOpAst extends BinaryOpAst {
-  type: AstNodeType.CONCATENATE_OP
+  type: AstNodeType.CONCATENATE_OP,
 }
 
 export const buildConcatenateOpAst = (left: Ast, right: Ast): ConcatenateOpAst => ({
@@ -125,7 +125,7 @@ export const buildConcatenateOpAst = (left: Ast, right: Ast): ConcatenateOpAst =
 })
 
 export interface EqualsOpAst extends BinaryOpAst {
-  type: AstNodeType.EQUALS_OP
+  type: AstNodeType.EQUALS_OP,
 }
 
 export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
@@ -135,7 +135,7 @@ export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
 })
 
 export interface NotEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.NOT_EQUAL_OP
+  type: AstNodeType.NOT_EQUAL_OP,
 }
 
 export const buildNotEqualOpAst = (left: Ast, right: Ast): NotEqualOpAst => ({
@@ -145,7 +145,7 @@ export const buildNotEqualOpAst = (left: Ast, right: Ast): NotEqualOpAst => ({
 })
 
 export interface GreaterThanOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OP
+  type: AstNodeType.GREATER_THAN_OP,
 }
 
 export const buildGreaterThanOpAst = (left: Ast, right: Ast): GreaterThanOpAst => ({
@@ -155,7 +155,7 @@ export const buildGreaterThanOpAst = (left: Ast, right: Ast): GreaterThanOpAst =
 })
 
 export interface LessThanOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OP
+  type: AstNodeType.LESS_THAN_OP,
 }
 
 export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
@@ -165,7 +165,7 @@ export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
 })
 
 export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP
+  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
 }
 
 export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast): GreaterThanOrEqualOpAst => ({
@@ -175,7 +175,7 @@ export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast): GreaterThan
 })
 
 export interface LessThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OR_EQUAL_OP
+  type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
 }
 
 export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast): LessThanOrEqualOpAst => ({
@@ -267,7 +267,7 @@ export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
 export interface ProcedureAst {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
-  args: Ast[]
+  args: Ast[],
 }
 
 export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
@@ -278,7 +278,7 @@ export const buildProcedureAst = (procedureName: string, args: Ast[]): Procedure
 
 export interface ParenthesisAst {
   type: AstNodeType.PARENTHESIS,
-  expression: Ast
+  expression: Ast,
 }
 
 export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
@@ -288,8 +288,8 @@ export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
 
 export interface ErrorAst {
   type: AstNodeType.ERROR,
-  args: ParsingError[]
-  error?: CellError
+  args: ParsingError[],
+  error?: CellError,
 }
 
 export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})

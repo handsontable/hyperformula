@@ -343,7 +343,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (end !== undefined) {
       if (offsetProcedure.type === AstNodeType.CELL_REFERENCE && end.type === AstNodeType.CELL_REFERENCE) {
-        return buildCellRangeAst(offsetProcedure.reference, end!.reference)
+        return buildCellRangeAst(offsetProcedure.reference, end.reference)
       } else if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
         return buildErrorAst([
           {
@@ -435,7 +435,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference)
     const address = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping!, cell.image, this.formulaAddress!, sheet)
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!, sheet)
     })
     if (address === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -475,10 +475,10 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (errors.length > 0) {
       return buildErrorAst(errors.map((e) =>
-          ({
-            type: ParsingErrorType.ParserError,
-            message: e.message,
-          }),
+        ({
+          type: ParsingErrorType.ParserError,
+          message: e.message,
+        }),
       ))
     }
 
@@ -584,10 +584,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
-        this.formulaAddress!.sheet,
-        cellArg.reference.col + colShift,
-        cellArg.reference.row + rowShift,
-        cellArg.reference.type,
+      this.formulaAddress!.sheet,
+      cellArg.reference.col + colShift,
+      cellArg.reference.row + rowShift,
+      cellArg.reference.type,
     )
 
     let absoluteCol = topLeftCorner.col
@@ -612,10 +612,10 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-          this.formulaAddress!.sheet,
-          topLeftCorner.col + width - 1,
-          topLeftCorner.row + height - 1,
-          topLeftCorner.type,
+        this.formulaAddress!.sheet,
+        topLeftCorner.col + width - 1,
+        topLeftCorner.row + height - 1,
+        topLeftCorner.type,
       )
       return buildCellRangeAst(topLeftCorner, bottomRightCorner)
     }
