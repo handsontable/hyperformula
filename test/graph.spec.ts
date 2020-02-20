@@ -360,7 +360,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 })
 
 describe('Graph cruds', () => {
-  it ('#removeEdge not existing edge', () => {
+  it('#removeEdge not existing edge', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
@@ -370,7 +370,7 @@ describe('Graph cruds', () => {
     expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error('Edge does not exist'))
   })
 
-  it ('#removeEdge removes edge from graph', () => {
+  it('#removeEdge removes edge from graph', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
@@ -387,7 +387,7 @@ describe('Graph cruds', () => {
     expect(graph.existsEdge(node0, node1)).toBe(false)
   })
 
-  it ('#removeIncomingEdges removes all edges incoming to given node', () => {
+  it('#removeIncomingEdges removes all edges incoming to given node', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')

@@ -17,7 +17,7 @@ describe('Function ACOS', () => {
   })
 
   it('for 1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([["=ACOS(1)"]])
+    const engine = HyperFormula.buildFromArray([['=ACOS(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
   })

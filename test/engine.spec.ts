@@ -2,7 +2,7 @@ import {Config, DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import {enGB, plPL} from '../src/i18n'
 import './testConfig.ts'
-import {adr, detailedError, expect_reference_to_have_ref_error} from './testUtils'
+import {adr, detailedError, expectReferenceToHaveRefError} from './testUtils'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -94,7 +94,7 @@ describe('Integration', () => {
   it('should be possible to build graph with reference to not existing sheet', () => {
     const engine = HyperFormula.buildFromArray([['=Sheet2!A2']])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
   it('#getCellFormula returns formula when present', () => {
@@ -216,7 +216,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow(`Sheet with id 0 doesn't exist`)
+    }).toThrow('Sheet with id 0 doesn\'t exist')
   })
 
   it('#renameSheet when new sheet name is already taken', () => {
@@ -226,7 +226,7 @@ describe('Integration', () => {
 
     expect(() => {
       engine.renameSheet(0, 'bar')
-    }).toThrow(`Sheet 'bar' already exists`)
+    }).toThrow('Sheet \'bar\' already exists')
   })
 
   it('#renameSheet for the same name', () => {
@@ -393,7 +393,7 @@ describe('Integration', () => {
   it('should correctly parse all JS types', () => {
     const engine = HyperFormula.buildFromArray([
       [1, true, EmptyValue],
-    ]);
+    ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(true)

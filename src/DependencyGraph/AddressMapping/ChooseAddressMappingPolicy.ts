@@ -3,7 +3,7 @@ import {IAddressMappingStrategyConstructor} from './IAddressMappingStrategy'
 import {SparseStrategy} from './SparseStrategy'
 
 export interface IChooseAddressMapping {
-  call(fill: number): IAddressMappingStrategyConstructor
+  call(fill: number): IAddressMappingStrategyConstructor,
 }
 
 export class DenseSparseChooseBasedOnThreshold implements IChooseAddressMapping {

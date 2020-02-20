@@ -40,14 +40,14 @@ export class ContentChanges {
 
   public exportChanges(exporter: CellValueExporter): ChangeList {
     const ret: ChangeList = []
-    for (const i in this.changes) {
+    this.changes.forEach((e, i) => {
       ret[i] = {
         sheet: this.changes[i].sheet,
         col: this.changes[i].col,
         row: this.changes[i].row,
         value: exporter.export(this.changes[i].value),
       }
-    }
+    })
     return ret
   }
 

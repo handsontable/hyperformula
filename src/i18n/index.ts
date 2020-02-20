@@ -10,7 +10,7 @@ import {plPL} from './plPL'
 export interface TranslationPackage {
   functions: TranslationSet,
   errors: ErrorTranslationSet,
-  interface: TranslationSet
+  interface: TranslationSet,
 }
 
 export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTranslations: TranslationSet): TranslationPackage => {

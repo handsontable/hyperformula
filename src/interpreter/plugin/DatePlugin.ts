@@ -158,7 +158,7 @@ export class DatePlugin extends FunctionPlugin {
     return endDateNumber - startDateNumber
   }
 
-    /**
+  /**
    * Corresponds to MONTH(date)
    *
    * Returns the month of the year specified by a given date

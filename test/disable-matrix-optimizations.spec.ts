@@ -92,15 +92,15 @@ describe('Disable matrix optimizatoins', () => {
 
     engine.disableNumericMatrices()
 
-    const a1_after_update = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
-    const b2_after_update = engine.addressMapping.fetchCell(adr('B2')) as ValueCellVertex
-    expect(a1_after_update).toBeInstanceOf(ValueCellVertex)
-    expect(b2_after_update).toBeInstanceOf(ValueCellVertex)
-    expect(a1_after_update).not.toBe(b2_after_update)
+    const a1AfterUpdate = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
+    const b2AfterUpdate = engine.addressMapping.fetchCell(adr('B2')) as ValueCellVertex
+    expect(a1AfterUpdate).toBeInstanceOf(ValueCellVertex)
+    expect(b2AfterUpdate).toBeInstanceOf(ValueCellVertex)
+    expect(a1AfterUpdate).not.toBe(b2AfterUpdate)
 
     const a3 = engine.addressMapping.fetchCell(adr('A3')) as ValueCellVertex
-    expect(engine.graph.existsEdge(a1_after_update, a3)).toBe(true)
-    expect(engine.graph.existsEdge(b2_after_update, a3)).toBe(true)
+    expect(engine.graph.existsEdge(a1AfterUpdate, a3)).toBe(true)
+    expect(engine.graph.existsEdge(b2AfterUpdate, a3)).toBe(true)
   })
 
   it('should not change edges not related to matrix', () => {
@@ -122,13 +122,13 @@ describe('Disable matrix optimizatoins', () => {
 
     engine.disableNumericMatrices()
 
-    const a1_after_update = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
-    const c1_after_update = engine.addressMapping.fetchCell(adr('C1')) as EmptyCellVertex
-    expect(c1).toBe(c1_after_update)
+    const a1AfterUpdate = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
+    const c1AfterUpdate = engine.addressMapping.fetchCell(adr('C1')) as EmptyCellVertex
+    expect(c1).toBe(c1AfterUpdate)
 
-    expect(a1_after_update).toBeInstanceOf(ValueCellVertex)
-    expect(c1_after_update).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a1_after_update, a3)).toBe(true)
-    expect(engine.graph.existsEdge(c1_after_update, a3)).toBe(true)
+    expect(a1AfterUpdate).toBeInstanceOf(ValueCellVertex)
+    expect(c1AfterUpdate).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1AfterUpdate, a3)).toBe(true)
+    expect(engine.graph.existsEdge(c1AfterUpdate, a3)).toBe(true)
   })
 })

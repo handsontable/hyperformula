@@ -30,7 +30,7 @@ export class RoundingPlugin extends FunctionPlugin {
     trunc: {
       translationKey: 'TRUNC',
     },
-    int_func: {
+    intFunc: {
       translationKey: 'INT',
     },
     even: {
@@ -81,7 +81,7 @@ export class RoundingPlugin extends FunctionPlugin {
     return this.rounddown(ast, formulaAddress)
   }
 
-  public int_func(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+  public intFunc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     return this.templateWithOneCoercedToNumberArgument(ast, formulaAddress, (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)

@@ -6,9 +6,9 @@ import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr, expect_array_with_same_content,
-  expect_function_to_have_ref_error,
-  expect_reference_to_have_ref_error,
+  adr, expectArrayWithSameContent,
+  expectFunctionToHaveRefError,
+  expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
   extractReference,
@@ -127,7 +127,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
   it('case Raa: relative dependency and formula above removed rows should not be affected', () => {
@@ -189,7 +189,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
     ])
 
     engine.removeRows(0, [1, 2])
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
   it('case Rcb: relative dependency in deleted row range should be replaced by #REF', () => {
@@ -201,7 +201,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
     ])
 
     engine.removeRows(0, [0, 2])
-    expect_reference_to_have_ref_error(engine, adr('A2'))
+    expectReferenceToHaveRefError(engine, adr('A2'))
   })
 
   it('case Rca, range', () => {
@@ -211,7 +211,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
       ['2'], //
     ])
     engine.removeRows(0, [1, 2])
-    expect_function_to_have_ref_error(engine, adr('A1'))
+    expectFunctionToHaveRefError(engine, adr('A1'))
   })
 })
 
@@ -321,8 +321,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 
     engine.removeRows(1, [0, 1])
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
-    expect_reference_to_have_ref_error(engine, adr('A2'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A2'))
   })
 
   it('does not truncate any ranges if rows are removed from different sheet', () => {
@@ -550,7 +550,7 @@ describe('Removing rows - reevaluation', () => {
     engine.removeRows(0, [0, 2])
 
     expect(a3setCellValueSpy).toHaveBeenCalled()
-    expect_function_to_have_ref_error(engine, adr('A1'))
+    expectFunctionToHaveRefError(engine, adr('A1'))
   })
 })
 
@@ -840,7 +840,7 @@ describe('Removing rows - column index', () => {
 
     const index = (engine.columnSearch as ColumnIndex)
 
-    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
-    expect_array_with_same_content([1], index.getValueIndex(0, 0, 2).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([1], index.getValueIndex(0, 0, 2).index)
   })
 })
