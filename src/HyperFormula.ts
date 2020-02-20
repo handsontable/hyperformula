@@ -33,7 +33,7 @@ import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {NamedExpressions} from './NamedExpressions'
-import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser} from './parser'
+import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 
 export type Index = [number, number]
@@ -893,23 +893,19 @@ export class HyperFormula {
    * @returns normalized formula
    */
   public normalizeFormula(formulaString: string): string {
-    const parsedCellContent = this.cellContentParser.parse(formulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
+    const [ast, address] = this.extractExternalFormula(formulaString)
+    if (!ast) {
       throw new Error('This is not a formula')
     }
-    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
-    return this.unparser.unparse(ast, exampleExternalFormulaAddress)
+    return this.unparser.unparse(ast, address)
   }
 
   public calculateFormula(formulaString: string): CellValue {
-    const parsedCellContent = this.cellContentParser.parse(formulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
+    const [ast, address] = this.extractExternalFormula(formulaString)
+    if (!ast) {
       throw new Error('This is not a formula')
     }
-    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
-    const internalCellValue = this.evaluator.runAndForget(ast, exampleExternalFormulaAddress)
+    const internalCellValue = this.evaluator.runAndForget(ast, address)
     return this.exporter.exportValue(internalCellValue)
   }
 
@@ -921,16 +917,24 @@ export class HyperFormula {
    * @returns whether formula can be executed outside of regular worksheet
    */
   public validateFormula(formulaString: string): boolean {
-    const parsedCellContent = this.cellContentParser.parse(formulaString)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
+    const [ast, address] = this.extractExternalFormula(formulaString)
+    if (!ast) {
       return false
     }
-    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
     if (ast.type === AstNodeType.ERROR && !ast.error) {
       return false
     }
     return true
+  }
+
+  private extractExternalFormula(formulaString: string): [Ast | false, SimpleCellAddress] {
+    const parsedCellContent = this.cellContentParser.parse(formulaString)
+    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      return [false, exampleExternalFormulaAddress]
+    }
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
+    return [ast, exampleExternalFormulaAddress]
   }
 
   /**
