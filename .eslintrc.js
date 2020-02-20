@@ -24,33 +24,32 @@ module.exports = {
                 delimiter: "comma",
             },
         }],
+        "@typescript-eslint/camelcase": "error",
         "@typescript-eslint/semi": ["error", "never"],
         "@typescript-eslint/brace-style": "error", // wtf
         "@typescript-eslint/indent": ["error", 2],
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["error"],
         "@typescript-eslint/no-extra-non-null-assertion": ["error"],
         "@typescript-eslint/array-type": ["error"],
+        "@typescript-eslint/space-before-function-paren": ["error", "never"],
+        "@typescript-eslint/quotes": ["error", "single", { avoidEscape: true }],
+        "@typescript-eslint/no-extra-semi": ["error"],
+        "@typescript-eslint/comma-spacing": ["error"],
+        "@typescript-eslint/func-call-spacing": ["error"],
 
         // Extensions (superseded by other rules)
         "semi": "off", // superseded by @typescript-eslint/semi
         "semi-style": "off", // superseded by @typescript-eslint/semi
         "brace-style": "off", // superseded by @typescript-eslint/brace-style
         "indent": "off", // superseded by @typescript-eslint/indent
-        "@typescript-eslint/comma-spacing": ["error"],
         "comma-spacing": "off", // superseded by @typescript-eslint/comma-spacing
-        "@typescript-eslint/func-call-spacing": ["error"],
         "func-call-spacing": "off", // superseded by @typescript-eslint/func-call-spacing
-        "@typescript-eslint/no-extra-semi": ["error"],
         "no-extra-semi": "off", // superseded by @typescript-eslint/no-extra-semi
-        "@typescript-eslint/quotes": ["error", "single", { avoidEscape: true }],
         "quotes": "off", // superseded by @typescript-eslint/quotes
-        "@typescript-eslint/space-before-function-paren": ["error", "never"],
         "space-before-function-paren": "off", // superseded by @typescript-eslint/space-before-function-paren
 
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/ban-types": "off",
-        "no-prototype-builtins": "off",
-
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
@@ -59,15 +58,10 @@ module.exports = {
         "no-useless-escape": "off",
         "no-inner-declarations": "off",
 
-        // warn
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/prefer-regexp-exec": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-
-        // error
-        "@typescript-eslint/interface-name-prefix": "off",
-
-        "@typescript-eslint/camelcase": "error",
+        "@typescript-eslint/no-non-null-assertion": "warn",
+        "@typescript-eslint/prefer-regexp-exec": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/interface-name-prefix": "warn",
     }
 };
