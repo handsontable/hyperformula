@@ -2,14 +2,13 @@ import {IToken, tokenMatcher} from 'chevrotain'
 import {SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
-import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
+import {Ast, AstNodeType, buildErrorAst, imageWithWhitespace, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
-import {withWhitespace} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
@@ -64,7 +63,7 @@ export class ParserWithCaching {
     if (cacheResult) {
       ++this.statsCacheUsed
     } else {
-      const processedTokens = processWhitespaces(lexerResult.tokens)
+      const processedTokens = bindWhitespacesToTokens(lexerResult.tokens)
       const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
       cacheResult = this.cache.set(hash, parsingResult)
     }
@@ -125,32 +124,32 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return withWhitespace(ast.value.toString(), ast.leadingWhitespace)
+        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return withWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
+        return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
-        const rightPart = ast.procedureName + '(' + args + withWhitespace(')', ast.internalWhitespace)
-        return withWhitespace(rightPart, ast.leadingWhitespace)
+        const rightPart = ast.procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return withWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
+        return imageWithWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
         const start = cellHashFromToken(ast.start)
         const end = cellHashFromToken(ast.end)
-        return withWhitespace(start + ':' + end, ast.leadingWhitespace)
+        return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return withWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
+        return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
-        return withWhitespace('+' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
+        return imageWithWhitespace('+' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PERCENT_OP: {
-        return this.computeHashOfAstNode(ast.value) + withWhitespace('%', ast.leadingWhitespace)
+        return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
         let image
@@ -159,15 +158,15 @@ export class ParserWithCaching {
         } else {
           image = '#ERR!'
         }
-        return withWhitespace(image, ast.leadingWhitespace)
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)
-        const rightPart = '(' + expression + withWhitespace(')', ast.internalWhitespace)
-        return withWhitespace(rightPart, ast.leadingWhitespace)
+        const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
-        return this.computeHashOfAstNode(ast.left) + withWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
+        return this.computeHashOfAstNode(ast.left) + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
     }
   }
@@ -190,7 +189,7 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
   }
 }
 
-export function processWhitespaces(tokens: IToken[]): IExtendedToken[] {
+export function bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
   const processedTokens: any[] = []
 
   const first = tokens[0]

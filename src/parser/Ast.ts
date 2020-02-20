@@ -342,3 +342,7 @@ export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken):
 function extractImage(token: IToken | undefined): string | undefined {
   return token !== undefined ? token.image : undefined
 }
+
+export function imageWithWhitespace(image: string, leadingWhitespace?: string) {
+  return (leadingWhitespace ? leadingWhitespace : '') + image
+}

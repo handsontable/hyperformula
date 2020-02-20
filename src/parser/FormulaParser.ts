@@ -653,6 +653,7 @@ export class FormulaLexer {
     if (tokens.length < 3) {
       return
     }
+
     let i = 0
     while (i < tokens.length - 2) {
       if ((tokenMatcher(tokens[i], CellReference) || tokenMatcher(tokens[i], RangeSeparator))
