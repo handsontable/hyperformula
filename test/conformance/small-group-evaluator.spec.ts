@@ -330,7 +330,6 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('A1')).toBe(4);
       expect(engine.getCellValue('B1')).toBe(4);
     });
-
     it('6.16.2 ABS fun should support relative references', () => {
       const engine = createEngine([
         ['-4', 4],
@@ -340,7 +339,6 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('A2')).toBe(4);
       expect(engine.getCellValue('B2')).toBe(4);
     });
-
     it('6.16.3 ACOS function', () => {
       const engine = createEngine([
         ['=ACOS(SQRT(2)/2)*4/PI()'],
@@ -354,7 +352,6 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('A3')).toBe(1);
       expect(engine.getCellValue('A4')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!'));
     });
-
     it('6.16.3 ACOS should support relative references', () => {
       const engine = createEngine([
         ['=ACOS(B7)'],
@@ -363,6 +360,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
 
       expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!'));
     });
+
     
 
 
