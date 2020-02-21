@@ -120,7 +120,11 @@ export function unaryminus(value: number | CellError): number | CellError {
   if (value instanceof CellError) {
     return value
   } else {
-    return -value
+    if(value === 0){
+      return 0
+    } else {
+      return -value
+    }
   }
 }
 
