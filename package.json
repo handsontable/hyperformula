@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
-    "core-js": "^3.6.0",
+    "core-js": "^3.6.4",
     "gpu.js": "2.3.0",
     "regenerator-runtime": "^0.13.3"
   }
