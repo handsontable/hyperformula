@@ -4,7 +4,7 @@ import {enGB} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
 import {EqualsOp, RangeSeparator, WhiteSpace} from '../../src/parser/LexerConfig'
 import {bindWhitespacesToTokens} from '../../src/parser/ParserWithCaching'
-import {expect_array_with_same_content} from '../testUtils'
+import {expectArrayWithSameContent} from '../testUtils'
 
 describe('tokenizeFormula', () => {
   const config = new Config()
@@ -26,26 +26,26 @@ describe('tokenizeFormula', () => {
   it('should skip whitespace inside range', () => {
     const tokens = lexer.tokenizeFormula('=A1: A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expect_array_with_same_content(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
   })
 
   it('should skip whitespace inside range 2', () => {
     const tokens = lexer.tokenizeFormula('=A1 :A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expect_array_with_same_content(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
   })
 
   it('should skip whitespace inside range 3', () => {
     const tokens = lexer.tokenizeFormula('=A1 : A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expect_array_with_same_content(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
   })
 
   it('should skip whitespace before function args separator', () => {
     const tokens = lexer.tokenizeFormula('=SUM(A1 , A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
     console.log(tokenTypes)
-    expect_array_with_same_content(tokenTypes, ['EqualsOp', 'ProcedureName', 'RelativeCell', 'ArgSeparator', 'WhiteSpace', 'RelativeCell', 'RParen'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'RelativeCell', 'ArgSeparator', 'WhiteSpace', 'RelativeCell', 'RParen'])
   })
 
   it('should treat space as whitespace', () => {
