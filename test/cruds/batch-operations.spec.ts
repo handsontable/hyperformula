@@ -43,6 +43,7 @@ describe('batch cruds', () => {
         e.addRows(0, [0, 1])
       })
     } catch(e) {
+      // empty line
     }
 
     expect(recomputeSpy).toBeCalledTimes(1)
