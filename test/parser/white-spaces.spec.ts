@@ -93,21 +93,21 @@ describe('processWhitespaces', () => {
     const tokens = lexer.tokenizeFormula('= SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    expect(processed[1].leadingWhitespace!!.image).toBe(' ')
+    expect(processed[1].leadingWhitespace!.image).toBe(' ')
   })
 
   it('should work for multiple whitespaces', () => {
     const tokens = lexer.tokenizeFormula('=    SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    expect(processed[1].leadingWhitespace!!.image).toBe('    ')
+    expect(processed[1].leadingWhitespace!.image).toBe('    ')
   })
 
   it('should work for whitespace at the beginning', () => {
     const tokens = lexer.tokenizeFormula(' =SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    expect(processed[0].leadingWhitespace!!.image).toBe(' ')
+    expect(processed[0].leadingWhitespace!.image).toBe(' ')
   })
 
   it('should not include whitespaces directly on the list', () => {

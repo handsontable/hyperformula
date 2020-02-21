@@ -626,7 +626,7 @@ type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = IOrAlt[] | OrMethodOpts
 
 export interface IExtendedToken extends IToken {
-  leadingWhitespace?: IToken
+  leadingWhitespace?: IToken,
 }
 
 export class FormulaLexer {

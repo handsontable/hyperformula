@@ -76,11 +76,11 @@ export enum AstNodeType {
 }
 
 export interface AstWithWhitespace {
-  leadingWhitespace?: string
+  leadingWhitespace?: string,
 }
 
 export interface AstWithInternalWhitespace extends AstWithWhitespace {
-  internalWhitespace?: string
+  internalWhitespace?: string,
 }
 
 export interface NumberAst extends AstWithWhitespace {
