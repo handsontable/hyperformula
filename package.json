@@ -57,6 +57,7 @@
     "cross-env": "^6.0.3",
     "env-cmd": "^9.0.3",
     "eslint": "^6.8.0",
+    "http-server": "^0.12.1",
     "jest": "^25.1.0",
     "license-checker": "^25.0.1",
     "moment": "^2.22.2",
