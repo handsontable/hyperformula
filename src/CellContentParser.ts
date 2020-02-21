@@ -7,7 +7,7 @@ export type RawCellContent = Date | string | number | boolean | EmptyValueType |
 export namespace CellContent {
   export class Number {
     constructor(public readonly value: number) {
-      if(value===-0) {
+      if(value === 0) { // catches when value is -0
         this.value = 0
       }
     }
@@ -79,11 +79,11 @@ export class CellContentParser {
     if (content === undefined || content === null || content === EmptyValue) {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
-        if( isNaN(content) || content === Infinity || content === -Infinity) {
-          return new CellContent.Error(ErrorType.NUM)
-        } else {
-          return new CellContent.Number(content)
-        }
+      if( isNaN(content) || content === Infinity || content === -Infinity) {
+        return new CellContent.Error(ErrorType.NUM)
+      } else {
+        return new CellContent.Number(content)
+      }
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
