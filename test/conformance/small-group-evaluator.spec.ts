@@ -1,6 +1,6 @@
 import { Config, HyperFormula } from '../../src'
 import '../testConfig'
-import {adr} from '../testUtils'
+import { adr } from '../testUtils'
 
 // Data and test scenarios were part of the working draft for OpenFormula standard
 // https://www.oasis-open.org/committees/download.php/16826/openformula-spec-20060221.html
@@ -26,16 +26,16 @@ const data = [
 ]
 
 function createEngine(sheetData: any[][], config?: Config) {
-    const engine = HyperFormula.buildFromArray(sheetData, config)
+  const engine = HyperFormula.buildFromArray(sheetData, config)
 
-    return {
-      getCellValue(cellAddress: string) {
-        return engine.getCellValue(adr(cellAddress));
-      },
-      getCellFormula(cellAddress: string) {
-        return engine.getCellFormula(adr(cellAddress));
-      },
-    }
+  return {
+    getCellValue(cellAddress: string) {
+      return engine.getCellValue(adr(cellAddress));
+    },
+    getCellFormula(cellAddress: string) {
+      return engine.getCellFormula(adr(cellAddress));
+    },
+  }
 }
 
 describe('ODFF 1.3 Small Group Evaluator', () => {
@@ -94,7 +94,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
 
   xit('Functions should support ommiting optional parameters', () => {
     const engine = createEngine([
-      ['=PV(0.05,10,100,0,1)','=PV(0.05,10,100,,1)'],
+      ['=PV(0.05,10,100,0,1)', '=PV(0.05,10,100,,1)'],
       ['=CONCATENATE("A","","B")', '=CONCATENATE("A",,"B")']
     ]);
 
@@ -109,16 +109,16 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
     ]);
 
     expect(engine.getCellValue('A1')).toBe(true);
-   });
+  });
 
   xdescribe("Math", () => {
     it('Precision', () => {
       const engine = createEngine([
         ['=0.1', '=0.2', '=0.3', '=1/3', '=2^(-3)'],
-        ['=A1+B1', '=A2=C1', '=D1*3', ],
-        ['=IF(0.1+0.2=0.3, "OK", "NOT OK")', ],
+        ['=A1+B1', '=A2=C1', '=D1*3',],
+        ['=IF(0.1+0.2=0.3, "OK", "NOT OK")',],
         ['=0.3', '=C1', '=A2', '=B2', '=0.1+0.2', '=SUMIF(A4:E4,"=0.3")', '=SUMIF(A4:E4,">0.3")'],
-        ['=0.3', '=0.1+0.2',  '=SUMIF(A5:B5,"=0.3")']
+        ['=0.3', '=0.1+0.2', '=SUMIF(A5:B5,"=0.3")']
       ]);
 
       expect(engine.getCellValue('C5')).toBe(0.6);
@@ -198,8 +198,8 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
   });
 
   xdescribe("Section D", () => {
-    it('6.3.5 Infix Operator Ordered Comparison ("<", "<=", ">", ">=")',  () => {
-      const engine =  createEngine([
+    it('6.3.5 Infix Operator Ordered Comparison ("<", "<=", ">", ">=")', () => {
+      const engine = createEngine([
         ['=1<2', '=2<2'],
         ['=2>1', '=2>2'],
         ['=1<=2', '=2<=2', '=3<=2'],
@@ -265,16 +265,16 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('C1')).toBe(0.001953125);
       expect(engine.getCellValue('D1')).toBe(262144);
     });
-    it('6.4.7 Infix Operator =',  () => {
-      const engine =  createEngine([
+    it('6.4.7 Infix Operator =', () => {
+      const engine = createEngine([
         ['=1=2', '=1=1'],
       ]);
 
       expect(engine.getCellValue('A1')).toBe(false);
       expect(engine.getCellValue('B1')).toBe(true);
     });
-    it('6.4.8 Infix Operator <>”',  () => {
-      const engine =  createEngine([
+    it('6.4.8 Infix Operator <>”', () => {
+      const engine = createEngine([
         ['=1<>2', '=1<>1'],
       ]);
 
@@ -317,6 +317,27 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
 
       expect(engine.getCellValue('C1')).toBe(2);
       expect(engine.getCellValue('D1')).toBe(3);
+    });
+  });
+
+  describe("Section E", () => {
+    it('6.16.2 ABS function', () => {
+      const engine = createEngine([
+        ['=ABS(-4)', '=ABS(4)'],
+      ]);
+
+      expect(engine.getCellValue('A1')).toBe(4);
+      expect(engine.getCellValue('B1')).toBe(4);
+    });
+
+    it('6.16.2 ABS fun should support relative references', () => {
+      const engine = createEngine([
+        ['-4', 4],
+        ['=ABS(A1)', '=ABS(B1)']
+      ]);
+
+      expect(engine.getCellValue('A2')).toBe(4);
+      expect(engine.getCellValue('B2')).toBe(4);
     });
   });
 });
