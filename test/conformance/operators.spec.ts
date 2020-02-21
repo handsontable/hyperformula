@@ -47,7 +47,7 @@ describe('Quality assurance of operators', () => {
 
     it('TRUE and BLANK should be supported by all comparison operators', () => { //https://github.com/handsontable/hyperformula/issues/142
         const engine = createEngine([
-            ['true', EmptyValue, ...data]
+            [true, null, ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -56,47 +56,47 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('F1')).toEqual(true); // GTE   //true
         expect(engine.getCellValue('G1')).toEqual(false); // LTE  
         expect(engine.getCellValue('H1')).toEqual(true); // NOT EQUAL
-        //expect(engine.getCellValue('I1')).toEqual(1); // ADD  // returns #VALUE!
-        //expect(engine.getCellValue('J1')).toEqual(1); // SUB  //returns #VALUE!
-        //expect(engine.getCellValue('K1')).toEqual(0); // MULT //returns #VALUE!
-        //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')); // DIV   returns #VALUE!
-        //expect(engine.getCellValue('M1')).toEqual(1); // EXP  returns #VALUE!
+        expect(engine.getCellValue('I1')).toEqual(1); // ADD  // returns #VALUE!
+        expect(engine.getCellValue('J1')).toEqual(1); // SUB  //returns #VALUE!
+        expect(engine.getCellValue('K1')).toEqual(0); // MULT //returns #VALUE!
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')); // DIV   returns #VALUE!
+        expect(engine.getCellValue('M1')).toEqual(1); // EXP  returns #VALUE!
         expect(engine.getCellValue('N1')).toEqual('true'); // CONCAT    
-        //expect(engine.getCellValue('O1')).toEqual(true); // UNARY PLUS   returns #VALUE!
-        //expect(engine.getCellValue('P1')).toEqual(-1); // UNARY MINUS  returns #VALUE!
-        //expect(engine.getCellValue('Q1')).toEqual(0.01); // PERCENTAGE  returns #VALUE!
+        expect(engine.getCellValue('O1')).toEqual(true); // UNARY PLUS   returns #VALUE!
+        expect(engine.getCellValue('P1')).toEqual(-1); // UNARY MINUS  returns #VALUE!
+        expect(engine.getCellValue('Q1')).toEqual(0.01); // PERCENTAGE  returns #VALUE!
     });
 
     it('BLANK and TRUE should be supported by all comparison operators', () => { //https://github.com/handsontable/hyperformula/issues/142
         const engine = createEngine([
-            ['null', 'true', ...data]
+            [null, true, ...data]
         ]);
 
         expect(engine.getCellValue('D1')).toEqual(false); // GT    
         expect(engine.getCellValue('E1')).toEqual(true); // LT   
         expect(engine.getCellValue('F1')).toEqual(false); // GTE   
         expect(engine.getCellValue('G1')).toEqual(true); // LTE  
-        //expect(engine.getCellValue('J1')).toEqual(-1); // SUB  returns value
-        //expect(engine.getCellValue('L1')).toEqual(0); // DIV returns   value
-        //expect(engine.getCellValue('M1')).toEqual(0); // EXP  returns value
+        expect(engine.getCellValue('J1')).toEqual(-1); // SUB  returns value
+        expect(engine.getCellValue('L1')).toEqual(0); // DIV returns   value
+        expect(engine.getCellValue('M1')).toEqual(0); // EXP  returns value
     });
 
     it('BLANK and FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            [null, 'false', ...data]
+            [null, false, ...data]
         ]);
 
         expect(engine.getCellValue('D1')).toEqual(false); // GT    
         //expect(engine.getCellValue('E1')).toEqual(false); // LT   true
-        expect(engine.getCellValue('F1')).toEqual(true); // GTE  //false 
-        //expect(engine.getCellValue('G1')).toEqual(true); // LTE  //false
-        //expect(engine.getCellValue('J1')).toEqual(0); // SUB  value
-        //expect(engine.getCellValue('M1')).toEqual(1); // EXP  value
+        //expect(engine.getCellValue('F1')).toEqual(true); // GTE  //false 
+        expect(engine.getCellValue('G1')).toEqual(true); // LTE  //false
+        expect(engine.getCellValue('J1')).toEqual(0); // SUB  value
+        expect(engine.getCellValue('M1')).toEqual(1); // EXP  value
     });
 
     xit('TRUE and TRUE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['true', 'true', ...data]
+            [true, true, ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(true);  // EQUAL
@@ -105,10 +105,10 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('F1')).toEqual(true); // GTE
         expect(engine.getCellValue('G1')).toEqual(true); // LTE
         expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL
-        //expect(engine.getCellValue('I1')).toEqual(2); // ADD //value
-        //expect(engine.getCellValue('J1')).toEqual(0); // SUB //value
-        //expect(engine.getCellValue('K1')).toEqual(1); // MULT //value
-        //expect(engine.getCellValue('L1')).toEqual(1); // DIV value
+        expect(engine.getCellValue('I1')).toEqual(2); // ADD //value
+        expect(engine.getCellValue('J1')).toEqual(0); // SUB //value
+        expect(engine.getCellValue('K1')).toEqual(1); // MULT //value
+        expect(engine.getCellValue('L1')).toEqual(1); // DIV value
         expect(engine.getCellValue('M1')).toEqual(1); // EXP value
         expect(engine.getCellValue('N1')).toEqual('truetrue'); // CONCAT
 
@@ -116,7 +116,7 @@ describe('Quality assurance of operators', () => {
 
     xit('TRUE and FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['true', 'false', ...data]
+            [true, false, ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(false);  // EQUAL
@@ -135,7 +135,7 @@ describe('Quality assurance of operators', () => {
 
     xit('FALSE and FALSE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['false', 'false', ...data]
+            [false, false, ...data]
         ]);
 
         expect(engine.getCellValue('C1')).toEqual(true);  // EQUAL
@@ -144,20 +144,20 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('F1')).toEqual(true); // GTE
         expect(engine.getCellValue('G1')).toEqual(true); // LTE 
         expect(engine.getCellValue('H1')).toEqual(false); // NOT EQUAL
-        //expect(engine.getCellValue('I1')).toEqual(0); // ADD value
-        //expect(engine.getCellValue('J1')).toEqual(0); // SUB value
-        //expect(engine.getCellValue('K1')).toEqual(0); // MULT value
-        //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')) // DIV value
-        //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP value, in GS 1
+        expect(engine.getCellValue('I1')).toEqual(0); // ADD value
+        expect(engine.getCellValue('J1')).toEqual(0); // SUB value
+        expect(engine.getCellValue('K1')).toEqual(0); // MULT value
+        expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')) // DIV value
+        expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); // EXP value, in GS 1
         expect(engine.getCellValue('N1')).toEqual('falsefalse'); // CONCAT
-        //expect(engine.getCellValue('O1')).toEqual(false); // UNARY PLUS value
-        //expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS value
-        //expect(engine.getCellValue('Q1')).toEqual(0); // PERCENTAGE value
+        expect(engine.getCellValue('O1')).toEqual(false); // UNARY PLUS value
+        expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS value
+        expect(engine.getCellValue('Q1')).toEqual(0); // PERCENTAGE value
     });
 
     xit('FALSE and TRUE should be supported by all comparison operators', () => {
         const engine = createEngine([
-            ['false', 'true', ...data]
+            [false, true, ...data]
         ]);
 
         expect(engine.getCellValue('D1')).toEqual(false); // GT    
