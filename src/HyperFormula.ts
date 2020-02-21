@@ -245,7 +245,7 @@ export class HyperFormula {
     }
     for (let i = 0; i < cellContents.length; i++) {
       if(!(cellContents[i] instanceof Array)) {
-        throw new Error('Expected an array.')
+        throw new Error('Expected raw value or an array of arrays.')
       }
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
@@ -650,11 +650,11 @@ export class HyperFormula {
     return this.batch((e) => {
       e.clearSheet(sheetName)
       if(!(values instanceof Array)) {
-        throw new Error('Expected an array.')
+        throw new Error('Expected an array of arrays.')
       }
       for (let i = 0; i < values.length; i++) {
         if(!(values[i] instanceof Array)) {
-          throw new Error('Expected an array.')
+          throw new Error('Expected an array of arrays.')
         }
         for (let j = 0; j < values[i].length; j++) {
           e.setCellContent({

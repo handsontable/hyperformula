@@ -45,14 +45,14 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setSheetContent('Sheet1', 1)
-    ).toThrow('Expected an array.')
+    ).toThrow('Expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setSheetContent('Sheet1', [1])
-    ).toThrow('Expected an array.')
+    ).toThrow('Expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => engine.setCellContents(adr('A1'), [1])
-    ).toThrow('Expected an array.')
+    ).toThrow('Expected raw value or an array of arrays.')
   })
 })
