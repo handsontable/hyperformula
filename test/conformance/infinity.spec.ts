@@ -32,6 +32,40 @@ describe('Quality assurance of operators', () => {
             ['=EXP(A1)']
         ]);
 
-        expect(engine.getCellValue('A2')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!'));
+        expect(engine.getCellValue('A2')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //return Infinity
     });
+
+    it('SQRT(-2)should thrown #NUM! error', () => {
+        const engine = createEngine([
+            ['=SQRT(-2)']
+        ]);
+
+        expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!'));
+    });
+
+    xit('1000^500 should thrown #NUM! error', () => {
+        const engine = createEngine([
+            ['=1000^500']
+        ]);
+
+        expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //return Infinity
+    });
+
+    it('smallest number -1*10 ^308 should return -1.0000000000000006e+308', () => {
+        const engine = createEngine([
+            ['=-1*10 ^308']
+        ]);
+
+        expect(engine.getCellValue('A1')).toEqual(-1.0000000000000006e+308);
+    });
+
+    xit('too small -1*10^309 should return #NUM!', () => {
+        const engine = createEngine([
+            ['=-1*10 ^309']
+        ]);
+
+        expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')); //return -Infinity
+    });
+
+
 })
