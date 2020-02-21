@@ -42,7 +42,8 @@ describe('batch cruds', () => {
         e.addRows(1, [0, 1]) // fail
         e.addRows(0, [0, 1])
       })
-    } catch(e) {}
+    } catch(e) {
+    }
 
     expect(recomputeSpy).toBeCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
