@@ -4,6 +4,7 @@ import {adr} from '../testUtils'
 
 // Data and test scenarios were part of the working draft for OpenFormula standard
 // https://www.oasis-open.org/committees/download.php/16826/openformula-spec-20060221.html
+// https://docs.oasis-open.org/office/OpenDocument/v1.3/csprd02/part4-formula/OpenDocument-v1.3-csprd02-part4-formula.html#__RefHeading__711846_826425813
 
 const data = [
   [null, null, null],
