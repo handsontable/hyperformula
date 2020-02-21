@@ -35,12 +35,14 @@ describe('batch cruds', () => {
 
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
 
-    engine.batch((e) => {
-      e.addRows(0, [0, 1], [1, 1])
-      e.removeRows(0, [0, 1])
-      e.addRows(1, [0, 1]) // fail
-      e.addRows(0, [0, 1])
-    })
+    try {
+      engine.batch((e) => {
+        e.addRows(0, [0, 1], [1, 1])
+        e.removeRows(0, [0, 1])
+        e.addRows(1, [0, 1]) // fail
+        e.addRows(0, [0, 1])
+      })
+    } catch(e) {}
 
     expect(recomputeSpy).toBeCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')

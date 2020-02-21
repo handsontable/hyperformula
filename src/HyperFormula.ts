@@ -806,7 +806,8 @@ export class HyperFormula {
     try {
       batchOperations(this.crudOperations)
     } catch (e) {
-      /* TODO we should be able to return error information along with changes */
+      this.recomputeIfDependencyGraphNeedsIt()
+      throw( e )
     }
     return this.recomputeIfDependencyGraphNeedsIt()
   }
