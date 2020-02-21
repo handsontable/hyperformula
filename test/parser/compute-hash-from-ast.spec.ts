@@ -213,7 +213,7 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 ) + #DIV/0!')
   })
 
-  it('sshould skip whitespaces before function args separators', () => {
+  it('should skip whitespaces before function args separators', () => {
     const formula = '=SUM(A1 , A2)'
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
@@ -221,4 +221,3 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
   })
 })
-
