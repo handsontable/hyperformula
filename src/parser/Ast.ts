@@ -29,7 +29,7 @@ export type Ast =
 
 export interface ParsingError {
   type: ParsingErrorType,
-  message: string
+  message: string,
 }
 
 export enum ParsingErrorType {
@@ -107,7 +107,7 @@ export const buildStringAst = (token: IExtendedToken): StringAst => ({
 
 export interface CellReferenceAst extends AstWithWhitespace {
   type: AstNodeType.CELL_REFERENCE,
-  reference: CellAddress
+  reference: CellAddress,
 }
 
 export const buildCellReferenceAst = (reference: CellAddress, leadingWhitespace?: IToken): CellReferenceAst => ({
@@ -119,7 +119,7 @@ export const buildCellReferenceAst = (reference: CellAddress, leadingWhitespace?
 export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
-  end: CellAddress
+  end: CellAddress,
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress, leadingWhitespace?: string): CellRangeAst => ({
@@ -135,7 +135,7 @@ export interface BinaryOpAst extends AstWithWhitespace {
 }
 
 export interface ConcatenateOpAst extends BinaryOpAst {
-  type: AstNodeType.CONCATENATE_OP
+  type: AstNodeType.CONCATENATE_OP,
 }
 
 export const buildConcatenateOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): ConcatenateOpAst => ({
@@ -146,7 +146,7 @@ export const buildConcatenateOpAst = (left: Ast, right: Ast, leadingWhitespace?:
 })
 
 export interface EqualsOpAst extends BinaryOpAst {
-  type: AstNodeType.EQUALS_OP
+  type: AstNodeType.EQUALS_OP,
 }
 
 export const buildEqualsOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): EqualsOpAst => ({
@@ -157,7 +157,7 @@ export const buildEqualsOpAst = (left: Ast, right: Ast, leadingWhitespace?: ITok
 })
 
 export interface NotEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.NOT_EQUAL_OP
+  type: AstNodeType.NOT_EQUAL_OP,
 }
 
 export const buildNotEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): NotEqualOpAst => ({
@@ -168,7 +168,7 @@ export const buildNotEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IT
 })
 
 export interface GreaterThanOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OP
+  type: AstNodeType.GREATER_THAN_OP,
 }
 
 export const buildGreaterThanOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): GreaterThanOpAst => ({
@@ -179,7 +179,7 @@ export const buildGreaterThanOpAst = (left: Ast, right: Ast, leadingWhitespace?:
 })
 
 export interface LessThanOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OP
+  type: AstNodeType.LESS_THAN_OP,
 }
 
 export const buildLessThanOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): LessThanOpAst => ({
@@ -190,7 +190,7 @@ export const buildLessThanOpAst = (left: Ast, right: Ast, leadingWhitespace?: IT
 })
 
 export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP
+  type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
 }
 
 export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): GreaterThanOrEqualOpAst => ({
@@ -201,7 +201,7 @@ export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast, leadingWhite
 })
 
 export interface LessThanOrEqualOpAst extends BinaryOpAst {
-  type: AstNodeType.LESS_THAN_OR_EQUAL_OP
+  type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
 }
 
 export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): LessThanOrEqualOpAst => ({
@@ -302,7 +302,7 @@ export const buildPercentOpAst = (value: Ast, leadingWhitespace?: IToken): Perce
 export interface ProcedureAst  extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
-  args: Ast[]
+  args: Ast[],
 }
 
 export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken): ProcedureAst => ({
@@ -315,7 +315,7 @@ export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhi
 
 export interface ParenthesisAst extends AstWithInternalWhitespace {
   type: AstNodeType.PARENTHESIS,
-  expression: Ast
+  expression: Ast,
 }
 
 export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken, internalWhitespace?: IToken): ParenthesisAst => ({
@@ -327,8 +327,8 @@ export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken,
 
 export interface ErrorAst extends AstWithWhitespace {
   type: AstNodeType.ERROR,
-  args: ParsingError[]
-  error?: CellError
+  args: ParsingError[],
+  error?: CellError,
 }
 
 export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})

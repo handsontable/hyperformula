@@ -15,7 +15,7 @@ import {simpleCellAddressToString} from '../src/parser'
 export class EngineComparator {
 
   constructor(private expected: HyperFormula,
-              private actual: HyperFormula) {
+    private actual: HyperFormula) {
   }
 
   public compare() {
@@ -38,10 +38,10 @@ export class EngineComparator {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
-    const expectedWidth = this.expected.addressMapping!.getWidth(sheet)
-    const expectedHeight = this.expected.addressMapping!.getHeight(sheet)
-    const actualWidth = this.actual.addressMapping!.getWidth(sheet)
-    const actualHeight = this.actual.addressMapping!.getHeight(sheet)
+    const expectedWidth = this.expected.addressMapping.getWidth(sheet)
+    const expectedHeight = this.expected.addressMapping.getHeight(sheet)
+    const actualWidth = this.actual.addressMapping.getWidth(sheet)
+    const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
     if (expectedHeight !== actualHeight) {
       console.warn(`Expected sheet of height ${expectedHeight}, actual: ${actualHeight}`)
@@ -53,8 +53,8 @@ export class EngineComparator {
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
-        const expectedVertex = this.expected.addressMapping!.getCell(address)
-        const actualVertex = this.actual.addressMapping!.getCell(address)
+        const expectedVertex = this.expected.addressMapping.getCell(address)
+        const actualVertex = this.actual.addressMapping.getCell(address)
 
         if (expectedVertex === null && actualVertex === null) {
           continue

@@ -56,17 +56,13 @@ describe('i18n', () => {
     }
   })
 
-  it('all translation packages should translate all enGB functions', () => {
-    const translatedFunctionsIn_enGB = new Set(Object.keys(enGB.functions))
+  it('all translation packages should translate all implemented functions', () => {
+    const implementedFunctions = (new Config()).getRegisteredFunctions()
+    implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
     for (const lang in languages) {
-      if (lang === 'enGB') {
-        continue
-      }
-
-      const translationPackage = languages[lang]
-      const translatedFunctionsIn_lang = new Set(Object.keys(languages[lang].functions))
-      expect(translatedFunctionsIn_lang).toEqual(translatedFunctionsIn_enGB)
+      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+      expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
   })
 })

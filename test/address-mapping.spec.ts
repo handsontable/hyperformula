@@ -300,13 +300,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.has(adr('B1'))).toBe(true)
   })
 
-  it ('should expand columns when adding cell', () => {
+  it('should expand columns when adding cell', () => {
     const mapping = builder(2, 2)
     mapping.setCell(adr('C1'), new EmptyCellVertex())
     expect(mapping.getWidth(0)).toBe(3)
   })
 
-  it ('should expand rows when adding cell', () => {
+  it('should expand rows when adding cell', () => {
     const mapping = builder(2, 2)
     mapping.setCell(adr('A3'), new EmptyCellVertex())
     expect(mapping.getHeight(0)).toBe(3)

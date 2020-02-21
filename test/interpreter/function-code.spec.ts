@@ -1,6 +1,6 @@
-import {HyperFormula} from "../../src"
-import {CellValueType, ErrorType} from "../../src/Cell"
-import {adr, detailedError} from "../testUtils"
+import {HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function CODE', () => {
   it('should not work for wrong number of arguments', () => {
@@ -54,7 +54,7 @@ describe('Function CODE', () => {
 
   it('should return number', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=CODE("foo")']
+      ['=CODE("foo")']
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toEqual(CellValueType.NUMBER)

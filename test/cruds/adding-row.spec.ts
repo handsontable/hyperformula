@@ -4,7 +4,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import { FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
 import '../testConfig'
-import {adr, expect_array_with_same_content, extractMatrixRange} from '../testUtils'
+import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -335,14 +335,14 @@ describe('Adding row - sheet dimensions', () => {
 describe('Adding row - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-        ['2'],
+      ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
+      ['2'],
     ], new Config({ useColumnIndex: true }))
 
     engine.addRows(0, [1, 1])
 
     const index = (engine.columnSearch as ColumnIndex)
-    expect_array_with_same_content([0], index.getValueIndex(0, 0, 1).index)
-    expect_array_with_same_content([2], index.getValueIndex(0, 0, 2).index)
+    expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([2], index.getValueIndex(0, 0, 2).index)
   })
 })

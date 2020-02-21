@@ -1,12 +1,12 @@
-import {HyperFormula} from "../../src"
-import {CellValueType, ErrorType} from "../../src/Cell"
-import {adr, detailedError} from "../testUtils"
+import {HyperFormula} from '../../src'
+import {CellValueType, ErrorType} from '../../src/Cell'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function DELTA', () => {
   it('should not work for wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=DELTA()'],
-        ['=DELTA(1, 2, 3)'],
+      ['=DELTA()'],
+      ['=DELTA(1, 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

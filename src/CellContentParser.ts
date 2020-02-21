@@ -1,8 +1,8 @@
-import {CellError, ErrorType} from './Cell'
+import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 
-export type RawCellContent = string | null | undefined
+export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
 export namespace CellContent {
   export class Number {
@@ -11,6 +11,10 @@ export namespace CellContent {
 
   export class String {
     constructor(public readonly value: string) { }
+  }
+
+  export class Boolean {
+    constructor(public readonly value: boolean) { }
   }
 
   export class Empty {
@@ -39,7 +43,7 @@ export namespace CellContent {
     }
   }
 
-  export type Type = Number | String | Empty | Formula | MatrixFormula | Error
+  export type Type = Number | String | Boolean | Empty | Formula | MatrixFormula | Error
 }
 
 /**
@@ -55,23 +59,28 @@ export function isMatrix(text: RawCellContent): Boolean {
   if (typeof text !== 'string') {
     return false
   }
-  return (text.length > 1) && (text[0] === '{') && (text[text.length - 1] === '}')
+  return (text.length > 1) && (text.startsWith('{')) && (text.endsWith('}'))
 }
 
 export function isError(text: string, errorMapping: Record<string, ErrorType>): Boolean {
   const upperCased = text.toUpperCase()
   const errorRegex = /#[A-Za-z0-9\/]+[?!]?/
-  return errorRegex.test(upperCased) && errorMapping.hasOwnProperty(upperCased)
+  return errorRegex.test(upperCased) && Object.prototype.hasOwnProperty.call(errorMapping, upperCased)
 }
 
 export class CellContentParser {
   constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {}
 
   public parse(content: RawCellContent): CellContent.Type {
-    if (content === undefined || content === null) {
+    if (content === undefined || content === null || content === EmptyValue) {
       return CellContent.Empty.getSingletonInstance()
-    }
-    if (isMatrix(content)) {
+    } else if (typeof content === 'number') {
+      return new CellContent.Number(content)
+    } else if (typeof content === 'boolean') {
+      return new CellContent.Boolean(content)
+    } else if (content instanceof Date) {
+      return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth() + 1, year: content.getFullYear()}))
+    } else if (isMatrix(content)) {
       return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
     } else if (isFormula(content)) {
       return new CellContent.Formula(content)
@@ -82,13 +91,14 @@ export class CellContentParser {
       if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
         return new CellContent.Number(Number(trimmedContent))
       }
-      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(content)
+      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
       if (parsedDateNumber !== null) {
         return new CellContent.Number(parsedDateNumber)
       } else {
-        return new CellContent.String(content)
+        return new CellContent.String(
+          content.startsWith('\'') ? content.slice(1) : content,
+        )
       }
-
     }
   }
 }

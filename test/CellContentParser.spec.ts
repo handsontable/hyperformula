@@ -1,4 +1,4 @@
-import {Config} from '../src'
+import {Config, EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {DateHelper} from '../src/DateHelper'
@@ -29,10 +29,18 @@ describe('CellContentParser', () => {
 
   it('numbers', () => {
     expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))
+    expect(cellContentParser.parse('+42')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(' 42')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse('42 ')).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse('42.13')).toStrictEqual(new CellContent.Number(42.13))
     expect(cellContentParser.parse('-42.13')).toStrictEqual(new CellContent.Number(-42.13))
+    expect(cellContentParser.parse('+42.13')).toStrictEqual(new CellContent.Number(42.13))
+  })
+
+  it( 'non-string', () => {
+    expect(cellContentParser.parse(42)).toStrictEqual(new CellContent.Number(42))
+    expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean(true))
+    expect(cellContentParser.parse(EmptyValue)).toStrictEqual(new CellContent.Empty())
   })
 
   it('string', () => {
@@ -44,20 +52,39 @@ describe('CellContentParser', () => {
   })
 
   it('errors', () => {
-    expect((cellContentParser.parse('#DIV/0!'))).toStrictEqual(new CellContent.Error(ErrorType.DIV_BY_ZERO))
-    expect((cellContentParser.parse('#NUM!'))).toStrictEqual(new CellContent.Error(ErrorType.NUM))
-    expect((cellContentParser.parse('#N/A'))).toStrictEqual(new CellContent.Error(ErrorType.NA))
-    expect((cellContentParser.parse('#VALUE!'))).toStrictEqual(new CellContent.Error(ErrorType.VALUE))
-    expect((cellContentParser.parse('#CYCLE!'))).toStrictEqual(new CellContent.Error(ErrorType.CYCLE))
-    expect((cellContentParser.parse('#NAME?'))).toStrictEqual(new CellContent.Error(ErrorType.NAME))
-    expect((cellContentParser.parse('#REF!'))).toStrictEqual(new CellContent.Error(ErrorType.REF))
+    expect(cellContentParser.parse('#DIV/0!')).toStrictEqual(new CellContent.Error(ErrorType.DIV_BY_ZERO))
+    expect(cellContentParser.parse('#NUM!')).toStrictEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse('#N/A')).toStrictEqual(new CellContent.Error(ErrorType.NA))
+    expect(cellContentParser.parse('#VALUE!')).toStrictEqual(new CellContent.Error(ErrorType.VALUE))
+    expect(cellContentParser.parse('#CYCLE!')).toStrictEqual(new CellContent.Error(ErrorType.CYCLE))
+    expect(cellContentParser.parse('#NAME?')).toStrictEqual(new CellContent.Error(ErrorType.NAME))
+    expect(cellContentParser.parse('#REF!')).toStrictEqual(new CellContent.Error(ErrorType.REF))
   })
 
   it('errors are case insensitive', () => {
-    expect((cellContentParser.parse('#dIv/0!'))).toStrictEqual(new CellContent.Error(ErrorType.DIV_BY_ZERO))
+    expect(cellContentParser.parse('#dIv/0!')).toStrictEqual(new CellContent.Error(ErrorType.DIV_BY_ZERO))
   })
 
   it('error-like literal is string', () => {
-    expect((cellContentParser.parse('#FOO!'))).toStrictEqual(new CellContent.String('#FOO!'))
+    expect(cellContentParser.parse('#FOO!')).toStrictEqual(new CellContent.String('#FOO!'))
+  })
+
+  it('date parsing', () => {
+    expect(cellContentParser.parse('02-02-2020')).toStrictEqual(new CellContent.Number(43863))
+    expect(cellContentParser.parse('  02-02-2020')).toStrictEqual(new CellContent.Number(43863))
+  })
+
+  it('JS Date parsing', () => {
+    expect(cellContentParser.parse(new Date(1995, 11, 17))).toStrictEqual(new CellContent.Number(35050))
+    expect(cellContentParser.parse(new Date('02-02-2020'))).toStrictEqual(new CellContent.Number(43863))
+  })
+
+  it( 'starts with \'', () => {
+    expect(cellContentParser.parse('\'123')).toStrictEqual(new CellContent.String('123'))
+    expect(cellContentParser.parse('\'=1+1')).toStrictEqual(new CellContent.String('=1+1'))
+    expect(cellContentParser.parse('\'\'1')).toStrictEqual(new CellContent.String('\'1'))
+    expect(cellContentParser.parse('\' 1')).toStrictEqual(new CellContent.String(' 1'))
+    expect(cellContentParser.parse(' \'1')).toStrictEqual(new CellContent.String(' \'1'))
+    expect(cellContentParser.parse('\'02-02-2020')).toStrictEqual(new CellContent.String('02-02-2020'))
   })
 })

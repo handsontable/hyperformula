@@ -91,7 +91,7 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
 /* terminals */
-export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /\d+(\.\d+)?/})
+export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /[\d]*[.]?[\d]+/  })
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -107,10 +107,10 @@ export const WhiteSpace = createToken({
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
-  OffsetProcedureName: TokenType
+  OffsetProcedureName: TokenType,
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
-  functionMapping: Record<string, string>
+  functionMapping: Record<string, string>,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {

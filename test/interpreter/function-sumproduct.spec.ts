@@ -146,9 +146,9 @@ describe('Function SUMPRODUCT', () => {
 
   it('works with matrices',  () => {
     const engine =  HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['3'],
-        ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
+      ['1', '2'],
+      ['3'],
+      ['=SUMPRODUCT(A1:B1, TRANSPOSE(A1:A2))'],
     ])
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
   })

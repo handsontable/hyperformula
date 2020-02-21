@@ -139,10 +139,10 @@ function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteC
   }
 }
 
-function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: Array<IterableIterator<InternalCellValue>>, computableIterable: IterableIterator<T>): IterableIterator<T> {
+function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalCellValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
-    if (!conditionalSplits.every((cs) => cs.hasOwnProperty('value'))) {
+    if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
     const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as InternalCellValue))
@@ -153,8 +153,8 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
   }
 }
 
-function zip<T, U>(arr1: T[], arr2: U[]): Array<[T, U]> {
-  const result: Array<[T, U]> = []
+function zip<T, U>(arr1: T[], arr2: U[]): [T, U][] {
+  const result: [T, U][] = []
   for (let i = 0; i < Math.min(arr1.length, arr2.length); i++) {
     result.push([arr1[i], arr2[i]])
   }
