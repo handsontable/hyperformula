@@ -1,12 +1,12 @@
 import {Config} from './Config'
 
-const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30 , 31, 30, 31]
+const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
 
 export interface IDate {
   year: number,
   month: number,
-  day: number
+  day: number,
 }
 
 export const maxDate = {year: 9999, month: 12, day: 31}
@@ -172,7 +172,9 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
 export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): IDate | null {
   for (const dateFormat of dateFormats) {
     const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
-    if (date !== null) { return date }
+    if (date !== null) {
+      return date 
+    }
   }
   return null
 }

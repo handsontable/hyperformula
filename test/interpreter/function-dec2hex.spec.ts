@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 describe('function DEC2HEX', () => {
   it('should return error when wrong type of argument', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=DEC2HEX("foo")'],
+      ['=DEC2HEX("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
@@ -62,10 +62,10 @@ describe('function DEC2HEX', () => {
 
   it('should work for numbers fitting in 10 bits', () => {
     const engine = HyperFormula.buildFromArray([
-      [`=DEC2HEX(-549755813889)`],
-      [`=DEC2HEX(-549755813888)`],
-      [`=DEC2HEX(549755813887)`],
-      [`=DEC2HEX(549755813888)`],
+      ['=DEC2HEX(-549755813889)'],
+      ['=DEC2HEX(-549755813888)'],
+      ['=DEC2HEX(549755813887)'],
+      ['=DEC2HEX(549755813888)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NUM))

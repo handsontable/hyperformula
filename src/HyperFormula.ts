@@ -230,7 +230,7 @@ export class HyperFormula {
       return false
     }
     return true
-}
+  }
 
   /**
    * Sets content of a block of cells.

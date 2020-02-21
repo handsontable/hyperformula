@@ -28,9 +28,9 @@ describe('Changing cell content - checking if its possible', () => {
     ])
 
     expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(false)
-    expect(engine.isItPossibleToSetCellContents(adr('A3'),1,1)).toBe(false)
-    expect(engine.isItPossibleToSetCellContents(adr('A1'),2,2)).toBe(true)
-    expect(engine.isItPossibleToSetCellContents(adr('A2'),2,2)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
   })
 
   it('yes if numeric matrix', () => {

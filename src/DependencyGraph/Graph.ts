@@ -1,9 +1,11 @@
 
 export interface IGetDependenciesQuery<T> {
-  call(node: T): Set<T> | null
+  call(node: T): Set<T> | null,
 }
 
-export interface TopSortResult<T> { sorted: T[], cycled: T[] }
+export interface TopSortResult<T> {
+  sorted: T[], cycled: T[], 
+}
 
 /**
  * Provides graph directed structure
@@ -189,7 +191,7 @@ export class Graph<T> {
     let currentNodeIndex = 0
     const topologicalOrdering: T[] = []
     while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex] as T
+      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]
       topologicalOrdering.push(currentNode)
       this.edges.get(currentNode)!.forEach((targetNode) => {
         incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)

@@ -29,7 +29,7 @@ export const collectAddressesDependentToMatrix = (vertex: Vertex, matrix: Matrix
   }
 
   return collectDependencies(formula)
-      .filter((d) => !Array.isArray(d))
-      .map((d) => (d as CellAddress).toSimpleCellAddress(address))
-      .filter((d) => range.addressInRange(d))
+    .filter((d) => !Array.isArray(d))
+    .map((d) => (d as CellAddress).toSimpleCellAddress(address))
+    .filter((d) => range.addressInRange(d))
 }

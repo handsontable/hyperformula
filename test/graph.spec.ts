@@ -253,7 +253,7 @@ describe('Basic Graph manipulation', () => {
 
 describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   it('case without edges', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
     graph.addNode(node0)
@@ -267,7 +267,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('case with obvious edge', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
     graph.addNode(node0)
@@ -283,7 +283,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('it doesnt call other if didnt change', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const node0 = 'foo'
     const node1 = 'bar'
     graph.addNode(node0)
@@ -298,7 +298,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('does call if some previous vertex marked as changed', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'bar', 'baz']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[2])
@@ -312,7 +312,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('returns cycled vertices', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
@@ -328,7 +328,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('doesnt call first one of the given vertices if its on cycle', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
@@ -343,7 +343,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
   })
 
   it('returns cycled vertices even if they were not tried to be computed', () => {
-    const graph = new Graph(new DummyGetDependenciesQuery())
+    const graph = new Graph<string>(new DummyGetDependenciesQuery())
     const nodes = ['foo', 'c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
     graph.addEdge(nodes[0], nodes[1])
@@ -360,7 +360,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 })
 
 describe('Graph cruds', () => {
-  it ('#removeEdge not existing edge', () => {
+  it('#removeEdge not existing edge', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
@@ -370,7 +370,7 @@ describe('Graph cruds', () => {
     expect(() => graph.removeEdge(node0, node1)).toThrowError(new Error('Edge does not exist'))
   })
 
-  it ('#removeEdge removes edge from graph', () => {
+  it('#removeEdge removes edge from graph', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')
@@ -387,7 +387,7 @@ describe('Graph cruds', () => {
     expect(graph.existsEdge(node0, node1)).toBe(false)
   })
 
-  it ('#removeIncomingEdges removes all edges incoming to given node', () => {
+  it('#removeIncomingEdges removes all edges incoming to given node', () => {
     const graph = new Graph(new DummyGetDependenciesQuery())
     const node0 = identifiableString(0, 'x0')
     const node1 = identifiableString(1, 'x1')

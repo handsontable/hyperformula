@@ -7,6 +7,6 @@ export interface ParserConfig {
   errorMapping: Record<string, ErrorType>,
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,
-  getErrorTranslationFor(errorType: ErrorType): string
-  getFunctionTranslationFor(functionName: string): string
+  getErrorTranslationFor(errorType: ErrorType): string,
+  getFunctionTranslationFor(functionName: string): string,
 }

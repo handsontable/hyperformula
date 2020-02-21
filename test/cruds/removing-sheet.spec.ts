@@ -8,8 +8,8 @@ import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
   adr, detailedError,
-  expect_array_with_same_content,
-  expect_reference_to_have_ref_error,
+  expectArrayWithSameContent,
+  expectReferenceToHaveRefError,
   expectEngineToBeTheSameAs,
   extractReference,
 } from '../testUtils'
@@ -94,8 +94,8 @@ describe('remove sheet', () => {
   it('should remove sheet with matrix', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-          ['1'],
-          ['{=TRANSPOSE(A1:A1)}'],
+        ['1'],
+        ['{=TRANSPOSE(A1:A1)}'],
       ],
     })
 
@@ -163,13 +163,13 @@ describe('remove sheet - adjust edges', () => {
       ],
     })
 
-    const a1_1 = engine.addressMapping.fetchCell(adr('A1'))
-    const a1_2 = engine.addressMapping.fetchCell(adr('A1', 1))
-    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(true)
+    const a1From0 = engine.addressMapping.fetchCell(adr('A1'))
+    const a1From1 = engine.addressMapping.fetchCell(adr('A1', 1))
+    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(true)
 
     engine.removeSheet('Sheet2')
 
-    expect(engine.graph.existsEdge(a1_2, a1_1)).toBe(false)
+    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(false)
   })
 })
 
@@ -204,7 +204,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
     engine.removeSheet('Sheet2')
 
-    expect_reference_to_have_ref_error(engine, adr('A1'))
+    expectReferenceToHaveRefError(engine, adr('A1'))
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=Sheet2!A1']]))
   })
 
@@ -239,8 +239,8 @@ describe('remove sheet - adjust range mapping', () => {
   it('should remove ranges from range mapping when removing sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
-          ['=SUM(B1:B2)'],
-          ['=SUM(C1:C2)'],
+        ['=SUM(B1:B2)'],
+        ['=SUM(C1:C2)'],
       ],
       Sheet2: [
         ['=SUM(B1:B2)'],
@@ -287,7 +287,7 @@ describe('remove sheet - adjust matrix mapping', () => {
 describe('remove sheet - adjust column index', () => {
   it('should remove sheet from index', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1'],
+      ['1'],
     ], new Config({ useColumnIndex: true }))
     const index = engine.columnSearch as ColumnIndex
     const removeSheetSpy = jest.spyOn(index, 'removeSheet')
@@ -295,6 +295,6 @@ describe('remove sheet - adjust column index', () => {
     engine.removeSheet('Sheet1')
 
     expect(removeSheetSpy).toHaveBeenCalled()
-    expect_array_with_same_content([], index.getValueIndex(0, 0, 1).index)
+    expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
   })
 })

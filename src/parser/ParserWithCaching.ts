@@ -49,10 +49,10 @@ export class ParserWithCaching {
 
     if (lexerResult.errors.length > 0) {
       const ast = buildErrorAst(lexerResult.errors.map((e) =>
-          ({
-            type: ParsingErrorType.LexingError,
-            message: e.message,
-          }),
+        ({
+          type: ParsingErrorType.LexingError,
+          message: e.message,
+        }),
       ))
       return { ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
     }
