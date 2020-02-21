@@ -127,6 +127,8 @@ export class SingleThreadEvaluator implements Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
+    } else if(typeof interpreterValue === 'number' && (isNaN(interpreterValue) || interpreterValue === Infinity || interpreterValue === -Infinity)) {
+      return new CellError(ErrorType.NUM)
     } else {
       return interpreterValue
     }

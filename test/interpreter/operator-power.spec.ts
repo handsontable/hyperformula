@@ -75,8 +75,8 @@ describe('Operator POWER', () => {
   it( 'NaN as a result', () => {
 
     const engine = HyperFormula.buildFromArray([
-      ['01/02/1999','02/02/1999','=A1^B1'],
-      ['3.1415','36193.2','=A2^B2'],
+      ['01/02/1999', '02/02/1999', '=A1^B1'],
+      ['3.1415', '36193.2', '=A2^B2'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
