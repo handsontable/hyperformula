@@ -1,6 +1,7 @@
-import { Config, HyperFormula } from '../../src'
+import { Config, HyperFormula, DetailedCellError } from '../../src'
 import '../testConfig'
 import { adr } from '../testUtils'
+import { CellError, ErrorType } from '../../src/Cell'
 
 // Data and test scenarios were part of the working draft for OpenFormula standard
 // https://www.oasis-open.org/committees/download.php/16826/openformula-spec-20060221.html
@@ -339,5 +340,33 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('A2')).toBe(4);
       expect(engine.getCellValue('B2')).toBe(4);
     });
+
+    it('6.16.3 ACOS function', () => {
+      const engine = createEngine([
+        ['=ACOS(SQRT(2)/2)*4/PI()'],
+        ['=ACOS(TRUE())'],
+        ['=ACOS(-1.0)/PI()'],
+        ['=ACOS(2.0)']
+      ]);
+
+      expect(engine.getCellValue('A1')).toBe(1);
+      expect(engine.getCellValue('A2')).toBe(0.0);
+      expect(engine.getCellValue('A3')).toBe(1);
+      expect(engine.getCellValue('A4')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!'));
+    });
+
+    it('6.16.3 ACOS should support relative references', () => {
+      const engine = createEngine([
+        ['=ACOS(B7)'],
+        ...data
+      ]);
+
+      expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!'));
+    });
+    
+
+
   });
 });
+
+
