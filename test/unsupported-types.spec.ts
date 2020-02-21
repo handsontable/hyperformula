@@ -47,6 +47,12 @@ describe( 'unsupported types should result in error', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    engine.setSheetContent('Sheet1', [1])
+    expect( () => engine.setSheetContent('Sheet1', 1)).toThrow('Expected an array.')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect( () => engine.setSheetContent('Sheet1', [1])).toThrow('Expected an array.')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect( () => engine.setCellContents(adr('A1'), [1])).toThrow('Expected an array.')
   })
 })
