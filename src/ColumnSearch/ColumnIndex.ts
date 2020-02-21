@@ -13,8 +13,8 @@ import {IColumnSearchStrategy} from './ColumnSearchStrategy'
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
 interface ValueIndex {
-  version: number
-  index: number[]
+  version: number,
+  index: number[],
 }
 
 type SheetIndex = ColumnMap[]
@@ -30,9 +30,9 @@ export class ColumnIndex implements IColumnSearchStrategy {
   private readonly binarySearchStrategy: ColumnBinarySearch
 
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly config: Config,
-      private readonly stats: Statistics,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly config: Config,
+    private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
@@ -129,7 +129,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       this.index.set(sheet, [])
     }
     const sheetMap = this.index.get(sheet)!
-    let columnMap = sheetMap![col]
+    let columnMap = sheetMap[col]
 
     if (!columnMap) {
       columnMap = new Map()

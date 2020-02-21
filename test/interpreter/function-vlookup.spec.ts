@@ -189,11 +189,11 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('should properly calculate absolute row index', () => {
       const engine = builder([
-          ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-          ['foo'],
-          ['1'],
-          ['2'],
-          ['3'],
+        ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
+        ['foo'],
+        ['1'],
+        ['2'],
+        ['3'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
@@ -257,15 +257,15 @@ describe('BinarySearchStrategy', () => {
 
   it('should calculate indexes properly when using binary search', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
-        [],
-        [],
-        [],
-        ['1'],
-        ['2'],
-        ['3'],
-        ['4'],
-        ['5'],
+      ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
+      [],
+      [],
+      [],
+      ['1'],
+      ['2'],
+      ['3'],
+      ['4'],
+      ['5'],
     ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)

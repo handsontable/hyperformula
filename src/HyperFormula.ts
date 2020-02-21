@@ -211,19 +211,25 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to change content in given address
+   * Returns information whether its possible to change content in a rectangular idea bounded by the box
    *
    * If returns true, doing this operation won't throw any errors
    *
-   * @param address - cell coordinates
+   * @param address - cell coordinate (top left corner)
+   * @param width - width of the box
+   * @param height - height of the box
    */
-  public isItPossibleToChangeContent(address: SimpleCellAddress): boolean {
+  public isItPossibleToSetCellContents(address: SimpleCellAddress, width: number = 1, height: number = 1): boolean {
     try {
-      this.crudOperations.ensureItIsPossibleToChangeContent(address)
-      return true
+      for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+          this.crudOperations.ensureItIsPossibleToChangeContent({col: address.col + i, row: address.row + j, sheet: address.sheet})
+        }
+      }
     } catch (e) {
       return false
     }
+    return true
   }
 
   /**

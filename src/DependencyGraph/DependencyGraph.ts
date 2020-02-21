@@ -29,24 +29,24 @@ export class DependencyGraph {
     const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
     const rangeMapping = new RangeMapping()
     return new DependencyGraph(
-        addressMapping,
-        rangeMapping,
-        new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
-        new SheetMapping(config.language),
-        new MatrixMapping(),
-        stats,
-        lazilyTransformingAstService,
+      addressMapping,
+      rangeMapping,
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
+      new SheetMapping(config.language),
+      new MatrixMapping(),
+      stats,
+      lazilyTransformingAstService,
     )
   }
 
   constructor(
-      public readonly addressMapping: AddressMapping,
-      public readonly rangeMapping: RangeMapping,
-      public readonly graph: Graph<Vertex>,
-      public readonly sheetMapping: SheetMapping,
-      public readonly matrixMapping: MatrixMapping,
-      public readonly stats: Statistics = new Statistics(),
-      public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly addressMapping: AddressMapping,
+    public readonly rangeMapping: RangeMapping,
+    public readonly graph: Graph<Vertex>,
+    public readonly sheetMapping: SheetMapping,
+    public readonly matrixMapping: MatrixMapping,
+    public readonly stats: Statistics = new Statistics(),
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 
@@ -105,7 +105,7 @@ export class DependencyGraph {
   }
 
   public ensureThatVertexIsNonMatrixCellVertex(vertex: CellVertex | null) {
-    assert.ok(!(vertex instanceof MatrixVertex), `Illegal operation`)
+    assert.ok(!(vertex instanceof MatrixVertex), 'Illegal operation')
   }
 
   public clearRecentlyChangedVertices() {
@@ -231,7 +231,7 @@ export class DependencyGraph {
     const matrices: Set<MatrixVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
       if (vertex instanceof MatrixVertex) {
-          matrices.add(vertex)
+        matrices.add(vertex)
       } else {
         this.setCellEmpty(address)
       }

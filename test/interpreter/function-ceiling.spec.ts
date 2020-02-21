@@ -1,6 +1,6 @@
-import {HyperFormula} from "../../src"
-import {ErrorType} from "../../src/Cell"
-import {adr, detailedError} from "../testUtils"
+import {HyperFormula} from '../../src'
+import {ErrorType} from '../../src/Cell'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING', () => {
   it('should return error for wrong number of arguments', () => {
@@ -37,14 +37,14 @@ describe('Function CEILING', () => {
 
   it('should work', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=CEILING(4.43, 0.3)'],
-        ['=CEILING(4.43, 0.6)'],
-        ['=CEILING(4.43, 2)'],
-        ['=CEILING(4.43)'],
-        ['=CEILING(-4.43)'],
-        ['=CEILING(-3.14, -1.8)'],
-        ['=CEILING(-3.14, 0)'],
-        ['=CEILING(3.14, 0)'],
+      ['=CEILING(4.43, 0.3)'],
+      ['=CEILING(4.43, 0.6)'],
+      ['=CEILING(4.43, 2)'],
+      ['=CEILING(4.43)'],
+      ['=CEILING(-4.43)'],
+      ['=CEILING(-3.14, -1.8)'],
+      ['=CEILING(-3.14, 0)'],
+      ['=CEILING(3.14, 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4.5)

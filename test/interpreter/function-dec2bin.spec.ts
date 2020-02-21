@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 describe('function DEC2BIN', () => {
   it('should return error when wrong type of argument', () => {
     const engine = HyperFormula.buildFromArray([
-        ['=DEC2BIN("foo")'],
+      ['=DEC2BIN("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))

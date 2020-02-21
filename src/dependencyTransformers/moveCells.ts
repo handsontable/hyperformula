@@ -18,10 +18,10 @@ export namespace MoveCellsDependencyTransformer {
   export function transformSingleAst(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     if (transformation.sourceRange.addressInRange(nodeAddress)) {
       const newAst = transformAddressesInFormula(
-          ast,
-          nodeAddress,
-          fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
-          cellRangeTransformer(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
+        ast,
+        nodeAddress,
+        fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
+        cellRangeTransformer(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
       )
 
       return [newAst, {

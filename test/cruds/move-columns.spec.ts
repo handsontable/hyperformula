@@ -163,7 +163,7 @@ describe('Move columns', () => {
 
   it('should adjust range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1' , '2'],
+      ['1', '2'],
       ['',  '=COUNTBLANK(A1:B1)'],
     ])
 
@@ -177,7 +177,7 @@ describe('Move columns', () => {
 
   it('should return changes', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1' , '2'],
+      ['1', '2'],
       ['',  '=COUNTBLANK(A1:B1)'],
     ])
 
