@@ -1,7 +1,7 @@
 import {HyperFormula} from '../src'
 import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
-import {adr, detailedError} from './testUtils'
+import {adr} from './testUtils'
 
 describe('Interpreter - function RAND', () => {
   it('works', () => {
