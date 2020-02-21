@@ -41,3 +41,9 @@ export class NamedExpressionDoesNotExist extends Error {
     super(`Named Expression '${expressionName}' does not exist`)
   }
 }
+
+export class UnableToParse extends Error {
+  constructor(value: any) {
+    super(`Unable to parse value: '${value.toString()}'`)
+  }
+}

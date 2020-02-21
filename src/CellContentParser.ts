@@ -1,6 +1,7 @@
 import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
+import {UnableToParse} from './errors'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
@@ -102,7 +103,7 @@ export class CellContentParser {
         }
       }
     } else {
-      throw new Error('Cannot parse value.')
+      throw new UnableToParse(content)
     }
   }
 }
