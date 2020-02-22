@@ -1,9 +1,9 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import { matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {coerceToRangeNumbersOrError} from '../coerce'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {

@@ -1,6 +1,6 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
 import {NoSheetWithNameError} from '../../src'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {

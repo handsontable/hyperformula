@@ -59,11 +59,11 @@ export class EngineComparator {
         if (expectedVertex === null && actualVertex === null) {
           continue
         } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
-          deepStrictEqual(expectedVertex.address, actualVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
-          deepStrictEqual(expectedVertex.getFormula(this.expected.lazilyTransformingAstService), actualVertex.getFormula(this.actual.lazilyTransformingAstService), 'Different AST in formulas')
-          deepStrictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
+          deepStrictEqual(actualVertex.address, expectedVertex.address, `Different addresses in formulas. expected: ${expectedVertex.address}, actual: ${actualVertex.address}`)
+          deepStrictEqual(actualVertex.getFormula(this.actual.lazilyTransformingAstService), expectedVertex.getFormula(this.expected.lazilyTransformingAstService), 'Different AST in formulas')
+          deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values of formulas. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof ValueCellVertex && actualVertex instanceof ValueCellVertex) {
-          deepStrictEqual(expectedVertex.getCellValue(), actualVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
+          deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
         } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
@@ -82,7 +82,7 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(expectedAdjacentAddresses, actualAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
+        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
       }
     }
   }

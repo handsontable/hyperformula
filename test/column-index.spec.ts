@@ -5,10 +5,9 @@ import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {ColumnsSpan} from '../src/ColumnsSpan'
 import {Matrix} from '../src/Matrix'
-import {collectDependencies} from '../src/parser'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
-import {adr, detailedError} from './testUtils'
+import {adr} from './testUtils'
 
 describe('ColumnIndex#add', () => {
   const statistics = new Statistics()

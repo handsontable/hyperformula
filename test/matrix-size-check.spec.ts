@@ -1,4 +1,3 @@
-
 import {Config} from '../src'
 import {SheetMapping} from '../src/DependencyGraph'
 import {enGB} from '../src/i18n'
@@ -6,7 +5,7 @@ import {checkMatrixSize, MatrixSize} from '../src/Matrix'
 import {ParserWithCaching} from '../src/parser'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
-import {adr, detailedError} from './testUtils'
+import {adr} from './testUtils'
 
 describe('Matrix size check tests', () => {
   it('check', () => {
