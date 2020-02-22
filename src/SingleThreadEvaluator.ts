@@ -26,7 +26,7 @@ export class SingleThreadEvaluator implements Evaluator {
 
   public run() {
     this.stats.start(StatType.TOP_SORT)
-    const { sorted, cycled } = this.dependencyGraph.topologicalSort()
+    const { sorted, cycled } = this.dependencyGraph.topSortWithScc()
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -38,49 +38,53 @@ export class SingleThreadEvaluator implements Evaluator {
     const changes = new ContentChanges()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      const cycled = this.dependencyGraph.graph.getTopologicallySortedSubgraphFrom(vertices, (vertex: Vertex) => {
-        if (vertex instanceof FormulaCellVertex) {
-          const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-          const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.evaluateAstToScalarValue(formula, address)
-          vertex.setCellValue(newCellValue)
-          if (newCellValue !== currentValue) {
-            changes.addChange(newCellValue, address)
-            this.columnSearch.change(currentValue, newCellValue, address)
+      const cycled = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
+        (vertex: Vertex) => {
+          if (vertex instanceof FormulaCellVertex) {
+            const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+            const formula = vertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const newCellValue = this.evaluateAstToScalarValue(formula, address)
+            vertex.setCellValue(newCellValue)
+            if (newCellValue !== currentValue) {
+              changes.addChange(newCellValue, address)
+              this.columnSearch.change(currentValue, newCellValue, address)
+              return true
+            }
+            return false
+          } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
+            const address = vertex.getAddress()
+            const formula = vertex.getFormula() as Ast
+            const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
+            const newCellValue = this.evaluateAstToRangeValue(formula, address)
+            if (newCellValue instanceof SimpleRangeValue) {
+              const newCellMatrix = new Matrix(newCellValue.rawNumbers())
+              vertex.setCellValue(newCellMatrix)
+              changes.addMatrixChange(newCellMatrix, address)
+              this.columnSearch.change(currentValue, newCellMatrix, address)
+            } else {
+              vertex.setErrorValue(newCellValue)
+              changes.addChange(newCellValue, address)
+              this.columnSearch.change(currentValue, newCellValue, address)
+            }
+            return true
+          } else if (vertex instanceof RangeVertex) {
+            vertex.clearCache()
+            return true
+          } else {
             return true
           }
-          return false
-        } else if (vertex instanceof MatrixVertex && vertex.isFormula()) {
-          const address = vertex.getAddress()
-          const formula = vertex.getFormula() as Ast
-          const currentValue = vertex.isComputed() ? vertex.getCellValue() : null
-          const newCellValue = this.evaluateAstToRangeValue(formula, address)
-          if (newCellValue instanceof SimpleRangeValue) {
-            const newCellMatrix = new Matrix(newCellValue.rawNumbers())
-            vertex.setCellValue(newCellMatrix)
-            changes.addMatrixChange(newCellMatrix, address)
-            this.columnSearch.change(currentValue, newCellMatrix, address)
-          } else {
-            vertex.setErrorValue(newCellValue)
-            changes.addChange(newCellValue, address)
-            this.columnSearch.change(currentValue, newCellValue, address)
+        },
+        (vertex: Vertex) => {
+          if (vertex instanceof RangeVertex) {
+            vertex.clearCache()
+          } else if (vertex instanceof FormulaCellVertex) {
+            const error = new CellError(ErrorType.CYCLE)
+            vertex.setCellValue(error)
+            changes.addChange(error, vertex.address)
           }
-          return true
-        } else if (vertex instanceof RangeVertex) {
-          vertex.clearCache()
-          return true
-        } else {
-          return true
-        }
-      })
-      cycled.forEach((vertex: Vertex) => {
-        if (vertex instanceof FormulaCellVertex) {
-          const error = new CellError(ErrorType.CYCLE)
-          vertex.setCellValue(error)
-          changes.addChange(error, vertex.address)
-        }
-      })
+        },
+      )
     })
     return changes
   }

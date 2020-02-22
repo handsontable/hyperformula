@@ -541,8 +541,8 @@ export class DependencyGraph {
     return result
   }
 
-  public topologicalSort(): TopSortResult<Vertex> {
-    return this.graph.topologicalSort()
+  public topSortWithScc(): TopSortResult<Vertex> {
+    return this.graph.topSortWithScc()
   }
 
   public markAsVolatile(vertex: Vertex) {

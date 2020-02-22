@@ -180,63 +180,112 @@ export class Graph<T> {
     return false
   }
 
-  /**
-   * Returns topological order of nodes.
-   *
+  /*
+   * return a topological sort order, but separates vertices that exist in some cycle
    */
-  public topologicalSort(): TopSortResult<T> {
-    const incomingEdges = this.incomingEdges()
-    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
-
-    let currentNodeIndex = 0
-    const topologicalOrdering: T[] = []
-    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]
-      topologicalOrdering.push(currentNode)
-      this.edges.get(currentNode)!.forEach((targetNode) => {
-        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-        if (incomingEdges.get(targetNode) === 0) {
-          nodesWithNoIncomingEdge.push(targetNode)
-        }
-      })
-      ++currentNodeIndex
-    }
-
-    const cycled = this.findCycles(this.nodes, nodesWithNoIncomingEdge, incomingEdges)
-    return { sorted: topologicalOrdering, cycled }
+  public topSortWithScc(): TopSortResult<T> {
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), (node: T) => true, (node: T) => {})
   }
 
-  public getTopologicallySortedSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean): T[] {
-    const subgraphNodes = this.computeSubgraphNodes(vertices)
-    const incomingEdges = this.incomingEdgesForSubgraph(subgraphNodes)
-    const shouldBeUpdatedMapping = new Set(vertices)
-    const nodesWithNoIncomingEdge = this.nodesWithNoIncomingEdge(incomingEdges)
+  public getTopSortedWithSccSubgraphFrom(vertices: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
 
-    let currentNodeIndex = 0
-    while (currentNodeIndex < nodesWithNoIncomingEdge.length) {
-      const currentNode = nodesWithNoIncomingEdge[currentNodeIndex]!
-      let result: boolean
-      if (shouldBeUpdatedMapping.has(currentNode)) {
-        result = operatingFunction(currentNode)
-      } else {
-        result = false
+    const disc: Map<T, number> = new Map()
+    const low: Map<T, number> = new Map()
+    const parent: Map<T, T | null> = new Map()
+    const processed: Set<T> = new Set()
+    const onStack: Set<T> = new Set()
+    const flatOrder: T[] = []
+    const deepOrder: T[][] = []
+
+    let time: number = 0
+
+    vertices.reverse().forEach( (v: T) => {
+      if (processed.has(v)) {
+        return
       }
-      this.edges.get(currentNode)!.forEach((targetNode) => {
-        if (subgraphNodes.has(targetNode)) {
-          if (result) {
-            shouldBeUpdatedMapping.add(targetNode)
+      const shortOrder: T[] = []
+      disc.set(v, time)
+      flatOrder.push(v)
+      shortOrder.push(v)
+      low.set(v, time)
+      parent.set(v, null)
+      time++
+      const DFSstack: T[] = [v]
+      onStack.add(v)
+      while ( DFSstack.length > 0 ) {
+        const u = DFSstack[ DFSstack.length - 1 ]
+        if ( processed.has(u) ) { // leaving this DFS subtree
+          const pu = parent.get(u)
+          if ( pu !==  null ) {
+            low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
-          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! - 1)
-          if (incomingEdges.get(targetNode) === 0) {
-            nodesWithNoIncomingEdge.push(targetNode)
-          }
+          DFSstack.pop()
+          onStack.delete(u)
+        } else {
+          this.adjacentNodes(u).forEach( (t: T) => {
+            if (disc.get(t) !== undefined) { // forward edge or backward edge
+              if (onStack.has(t)) { // backward edge
+                low.set(u, Math.min(low.get(u)!, disc.get(t)!))
+              }
+            } else {
+              disc.set(t, time)
+              flatOrder.push(t)
+              shortOrder.push(t)
+              low.set(t, time)
+              parent.set(t, u)
+              DFSstack.push(t)
+              onStack.add(t)
+              time++
+            }
+          })
+          processed.add(u)
+        }
+      }
+      deepOrder.push(shortOrder)
+    })
+
+    const sccMap: Map<T, T> = new Map()
+    const sccInnerEdgeCnt: Map<T, number> = new Map()
+    flatOrder.forEach( (v: T) => {
+      if (disc.get(v) === low.get(v)) {
+        sccMap.set(v, v)
+        sccInnerEdgeCnt.set(v, 0)
+      } else {
+        sccMap.set(v, sccMap.get(parent.get(v) as T)!)
+      }
+    })
+
+    this.edges.forEach( (targets: Set<T>, v: T) => {
+      targets.forEach( (u: T) => {
+        const uRepr = sccMap.get(u)!
+        const vRepr = sccMap.get(v)!
+        if (uRepr === vRepr) {
+          sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)! + 1)
         }
       })
-      ++currentNodeIndex
-    }
+    })
 
-    const cycled = this.findCycles(subgraphNodes, nodesWithNoIncomingEdge, incomingEdges)
-    return cycled
+    const shouldBeUpdatedMapping = new Set(vertices)
+
+    const sorted: T[] = []
+    const cycled: T[] = []
+    deepOrder.reverse().forEach( (arr: T[]) =>
+      arr.forEach( (t: T) => {
+        const tRepr = sccMap.get(t)!
+        if (sccInnerEdgeCnt.get(tRepr) === 0) {
+          sorted.push(t)
+          if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
+            this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+          }
+        } else {
+          cycled.push(t)
+          // operatingFunction(t)
+          onCycle(t)
+          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+        }
+      }),
+    )
+    return { sorted, cycled }
   }
 
   public getDependencies(vertex: T): T[] {
