@@ -1,7 +1,5 @@
 import {HyperFormula} from '../src'
-import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
-import {adr} from './testUtils'
 
 describe('External formulas - normalization', () => {
   it('works', () => {

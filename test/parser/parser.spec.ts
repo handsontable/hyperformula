@@ -19,7 +19,6 @@ import {
   StringAst,
 } from '../../src/parser'
 import {ParenthesisAst} from '../../src/parser/Ast'
-import {detailedError} from '../testUtils'
 
 describe('ParserWithCaching', () => {
   it('integer literal', () => {

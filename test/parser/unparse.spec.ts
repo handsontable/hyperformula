@@ -4,7 +4,7 @@ import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, ParserWithCaching} from '../../src/parser'
 import {CellAddress} from '../../src/parser'
 import {Unparser} from '../../src/parser'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Unparse', () => {
   const config = new Config()

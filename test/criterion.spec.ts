@@ -1,4 +1,4 @@
-import {CellError, ErrorType} from '../src/Cell'
+import {ErrorType} from '../src/Cell'
 import {buildCriterion, CriterionType, parseCriterion} from '../src/interpreter/Criterion'
 import {detailedError} from './testUtils'
 

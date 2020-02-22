@@ -2,8 +2,7 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {adr, detailedError} from '../testUtils'
-import has = Reflect.has
+import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
   const config = new Config()
