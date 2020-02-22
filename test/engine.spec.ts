@@ -105,6 +105,14 @@ describe('Integration', () => {
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(1,2,3,C3)')
   })
 
+  it('#getCellFormula works with -0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-0'],
+    ])
+
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=-0')
+  })
+
   it('#getCellFormula returns undefined for simple values', () => {
     const engine = HyperFormula.buildFromArray([
       [''],

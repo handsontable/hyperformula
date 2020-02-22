@@ -104,7 +104,7 @@ export class CellContentParser {
         return new CellContent.Number(parsedDateNumber)
       } else {
         return new CellContent.String(
-          content.startsWith('\'') ? content.slice(1) : content,
+          content.startsWith('\'') ? content.slice(1) : content
         )
       }
     }

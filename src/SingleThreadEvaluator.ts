@@ -129,6 +129,8 @@ export class SingleThreadEvaluator implements Evaluator {
       return new CellError(ErrorType.VALUE)
     } else if(typeof interpreterValue === 'number' && (isNaN(interpreterValue) || interpreterValue === Infinity || interpreterValue === -Infinity)) {
       return new CellError(ErrorType.NUM)
+    } else if(typeof interpreterValue === 'number' && interpreterValue === 0) {
+      return 0
     } else {
       return interpreterValue
     }
