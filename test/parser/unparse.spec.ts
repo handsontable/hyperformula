@@ -16,14 +16,14 @@ describe('Unparse', () => {
   const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
 
-  it('#unparse',  () => {
+  it('#unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse simple addreess',  () => {
+  it('#unparse simple addreess', () => {
     const formula = '=A1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -31,7 +31,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse simple addreess from other sheet',  () => {
+  it('#unparse simple addreess from other sheet', () => {
     const formula = '=Sheet1!A1'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
@@ -39,7 +39,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse absolute col',  () => {
+  it('#unparse absolute col', () => {
     const formula = '=$A1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -47,7 +47,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse absolute row addreess',  () => {
+  it('#unparse absolute row addreess', () => {
     const formula = '=A$1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -55,7 +55,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse absolute address',  () => {
+  it('#unparse absolute address', () => {
     const formula = '=$A$1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -63,7 +63,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse cell ref between strings',  () => {
+  it('#unparse cell ref between strings', () => {
     const formula = '="A5"+A4+"A6"'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -71,7 +71,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse  cell ref in string with escape',  () => {
+  it('#unparse  cell ref in string with escape', () => {
     const formula = '="fdsaf\\"A5"'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -79,7 +79,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse cell range from same sheet',  () => {
+  it('#unparse cell range from same sheet', () => {
     const formula = '=$A$1:B$2'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -87,7 +87,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse cell range from other sheet',  () => {
+  it('#unparse cell range from other sheet', () => {
     const formula = '=Sheet1!$A$1:B$2'
     const ast = parser.parse(formula, CellAddress.absolute(1, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1', 1))
@@ -95,7 +95,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse ops',  () => {
+  it('#unparse ops', () => {
     const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -120,7 +120,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse with known error with translation', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({language: plPL})
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
@@ -139,13 +139,13 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=SUM(1,2,3)')
   })
 
-  it('#unparse forgets about spaces', () => {
-    const formula = '= 1 + sum(1,2,   3)'
+  it('#unparse should not forget about spaces', () => {
+    const formula = '= 1 + sum( 1,2,   3) +A1 / 2'
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=1+SUM(1,2,3)')
+    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2')
   })
 
   it('#unparse forgets about OFFSET', () => {
@@ -265,8 +265,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = new Config({ language: enGB })
-    const configPL = new Config({ language: plPL })
+    const configEN = new Config({language: enGB})
+    const configPL = new Config({language: plPL})
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 
@@ -313,5 +313,97 @@ describe('Unparse', () => {
     const unparsed = unparser.unparse(ast, adr('A1'))
 
     expect(unparsed).toEqual('=FOOBAR(1,2,3)')
+  })
+})
+
+describe('whitespaces', () => {
+  const config = new Config()
+  const lexerConfig = buildLexerConfig(config)
+  const sheetMapping = new SheetMapping(enGB)
+  sheetMapping.addSheet('Sheet1')
+  sheetMapping.addSheet('Sheet2')
+  sheetMapping.addSheet('Sheet with spaces')
+  const parser = new ParserWithCaching(config, sheetMapping.get)
+  const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+
+  it('should unparse with original whitespaces', () => {
+    const formula = '= 1'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse string with original whitespaces', () => {
+    const formula = '= "foo"'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse reference with original whitespaces', () => {
+    const formula = '= A1+ Sheet2!A1'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse operators with original whitespaces', () => {
+    const formula = '= - 1 + 2 - 3 / 4 * 5 ^ 6 %'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse ranges with leading whitespaces only', () => {
+    const formula = '=  A1   :   A2'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=  A1:A2')
+  })
+
+  it('should unparse formula with leading and internal whitespace', () => {
+    const formula = '=  SUM( A1,   A2   )'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should forget about spaces before func args separator', () => {
+    const formula = '=  SUM( A1   ,   A2   )'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=  SUM( A1,   A2   )')
+  })
+
+  it('should unparse parenthesis with leading and internal whitespace', () => {
+    const formula = '=1 + ( A1 +   A2   )'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('should unparse error literals with leading whitespaces', () => {
+    const formula = '= #DIV/0!'
+    const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
   })
 })

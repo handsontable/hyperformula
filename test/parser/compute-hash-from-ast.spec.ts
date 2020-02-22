@@ -203,4 +203,20 @@ describe('Compute hash from ast', () => {
     expect(hash).toEqual(hashFromTokens)
     expect(hash).toEqual(formula)
   })
+
+  it('should work with whitespaces', () => {
+    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( A1, A1 : A2 ) + #DIV/0!'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const hash = parser.computeHashFromAst(ast)
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 ) + #DIV/0!')
+  })
+
+  it('should skip whitespaces before function args separators', () => {
+    const formula = '=SUM(A1 , A2)'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+    const hash = parser.computeHashFromAst(ast)
+    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
+  })
 })

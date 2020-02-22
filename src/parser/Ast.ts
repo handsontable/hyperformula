@@ -1,5 +1,7 @@
+import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
 import {CellAddress} from './CellAddress'
+import {IExtendedToken} from './FormulaParser'
 
 export type Ast =
   NumberAst
@@ -73,43 +75,61 @@ export enum AstNodeType {
   ERROR = 'ERROR',
 }
 
-export interface NumberAst {
+export interface AstWithWhitespace {
+  leadingWhitespace?: string,
+}
+
+export interface AstWithInternalWhitespace extends AstWithWhitespace {
+  internalWhitespace?: string,
+}
+
+export interface NumberAst extends AstWithWhitespace {
   type: AstNodeType.NUMBER,
   value: number,
 }
 
-export const buildNumberAst = (value: number): NumberAst => ({type: AstNodeType.NUMBER, value})
+export const buildNumberAst = (token: IExtendedToken): NumberAst => ({
+  type: AstNodeType.NUMBER,
+  value: parseFloat(token.image),
+  leadingWhitespace: extractImage(token.leadingWhitespace),
+})
 
-export interface StringAst {
+export interface StringAst extends AstWithWhitespace {
   type: AstNodeType.STRING,
   value: string,
 }
 
-export const buildStringAst = (value: string): StringAst => ({type: AstNodeType.STRING, value})
+export const buildStringAst = (token: IExtendedToken): StringAst => ({
+  type: AstNodeType.STRING,
+  value: token.image.slice(1, -1),
+  leadingWhitespace: extractImage(token.leadingWhitespace),
+})
 
-export interface CellReferenceAst {
+export interface CellReferenceAst extends AstWithWhitespace {
   type: AstNodeType.CELL_REFERENCE,
   reference: CellAddress,
 }
 
-export const buildCellReferenceAst = (reference: CellAddress): CellReferenceAst => ({
+export const buildCellReferenceAst = (reference: CellAddress, leadingWhitespace?: IToken): CellReferenceAst => ({
   type: AstNodeType.CELL_REFERENCE,
   reference,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-export interface CellRangeAst {
+export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress,
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress): CellRangeAst => ({
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress, leadingWhitespace?: string): CellRangeAst => ({
   type: AstNodeType.CELL_RANGE,
   start,
   end,
+  leadingWhitespace,
 })
 
-export interface BinaryOpAst {
+export interface BinaryOpAst extends AstWithWhitespace {
   left: Ast,
   right: Ast,
 }
@@ -118,175 +138,194 @@ export interface ConcatenateOpAst extends BinaryOpAst {
   type: AstNodeType.CONCATENATE_OP,
 }
 
-export const buildConcatenateOpAst = (left: Ast, right: Ast): ConcatenateOpAst => ({
+export const buildConcatenateOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): ConcatenateOpAst => ({
   type: AstNodeType.CONCATENATE_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface EqualsOpAst extends BinaryOpAst {
   type: AstNodeType.EQUALS_OP,
 }
 
-export const buildEqualsOpAst = (left: Ast, right: Ast): EqualsOpAst => ({
+export const buildEqualsOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): EqualsOpAst => ({
   type: AstNodeType.EQUALS_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface NotEqualOpAst extends BinaryOpAst {
   type: AstNodeType.NOT_EQUAL_OP,
 }
 
-export const buildNotEqualOpAst = (left: Ast, right: Ast): NotEqualOpAst => ({
+export const buildNotEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): NotEqualOpAst => ({
   type: AstNodeType.NOT_EQUAL_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface GreaterThanOpAst extends BinaryOpAst {
   type: AstNodeType.GREATER_THAN_OP,
 }
 
-export const buildGreaterThanOpAst = (left: Ast, right: Ast): GreaterThanOpAst => ({
+export const buildGreaterThanOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): GreaterThanOpAst => ({
   type: AstNodeType.GREATER_THAN_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface LessThanOpAst extends BinaryOpAst {
   type: AstNodeType.LESS_THAN_OP,
 }
 
-export const buildLessThanOpAst = (left: Ast, right: Ast): LessThanOpAst => ({
+export const buildLessThanOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): LessThanOpAst => ({
   type: AstNodeType.LESS_THAN_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
   type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
 }
 
-export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast): GreaterThanOrEqualOpAst => ({
+export const buildGreaterThanOrEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): GreaterThanOrEqualOpAst => ({
   type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface LessThanOrEqualOpAst extends BinaryOpAst {
   type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
 }
 
-export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast): LessThanOrEqualOpAst => ({
+export const buildLessThanOrEqualOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): LessThanOrEqualOpAst => ({
   type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface PlusOpAst extends BinaryOpAst {
   type: AstNodeType.PLUS_OP,
 }
 
-export const buildPlusOpAst = (left: Ast, right: Ast): PlusOpAst => ({
+export const buildPlusOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): PlusOpAst => ({
   type: AstNodeType.PLUS_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface MinusOpAst extends BinaryOpAst {
   type: AstNodeType.MINUS_OP,
 }
 
-export const buildMinusOpAst = (left: Ast, right: Ast): MinusOpAst => ({
+export const buildMinusOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): MinusOpAst => ({
   type: AstNodeType.MINUS_OP,
   left,
   right,
-})
-
-export interface MinusUnaryOpAst {
-  type: AstNodeType.MINUS_UNARY_OP,
-  value: Ast,
-}
-
-export const buildMinusUnaryOpAst = (value: Ast): MinusUnaryOpAst => ({
-  type: AstNodeType.MINUS_UNARY_OP,
-  value,
-})
-
-export interface PlusUnaryOpAst {
-  type: AstNodeType.PLUS_UNARY_OP,
-  value: Ast,
-}
-
-export const buildPlusUnaryOpAst = (value: Ast): PlusUnaryOpAst => ({
-  type: AstNodeType.PLUS_UNARY_OP,
-  value,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface TimesOpAst extends BinaryOpAst {
   type: AstNodeType.TIMES_OP,
 }
 
-export const buildTimesOpAst = (left: Ast, right: Ast): TimesOpAst => ({
+export const buildTimesOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): TimesOpAst => ({
   type: AstNodeType.TIMES_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface DivOpAst extends BinaryOpAst {
   type: AstNodeType.DIV_OP,
 }
 
-export const buildDivOpAst = (left: Ast, right: Ast): DivOpAst => ({
+export const buildDivOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): DivOpAst => ({
   type: AstNodeType.DIV_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface PowerOpAst extends BinaryOpAst {
   type: AstNodeType.POWER_OP,
 }
 
-export const buildPowerOpAst = (left: Ast, right: Ast): PowerOpAst => ({
+export const buildPowerOpAst = (left: Ast, right: Ast, leadingWhitespace?: IToken): PowerOpAst => ({
   type: AstNodeType.POWER_OP,
   left,
   right,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-export interface PercentOpAst {
+export interface MinusUnaryOpAst extends AstWithWhitespace {
+  type: AstNodeType.MINUS_UNARY_OP,
+  value: Ast,
+}
+
+export const buildMinusUnaryOpAst = (value: Ast, leadingWhitespace?: IToken): MinusUnaryOpAst => ({
+  type: AstNodeType.MINUS_UNARY_OP,
+  value,
+  leadingWhitespace: extractImage(leadingWhitespace),
+})
+
+export interface PlusUnaryOpAst extends AstWithWhitespace {
+  type: AstNodeType.PLUS_UNARY_OP,
+  value: Ast,
+}
+
+export const buildPlusUnaryOpAst = (value: Ast, leadingWhitespace?: IToken): PlusUnaryOpAst => ({
+  type: AstNodeType.PLUS_UNARY_OP,
+  value,
+  leadingWhitespace: extractImage(leadingWhitespace),
+})
+
+export interface PercentOpAst extends AstWithWhitespace {
   type: AstNodeType.PERCENT_OP,
   value: Ast,
 }
 
-export const buildPercentOpAst = (value: Ast): PercentOpAst => ({
+export const buildPercentOpAst = (value: Ast, leadingWhitespace?: IToken): PercentOpAst => ({
   type: AstNodeType.PERCENT_OP,
   value,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-export interface ProcedureAst {
+export interface ProcedureAst  extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[],
 }
 
-export const buildProcedureAst = (procedureName: string, args: Ast[]): ProcedureAst => ({
+export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
+  leadingWhitespace: extractImage(leadingWhitespace),
+  internalWhitespace: extractImage(internalWhitespace),
 })
 
-export interface ParenthesisAst {
+export interface ParenthesisAst extends AstWithInternalWhitespace {
   type: AstNodeType.PARENTHESIS,
   expression: Ast,
 }
 
-export const buildParenthesisAst = (expression: Ast): ParenthesisAst => ({
+export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken, internalWhitespace?: IToken): ParenthesisAst => ({
   type: AstNodeType.PARENTHESIS,
   expression,
+  leadingWhitespace: extractImage(leadingWhitespace),
+  internalWhitespace: extractImage(internalWhitespace),
 })
 
-export interface ErrorAst {
+export interface ErrorAst extends AstWithWhitespace {
   type: AstNodeType.ERROR,
   args: ParsingError[],
   error?: CellError,
@@ -294,4 +333,16 @@ export interface ErrorAst {
 
 export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
 
-export const buildCellErrorAst = (error: CellError): ErrorAst => ({type: AstNodeType.ERROR, args: [], error})
+export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken): ErrorAst => ({
+  type: AstNodeType.ERROR,
+  args: [], error,
+  leadingWhitespace: extractImage(leadingWhitespace),
+})
+
+function extractImage(token: IToken | undefined): string | undefined {
+  return token !== undefined ? token.image : undefined
+}
+
+export function imageWithWhitespace(image: string, leadingWhitespace?: string) {
+  return (leadingWhitespace ? leadingWhitespace : '') + image
+}
