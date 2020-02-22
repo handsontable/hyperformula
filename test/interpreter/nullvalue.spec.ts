@@ -22,7 +22,7 @@ describe('EmptyValue tests', () => {
     expect(engine.getCellValue(adr('M1'))).toEqual(1) // EXP
     expect(engine.getCellValue(adr('N1'))).toEqual('') // CONCAT
     expect(engine.getCellValue(adr('O1'))).toEqual(0) // UNARY PLUS
-    expect(engine.getCellValue(adr('P1'))).toEqual(-0) // UNARY MINUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(0) // UNARY MINUS
     expect(engine.getCellValue(adr('Q1'))).toEqual(0) // PERCENTAGE
   })
   it('Boolean vs EmptyValue tests', () => {
