@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import { InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
@@ -541,8 +541,8 @@ export class DependencyGraph {
     return result
   }
 
-  public topologicalSort(): TopSortResult<Vertex> {
-    return this.graph.topologicalSort()
+  public topSortWithScc(): TopSortResult<Vertex> {
+    return this.graph.topSortWithScc()
   }
 
   public markAsVolatile(vertex: Vertex) {

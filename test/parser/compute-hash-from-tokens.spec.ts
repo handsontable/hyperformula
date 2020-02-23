@@ -75,19 +75,19 @@ describe('computeHashFromTokens', () => {
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3R-1:#0#14R0')
   })
 
-  it('ignores whitespace', () => {
+  it('do not ignores whitespace', () => {
     const code = '= 42'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=42')
+    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('= 42')
   })
 
-  it('same hash for formulas with different namespace', () => {
+  it('different hash for formulas with different namespace', () => {
     const code1 = '= 42 '
-    const code2 = '   =42'
+    const code2 = '=42'
 
     const result1 = computeFunc(code1, CellAddress.absolute(0, 1, 1))
     const result2 = computeFunc(code2, CellAddress.absolute(0, 1, 1))
-    expect(result1).toEqual(result2)
+    expect(result1).not.toEqual(result2)
   })
 
   it('support sheets', () => {
@@ -112,5 +112,29 @@ describe('computeHashFromTokens', () => {
     const code = '=fooBAR()'
 
     expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=FOOBAR()')
+  })
+
+  it('should work with whitespaces', () => {
+    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( A1, A1:A2 )'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 )')
+  })
+
+  it('should skip whitespaces inside range ', () => {
+    const formula = '=SUM( A1 : A2 )'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=SUM( #0#0R0:#0#1R0 )')
+  })
+
+  it('should skip trailing whitespace', () => {
+    const formula = '=1 '
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=1')
+  })
+
+  it('should skip whitespaces before function args separators', () => {
+    const formula = '=SUM(A1 , A2)'
+    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
   })
 })

@@ -1,5 +1,5 @@
 import {Config, HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Function E', () => {
   it('should return E with proper precision', () => {

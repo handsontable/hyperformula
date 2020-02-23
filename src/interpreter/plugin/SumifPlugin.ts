@@ -252,7 +252,7 @@ export class SumifPlugin extends FunctionPlugin {
       () => 'COUNTIF',
       0,
       (left, right) => left + right,
-      (arg) => 1,
+      () => 1,
     ).compute(conditionArg, [new Condition(conditionArg, criterionPackage)])
 
     return result
@@ -288,7 +288,7 @@ export class SumifPlugin extends FunctionPlugin {
       countifsCacheKey,
       0,
       (left, right) => left + right,
-      (arg) => 1,
+      () => 1,
     ).compute(conditions[0].conditionRange, conditions)
 
     return result

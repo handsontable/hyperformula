@@ -20,7 +20,9 @@ describe('ParserWithCaching - caching', () => {
   it("doesn't count cache for different formulas", () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
+    // eslint-disable-next-line
     const bast1 = parser.parse('=A1', CellAddress.absolute(0, 0, 0)).ast
+    // eslint-disable-next-line
     const bast2 = parser.parse('=A2+A3', CellAddress.absolute(0, 0, 0)).ast
 
     expect(parser.statsCacheUsed).toBe(0)

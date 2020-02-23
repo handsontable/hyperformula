@@ -41,6 +41,10 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse(42)).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean(true))
     expect(cellContentParser.parse(EmptyValue)).toStrictEqual(new CellContent.Empty())
+    expect(cellContentParser.parse(-0)).toStrictEqual(new CellContent.Number(0))
+    expect(cellContentParser.parse(Infinity)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(-Infinity)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(NaN)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
   })
 
   it('string', () => {

@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import { SimpleCellAddress} from '../src/Cell'
-import {adr, detailedError} from './testUtils'
+import {adr} from './testUtils'
 
 describe('generateCellsFromRange', () => {
   const generateCellsFromRange = (range: AbsoluteCellRange): SimpleCellAddress[] => {

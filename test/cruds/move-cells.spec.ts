@@ -458,7 +458,6 @@ describe('moving ranges', () => {
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    const b2 = engine.addressMapping.fetchCell(adr('B2'))
     const c1 = engine.addressMapping.fetchCell(adr('C1'))
     const c2 = engine.addressMapping.fetchCell(adr('C2'))
     const range = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))

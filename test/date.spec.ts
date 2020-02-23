@@ -1,6 +1,6 @@
 import {Config} from '../src'
 import {DateHelper, IDate} from '../src/DateHelper'
-import moment, {Moment} from 'moment'
+import moment from 'moment'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
@@ -106,7 +106,7 @@ describe('Date helpers, other zero date', () => {
 
 describe('Custom date parsing', () => {
 
-  function customParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): IDate | null {
+  function customParseDate(dateString: string, dateFormats: string[]): IDate | null {
     for(const dateFormat of dateFormats) {
       const momentDate = moment(dateString, dateFormat, true)
       if(momentDate.isValid()){

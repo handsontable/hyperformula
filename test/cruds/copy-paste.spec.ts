@@ -1,4 +1,4 @@
-import {CellError, Config, EmptyValue, HyperFormula} from '../../src'
+import {Config, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {CellReferenceType} from '../../src/parser/CellAddress'

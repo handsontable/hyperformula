@@ -56,7 +56,7 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
-  const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
+  const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
 
   let col
   if (result[4].length === 1) {

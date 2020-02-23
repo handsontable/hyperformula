@@ -2,7 +2,7 @@ import {Config, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {adr, detailedError} from './testUtils'
+import {adr} from './testUtils'
 
 describe('Disable matrix optimizatoins', () => {
   it('should split matrix into value cell vertices', () => {
