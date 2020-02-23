@@ -7,6 +7,7 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} f
 import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
+import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -131,6 +132,12 @@ export class SingleThreadEvaluator implements Evaluator {
     const interpreterValue = this.interpreter.evaluateAst(ast, formulaAddress)
     if (interpreterValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
+    } else if(typeof interpreterValue === 'number') {
+      if(isNumberOverflow(interpreterValue)) {
+        return new CellError(ErrorType.NUM)
+      } else {
+        return fixNegativeZero(interpreterValue)
+      }
     } else {
       return interpreterValue
     }

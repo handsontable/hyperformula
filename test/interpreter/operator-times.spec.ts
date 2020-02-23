@@ -12,6 +12,14 @@ describe('Operator TIMES', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(24)
   })
 
+  it('no -0', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=(-12)*0'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+  })
+
   it('use number coerce', () => {
     const engine = HyperFormula.buildFromArray([
       ['="8"*"3"'],
