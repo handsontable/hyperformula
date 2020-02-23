@@ -1,15 +1,14 @@
 import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
+import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
 export namespace CellContent {
   export class Number {
     constructor(public readonly value: number) {
-      if(value === 0) { // catches when value is -0
-        this.value = 0
-      }
+      this.value = fixNegativeZero(this.value)
     }
   }
 
@@ -79,7 +78,7 @@ export class CellContentParser {
     if (content === undefined || content === null || content === EmptyValue) {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
-      if( isNaN(content) || content === Infinity || content === -Infinity) {
+      if( isNumberOverflow(content)) {
         return new CellContent.Error(ErrorType.NUM)
       } else {
         return new CellContent.Number(content)

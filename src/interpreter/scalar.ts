@@ -120,11 +120,7 @@ export function unaryminus(value: number | CellError): number | CellError {
   if (value instanceof CellError) {
     return value
   } else {
-    if(value === 0){
-      return 0
-    } else {
-      return -value
-    }
+    return -value
   }
 }
 
@@ -278,5 +274,17 @@ export function numberCmp(left: number, right: number): number {
     return -1
   } else {
     return 0
+  }
+}
+
+export function isNumberOverflow(arg: number): boolean {
+  return (isNaN(arg) || arg===Infinity || arg===-Infinity)
+}
+
+export function fixNegativeZero(arg: number): number {
+  if(arg===0) {
+    return 0
+  } else {
+    return arg
   }
 }
