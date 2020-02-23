@@ -1,6 +1,6 @@
 import {Config} from '../src'
 import {DateHelper, IDate} from '../src/DateHelper'
-import moment, {Moment} from 'moment'
+import moment from 'moment'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {

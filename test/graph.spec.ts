@@ -259,7 +259,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node0)
     graph.addNode(node1)
 
-    const fn = jest.fn((node: string) => true)
+    const fn = jest.fn(() => true)
     graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -274,7 +274,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn((node: string) => true)
+    const fn = jest.fn(() => true)
     graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(2)
@@ -290,7 +290,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addNode(node1)
     graph.addEdge(node0, node1)
 
-    const fn = jest.fn((node: string) => false)
+    const fn = jest.fn(() => false)
     graph.getTopologicallySortedSubgraphFrom([node0], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -320,7 +320,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn((node: string) => true)
+    const fn = jest.fn(() => true)
     const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)
@@ -335,7 +335,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[1], nodes[2])
     graph.addEdge(nodes[2], nodes[0])
 
-    const fn = jest.fn((node: string) => true)
+    const fn = jest.fn(() => true)
     const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(0)
@@ -351,7 +351,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     graph.addEdge(nodes[2], nodes[3])
     graph.addEdge(nodes[3], nodes[1])
 
-    const fn = jest.fn((node: string) => false)
+    const fn = jest.fn(() => false)
     const cycled = graph.getTopologicallySortedSubgraphFrom([nodes[0]], fn)
 
     expect(fn).toHaveBeenCalledTimes(1)

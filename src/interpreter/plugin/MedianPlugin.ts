@@ -1,5 +1,5 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import { ProcedureAst} from '../../parser'
+import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from './FunctionPlugin'
 
 /**

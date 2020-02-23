@@ -1,4 +1,4 @@
-import {CellError, Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
