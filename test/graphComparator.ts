@@ -76,10 +76,10 @@ export class EngineComparator {
         const actualAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
 
         for (const adjacentNode of expectedGraph.adjacentNodes(expectedVertex)) {
-          expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode, sheet))
+          expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode))
         }
         for (const adjacentNode of actualGraph.adjacentNodes(actualVertex)) {
-          actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode, sheet))
+          actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode))
         }
         const sheetMapping = this.expected.sheetMapping
         deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
@@ -87,7 +87,7 @@ export class EngineComparator {
     }
   }
 
-  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex, sheet: number): SimpleCellAddress | AbsoluteCellRange {
+  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }

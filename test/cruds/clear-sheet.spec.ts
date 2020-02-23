@@ -120,6 +120,7 @@ describe('Clear sheet content', () => {
       ],
     })
 
+    // eslint-disable-next-line
     const changes = engine.clearSheet('Sheet1')
 
     engine.setCellContents(adr('A1'), '2')

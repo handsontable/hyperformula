@@ -12,7 +12,7 @@ class FooPlugin extends FunctionPlugin {
     },
   }
 
-  public foo: PluginFunctionType = (ast, formulaAdress) => {
+  public foo: PluginFunctionType = () => {
     return 42
   }
 }

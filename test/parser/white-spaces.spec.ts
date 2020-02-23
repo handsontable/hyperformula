@@ -2,7 +2,7 @@ import {Config} from '../../src'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer} from '../../src/parser'
-import {EqualsOp, RangeSeparator, WhiteSpace} from '../../src/parser/LexerConfig'
+import {WhiteSpace} from '../../src/parser/LexerConfig'
 import {bindWhitespacesToTokens} from '../../src/parser/ParserWithCaching'
 import {expectArrayWithSameContent} from '../testUtils'
 

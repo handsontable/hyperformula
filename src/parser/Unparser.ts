@@ -86,7 +86,7 @@ export class Unparser {
 
   private unparseSheetName(sheetId: number): string {
     const sheet = this.sheetMappingFn(sheetId)
-    if (sheet.match(new RegExp(additionalCharactersAllowedInQuotes))) {
+    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
       return `'${sheet}'`
     } else {
       return sheet
