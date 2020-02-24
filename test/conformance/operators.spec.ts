@@ -23,7 +23,7 @@ function createEngine(data: any[][]) {
 };
 
 describe('Quality assurance of operators', () => {
-    it('BLANK should be supported by all comparison operators', () => { //https://github.com/handsontable/hyperformula/issues/127#issuecomment-589234601
+    it('BLANK should be supported by all comparison operators', () => { //
         const engine = createEngine([
             [null, null, ...data]
         ]);
@@ -41,7 +41,7 @@ describe('Quality assurance of operators', () => {
         expect(engine.getCellValue('M1')).toEqual(1); //EXP 
         expect(engine.getCellValue('N1')).toEqual(""); // CONCAT
         expect(engine.getCellValue('O1')).toEqual(0); // UNARY PLUS
-        //expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS -0 in E and GS
+        expect(engine.getCellValue('P1')).toEqual(0); // UNARY MINUS 
         expect(engine.getCellValue('Q1')).toEqual(0); // PERCENTAGE
     });
 
