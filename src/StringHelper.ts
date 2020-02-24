@@ -1,6 +1,10 @@
 import {Config} from './Config'
 
 export function collatorFromConfig(config: Config): Intl.Collator {
-  return new Intl.Collator(config.localeLang)
+
+  const sensitivity = config.caseSensitive ? (config.accentSensitive ? 'variant' : 'case') : (config.accentSensitive ? 'accent' : 'base' )
+  const caseFirst = 'upper'
+  const ignorePunctuation = config.ignorePunctuation
+  return new Intl.Collator(config.localeLang, {sensitivity, caseFirst, ignorePunctuation})
 }
 

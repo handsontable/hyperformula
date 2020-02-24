@@ -41,6 +41,7 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
+  accentSensitive: boolean,
   caseSensitive: boolean,
   chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormats: string[],
@@ -48,6 +49,7 @@ export interface ConfigParams {
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
+  ignorePunctuation: boolean,
   leapYear1900: boolean,
   localeLang: string,
   matrixDetection: boolean,
@@ -66,7 +68,9 @@ export interface ConfigParams {
 export class Config {
 
   public static defaultConfig: ConfigParams = {
+    accentSensitive: false,
     caseSensitive: false,
+    ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
@@ -124,6 +128,7 @@ export class Config {
     CorrelPlugin,
   ]
 
+  public readonly accentSensitive: boolean
   public readonly caseSensitive: boolean
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
   public readonly dateFormats: string[]
@@ -131,6 +136,7 @@ export class Config {
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
+  public readonly ignorePunctuation: boolean
   public readonly leapYear1900: boolean
   public readonly localeLang: string
   public readonly matrixDetection: boolean
@@ -148,6 +154,7 @@ export class Config {
 
   constructor(
     {
+      accentSensitive,
       caseSensitive,
       chooseAddressMappingPolicy,
       dateFormats,
@@ -155,6 +162,7 @@ export class Config {
       language,
       functionPlugins,
       gpuMode,
+      ignorePunctuation,
       leapYear1900,
       localeLang,
       smartRounding,
@@ -170,7 +178,9 @@ export class Config {
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
+    this.accentSensitive = typeof accentSensitive === 'boolean' ? accentSensitive : Config.defaultConfig.accentSensitive
     this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
+    this.ignorePunctuation = typeof ignorePunctuation === 'boolean' ? ignorePunctuation : Config.defaultConfig.ignorePunctuation
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
