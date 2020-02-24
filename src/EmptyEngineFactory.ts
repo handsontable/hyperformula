@@ -6,6 +6,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics} from './statistics/Statistics'
+import {collatorFromConfig} from './StringHelper'
 
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HyperFormula {
@@ -16,7 +17,8 @@ export class EmptyEngineFactory {
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
+    const collator = collatorFromConfig(config)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
     const cellContentParser = new CellContentParser(config, dateHelper)
     lazilyTransformingAstService.parser = parser
     const engine = new HyperFormula(

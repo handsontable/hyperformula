@@ -25,12 +25,13 @@ import {
   floatCmp,
   multiply, numberCmp,
   percent,
-  power, strCmp,
+  power,
   subtract,
   unaryminus,
   unaryplus,
 } from './scalar'
 import {concatenate} from './text'
+import Collator = Intl.Collator
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -42,6 +43,7 @@ export class Interpreter {
     public readonly config: Config,
     public readonly stats: Statistics,
     public readonly dateHelper: DateHelper,
+    public readonly collator: Collator
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
@@ -318,11 +320,7 @@ export class Interpreter {
     }
 
     if ( typeof left === 'string' && typeof right === 'string') {
-      if ( this.config.caseSensitive) {
-        return strCmp(left, right)
-      } else {
-        return strCmp(left.toLowerCase(), right.toLowerCase())
-      }
+      return this.collator.compare(left, right)
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
     } else if ( typeof left === 'number' && typeof right === 'number' ) {

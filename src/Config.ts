@@ -49,6 +49,7 @@ export interface ConfigParams {
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
   leapYear1900: boolean,
+  localeLang: string,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
@@ -74,6 +75,7 @@ export class Config {
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
+    localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
@@ -130,6 +132,7 @@ export class Config {
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
   public readonly leapYear1900: boolean
+  public readonly localeLang: string
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
@@ -153,6 +156,7 @@ export class Config {
       functionPlugins,
       gpuMode,
       leapYear1900,
+      localeLang,
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
@@ -171,6 +175,7 @@ export class Config {
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
+    this.localeLang = typeof localeLang === 'string' ? localeLang : Config.defaultConfig.localeLang
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
     this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
