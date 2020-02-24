@@ -1,7 +1,7 @@
-import {CellError, EmptyValueType, ErrorType, InternalCellValue} from './Cell'
+import {CellError, EmptyValueType, ErrorType, InternalCellValue, NoErrorCellValue} from './Cell'
 import {Config} from './Config'
 
-export type CellValue = number | string | boolean | DetailedCellError | EmptyValueType
+export type CellValue = NoErrorCellValue | DetailedCellError
 
 export class DetailedCellError {
   constructor(

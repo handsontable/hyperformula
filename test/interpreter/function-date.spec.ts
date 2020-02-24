@@ -155,4 +155,12 @@ describe( 'Function DATE + leap years', () =>{
     ])
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2400')
   })
+
+  it('should throw a error in the absence of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE()'],
+    ]);
+
+    expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual(detailedError(ErrorType.NA));
+  })
 })
