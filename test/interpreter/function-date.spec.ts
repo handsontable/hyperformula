@@ -175,7 +175,7 @@ describe( 'Function DATE + leap years', () =>{
 
   it('with blanks', () => {
     const engine = HyperFormula.buildFromArray([
-      [null, '', 'string', EmptyValue,'\''],
+      [null, '', 'string', EmptyValue, '\''],
       ['=DATE(A1, 2, 3)'],
       ['=DATE(B1, 2, 3)'],
       ['=DATE(C1, 2, 3)'],
