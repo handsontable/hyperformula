@@ -33,7 +33,7 @@ describe('string comparison', () => {
   it('accents sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['Ą', 'ą', '=A1>B1'],
-      ['ää','áá', '=A2>B2'],
+      ['ää', 'áá', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
       ['ää', 'ŹŹ', '=A4>B4'],
     ], new Config({accentSensitive: true}))
