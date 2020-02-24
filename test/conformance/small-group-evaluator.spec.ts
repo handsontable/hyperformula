@@ -360,7 +360,29 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
 
       expect(engine.getCellValue('A1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!'));
     });
+    it('6.15.2 AND function', () => {
+      const engine = createEngine([
+        ['=AND(FALSE(),FALSE())'], //A1
+        ['=AND(FALSE(),TRUE())'],  //A2
+        ['=AND(TRUE(),FALSE())'],  //A3
+        ['=AND(TRUE(),TRUE())'],   //A4
+        ['=AND(TRUE()  ,NA())'],     //A5
+        ['=AND(1,TRUE())'],        //A6
+        ['=AND(0,TRUE())'],     //A7
+        ['=AND(TRUE(), TRUE(),TRUE())'],   //A8
+        ['=AND(TRUE())'],   //A9
+      ]);
 
+      expect(engine.getCellValue('A1')).toBe(false);
+      expect(engine.getCellValue('A2')).toBe(false);
+      expect(engine.getCellValue('A3')).toBe(false);
+      expect(engine.getCellValue('A4')).toBe(true);
+      expect(engine.getCellValue('A5')).toEqual(new DetailedCellError(new CellError(ErrorType.NAME), '#NAME?')); 
+      expect(engine.getCellValue('A6')).toBe(true); 
+      expect(engine.getCellValue('A7')).toBe(false);
+      expect(engine.getCellValue('A8')).toBe(true);
+      expect(engine.getCellValue('A9')).toBe(true);
+    });
     
 
 
