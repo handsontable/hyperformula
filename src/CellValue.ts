@@ -1,4 +1,4 @@
-import {CellError, EmptyValueType, ErrorType, InternalCellValue, NoErrorCellValue} from './Cell'
+import {CellError, ErrorType, InternalCellValue, NoErrorCellValue} from './Cell'
 import {Config} from './Config'
 
 export type CellValue = NoErrorCellValue | DetailedCellError

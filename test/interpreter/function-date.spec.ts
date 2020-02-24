@@ -156,6 +156,7 @@ describe( 'Function DATE + leap years', () =>{
     expect(dateNumberToString(engine.getCellValue(adr('A1')))).toEqual('02/29/2400')
   })
 
+<<<<<<< HEAD
   it('should support null year', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(0,02,29)'],
@@ -189,4 +190,6 @@ describe( 'Function DATE + leap years', () =>{
     expect(dateNumberToString(engine.getCellValue(adr('A5')))).toEqual('02/03/2000')
     expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.VALUE))
   })
+=======
+>>>>>>> develop
 })
