@@ -187,6 +187,6 @@ describe( 'Function DATE + leap years', () =>{
     expect(dateNumberToString(engine.getCellValue(adr('A3')))).toEqual('02/03/2000')
     expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
     expect(dateNumberToString(engine.getCellValue(adr('A5')))).toEqual('02/03/2000')
-    expect(engine.getCellValue(adr('A6'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A6'))).toEqual('02/03/2000')
   })
 })
