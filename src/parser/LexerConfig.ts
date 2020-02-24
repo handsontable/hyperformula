@@ -103,15 +103,14 @@ export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-
 export const WhiteSpace = createToken({
   name: 'WhiteSpace',
   pattern: /[ \t\n\r]+/,
-  group: Lexer.SKIPPED,
 })
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
-  OffsetProcedureName: TokenType
+  OffsetProcedureName: TokenType,
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
-  functionMapping: Record<string, string>
+  functionMapping: Record<string, string>,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {

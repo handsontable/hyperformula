@@ -18,10 +18,10 @@ export namespace MoveCellsDependencyTransformer {
   export function transformSingleAst(transformation: MoveCellsTransformation, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     if (transformation.sourceRange.addressInRange(nodeAddress)) {
       const newAst = transformAddressesInFormula(
-          ast,
-          nodeAddress,
-          fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
-          cellRangeTransformer(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
+        ast,
+        nodeAddress,
+        fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom),
+        cellRangeTransformer(fixDependenciesInMovedCells(transformation.sourceRange, transformation.toRight, transformation.toBottom)),
       )
 
       return [newAst, {
@@ -88,24 +88,28 @@ export namespace MoveCellsDependencyTransformer {
       }
       case AstNodeType.PERCENT_OP: {
         return {
+          ...ast,
           type: ast.type,
           value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       case AstNodeType.PLUS_UNARY_OP: {
         return {
+          ...ast,
           type: ast.type,
           value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
         return {
+          ...ast,
           type: ast.type,
           value: transformDependentFormulas(ast.value, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       case AstNodeType.FUNCTION_CALL: {
         return {
+          ...ast,
           type: ast.type,
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => transformDependentFormulas(arg, address, sourceRange, toRight, toBottom, toSheet)),
@@ -113,12 +117,14 @@ export namespace MoveCellsDependencyTransformer {
       }
       case AstNodeType.PARENTHESIS: {
         return {
+          ...ast,
           type: ast.type,
           expression: transformDependentFormulas(ast.expression, address, sourceRange, toRight, toBottom, toSheet),
         }
       }
       default: {
         return {
+          ...ast,
           type: ast.type,
           left: transformDependentFormulas(ast.left, address, sourceRange, toRight, toBottom, toSheet),
           right: transformDependentFormulas(ast.right, address, sourceRange, toRight, toBottom, toSheet),

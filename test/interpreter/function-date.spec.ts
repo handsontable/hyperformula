@@ -1,5 +1,5 @@
 import {Config, HyperFormula} from '../../src'
-import {CellError, ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
@@ -146,7 +146,7 @@ describe( 'Function DATE + leap years', () =>{
     const engine = HyperFormula.buildFromArray([
       ['=DATE(1900,02,29)'],
     ], config )
-    expect(dateNumberToString(engine.getCellValue(adr('A1')),config)).toEqual('02/29/1900')
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('02/29/1900')
   })
 
   it('should support leap year 2400', () => {

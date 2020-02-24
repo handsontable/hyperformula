@@ -1,9 +1,9 @@
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
-import { matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
+import {matrixSizeForMultiplication, matrixSizeForPoolFunction, matrixSizeForTranspose} from '../../Matrix'
 import {Ast, AstNodeType, NumberAst, ProcedureAst} from '../../parser'
 import {coerceToRangeNumbersOrError} from '../coerce'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
 export class MatrixPlugin extends FunctionPlugin {
@@ -42,7 +42,7 @@ export class MatrixPlugin extends FunctionPlugin {
     const kernel = gpu.createKernel(function(a: number[][], b: number[][], width: number) {
       let sum = 0
       for (let i = 0; i < width; ++i) {
-        sum += a[this.thread.y as number][i] * b[i][this.thread.x as number]
+        sum += a[this.thread.y as number][i] * b[i][this.thread.x]
       }
       return sum
     }).setPrecision('unsigned')
@@ -81,7 +81,7 @@ export class MatrixPlugin extends FunctionPlugin {
     /* istanbul ignore next: gpu.js */
     const gpu = this.interpreter.getGpuInstance()
     const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x as number * stride
+      const leftCornerX = this.thread.x * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {
@@ -126,7 +126,7 @@ export class MatrixPlugin extends FunctionPlugin {
     /* istanbul ignore next: gpu.js */
     const gpu = this.interpreter.getGpuInstance()
     const kernel = gpu.createKernel(function(a: number[][], windowSize: number, stride: number) {
-      const leftCornerX = this.thread.x as number * stride
+      const leftCornerX = this.thread.x * stride
       const leftCornerY = this.thread.y as number * stride
       let currentMax = a[leftCornerY][leftCornerX]
       for (let i = 0; i < windowSize; i++) {

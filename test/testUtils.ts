@@ -33,30 +33,30 @@ export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddr
   return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
 }
 
-export const expect_reference_to_have_ref_error = (engine: HyperFormula, address: SimpleCellAddress) => {
+export const expectReferenceToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
   expect(formula).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
-export const expect_function_to_have_ref_error = (engine: HyperFormula, address: SimpleCellAddress) => {
+export const expectFunctionToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
   const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   expect(formula.args.find((arg) => arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
-export const expect_cell_to_have_formula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
+export const expectCellToHaveFormula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
   const formula = (engine.addressMapping.fetchCell(address!) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
   const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.fetchDisplayName)
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 
-export const expect_array_with_same_content = (expected: any[], actual: any[]) => {
+export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
   expect(actual).toEqual(expect.arrayContaining(expected))
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
-  const result = stringAddress.match(/^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/)!
+  const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
 
   let col
   if (result[4].length === 1) {
@@ -67,7 +67,7 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
     }, 0) - 1
   }
 
-  const row = Number(result[6] as string) - 1
+  const row = Number(result[6]) - 1
 
   return simpleCellAddress(sheet, col, row)
 }

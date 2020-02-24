@@ -52,5 +52,6 @@ describe('detailed error', () => {
 
     const error = cellValueExporter.export(new CellError(ErrorType.VALUE)) as DetailedCellError
     expect(error).toEqual(detailedError(ErrorType.VALUE, config))
-    expect(error.value).toEqual('#ARG!')  })
+    expect(error.value).toEqual('#ARG!')  
+  })
 })

@@ -23,7 +23,7 @@ export interface IAddressMappingStrategy {
    */
   setCell(address: SheetCellAddress, newVertex: CellVertex): void,
 
-  removeCell(address: SimpleCellAddress): void
+  removeCell(address: SimpleCellAddress): void,
 
   /**
    * Returns whether the address is present or not
@@ -60,5 +60,5 @@ export interface IAddressMappingStrategy {
 
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
 
-  vertices(): IterableIterator<CellVertex>
+  vertices(): IterableIterator<CellVertex>,
 }

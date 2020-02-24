@@ -1,9 +1,9 @@
-import {CellError, Config, EmptyValue, HyperFormula} from '../../src'
+import {Config, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
-import {adr, detailedError, expect_array_with_same_content, extractReference} from '../testUtils'
+import {adr, detailedError, expectArrayWithSameContent, extractReference} from '../testUtils'
 
 describe('Copy - paste integration', () => {
   it('copy should return values', () => {
@@ -14,8 +14,8 @@ describe('Copy - paste integration', () => {
 
     const values = engine.copy(adr('A1'), 2, 2)
 
-    expect_array_with_same_content([1, 2], values[0])
-    expect_array_with_same_content(['foo', 1], values[1])
+    expectArrayWithSameContent([1, 2], values[0])
+    expectArrayWithSameContent(['foo', 1], values[1])
   })
 
   it('copy should round return values', () => {
@@ -25,7 +25,7 @@ describe('Copy - paste integration', () => {
 
     const values = engine.copy(adr('A1'), 2, 1)
 
-    expect_array_with_same_content([1.0000000001, 1], values[0])
+    expectArrayWithSameContent([1.0000000001, 1], values[0])
   })
 
   it('should copy empty cell vertex', () => {
@@ -36,7 +36,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expect_array_with_same_content([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
+    expectArrayWithSameContent([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
   })
 
   it('should work for single number', () => {
@@ -160,7 +160,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 2, 1)
     const changes = engine.paste(adr('A2'))
 
-    expect_array_with_same_content([
+    expectArrayWithSameContent([
       { sheet:0, col: 0, row: 1, value: 1},
       { sheet:0, col: 1, row: 1, value: 1},
     ], changes)

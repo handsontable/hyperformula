@@ -1,13 +1,13 @@
 import {EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {
   it('should set matrix empty', () => {
     const engine = HyperFormula.buildFromArray([
-        ['1', '2'],
-        ['{=TRANSPOSE(A1:B1)}'],
-        ['{=TRANSPOSE(A1:B1)}'],
+      ['1', '2'],
+      ['{=TRANSPOSE(A1:B1)}'],
+      ['{=TRANSPOSE(A1:B1)}'],
     ])
     const dependencyGraph = engine.dependencyGraph
     const matrixVertex = dependencyGraph.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!

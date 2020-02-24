@@ -1,4 +1,4 @@
-import {CellError, Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -9,13 +9,13 @@ describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(simpleCellAddress(0, -1, 0))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(simpleCellAddress(0, -1, 0))).toEqual(false)
   })
 
   it('address should be in existing sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(adr('A1', 1))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toEqual(false)
   })
 
   it('no if in formula matrix', () => {
@@ -27,7 +27,10 @@ describe('Changing cell content - checking if its possible', () => {
       ['13'],
     ])
 
-    expect(engine.isItPossibleToChangeContent(adr('A3'))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A3'), 1, 1)).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'), 2, 2)).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'), 2, 2)).toBe(false)
   })
 
   it('yes if numeric matrix', () => {
@@ -38,13 +41,13 @@ describe('Changing cell content - checking if its possible', () => {
     ], config)
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
-    expect(engine.isItPossibleToChangeContent(adr('A2'))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A2'))).toBe(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToChangeContent(adr('A1'))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
   })
 })
 

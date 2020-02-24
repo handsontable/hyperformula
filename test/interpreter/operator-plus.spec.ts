@@ -63,7 +63,7 @@ describe('Operator PLUS', () => {
 
   it('Plus propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1','2','=(1/0)+2','=2+(1/0)', '=(A1:B1)+(1/0)', '=(1/0)+(A1:B1)'],
+      ['1', '2', '=(1/0)+2', '=2+(1/0)', '=(A1:B1)+(1/0)', '=(1/0)+(A1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))

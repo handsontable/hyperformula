@@ -1,10 +1,10 @@
-import {CellError, EmptyValue, HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {adr, detailedError, extractRange, extractReference} from '../testUtils'
 
-describe("Ensure it is possible to move rows", () => {
+describe('Ensure it is possible to move rows', () => {
   it('should return false when target makes no sense', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
@@ -77,7 +77,7 @@ describe("Ensure it is possible to move rows", () => {
   })
 })
 
-describe("Move rows", () => {
+describe('Move rows', () => {
   it('should throw error when target makes no sense', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],

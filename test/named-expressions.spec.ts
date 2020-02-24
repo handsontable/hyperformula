@@ -1,9 +1,8 @@
 import {HyperFormula} from '../src'
-import {simpleCellAddress} from '../src/Cell'
 import './testConfig'
 import {adr} from './testUtils'
 
-describe("Named expressions", () => {
+describe('Named expressions', () => {
   it('basic usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
@@ -43,7 +42,7 @@ describe("Named expressions", () => {
 
     expect(() => {
       engine.addNamedExpression('myName', '=Sheet1!A1+10')
-    }).toThrowError(`Name of Named Expression 'myName' is already present in the workbook`)
+    }).toThrowError('Name of Named Expression \'myName\' is already present in the workbook')
   })
 
   it('named expressions is validated when added', () => {

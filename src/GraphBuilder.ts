@@ -35,12 +35,12 @@ export class GraphBuilder {
    * @param config - configuration of the sheet
    */
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly columnSearch: IColumnSearchStrategy,
-      private readonly parser: ParserWithCaching,
-      private readonly cellContentParser: CellContentParser,
-      private readonly config: Config = new Config(),
-      private readonly stats: Statistics = new Statistics(),
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly parser: ParserWithCaching,
+    private readonly cellContentParser: CellContentParser,
+    private readonly config: Config = new Config(),
+    private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {
       this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold, this.cellContentParser)
@@ -67,16 +67,16 @@ export class GraphBuilder {
 }
 
 export interface GraphBuilderStrategy {
-  run(sheets: Sheets): Dependencies
+  run(sheets: Sheets): Dependencies,
 }
 
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly columnIndex: IColumnSearchStrategy,
-      private readonly parser: ParserWithCaching,
-      private readonly stats: Statistics,
-      private readonly cellContentParser: CellContentParser,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnIndex: IColumnSearchStrategy,
+    private readonly parser: ParserWithCaching,
+    private readonly stats: Statistics,
+    private readonly cellContentParser: CellContentParser,
   ) {
   }
 
@@ -85,7 +85,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
-      const sheet = sheets[sheetName] as Sheet
+      const sheet = sheets[sheetName]
 
       for (let i = 0; i < sheet.length; ++i) {
         const row = sheet[i]
@@ -130,12 +130,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
-      private readonly dependencyGraph: DependencyGraph,
-      private readonly columnSearch: IColumnSearchStrategy,
-      private readonly parser: ParserWithCaching,
-      private readonly stats: Statistics,
-      private readonly threshold: number,
-      private readonly cellContentParser: CellContentParser,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly parser: ParserWithCaching,
+    private readonly stats: Statistics,
+    private readonly threshold: number,
+    private readonly cellContentParser: CellContentParser,
   ) {}
 
   public run(sheets: Sheets): Dependencies {
@@ -145,7 +145,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
 
     for (const sheetName in sheets) {
       const sheetId = this.dependencyGraph.getSheetId(sheetName)
-      const sheet = sheets[sheetName] as Sheet
+      const sheet = sheets[sheetName]
 
       matrixHeuristic.addSheet(sheetId, {
         width: this.dependencyGraph.getSheetWidth(sheetId),

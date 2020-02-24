@@ -63,12 +63,23 @@ describe('Operator POWER', () => {
 
   it('Power propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1','2','=(1/0)^2','=2^(1/0)', '=(A1:B1)^(1/0)', '=(1/0)^(A1:B1)'],
+      ['1', '2', '=(1/0)^2', '=2^(1/0)', '=(A1:B1)^(1/0)', '=(1/0)^(A1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('F1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it( 'NaN as a result', () => {
+
+    const engine = HyperFormula.buildFromArray([
+      ['01/02/1999', '02/02/1999', '=A1^B1'],
+      ['3.1415', '36193.2', '=A2^B2'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NUM))
+    expect(engine.getCellValue(adr('C2'))).toEqual(detailedError(ErrorType.NUM))
   })
 })

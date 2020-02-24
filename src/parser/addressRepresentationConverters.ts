@@ -17,7 +17,7 @@ const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${a
  * @returns object representation of address
  */
 export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress | undefined => {
-  const result = stringAddress.match(addressRegex)!
+  const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
 
@@ -35,7 +35,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     return undefined
   }
 
-  const row = Number(result[8] as string) - 1
+  const row = Number(result[8]) - 1
   if (result[5] === '$' && result[7] === '$') {
     return CellAddress.absolute(sheet, col, row)
   } else if (result[5] === '$') {
@@ -66,7 +66,7 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
 export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): SimpleCellAddress | undefined => {
-  const result = stringAddress.match(addressRegex)!
+  const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
 
@@ -82,7 +82,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
     return undefined
   }
 
-  const row = Number(result[8] as string) - 1
+  const row = Number(result[8]) - 1
   return simpleCellAddress(sheet, col, row)
 }
 

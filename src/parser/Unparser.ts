@@ -1,7 +1,6 @@
-
 import {SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType} from './Ast'
+import {Ast, AstNodeType, imageWithWhitespace} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -23,63 +22,71 @@ export class Unparser {
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return ast.value.toString()
+        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return '"' + ast.value + '"'
+        return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        return (procedureName || ast.procedureName) + '(' + args + ')'
+        const procedureName = this.config.getFunctionTranslationFor(ast.procedureName) || ast.procedureName
+        const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
+        let image
         if (ast.reference.sheet === address.sheet) {
-          return cellAddressToString(ast.reference, address)
+          image = cellAddressToString(ast.reference, address)
         } else {
-          return this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+          image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
         }
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
+        let image
         if (ast.start.sheet === address.sheet) {
-          return cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          image = cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         } else {
-          return this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+          image = this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '+' + unparsedExpr
+        return imageWithWhitespace('+', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
-        return '-' + unparsedExpr
+        return imageWithWhitespace('-', ast.leadingWhitespace) + unparsedExpr
       }
       case AstNodeType.PERCENT_OP: {
-        return this.unparseAst(ast.value, address) + '%'
+        return this.unparseAst(ast.value, address) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
+        let image
         if (ast.error) {
-          return this.config.getErrorTranslationFor(ast.error.type)
+          image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          return '#ERR!'
+          image = '#ERR!'
         }
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.unparseAst(ast.expression, address)
-        return '(' + expression + ')'
+        const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)
-        return left + binaryOpTokenMap[ast.type] + right
+        return left + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + right
       }
     }
   }
 
   private unparseSheetName(sheetId: number): string {
     const sheet = this.sheetMappingFn(sheetId)
-    if (sheet.match(new RegExp(additionalCharactersAllowedInQuotes))) {
+    if (new RegExp(additionalCharactersAllowedInQuotes).exec(sheet)) {
       return `'${sheet}'`
     } else {
       return sheet

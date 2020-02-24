@@ -41,6 +41,10 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse(42)).toStrictEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(true)).toStrictEqual(new CellContent.Boolean(true))
     expect(cellContentParser.parse(EmptyValue)).toStrictEqual(new CellContent.Empty())
+    expect(cellContentParser.parse(-0)).toStrictEqual(new CellContent.Number(0))
+    expect(cellContentParser.parse(Infinity)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(-Infinity)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(NaN)).toStrictEqual(new CellContent.Error(ErrorType.NUM))
   })
 
   it('string', () => {
@@ -72,6 +76,11 @@ describe('CellContentParser', () => {
   it('date parsing', () => {
     expect(cellContentParser.parse('02-02-2020')).toStrictEqual(new CellContent.Number(43863))
     expect(cellContentParser.parse('  02-02-2020')).toStrictEqual(new CellContent.Number(43863))
+  })
+
+  it('JS Date parsing', () => {
+    expect(cellContentParser.parse(new Date(1995, 11, 17))).toStrictEqual(new CellContent.Number(35050))
+    expect(cellContentParser.parse(new Date('02-02-2020'))).toStrictEqual(new CellContent.Number(43863))
   })
 
   it( 'starts with \'', () => {

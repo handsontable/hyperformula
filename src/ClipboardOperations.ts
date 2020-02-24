@@ -22,7 +22,7 @@ enum ClipboardCellType {
 
 interface ClipboardCellValue {
   type: ClipboardCellType.VALUE,
-  value: ValueCellVertexValue
+  value: ValueCellVertexValue,
 }
 
 interface ClipboardCellEmpty {
@@ -30,8 +30,8 @@ interface ClipboardCellEmpty {
 }
 
 interface ClipboardCellFormula {
-  type: ClipboardCellType.FORMULA
-  hash: string
+  type: ClipboardCellType.FORMULA,
+  hash: string,
 }
 
 class Clipboard {

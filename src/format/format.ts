@@ -80,7 +80,7 @@ export function defaultStringifyDate(value: number, formatArg: string, dateHelpe
   const tokens = expression.tokens
   let result = ''
   const date = dateHelper.numberToDate(value)
-//  let minutes: boolean = false
+  //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
@@ -90,17 +90,17 @@ export function defaultStringifyDate(value: number, formatArg: string, dateHelpe
     }
 
     switch (token.value) {
-        /* hours*/
-//      case 'h':
-//      case 'H':
-//      case 'hh':
-//      case 'HH': {
-//        minutes = true
-//        result += date.format(token.value)
-//        break
-//      }
+      /* hours*/
+      //      case 'h':
+      //      case 'H':
+      //      case 'hh':
+      //      case 'HH': {
+      //        minutes = true
+      //        result += date.format(token.value)
+      //        break
+      //      }
 
-        /* days */
+      /* days */
       case 'd':
       case 'D':
       case 'dd':
@@ -108,28 +108,28 @@ export function defaultStringifyDate(value: number, formatArg: string, dateHelpe
         result += padLeft(date.day, token.value.length)
         break
       }
-//      case 'ddd':
-//      case 'DDD':
-//        result += date.format('ddd')
-//        break
-//      case 'dddd':
-//      case 'DDDD': {
-//        result += date.format('dddd')
-//        break
-//      }
+      //      case 'ddd':
+      //      case 'DDD':
+      //        result += date.format('ddd')
+      //        break
+      //      case 'dddd':
+      //      case 'DDDD': {
+      //        result += date.format('dddd')
+      //        break
+      //      }
 
-        /* minutes / months */
+      /* minutes / months */
       case 'M':
       case 'm':
       case 'MM':
       case 'mm': {
-//        if (minutes) {
-//          result += padLeft(date.minute(), token.value.length)
-//          break
-//        } else {
-          result += padLeft(date.month, token.value.length)
-          break
-//        }
+        //        if (minutes) {
+        //          result += padLeft(date.minute(), token.value.length)
+        //          break
+        //        } else {
+        result += padLeft(date.month, token.value.length)
+        break
+        //        }
       }
       // case 'mmm':
       // case 'MMM': {
@@ -147,7 +147,7 @@ export function defaultStringifyDate(value: number, formatArg: string, dateHelpe
       //   break
       // }
 
-        /* years */
+      /* years */
       case 'yy':
       case 'YY': {
         result += padLeft(date.year % 100, token.value.length)

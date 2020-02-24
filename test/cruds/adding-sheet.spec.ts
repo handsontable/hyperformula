@@ -1,7 +1,7 @@
 import {Config, EmptyValue, HyperFormula} from '../../src'
 import {plPL} from '../../src/i18n'
 import '../testConfig'
-import {adr, detailedError} from '../testUtils'
+import {adr} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {

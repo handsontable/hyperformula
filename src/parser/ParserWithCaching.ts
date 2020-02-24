@@ -2,12 +2,12 @@ import {IToken, tokenMatcher} from 'chevrotain'
 import {SimpleCellAddress} from '../Cell'
 import {RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
-import {Ast, AstNodeType, buildErrorAst, ParsingErrorType} from './Ast'
+import {Ast, AstNodeType, buildErrorAst, imageWithWhitespace, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {FormulaLexer, FormulaParser} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName} from './LexerConfig'
+import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
+import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export interface ParsingResult {
@@ -49,12 +49,12 @@ export class ParserWithCaching {
 
     if (lexerResult.errors.length > 0) {
       const ast = buildErrorAst(lexerResult.errors.map((e) =>
-          ({
-            type: ParsingErrorType.LexingError,
-            message: e.message,
-          }),
+        ({
+          type: ParsingErrorType.LexingError,
+          message: e.message,
+        }),
       ))
-      return { ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
+      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: []}
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -63,12 +63,13 @@ export class ParserWithCaching {
     if (cacheResult) {
       ++this.statsCacheUsed
     } else {
-      const parsingResult = this.formulaParser.parseFromTokens(lexerResult, formulaAddress)
+      const processedTokens = bindWhitespacesToTokens(lexerResult.tokens)
+      const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
       cacheResult = this.cache.set(hash, parsingResult)
     }
-    const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+    return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -76,8 +77,8 @@ export class ParserWithCaching {
     if (cacheResult === null) {
       throw new Error('There is no AST with such key in the cache')
     } else {
-      const { ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
-      return { ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies }
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
+      return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
     }
   }
 
@@ -123,44 +124,49 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return ast.value.toString()
+        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
-        return '"' + ast.value + '"'
+        return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.computeHashOfAstNode(arg)).join(this.config.functionArgSeparator)
-        return ast.procedureName + '(' + args + ')'
+        const rightPart = ast.procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return cellHashFromToken(ast.reference)
+        return imageWithWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
         const start = cellHashFromToken(ast.start)
         const end = cellHashFromToken(ast.end)
-        return start + ':' + end
+        return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
-        return '-' + this.computeHashOfAstNode(ast.value)
+        return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
-        return '+' + this.computeHashOfAstNode(ast.value)
+        return imageWithWhitespace('+' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }
       case AstNodeType.PERCENT_OP: {
-        return this.computeHashOfAstNode(ast.value) + '%'
+        return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
+        let image
         if (ast.error) {
-          return this.config.getErrorTranslationFor(ast.error.type)
+          image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          return '#ERR!'
+          image = '#ERR!'
         }
+        return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
-        return '(' + this.computeHashOfAstNode(ast.expression) + ')'
+        const expression = this.computeHashOfAstNode(ast.expression)
+        const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
+        return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       default: {
-        return this.computeHashOfAstNode(ast.left) + binaryOpTokenMap[ast.type] + this.computeHashOfAstNode(ast.right)
+        return this.computeHashOfAstNode(ast.left) + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
     }
   }
@@ -181,4 +187,28 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
       return `#${cellAddress.sheet}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
+}
+
+export function bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
+  const processedTokens: any[] = []
+
+  const first = tokens[0]
+  if (!tokenMatcher(first, WhiteSpace)) {
+    processedTokens.push(first)
+  }
+
+  for (let i = 1; i < tokens.length; ++i) {
+    const current = tokens[i] as IExtendedToken
+    if (tokenMatcher(current, WhiteSpace)) {
+      continue
+    }
+
+    const previous = tokens[i - 1]
+    if (tokenMatcher(previous, WhiteSpace)) {
+      current.leadingWhitespace = previous
+    }
+    processedTokens.push(current)
+  }
+
+  return processedTokens
 }

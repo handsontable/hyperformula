@@ -244,10 +244,6 @@ export function mina(left: InternalCellValue, right: InternalCellValue): Interna
   }
 }
 
-export function equalString(left: string, right: string): boolean {
-  return left.localeCompare(right) === 0
-}
-
 export function strCmp(left: string, right: string): number {
   if (left > right) {
     return 1
@@ -278,5 +274,17 @@ export function numberCmp(left: number, right: number): number {
     return -1
   } else {
     return 0
+  }
+}
+
+export function isNumberOverflow(arg: number): boolean {
+  return (isNaN(arg) || arg===Infinity || arg===-Infinity)
+}
+
+export function fixNegativeZero(arg: number): number {
+  if(arg===0) {
+    return 0
+  } else {
+    return arg
   }
 }
