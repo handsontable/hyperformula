@@ -46,6 +46,7 @@ function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
     case 'symbol':
+    case 'bigint':
       return val.toString()
     default: {
       if(val instanceof RegExp) {

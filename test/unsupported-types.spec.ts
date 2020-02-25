@@ -66,6 +66,12 @@ describe( 'unsupported types should result in error', () => {
       '    \"Symbol(/abcd/)\"\n' +
       ']')
   })
+  it('should give parsing error #11', () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect( () => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
+    ).toThrow('Unable to parse value: \"9007199254740991\"')
+  })
   it('should give parsing error for setCellContents', () => {
     const sheet = [
       [],
