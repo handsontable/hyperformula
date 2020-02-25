@@ -47,9 +47,11 @@ function replacer(key: any, val: any): any {
     case 'function':
     case 'symbol':
       return val.toString()
+    case 'bigint':
+      return 'BigInt('+val.toString()+')'
     default: {
       if(val instanceof RegExp) {
-        return val.toString()
+        return 'RegExp('+val.toString()+')'
       } else {
         return val
       }
