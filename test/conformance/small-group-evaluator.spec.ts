@@ -99,9 +99,9 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       ['=CONCATENATE("A","","B")', '=CONCATENATE("A",,"B")']
     ])
 
-    // expect(engine.getCellValue('A1')).toBe(810.78);
+    //expect(engine.getCellValue('A1')).toBe(810.78)
     expect(engine.getCellValue('A2')).toBe('AB')
-    //expect(engine.getCellValue('B2')).toBe("AB");
+    //expect(engine.getCellValue('B2')).toBe('AB')
   })
 
   xit('Errors should be parsed and propagated', () => {
@@ -112,32 +112,35 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
     expect(engine.getCellValue('A1')).toBe(true)
   })
 
-  xdescribe('Math', () => {
+  describe('Math', () => {
     it('Precision', () => {
       const engine = createEngine([
         ['=0.1', '=0.2', '=0.3', '=1/3', '=2^(-3)'],
-        ['=A1+B1', '=A2=C1', '=D1*3', ],
+        ['=A1+B1', '=A2+C1', '=D1*3', ],
         ['=IF(0.1+0.2=0.3, "OK", "NOT OK")', ],
         ['=0.3', '=C1', '=A2', '=B2', '=0.1+0.2', '=SUMIF(A4:E4,"=0.3")', '=SUMIF(A4:E4,">0.3")'],
         ['=0.3', '=0.1+0.2', '=SUMIF(A5:B5,"=0.3")']
       ])
-
-      expect(engine.getCellValue('C5')).toBe(0.6)
+      expect(engine.getCellValue('A1')).toBe(0.1)
+      expect(engine.getCellValue('B1')).toBe(0.2)
+      expect(engine.getCellValue('B2')).toBe(0.6)
+      expect(engine.getCellValue('B5')).toBe(0.3)
+      //expect(engine.getCellValue('C5')).toBe(0.6)
 
       expect(engine.getCellValue('A1')).toBe(0.1)
       expect(engine.getCellValue('B1')).toBe(0.2)
       expect(engine.getCellValue('C1')).toBe(0.3)
-      expect(engine.getCellValue('D1')).toBe(0.3333333333333333)
+      expect(engine.getCellValue('D1')).toBe(0.33333333333333)
       expect(engine.getCellValue('E1')).toBe(0.125)
 
-      //expect(engine.getCellValue('A2')).toBe(0.3);
-      //expect(engine.getCellValue('B2')).toBe(true);
+      expect(engine.getCellValue('A2')).toBe(0.3)
+      expect(engine.getCellValue('B2')).toBe(0.6)
       expect(engine.getCellValue('C2')).toBe(1)
 
-      //expect(engine.getCellValue('A3')).toBe("OK");
+      expect(engine.getCellValue('A3')).toBe('OK')
 
-      //expect(engine.getCellValue('F4')).toBe(1.5);
-      expect(engine.getCellValue('G4')).toBe(0)
+      //expect(engine.getCellValue('F4')).toBe(1.2) 
+      //expect(engine.getCellValue('G4')).toBe(0.6) 
     })
 
     it('can parse a decimal without leading zero', () => {
@@ -158,10 +161,9 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
         ['="foo"&PRAWDA()', '="foo"&TRUE()', '=FALSE()', '="foo"&C3'],
         ['="foo"', '=PRAWDA()', '=A1:B1', '=A1&C1'],
       ])
-
-      // return number as logical, TRUE for <>0, FALSE for 0
+      //return number as logical, TRUE for <>0, FALSE for 0
       expect(engine.getCellValue('A1')).toBe(false)
-      //expect(engine.getCellValue('B1')).toBe(true)
+      //expect(engine.getCellValue('B1')).toBe(true) 
       expect(engine.getCellValue('C1')).toBe(true)
       expect(engine.getCellValue('D1')).toBe(false)
       // return logical as logical
@@ -169,8 +171,8 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       expect(engine.getCellValue('B2')).toBe(false)
       // return logical as string TRUE or FALSE
       expect(engine.getCellValue('A3')).toBe('fooTRUE')
-      expect(engine.getCellValue('B3')).toBe('fooTRUE')
-      expect(engine.getCellValue('C3')).toBe('TRUE')
+      expect(engine.getCellValue('B3')).toBe('fooTRUE') 
+      expect(engine.getCellValue('C3')).toBe('FALSE')
       expect(engine.getCellValue('D3')).toBe('fooFALSE')
 
     })
@@ -190,7 +192,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       // return text as text
       expect(engine.getCellValue('A2')).toBe('foo')
       // return logical as string TRUE or FALSE
-      expect(engine.getCellValue('A3')).toBe('fooTRUE')
+      expect(engine.getCellValue('A3')).toBe('fooTRUE') 
       expect(engine.getCellValue('B3')).toBe('fooTRUE')
       expect(engine.getCellValue('C3')).toBe('TRUE')
       expect(engine.getCellValue('D3')).toBe('fooFALSE')
