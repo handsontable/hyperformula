@@ -30,19 +30,21 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[Symbol()]])
-    ).toThrow('Unable to parse value: undefined')
+    ).toThrow('Unable to parse value: \"Symbol()\"')
   })
   it('should give parsing error #6', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[/abcd/]])
-    ).toThrow('Unable to parse value: {}')
+    ).toThrow('Unable to parse value: \"/abcd/\"')
   })
   it('should give parsing error #7', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[{sym: Symbol()}]])
-    ).toThrow('Unable to parse value: {}')
+    ).toThrow('Unable to parse value: {\n' +
+      '    \"sym\": \"Symbol()\"\n' +
+      '}')
   })
   it('should give parsing error #8', () => {
     // eslint-disable-next-line
@@ -54,7 +56,15 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[Symbol('a')]])
-    ).toThrow('Unable to parse value: undefined')
+    ).toThrow('Unable to parse value: \"Symbol(a)\"')
+  })
+  it('should give parsing error #10', () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect( () => HyperFormula.buildFromArray([[[Symbol(/abcd/)]]])
+    ).toThrow('Unable to parse value: [\n' +
+      '    \"Symbol(/abcd/)\"\n' +
+      ']')
   })
   it('should give parsing error for setCellContents', () => {
     const sheet = [

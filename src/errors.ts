@@ -45,9 +45,15 @@ export class NamedExpressionDoesNotExist extends Error {
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
+    case 'symbol':
       return val.toString()
-    default:
-      return val
+    default: {
+      if(val instanceof RegExp) {
+        return val.toString()
+      } else {
+        return val
+      }
+    }
   }
 }
 
