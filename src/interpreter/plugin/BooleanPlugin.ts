@@ -30,6 +30,9 @@ export class BooleanPlugin extends FunctionPlugin {
     not: {
       translationKey: 'NOT',
     },
+    switch: {
+      translationKey: 'SWITCH',
+    },
   }
 
   /**
@@ -192,6 +195,21 @@ export class BooleanPlugin extends FunctionPlugin {
       return (truesCount % 2 === 1)
     } else {
       return new CellError(ErrorType.VALUE)
+    }
+  }
+
+  public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length < 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const vals: InterpreterValue[] = []
+    for(const arg of ast.args) {
+      vals.push(this.evaluateAst(arg, formulaAddress))
+    }
+    const n = vals.length
+    if(vals[0] instanceof CellError){
+      return vals[0]
     }
   }
 }
