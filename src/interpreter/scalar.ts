@@ -36,7 +36,7 @@ export function add(left: number | CellError, right: number | CellError, eps: nu
     return right
   } else {
     const ret = left + right
-    if (Math.abs(ret) < eps * Math.abs(left)  ) {
+    if (Math.abs(ret) < eps * Math.abs(left)) {
       return 0
     } else {
       return ret
@@ -62,7 +62,7 @@ export function subtract(left: number | CellError, right: number | CellError, ep
     return right
   } else {
     const ret = left - right
-    if ( Math.abs(ret) < eps * Math.abs(left)  ) {
+    if (Math.abs(ret) < eps * Math.abs(left)) {
       return 0
     } else {
       return ret
@@ -256,11 +256,11 @@ export function strCmp(left: string, right: string): number {
 
 export function floatCmp(left: number, right: number, eps: number): number {
   const mod = (1 + eps)
-  if ( (right >= 0) && (left * mod >= right) && (left <= right * mod) ) {
+  if ((right >= 0) && (left * mod >= right) && (left <= right * mod)) {
     return 0
-  } else if ( (right <= 0) && (left * mod <= right) && (left >= right * mod) ) {
+  } else if ((right <= 0) && (left * mod <= right) && (left >= right * mod)) {
     return 0
-  } else if ( left > right ) {
+  } else if (left > right) {
     return 1
   } else {
     return -1
@@ -278,11 +278,11 @@ export function numberCmp(left: number, right: number): number {
 }
 
 export function isNumberOverflow(arg: number): boolean {
-  return (isNaN(arg) || arg===Infinity || arg===-Infinity)
+  return (isNaN(arg) || arg === Infinity || arg === -Infinity)
 }
 
 export function fixNegativeZero(arg: number): number {
-  if(arg===0) {
+  if (arg === 0) {
     return 0
   } else {
     return arg

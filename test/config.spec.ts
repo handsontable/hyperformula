@@ -25,4 +25,10 @@ describe('Config', () => {
 
     expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
   })
+
+  it('should throw error when there is a conflict between separators', () => {
+    expect(() => {
+      new Config({ decimalSeparator: ',', functionArgSeparator: ',' })
+    }).toThrow('Config initialization failed.')
+  })
 })
