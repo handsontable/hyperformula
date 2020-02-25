@@ -199,6 +199,9 @@ export class Config {
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
     }
+    if (this.decimalSeparator !== '.' && this.decimalSeparator !== ',') {
+      throw Error('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
+    }
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {

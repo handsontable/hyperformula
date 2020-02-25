@@ -31,4 +31,12 @@ describe('Config', () => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',' })
     }).toThrow('Config initialization failed.')
   })
+
+  it('should throw error when decimal separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ decimalSeparator: ';' })
+    }).toThrow('Config initialization failed.')
+  })
 })
