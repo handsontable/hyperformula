@@ -18,23 +18,41 @@ function createEngine(sheetData: any[][], config?: Config) {
 xdescribe('Conversion to logical', () => {
   it('simple TRUE() should return TRUE', () => {
     const engine = createEngine([
-      ['=TRUE()'],
+      ['=TRUE()']
     ])
-    expect(engine.getCellValue('A1')).toStrictEqual('TRUE')
+    
+    expect(engine.getCellValue('A1')).toBe('TRUE')
   })
 
   it('simple FALSE() should return FALSE', () => {
     const engine = createEngine([
       ['=FALSE()']
     ])
-    expect(engine.getCellValue('A1')).toStrictEqual('FALSE')
+    
+    expect(engine.getCellValue('A1')).toBe('FALSE')
+  })
+
+  it('simple TRUE() should return TRUE with caseSensetive', () => {
+    const engine = createEngine([
+      ['=TRUE()']],
+    new Config({ caseSensitive: true }))
+    
+    expect(engine.getCellValue('A1')).toBe('TRUE')
+  })
+
+  it('simple FALSE() should return FALSE with caseSensetive', () => {
+    const engine = createEngine([
+      ['=FALSE()']],
+    new Config({ caseSensitive: true }))
+    
+    expect(engine.getCellValue('A1')).toBe('FALSE')
   })
 
   it('string concat with logical function TRUE', () => {
     const engine = createEngine([
       ['="foo"&TRUE()']
     ])
-    expect(engine.getCellValue('A1')).toStrictEqual('fooTRUE')
+    expect(engine.getCellValue('A1')).toBe('fooTRUE')
   })
 
   it('string concat with logical function FALSE', () => {
@@ -42,7 +60,7 @@ xdescribe('Conversion to logical', () => {
       ['="foo"&TRUE()']
 
     ])
-    expect(engine.getCellValue('A2')).toStrictEqual('fooTRUE')
+    expect(engine.getCellValue('A2')).toBe('fooTRUE')
   })
 
   it('string concat with logical function FALSE', () => {
@@ -50,7 +68,7 @@ xdescribe('Conversion to logical', () => {
       ['=FALSE()'],
       ['="foo"&A1'],
     ])
-    expect(engine.getCellValue('A2')).toStrictEqual('fooFALSE')
+    expect(engine.getCellValue('A2')).toBe('fooFALSE')
   })
 
 
