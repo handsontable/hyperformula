@@ -20,7 +20,11 @@ export class DateHelper {
     this.minDateValue = this.dateToNumber(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
 
-    this.epochYearZero = this.dateNumberToYearNumber(2) //always shift by two days
+    if(!config.leapYear1900 && this.minDateValue < this.dateToNumber({year: 1900, month: 2, day: 28})) {
+      this.epochYearZero = this.dateNumberToYearNumber(2)
+    } else {
+      this.epochYearZero = this.dateNumberToYearNumber(1)
+    }
   }
 
   public getWithinBounds(dayNumber: number) {
