@@ -41,16 +41,14 @@ export class NamedExpressionDoesNotExist extends Error {
     super(`Named Expression '${expressionName}' does not exist`)
   }
 }
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
-      return val.toString();
-//    case 'symbol':
-//      return val.description;
+      return val.toString()
     default:
-      return val;
+      return val
   }
-
 }
 
 export class UnableToParse extends Error {

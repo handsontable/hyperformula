@@ -1,4 +1,4 @@
-import {EmptyValue, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
 describe( 'unsupported types should result in error', () => {
