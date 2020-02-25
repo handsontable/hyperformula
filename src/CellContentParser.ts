@@ -100,7 +100,7 @@ export class CellContentParser {
     } else {
       const trimmedContent = content.trim()
       if (this.isNumber(trimmedContent)) {
-        return new CellContent.Number(this.parseNumericString(trimmedContent))
+        return new CellContent.Number(this.config.parseNumericString(trimmedContent))
       }
       const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
       if (parsedDateNumber !== null) {
@@ -115,11 +115,6 @@ export class CellContentParser {
 
   private isNumber(input: string): boolean {
     return this.numberPattern.test(input)
-  }
-
-  private parseNumericString(input: string): number {
-    const normalized = input.replace(this.config.decimalSeparator, '.')
-    return Number(normalized)
   }
 }
 

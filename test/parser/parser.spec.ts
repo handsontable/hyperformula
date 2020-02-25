@@ -177,6 +177,20 @@ describe('ParserWithCaching', () => {
     expect(ast.value).toBe(3.14)
   })
 
+  it('float literal with different decimal separator', () => {
+    const parser = new ParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(enGB).get)
+    const ast1 = parser.parse('=3,14', CellAddress.absolute(0, 0, 0)).ast as NumberAst
+    const ast2 = parser.parse('=03,14', CellAddress.absolute(0, 0, 0)).ast as NumberAst
+    const ast3 = parser.parse('=,14', CellAddress.absolute(0, 0, 0)).ast as NumberAst
+
+    expect(ast1.type).toBe(AstNodeType.NUMBER)
+    expect(ast1.value).toBe(3.14)
+    expect(ast2.type).toBe(AstNodeType.NUMBER)
+    expect(ast2.value).toBe(3.14)
+    expect(ast3.type).toBe(AstNodeType.NUMBER)
+    expect(ast3.value).toBe(0.14)
+  })
+
   it('leading zeros of number literals', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const int = parser.parse('=01234', CellAddress.absolute(0, 0, 0)).ast as NumberAst

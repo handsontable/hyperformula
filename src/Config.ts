@@ -38,6 +38,7 @@ import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {sheetNameRegexp} from './parser/LexerConfig'
+import {ParserConfig} from './parser/ParserConfig'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -64,7 +65,7 @@ export interface ConfigParams {
   nullDate: IDate,
 }
 
-export class Config {
+export class Config implements ParserConfig{
 
   public static defaultConfig: ConfigParams = {
     caseSensitive: false,
@@ -210,6 +211,11 @@ export class Config {
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
+  }
+
+  public parseNumericString = (input: string): number => {
+    const normalized = input.replace(this.decimalSeparator, '.')
+    return Number(normalized)
   }
 
   public allFunctionPlugins(): any[] {
