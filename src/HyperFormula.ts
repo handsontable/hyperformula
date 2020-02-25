@@ -68,29 +68,29 @@ export class HyperFormula {
   }
 
   /**
-   * Builds engine for sheet from two-dimensional array representation.
+   * Builds the engine for sheet from two-dimensional array representation.
    *
    * @param sheet - two-dimensional array representation of sheet
-   * @param maybeConfig - config
+   * @param maybeConfig - engine configuration
    */
   public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
   }
 
   /**
-   * Builds engine from object containing multiple sheets with names.
+   * Builds the engine from an object containing multiple sheets with names.
    *
    * @param sheets - object with sheets definition
-   * @param maybeConfig - config
+   * @param maybeConfig - engine configuration
    */
   public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
   }
 
   /**
-   * Builds empty engine instance.
+   * Builds an empty engine instance.
    *
-   * @param maybeConfig - config
+   * @param maybeConfig - engine configuration
    */
   public static buildEmpty(maybeConfig?: Config): HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
@@ -101,21 +101,21 @@ export class HyperFormula {
   private readonly namedExpressions: NamedExpressions
 
   constructor(
-    /** Engine config */
+    /** Engine configuration. */
     public readonly config: Config,
-    /** Statistics module for benchmarking */
+    /** Statistics module for benchmarking. */
     public readonly stats: Statistics,
-    /** Dependency graph storing sheets structure */
+    /** Dependency graph storing sheets structure. */
     public readonly dependencyGraph: DependencyGraph,
-    /** Column search strategy used by VLOOKUP plugin */
+    /** Column search strategy used by VLOOKUP plugin. */
     public readonly columnSearch: IColumnSearchStrategy,
-    /** Parser with caching */
+    /** Parser with caching. */
     private readonly parser: ParserWithCaching,
     private readonly unparser: Unparser,
     private readonly cellContentParser: CellContentParser,
-    /** Formula evaluator */
+    /** Formula evaluator. */
     public readonly evaluator: Evaluator,
-    /** Service handling postponed CRUD transformations */
+    /** Service handling postponed CRUD transformations. */
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
@@ -125,7 +125,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns value of the cell with the given address.
+   * Returns the cell value of a given address. </br>
    * Applies rounding and post-processing.
    *
    * @param address - cell coordinates
@@ -135,7 +135,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns normalized formula string from the cell with the given address.
+   * Returns a normalized formula string from the cell of a given address.
    *
    * @param address - cell coordinates
    */
@@ -154,9 +154,10 @@ export class HyperFormula {
   }
 
   /**
-   * Returns array with values of all cells.
+   * Returns an array with values of all cells. </br>
+   * Applies rounding and post-processing.
    *
-   * @param sheet - sheet id number
+   * @param sheet - sheet ID number
    */
   public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
@@ -176,7 +177,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns map containing dimensions of all sheets.
+   * Returns a map containing dimensions of all sheets.
    *
    */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
@@ -192,9 +193,9 @@ export class HyperFormula {
   }
 
   /**
-   * Returns dimensions of specific sheet.
+   * Returns dimensions of a specified sheet.
    *
-   * @param sheet - sheet id number
+   * @param sheet - sheet ID number
    */
   public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
@@ -204,18 +205,17 @@ export class HyperFormula {
   }
 
   /**
-   * Returns snapshot of a computation time statistics.
+   * Returns a snapshot of the computation time statistics.
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
   }
 
   /**
-   * Returns information whether its possible to change content in a rectangular idea bounded by the box
+   * Returns information whether it is possible to change the content in a rectangular area bounded by the box. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param address - cell coordinate (top left corner)
+   * @param address - cell coordinates (top left corner)
    * @param width - width of the box
    * @param height - height of the box
    */
@@ -233,7 +233,7 @@ export class HyperFormula {
   }
 
   /**
-   * Sets content of a block of cells.
+   * Sets the content for a block of cells.
    *
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
@@ -265,11 +265,10 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to add rows
+   * Returns information whether it is possible to add rows into a specified position in a given sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param sheet - sheet id in which rows will be added
+   * @param sheet - sheet ID in which rows will be added
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
@@ -283,10 +282,10 @@ export class HyperFormula {
   }
 
   /**
-   * Add multiple rows to sheet. </br>
+   * Adds multiple rows into a specified position in a given sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
    *
-   * @param sheet - sheet id in which rows will be added
+   * @param sheet - sheet ID in which rows will be added
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
    */
   public addRows(sheet: number, ...indexes: Index[]): ChangeList {
@@ -295,12 +294,11 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to remove rows
+   * Returns information whether it is possible to remove rows from a specified position in a given sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param indexes - non-contiguous indexes with format [row, amount]
+   * @param sheet - sheet ID from which rows will be removed
+   * @param indexes - non-contiguous indexes with format: [row, amount]
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
@@ -313,11 +311,11 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
+   * Removes multiple rows from a specified position in a given sheet. </br>
+   * Does nothing if rows are outside of the effective sheet size.
    *
-   * @param sheet - sheet id from which rows will be removed
-   * @param indexes - non-contiguous indexes with format [row, amount]
+   * @param sheet - sheet ID from which rows will be removed
+   * @param indexes - non-contiguous indexes with format: [row, amount]
    * */
   public removeRows(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeRows(sheet, ...indexes)
@@ -325,12 +323,11 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to add columns
+   * Returns information whether it is possible to add columns into a specified position in a given sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
+   * @param sheet - sheet ID in which columns will be added
+   * @param indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
@@ -343,11 +340,11 @@ export class HyperFormula {
   }
 
   /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
+   * Adds multiple columns into a specified position in a given sheet. </br>
+   * Does nothing if the columns are outside of the effective sheet size.
    *
-   * @param sheet - sheet id in which columns will be added
-   * @param indexes - non-contiguous indexes with format [column, amount], where column is a column number from which new columns will be added
+   * @param sheet - sheet ID in which columns will be added
+   * @param indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * */
   public addColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.addColumns(sheet, ...indexes)
@@ -355,11 +352,10 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to remove columns
+   * Returns information whether its possible to remove columns from a specified position in a given sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param sheet - sheet id from which columns will be removed
+   * @param sheet - sheet ID from which columns will be removed
    * @param indexes - non-contiguous indexes with format [column, amount]
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
@@ -373,11 +369,11 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
+   * Removes multiple columns from a specified position in a given sheet. </br>
+   * Does nothing if columns are outside of the effective sheet size.
    *
-   * @param sheet - sheet id from which columns will be removed
-   * @param indexes - non-contiguous indexes with format [column, amount]
+   * @param sheet - sheet ID from which columns will be removed
+   * @param indexes - non-contiguous indexes with format: [column, amount]
    * */
   public removeColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeColumns(sheet, ...indexes)
@@ -385,13 +381,12 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to move cells
+   * Returns information whether it is possible to move cells to a specified position in a given sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
-   * If returns true, doing this operation won't throw any errors
-   *
-   * @param sourceLeftCorner - address of the upper left corner of moved block
-   * @param width - width of the cell block being moved
-   * @param height - height of the cell block being moved
+   * @param sourceLeftCorner - address of the upper left corner of a moved block
+   * @param width - width of the cell block that is being moved
+   * @param height - height of the cell block that is being moved
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
@@ -404,11 +399,11 @@ export class HyperFormula {
   }
 
   /**
-   * Moves content of the cell block.
+   * Moves the content of a cell block from source to the target location.
    *
-   * @param sourceLeftCorner - address of the upper left corner of moved block
-   * @param width - width of the cell block being moved
-   * @param height - height of the cell block being moved
+   * @param sourceLeftCorner - address of the upper left corner of a moved block
+   * @param width - width of the cell block that is being moved
+   * @param height - height of the cell block that is being moved
    * @param destinationLeftCorner - upper left address of the target cell block
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ChangeList {
@@ -417,11 +412,10 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to move rows.
-   *
+   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet. </br>
    * If returns true, doing this operation won't throw any errors.
    *
-   * @param sheet - number of sheet in which the operation will be performed
+   * @param sheet - a sheet number in which the operation will be performed
    * @param startRow - number of the first row to move
    * @param numberOfRows - number of rows to move
    * @param targetRow - row number before which rows will be moved
@@ -436,9 +430,9 @@ export class HyperFormula {
   }
 
   /**
-   * Moves selected rows before target row.
+   * Moves a particular number of rows to a specified position in a given sheet.
    *
-   * @param sheet - number of sheet in which the operation will be performed
+   * @param sheet - a sheet number in which the operation will be performed
    * @param startRow - number of the first row to move
    * @param numberOfRows - number of rows to move
    * @param targetRow - row number before which rows will be moved
@@ -449,14 +443,14 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to move columns.
-   *
+   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet. </br>
    * If returns true, doing this operation won't throw any errors.
    *
-   * @param sheet - number of sheet in which the operation will be performed
+   * @param sheet - a sheet number in which the operation will be performed
    * @param startColumn - number of the first column to move
    * @param numberOfColumns - number of columns to move
    * @param targetColumn - column number before which columns will be moved
+   * 
    */
   public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
     try {
@@ -468,12 +462,13 @@ export class HyperFormula {
   }
 
   /**
-   * Moves selected columns before target column.
+   * Moves a particular number of columns to a specified position in a given sheet.
    *
-   * @param sheet - number of sheet in which the operation will be performed
+   * @param sheet - a sheet number in which the operation will be performed
    * @param startColumn - number of the first column to move
    * @param numberOfColumns - number of columns to move
    * @param targetColumn - column number before which columns will be moved
+   * 
    */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): ChangeList {
     this.crudOperations.moveColumns(sheet, startColumn, numberOfColumns, targetColumn)
@@ -481,10 +476,10 @@ export class HyperFormula {
   }
 
   /**
-   * Stores copy of cell block in internal clipboard for further paste.</br>
+   * Stores a copy of the cell block in internal clipboard for the further paste.</br>
    * Returns values of cells for use in external clipboard.
    *
-   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param sourceLeftCorner - address of the upper left corner of a copied block
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
@@ -494,12 +489,12 @@ export class HyperFormula {
   }
 
   /**
-   * Stores information of cell block in internal clipboard for further paste. </br>
-   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.</br>
-   * Almost any CRUD operation called after this method will abortCut cut operation.</br>
+   * Stores information of the cell block in internal clipboard for further paste. </br>
+   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}. </br>
+   * Almost any CRUD operation called after this method will abort the cut operation. </br>
    * Returns values of cells for use in external clipboard.
    *
-   * @param sourceLeftCorner - address of the upper left corner of copied block
+   * @param sourceLeftCorner - address of the upper left corner of a copied block
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
@@ -509,9 +504,9 @@ export class HyperFormula {
   }
 
   /**
-   * When called after {@link copy} it will paste copied values and formulas into cell block.</br>
-   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.</br>
-   * Does nothing if clipboard is empty.
+   * When called after {@link copy} it will paste copied values and formulas into a cell block. </br>
+   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block. </br>
+   * Does nothing if the clipboard is empty.
    *
    * @param targetLeftCorner - upper left address of the target cell block
    * */
@@ -521,14 +516,14 @@ export class HyperFormula {
   }
 
   /**
-   * Clears clipboard content.
+   * Clears the clipboard content.
    * */
   public clearClipboard(): void {
     this.crudOperations.clearClipboard()
   }
 
   /**
-   * Returns cell content of cells in given range
+   * Returns the cell content of a given range.
    *
    * @param range
    */
@@ -541,9 +536,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to add sheet
-   *
-   * If returns true, doing this operation won't throw any errors
+   * Returns information whether it is possible to add a sheet to the engine. </br>
+   * If returns true, doing this operation won't throw any errors.
    */
   public isItPossibleToAddSheet(name: string): boolean {
     try {
@@ -555,7 +549,7 @@ export class HyperFormula {
   }
 
   /**
-   * Adds new sheet to engine.
+   * Adds a new sheet to the engine.
    *
    * @param name - if not specified, name will be autogenerated
    * @returns given or autogenerated name of a new sheet
@@ -565,9 +559,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to remove sheet
-   *
-   * If returns true, doing this operation won't throw any errors
+   * Returns information whether it is possible to remove sheet for the engine. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
    */
@@ -581,7 +574,7 @@ export class HyperFormula {
   }
 
   /**
-   * Removes sheet with given name
+   * Removes sheet with a specified name.
    *
    * @param name - sheet name
    */
@@ -591,9 +584,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to clear sheet
-   *
-   * If returns true, doing this operation won't throw any errors
+   * Returns information whether its possible to clear a specified sheet. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
    */
@@ -607,7 +599,7 @@ export class HyperFormula {
   }
 
   /**
-   * Clears sheet content
+   * Clears the sheet content.
    *
    * @param name - sheet name
    * */
@@ -618,9 +610,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to replace sheet content
-   *
-   * If returns true, doing this operation won't throw any errors
+   * Returns information whether its possible to replace the sheet content. </br>
+   * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
    */
@@ -634,7 +625,7 @@ export class HyperFormula {
   }
 
   /**
-   * Replaces sheet content with new values.
+   * Replaces the sheet content with new values.
    *
    * @param sheetName - sheet name
    * @param values - array of new values
@@ -666,16 +657,16 @@ export class HyperFormula {
   }
 
   /**
-   * Disables numeric arrays detected during graph build phase replacing them with ordinary numeric cells.
+   * Disables numeric arrays detected during graph build phase and replaces them with ordinary numeric cells.
    */
   public disableNumericMatrices(): void {
     this.dependencyGraph.disableNumericMatrices()
   }
 
   /**
-   * Computes simple (absolute) address of a cell address based on it's string representation.
-   * If sheet name is present in string representation but is not present in engine, returns undefined.
-   * If sheet name is not present in string representation, returns {@param sheet} as sheet number
+   * Computes simple (absolute) address of a cell address based on its string representation. </br>
+   * If sheet name is present in string representation but not present in the engine, returns undefined. </br>
+   * If sheet name is not present in string representation, returns {@param sheet} as a sheet number.
    *
    * @param stringAddress - string representation of cell address, e.g. 'C64'
    * @param sheet - override sheet index regardless of sheet mapping
@@ -686,10 +677,10 @@ export class HyperFormula {
   }
 
   /**
-   * Returns string representation of absolute address
-   * If sheet index is not present in engine, returns undefined
+   * Returns string representation of an absolute address. </br>
+   * If the sheet index is not present in the engine, returns undefined.
    *
-   * @param address - object representation of absolute address
+   * @param address - object representation of an absolute address
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
@@ -697,9 +688,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns a unique sheet name assigned to the sheet of given id
-   *
-   * Or undefined if the there's no sheet with given ID
+   * Returns a unique sheet name assigned to the sheet of a given ID. </br>
+   * Or undefined if the there is no sheet with a given ID.
    *
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
@@ -709,9 +699,8 @@ export class HyperFormula {
   }
 
   /**
-   * Returns a unique sheet ID assigned to the sheet with given name
-   *
-   * Or undefined if the there's no sheet with given name
+   * Returns a unique sheet ID assigned to the sheet with a given name. </br>
+   * Returns undefined if the there's no sheet with a given name.
    *
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
@@ -721,7 +710,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns whether sheet with given name exists
+   * Returns true whether sheet with a given name exists.
    *
    * @param sheetName - name of the sheet
    */
@@ -730,10 +719,9 @@ export class HyperFormula {
   }
 
   /**
-   * Returns type of a cell at given address
+   * Returns type of a cell of a given address.
    *
    * @param address - cell coordinates
-   * @returns type of a cell
    * */
   public getCellType(address: SimpleCellAddress): CellType {
     const vertex = this.dependencyGraph.getCell(address)
@@ -741,7 +729,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns weather cell contains simple value
+   * Returns true if the cell contains a simple value.
    *
    * @param address - cell coordinates
    * */
@@ -750,7 +738,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns weather cell contains formula
+   * Returns true if the cell contains a formula.
    *
    * @param address - cell coordinates
    * */
@@ -759,7 +747,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns weather cell is empty
+   * Returns true if the cell is empty.
    *
    * @param address - cell coordinates
    * */
@@ -768,7 +756,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns weather cell is part o a matrix
+   * Returns true if the cell is part of a matrix.
    *
    * @param address - cell coordinates
    * */
@@ -777,7 +765,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns type of a cell value at given address
+   * Returns type of the cell value of a given address.
    *
    * @param address - cell coordinates
    * */
@@ -787,7 +775,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns number of existing sheets
+   * Returns the number of existing sheets.
    */
   public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
@@ -798,7 +786,7 @@ export class HyperFormula {
   }
 
   /**
-   * Run multiple operations and recompute formulas at the end
+   * Runs multiple operations and recomputes formulas at the end.
    *
    * @param batchOperations
    */
@@ -812,9 +800,11 @@ export class HyperFormula {
   }
 
   /**
-   * Add named expression
+   * Adds a named expression.
    *
-   * @param batchOperations
+   * @param expressionName
+   * @param formulaString
+   * 
    */
   public addNamedExpression(expressionName: string, formulaString: string): ChangeList {
     if (!this.namedExpressions.isNameValid(expressionName)) {
@@ -828,11 +818,10 @@ export class HyperFormula {
   }
 
   /**
-   * Get named expression value
+   * Gets named expression value.
    *
-   * @param expressionName - an expression name
+   * @param expressionName - expression name
    *
-   * @returns CellValue | null
    */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
     const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
@@ -844,9 +833,9 @@ export class HyperFormula {
   }
 
   /**
-   * Change named expression formula
+   * Changes named expression to a formula.
    *
-   * @param expressionName - an expression name
+   * @param expressionName - expression name
    * @param newFormulaString - a new formula
    */
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): ChangeList {
@@ -858,9 +847,9 @@ export class HyperFormula {
   }
 
   /**
-   * Remove named expression
+   * Removes a named expression.
    *
-   * @param expressionName - an expression name
+   * @param expressionName - expression name
    */
   public removeNamedExpression(expressionName: string): ChangeList {
     this.namedExpressions.removeNamedExpression(expressionName)
@@ -868,20 +857,21 @@ export class HyperFormula {
   }
 
   /**
-   * List all named expression
+   * Lists all named expressions.
    *
-   * @param expressionName - an expression name
+   * @param expressionName - expression name
    */
   public listNamedExpressions(): string[] {
     return this.namedExpressions.getAllNamedExpressionsNames()
   }
 
   /**
-   * Normalizes formula
+   * Normalizes the formula. </br>
+   * Throws an error if the provided argument is not a valid formula.
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @returns normalized formula
+   * @returns a normalized formula
    */
   public normalizeFormula(formulaString: string): string {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
@@ -894,11 +884,12 @@ export class HyperFormula {
   }
 
   /**
-   * Validates formula
+   * Validates the formula.
+   * 
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @returns whether formula can be executed outside of regular worksheet
+   * @returns True if the formula can be executed outside of regular worksheet
    */
   public validateFormula(formulaString: string): boolean {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
@@ -914,7 +905,7 @@ export class HyperFormula {
   }
 
   /**
-   *  Destroys instance of HyperFormula
+   *  Destroys instance of HyperFormula.
    * */
   public destroy(): void {
     this.dependencyGraph.destroy()
@@ -927,7 +918,7 @@ export class HyperFormula {
   }
 
   /**
-   * Runs recomputation starting from recently changed vertices.
+   * Runs a recomputation starting from recently changed vertices.
    */
   private recomputeIfDependencyGraphNeedsIt(): ChangeList {
     const changes = this.crudOperations.getAndClearContentChanges()
