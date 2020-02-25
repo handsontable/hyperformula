@@ -133,7 +133,6 @@ export function offsetMonth(date: IDate, offset: number): IDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-
 function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): IDate | null {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
