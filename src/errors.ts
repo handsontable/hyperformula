@@ -44,6 +44,6 @@ export class NamedExpressionDoesNotExist extends Error {
 
 export class UnableToParse extends Error {
   constructor(value: any) {
-    super(`Unable to parse value: '${value.toString()}'`)
+    super(`Unable to parse value: '${JSON.stringify(value, null, 4)}'`)
   }
 }
