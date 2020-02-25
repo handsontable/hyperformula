@@ -1,7 +1,7 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
-import {DependencyGraph} from './DependencyGraph'
+import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
 import { ParserWithCaching} from './parser'
 
 class NamedExpression {
@@ -61,10 +61,12 @@ export class NamedExpressions {
   private workbookStore = new NamedExpressionsStore()
 
   constructor(
+    addressMapping: AddressMapping,
     private readonly cellContentParser: CellContentParser,
     private readonly dependencyGraph: DependencyGraph,
     private readonly parser: ParserWithCaching,
   ) {
+    addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {

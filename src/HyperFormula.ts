@@ -118,9 +118,8 @@ export class HyperFormula {
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
-    this.namedExpressions = new NamedExpressions(this.cellContentParser, this.dependencyGraph, this.parser)
+    this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser)
     this.exporter = new Exporter(config, this.namedExpressions)
-    this.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   /**
