@@ -41,9 +41,20 @@ export class NamedExpressionDoesNotExist extends Error {
     super(`Named Expression '${expressionName}' does not exist`)
   }
 }
+function replacer(key: any, val: any): any {
+  switch (typeof val) {
+    case 'function':
+      return val.toString();
+//    case 'symbol':
+//      return val.description;
+    default:
+      return val;
+  }
+
+}
 
 export class UnableToParse extends Error {
   constructor(value: any) {
-    super(`Unable to parse value: '${JSON.stringify(value, null, 4)}'`)
+    super(`Unable to parse value: '${JSON.stringify(value, replacer, 4)}'`)
   }
 }
