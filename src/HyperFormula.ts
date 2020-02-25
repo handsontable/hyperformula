@@ -244,6 +244,9 @@ export class HyperFormula {
       return this.recomputeIfDependencyGraphNeedsIt()
     }
     for (let i = 0; i < cellContents.length; i++) {
+      if(!(cellContents[i] instanceof Array)) {
+        throw new Error('Expected an array of arrays or a raw cell value.')
+      }
       for (let j = 0; j < cellContents[i].length; j++) {
         if (isMatrix(cellContents[i][j])) {
           throw new Error('Cant change matrices in batch operation')
@@ -646,7 +649,13 @@ export class HyperFormula {
 
     return this.batch((e) => {
       e.clearSheet(sheetName)
+      if(!(values instanceof Array)) {
+        throw new Error('Expected an array of arrays.')
+      }
       for (let i = 0; i < values.length; i++) {
+        if(!(values[i] instanceof Array)) {
+          throw new Error('Expected an array of arrays.')
+        }
         for (let j = 0; j < values[i].length; j++) {
           e.setCellContent({
             sheet: sheetId,
@@ -806,7 +815,8 @@ export class HyperFormula {
     try {
       batchOperations(this.crudOperations)
     } catch (e) {
-      /* TODO we should be able to return error information along with changes */
+      this.recomputeIfDependencyGraphNeedsIt()
+      throw( e )
     }
     return this.recomputeIfDependencyGraphNeedsIt()
   }

@@ -12,3 +12,4 @@ typings/
 dev*.html
 yarn-error.log
 .DS_Store
+package-lock.json
