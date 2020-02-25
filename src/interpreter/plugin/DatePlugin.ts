@@ -75,8 +75,8 @@ export class DatePlugin extends FunctionPlugin {
     const d = Math.trunc(coercedDay)
     let m = Math.trunc(coercedMonth)
     let y = Math.trunc(coercedYear)
-    if(y<this.interpreter.dateHelper.getNullDateYearRounded()) {
-      y += this.interpreter.dateHelper.getNullDateYearRounded()
+    if(y<this.interpreter.dateHelper.getEpochYearZero()) {
+      y += this.interpreter.dateHelper.getEpochYearZero()
     }
     const delta = Math.floor( (m - 1) / 12 )
     y += delta

@@ -14,10 +14,13 @@ export const maxDate = {year: 9999, month: 12, day: 31}
 export class DateHelper {
   private minDateValue: number
   private maxDateValue: number
+  private epochYearZero: number
   constructor(private readonly config: Config) {
     this.config = config
     this.minDateValue = this.dateToNumber(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
+
+    this.epochYearZero = this.dateNumberToYearNumber(2) //always shift by two days
   }
 
   public getWithinBounds(dayNumber: number) {
@@ -33,8 +36,8 @@ export class DateHelper {
     return this.config.nullYear
   }
 
-  public getNullDateYearRounded() {
-    return Math.round(this.config.nullDate.year/100)*100
+  public getEpochYearZero() {
+    return this.epochYearZero
   }
 
   public isValidDate(date: IDate): boolean {
