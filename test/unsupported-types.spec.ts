@@ -36,7 +36,7 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[/abcd/]])
-    ).toThrow('Unable to parse value: \"/abcd/\"')
+    ).toThrow('Unable to parse value: \"RegExp(/abcd/)\"')
   })
   it('should give parsing error #7', () => {
     // eslint-disable-next-line
@@ -70,7 +70,7 @@ describe( 'unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect( () => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
-    ).toThrow('Unable to parse value: \"9007199254740991\"')
+    ).toThrow('Unable to parse value: \"BigInt(9007199254740991)\"')
   })
   it('should give parsing error for setCellContents', () => {
     const sheet = [
