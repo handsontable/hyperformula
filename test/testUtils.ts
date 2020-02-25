@@ -1,4 +1,4 @@
-import {Config, DetailedCellError, HyperFormula} from '../src'
+import {CellValue, Config, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress, InternalCellValue} from '../src/Cell'
 import {DateHelper} from '../src/DateHelper'
@@ -83,8 +83,8 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: InternalCellValue, config = new Config()): string | CellError {
-  if(dateNumber instanceof CellError) {
+export function dateNumberToString(dateNumber: CellValue, config: Config): string | DetailedCellError {
+  if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }
   const dateHelper = new DateHelper(config)
