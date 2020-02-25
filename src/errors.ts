@@ -55,6 +55,6 @@ function replacer(key: any, val: any): any {
 
 export class UnableToParse extends Error {
   constructor(value: any) {
-    super(`Unable to parse value: '${JSON.stringify(value, replacer, 4)}'`)
+    super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
   }
 }
