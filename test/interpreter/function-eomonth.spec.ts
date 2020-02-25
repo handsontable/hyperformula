@@ -1,10 +1,10 @@
-import {HyperFormula} from '../../src'
+import {Config, HyperFormula} from '../../src'
 import {ErrorType, SimpleCellAddress} from '../../src/Cell'
 import '../testConfig'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, dateString: string) => {
-  expect(dateNumberToString(engine.getCellValue(address))).toEqual(dateString)
+  expect(dateNumberToString(engine.getCellValue(address), new Config())).toEqual(dateString)
 }
 
 describe('Function EOMONTH', () => {
