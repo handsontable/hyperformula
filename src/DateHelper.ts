@@ -33,6 +33,10 @@ export class DateHelper {
     return this.config.nullYear
   }
 
+  public getNullDateYearRounded() {
+    return Math.round(this.config.nullDate.year/100)*100
+  }
+
   public isValidDate(date: IDate): boolean {
     if (isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
       return false
