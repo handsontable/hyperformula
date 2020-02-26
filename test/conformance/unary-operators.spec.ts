@@ -49,12 +49,12 @@ describe('Quality assurance of operators Unary plus and minus', () => {
     expect(engine.getCellValue('A1')).toEqual(detailedError(ErrorType.VALUE)) 
   })
 
-  xit('float given by reference should return same float with UNARY+', () => {
+  it('float given by reference should return same float with UNARY+', () => {
     const engine = createEngine([
-      ['3,1415'],
+      ['3.1415'],
       ['=+A1']
     ])
-    expect(engine.getCellValue('A2')).toEqual('3,1415') 
+    expect(engine.getCellValue('A2')).toEqual(3.1415) 
   })
 
   it('number given by reference should return same number with UNARY+', () => {
