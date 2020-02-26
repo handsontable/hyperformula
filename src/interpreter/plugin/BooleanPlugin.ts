@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean} from '../coerce'
+import {coerceScalarToBoolean, coerceToMaybeNumber} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -38,6 +38,9 @@ export class BooleanPlugin extends FunctionPlugin {
     },
     ifna: {
       translationKey: 'IFNA',
+    },
+    choose: {
+      translationKey: 'CHOOSE',
     },
   }
 
@@ -272,5 +275,33 @@ export class BooleanPlugin extends FunctionPlugin {
     } else {
       return left
     }
+  }
+
+  public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const vals: InternalCellValue[] = []
+    for(const arg of ast.args) {
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if(val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      vals.push(val)
+    }
+
+    const n = vals.length
+
+    if(vals[0] instanceof CellError){
+      return vals[0]
+    }
+
+    const selector = coerceToMaybeNumber(vals[0], this.interpreter.dateHelper)
+
+    if(selector === null || selector != Math.round(selector) || selector < 1 || selector >= n) {
+      return new CellError(ErrorType.NUM)
+    }
+    return vals[selector]
   }
 }

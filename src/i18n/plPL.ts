@@ -101,6 +101,7 @@ export const plPL: TranslationPackage = {
     SWITCH: 'SWITCH',
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
+    CHOOSE: 'CHOOSE',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
