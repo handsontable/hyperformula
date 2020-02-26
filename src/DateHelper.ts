@@ -14,10 +14,21 @@ export const maxDate = {year: 9999, month: 12, day: 31}
 export class DateHelper {
   private minDateValue: number
   private maxDateValue: number
+  private epochYearZero: number
   constructor(private readonly config: Config) {
     this.config = config
     this.minDateValue = this.dateToNumber(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
+
+    // code below fixes epochYearStart while being leapYear1900 sensitive
+    // if nullDate is earlier than fateful 28 Feb 1900 and 1900 is not supposed to be leap year, then we should
+    // add two days (this is the config default)
+    // otherwise only one day
+    if(!config.leapYear1900 && this.minDateValue <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
+      this.epochYearZero = this.dateNumberToYearNumber(2)
+    } else {
+      this.epochYearZero = this.dateNumberToYearNumber(1)
+    }
   }
 
   public getWithinBounds(dayNumber: number) {
@@ -31,6 +42,10 @@ export class DateHelper {
 
   public getNullYear() {
     return this.config.nullYear
+  }
+
+  public getEpochYearZero() {
+    return this.epochYearZero
   }
 
   public isValidDate(date: IDate): boolean {

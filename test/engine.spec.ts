@@ -407,4 +407,15 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(EmptyValue)
   })
+
+  it('should work with other numerals', () => {
+    const engine = HyperFormula.buildFromArray([
+      [0o777, 0xFF, 0b1010, 1_000_000_000_000],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(511)
+    expect(engine.getCellValue(adr('B1'))).toBe(255)
+    expect(engine.getCellValue(adr('C1'))).toBe(10)
+    expect(engine.getCellValue(adr('D1'))).toBe(1000000000000)
+  })
 })
