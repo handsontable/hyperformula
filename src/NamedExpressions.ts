@@ -102,7 +102,7 @@ export class NamedExpressions {
       throw new Error('Name of Named Expression already taken')
     }
     const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
-    this.storeFormulaInCell(namedExpression, expression)
+    this.storeExpressionInCell(namedExpression, expression)
     this.nextNamedExpressionRow++
     this.workbookStore.add(namedExpression)
   }
@@ -130,7 +130,7 @@ export class NamedExpressions {
     if (!namedExpression) {
       throw new Error('Requested Named Expression does not exist')
     }
-    this.storeFormulaInCell(namedExpression, newExpression)
+    this.storeExpressionInCell(namedExpression, newExpression)
   }
 
   public getAllNamedExpressionsNames(): string[] {
@@ -141,7 +141,7 @@ export class NamedExpressions {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
 
-  private storeFormulaInCell(namedExpression: NamedExpression, expression: RawCellContent) {
+  private storeExpressionInCell(namedExpression: NamedExpression, expression: RawCellContent) {
     const parsedCellContent = this.cellContentParser.parse(expression)
     const address = this.buildAddress(namedExpression.row)
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
