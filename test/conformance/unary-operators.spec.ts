@@ -70,7 +70,14 @@ describe('Quality assurance of operators Unary plus and minus', () => {
       ['02/01/1999'],
       ['=+A1']
     ])
-    expect(engine.getCellValue('A2')).toEqual(36192) 
+    expect(engine.getCellValue('A2')).toEqual('02/01/1999') 
+  })
+
+  it('Integer given by reference shoud return same Integer with UNARY+', () => {
+    const engine = createEngine([
+      ['=+"02/01/1999"']
+    ])
+    expect(engine.getCellValue('A1')).toEqual('02/01/1999') 
   })
 
 })
