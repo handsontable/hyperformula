@@ -147,6 +147,17 @@ describe('Named expressions', () => {
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
 
+  it('is possible to change named expression formula to other expression', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+    engine.addNamedExpression('myName', '=Sheet1!A1+10')
+
+    engine.changeNamedExpressionExpression('myName', 58)
+
+    expect(engine.getNamedExpressionValue('myName')).toEqual(58)
+  })
+
   it('when changing named expression, only formulas are accepted', () => {
     const engine = HyperFormula.buildEmpty()
 
