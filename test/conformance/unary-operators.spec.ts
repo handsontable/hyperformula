@@ -80,6 +80,20 @@ describe('Quality assurance of operators Unary plus and minus', () => {
     expect(engine.getCellValue('A1')).toEqual('02/01/1999') //36192
   })
 
+  it('Integer given by reference should be counted with UNARY-', () => {
+    const engine = createEngine([
+      ['02/01/1999'],
+      ['=-A1']
+    ])
+    expect(engine.getCellValue('A2')).toEqual(-36192)
+  }) 
+  it('Integer given by reference should be counted  with UNARY-', () => {
+    const engine = createEngine([
+      ['=-"02/01/1999"']
+    ])
+    expect(engine.getCellValue('A1')).toEqual(-36192) 
+  })
+
 })
 
 
