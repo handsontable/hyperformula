@@ -1,6 +1,7 @@
-import {HyperFormula, ExportedNamedExpressionChange} from '../src'
+import {HyperFormula, ExportedNamedExpressionChange, EmptyValue} from '../src'
 import './testConfig'
-import {adr} from './testUtils'
+import {adr, detailedError} from './testUtils'
+import {ErrorType} from '../src/Cell'
 
 describe('Named expressions', () => {
   it('basic usage', () => {
@@ -11,6 +12,33 @@ describe('Named expressions', () => {
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(52)
+  })
+
+  it('using string expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', 'foobarbaz')
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', 'foobarbaz')])
+    expect(engine.getNamedExpressionValue('myName')).toEqual('foobarbaz')
+  })
+
+  it('using number expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', '42')
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', 42)])
+    expect(engine.getNamedExpressionValue('myName')).toEqual(42)
+  })
+
+  it('using error expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', '#VALUE!')
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', detailedError(ErrorType.VALUE))])
+    expect(engine.getNamedExpressionValue('myName')).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('is recomputed', () => {
@@ -55,12 +83,12 @@ describe('Named expressions', () => {
     }).toThrowError("Name of Named Expression '1definitelyIncorrectName' is invalid")
   })
 
-  it('when adding named expression, only formulas are accepted', () => {
+  it('when adding named expression, matrix formulas are not accepted', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
-      engine.addNamedExpression('myName', '42')
-    }).toThrowError(/not a formula/)
+      engine.addNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
+    }).toThrowError(/Matrix formulas are not supported/)
   })
 
   it('retrieving non-existing named expression', () => {
@@ -98,8 +126,8 @@ describe('Named expressions', () => {
     engine.addNamedExpression('myName', '=42')
 
     expect(() => {
-      engine.changeNamedExpressionFormula('myName', '42')
-    }).toThrowError(/not a formula/)
+      engine.changeNamedExpressionFormula('myName', '{=TRANSPOSE(A1:B2)}')
+    }).toThrowError(/not supported/)
   })
 
   it('changing not existing named expression', () => {

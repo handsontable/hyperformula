@@ -3,6 +3,7 @@ import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
 import { ParserWithCaching} from './parser'
+import {CrudOperations} from './CrudOperations'
 
 class NamedExpression {
   constructor(
@@ -65,6 +66,7 @@ export class NamedExpressions {
     private readonly cellContentParser: CellContentParser,
     private readonly dependencyGraph: DependencyGraph,
     private readonly parser: ParserWithCaching,
+    private readonly crudOperations: CrudOperations,
   ) {
     addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
@@ -141,11 +143,16 @@ export class NamedExpressions {
 
   private storeFormulaInCell(namedExpression: NamedExpression, formula: string) {
     const parsedCellContent = this.cellContentParser.parse(formula)
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      throw new Error('This is not a formula')
-    }
     const address = this.buildAddress(namedExpression.row)
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    if (parsedCellContent instanceof CellContent.MatrixFormula) {
+      throw new Error('Matrix formulas are not supported')
+    } else if (parsedCellContent instanceof CellContent.Formula) {
+      const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.crudOperations.setCellEmpty(address)
+    } else {
+      this.crudOperations.setValueToCell(parsedCellContent.value, address)
+    }
   }
 }
