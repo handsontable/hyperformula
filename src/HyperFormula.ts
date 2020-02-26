@@ -125,7 +125,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns the cell value of a given address. </br>
+   * Returns the cell value of a given address.\
    * Applies rounding and post-processing.
    *
    * @param address - cell coordinates
@@ -154,7 +154,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns an array with values of all cells. </br>
+   * Returns an array with values of all cells.\
    * Applies rounding and post-processing.
    *
    * @param sheet - sheet ID number
@@ -212,7 +212,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to change the content in a rectangular area bounded by the box. </br>
+   * Returns information whether it is possible to change the content in a rectangular area bounded by the box.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param address - cell coordinates (top left corner)
@@ -265,7 +265,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add rows into a specified position in a given sheet. </br>
+   * Returns information whether it is possible to add rows into a specified position in a given sheet.  
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID in which rows will be added
@@ -282,7 +282,7 @@ export class HyperFormula {
   }
 
   /**
-   * Adds multiple rows into a specified position in a given sheet. </br>
+   * Adds multiple rows into a specified position in a given sheet.  
    * Does nothing if rows are outside of effective sheet size.
    *
    * @param sheet - sheet ID in which rows will be added
@@ -294,7 +294,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to remove rows from a specified position in a given sheet. </br>
+   * Returns information whether it is possible to remove rows from a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID from which rows will be removed
@@ -311,7 +311,7 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple rows from a specified position in a given sheet. </br>
+   * Removes multiple rows from a specified position in a given sheet.\
    * Does nothing if rows are outside of the effective sheet size.
    *
    * @param sheet - sheet ID from which rows will be removed
@@ -323,7 +323,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add columns into a specified position in a given sheet. </br>
+   * Returns information whether it is possible to add columns into a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID in which columns will be added
@@ -340,7 +340,7 @@ export class HyperFormula {
   }
 
   /**
-   * Adds multiple columns into a specified position in a given sheet. </br>
+   * Adds multiple columns into a specified position in a given sheet.\
    * Does nothing if the columns are outside of the effective sheet size.
    *
    * @param sheet - sheet ID in which columns will be added
@@ -352,7 +352,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to remove columns from a specified position in a given sheet. </br>
+   * Returns information whether its possible to remove columns from a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID from which columns will be removed
@@ -369,7 +369,7 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple columns from a specified position in a given sheet. </br>
+   * Removes multiple columns from a specified position in a given sheet.\
    * Does nothing if columns are outside of the effective sheet size.
    *
    * @param sheet - sheet ID from which columns will be removed
@@ -381,7 +381,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move cells to a specified position in a given sheet. </br>
+   * Returns information whether it is possible to move cells to a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sourceLeftCorner - address of the upper left corner of a moved block
@@ -412,7 +412,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet. </br>
+   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - a sheet number in which the operation will be performed
@@ -443,7 +443,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet. </br>
+   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - a sheet number in which the operation will be performed
@@ -476,7 +476,7 @@ export class HyperFormula {
   }
 
   /**
-   * Stores a copy of the cell block in internal clipboard for the further paste.</br>
+   * Stores a copy of the cell block in internal clipboard for the further paste.\
    * Returns values of cells for use in external clipboard.
    *
    * @param sourceLeftCorner - address of the upper left corner of a copied block
@@ -489,9 +489,9 @@ export class HyperFormula {
   }
 
   /**
-   * Stores information of the cell block in internal clipboard for further paste. </br>
-   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}. </br>
-   * Almost any CRUD operation called after this method will abort the cut operation. </br>
+   * Stores information of the cell block in internal clipboard for further paste.\
+   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.\
+   * Almost any CRUD operation called after this method will abort the cut operation.\
    * Returns values of cells for use in external clipboard.
    *
    * @param sourceLeftCorner - address of the upper left corner of a copied block
@@ -504,8 +504,8 @@ export class HyperFormula {
   }
 
   /**
-   * When called after {@link copy} it will paste copied values and formulas into a cell block. </br>
-   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block. </br>
+   * When called after {@link copy} it will paste copied values and formulas into a cell block.\
+   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.\
    * Does nothing if the clipboard is empty.
    *
    * @param targetLeftCorner - upper left address of the target cell block
@@ -536,7 +536,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add a sheet to the engine. </br>
+   * Returns information whether it is possible to add a sheet to the engine.\
    * If returns true, doing this operation won't throw any errors.
    */
   public isItPossibleToAddSheet(name: string): boolean {
@@ -559,7 +559,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to remove sheet for the engine. </br>
+   * Returns information whether it is possible to remove sheet for the engine.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
@@ -584,7 +584,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to clear a specified sheet. </br>
+   * Returns information whether its possible to clear a specified sheet.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
@@ -610,7 +610,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to replace the sheet content. </br>
+   * Returns information whether its possible to replace the sheet content.\
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
@@ -664,8 +664,8 @@ export class HyperFormula {
   }
 
   /**
-   * Computes simple (absolute) address of a cell address based on its string representation. </br>
-   * If sheet name is present in string representation but not present in the engine, returns undefined. </br>
+   * Computes simple (absolute) address of a cell address based on its string representation.\
+   * If sheet name is present in string representation but not present in the engine, returns undefined.\
    * If sheet name is not present in string representation, returns {@param sheet} as a sheet number.
    *
    * @param stringAddress - string representation of cell address, e.g. 'C64'
@@ -677,7 +677,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns string representation of an absolute address. </br>
+   * Returns string representation of an absolute address.\
    * If the sheet index is not present in the engine, returns undefined.
    *
    * @param address - object representation of an absolute address
@@ -688,7 +688,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns a unique sheet name assigned to the sheet of a given ID. </br>
+   * Returns a unique sheet name assigned to the sheet of a given ID.\
    * Or undefined if the there is no sheet with a given ID.
    *
    * @param sheetId - ID of the sheet, for which we want to retrieve name
@@ -699,7 +699,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns a unique sheet ID assigned to the sheet with a given name. </br>
+   * Returns a unique sheet ID assigned to the sheet with a given name.\
    * Returns undefined if the there's no sheet with a given name.
    *
    * @param sheetName - name of the sheet, for which we want to retrieve ID
@@ -866,7 +866,7 @@ export class HyperFormula {
   }
 
   /**
-   * Normalizes the formula. </br>
+   * Normalizes the formula.\
    * Throws an error if the provided argument is not a valid formula.
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
