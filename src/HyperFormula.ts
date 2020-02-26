@@ -891,7 +891,7 @@ export class HyperFormula {
    * @returns normalized formula
    */
   public normalizeFormula(formulaString: string): string {
-    const [ast, address] = this.extractExternalFormula(formulaString)
+    const [ast, address] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
       throw new Error('This is not a formula')
     }
@@ -909,7 +909,7 @@ export class HyperFormula {
   public calculateFormula(formulaString: string, sheetName: string): CellValue {
     this.crudOperations.ensureSheetExists(sheetName)
     const sheetId = this.sheetMapping.fetch(sheetName)
-    const [ast, address] = this.extractExternalFormula(formulaString, sheetId)
+    const [ast, address] = this.extractTemporaryFormula(formulaString, sheetId)
     if (!ast) {
       throw new Error('This is not a formula')
     }
@@ -925,7 +925,7 @@ export class HyperFormula {
    * @returns whether formula can be executed outside of regular worksheet
    */
   public validateFormula(formulaString: string): boolean {
-    const [ast, address] = this.extractExternalFormula(formulaString)
+    const [ast, address] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
       return false
     }
@@ -935,14 +935,14 @@ export class HyperFormula {
     return true
   }
 
-  private extractExternalFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
-    const exampleExternalFormulaAddress = { sheet: sheetId, col: 0, row: 0 }
+    const exampleTemporaryFormulaAddress = { sheet: sheetId, col: 0, row: 0 }
     if (!(parsedCellContent instanceof CellContent.Formula)) {
-      return [false, exampleExternalFormulaAddress]
+      return [false, exampleTemporaryFormulaAddress]
     }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleExternalFormulaAddress)
-    return [ast, exampleExternalFormulaAddress]
+    const {ast} = this.parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+    return [ast, exampleTemporaryFormulaAddress]
   }
 
   /**
