@@ -54,4 +54,10 @@ describe('Interpreter - SWITCH function', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('B1'))).toEqual(5)
   })
+  it('Should fail with range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SWITCH(1,2,A2:A3,4,5)']
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+  })
 })

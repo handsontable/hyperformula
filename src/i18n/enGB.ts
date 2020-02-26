@@ -98,7 +98,8 @@ export const enGB: TranslationPackage = {
     RADIANS: 'RADIANS',
     E: 'E',
     OFFSET: 'OFFSET',
-    SWITCH: 'SWITCH'
+    SWITCH: 'SWITCH',
+    IFERROR: 'IFERROR',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

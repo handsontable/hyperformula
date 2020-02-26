@@ -33,6 +33,9 @@ export class BooleanPlugin extends FunctionPlugin {
     switch: {
       translationKey: 'SWITCH',
     },
+    iferror: {
+      translationKey: 'IFERROR',
+    },
   }
 
   /**
@@ -229,6 +232,24 @@ export class BooleanPlugin extends FunctionPlugin {
       return vals[i]
     } else {
       return new CellError(ErrorType.NA)
+    }
+  }
+
+  public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
+    const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
+
+    if(left instanceof SimpleRangeValue || right instanceof SimpleRangeValue){
+      return new CellError(ErrorType.VALUE)
+    }
+
+    if(left instanceof CellError){
+      return right
+    } else {
+      return left
     }
   }
 }
