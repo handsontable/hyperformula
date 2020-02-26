@@ -100,6 +100,7 @@ export const plPL: TranslationPackage = {
     OFFSET: 'PRZESUNIĘCIE',
     SWITCH: 'SWITCH',
     IFERROR: 'IFERROR',
+    IFNA: 'IFNA',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

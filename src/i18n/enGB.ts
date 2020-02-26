@@ -100,6 +100,7 @@ export const enGB: TranslationPackage = {
     OFFSET: 'OFFSET',
     SWITCH: 'SWITCH',
     IFERROR: 'IFERROR',
+    IFNA: 'IFNA',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
