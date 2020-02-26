@@ -3,7 +3,7 @@ import {ErrorType} from '../src/Cell'
 import './testConfig'
 import {detailedError} from './testUtils'
 
-describe('External formulas - normalization', () => {
+describe('Temporary formulas - normalization', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([])
 
@@ -13,7 +13,7 @@ describe('External formulas - normalization', () => {
   })
 })
 
-describe('External formulas - validation', () => {
+describe('Temporary formulas - validation', () => {
   it('ok for formulas', () => {
     const engine = HyperFormula.buildFromArray([])
 
@@ -42,7 +42,7 @@ describe('External formulas - validation', () => {
   })
 })
 
-describe('External formulas - calculation', () => {
+describe('Temporary formulas - calculation', () => {
   it('basic usage', () => {
     const engine = HyperFormula.buildFromArray([
       ['42'],
