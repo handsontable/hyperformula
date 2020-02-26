@@ -903,11 +903,14 @@ export class HyperFormula {
    * Calculates fire-and-forget formula
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
+   * @param sheetName - a name of the sheet in context of which we evaluate formula
    *
    * @returns value of the formula
    */
-  public calculateFormula(formulaString: string): CellValue {
-    const [ast, address] = this.extractExternalFormula(formulaString)
+  public calculateFormula(formulaString: string, sheetName: string): CellValue {
+    this.crudOperations.ensureSheetExists(sheetName)
+    const sheetId = this.sheetMapping.fetch(sheetName)
+    const [ast, address] = this.extractExternalFormula(formulaString, sheetId)
     if (!ast) {
       throw new Error('This is not a formula')
     }
@@ -933,9 +936,9 @@ export class HyperFormula {
     return true
   }
 
-  private extractExternalFormula(formulaString: string): [Ast | false, SimpleCellAddress] {
+  private extractExternalFormula(formulaString: string, sheetId: number = 1): [Ast | false, SimpleCellAddress] {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
-    const exampleExternalFormulaAddress = { sheet: -1, col: 0, row: 0 }
+    const exampleExternalFormulaAddress = { sheet: sheetId, col: 0, row: 0 }
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       return [false, exampleExternalFormulaAddress]
     }

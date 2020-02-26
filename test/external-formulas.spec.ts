@@ -48,9 +48,29 @@ describe('External formulas - calculation', () => {
       ['42'],
     ])
 
-    const result = engine.calculateFormula('=Sheet1!A1+10')
+    const result = engine.calculateFormula('=Sheet1!A1+10', "Sheet1")
 
     expect(result).toEqual(52)
+  })
+
+  it('formulas are executed in context of given sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['42']],
+      Sheet2: [['58']],
+    })
+
+    expect(engine.calculateFormula('=A1+10', "Sheet1")).toEqual(52)
+    expect(engine.calculateFormula('=A1+10', "Sheet2")).toEqual(68)
+  })
+
+  it('when sheet name does not exist', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42'],
+    ])
+
+    expect(() => {
+      engine.calculateFormula('=Sheet1!A1+10', "NotExistingSheet")
+    }).toThrowError(/no sheet with name/)
   })
 
   it('non-scalars doesnt work', () => {
@@ -59,20 +79,20 @@ describe('External formulas - calculation', () => {
       ['1', '2'],
     ])
 
-    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)')
+    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', "Sheet1")
 
     expect(result).toEqual(detailedError(ErrorType.VALUE))
   })
 
   it('passing something which is not a formula doesnt work', () => {
-    const engine = HyperFormula.buildEmpty()
+    const engine = HyperFormula.buildFromArray([])
 
     expect(() => {
-      engine.calculateFormula('{=TRANSPOSE(A1:B2)}')
+      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', "Sheet1")
     }).toThrowError(/not a formula/)
 
     expect(() => {
-      engine.calculateFormula('42')
+      engine.calculateFormula('42', "Sheet1")
     }).toThrowError(/not a formula/)
   })
 })
