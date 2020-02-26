@@ -125,7 +125,7 @@ export class NamedExpressions {
     this.workbookStore.remove(expressionName)
   }
 
-  public changeNamedExpressionFormula(expressionName: string, newExpression: RawCellContent): void {
+  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (!namedExpression) {
       throw new Error('Requested Named Expression does not exist')

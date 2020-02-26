@@ -856,11 +856,11 @@ export class HyperFormula {
    * @param expressionName - an expression name
    * @param newFormulaString - a new formula
    */
-  public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): ExportedChange[] {
+  public changeNamedExpressionExpression(expressionName: string, newFormulaString: string): ExportedChange[] {
     if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
-    this.namedExpressions.changeNamedExpressionFormula(expressionName, newFormulaString)
+    this.namedExpressions.changeNamedExpressionExpression(expressionName, newFormulaString)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
