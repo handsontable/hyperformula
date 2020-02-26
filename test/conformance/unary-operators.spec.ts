@@ -19,7 +19,7 @@ function createEngine(data: any[][]) {
 }
 
 describe('Quality assurance of operators Unary plus and minus', () => {
-  it('string given by reference shoud return string with UNARY+', () => {
+  xit('string given by reference shoud return string with UNARY+', () => {
     const engine = createEngine([
       ['Liz'],
       ['=+A1']
@@ -34,12 +34,12 @@ describe('Quality assurance of operators Unary plus and minus', () => {
     ])
     expect(engine.getCellValue('A2')).toEqual(detailedError(ErrorType.VALUE))
   })
-  
-  it('string given directly shoud return same string', () => {
+
+  xit('string given directly shoud return same string', () => {
     const engine = createEngine([
       ['=+"Liz"']
     ])
-    expect(engine.getCellValue('A1')).toEqual('Liz') // GS 
+    expect(engine.getCellValue('A1')).toEqual('Liz') 
   })
 
   it('string given directly shoud thrown error with UNARY-', () => {
