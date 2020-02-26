@@ -822,16 +822,15 @@ export class HyperFormula {
   /**
    * Add named expression
    *
-   * @param batchOperations
    */
-  public addNamedExpression(expressionName: string, formulaString: string): ExportedChange[] {
+  public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.isNameValid(expressionName)) {
       throw new NamedExpressionNameIsInvalid(expressionName)
     }
     if (!this.namedExpressions.isNameAvailable(expressionName)) {
       throw new NamedExpressionNameIsAlreadyTaken(expressionName)
     }
-    this.namedExpressions.addNamedExpression(expressionName, formulaString)
+    this.namedExpressions.addNamedExpression(expressionName, expression)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

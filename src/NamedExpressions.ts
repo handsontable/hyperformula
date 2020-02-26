@@ -1,8 +1,8 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellContent, CellContentParser} from './CellContentParser'
+import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
-import { ParserWithCaching} from './parser'
+import {ParserWithCaching} from './parser'
 import {CrudOperations} from './CrudOperations'
 
 class NamedExpression {
@@ -94,7 +94,7 @@ export class NamedExpressions {
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF\._]*$/.test(expressionName)
   }
 
-  public addNamedExpression(expressionName: string, formulaString: string): void {
+  public addNamedExpression(expressionName: string, expression: RawCellContent): void {
     if (!this.isNameValid(expressionName)) {
       throw new Error('Name of Named Expression is invalid')
     }
@@ -102,7 +102,7 @@ export class NamedExpressions {
       throw new Error('Name of Named Expression already taken')
     }
     const namedExpression = new NamedExpression(expressionName, this.nextNamedExpressionRow)
-    this.storeFormulaInCell(namedExpression, formulaString)
+    this.storeFormulaInCell(namedExpression, expression)
     this.nextNamedExpressionRow++
     this.workbookStore.add(namedExpression)
   }
@@ -125,12 +125,12 @@ export class NamedExpressions {
     this.workbookStore.remove(expressionName)
   }
 
-  public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): void {
+  public changeNamedExpressionFormula(expressionName: string, newExpression: RawCellContent): void {
     const namedExpression = this.workbookStore.get(expressionName)
     if (!namedExpression) {
       throw new Error('Requested Named Expression does not exist')
     }
-    this.storeFormulaInCell(namedExpression, newFormulaString)
+    this.storeFormulaInCell(namedExpression, newExpression)
   }
 
   public getAllNamedExpressionsNames(): string[] {
@@ -141,8 +141,8 @@ export class NamedExpressions {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, namedExpressionRow)
   }
 
-  private storeFormulaInCell(namedExpression: NamedExpression, formula: string) {
-    const parsedCellContent = this.cellContentParser.parse(formula)
+  private storeFormulaInCell(namedExpression: NamedExpression, expression: RawCellContent) {
+    const parsedCellContent = this.cellContentParser.parse(expression)
     const address = this.buildAddress(namedExpression.row)
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')

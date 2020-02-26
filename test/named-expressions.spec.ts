@@ -32,6 +32,33 @@ describe('Named expressions', () => {
     expect(engine.getNamedExpressionValue('myName')).toEqual(42)
   })
 
+  it('using empty expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', null)
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', EmptyValue)])
+    expect(engine.getNamedExpressionValue('myName')).toEqual(EmptyValue)
+  })
+
+  it('using native number as expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', 42)
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', 42)])
+    expect(engine.getNamedExpressionValue('myName')).toEqual(42)
+  })
+
+  it('using native boolean as expression', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    const changes = engine.addNamedExpression('myName', true)
+
+    expect(changes).toEqual([new ExportedNamedExpressionChange('myName', true)])
+    expect(engine.getNamedExpressionValue('myName')).toEqual(true)
+  })
+
   it('using error expression', () => {
     const engine = HyperFormula.buildEmpty()
 
