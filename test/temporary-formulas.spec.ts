@@ -48,7 +48,7 @@ describe('Temporary formulas - calculation', () => {
       ['42'],
     ])
 
-    const result = engine.calculateFormula('=Sheet1!A1+10', "Sheet1")
+    const result = engine.calculateFormula('=Sheet1!A1+10', 'Sheet1')
 
     expect(result).toEqual(52)
   })
@@ -59,8 +59,8 @@ describe('Temporary formulas - calculation', () => {
       Sheet2: [['58']],
     })
 
-    expect(engine.calculateFormula('=A1+10', "Sheet1")).toEqual(52)
-    expect(engine.calculateFormula('=A1+10', "Sheet2")).toEqual(68)
+    expect(engine.calculateFormula('=A1+10', 'Sheet1')).toEqual(52)
+    expect(engine.calculateFormula('=A1+10', 'Sheet2')).toEqual(68)
   })
 
   it('when sheet name does not exist', () => {
@@ -69,7 +69,7 @@ describe('Temporary formulas - calculation', () => {
     ])
 
     expect(() => {
-      engine.calculateFormula('=Sheet1!A1+10', "NotExistingSheet")
+      engine.calculateFormula('=Sheet1!A1+10', 'NotExistingSheet')
     }).toThrowError(/no sheet with name/)
   })
 
@@ -79,7 +79,7 @@ describe('Temporary formulas - calculation', () => {
       ['1', '2'],
     ])
 
-    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', "Sheet1")
+    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 'Sheet1')
 
     expect(result).toEqual(detailedError(ErrorType.VALUE))
   })
@@ -88,11 +88,11 @@ describe('Temporary formulas - calculation', () => {
     const engine = HyperFormula.buildFromArray([])
 
     expect(() => {
-      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', "Sheet1")
+      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 'Sheet1')
     }).toThrowError(/not a formula/)
 
     expect(() => {
-      engine.calculateFormula('42', "Sheet1")
+      engine.calculateFormula('42', 'Sheet1')
     }).toThrowError(/not a formula/)
   })
 })
