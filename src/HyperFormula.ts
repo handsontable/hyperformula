@@ -842,11 +842,11 @@ export class HyperFormula {
    * @returns CellValue | null
    */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
-    const internalNamedExpressionAddress = this.namedExpressions.getInternalNamedExpressionAddress(expressionName)
-    if (internalNamedExpressionAddress === null) {
+    const namedExpressionValue = this.namedExpressions.getNamedExpressionValue(expressionName)
+    if (namedExpressionValue === null) {
       return null
     } else {
-      return this.exporter.exportValue(this.dependencyGraph.getCellValue(internalNamedExpressionAddress))
+      return this.exporter.exportValue(namedExpressionValue)
     }
   }
 

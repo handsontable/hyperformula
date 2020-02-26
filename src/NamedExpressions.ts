@@ -1,5 +1,5 @@
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {SimpleCellAddress, simpleCellAddress} from './Cell'
+import {SimpleCellAddress, simpleCellAddress, InternalCellValue} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
 import {ParserWithCaching} from './parser'
@@ -107,7 +107,7 @@ export class NamedExpressions {
     this.workbookStore.add(namedExpression)
   }
 
-  public getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
+  private getInternalNamedExpressionAddress(expressionName: string): SimpleCellAddress | null {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
       return null
@@ -135,6 +135,15 @@ export class NamedExpressions {
 
   public getAllNamedExpressionsNames(): string[] {
     return this.workbookStore.getAllNamedExpressions().map((ne) => ne.name)
+  }
+
+  public getNamedExpressionValue(expressionName: string): InternalCellValue | null {
+    const internalNamedExpressionAddress = this.getInternalNamedExpressionAddress(expressionName)
+    if (internalNamedExpressionAddress === null) {
+      return null
+    } else {
+      return this.dependencyGraph.getCellValue(internalNamedExpressionAddress)
+    }
   }
 
   private buildAddress(namedExpressionRow: number) {
