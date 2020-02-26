@@ -49,6 +49,30 @@ describe('Quality assurance of operators Unary plus and minus', () => {
     expect(engine.getCellValue('A1')).toEqual(detailedError(ErrorType.VALUE)) 
   })
 
+  xit('float given by reference shoud return same float with UNARY+', () => {
+    const engine = createEngine([
+      ['3,1415'],
+      ['=+A1']
+    ])
+    expect(engine.getCellValue('A2')).toEqual('3,1415') 
+  })
+
+  it('number given by reference shoud return same number with UNARY+', () => {
+    const engine = createEngine([
+      [999],
+      ['=+A1']
+    ])
+    expect(engine.getCellValue('A2')).toEqual(999) 
+  })
+
+  it('Integer given by reference shoud return same Integer with UNARY+', () => {
+    const engine = createEngine([
+      ['02/01/1999'],
+      ['=+A1']
+    ])
+    expect(engine.getCellValue('A2')).toEqual(36192) 
+  })
+
 })
 
 
