@@ -4,6 +4,12 @@ import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function IF', () => {
+  it('wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "no")', '=IF(1)']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+  })
   it('when value is true', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
 
