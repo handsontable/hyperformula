@@ -209,14 +209,14 @@ export class BooleanPlugin extends FunctionPlugin {
       if(val instanceof SimpleRangeValue) {
         return new CellError(ErrorType.VALUE)
       }
-    vals.push(val)
+      vals.push(val)
     }
     const n = vals.length
     if(vals[0] instanceof CellError){
       return vals[0]
     }
 
-    var i = 1
+    let i = 1
     for(;i+1<n;i+=2){
       if(vals[i] instanceof CellError) {
         continue
