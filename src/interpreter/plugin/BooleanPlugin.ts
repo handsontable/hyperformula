@@ -203,13 +203,32 @@ export class BooleanPlugin extends FunctionPlugin {
       return new CellError(ErrorType.NA)
     }
 
-    const vals: InterpreterValue[] = []
+    const vals: InternalCellValue[] = []
     for(const arg of ast.args) {
-      vals.push(this.evaluateAst(arg, formulaAddress))
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if(val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+    vals.push(val)
     }
     const n = vals.length
     if(vals[0] instanceof CellError){
       return vals[0]
+    }
+
+    var i = 1
+    for(;i+1<n;i+=2){
+      if(vals[i] instanceof CellError) {
+        continue
+      }
+      if( this.interpreter.compare(vals[0], vals[i]) === 0 ) {
+        return vals[i+1]
+      }
+    }
+    if(i<n) {
+      return vals[i]
+    } else {
+      return new CellError(ErrorType.NA)
     }
   }
 }
