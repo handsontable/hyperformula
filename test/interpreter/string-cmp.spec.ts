@@ -45,7 +45,6 @@ describe('string comparison', () => {
   })
 
   it('accents+case sensitive', () => {
-    // I cannot find a case where accentSensitive+caseSensitive would make a difference over accentSensitive
     const engine = HyperFormula.buildFromArray([
       ['Ą', 'ą', '=A1>B1'],
       ['áá', 'ää', '=A2>B2'],
@@ -60,10 +59,6 @@ describe('string comparison', () => {
   })
 
   it('accents lang', () => {
-    // const cmp1 = 'ä'.localeCompare('z', 'de')
-    // const cmp2 = 'ä'.localeCompare('z', 'sv')
-    // for some reason this does not comply with https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
-    // I see no way of testing whether locale has effect on sorting order
     const engine = HyperFormula.buildFromArray([
       ['a', 'ä', '=A1>B1'],
       ['aa', 'ää', '=A2>B2'],
@@ -73,8 +68,8 @@ describe('string comparison', () => {
 
     expect(engine.getCellValue(adr('C1'))).toBe(false)
     expect(engine.getCellValue(adr('C2'))).toBe(false)
-    expect(engine.getCellValue(adr('C3'))).toBe(false)
-    expect(engine.getCellValue(adr('C4'))).toBe(false)
+    expect(engine.getCellValue(adr('C3'))).toBe(true)
+    expect(engine.getCellValue(adr('C4'))).toBe(true)
   })
 
 
