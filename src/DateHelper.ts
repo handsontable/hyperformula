@@ -9,6 +9,14 @@ export interface IDate {
   day: number,
 }
 
+export function instanceOfIDate(obj: any): obj is IDate {
+  if(typeof obj === 'object') {
+    return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
+  } else {
+    return false
+  }
+}
+
 export const maxDate = {year: 9999, month: 12, day: 31}
 
 export class DateHelper {

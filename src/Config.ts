@@ -1,6 +1,6 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, IDate} from './DateHelper'
+import {DateHelper, defaultParseDate, IDate, instanceOfIDate} from './DateHelper'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ExpectedValueOfType} from './errors'
 import {defaultStringifyDate} from './format/format'
@@ -169,8 +169,8 @@ export class Config {
   ) {
     this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig.caseSensitive, 'boolean', 'caseSensitive')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
-    this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
+    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig.dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig.functionArgSeparator, 'string', 'functionArgSeparator')
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
@@ -184,12 +184,12 @@ export class Config {
       this.precisionEpsilon = 0
     }
     this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig.useColumnIndex, 'boolean', 'useColumnIndex')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig.vlookupThreshold, 'number')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig.vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig.parseDate, 'function')
-    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig.stringifyDate, 'function')
-    this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
-    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig.leapYear1900, 'boolean')
+    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig.parseDate, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig.stringifyDate, 'function', 'stringifyDate')
+    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig.nullDate, instanceOfIDate, 'IDate', 'nullDate' )
+    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig.leapYear1900, 'boolean', 'leapYear1900')
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -254,6 +254,16 @@ export class Config {
     if(typeof inputValue === expectedType) {
       return inputValue
     } else if(typeof inputValue === 'undefined') {
+      return defaultValue
+    } else {
+      throw new ExpectedValueOfType(expectedType, paramName)
+    }
+  }
+
+  private valueFromParamCheck(inputValue: any, defaultValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: string ) {
+    if (typeCheck(inputValue)) {
+      return inputValue
+    } else if (typeof inputValue === 'undefined') {
       return defaultValue
     } else {
       throw new ExpectedValueOfType(expectedType, paramName)

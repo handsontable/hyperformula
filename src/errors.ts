@@ -67,7 +67,7 @@ export class UnableToParse extends Error {
 
 export class ExpectedValueOfType extends Error {
   constructor(expectedType: string, paramName: string) {
-    super(`Expected value of type ${expectedType} for config parameter ${paramName}`);
+    super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`);
   }
 }
 
