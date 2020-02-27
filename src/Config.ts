@@ -2,6 +2,7 @@ import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
 import {DateHelper, defaultParseDate, IDate} from './DateHelper'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {ExpectedValueOfType} from './errors'
 import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -166,29 +167,29 @@ export class Config {
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
-    this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
+    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig.caseSensitive, 'boolean', 'caseSensitive')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
-    this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
-    this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
-    this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
-    this.nullYear = typeof nullYear === 'number' ? nullYear : Config.defaultConfig.nullYear
-    this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
-    this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
+    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig.smartRounding, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig.matrixDetection, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig.matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig.nullYear, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig.precisionRounding, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig.precisionEpsilon, 'number', 'precisionEpsilon')
     if (!this.smartRounding) {
       this.precisionEpsilon = 0
     }
-    this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
-    this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig.useColumnIndex, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig.vlookupThreshold, 'number')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
-    this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
+    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig.parseDate, 'function')
+    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig.stringifyDate, 'function')
     this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
-    this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
+    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig.leapYear1900, 'boolean')
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -247,5 +248,15 @@ export class Config {
       ret[language.errors[key as ErrorType]] = key as ErrorType
       return ret
     }, {} as Record<string, ErrorType>)
+  }
+
+  private valueFromParam(inputValue: any, defaultValue: any, expectedType: string, paramName: string) {
+    if(typeof inputValue === expectedType) {
+      return inputValue
+    } else if(typeof inputValue === 'undefined') {
+      return defaultValue
+    } else {
+      throw new ExpectedValueOfType(expectedType, paramName)
+    }
   }
 }

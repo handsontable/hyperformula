@@ -25,4 +25,10 @@ describe('Config', () => {
 
     expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
   })
+
+  it( 'validation: boolean params', () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(new Config({caseSensitive: 'abcd'})).toThrow('')
+  })
 })

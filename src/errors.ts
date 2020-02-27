@@ -64,3 +64,10 @@ export class UnableToParse extends Error {
     super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
   }
 }
+
+export class ExpectedValueOfType extends Error {
+  constructor(expectedType: string, paramName: string) {
+    super(`Expected value of type ${expectedType} for config parameter ${paramName}`);
+  }
+}
+
