@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IF', () => {
   it('wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "no")', '=IF(1)']])
+    const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "no", 1, 2)', '=IF(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
@@ -58,7 +58,7 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('yes')
   })
 
-  it('works when only first part is given and condition is falsey', () => {
+  it('works when only first part is given and condition is false', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(false)

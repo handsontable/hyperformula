@@ -73,7 +73,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
-    if (ast.args.length !== 3) {
+    if (ast.args.length > 3 || ast.args.length < 2) {
       return new CellError(ErrorType.NA)
     }
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
