@@ -96,6 +96,10 @@ export class SingleThreadEvaluator implements Evaluator {
     this.interpreter.destroy()
   }
 
+  public runAndForget(ast: Ast, address: SimpleCellAddress) {
+    return this.evaluateAstToScalarValue(ast, address)
+  }
+
   /**
    * Recalculates formulas in the topological sort order
    */

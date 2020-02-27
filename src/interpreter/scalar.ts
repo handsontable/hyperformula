@@ -112,10 +112,6 @@ export function divide(left: number | CellError, right: number | CellError): num
   }
 }
 
-export function unaryplus(value: number | CellError): number | CellError {
-  return value
-}
-
 export function unaryminus(value: number | CellError): number | CellError {
   if (value instanceof CellError) {
     return value

@@ -27,8 +27,7 @@ import {
   percent,
   power,
   subtract,
-  unaryminus,
-  unaryplus,
+  unaryminus
 } from './scalar'
 import {concatenate} from './text'
 import Collator = Intl.Collator
@@ -200,10 +199,8 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
-        } else if (typeof result === 'boolean') {
-          return result
         } else {
-          return unaryplus(coerceScalarToNumberOrError(result, this.dateHelper))
+          return result
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
