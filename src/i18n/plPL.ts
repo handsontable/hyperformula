@@ -13,7 +13,7 @@ export const plPL: TranslationPackage = {
     COUNTBLANK: 'LICZ.PUSTE',
     COUNTIF: 'LICZ.JEŻELI',
     COUNTIFS: 'LICZ.WARUNKI',
-    COUNTUNIQUE: 'COUNTUNIQUE',
+    COUNTUNIQUE: 'COUNTUNIQUE', // TODO?
     COUNT: 'COUNT',
     COUNTA: 'COUNTA',
     DATE: 'DATA',
@@ -98,10 +98,10 @@ export const plPL: TranslationPackage = {
     ERFC: 'KOMP.FUNKCJA.BŁ',
     ABS: 'WART.BEZWGL',
     OFFSET: 'PRZESUNIĘCIE',
-    SWITCH: 'SWITCH',
-    IFERROR: 'IFERROR',
-    IFNA: 'IFNA',
-    CHOOSE: 'CHOOSE',
+    SWITCH: 'PRZEŁĄCZ',
+    IFERROR: 'JEŻELI.BŁĄD',
+    IFNA: 'IFNA', // TODO?
+    CHOOSE: 'WYBIERZ',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
