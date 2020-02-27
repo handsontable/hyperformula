@@ -306,8 +306,8 @@ export class Interpreter {
       return null
     }
   }
-  private compare(left: InternalCellValue, right: InternalCellValue): number {
 
+  public compare(left: InternalCellValue, right: InternalCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
