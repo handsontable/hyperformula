@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToBoolean} from '../coerce'
+import {coerceScalarToBoolean, coerceToMaybeNumber} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 
@@ -29,6 +29,18 @@ export class BooleanPlugin extends FunctionPlugin {
     },
     not: {
       translationKey: 'NOT',
+    },
+    switch: {
+      translationKey: 'SWITCH',
+    },
+    iferror: {
+      translationKey: 'IFERROR',
+    },
+    ifna: {
+      translationKey: 'IFNA',
+    },
+    choose: {
+      translationKey: 'CHOOSE',
     },
   }
 
@@ -73,6 +85,9 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public conditionalIf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InterpreterValue {
+    if (ast.args.length > 3 || ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
     const conditionValue = this.evaluateAst(ast.args[0], formulaAddress)
     if (conditionValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
@@ -193,5 +208,103 @@ export class BooleanPlugin extends FunctionPlugin {
     } else {
       return new CellError(ErrorType.VALUE)
     }
+  }
+
+  public switch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length < 3) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const vals: InternalCellValue[] = []
+    for(const arg of ast.args) {
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if(val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      vals.push(val)
+    }
+    const n = vals.length
+    if(vals[0] instanceof CellError){
+      return vals[0]
+    }
+
+    let i = 1
+    for(;i+1<n;i+=2){
+      if(vals[i] instanceof CellError) {
+        continue
+      }
+      if( this.interpreter.compare(vals[0], vals[i]) === 0 ) {
+        return vals[i+1]
+      }
+    }
+    if(i<n) {
+      return vals[i]
+    } else {
+      return new CellError(ErrorType.NA)
+    }
+  }
+
+  public iferror(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
+    const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
+
+    if(left instanceof SimpleRangeValue || right instanceof SimpleRangeValue){
+      return new CellError(ErrorType.VALUE)
+    }
+
+    if(left instanceof CellError){
+      return right
+    } else {
+      return left
+    }
+  }
+
+  public ifna(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
+    const left: InterpreterValue = this.evaluateAst(ast.args[0], formulaAddress)
+    const right: InterpreterValue = this.evaluateAst(ast.args[1], formulaAddress)
+
+    if(left instanceof SimpleRangeValue || right instanceof SimpleRangeValue){
+      return new CellError(ErrorType.VALUE)
+    }
+
+    if(left instanceof CellError && left.type === ErrorType.NA){
+      return right
+    } else {
+      return left
+    }
+  }
+
+  public choose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA)
+    }
+
+    const vals: InternalCellValue[] = []
+    for(const arg of ast.args) {
+      const val: InterpreterValue = this.evaluateAst(arg, formulaAddress)
+      if(val instanceof SimpleRangeValue) {
+        return new CellError(ErrorType.VALUE)
+      }
+      vals.push(val)
+    }
+
+    const n = vals.length
+
+    if(vals[0] instanceof CellError){
+      return vals[0]
+    }
+
+    const selector = coerceToMaybeNumber(vals[0], this.interpreter.dateHelper)
+
+    if(selector === null || selector != Math.round(selector) || selector < 1 || selector >= n) {
+      return new CellError(ErrorType.NUM)
+    }
+    return vals[selector]
   }
 }

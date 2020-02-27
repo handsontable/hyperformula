@@ -1,8 +1,9 @@
-import {Config, HyperFormula} from '../../src'
+import {Config, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
+import {simpleCellAddress} from '../../src/Cell'
 import '../testConfig'
 import {
   adr,
@@ -492,7 +493,7 @@ describe('Removing columns - reevaluation', () => {
     const changes = engine.removeColumns(0, [0, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, row: 0, col: 1, value: 2})
+    expect(changes).toEqual([new ExportedCellChange(simpleCellAddress(0, 1, 0), 2)])
   })
 })
 

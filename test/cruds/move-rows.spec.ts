@@ -1,5 +1,5 @@
-import {EmptyValue, HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import {adr, detailedError, extractRange, extractReference} from '../testUtils'
@@ -203,7 +203,7 @@ describe('Move rows', () => {
     const changes = engine.moveRows(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
-    expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress( 0, 1, 2), 1 ))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
