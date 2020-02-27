@@ -68,10 +68,18 @@ export class HyperFormula {
   }
 
   /**
-   * Builds the engine for sheet from two-dimensional array representation.
+   * Builds the engine for sheet from a two-dimensional array representation.
+   * 
+   * The engine is created with a single sheet.
+   * 
+   * Can be configured with the optional second argument that represents a {Config}.
+   * 
+   * If not specified the engine will be built with the default configuration.
    *
    * @param sheet - two-dimensional array representation of sheet
    * @param maybeConfig - engine configuration
+   * 
+   * @return an instance of HyperFormula
    */
   public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
@@ -79,9 +87,17 @@ export class HyperFormula {
 
   /**
    * Builds the engine from an object containing multiple sheets with names.
+   * 
+   * The engine is created with one or more sheets.
+   * 
+   * Can be configured with the optional second argument that represents a {Config}.
+   * 
+   * If not specified the engine will be built with the default configuration.
    *
    * @param sheets - object with sheets definition
    * @param maybeConfig - engine configuration
+   * 
+   * @return an instance of HyperFormula
    */
   public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
@@ -89,8 +105,14 @@ export class HyperFormula {
 
   /**
    * Builds an empty engine instance.
+   * 
+   * Can be configured with the optional argument that represents a {Config}.
+   * 
+   * If not specified the engine will be built with the default configuration.
    *
    * @param maybeConfig - engine configuration
+   * 
+   * @return an instance of HyperFormula
    */
   public static buildEmpty(maybeConfig?: Config): HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
@@ -125,19 +147,33 @@ export class HyperFormula {
   }
 
   /**
-   * Returns the cell value of a given address.\
+   * Returns the cell value of a given address.
+   * 
+   * Returned value can be either number or string or boolean or a Symbol() for empty values.
+   * 
+   * Throws an error if the given sheet ID does not exist.
+   * 
    * Applies rounding and post-processing.
    *
    * @param address - cell coordinates
+   * 
+   * @return which can be a number, string, boolean, Symbol() for empty values or {CellError}
+   * 
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.cellValueExporter.export(this.dependencyGraph.getCellValue(address))
   }
 
   /**
-   * Returns a normalized formula string from the cell of a given address.
-   *
+   * Returns a normalized formula string from the cell of a given address
+   * 
+   * or undefined for address that does not exist and empty values.
+   * 
+   * Unparses AST.
+   * 
    * @param address - cell coordinates
+   * 
+   * @return string in a specific format or undefined
    */
   public getCellFormula(address: SimpleCellAddress): string | undefined {
     const formulaVertex = this.dependencyGraph.getCell(address)
@@ -154,10 +190,15 @@ export class HyperFormula {
   }
 
   /**
-   * Returns an array with values of all cells.\
-   * Applies rounding and post-processing.
+   * Returns an array with values of all cells of a given sheet.
    *
+   * Applies rounding and post-processing.
+   * 
+   * Throws an error if the given sheet ID does not exist.
+   * 
    * @param sheet - sheet ID number
+   * 
+   * @return an array fo arrays with numbers, strings, booleans, Symbol() for empty values or {DetailedCellError}
    */
   public getValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
@@ -177,7 +218,11 @@ export class HyperFormula {
   }
 
   /**
-   * Returns a map containing dimensions of all sheets.
+   * Returns a map containing dimensions of all sheets for the engine instance
+   * 
+   * represented as a key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
+   * 
+   * @return key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    *
    */
   public getSheetsDimensions(): Map<string, { width: number, height: number }> {
@@ -194,8 +239,14 @@ export class HyperFormula {
 
   /**
    * Returns dimensions of a specified sheet.
+   * 
+   * The sheet dimensions is represented with numbers: width and height.
+   * 
+   * Throws an error if the given sheet ID does not exist.
    *
    * @param sheet - sheet ID number
+   * 
+   * @return with and height of the sheet
    */
   public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
@@ -206,14 +257,26 @@ export class HyperFormula {
 
   /**
    * Returns a snapshot of the computation time statistics.
+   * 
+   * The method accepts no arguments.
+   * 
+   * It returns a map with key-value pairs where keys are enums for stat type and time (number)
+   * 
+   * @return which is a collection of key-value pair where StatType (key) is a named constant and time (value) is a number
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
   }
 
   /**
-   * Returns information whether it is possible to change the content in a rectangular area bounded by the box.\
+   * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
+   * 
+   * The method accepts address which is the cell coordinates, width and height of the block.
+   * 
    * If returns true, doing this operation won't throw any errors.
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
+   * 
    *
    * @param address - cell coordinates (top left corner)
    * @param width - width of the box
@@ -233,10 +296,16 @@ export class HyperFormula {
   }
 
   /**
-   * Sets the content for a block of cells.
+   * Sets the content for a block of cells of a given coordinates.
+   * 
+   * The method accepts address which is the cell coordinates, width and height of the block.
+   * 
    *
    * @param topLeftCornerAddress - top left corner of block of cells
    * @param cellContents - array with content
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ChangeList {
     if (!(cellContents instanceof Array)) {
@@ -265,11 +334,18 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add rows into a specified position in a given sheet.  
+   * Returns information whether it is possible to add rows into a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which addRows is to be called and array of coordinates where the rows should be added.
+   * 
+   * Checks against particular rules to ascertain that addRows can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
-   *
+   * 
    * @param sheet - sheet ID in which rows will be added
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    */
   public isItPossibleToAddRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
@@ -282,11 +358,16 @@ export class HyperFormula {
   }
 
   /**
-   * Adds multiple rows into a specified position in a given sheet.  
+   * Adds multiple rows into a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which addRows is to be called and array of coordinates where the rows should be added.
+   * 
    * Does nothing if rows are outside of effective sheet size.
    *
    * @param sheet - sheet ID in which rows will be added
    * @param indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    */
   public addRows(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.addRows(sheet, ...indexes)
@@ -294,11 +375,18 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to remove rows from a specified position in a given sheet.\
+   * Returns information whether it is possible to remove rows from a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which removeRows is to be called and array of coordinates of rows to be removed.
+   * 
+   * Checks against particular rules to ascertain that removeRows can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID from which rows will be removed
    * @param indexes - non-contiguous indexes with format: [row, amount]
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows.
    */
   public isItPossibleToRemoveRows(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
@@ -311,11 +399,16 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple rows from a specified position in a given sheet.\
+   * Removes multiple rows from a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which removeRows is to be called and array of coordinates of rows to be removed.
+   * 
    * Does nothing if rows are outside of the effective sheet size.
    *
    * @param sheet - sheet ID from which rows will be removed
    * @param indexes - non-contiguous indexes with format: [row, amount]
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * */
   public removeRows(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeRows(sheet, ...indexes)
@@ -323,11 +416,19 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add columns into a specified position in a given sheet.\
+   * Returns information whether it is possible to add columns into a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which addColumns is to be called and array of coordinates of columns to be added.
+   * 
+   * Checks against particular rules to ascertain that addColumns can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID in which columns will be added
    * @param indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * 
    */
   public isItPossibleToAddColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
@@ -340,11 +441,17 @@ export class HyperFormula {
   }
 
   /**
-   * Adds multiple columns into a specified position in a given sheet.\
+   * Adds multiple columns into a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which addColumns is to be called and array of coordinates of columns to be added.
+   * 
    * Does nothing if the columns are outside of the effective sheet size.
    *
    * @param sheet - sheet ID in which columns will be added
    * @param indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    * */
   public addColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.addColumns(sheet, ...indexes)
@@ -352,11 +459,19 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to remove columns from a specified position in a given sheet.\
+   * Returns information whether it is possible to remove columns from a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which removeColumns is to be called and array of coordinates of columns to be removed.
+   * 
+   * Checks against particular rules to ascertain that removeColumns can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - sheet ID from which columns will be removed
    * @param indexes - non-contiguous indexes with format [column, amount]
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns.
+   * 
    */
   public isItPossibleToRemoveColumns(sheet: number, ...indexes: Index[]): boolean {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
@@ -369,11 +484,16 @@ export class HyperFormula {
   }
 
   /**
-   * Removes multiple columns from a specified position in a given sheet.\
+   * Removes multiple columns from a specified position in a given sheet.
+   * 
+   * The method accepts sheet ID in which removeColumns is to be called and array of coordinates of columns to be removed.
+   * 
    * Does nothing if columns are outside of the effective sheet size.
    *
    * @param sheet - sheet ID from which columns will be removed
    * @param indexes - non-contiguous indexes with format: [column, amount]
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * */
   public removeColumns(sheet: number, ...indexes: Index[]): ChangeList {
     this.crudOperations.removeColumns(sheet, ...indexes)
@@ -381,13 +501,21 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move cells to a specified position in a given sheet.\
+   * Returns information whether it is possible to move cells to a specified position in a given sheet.
+   * 
+   * The method accepts source location, dimensions and the target location of the block.
+   * 
+   * Checks against particular rules to ascertain that moveCells can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sourceLeftCorner - address of the upper left corner of a moved block
    * @param width - width of the cell block that is being moved
    * @param height - height of the cell block that is being moved
    * @param destinationLeftCorner - upper left address of the target cell block
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
+   * 
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
     try {
@@ -400,11 +528,16 @@ export class HyperFormula {
 
   /**
    * Moves the content of a cell block from source to the target location.
+   * 
+   * The method accepts source location, dimensions and the target location of the block.
    *
    * @param sourceLeftCorner - address of the upper left corner of a moved block
    * @param width - width of the cell block that is being moved
    * @param height - height of the cell block that is being moved
    * @param destinationLeftCorner - upper left address of the target cell block
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ChangeList {
     this.crudOperations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
@@ -412,13 +545,21 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.\
+   * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
+   * 
+   * The method accepts source location, dimensions and the target location of the block.
+   * 
+   * Checks against particular rules to ascertain that moveRows can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - a sheet number in which the operation will be performed
    * @param startRow - number of the first row to move
    * @param numberOfRows - number of rows to move
    * @param targetRow - row number before which rows will be moved
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected rows, the target location has matrix or the provided address is invalid.
+   * 
    */
   public isItPossibleToMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): boolean {
     try {
@@ -431,11 +572,15 @@ export class HyperFormula {
 
   /**
    * Moves a particular number of rows to a specified position in a given sheet.
+   * 
+   * The method accepts source location, dimensions and the target location of the block.
    *
    * @param sheet - a sheet number in which the operation will be performed
    * @param startRow - number of the first row to move
    * @param numberOfRows - number of rows to move
    * @param targetRow - row number before which rows will be moved
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): ChangeList {
     this.crudOperations.moveRows(sheet, startRow, numberOfRows, targetRow)
@@ -443,13 +588,18 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.\
+   * Returns information whether it is possible to move a particular number of columns to a specified position in a given sheet.
+   * 
+   * Checks against particular rules to ascertain that moveColumns can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param sheet - a sheet number in which the operation will be performed
    * @param startColumn - number of the first column to move
    * @param numberOfColumns - number of columns to move
    * @param targetColumn - column number before which columns will be moved
+   * 
+   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    * 
    */
   public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
@@ -463,11 +613,15 @@ export class HyperFormula {
 
   /**
    * Moves a particular number of columns to a specified position in a given sheet.
+   * 
+   * The method accepts source location, dimensions and the target location of the block.
    *
    * @param sheet - a sheet number in which the operation will be performed
    * @param startColumn - number of the first column to move
    * @param numberOfColumns - number of columns to move
    * @param targetColumn - column number before which columns will be moved
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * 
    */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): ChangeList {
@@ -476,12 +630,18 @@ export class HyperFormula {
   }
 
   /**
-   * Stores a copy of the cell block in internal clipboard for the further paste.\
+   * Stores a copy of the cell block in internal clipboard for the further paste.
+   * 
+   * The method accepts source location and the dimensions of the selected block.
+   * 
    * Returns values of cells for use in external clipboard.
    *
    * @param sourceLeftCorner - address of the upper left corner of a copied block
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
+   * 
+   * @return Which is an array of arrays that can contain numbers, strings, booleans, Symbol() for empty values or {CellError}
+   * 
   * */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
@@ -489,14 +649,21 @@ export class HyperFormula {
   }
 
   /**
-   * Stores information of the cell block in internal clipboard for further paste.\
-   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.\
-   * Almost any CRUD operation called after this method will abort the cut operation.\
+   * Stores information of the cell block in internal clipboard for further paste.
+   * 
+   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.
+   * 
+   * Almost any CRUD operation called after this method will abort the cut operation.
+   * 
    * Returns values of cells for use in external clipboard.
+   * 
+   * The method accepts source location and the dimensions of the selected block.
    *
    * @param sourceLeftCorner - address of the upper left corner of a copied block
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
+   * 
+   * @return Which is an array of arrays that can contain numbers, strings, booleans, Symbol() for empty values or {CellError}
    * */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
@@ -504,11 +671,17 @@ export class HyperFormula {
   }
 
   /**
-   * When called after {@link copy} it will paste copied values and formulas into a cell block.\
-   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.\
+   * When called after {@link copy} it will paste copied values and formulas into a cell block.
+   * 
+   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.
+   * 
    * Does nothing if the clipboard is empty.
-   *
+   * 
+   * The method accepts source location of the selected block.
+   * 
    * @param targetLeftCorner - upper left address of the target cell block
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * */
   public paste(targetLeftCorner: SimpleCellAddress): ChangeList {
     this.crudOperations.paste(targetLeftCorner)
@@ -516,16 +689,18 @@ export class HyperFormula {
   }
 
   /**
-   * Clears the clipboard content.
+   * Clears the clipboard content by setting the content to undefined.
    * */
   public clearClipboard(): void {
     this.crudOperations.clearClipboard()
   }
 
   /**
-   * Returns the cell content of a given range.
+   * Returns the cell content of a given range in a {InternalCellValue[][]} format.
    *
-   * @param range
+   * @param range absolute cell range
+   * 
+   * @return Which is an array of arrays that can contain numbers, strings, booleans, Symbol() for empty values or {CellError}
    */
   public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
     return this.dependencyGraph.getValuesInRange(range).map(
@@ -536,8 +711,15 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to add a sheet to the engine.\
+   * Returns information whether it is possible to add a sheet to the engine.
+   * 
+   * The method accepts sheet name as a string.
+   * 
+   * Checks against particular rules to ascertain that addSheet can be called.
+   * 
    * If returns true, doing this operation won't throw any errors.
+   * 
+   * @return true if it possible to add sheet with provided name, meaning the name does not already exists in the instance, false if the chosen name is already used
    */
   public isItPossibleToAddSheet(name: string): boolean {
     try {
@@ -550,8 +732,11 @@ export class HyperFormula {
 
   /**
    * Adds a new sheet to the engine.
+   * 
+   * The method accepts the name of a new sheet.
    *
    * @param name - if not specified, name will be autogenerated
+   * 
    * @returns given or autogenerated name of a new sheet
    */
   public addSheet(name?: string): string {
@@ -559,10 +744,15 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether it is possible to remove sheet for the engine.\
+   * Returns information whether it is possible to remove sheet for the engine.
+   * 
+   * The method accepts sheet name as a string.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
+   * 
+   * @return true if the provided name of a sheet exists and then it can be removed, false if there is no sheet with a given name
    */
   public isItPossibleToRemoveSheet(name: string): boolean {
     try {
@@ -577,6 +767,8 @@ export class HyperFormula {
    * Removes sheet with a specified name.
    *
    * @param name - sheet name
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    */
   public removeSheet(name: string): ChangeList {
     this.crudOperations.removeSheet(name)
@@ -584,10 +776,15 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to clear a specified sheet.\
+   * Returns information whether it is possible to clear a specified sheet.
+   * 
+   * The method accepts sheet name as a string.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
+   * 
+   * @return true if the provided name of a sheet exists and then its content can be cleared, false if there is no sheet with a given name
    */
   public isItPossibleToClearSheet(name: string): boolean {
     try {
@@ -600,8 +797,16 @@ export class HyperFormula {
 
   /**
    * Clears the sheet content.
+   * 
+   * The method accepts sheet name.
+   * 
+   * Based on that the method finds the ID of a sheet to be cleared.
+   * 
+   * Double-checks if the sheet exists.
    *
    * @param name - sheet name
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * */
   public clearSheet(name: string): ChangeList {
     this.crudOperations.ensureSheetExists(name)
@@ -610,10 +815,15 @@ export class HyperFormula {
   }
 
   /**
-   * Returns information whether its possible to replace the sheet content.\
+   * Returns information whether it is possible to replace the sheet content.
+   * 
+   * The method accepts sheet name as a string.
+   * 
    * If returns true, doing this operation won't throw any errors.
    *
    * @param name - sheet name
+   * 
+   * @return true if the provided name of a sheet exists and then its content can be replaced, false if there is no sheet with a given name
    */
   public isItPossibleToReplaceSheetContent(name: string): boolean {
     try {
@@ -626,9 +836,17 @@ export class HyperFormula {
 
   /**
    * Replaces the sheet content with new values.
+   * 
+   * The method accepts sheet name and an array of new values to be put in a given sheet.
+   * 
+   * The new value is to be provided as an array of: Date, string, number, boolean, {EmptyValueType}, null, undefined
+   * 
+   * The method finds sheet ID based on the provided sheet name.
    *
    * @param sheetName - sheet name
    * @param values - array of new values
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ChangeList {
     this.crudOperations.ensureSheetExists(sheetName)
@@ -664,8 +882,10 @@ export class HyperFormula {
   }
 
   /**
-   * Computes simple (absolute) address of a cell address based on its string representation.\
-   * If sheet name is present in string representation but not present in the engine, returns undefined.\
+   * Computes simple (absolute) address of a cell address based on its string representation.
+   * 
+   * If sheet name is present in string representation but not present in the engine, returns undefined.
+   * 
    * If sheet name is not present in string representation, returns {@param sheet} as a sheet number.
    *
    * @param stringAddress - string representation of cell address, e.g. 'C64'
@@ -677,22 +897,29 @@ export class HyperFormula {
   }
 
   /**
-   * Returns string representation of an absolute address.\
+   * Returns string representation of an absolute address.
+   * 
+   * Accepts cell address and sheet ID or sheet name.
+   * 
    * If the sheet index is not present in the engine, returns undefined.
    *
    * @param address - object representation of an absolute address
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
+   * 
+   * @return absolute address in string or undefined 
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
   /**
-   * Returns a unique sheet name assigned to the sheet of a given ID.\
+   * Returns a unique sheet name assigned to the sheet of a given ID.
+   * 
    * Or undefined if the there is no sheet with a given ID.
    *
    * @param sheetId - ID of the sheet, for which we want to retrieve name
-   * @returns name of the sheet
+   * 
+   * @return name of the sheet
    */
   public getSheetName(sheetId: number): string | undefined {
     return this.sheetMapping.getDisplayName(sheetId)
@@ -819,6 +1046,8 @@ export class HyperFormula {
 
   /**
    * Gets named expression value.
+   * 
+   * The method accepts expression name in string.
    *
    * @param expressionName - expression name
    *
