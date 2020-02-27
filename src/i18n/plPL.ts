@@ -13,7 +13,7 @@ export const plPL: TranslationPackage = {
     COUNTBLANK: 'LICZ.PUSTE',
     COUNTIF: 'LICZ.JEŻELI',
     COUNTIFS: 'LICZ.WARUNKI',
-    COUNTUNIQUE: 'COUNTUNIQUE', // TODO?
+    COUNTUNIQUE: 'COUNTUNIQUE',
     COUNT: 'COUNT',
     COUNTA: 'COUNTA',
     DATE: 'DATA',
