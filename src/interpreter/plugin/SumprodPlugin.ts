@@ -14,6 +14,9 @@ export class SumprodPlugin extends FunctionPlugin {
   }
 
   public sumprod(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
     const [left, right] = ast.args
 
     const leftArgValue = coerceToRange(this.evaluateAst(left, formulaAddress))

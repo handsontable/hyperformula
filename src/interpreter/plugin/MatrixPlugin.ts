@@ -23,6 +23,9 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public mmult(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
     const [left, right] = ast.args
 
     const leftMatrix = coerceToRangeNumbersOrError(this.evaluateAst(left, formulaAddress))
@@ -187,6 +190,9 @@ export class MatrixPlugin extends FunctionPlugin {
   }
 
   public transpose(ast: ProcedureAst, formulaAddress: SimpleCellAddress): SimpleRangeValue | CellError {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
     const value = coerceToRangeNumbersOrError(this.evaluateAst(ast.args[0], formulaAddress))
 
     if (value instanceof CellError) {

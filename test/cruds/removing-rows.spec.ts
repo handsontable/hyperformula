@@ -1,4 +1,5 @@
-import {Config, HyperFormula} from '../../src'
+import {Config, HyperFormula, ExportedCellChange} from '../../src'
+import {simpleCellAddress} from '../../src/Cell'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex} from '../../src/DependencyGraph'
@@ -824,7 +825,7 @@ describe('Removing rows - sheet dimensions', () => {
     const changes = engine.removeRows(0, [0, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, row: 1, col: 0, value: 2})
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 1), 2))
   })
 })
 

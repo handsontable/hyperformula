@@ -211,11 +211,32 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
+  xit('transpose wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=TRANSPOSE()}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+  })
   it('transpose returns VALUE when wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['{=TRANSPOSE("fdsa")}'],
     ], configWithMatrixPlugin)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+  })
+
+  it('transpose without braces', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['5', '6'],
+      ['=TRANSPOSE(A1:B3)'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A5'))).toEqual(EmptyValue)
+    expect(engine.getCellValue(adr('B4'))).toEqual(EmptyValue)
   })
 })

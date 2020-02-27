@@ -50,6 +50,9 @@ export class TextPlugin extends FunctionPlugin {
    * @param formulaAddress
    */
   public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 2) {
+      return new CellError(ErrorType.NA)
+    }
     const stringArg = ast.args[0]
     const indexArg = ast.args[1]
 

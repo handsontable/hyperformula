@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {Config, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -193,7 +193,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual({ sheet: 0, col: 1, row: 2, value: 1 })
+    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
   })
 })
 
