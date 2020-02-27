@@ -100,7 +100,7 @@ export const plPL: TranslationPackage = {
     OFFSET: 'PRZESUNIĘCIE',
     SWITCH: 'PRZEŁĄCZ',
     IFERROR: 'JEŻELI.BŁĄD',
-    IFNA: 'IFNA', // TODO?
+    IFNA: 'JEŻELI.ND', // TODO?
     CHOOSE: 'WYBIERZ',
   },
   errors: {
