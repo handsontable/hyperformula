@@ -213,7 +213,7 @@ describe('Function TRANSPOSE', () => {
 
   xit('transpose wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE()}',],
+      ['{=TRANSPOSE()}'],
     ], configWithMatrixPlugin)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
