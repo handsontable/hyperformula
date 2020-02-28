@@ -55,7 +55,7 @@ describe('Quality assurance of operators', () => {
       ['=-1*10 ^308']
     ])
 
-    expect(engine.getCellValue('A1')).toEqual(-1.0000000000000006e+308)
+    expect(engine.getCellValue('A1')).toBe(-1e+308)
   })
 
   it('too small -1*10^309 should return #NUM!', () => {
