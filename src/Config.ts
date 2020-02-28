@@ -37,6 +37,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ParserConfig} from './parser/ParserConfig'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 
@@ -45,6 +46,7 @@ export interface ConfigParams {
   chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
+  decimalSeparator: '.' | ',',
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
@@ -62,13 +64,14 @@ export interface ConfigParams {
   nullDate: IDate,
 }
 
-export class Config {
+export class Config implements ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     caseSensitive: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
+    decimalSeparator: '.',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
@@ -126,6 +129,7 @@ export class Config {
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
+  public readonly decimalSeparator: '.' | ','
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
@@ -149,6 +153,7 @@ export class Config {
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
+      decimalSeparator,
       language,
       functionPlugins,
       gpuMode,
@@ -170,6 +175,7 @@ export class Config {
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
     this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
+    this.decimalSeparator = decimalSeparator || Config.defaultConfig.decimalSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
@@ -189,6 +195,13 @@ export class Config {
     this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
     this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
     this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
+
+    if (this.decimalSeparator === this.functionArgSeparator) {
+      throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+    }
+    if (this.decimalSeparator !== '.' && this.decimalSeparator !== ',') {
+      throw Error('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
+    }
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -197,6 +210,11 @@ export class Config {
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
+  }
+
+  public numericStringToNumber = (input: string): number => {
+    const normalized = input.replace(this.decimalSeparator, '.')
+    return Number(normalized)
   }
 
   public allFunctionPlugins(): any[] {
