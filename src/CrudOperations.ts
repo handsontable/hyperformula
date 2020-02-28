@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellError, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -227,9 +227,9 @@ export class CrudOperations implements IBatchExecutor {
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
       const parseResult = this.parser.parse(parsedCellContent.formula, address)
 
-      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+      const newVertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
 
-      if (!size || !(newVertex instanceof MatrixVertex)) {
+      if (newVertex instanceof ValueCellVertex) {
         throw Error('What if new matrix vertex is not properly constructed?')
       }
 

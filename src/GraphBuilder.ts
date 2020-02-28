@@ -99,7 +99,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               continue
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+            const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (parsedCellContent instanceof CellContent.Formula) {
@@ -164,7 +164,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
               continue
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+            const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (parsedCellContent instanceof CellContent.Formula) {
@@ -204,10 +204,10 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: MatrixVertex | ValueCellVertex, size: MatrixSizeCheck } {
+export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): MatrixVertex | ValueCellVertex {
   const size = checkMatrixSize(ast, formulaAddress)
-  if (!size) {
-    return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size }
+  if (size instanceof CellError) {
+    return new ValueCellVertex(size)
   }
-  return { vertex: new MatrixVertex(formulaAddress, size.width, size.height, ast), size }
+  return new MatrixVertex(formulaAddress, size.width, size.height, ast)
 }
