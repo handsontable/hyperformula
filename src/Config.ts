@@ -68,7 +68,7 @@ type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFo
   | 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
   | 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
 
-export class Config {
+export class Config implements ConfigParams{
 
   public static defaultConfig: ConfigParams = {
     caseSensitive: false,
