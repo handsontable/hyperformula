@@ -71,3 +71,9 @@ export class ExpectedValueOfType extends Error {
   }
 }
 
+export class ExpectedOneOfValues extends Error {
+  constructor(values: string, paramName: string) {
+    super(`Expected: ${values} for config parameter: ${paramName}`)
+  }
+}
+

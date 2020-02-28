@@ -2,7 +2,7 @@ import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
 import {DateHelper, defaultParseDate, IDate, instanceOfIDate} from './DateHelper'
 import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {ExpectedValueOfType} from './errors'
+import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -40,6 +40,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
+const PossibleGPUModeString = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headlessgl'] // TODO: is there a better way to do it?
 
 export interface ConfigParams {
   caseSensitive: boolean,
@@ -173,7 +174,7 @@ export class Config {
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig.functionArgSeparator, 'string', 'functionArgSeparator')
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
+    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig.gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig.smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig.matrixDetection, 'boolean', 'matrixDetection')
     this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig.matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
@@ -250,13 +251,21 @@ export class Config {
     }, {} as Record<string, ErrorType>)
   }
 
-  private valueFromParam(inputValue: any, defaultValue: any, expectedType: string, paramName: string) {
-    if(typeof inputValue === expectedType) {
-      return inputValue
-    } else if(typeof inputValue === 'undefined') {
+  private valueFromParam(inputValue: any, defaultValue: any, expectedType: string | string[], paramName: string) {
+    if(typeof inputValue === 'undefined') {
       return defaultValue
+    } else if(typeof expectedType === 'string') {
+      if(typeof inputValue === expectedType) {
+        return inputValue
+      } else {
+        throw new ExpectedValueOfType(expectedType, paramName)
+      }
     } else {
-      throw new ExpectedValueOfType(expectedType, paramName)
+      if(expectedType.includes(inputValue)) {
+        return inputValue
+      } else {
+        throw new ExpectedOneOfValues(expectedType.join(', '), paramName)
+      }
     }
   }
 
