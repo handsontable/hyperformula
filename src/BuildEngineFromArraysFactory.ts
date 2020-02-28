@@ -7,6 +7,7 @@ import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
+import {UndoRedo} from './UndoRedo'
 
 export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HyperFormula {
@@ -14,7 +15,8 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const undoRedo = new UndoRedo()
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats, undoRedo)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
@@ -35,6 +37,7 @@ export class BuildEngineFromArraysFactory {
     })
 
     lazilyTransformingAstService.parser = parser
+    undoRedo.parser = parser
 
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
     evaluator.run()
@@ -51,6 +54,7 @@ export class BuildEngineFromArraysFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
+      undoRedo,
     )
 
     return engine

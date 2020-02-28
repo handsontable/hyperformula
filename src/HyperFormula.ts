@@ -38,6 +38,7 @@ import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellA
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
+import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
 
@@ -120,8 +121,10 @@ export class HyperFormula {
     public readonly evaluator: Evaluator,
     /** Service handling postponed CRUD transformations */
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly undoRedo: UndoRedo,
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
+    undoRedo.crudOperations = this.crudOperations
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
   }
@@ -286,6 +289,10 @@ export class HyperFormula {
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
+  }
+
+  public undo() {
+    this.undoRedo.undo()
   }
 
   /**

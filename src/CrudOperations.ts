@@ -7,7 +7,17 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, MatrixVertex, ParsingErrorVertex, SheetMapping, ValueCellVertex} from './DependencyGraph'
+import {
+  AddressMapping,
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  SheetMapping,
+  ValueCellVertex,
+  ParsingErrorVertex,
+  Vertex,
+} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
@@ -23,6 +33,7 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
+import {UndoRedo} from './UndoRedo'
 
 export class CrudOperations implements IBatchExecutor {
 
@@ -44,6 +55,7 @@ export class CrudOperations implements IBatchExecutor {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly undoRedo: UndoRedo,
   ) {
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
   }
@@ -61,9 +73,14 @@ export class CrudOperations implements IBatchExecutor {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
     this.clipboardOperations.abortCut()
+    const versions = []
     for (const index of normalizedIndexes) {
-      this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
+      const result = this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
+      if (result) {
+        versions.push(result)
+      }
     }
+    this.undoRedo.saveOperationRemoveRows(sheet, normalizedIndexes, versions)
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
@@ -483,19 +500,26 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, Vertex[]] | undefined {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
 
     const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
+    const vertices = []
+    for (const vertex of this.dependencyGraph.addressMapping.verticesFromRowsSpan(removedRows)) {
+      vertices.push(vertex)
+    }
+
     this.dependencyGraph.removeRows(removedRows)
 
+    let version : number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
+      version = this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
     })
+    return [version!, vertices]
   }
 
   /**

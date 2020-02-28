@@ -10,6 +10,7 @@ import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeS
 import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
+import {UndoRedo} from './UndoRedo'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -73,6 +74,7 @@ export class LazilyTransformingAstService {
 
   constructor(
     private readonly stats: Statistics,
+    private readonly undoRedo: UndoRedo
   ) {
   }
 
@@ -88,8 +90,9 @@ export class LazilyTransformingAstService {
     this.transformations.push({ type: TransformationType.ADD_ROWS, addedRows, sheet: addedRows.sheet })
   }
 
-  public addRemoveRowsTransformation(removedRows: RowsSpan) {
+  public addRemoveRowsTransformation(removedRows: RowsSpan): number {
     this.transformations.push({ type: TransformationType.REMOVE_ROWS, removedRows, sheet: removedRows.sheet })
+    return this.version()
   }
 
   public addRemoveColumnsTransformation(removedColumns: ColumnsSpan) {
@@ -137,6 +140,7 @@ export class LazilyTransformingAstService {
         }
         case TransformationType.REMOVE_ROWS: {
           const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
+          this.undoRedo.storeDataForVersion(v, address, ast)
           ast = newAst
           address = newAddress
           break
