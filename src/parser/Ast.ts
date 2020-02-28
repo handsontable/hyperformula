@@ -1,5 +1,5 @@
 import {IToken} from 'chevrotain'
-import {CellError} from '../Cell'
+import {CellError, ErrorType} from '../Cell'
 import {CellAddress} from './CellAddress'
 import {IExtendedToken} from './FormulaParser'
 
@@ -31,6 +31,10 @@ export interface ParsingError {
   type: ParsingErrorType,
   message: string,
 }
+
+export const parsingError = (type: ParsingErrorType, message: string) => ({
+  type, message
+})
 
 export enum ParsingErrorType {
   LexingError = 'LexingError',
@@ -73,6 +77,7 @@ export enum AstNodeType {
   CELL_RANGE = 'CELL_RANGE',
 
   ERROR = 'ERROR',
+  PARSING_ERROR = 'PARSING_ERROR',
 }
 
 export interface AstWithWhitespace {
@@ -327,16 +332,18 @@ export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken,
 
 export interface ErrorAst extends AstWithWhitespace {
   type: AstNodeType.ERROR,
-  args: ParsingError[],
-  error?: CellError,
+  error: CellError,
 }
-
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
 
 export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken): ErrorAst => ({
   type: AstNodeType.ERROR,
-  args: [], error,
+  error,
   leadingWhitespace: extractImage(leadingWhitespace),
+})
+
+export const buildParsingErrorAst = (): ErrorAst => ({
+  type: AstNodeType.ERROR,
+  error: new CellError(ErrorType.VALUE, "Parsing error")
 })
 
 function extractImage(token: IToken | undefined): string | undefined {

@@ -26,4 +26,12 @@ describe( 'decimal parsing', () => {
     expect(engine.getCellValue(adr('A6'))).toBe('.1.4')
     expect(engine.getCellValue(adr('B6'))).toEqual(detailedError(ErrorType.NAME))
   })
+
+  it('should asdf', () => {
+    interface IUserProfile  {
+      id: string;
+      name: string;
+    };
+    type KeysEnum<T> = { [P in keyof Required<T>]: true };
+  })
 })
