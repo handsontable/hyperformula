@@ -9,6 +9,7 @@ import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {formatNumber} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
@@ -124,7 +125,7 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
+        return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)

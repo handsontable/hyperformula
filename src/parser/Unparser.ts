@@ -22,7 +22,7 @@ export class Unparser {
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return imageWithWhitespace(this.formatNumber(ast.value), ast.leadingWhitespace)
+        return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
@@ -92,9 +92,9 @@ export class Unparser {
       return sheet
     }
   }
+}
 
-  private formatNumber(number: number): string {
-    const numericString = number.toString()
-    return numericString.replace('.', this.config.decimalSeparator)
-  }
+export function formatNumber(number: number, decimalSeparator: string): string {
+  const numericString = number.toString()
+  return numericString.replace('.', decimalSeparator)
 }
