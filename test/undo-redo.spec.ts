@@ -52,4 +52,18 @@ describe('UndoRedo - removing row', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('restores dependent cell formulas', () => {
+    const sheet = [
+      ['=A2'],
+      ['42'], // remove
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeRows(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })

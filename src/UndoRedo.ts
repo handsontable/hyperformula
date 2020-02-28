@@ -14,6 +14,8 @@ export class UndoRedo {
   }[] = []
   public crudOperations?: CrudOperations
 
+  public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
+
   constructor(
     private readonly dependencyGraph: DependencyGraph,
     private readonly parser: ParserWithCaching,
@@ -25,7 +27,12 @@ export class UndoRedo {
     this.undoStack.push({ sheet, indexes, versions })
   }
 
-  public storeDataForVersion(version: number, address: SimpleCellAddress, ast: Ast) {
+  public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
+    if (!this.oldData.has(version)) {
+      this.oldData.set(version, [])
+    }
+    const currentOldData = this.oldData.get(version)!
+    currentOldData.push([address, astHash])
   }
 
   public undo() {
@@ -46,6 +53,12 @@ export class UndoRedo {
             break
           }
         }
+      }
+
+      const oldDataToRestore = this.oldData.get(version - 1) || []
+      for (const entryToRestore of oldDataToRestore) {
+        const [ address, hash ] = entryToRestore
+        this.crudOperations!.setFormulaToCellFromCache(hash, address)
       }
     }
   }

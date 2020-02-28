@@ -140,7 +140,7 @@ export class LazilyTransformingAstService {
         }
         case TransformationType.REMOVE_ROWS: {
           const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
-          this.undoRedo!.storeDataForVersion(v, address, ast)
+          this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
           ast = newAst
           address = newAddress
           break
