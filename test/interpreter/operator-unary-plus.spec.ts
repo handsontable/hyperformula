@@ -18,8 +18,8 @@ describe('Unary operator PLUS', () => {
       ['=+"foobar"'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toBe('3')
+    expect(engine.getCellValue(adr('A2'))).toEqual('foobar')
   })
 
   it('pass error', () => {
@@ -42,5 +42,13 @@ describe('Unary operator PLUS', () => {
     ])
 
     expect(engine.getCellValue(adr('B2'))).toEqual(detailedError(ErrorType.VALUE))
+  })
+
+  it('string given by reference should return string with UNARY+', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['Liz'],
+      ['=+A1']
+    ])
+    expect(engine.getCellValue(adr('A2'))).toEqual('Liz') // UNARY PLUS value
   })
 })

@@ -41,3 +41,26 @@ export class NamedExpressionDoesNotExist extends Error {
     super(`Named Expression '${expressionName}' does not exist`)
   }
 }
+
+function replacer(key: any, val: any): any {
+  switch (typeof val) {
+    case 'function':
+    case 'symbol':
+      return val.toString()
+    case 'bigint':
+      return 'BigInt('+val.toString()+')'
+    default: {
+      if(val instanceof RegExp) {
+        return 'RegExp('+val.toString()+')'
+      } else {
+        return val
+      }
+    }
+  }
+}
+
+export class UnableToParse extends Error {
+  constructor(value: any) {
+    super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
+  }
+}

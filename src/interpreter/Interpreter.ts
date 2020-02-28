@@ -27,8 +27,7 @@ import {
   percent,
   power, strCmp,
   subtract,
-  unaryminus,
-  unaryplus,
+  unaryminus
 } from './scalar'
 import {concatenate} from './text'
 
@@ -198,10 +197,8 @@ export class Interpreter {
         const result = this.evaluateAst(ast.value, formulaAddress)
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
-        } else if (typeof result === 'boolean') {
-          return result
         } else {
-          return unaryplus(coerceScalarToNumberOrError(result, this.dateHelper))
+          return result
         }
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -307,8 +304,8 @@ export class Interpreter {
       return null
     }
   }
-  private compare(left: InternalCellValue, right: InternalCellValue): number {
 
+  public compare(left: InternalCellValue, right: InternalCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right

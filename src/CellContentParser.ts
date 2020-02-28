@@ -1,6 +1,7 @@
 import {CellError, EmptyValue, EmptyValueType, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateHelper} from './DateHelper'
+import {UnableToParse} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
@@ -59,7 +60,7 @@ export function isFormula(text: string): Boolean {
 }
 
 export function isMatrix(text: RawCellContent): Boolean {
-  if (typeof text !== 'string') {
+  if(typeof text !== 'string') {
     return false
   }
   return (text.length > 1) && (text.startsWith('{')) && (text.endsWith('}'))
@@ -91,25 +92,29 @@ export class CellContentParser {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
       return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth() + 1, year: content.getFullYear()}))
-    } else if (isMatrix(content)) {
-      return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
-    } else if (isFormula(content)) {
-      return new CellContent.Formula(content)
-    } else if (isError(content, this.config.errorMapping)) {
-      return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
-    } else {
-      const trimmedContent = content.trim()
-      if (this.isNumber(trimmedContent)) {
-        return new CellContent.Number(this.config.numericStringToNumber(trimmedContent))
-      }
-      const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
-      if (parsedDateNumber !== null) {
-        return new CellContent.Number(parsedDateNumber)
+    } else if (typeof content === 'string') {
+      if (isMatrix(content)) {
+        return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
+      } else if (isFormula(content)) {
+        return new CellContent.Formula(content)
+      } else if (isError(content, this.config.errorMapping)) {
+        return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
       } else {
-        return new CellContent.String(
-          content.startsWith('\'') ? content.slice(1) : content
-        )
+        const trimmedContent = content.trim()
+        if (this.isNumber(trimmedContent)) {
+          return new CellContent.Number(this.config.numericStringToNumber(trimmedContent))
+        }
+        const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
+        if (parsedDateNumber !== null) {
+          return new CellContent.Number(parsedDateNumber)
+        } else {
+          return new CellContent.String(
+            content.startsWith('\'') ? content.slice(1) : content,
+          )
+        }
       }
+    } else {
+      throw new UnableToParse(content)
     }
   }
 

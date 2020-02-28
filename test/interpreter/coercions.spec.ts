@@ -125,7 +125,7 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqual(0) // DIV
     expect(engine.getCellValue(adr('G1'))).toEqual(0) // EXP
-    expect(engine.getCellValue(adr('H1'))).toEqual(0) // UNARY PLUS
+    expect(engine.getCellValue(adr('H1'))).toEqual(EmptyValue) // UNARY PLUS
     expect(engine.getCellValue(adr('I1'))).toEqual(0) // UNARY MINUS
     expect(engine.getCellValue(adr('J1'))).toEqual(0) // PERCENTAGE
   })

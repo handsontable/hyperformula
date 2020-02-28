@@ -98,6 +98,10 @@ export const enGB: TranslationPackage = {
     RADIANS: 'RADIANS',
     E: 'E',
     OFFSET: 'OFFSET',
+    SWITCH: 'SWITCH',
+    IFERROR: 'IFERROR',
+    IFNA: 'IFNA',
+    CHOOSE: 'CHOOSE',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
