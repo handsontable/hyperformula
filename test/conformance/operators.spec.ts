@@ -39,7 +39,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!'))
     expect(engine.getCellValue('M1')).toEqual(1) //EXP 
     expect(engine.getCellValue('N1')).toEqual('') // CONCAT
-    expect(engine.getCellValue('O1')).toEqual(0) // UNARY PLUS
+    expect(engine.getCellValue('O1')).toEqual(EmptyValue) // UNARY PLUS
     expect(engine.getCellValue('P1')).toEqual(0) // UNARY MINUS 
     expect(engine.getCellValue('Q1')).toEqual(0) // PERCENTAGE
   })
@@ -333,7 +333,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // DIV
     expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // EXP
     expect(engine.getCellValue('N1')).toEqual('Liz') // CONCAT
-    //expect(engine.getCellValue('O1')).toEqual('Liz') // UNARY PLUS pending for #212
+    expect(engine.getCellValue('O1')).toEqual('Liz') // UNARY PLUS pending for #212
     expect(engine.getCellValue('P1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS
     expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
@@ -366,7 +366,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('D1')).toEqual(false) // GT true
     //expect(engine.getCellValue('E1')).toEqual(true); // LT false
     expect(engine.getCellValue('F1')).toEqual(false) // GTE true
-    //expect(engine.getCellValue('G1')).toEqual(true); // LTE false
+    expect(engine.getCellValue('G1')).toEqual(true); // LTE false
     expect(engine.getCellValue('H1')).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue('I1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //ADD
     expect(engine.getCellValue('J1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //SUB
@@ -515,7 +515,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('J1')).toEqual(0) // SUB   value
     expect(engine.getCellValue('K1')).toEqual(0) // MULT  value
     expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')) // DIV value  
-    //expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')) // EXP  
+    expect(engine.getCellValue('M1')).toEqual(1) // EXP  
     expect(engine.getCellValue('N1')).toEqual('0false') // CONCAT     
   })
 
@@ -553,7 +553,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('I1')).toEqual(2.7) // ADD 
     expect(engine.getCellValue('J1')).toEqual(-2.7) // SUB   
     expect(engine.getCellValue('K1')).toEqual(0) // MULT  
-    //expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // DIV  0
+    expect(engine.getCellValue('L1')).toEqual(0) // DIV 
     expect(engine.getCellValue('M1')).toEqual(0) // EXP  
     expect(engine.getCellValue('N1')).toEqual('02.7') // CONCAT     
   })
