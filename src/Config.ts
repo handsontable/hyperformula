@@ -67,8 +67,9 @@ export interface ConfigParams {
 }
 
 type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFormats' | 'functionArgSeparator' | 'language'
-  | 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
-  | 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
+| 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
+| 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
+| 'decimalSeparator'
 
 export class Config implements ConfigParams, ParserConfig{
 
@@ -181,7 +182,7 @@ export class Config implements ConfigParams, ParserConfig{
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
-    this.decimalSeparator = decimalSeparator || Config.defaultConfig.decimalSeparator
+    this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
@@ -204,9 +205,6 @@ export class Config implements ConfigParams, ParserConfig{
 
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
-    }
-    if (this.decimalSeparator !== '.' && this.decimalSeparator !== ',') {
-      throw Error('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
     }
   }
 
@@ -286,7 +284,7 @@ export class Config implements ConfigParams, ParserConfig{
       if(expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.join(', '), paramName)
+        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\''+val+'\'').join(', '), paramName)
       }
     }
   }
