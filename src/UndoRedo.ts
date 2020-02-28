@@ -3,7 +3,7 @@ import {Ast, ParserWithCaching} from './parser'
 import {SimpleCellAddress} from './Cell'
 import {CrudOperations} from './CrudOperations'
 import {
-  AddressMapping,
+  AddressMapping, CellVertex,
   DependencyGraph,
   FormulaCellVertex,
   Graph,
@@ -11,12 +11,12 @@ import {
   MatrixVertex,
   RangeMapping,
   SheetMapping,
-  SparseStrategy,
+  SparseStrategy, ValueCellVertex,
   Vertex,
 } from './DependencyGraph'
 
 export class UndoRedo {
-  public readonly undoStack: any[] = []
+  public readonly undoStack: { sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, CellVertex][]][]}[] = []
   public parser?: ParserWithCaching
   public crudOperations?: CrudOperations
 
@@ -24,7 +24,7 @@ export class UndoRedo {
   ) {
   }
 
-  public saveOperationRemoveRows(sheet: number, indexes: Index[], versions: [number, Vertex[]][]) {
+  public saveOperationRemoveRows(sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, CellVertex][]][]) {
     this.undoStack.push({ sheet, indexes, versions })
   }
 
@@ -32,9 +32,17 @@ export class UndoRedo {
   }
 
   public undo() {
-    const { sheet, indexes, versions } = this.undoStack.pop()
+    const { sheet, indexes, versions } = this.undoStack.pop()!
     for (let i = indexes.length - 1; i >= 0; --i) {
-      this.crudOperations!.addRows(sheet, indexes[i])
+      const index = indexes[i]
+      const [version, vertices] = versions[i]
+      this.crudOperations!.addRows(sheet, index)
+
+      for (let [address, vertex] of vertices) {
+        if (vertex instanceof ValueCellVertex) {
+          this.crudOperations?.setValueToCell(vertex.getCellValue(), address)
+        }
+      }
     }
   }
 }

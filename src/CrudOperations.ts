@@ -8,7 +8,7 @@ import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {
-  AddressMapping,
+  AddressMapping, CellVertex,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
@@ -500,7 +500,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, Vertex[]] | undefined {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, [SimpleCellAddress, CellVertex][]] | undefined {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
@@ -508,8 +508,8 @@ export class CrudOperations implements IBatchExecutor {
     const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
     const vertices = []
-    for (const vertex of this.dependencyGraph.addressMapping.verticesFromRowsSpan(removedRows)) {
-      vertices.push(vertex)
+    for (const entry of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
+      vertices.push(entry)
     }
 
     this.dependencyGraph.removeRows(removedRows)
