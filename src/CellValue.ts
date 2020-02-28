@@ -1,7 +1,43 @@
-import {CellError, ErrorType, InternalCellValue, NoErrorCellValue} from './Cell'
+import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {CellValueChange} from './ContentChanges'
 import {Config} from './Config'
+import {NamedExpressions} from './NamedExpressions'
 
 export type CellValue = NoErrorCellValue | DetailedCellError
+
+export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
+
+export class ExportedCellChange {
+  constructor(
+    public readonly address: SimpleCellAddress,
+    public readonly newValue: CellValue,
+  ) {
+  }
+
+  public get col() {
+    return this.address.col
+  }
+
+  public get row() {
+    return this.address.row
+  }
+
+  public get sheet() {
+    return this.address.sheet
+  }
+
+  public get value() {
+    return this.newValue
+  }
+}
+
+export class ExportedNamedExpressionChange {
+  constructor(
+    public readonly name: string,
+    public readonly newValue: CellValue,
+  ) {
+  }
+}
 
 export class DetailedCellError {
   constructor(
@@ -19,13 +55,28 @@ export class DetailedCellError {
   }
 }
 
-export class CellValueExporter {
+export class Exporter {
   constructor(
     private readonly config: Config,
+    private readonly namedExpressions: NamedExpressions,
   ) {
   }
 
-  public export(value: InternalCellValue): CellValue {
+  public exportChange(change: CellValueChange): ExportedChange {
+    if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      return new ExportedNamedExpressionChange(
+        this.namedExpressions.fetchNameForNamedExpressionRow(change.row),
+        this.exportValue(change.value),
+      )
+    } else {
+      return new ExportedCellChange(
+        simpleCellAddress(change.sheet, change.col, change.row),
+        this.exportValue(change.value),
+      )
+    }
+  }
+
+  public exportValue(value: InternalCellValue): CellValue {
     if (this.config.smartRounding && typeof value == 'number' && !Number.isInteger(value)) {
       return this.cellValueRounding(value)
     } else if (value instanceof CellError) {

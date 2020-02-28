@@ -16,10 +16,13 @@ describe('Operator PLUS', () => {
     const engine = HyperFormula.buildFromArray([
       ['="2"+"3"'],
       ['="foobar"+1'],
+      ['\'3'],
+      ['=A3+A3'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
   it('pass error from left operand', () => {
