@@ -38,6 +38,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ParserConfig} from './parser/ParserConfig'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
 const PossibleGPUModeString = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headlessgl'] // TODO: is there a better way to do it?
@@ -47,6 +48,7 @@ export interface ConfigParams {
   chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
+  decimalSeparator: '.' | ',',
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
@@ -68,13 +70,14 @@ type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFo
   | 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
   | 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
 
-export class Config implements ConfigParams{
+export class Config implements ConfigParams, ParserConfig{
 
   public static defaultConfig: ConfigParams = {
     caseSensitive: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
+    decimalSeparator: '.',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
@@ -132,6 +135,7 @@ export class Config implements ConfigParams{
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
+  public readonly decimalSeparator: '.' | ','
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
@@ -155,6 +159,7 @@ export class Config implements ConfigParams{
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
+      decimalSeparator,
       language,
       functionPlugins,
       gpuMode,
@@ -176,6 +181,7 @@ export class Config implements ConfigParams{
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
+    this.decimalSeparator = decimalSeparator || Config.defaultConfig.decimalSeparator
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
@@ -195,6 +201,13 @@ export class Config implements ConfigParams{
     this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfIDate, 'IDate', 'nullDate' )
     this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
+
+    if (this.decimalSeparator === this.functionArgSeparator) {
+      throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+    }
+    if (this.decimalSeparator !== '.' && this.decimalSeparator !== ',') {
+      throw Error('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
+    }
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -203,6 +216,11 @@ export class Config implements ConfigParams{
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
+  }
+
+  public numericStringToNumber = (input: string): number => {
+    const normalized = input.replace(this.decimalSeparator, '.')
+    return Number(normalized)
   }
 
   public allFunctionPlugins(): any[] {

@@ -77,12 +77,27 @@ describe('Config', () => {
   it( 'validation: other params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({nullDate: {year: 123, month: 123, day: true}})).toThrow('Expected value of type: IDate for config parameter: nullDate')
+    expect(() => new Config({nullDate: { year: 123, month: 123, day: true }
+    })).toThrow('Expected value of type: IDate for config parameter: nullDate')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({dateFormats: {}})).toThrow('Expected value of type: array for config parameter: dateFormats')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({gpuMode: 'abcd'})).toThrow('Expected: gpu, cpu, dev, webgl, webgl2, headlessgl for config parameter: gpuMode')
+  })
+
+  it('should throw error when there is a conflict between separators', () => {
+    expect(() => {
+      new Config({ decimalSeparator: ',', functionArgSeparator: ',' })
+    }).toThrow('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+  })
+
+  it('should throw error when decimal separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ decimalSeparator: ';' })
+    }).toThrow('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
   })
 })

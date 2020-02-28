@@ -35,6 +35,19 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('42.13')).toStrictEqual(new CellContent.Number(42.13))
     expect(cellContentParser.parse('-42.13')).toStrictEqual(new CellContent.Number(-42.13))
     expect(cellContentParser.parse('+42.13')).toStrictEqual(new CellContent.Number(42.13))
+    expect(cellContentParser.parse('.13')).toStrictEqual(new CellContent.Number(0.13))
+  })
+
+  it('numbers with different decimal separators', () => {
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const cellContentParser = new CellContentParser(config, new DateHelper(config))
+
+    expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))
+    expect(cellContentParser.parse('42,13')).toStrictEqual(new CellContent.Number(42.13))
+    expect(cellContentParser.parse('-42,13')).toStrictEqual(new CellContent.Number(-42.13))
+    expect(cellContentParser.parse('+42,13')).toStrictEqual(new CellContent.Number(42.13))
+    expect(cellContentParser.parse(',13')).toStrictEqual(new CellContent.Number(0.13))
+    expect(cellContentParser.parse('42.13')).toStrictEqual(new CellContent.String('42.13'))
   })
 
   it( 'non-string', () => {

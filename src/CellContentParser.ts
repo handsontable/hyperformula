@@ -73,7 +73,11 @@ export function isError(text: string, errorMapping: Record<string, ErrorType>): 
 }
 
 export class CellContentParser {
-  constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {}
+  private numberPattern: RegExp
+
+  constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {
+    this.numberPattern = new RegExp(`^[\+|-]?[\\d]*[${this.config.decimalSeparator}]?[\\d]+\$`)
+  }
 
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null || content === EmptyValue) {
@@ -97,8 +101,8 @@ export class CellContentParser {
         return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
       } else {
         const trimmedContent = content.trim()
-        if (trimmedContent !== '' && !isNaN(Number(trimmedContent))) {
-          return new CellContent.Number(Number(trimmedContent))
+        if (this.isNumber(trimmedContent)) {
+          return new CellContent.Number(this.config.numericStringToNumber(trimmedContent))
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
         if (parsedDateNumber !== null) {
@@ -113,4 +117,9 @@ export class CellContentParser {
       throw new UnableToParse(content)
     }
   }
+
+  private isNumber(input: string): boolean {
+    return this.numberPattern.test(input)
+  }
 }
+
