@@ -3,13 +3,13 @@ import {ColumnsSpan} from '../src/ColumnsSpan'
 describe('ColumnsSpan', () => {
   it('raise error when starting column is less than 0', () => {
     expect(() => {
-      const span = new ColumnsSpan(0, -1, 0)
+      new ColumnsSpan(0, -1, 0)
     }).toThrow('Starting column cant be less than 0')
   })
 
   it('raise error when column end before column start', () => {
     expect(() => {
-      const span = new ColumnsSpan(0, 1, 0)
+      new ColumnsSpan(0, 1, 0)
     }).toThrow('Column span cant end before start')
   })
 

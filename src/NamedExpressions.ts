@@ -156,7 +156,7 @@ export class NamedExpressions {
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')
     } else if (parsedCellContent instanceof CellContent.Formula) {
-      const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.crudOperations.setCellEmpty(address)

@@ -126,7 +126,7 @@ export class NotComputedMatrix implements IMatrix {
   public height(): number {
     return this.size.height
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public get(col: number, row: number): number {
     throw Error('Matrix not computed yet.')
   }
@@ -226,7 +226,7 @@ export class ErroredMatrix implements IMatrix {
     public readonly size: MatrixSize,
   ) {
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public get(col: number, row: number): CellError {
     return this.error
   }

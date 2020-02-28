@@ -8,7 +8,7 @@ import {Matrix} from '../Matrix'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {IColumnSearchStrategy} from './ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearchStrategy'
 
 type ColumnMap = Map<InternalCellValue, ValueIndex>
 
@@ -19,7 +19,7 @@ interface ValueIndex {
 
 type SheetIndex = ColumnMap[]
 
-export class ColumnIndex implements IColumnSearchStrategy {
+export class ColumnIndex implements ColumnSearchStrategy {
 
   public static buildEmpty(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics) {
     const dependencyGraph = DependencyGraph.buildEmpty(transformingService, config, statistics)
@@ -84,7 +84,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     }
   }
 
-  public find(key: any, range: AbsoluteCellRange, sorted: boolean): number {
+  public find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number {
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -128,7 +128,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
     }
-    const sheetMap = this.index.get(sheet)!
+    const sheetMap = this.index.get(sheet)! // eslint-disable-line @typescript-eslint/no-non-null-assertion
     let columnMap = sheetMap[col]
 
     if (!columnMap) {
@@ -203,7 +203,7 @@ export class ColumnIndex implements IColumnSearchStrategy {
       }
 
       if (columnMap.size === 0) {
-        delete this.index.get(address.sheet)![address.col]
+        delete this.index.get(address.sheet)![address.col] // eslint-disable-line @typescript-eslint/no-non-null-assertion
       }
     })
   }

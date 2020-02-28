@@ -11,7 +11,7 @@ import {
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
@@ -107,7 +107,7 @@ export class HyperFormula {
     /** Dependency graph storing sheets structure */
     public readonly dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin */
-    public readonly columnSearch: IColumnSearchStrategy,
+    public readonly columnSearch: ColumnSearchStrategy,
     /** Parser with caching */
     private readonly parser: ParserWithCaching,
     private readonly unparser: Unparser,
