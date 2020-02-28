@@ -98,6 +98,10 @@ export const plPL: TranslationPackage = {
     ERFC: 'KOMP.FUNKCJA.BŁ',
     ABS: 'WART.BEZWGL',
     OFFSET: 'PRZESUNIĘCIE',
+    SWITCH: 'PRZEŁĄCZ',
+    IFERROR: 'JEŻELI.BŁĄD',
+    IFNA: 'JEŻELI.ND',
+    CHOOSE: 'WYBIERZ',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
