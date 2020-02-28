@@ -37,7 +37,6 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
-import {sheetNameRegexp} from './parser/LexerConfig'
 import {ParserConfig} from './parser/ParserConfig'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
@@ -47,7 +46,7 @@ export interface ConfigParams {
   chooseAddressMappingPolicy: IChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
-  decimalSeparator: ',' | '.',
+  decimalSeparator: '.' | ',',
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: PossibleGPUMode,
