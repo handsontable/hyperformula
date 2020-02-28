@@ -64,6 +64,10 @@ export interface ConfigParams {
   nullDate: IDate,
 }
 
+type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFormats' | 'functionArgSeparator' | 'language'
+  | 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
+  | 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
+
 export class Config {
 
   public static defaultConfig: ConfigParams = {
@@ -168,29 +172,29 @@ export class Config {
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
-    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig.caseSensitive, 'boolean', 'caseSensitive')
+    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig.dateFormats, Array.isArray, 'array', 'dateFormats')
-    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig.functionArgSeparator, 'string', 'functionArgSeparator')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig.gpuMode, PossibleGPUModeString, 'gpuMode')
-    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig.smartRounding, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig.matrixDetection, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig.matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
-    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig.nullYear, 'number', 'nullYear')
-    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig.precisionRounding, 'number', 'precisionRounding')
-    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig.precisionEpsilon, 'number', 'precisionEpsilon')
+    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig, 'number', 'precisionEpsilon')
     if (!this.smartRounding) {
       this.precisionEpsilon = 0
     }
-    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig.useColumnIndex, 'boolean', 'useColumnIndex')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig.vlookupThreshold, 'number', 'vlookupThreshold')
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig.parseDate, 'function', 'parseDate')
-    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig.stringifyDate, 'function', 'stringifyDate')
+    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig.nullDate, instanceOfIDate, 'IDate', 'nullDate' )
-    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig.leapYear1900, 'boolean', 'leapYear1900')
+    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -251,9 +255,9 @@ export class Config {
     }, {} as Record<string, ErrorType>)
   }
 
-  private valueFromParam(inputValue: any, defaultValue: any, expectedType: string | string[], paramName: string) {
+  private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
     if(typeof inputValue === 'undefined') {
-      return defaultValue
+      return baseConfig[paramName]
     } else if(typeof expectedType === 'string') {
       if(typeof inputValue === expectedType) {
         return inputValue
@@ -269,7 +273,7 @@ export class Config {
     }
   }
 
-  private valueFromParamCheck(inputValue: any, defaultValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: string ) {
+  private valueFromParamCheck(inputValue: any, defaultValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue
     } else if (typeof inputValue === 'undefined') {
