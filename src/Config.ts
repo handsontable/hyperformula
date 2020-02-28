@@ -174,7 +174,7 @@ export class Config {
   ) {
     this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig.dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
     this.language = language || Config.defaultConfig.language
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
@@ -193,7 +193,7 @@ export class Config {
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig.nullDate, instanceOfIDate, 'IDate', 'nullDate' )
+    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfIDate, 'IDate', 'nullDate' )
     this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
   }
 
@@ -273,11 +273,11 @@ export class Config {
     }
   }
 
-  private valueFromParamCheck(inputValue: any, defaultValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
+  private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue
     } else if (typeof inputValue === 'undefined') {
-      return defaultValue
+      return baseConfig[paramName]
     } else {
       throw new ExpectedValueOfType(expectedType, paramName)
     }
