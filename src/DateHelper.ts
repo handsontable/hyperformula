@@ -10,7 +10,7 @@ export interface IDate {
 }
 
 export function instanceOfIDate(obj: any): obj is IDate {
-  if(typeof obj === 'object') {
+  if( !obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
   } else {
     return false
