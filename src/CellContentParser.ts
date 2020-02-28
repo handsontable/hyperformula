@@ -100,7 +100,7 @@ export class CellContentParser {
     } else {
       const trimmedContent = content.trim()
       if (this.isNumber(trimmedContent)) {
-        return new CellContent.Number(this.config.parseNumericString(trimmedContent))
+        return new CellContent.Number(this.config.numericStringToNumber(trimmedContent))
       }
       const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
       if (parsedDateNumber !== null) {

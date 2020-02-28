@@ -65,7 +65,7 @@ export interface ConfigParams {
   nullDate: IDate,
 }
 
-export class Config implements ParserConfig{
+export class Config implements ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     caseSensitive: false,
@@ -213,7 +213,7 @@ export class Config implements ParserConfig{
     return this.language.errors[functionTranslationKey]
   }
 
-  public parseNumericString = (input: string): number => {
+  public numericStringToNumber = (input: string): number => {
     const normalized = input.replace(this.decimalSeparator, '.')
     return Number(normalized)
   }

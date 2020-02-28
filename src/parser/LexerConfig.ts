@@ -109,22 +109,19 @@ export interface ILexerConfig {
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
-  parseNumericString: (input: string) => number
+  numericStringToNumber: (input: string) => number,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
-  const OffsetProcedureName = createToken({
-    name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
-  })
   const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.language)
-  const parseNumericString = config.parseNumericString
+  const numericStringToNumber = config.numericStringToNumber
 
   /* configurable tokens */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
   const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`[\\d]*[${config.decimalSeparator}]?[\\d]+`)})
+  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -164,6 +161,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
   ]
+
   return {
     ArgSeparator,
     NumberLiteral,
@@ -171,7 +169,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     allTokens,
     errorMapping,
     functionMapping,
-    parseNumericString
+    numericStringToNumber
   }
 }
 

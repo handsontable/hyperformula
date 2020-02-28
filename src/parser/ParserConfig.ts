@@ -10,5 +10,5 @@ export interface ParserConfig {
   structuralChangeFunctions(): Set<string>,
   getErrorTranslationFor(errorType: ErrorType): string,
   getFunctionTranslationFor(functionName: string): string,
-  parseNumericString(input: string): number,
+  numericStringToNumber: (input: string) => number,
 }

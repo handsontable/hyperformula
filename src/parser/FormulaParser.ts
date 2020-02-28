@@ -320,7 +320,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
-          return buildNumberAst(this.lexerConfig.parseNumericString(number.image), number.leadingWhitespace)
+          return buildNumberAst(this.lexerConfig.numericStringToNumber(number.image), number.leadingWhitespace)
         },
       },
       {
