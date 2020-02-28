@@ -70,11 +70,11 @@ export type Transformation =
 export class LazilyTransformingAstService {
 
   public parser?: ParserWithCaching
+  public undoRedo?: UndoRedo
   private transformations: Transformation[] = []
 
   constructor(
     private readonly stats: Statistics,
-    private readonly undoRedo: UndoRedo
   ) {
   }
 
@@ -140,7 +140,7 @@ export class LazilyTransformingAstService {
         }
         case TransformationType.REMOVE_ROWS: {
           const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
-          this.undoRedo.storeDataForVersion(v, address, ast)
+          this.undoRedo!.storeDataForVersion(v, address, ast)
           ast = newAst
           address = newAddress
           break

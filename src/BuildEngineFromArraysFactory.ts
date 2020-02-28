@@ -15,8 +15,7 @@ export class BuildEngineFromArraysFactory {
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const undoRedo = new UndoRedo()
-    const lazilyTransformingAstService = new LazilyTransformingAstService(stats, undoRedo)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
@@ -31,13 +30,15 @@ export class BuildEngineFromArraysFactory {
     const dateHelper = new DateHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
+    const undoRedo = new UndoRedo(dependencyGraph, parser, lazilyTransformingAstService)
+
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
     lazilyTransformingAstService.parser = parser
-    undoRedo.parser = parser
+    lazilyTransformingAstService.undoRedo = undoRedo
 
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
     evaluator.run()

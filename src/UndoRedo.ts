@@ -1,30 +1,27 @@
-import {Index} from './HyperFormula'
-import {Ast, ParserWithCaching} from './parser'
 import {SimpleCellAddress} from './Cell'
+import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {CrudOperations} from './CrudOperations'
-import {
-  AddressMapping, CellVertex,
-  DependencyGraph,
-  FormulaCellVertex,
-  Graph,
-  MatrixMapping,
-  MatrixVertex,
-  RangeMapping,
-  SheetMapping,
-  SparseStrategy, ValueCellVertex,
-  Vertex,
-} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
+import {Index} from './HyperFormula'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Ast, ParserWithCaching} from './parser'
 
 export class UndoRedo {
-  public readonly undoStack: { sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, CellVertex][]][]}[] = []
-  public parser?: ParserWithCaching
+  public readonly undoStack: {
+    sheet: number,
+    indexes: Index[],
+    versions: [number, [SimpleCellAddress, ClipboardCell][]][]
+  }[] = []
   public crudOperations?: CrudOperations
 
   constructor(
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly parser: ParserWithCaching,
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
   }
 
-  public saveOperationRemoveRows(sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, CellVertex][]][]) {
+  public saveOperationRemoveRows(sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, ClipboardCell][]][]) {
     this.undoStack.push({ sheet, indexes, versions })
   }
 
@@ -39,8 +36,15 @@ export class UndoRedo {
       this.crudOperations!.addRows(sheet, index)
 
       for (let [address, vertex] of vertices) {
-        if (vertex instanceof ValueCellVertex) {
-          this.crudOperations?.setValueToCell(vertex.getCellValue(), address)
+        switch (vertex.type) {
+          case ClipboardCellType.VALUE: {
+            this.crudOperations?.setValueToCell(vertex.value, address)
+            break
+          }
+          case ClipboardCellType.FORMULA: {
+            this.crudOperations?.setFormulaToCellFromCache(vertex.hash, address)
+            break
+          }
         }
       }
     }

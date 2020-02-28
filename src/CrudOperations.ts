@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {ClipboardOperations} from './ClipboardOperations'
+import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -500,16 +500,16 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, [SimpleCellAddress, CellVertex][]] | undefined {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, [SimpleCellAddress, ClipboardCell][]] | undefined {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
 
     const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
-    const vertices = []
-    for (const entry of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
-      vertices.push(entry)
+    const vertices: [SimpleCellAddress, ClipboardCell][] = []
+    for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
+      vertices.push([address, this.getClipboardCell(address)])
     }
 
     this.dependencyGraph.removeRows(removedRows)
@@ -598,6 +598,23 @@ export class CrudOperations implements IBatchExecutor {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
+  }
+
+  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex === null || vertex instanceof EmptyCellVertex) {
+      return { type: ClipboardCellType.EMPTY }
+    } else if (vertex instanceof ValueCellVertex) {
+      /* TODO should we copy errors? */
+      return { type: ClipboardCellType.VALUE, value: vertex.getCellValue() }
+    } else if (vertex instanceof MatrixVertex) {
+      return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
+    } else if (vertex instanceof FormulaCellVertex) {
+      return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
+    }
+
+    throw Error('Trying to copy unsupported type')
   }
 }
 

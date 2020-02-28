@@ -38,4 +38,18 @@ describe('UndoRedo - removing row', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('works with formula in removed row', () => {
+    const sheet = [
+      ['1'],
+      ['=SUM(A1)'], // remove
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeRows(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })

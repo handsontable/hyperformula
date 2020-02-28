@@ -293,6 +293,7 @@ export class HyperFormula {
 
   public undo() {
     this.undoRedo.undo()
+    this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
