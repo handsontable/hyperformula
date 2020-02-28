@@ -1,12 +1,13 @@
 import {SimpleCellAddress} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {CrudOperations} from './CrudOperations'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
 import {Index} from './HyperFormula'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {Ast, ParserWithCaching} from './parser'
 
 export class UndoRedo {
+
+  constructor() {
+  }
+
   public readonly undoStack: {
     sheet: number,
     indexes: Index[],
@@ -15,13 +16,6 @@ export class UndoRedo {
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
-
-  constructor(
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly parser: ParserWithCaching,
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-  ) {
-  }
 
   public saveOperationRemoveRows(sheet: number, indexes: Index[], versions: [number, [SimpleCellAddress, ClipboardCell][]][]) {
     this.undoStack.push({ sheet, indexes, versions })

@@ -30,7 +30,7 @@ export class BuildEngineFromArraysFactory {
     const dateHelper = new DateHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
-    const undoRedo = new UndoRedo(dependencyGraph, parser, lazilyTransformingAstService)
+    const undoRedo = new UndoRedo()
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)

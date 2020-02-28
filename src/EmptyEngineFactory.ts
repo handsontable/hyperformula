@@ -12,7 +12,7 @@ export class EmptyEngineFactory {
   public build(config: Config = new Config()): HyperFormula {
     const undoRedo = new UndoRedo()
     const stats = new Statistics()
-    const lazilyTransformingAstService = new LazilyTransformingAstService(stats, undoRedo)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
@@ -20,8 +20,10 @@ export class EmptyEngineFactory {
     const dateHelper = new DateHelper(config)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
     const cellContentParser = new CellContentParser(config, dateHelper)
+
     lazilyTransformingAstService.parser = parser
-    undoRedo.parser = parser
+    lazilyTransformingAstService.undoRedo = undoRedo
+
     const engine = new HyperFormula(
       config,
       stats,
@@ -34,6 +36,7 @@ export class EmptyEngineFactory {
       lazilyTransformingAstService,
       undoRedo,
     )
+
     return engine
   }
 }
