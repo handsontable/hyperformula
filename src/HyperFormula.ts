@@ -72,7 +72,7 @@ export class HyperFormula {
    * 
    * The engine is created with a single sheet.
    * 
-   * Can be configured with the optional second argument that represents a {Config}.
+   * Can be configured with the optional second parameter that represents a {Config}.
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -90,7 +90,7 @@ export class HyperFormula {
    * 
    * The engine is created with one or more sheets.
    * 
-   * Can be configured with the optional second argument that represents a {Config}.
+   * Can be configured with the optional second parameter that represents a {Config}.
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -106,7 +106,7 @@ export class HyperFormula {
   /**
    * Builds an empty engine instance.
    * 
-   * Can be configured with the optional argument that represents a {Config}.
+   * Can be configured with the optional parameter that represents a {Config}.
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -258,7 +258,7 @@ export class HyperFormula {
   /**
    * Returns a snapshot of the computation time statistics.
    * 
-   * The method accepts no arguments.
+   * The method accepts no parameters.
    * 
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
    * 
@@ -916,21 +916,26 @@ export class HyperFormula {
    * Returns a unique sheet name assigned to the sheet of a given ID.
    * 
    * Or undefined if the there is no sheet with a given ID.
+   * 
+   * The method accepts sheet ID as a parameter
    *
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * 
-   * @return name of the sheet
+   * @return name of the sheet or undefined if the sheet does not exist
    */
   public getSheetName(sheetId: number): string | undefined {
     return this.sheetMapping.getDisplayName(sheetId)
   }
 
   /**
-   * Returns a unique sheet ID assigned to the sheet with a given name.\
+   * Returns a unique sheet ID assigned to the sheet with a given name.
+   * 
    * Returns undefined if the there's no sheet with a given name.
-   *
+   * 
+   * The method accepts sheet name as a parameter
+   * 
    * @param sheetName - name of the sheet, for which we want to retrieve ID
-   * @returns ID of the sheet
+   * @returns ID of the sheet or undefined if the sheet does not exist
    */
   public getSheetId(sheetName: string): number | undefined {
     return this.sheetMapping.get(sheetName)
@@ -938,17 +943,25 @@ export class HyperFormula {
 
   /**
    * Returns true whether sheet with a given name exists.
-   *
+   * 
+   * The methods accepts sheet name to be checked.
+   * 
    * @param sheetName - name of the sheet
+   * 
+   * @return true if a given sheet exists
    */
   public doesSheetExist(sheetName: string): boolean {
     return this.sheetMapping.hasSheetWithName(sheetName)
   }
 
   /**
-   * Returns type of a cell of a given address.
+   * Returns type of a specified cell of a given address.
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param address - cell coordinates
+   * 
+   * @return a named constant: FORMULA, VALUE, MATRIX, EMPTY
    * */
   public getCellType(address: SimpleCellAddress): CellType {
     const vertex = this.dependencyGraph.getCell(address)
@@ -956,34 +969,48 @@ export class HyperFormula {
   }
 
   /**
-   * Returns true if the cell contains a simple value.
-   *
+   * Checks if the specified cell contains a simple value.
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
+   * 
    * @param address - cell coordinates
+   * 
+   * @return true if cell contains a simple value
    * */
   public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.VALUE
   }
 
   /**
-   * Returns true if the cell contains a formula.
+   * Checks if the specified cell contains a formula.
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param address - cell coordinates
+   * 
+   * @return true if cell contains a formula
    * */
   public doesCellHaveFormula(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.FORMULA
   }
 
   /**
-   * Returns true if the cell is empty.
+   * Checks if the specified cell is empty.
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param address - cell coordinates
+   * 
+   * @return true if the cell is empty
    * */
   public isCellEmpty(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.EMPTY
   }
 
   /**
-   * Returns true if the cell is part of a matrix.
+   * Returns true if a given cell is a part of a matrix.
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param address - cell coordinates
    * */
@@ -993,8 +1020,14 @@ export class HyperFormula {
 
   /**
    * Returns type of the cell value of a given address.
-   *
+   * 
+   * The methods accepts cell coordinates as object with column, row and sheet numbers.
+   * 
+   * Gives an empty value if the vertex is null.
+   * 
    * @param address - cell coordinates
+   * 
+   * @return cell value type which is a named constant: EMPTY, NUMBER, STRING, BOOLEAN, ERROR
    * */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
     const value = this.dependencyGraph.getCellValue(address)
@@ -1003,19 +1036,35 @@ export class HyperFormula {
 
   /**
    * Returns the number of existing sheets.
+   * 
+   * The method does not accept any parameters.
+   * 
+   * @return which is a number of sheets
    */
   public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
   }
 
+  /**
+   * Renames a specified sheet.
+   * 
+   * The method accepts sheet ID as the first parameter and a new name of a sheet to be given a the second.
+   * 
+   * If both are same does nothing.
+   * 
+   * Throws an error if the provided sheet ID does not exists.
+   * 
+   */
   public renameSheet(sheetId: number, newName: string): void {
     this.sheetMapping.renameSheet(sheetId, newName)
   }
 
   /**
    * Runs multiple operations and recomputes formulas at the end.
-   *
+   * 
    * @param batchOperations
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}   * 
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ChangeList {
     try {
@@ -1027,10 +1076,16 @@ export class HyperFormula {
   }
 
   /**
-   * Adds a named expression.
+   * Adds a specified named expression.
+   * 
+   * The method accepts expression name as the first parameter and formula string as the second.
+   * 
+   * Checks if the named expression is valid and available, if not throws errors.
    *
    * @param expressionName
    * @param formulaString
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * 
    */
   public addNamedExpression(expressionName: string, formulaString: string): ChangeList {
@@ -1045,11 +1100,13 @@ export class HyperFormula {
   }
 
   /**
-   * Gets named expression value.
+   * Gets specified named expression value.
    * 
-   * The method accepts expression name in string.
+   * The method accepts expression name string as a parameter.
    *
    * @param expressionName - expression name
+   * 
+   * @return which can be a number, string, boolean, Symbol() for empty values or {CellError}, or null
    *
    */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
@@ -1062,10 +1119,17 @@ export class HyperFormula {
   }
 
   /**
-   * Changes named expression to a formula.
+   * Changes a given named expression to a specified formula.
+   * 
+   * The method accepts expression name as a first parameter and a new formula as a second parameter.
+   * 
+   * Checks whether the given expression exist, throws an error if does not.
    *
    * @param expressionName - expression name
    * @param newFormulaString - a new formula
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    */
   public changeNamedExpressionFormula(expressionName: string, newFormulaString: string): ChangeList {
     if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
@@ -1077,8 +1141,13 @@ export class HyperFormula {
 
   /**
    * Removes a named expression.
+   * 
+   * The method accepts string with expression name to be removed as a parameter.
    *
    * @param expressionName - expression name
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    */
   public removeNamedExpression(expressionName: string): ChangeList {
     this.namedExpressions.removeNamedExpression(expressionName)
@@ -1087,20 +1156,25 @@ export class HyperFormula {
 
   /**
    * Lists all named expressions.
+   * 
+   * The method does not accept any parameters.
    *
    * @param expressionName - expression name
+   * 
+   * @return an array of expression names as strings
    */
   public listNamedExpressions(): string[] {
     return this.namedExpressions.getAllNamedExpressionsNames()
   }
 
   /**
-   * Normalizes the formula.\
-   * Throws an error if the provided argument is not a valid formula.
+   * Normalizes the formula.
+   * 
+   * Throws an error if the provided parameter is not a valid formula.
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @returns a normalized formula
+   * @returns a normalized formula, throws an error if the provided string is not a formula, i.e does not start with "="
    */
   public normalizeFormula(formulaString: string): string {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
@@ -1115,10 +1189,13 @@ export class HyperFormula {
   /**
    * Validates the formula.
    * 
+   * The method accepts string with a formula as a parameter.
+   * 
+   * If the provided string starts with "=" the method returns true.
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @returns True if the formula can be executed outside of regular worksheet
+   * @returns True if the formula can be executed outside of a regular worksheet
    */
   public validateFormula(formulaString: string): boolean {
     const parsedCellContent = this.cellContentParser.parse(formulaString)
@@ -1135,6 +1212,9 @@ export class HyperFormula {
 
   /**
    *  Destroys instance of HyperFormula.
+   * 
+   *  Dependency graph, columns search, evaluator, parser, transforming AST, stats and CRUD operations are removed.
+   * 
    * */
   public destroy(): void {
     this.dependencyGraph.destroy()
@@ -1148,6 +1228,9 @@ export class HyperFormula {
 
   /**
    * Runs a recomputation starting from recently changed vertices.
+   * 
+   * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * 
    */
   private recomputeIfDependencyGraphNeedsIt(): ChangeList {
     const changes = this.crudOperations.getAndClearContentChanges()
