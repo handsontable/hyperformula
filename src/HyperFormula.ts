@@ -36,7 +36,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
-import {SheetAddedHandler} from './Emitter'
+import {SheetAddedHandler, SheetRemovedHandler} from './Emitter'
 
 export type Index = [number, number]
 
@@ -593,7 +593,9 @@ export class HyperFormula {
    */
   public removeSheet(name: string): ExportedChange[] {
     this.crudOperations.removeSheet(name)
-    return this.recomputeIfDependencyGraphNeedsIt()
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this.emitter.emit('sheetRemoved', changes)
+    return changes
   }
 
   /**
@@ -952,6 +954,10 @@ export class HyperFormula {
 
   public onSheetAdded(handler: SheetAddedHandler): void {
     this.emitter.on('sheetAdded', handler)
+  }
+
+  public onSheetRemoved(handler: SheetRemovedHandler): void {
+    this.emitter.on('sheetRemoved', handler)
   }
 
   /**
