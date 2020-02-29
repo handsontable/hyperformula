@@ -343,7 +343,7 @@ export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken):
 
 export const buildParsingErrorAst = (): ErrorAst => ({
   type: AstNodeType.ERROR,
-  error: new CellError(ErrorType.ERROR, 'Parsing error')
+  error: CellError.parsingError()
 })
 
 function extractImage(token: IToken | undefined): string | undefined {

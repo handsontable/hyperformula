@@ -101,6 +101,10 @@ export class CellError {
     public readonly message?: string,
   ) {
   }
+
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, 'Parsing error')
+  }
 }
 
 export interface SimpleCellAddress {

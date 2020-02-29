@@ -418,4 +418,25 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(10)
     expect(engine.getCellValue(adr('D1'))).toBe(1000000000000)
   })
+
+  it('should allow to edit invalid formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+  })
+
+  it('should propagate parsing errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(', '=A1']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
+  })
 })

@@ -45,4 +45,10 @@ describe('Function IFERROR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
+
+  it('when left-parsing error', () => {
+    const engine = HyperFormula.buildFromArray([['=IFERROR(B1, 1/0)', '=SUM(']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
+  })
 })

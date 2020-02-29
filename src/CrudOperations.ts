@@ -1,21 +1,13 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
 import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {
-  AddressMapping,
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  SheetMapping,
-  ValueCellVertex,
-} from './DependencyGraph'
+import {AddressMapping, DependencyGraph, MatrixVertex, ParsingErrorVertex, SheetMapping, ValueCellVertex,} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
@@ -225,21 +217,26 @@ export class CrudOperations implements IBatchExecutor {
       this.columnSearch.change(oldValue, newValue, address)
       this.changes.addChange(newValue, address)
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const parseResult = this.parser.parse(parsedCellContent.formula, address)
-
-      const newVertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
-
-      if (newVertex instanceof ValueCellVertex) {
-        throw Error('What if new matrix vertex is not properly constructed?')
+      const { ast, errors, dependencies } = this.parser.parse(parsedCellContent.formula, address)
+      if (errors.length > 0) {
+        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+      } else {
+        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
+        if (newVertex instanceof ValueCellVertex) {
+          throw Error('What if new matrix vertex is not properly constructed?')
+        }
+        this.dependencyGraph.addNewMatrixVertex(newVertex)
+        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
+        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
       }
-
-      this.dependencyGraph.addNewMatrixVertex(newVertex)
-      this.dependencyGraph.processCellDependencies(absolutizeDependencies(parseResult.dependencies, address), newVertex)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
-    } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
+    } else if (!(vertex instanceof MatrixVertex)) {
       if (parsedCellContent instanceof CellContent.Formula) {
-        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-        this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+        if (errors.length > 0) {
+          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+        } else {
+          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+        }
       } else if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
       } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
@@ -267,7 +264,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
