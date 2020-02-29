@@ -428,6 +428,15 @@ describe('Integration', () => {
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
   })
 
+  it('should allow to edit invalid matrix formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ '{=TRANSPOSE(}' ]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+  })
+
   it('should propagate parsing errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(', '=A1']

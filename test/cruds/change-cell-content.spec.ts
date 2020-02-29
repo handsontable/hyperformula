@@ -523,6 +523,15 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
+
+  it('update empty cell to unparsable matrix formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+  })
 })
 
 describe('change multiple cells contents', () => {

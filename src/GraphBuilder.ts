@@ -100,7 +100,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
-              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
+              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formulaWithBraces())
               this.dependencyGraph.addVertex(address, vertex)
             } else {
               const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
@@ -175,7 +175,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
-              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
+              const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formulaWithBraces())
               this.dependencyGraph.addVertex(address, vertex)
             } else {
               const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)

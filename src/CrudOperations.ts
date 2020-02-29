@@ -219,7 +219,7 @@ export class CrudOperations implements IBatchExecutor {
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
       const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
       } else {
         const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
         if (newVertex instanceof ValueCellVertex) {
