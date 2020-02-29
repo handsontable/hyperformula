@@ -19,6 +19,9 @@ export enum ErrorType {
 
   /* Wrong address reference. */
   REF = 'REF',
+
+  /* Generic error */
+  ERROR = 'ERROR'
 }
 
 export const EmptyValue = Symbol()

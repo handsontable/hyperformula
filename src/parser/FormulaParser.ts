@@ -10,7 +10,7 @@ import {
   buildCellReferenceAst,
   buildConcatenateOpAst,
   buildDivOpAst,
-  buildEqualsOpAst, buildParsingErrorAst,
+  buildEqualsOpAst,
   buildGreaterThanOpAst,
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
@@ -20,6 +20,7 @@ import {
   buildNotEqualOpAst,
   buildNumberAst,
   buildParenthesisAst,
+  buildParsingErrorAst,
   buildPercentOpAst,
   buildPlusOpAst,
   buildPlusUnaryOpAst,
@@ -27,7 +28,8 @@ import {
   buildProcedureAst,
   buildStringAst,
   buildTimesOpAst,
-  CellReferenceAst, ErrorAst,
+  CellReferenceAst,
+  ErrorAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -61,10 +63,9 @@ import {
   WhiteSpace,
 } from './LexerConfig'
 
-
 export interface FormulaParserResult {
   ast: Ast,
-  errors: ParsingError[]
+  errors: ParsingError[],
 }
 /**
  * LL(k) formula parser described using Chevrotain DSL
@@ -117,7 +118,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): FormulaParserResult {
     this.input = tokens
 
-    const ast = this.formulaWithContext(formulaAddress)
+    let ast = this.formulaWithContext(formulaAddress)
 
     const errors: ParsingError[] = this.errors.map((e) => ({
       type: ParsingErrorType.ParserError,
@@ -126,6 +127,10 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (this.customParsingError) {
       errors.push(this.customParsingError)
+    }
+
+    if (errors.length > 0) {
+      ast = buildParsingErrorAst()
     }
 
     return {
@@ -288,7 +293,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           } else if (tokenMatcher(op, MinusOp)) {
             return buildMinusUnaryOpAst(value, op.leadingWhitespace)
           } else {
-            this.customParsingError = parsingError(ParsingErrorType.ParserError, "Mismatched token type")
+            this.customParsingError = parsingError(ParsingErrorType.ParserError, 'Mismatched token type')
             return this.customParsingError
           }
         },
@@ -574,7 +579,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
-      return this.parsingError(ParsingErrorType.StaticOffsetOutOfRangeError, 'Resulting reference is out of the sheet')
+      return buildCellErrorAst(new CellError(ErrorType.REF, 'Resulting reference is out of the sheet'))
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)

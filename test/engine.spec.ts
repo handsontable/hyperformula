@@ -79,7 +79,7 @@ describe('Integration', () => {
   it('#loadSheet - it should build graph without cycle but with formula with error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it('#loadSheet - dependency before value', () => {

@@ -1,12 +1,12 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {SimpleCellAddress} from '../Cell'
+import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
-import {FormulaLexer, FormulaParser, FormulaParserResult, IExtendedToken} from './FormulaParser'
+import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
@@ -163,7 +163,7 @@ export class ParserWithCaching {
         if (ast.error) {
           image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          image = '#ERR!'
+          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }

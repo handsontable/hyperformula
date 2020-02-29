@@ -1,3 +1,4 @@
+import {CellError, ErrorType} from '../Cell'
 import {ParsingError} from '../parser/Ast'
 
 export class ParsingErrorVertex {
@@ -5,4 +6,12 @@ export class ParsingErrorVertex {
     public readonly errors: ParsingError,
     public readonly rawInput: string
   ) {}
+
+  public getCellValue(): CellError {
+    return new CellError(ErrorType.ERROR, 'Parsing error')
+  }
+
+  public getFormula(): string {
+    return this.rawInput
+  }
 }

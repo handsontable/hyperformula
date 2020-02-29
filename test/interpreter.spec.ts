@@ -68,11 +68,11 @@ describe('Interpreter', () => {
   it('errors - parsing errors', () => {
     const engine = HyperFormula.buildFromArray([['=A', '=A1C1', '=SUM(A)', '=foo', '=)(asdf']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.NAME))
-    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('D1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('E1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it('function OFFSET basic use', () => {
@@ -85,8 +85,8 @@ describe('Interpreter', () => {
   it('function OFFSET out of range', () => {
     const engine = HyperFormula.buildFromArray([['=OFFSET(A1, -1, 0)', '=OFFSET(A1, 0, -1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF, 'Resulting reference is out of the sheet'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.REF, 'Resulting reference is out of the sheet'))
   })
 
   it('function OFFSET returns bigger range', () => {
@@ -103,7 +103,7 @@ describe('Interpreter', () => {
       ['=OFFSET(A1, 0, 1,2,1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it('function OFFSET used twice in a range', () => {

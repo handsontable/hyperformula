@@ -111,6 +111,7 @@ export const enGB: TranslationPackage = {
     NA: '#N/A',
     CYCLE: '#CYCLE!',
     REF: '#REF!',
+    ERROR: '#ERROR!'
   },
   interface: {
     NEW_SHEET_PREFIX: 'Sheet',

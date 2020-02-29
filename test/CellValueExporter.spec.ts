@@ -54,7 +54,7 @@ describe('detailed error', () => {
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
-    expect(error).toEqual(detailedError(ErrorType.VALUE, config))
+    expect(error).toEqual(detailedError(ErrorType.VALUE, undefined, config))
     expect(error.value).toEqual('#ARG!')  
   })
 })

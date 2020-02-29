@@ -941,7 +941,13 @@ export class HyperFormula {
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       return [false, exampleTemporaryFormulaAddress]
     }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+
+    const { ast, errors } = this.parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+
+    if (errors.length > 0) {
+      return [false, exampleTemporaryFormulaAddress]
+    }
+
     return [ast, exampleTemporaryFormulaAddress]
   }
 
