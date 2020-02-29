@@ -3,8 +3,8 @@ import {ErrorType} from '../src/Cell'
 import './testConfig'
 import { adr, detailedError } from './testUtils'
 
-describe('Events - onSheetAdded', () => {
-  it('works', function() {
+describe('Events', () => {
+  it('sheetAdded works', function() {
     const engine = HyperFormula.buildEmpty()
     const handler = jest.fn()
     
@@ -14,10 +14,8 @@ describe('Events - onSheetAdded', () => {
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("FooBar")
   })
-})
 
-describe('Events - onSheetRemoved', () => {
-  it('works', function() {
+  it('sheetRemoved works', function() {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [['=Sheet2!A1']],
       Sheet2: [['42']],
