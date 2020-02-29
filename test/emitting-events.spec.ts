@@ -28,4 +28,25 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
   })
+
+  it('sheetRenamed works', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    const handler = jest.fn()
+
+    engine.onSheetRenamed(handler)
+    engine.renameSheet(0, 'SomeNewName')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith("Sheet1", "SomeNewName")
+  })
+
+  it('sheetRenamed is no triggered when sheet didnt change', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    const handler = jest.fn()
+
+    engine.onSheetRenamed(handler)
+    engine.renameSheet(0, 'Sheet1')
+
+    expect(handler).not.toHaveBeenCalled()
+  })
 })

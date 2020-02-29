@@ -36,7 +36,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
-import {SheetAddedHandler, SheetRemovedHandler} from './Emitter'
+import {SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler} from './Emitter'
 
 export type Index = [number, number]
 
@@ -808,7 +808,10 @@ export class HyperFormula {
   }
 
   public renameSheet(sheetId: number, newName: string): void {
-    this.sheetMapping.renameSheet(sheetId, newName)
+    const oldName = this.sheetMapping.renameSheet(sheetId, newName)
+    if (oldName !== SheetMapping.NO_CHANGE) {
+      this.emitter.emit('sheetRenamed', oldName, newName)
+    }
   }
 
   /**
@@ -958,6 +961,10 @@ export class HyperFormula {
 
   public onSheetRemoved(handler: SheetRemovedHandler): void {
     this.emitter.on('sheetRemoved', handler)
+  }
+
+  public onSheetRenamed(handler: SheetRenamedHandler): void {
+    this.emitter.on('sheetRenamed', handler)
   }
 
   /**
