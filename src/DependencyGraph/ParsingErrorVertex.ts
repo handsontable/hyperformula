@@ -1,5 +1,5 @@
-import {CellError, ErrorType} from '../Cell'
-import {buildParsingErrorAst, ParsingError} from '../parser/Ast'
+import {CellError} from '../Cell'
+import {ParsingError} from '../parser/Ast'
 
 export class ParsingErrorVertex {
   constructor(

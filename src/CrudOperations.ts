@@ -7,7 +7,7 @@ import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, MatrixVertex, ParsingErrorVertex, SheetMapping, ValueCellVertex,} from './DependencyGraph'
+import {AddressMapping, DependencyGraph, MatrixVertex, ParsingErrorVertex, SheetMapping, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
@@ -217,7 +217,7 @@ export class CrudOperations implements IBatchExecutor {
       this.columnSearch.change(oldValue, newValue, address)
       this.changes.addChange(newValue, address)
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const { ast, errors, dependencies } = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       if (errors.length > 0) {
         this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
       } else {
