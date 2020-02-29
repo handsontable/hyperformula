@@ -36,7 +36,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
-import {SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler} from './Emitter'
+import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler} from './Emitter'
 
 export type Index = [number, number]
 
@@ -566,7 +566,7 @@ export class HyperFormula {
    */
   public addSheet(name?: string): string {
     const result = this.crudOperations.addSheet(name)
-    this.emitter.emit('sheetAdded', result)
+    this.emitter.emit(Events.SheetAdded, result)
     return result
   }
 
@@ -594,7 +594,7 @@ export class HyperFormula {
   public removeSheet(name: string): ExportedChange[] {
     this.crudOperations.removeSheet(name)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
-    this.emitter.emit('sheetRemoved', changes)
+    this.emitter.emit(Events.SheetRemoved, changes)
     return changes
   }
 
@@ -810,7 +810,7 @@ export class HyperFormula {
   public renameSheet(sheetId: number, newName: string): void {
     const oldName = this.sheetMapping.renameSheet(sheetId, newName)
     if (oldName !== SheetMapping.NO_CHANGE) {
-      this.emitter.emit('sheetRenamed', oldName, newName)
+      this.emitter.emit(Events.SheetRenamed, oldName, newName)
     }
   }
 
@@ -956,15 +956,15 @@ export class HyperFormula {
   }
 
   public onSheetAdded(handler: SheetAddedHandler): void {
-    this.emitter.on('sheetAdded', handler)
+    this.emitter.on(Events.SheetAdded, handler)
   }
 
   public onSheetRemoved(handler: SheetRemovedHandler): void {
-    this.emitter.on('sheetRemoved', handler)
+    this.emitter.on(Events.SheetRemoved, handler)
   }
 
   public onSheetRenamed(handler: SheetRenamedHandler): void {
-    this.emitter.on('sheetRenamed', handler)
+    this.emitter.on(Events.SheetRenamed, handler)
   }
 
   /**
