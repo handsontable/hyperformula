@@ -8,7 +8,7 @@ import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
-export interface IColumnSearchStrategy {
+export interface ColumnSearchStrategy {
   add(value: InternalCellValue | Matrix, address: SimpleCellAddress): void,
 
   remove(value: InternalCellValue | Matrix | null, address: SimpleCellAddress): void,
@@ -25,12 +25,12 @@ export interface IColumnSearchStrategy {
 
   removeValues(range: IterableIterator<[InternalCellValue, SimpleCellAddress]>): void,
 
-  find(key: any, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: InternalCellValue, range: AbsoluteCellRange, sorted: boolean): number,
 
   destroy(): void,
 }
 
-export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): IColumnSearchStrategy {
+export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): ColumnSearchStrategy {
   if (config.useColumnIndex) {
     return new ColumnIndex(dependencyGraph, config, statistics)
   } else {

@@ -1,12 +1,12 @@
 import {DenseStrategy} from './DenseStrategy'
-import {IAddressMappingStrategyConstructor} from './IAddressMappingStrategy'
+import {AddressMappingStrategyConstructor} from './IAddressMappingStrategy'
 import {SparseStrategy} from './SparseStrategy'
 
-export interface IChooseAddressMapping {
-  call(fill: number): IAddressMappingStrategyConstructor,
+export interface ChooseAddressMapping {
+  call(fill: number): AddressMappingStrategyConstructor,
 }
 
-export class DenseSparseChooseBasedOnThreshold implements IChooseAddressMapping {
+export class DenseSparseChooseBasedOnThreshold implements ChooseAddressMapping {
   constructor(
     private readonly threshold: number,
   ) {
@@ -21,13 +21,13 @@ export class DenseSparseChooseBasedOnThreshold implements IChooseAddressMapping 
   }
 }
 
-export class AlwaysSparse implements IChooseAddressMapping {
+export class AlwaysSparse implements ChooseAddressMapping {
   public call() {
     return SparseStrategy
   }
 }
 
-export class AlwaysDense implements IChooseAddressMapping {
+export class AlwaysDense implements ChooseAddressMapping {
   public call() {
     return DenseStrategy
   }

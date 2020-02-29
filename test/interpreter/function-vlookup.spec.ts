@@ -239,6 +239,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 }
 
 describe('ColumnIndex strategy', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
     return HyperFormula.buildFromArray(sheet, new Config({
       useColumnIndex: true,
@@ -248,6 +249,7 @@ describe('ColumnIndex strategy', () => {
 })
 
 describe('BinarySearchStrategy', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
     return HyperFormula.buildFromArray(sheet, new Config({
       useColumnIndex: false,

@@ -3,7 +3,7 @@ import {Config} from './Config'
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
 
-export interface IDate {
+export interface SimpleDate {
   year: number,
   month: number,
   day: number,
@@ -48,7 +48,7 @@ export class DateHelper {
     return this.epochYearZero
   }
 
-  public isValidDate(date: IDate): boolean {
+  public isValidDate(date: SimpleDate): boolean {
     if (isNaN(date.year) || isNaN(date.month) || isNaN(date.day)) {
       return false
     } else if (date.day !== Math.round(date.day) || date.month !== Math.round(date.month) || date.year !== Math.round(date.year)) {
@@ -66,11 +66,11 @@ export class DateHelper {
     }
   }
 
-  public dateToNumber(date: IDate): number {
+  public dateToNumber(date: SimpleDate): number {
     return this.dateToNumberFromZero(date) - this.dateToNumberFromZero(this.config.nullDate)
   }
 
-  public numberToDate(arg: number): IDate {
+  public numberToDate(arg: number): SimpleDate {
     const dateNumber = arg + this.dateToNumberFromZero(this.config.nullDate)
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
@@ -102,7 +102,7 @@ export class DateHelper {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
-  private dateToNumberFromZero(date: IDate): number {
+  private dateToNumberFromZero(date: SimpleDate): number {
     return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
   }
 
@@ -135,16 +135,16 @@ function dayToMonth(dayOfYear: number): number {
   return month
 }
 
-export function endOfMonth(date: IDate): IDate {
+export function endOfMonth(date: SimpleDate): SimpleDate {
   return {year: date.year, month: date.month, day: numDays[date.month - 1]}
 }
 
-export function offsetMonth(date: IDate, offset: number): IDate {
+export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   const totalM = 12 * date.year + date.month - 1 + offset
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): IDate | null {
+function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): SimpleDate | null {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
@@ -179,12 +179,12 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
 
-  const date: IDate = {year, month, day}
+  const date: SimpleDate = {year, month, day}
 
   return dateHelper.isValidDate( date) ? date : null
 }
 
-export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): IDate | null {
+export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): SimpleDate | null {
   for (const dateFormat of dateFormats) {
     const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
     if (date !== null) {

@@ -1,7 +1,7 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, IDate} from './DateHelper'
-import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {DateHelper, defaultParseDate, SimpleDate} from './DateHelper'
+import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -43,7 +43,7 @@ type PossibleGPUMode = GPUMode | GPUInternalMode
 
 export interface ConfigParams {
   caseSensitive: boolean,
-  chooseAddressMappingPolicy: IChooseAddressMapping,
+  chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
@@ -54,14 +54,14 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null,
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null,
   precisionEpsilon: number,
   precisionRounding: number,
   stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
-  nullDate: IDate,
+  nullDate: SimpleDate,
 }
 
 export class Config implements ParserConfig {
@@ -126,7 +126,7 @@ export class Config implements ParserConfig {
   ]
 
   public readonly caseSensitive: boolean
-  public readonly chooseAddressMappingPolicy: IChooseAddressMapping
+  public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
   public readonly decimalSeparator: '.' | ','
@@ -137,7 +137,7 @@ export class Config implements ParserConfig {
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
@@ -145,7 +145,7 @@ export class Config implements ParserConfig {
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
-  public readonly nullDate: IDate
+  public readonly nullDate: SimpleDate
 
   constructor(
     {
