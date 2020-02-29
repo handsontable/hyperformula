@@ -10,7 +10,7 @@ import {
   invalidSimpleCellAddress,
   SimpleCellAddress,
 } from '../Cell'
-import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -29,7 +29,7 @@ export class Interpreter {
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,
-    public readonly columnSearch: IColumnSearchStrategy,
+    public readonly columnSearch: ColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
     public readonly dateHelper: DateHelper,

@@ -14,7 +14,6 @@ import {formatNumber} from './Unparser'
 export interface ParsingResult {
   ast: Ast,
   errors: ParsingError[],
-  hash: string,
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
@@ -56,7 +55,7 @@ export class ParserWithCaching {
           message: e.message,
         }),
       )
-      return { ast: buildParsingErrorAst(), errors, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
+      return { ast: buildParsingErrorAst(), errors, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: [] }
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -69,14 +68,14 @@ export class ParserWithCaching {
       const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
 
       if (parsingResult.errors.length > 0) {
-        return { ...parsingResult, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: [] }
+        return { ...parsingResult, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: [] }
       } else {
         cacheResult = this.cache.set(hash, parsingResult.ast)
       }
     }
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -85,7 +84,7 @@ export class ParserWithCaching {
       throw new Error('There is no AST with such key in the cache')
     } else {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
     }
   }
 
@@ -197,7 +196,7 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
 }
 
 export function bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
-  const processedTokens: any[] = []
+  const processedTokens: IExtendedToken[] = []
 
   const first = tokens[0]
   if (!tokenMatcher(first, WhiteSpace)) {

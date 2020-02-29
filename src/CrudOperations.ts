@@ -3,7 +3,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -37,7 +37,7 @@ export class CrudOperations implements IBatchExecutor {
     /** Dependency graph storing sheets structure */
     private readonly dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin */
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     /** Parser with caching */
     private readonly parser: ParserWithCaching,
     /** Raw cell input parser */

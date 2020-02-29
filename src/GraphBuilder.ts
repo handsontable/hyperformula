@@ -2,7 +2,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
@@ -36,7 +36,7 @@ export class GraphBuilder {
    */
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config = new Config(),
@@ -73,7 +73,7 @@ export interface GraphBuilderStrategy {
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnIndex: IColumnSearchStrategy,
+    private readonly columnIndex: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly cellContentParser: CellContentParser,
@@ -141,7 +141,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly threshold: number,
