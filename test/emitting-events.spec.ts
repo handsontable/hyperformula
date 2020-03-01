@@ -1,4 +1,4 @@
-import {HyperFormula, ExportedCellChange} from '../src'
+import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '../src'
 import {ErrorType} from '../src/Cell'
 import './testConfig'
 import { adr, detailedError } from './testUtils'
@@ -48,5 +48,16 @@ describe('Events', () => {
     engine.renameSheet(0, 'Sheet1')
 
     expect(handler).not.toHaveBeenCalled()
+  })
+
+  it('namedExpressionAdded works', () => {
+    const engine = HyperFormula.buildEmpty()
+    const handler = jest.fn()
+
+    engine.onNamedExpressionAdded(handler)
+    engine.addNamedExpression('myName', 'foobarbaz')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith("myName", [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
   })
 })
