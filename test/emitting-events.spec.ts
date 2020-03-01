@@ -40,7 +40,7 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledWith("Sheet1", "SomeNewName")
   })
 
-  it('sheetRenamed is no triggered when sheet didnt change', () => {
+  it('sheetRenamed is not triggered when sheet didnt change', () => {
     const engine = HyperFormula.buildFromArray([[]])
     const handler = jest.fn()
 
