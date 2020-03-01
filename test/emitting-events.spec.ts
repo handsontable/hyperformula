@@ -82,4 +82,30 @@ describe('Events', () => {
 
     expect(handler).toHaveBeenCalledTimes(0)
   })
+
+  it('valuesUpdated works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42']
+    ])
+    const handler = jest.fn()
+
+    engine.onValuesUpdated(handler)
+    engine.setCellContents(adr('A1'), [['43']])
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 43)])
+  })
+
+  it('valuesUpdated may sometimes be triggered even if nothing changed', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['42']
+    ])
+    const handler = jest.fn()
+
+    engine.onValuesUpdated(handler)
+    engine.setCellContents(adr('A1'), [['42']])
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 42)])
+  })
 })

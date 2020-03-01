@@ -36,7 +36,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
-import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler} from './Emitter'
+import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
 
 export type Index = [number, number]
 
@@ -983,6 +983,10 @@ export class HyperFormula {
     this.emitter.on(Events.NamedExpressionRemoved, handler)
   }
 
+  public onValuesUpdated(handler: ValuesUpdatedHandler): void {
+    this.emitter.on(Events.ValuesUpdated, handler)
+  }
+
   /**
    *  Destroys instance of HyperFormula
    * */
@@ -1007,7 +1011,13 @@ export class HyperFormula {
     if (verticesToRecomputeFrom.length > 0) {
       changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
     }
+    
+    const exportedChanges = changes.exportChanges(this.exporter)
 
-    return changes.exportChanges(this.exporter)
+    if (!changes.isEmpty()) {
+      this.emitter.emit(Events.ValuesUpdated, exportedChanges)
+    }
+
+    return exportedChanges
   }
 }
