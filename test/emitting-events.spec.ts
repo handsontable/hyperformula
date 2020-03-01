@@ -9,10 +9,10 @@ describe('Events', () => {
     const handler = jest.fn()
     
     engine.onSheetAdded(handler)
-    engine.addSheet("FooBar")
+    engine.addSheet('FooBar')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("FooBar")
+    expect(handler).toHaveBeenCalledWith('FooBar')
   })
 
   it('sheetRemoved works', function() {
@@ -23,7 +23,7 @@ describe('Events', () => {
     const handler = jest.fn()
 
     engine.onSheetRemoved(handler)
-    engine.removeSheet("Sheet2")
+    engine.removeSheet('Sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
@@ -37,7 +37,7 @@ describe('Events', () => {
     engine.renameSheet(0, 'SomeNewName')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("Sheet1", "SomeNewName")
+    expect(handler).toHaveBeenCalledWith('Sheet1', 'SomeNewName')
   })
 
   it('sheetRenamed is not triggered when sheet didnt change', () => {
@@ -58,7 +58,7 @@ describe('Events', () => {
     engine.addNamedExpression('myName', 'foobarbaz')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("myName", [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
+    expect(handler).toHaveBeenCalledWith('myName', [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
   })
 
   it('namedExpressionRemoved works', () => {
@@ -70,7 +70,7 @@ describe('Events', () => {
     engine.removeNamedExpression('myName')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("myName", [])
+    expect(handler).toHaveBeenCalledWith('myName', [])
   })
 
   it('namedExpressionRemoved is not triggered if there was nothing to remove', () => {
