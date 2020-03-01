@@ -60,4 +60,16 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("myName", [new ExportedNamedExpressionChange('myName', 'foobarbaz')])
   })
+
+  it('namedExpressionRemoved works', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addNamedExpression('myName', 'foobarbaz')
+    const handler = jest.fn()
+
+    engine.onNamedExpressionRemoved(handler)
+    engine.removeNamedExpression('myName')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith("myName", [])
+  })
 })

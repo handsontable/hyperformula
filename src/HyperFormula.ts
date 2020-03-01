@@ -36,7 +36,7 @@ import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
-import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler} from './Emitter'
+import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler} from './Emitter'
 
 export type Index = [number, number]
 
@@ -883,7 +883,9 @@ export class HyperFormula {
    */
   public removeNamedExpression(expressionName: string): ExportedChange[] {
     this.namedExpressions.removeNamedExpression(expressionName)
-    return this.recomputeIfDependencyGraphNeedsIt()
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    this.emitter.emit(Events.NamedExpressionRemoved, expressionName, changes)
+    return changes
   }
 
   /**
@@ -971,6 +973,10 @@ export class HyperFormula {
 
   public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
     this.emitter.on(Events.NamedExpressionAdded, handler)
+  }
+
+  public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
+    this.emitter.on(Events.NamedExpressionRemoved, handler)
   }
 
   /**
