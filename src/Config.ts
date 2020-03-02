@@ -135,6 +135,10 @@ export class Config {
   public readonly nullYear: number
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
+  /* precisionEpsilon controls how far two numerical values need to be from each other so we treat them as non-equal
+  
+
+   */
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
   public readonly smartRounding: boolean
