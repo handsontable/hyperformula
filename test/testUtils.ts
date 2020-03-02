@@ -49,7 +49,7 @@ export const expectCellToHaveFormula = (engine: HyperFormula, addressString: str
   const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.fetchDisplayName)
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
   expect(actual).toEqual(expect.arrayContaining(expected))
@@ -83,7 +83,7 @@ export const expectEngineToBeTheSameAs = (actual: HyperFormula, expected: HyperF
   comparator.compare()
 }
 
-export function dateNumberToString(dateNumber: CellValue, config = new Config()): string | DetailedCellError {
+export function dateNumberToString(dateNumber: CellValue, config: Config): string | DetailedCellError {
   if(dateNumber instanceof DetailedCellError) {
     return dateNumber
   }

@@ -2,7 +2,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
@@ -36,7 +36,7 @@ export class GraphBuilder {
    */
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config = new Config(),
@@ -73,7 +73,7 @@ export interface GraphBuilderStrategy {
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnIndex: IColumnSearchStrategy,
+    private readonly columnIndex: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly cellContentParser: CellContentParser,
@@ -99,7 +99,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               continue
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+            const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (parsedCellContent instanceof CellContent.Formula) {
@@ -131,7 +131,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly threshold: number,
@@ -164,7 +164,7 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
               continue
             }
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
-            const { vertex } = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+            const vertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
             dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
             this.dependencyGraph.addMatrixVertex(address, vertex)
           } else if (parsedCellContent instanceof CellContent.Formula) {
@@ -204,10 +204,10 @@ export class MatrixDetectionStrategy implements GraphBuilderStrategy {
   }
 }
 
-export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): { vertex: MatrixVertex | ValueCellVertex, size: MatrixSizeCheck } {
+export function buildMatrixVertex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): MatrixVertex | ValueCellVertex {
   const size = checkMatrixSize(ast, formulaAddress)
-  if (!size) {
-    return { vertex: new ValueCellVertex(new CellError(ErrorType.VALUE)), size }
+  if (size instanceof CellError) {
+    return new ValueCellVertex(size)
   }
-  return { vertex: new MatrixVertex(formulaAddress, size.width, size.height, ast), size }
+  return new MatrixVertex(formulaAddress, size.width, size.height, ast)
 }

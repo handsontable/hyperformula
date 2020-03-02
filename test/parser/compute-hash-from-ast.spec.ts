@@ -219,4 +219,24 @@ describe('Compute hash from ast', () => {
     const hash = parser.computeHashFromAst(ast)
     expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
   })
+
+  it('should work with decimal separator', () => {
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const sheetMapping = new SheetMapping(plPL)
+    sheetMapping.addSheet('Sheet1')
+    const lexer = new FormulaLexer(buildLexerConfig(config))
+    const parser = new ParserWithCaching(config, sheetMapping.get)
+
+
+    const formula = '=1+123,456'
+    const address = adr('A1')
+    const ast = parser.parse(formula, address).ast
+
+    const lexerResult = lexer.tokenizeFormula(formula)
+    const hashFromTokens = parser.computeHashFromTokens(lexerResult.tokens, address)
+    const hash = parser.computeHashFromAst(ast)
+
+    expect(hash).toEqual(formula)
+    expect(hash).toEqual(hashFromTokens)
+  })
 })

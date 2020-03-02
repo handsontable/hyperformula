@@ -88,10 +88,10 @@ export interface NumberAst extends AstWithWhitespace {
   value: number,
 }
 
-export const buildNumberAst = (token: IExtendedToken): NumberAst => ({
+export const buildNumberAst = (value: number, leadingWhitespace?: IToken): NumberAst => ({
   type: AstNodeType.NUMBER,
-  value: parseFloat(token.image),
-  leadingWhitespace: extractImage(token.leadingWhitespace),
+  value: value,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface StringAst extends AstWithWhitespace {

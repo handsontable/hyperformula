@@ -1,5 +1,5 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {Config, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
@@ -36,7 +36,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     const changes = engine.paste(adr('A2'))
 
-    expectArrayWithSameContent([{ sheet:0, col: 0, row: 1, value: EmptyValue}], changes)
+    expectArrayWithSameContent([new ExportedCellChange(simpleCellAddress(0, 0, 1), EmptyValue)], changes)
   })
 
   it('should work for single number', () => {
@@ -161,8 +161,8 @@ describe('Copy - paste integration', () => {
     const changes = engine.paste(adr('A2'))
 
     expectArrayWithSameContent([
-      { sheet:0, col: 0, row: 1, value: 1},
-      { sheet:0, col: 1, row: 1, value: 1},
+      new ExportedCellChange(simpleCellAddress(0, 0, 1), 1),
+      new ExportedCellChange(simpleCellAddress(0, 1, 1), 1),
     ], changes)
   })
 

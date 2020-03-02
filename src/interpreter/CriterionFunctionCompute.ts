@@ -66,6 +66,11 @@ export class CriterionFunctionCompute<T> {
       }
 
       valuesRangeVertex.setCriterionFunctionValues(this.cacheKey(conditions), cache)
+      conditionsVertices.forEach(range => {
+        if (range !== undefined) {
+          range.addDependentCacheRange(valuesRangeVertex)
+        }
+      })
 
       return cache.get(fullCriterionString)![0]
     } else {

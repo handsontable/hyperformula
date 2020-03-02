@@ -9,10 +9,10 @@ import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
+import {formatNumber} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
-  hash: string,
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
@@ -54,7 +54,7 @@ export class ParserWithCaching {
           message: e.message,
         }),
       ))
-      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: []}
+      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: []}
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -69,7 +69,7 @@ export class ParserWithCaching {
     }
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+    return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -78,7 +78,7 @@ export class ParserWithCaching {
       throw new Error('There is no AST with such key in the cache')
     } else {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+      return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
     }
   }
 
@@ -124,7 +124,7 @@ export class ParserWithCaching {
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
+        return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
@@ -190,7 +190,7 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
 }
 
 export function bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
-  const processedTokens: any[] = []
+  const processedTokens: IExtendedToken[] = []
 
   const first = tokens[0]
   if (!tokenMatcher(first, WhiteSpace)) {

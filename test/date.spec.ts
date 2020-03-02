@@ -1,5 +1,5 @@
 import {Config} from '../src'
-import {DateHelper, IDate} from '../src/DateHelper'
+import {DateHelper, SimpleDate} from '../src/DateHelper'
 import moment from 'moment'
 
 describe('Date helpers', () => {
@@ -106,7 +106,7 @@ describe('Date helpers, other zero date', () => {
 
 describe('Custom date parsing', () => {
 
-  function customParseDate(dateString: string, dateFormats: string[]): IDate | null {
+  function customParseDate(dateString: string, dateFormats: string[]): SimpleDate | null {
     for(const dateFormat of dateFormats) {
       const momentDate = moment(dateString, dateFormat, true)
       if(momentDate.isValid()){

@@ -90,9 +90,6 @@ export const RParen = createToken({name: 'RParen', pattern: /\)/})
 /* prcoedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /(\.?[0-9A-Za-z\u00C0-\u02AF]+)+\(/})
 
-/* terminals */
-export const NumberLiteral = createToken({name: 'NumberLiteral', pattern: /[\d]*[.]?[\d]+/  })
-
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
 
@@ -107,22 +104,24 @@ export const WhiteSpace = createToken({
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
+  NumberLiteral: TokenType,
   OffsetProcedureName: TokenType,
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
+  numericStringToNumber: (input: string) => number,
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
-  /* separator */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
   const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
-  const OffsetProcedureName = createToken({
-    name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i'),
-  })
   const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.language)
+  const numericStringToNumber = config.numericStringToNumber
+
+  /* configurable tokens */
+  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`[\\d]*[${config.decimalSeparator}]?[\\d]+`)})
+  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -162,12 +161,15 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
   ]
+
   return {
     ArgSeparator,
+    NumberLiteral,
     OffsetProcedureName,
     allTokens,
     errorMapping,
     functionMapping,
+    numericStringToNumber
   }
 }
 

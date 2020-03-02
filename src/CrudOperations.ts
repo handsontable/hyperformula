@@ -3,7 +3,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -45,7 +45,7 @@ export class CrudOperations implements IBatchExecutor {
     /** Dependency graph storing sheets structure */
     private readonly dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin */
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     /** Parser with caching */
     private readonly parser: ParserWithCaching,
     /** Raw cell input parser */
@@ -227,9 +227,9 @@ export class CrudOperations implements IBatchExecutor {
     } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
       const parseResult = this.parser.parse(parsedCellContent.formula, address)
 
-      const {vertex: newVertex, size} = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
+      const newVertex = buildMatrixVertex(parseResult.ast as ProcedureAst, address)
 
-      if (!size || !(newVertex instanceof MatrixVertex)) {
+      if (newVertex instanceof ValueCellVertex) {
         throw Error('What if new matrix vertex is not properly constructed?')
       }
 
@@ -238,7 +238,7 @@ export class CrudOperations implements IBatchExecutor {
       this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     } else if (vertex instanceof FormulaCellVertex || vertex instanceof ValueCellVertex || vertex instanceof EmptyCellVertex || vertex === null) {
       if (parsedCellContent instanceof CellContent.Formula) {
-        const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+        const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
         this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (parsedCellContent instanceof CellContent.Empty) {
         this.setCellEmpty(address)
@@ -267,7 +267,7 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
-    const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
     this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
