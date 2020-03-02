@@ -159,6 +159,9 @@ export class Config {
    * abs(a) <= (1+precisionEpsilon) * abs(b)
    * and
    * abs(b) <= (1+precisionEpsilon) * abs(a)
+   *
+   * it also controls snap-to-zero behaviour for additions/subtractions:
+   * for c=a+b or c=a-b, if abs(c) <= precisionEpsilon * abs(a), then c is set to 0
    */
   public readonly precisionEpsilon: number
   /*
