@@ -128,22 +128,52 @@ export class Config implements ParserConfig {
    * whether string comparison is case-sensitive or not
    */
   public readonly caseSensitive: boolean
+  /*
+  * determines which addess mapping policy will be used. Built in implementations:
+  * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
+  * AlwaysDense - will use DenseStrategy for all sheets
+  * AlwaysSparse - will use SparseStrategy for all sheets
+  * */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   /*
    * list of date formats that are supported by date parsing functions
    */
   public readonly dateFormats: string[]
+  /*
+  * separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
+  * */
   public readonly functionArgSeparator: string
+  /*
+  * decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
+  * */
   public readonly decimalSeparator: '.' | ','
+  /*
+  * translation package with translations of function and error names.
+  * */
   public readonly language: TranslationPackage
+  /*
+  * list of additional function plugins to use by formula interpreter.
+  * */
   public readonly functionPlugins: any[]
+  /*
+  * when set to 'gpu' (by default) it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+  * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+  * */
   public readonly gpuMode: PossibleGPUMode
   /*
    * year 1900 was not leap, but in lotus 1-2-3 it was faulty interpreted as leap.
    * this error was inherited by excel, and we have this option for compatibility
    */
   public readonly leapYear1900: boolean
+  /*
+  * enables numeric matrix detection feature when set to 'true'.
+  * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
+  * Some CRUD operations may break numeric matrices into individual vertices if needed.
+  * */
   public readonly matrixDetection: boolean
+  /*
+  * specifies how many cells an area must have in order to be treated as matrix. Relevant only if matrixDetection is set to true.
+  * */
   public readonly matrixDetectionThreshold: number
   /*
    * two-digit values when interpreted as year can be either 19xx or 20xx. If xx<=nullYear its latter, otherwise its former.
@@ -176,13 +206,26 @@ export class Config implements ParserConfig {
    * if false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon)
    */
   public readonly smartRounding: boolean
+  /*
+  * switches column search strategy from binary search to column index. Used by VLOOKUP and MATCH procedures.
+  * Using column index may improve time efficency but it will increase memory usage. In some scenarios column index may fall back to binary search
+  * despite of this flag.
+  * */
   public readonly useColumnIndex: boolean
+  /*
+  * determines minimum number of elements a range must have in order to use binary search. Shorter ranges will be searched naively.
+  * Used by VLOOKUP and MATCH procedures.
+  * */
   public readonly vlookupThreshold: number
-  public readonly errorMapping: Record<string, ErrorType>
   /*
    * dates are represented internally as number of days that passed since nullDate
    */
   public readonly nullDate: SimpleDate
+  /*
+  * built automatically based on translation package.
+  * */
+  public readonly errorMapping: Record<string, ErrorType>
+
 
   constructor(
     {
