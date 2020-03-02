@@ -1,8 +1,8 @@
 import {GPUInternalMode, GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, IDate, instanceOfIDate} from './DateHelper'
-import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
+import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -45,7 +45,7 @@ const PossibleGPUModeString = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headless
 
 export interface ConfigParams {
   caseSensitive: boolean,
-  chooseAddressMappingPolicy: IChooseAddressMapping,
+  chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
@@ -56,14 +56,14 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null,
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null,
   precisionEpsilon: number,
   precisionRounding: number,
   stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
-  nullDate: IDate,
+  nullDate: SimpleDate,
 }
 
 type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFormats' | 'functionArgSeparator' | 'language'
@@ -133,7 +133,7 @@ export class Config implements ConfigParams, ParserConfig{
   ]
 
   public readonly caseSensitive: boolean
-  public readonly chooseAddressMappingPolicy: IChooseAddressMapping
+  public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
   public readonly decimalSeparator: '.' | ','
@@ -144,7 +144,7 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   public readonly precisionEpsilon: number
   public readonly precisionRounding: number
@@ -152,7 +152,7 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
-  public readonly nullDate: IDate
+  public readonly nullDate: SimpleDate
 
   constructor(
     {
@@ -200,7 +200,7 @@ export class Config implements ConfigParams, ParserConfig{
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfIDate, 'IDate', 'nullDate' )
+    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfSimpleDate, 'IDate', 'nullDate' )
     this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
 
     if (this.decimalSeparator === this.functionArgSeparator) {

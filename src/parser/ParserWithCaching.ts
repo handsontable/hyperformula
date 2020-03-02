@@ -13,7 +13,6 @@ import {formatNumber} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
-  hash: string,
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
@@ -55,7 +54,7 @@ export class ParserWithCaching {
           message: e.message,
         }),
       ))
-      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, hash: '', dependencies: []}
+      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: []}
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -70,7 +69,7 @@ export class ParserWithCaching {
     }
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+    return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -79,7 +78,7 @@ export class ParserWithCaching {
       throw new Error('There is no AST with such key in the cache')
     } else {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, hasVolatileFunction, hasStructuralChangeFunction, hash, dependencies: relativeDependencies}
+      return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
     }
   }
 
@@ -191,7 +190,7 @@ export const cellHashFromToken = (cellAddress: CellAddress): string => {
 }
 
 export function bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
-  const processedTokens: any[] = []
+  const processedTokens: IExtendedToken[] = []
 
   const first = tokens[0]
   if (!tokenMatcher(first, WhiteSpace)) {

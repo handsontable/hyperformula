@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
 import {Matrix, MatrixSize} from './Matrix'
@@ -58,7 +58,7 @@ export class GraphBuilderMatrixHeuristic {
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly dependencies: Map<Vertex, CellDependency[]>,
     private readonly threshold: number,
     private readonly cellContentParser: CellContentParser,

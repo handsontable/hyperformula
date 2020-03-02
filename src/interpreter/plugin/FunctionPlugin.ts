@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {IColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
@@ -29,7 +29,7 @@ export abstract class FunctionPlugin {
   public static implementedFunctions: IImplementedFunctions
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
-  protected readonly columnSearch: IColumnSearchStrategy
+  protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
 
   protected constructor(interpreter: Interpreter) {
