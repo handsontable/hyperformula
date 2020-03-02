@@ -121,30 +121,60 @@ export class Config {
     ErrorFunctionPlugin,
     CorrelPlugin,
   ]
-
+  /*
+   * whether string comparison is case-sensitive or not
+   */
   public readonly caseSensitive: boolean
   public readonly chooseAddressMappingPolicy: IChooseAddressMapping
+  /*
+   * list of date formats that are supported by date parsing functions
+   */
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: PossibleGPUMode
+  /*
+   * year 1900 was not leap, but in lotus 1-2-3 it was faulty interpreted as leap.
+   * this error was inherited by excel, and we have this option for compatibility
+   */
   public readonly leapYear1900: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
+  /*
+   * two-digit values when interpreted as year can be either 19xx or 20xx. If xx<=nullYear its latter, otherwise its former.
+   */
   public readonly nullYear: number
+  /*
+   * function that takes string representing date and parses it into actual date
+   */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  /*
+   * function that takes date (represented as a number) and prints it into string
+   */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
-  /* precisionEpsilon controls how far two numerical values need to be from each other so we treat them as non-equal
-  
-
+  /*
+   * precisionEpsilon controls how far two numerical values need to be from each other so we treat them as non-equal
+   * a and b are equal if they are of the same sign and:
+   * abs(a) <= (1+precisionEpsilon) * abs(b)
+   * and
+   * abs(b) <= (1+precisionEpsilon) * abs(a)
    */
   public readonly precisionEpsilon: number
+  /*
+   * numerical outputs are rounded to precisionRounding many digits after decimal
+   */
   public readonly precisionRounding: number
+  /*
+   * if false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon)
+   */
   public readonly smartRounding: boolean
   public readonly useColumnIndex: boolean
   public readonly vlookupThreshold: number
   public readonly errorMapping: Record<string, ErrorType>
+  /*
+   * dates are represented internally as number of days that passed since nullDate
+   */
   public readonly nullDate: IDate
 
   constructor(
