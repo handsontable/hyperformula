@@ -883,10 +883,11 @@ export class HyperFormula {
    * @param expressionName - an expression name
    */
   public removeNamedExpression(expressionName: string): ExportedChange[] {
+    const namedExpressionDisplayName = this.namedExpressions.getDisplayNameByName(expressionName)!
     const actuallyRemoved = this.namedExpressions.removeNamedExpression(expressionName)
     if (actuallyRemoved) {
       const changes = this.recomputeIfDependencyGraphNeedsIt()
-      this.emitter.emit(Events.NamedExpressionRemoved, expressionName, changes)
+      this.emitter.emit(Events.NamedExpressionRemoved, namedExpressionDisplayName, changes)
       return changes
     } else {
       return []

@@ -87,6 +87,15 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
+  public getDisplayNameByName(expressionName: string): string | undefined {
+    const namedExpression = this.workbookStore.get(expressionName)
+    if (namedExpression) {
+      return namedExpression.name
+    } else {
+      return undefined
+    }
+  }
+
   public isNameValid(expressionName: string): boolean {
     if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
       return false

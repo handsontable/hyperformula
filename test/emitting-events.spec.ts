@@ -97,6 +97,18 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledTimes(0)
   })
 
+  it('namedExpressionRemoved contains actual named expression name', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addNamedExpression('myName', 'foobarbaz')
+    const handler = jest.fn()
+
+    engine.onNamedExpressionRemoved(handler)
+    engine.removeNamedExpression('MYNAME')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith('myName', [])
+  })
+
   it('valuesUpdated works', () => {
     const engine = HyperFormula.buildFromArray([
       ['42']
