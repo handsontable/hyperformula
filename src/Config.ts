@@ -66,10 +66,7 @@ export interface ConfigParams {
   nullDate: SimpleDate,
 }
 
-type ConfigParamsList = 'caseSensitive' | 'chooseAddressMappingPolicy' | 'dateFormats' | 'functionArgSeparator' | 'language'
-| 'functionPlugins' | 'gpuMode' | 'leapYear1900' | 'matrixDetection' | 'matrixDetectionThreshold' | 'nullYear' | 'parseDate'
-| 'precisionEpsilon' | 'precisionRounding' | 'stringifyDate' | 'smartRounding' | 'useColumnIndex' | 'vlookupThreshold' | 'nullDate'
-| 'decimalSeparator'
+type ConfigParamsList = keyof ConfigParams
 
 export class Config implements ConfigParams, ParserConfig{
 
