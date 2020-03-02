@@ -79,6 +79,15 @@ export class SheetMapping {
     }
   }
 
+  public getDisplayNameByName(sheetName: string): string | undefined {
+    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
+    if (sheet) {
+      return sheet.displayName
+    } else {
+      return undefined
+    }
+  }
+
   public* displayNames(): IterableIterator<string> {
     for (const sheet of this.mappingFromCanonicalName.values()) {
       yield sheet.displayName

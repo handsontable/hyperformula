@@ -592,9 +592,10 @@ export class HyperFormula {
    * @param name - sheet name
    */
   public removeSheet(name: string): ExportedChange[] {
+    const displayName = this.sheetMapping.getDisplayNameByName(name)!
     this.crudOperations.removeSheet(name)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
-    this.emitter.emit(Events.SheetRemoved, name, changes)
+    this.emitter.emit(Events.SheetRemoved, displayName, changes)
     return changes
   }
 

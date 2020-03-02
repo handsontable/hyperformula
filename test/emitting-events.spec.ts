@@ -29,6 +29,20 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
   })
 
+  it('sheetRemoved name contains actual display name', function() {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=Sheet2!A1']],
+      Sheet2: [['42']],
+    })
+    const handler = jest.fn()
+
+    engine.onSheetRemoved(handler)
+    engine.removeSheet('sheet2')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+  })
+
   it('sheetRenamed works', () => {
     const engine = HyperFormula.buildFromArray([[]])
     const handler = jest.fn()
