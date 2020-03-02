@@ -475,8 +475,6 @@ describe('Parsing errors', () => {
 
     const ast1 = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0)).ast
     const ast2 = parser.parse('=1', CellAddress.absolute(0, 0, 0)).ast
-
-    console.log()
   })
 
   // weird error
