@@ -26,7 +26,7 @@ describe('Events', () => {
     engine.removeSheet('Sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedError(ErrorType.REF))])
   })
 
   it('sheetRenamed works', () => {

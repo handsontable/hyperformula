@@ -594,7 +594,7 @@ export class HyperFormula {
   public removeSheet(name: string): ExportedChange[] {
     this.crudOperations.removeSheet(name)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
-    this.emitter.emit(Events.SheetRemoved, changes)
+    this.emitter.emit(Events.SheetRemoved, name, changes)
     return changes
   }
 
