@@ -106,7 +106,7 @@ describe('Text arithmetic', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
   })
 
-  it('"jaźŃ", "ąęćńóśżź" should be supported by all comparison operators', () => {
+  xit('"jaźŃ", "ąęćńóśżź" should be supported by all comparison operators', () => { //pending on #225
     const engine = HyperFormula.buildFromArray([
       ['jaźŃ', 'ąęćńóśżź', ...data],
     ], new Config({ caseSensitive : true, language: plPL}))
@@ -114,7 +114,7 @@ describe('Text arithmetic', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
     //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
-    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
     //expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
