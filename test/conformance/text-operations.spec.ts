@@ -263,16 +263,16 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP 
   })
 
-  xit('Turkish name İnanç', () => {
+  it('Turkish name İnanç compared with "aaaaa" with caseSensetive', () => {
     const engine = HyperFormula.buildFromArray([
       ['İnanç', 'aaaaa', ...data],
     ], new Config({ caseSensitive : true }))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
-    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
     expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
-    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
@@ -282,6 +282,43 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
   })
 
+  it('Turkish name İnanç compared with "aaaaa" without caseSensetive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['İnanç', 'aaaaa', ...data],
+    ], new Config({ caseSensitive : false }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
+  })
+
+  it('Turkish name İnanç compared with "aaaaa" with caseSensetive & PL', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['İnanç', 'aaaaa', ...data],
+    ], new Config({ caseSensitive : true, language: plPL }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
+  })
   
 
   
