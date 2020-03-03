@@ -176,8 +176,8 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
 
     expect(engine.getCellValue(adr('C1'))).toEqual(true)  // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
-    //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
-    //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
     expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(false) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
@@ -226,7 +226,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('aaaAAa') // CONCAT
   })
   
-  it('"A", "a" should be supported by all operators with case sensitive', () => {
+  xit('"A", "a" should be supported by all operators with case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['A', 'a', ...data],
     ], new Config({ caseSensitive : true }))
