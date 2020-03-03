@@ -44,7 +44,7 @@ type PossibleGPUMode = GPUMode | GPUInternalMode
 export interface ConfigParams {
   accentSensitive: boolean,
   caseSensitive: boolean,
-  caseFirst: 'upper' | 'lower' | 'false'
+  caseFirst: 'upper' | 'lower' | 'false',
   chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
