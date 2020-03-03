@@ -40,8 +40,7 @@ import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {ParserConfig} from './parser/ParserConfig'
 
-type PossibleGPUMode = GPUMode | GPUInternalMode
-const PossibleGPUModeString: PossibleGPUMode[] = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headlessgl']
+const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
   caseSensitive: boolean,
@@ -51,7 +50,7 @@ export interface ConfigParams {
   decimalSeparator: '.' | ',',
   language: TranslationPackage,
   functionPlugins: any[],
-  gpuMode: PossibleGPUMode,
+  gpuMode: GPUMode,
   leapYear1900: boolean,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
@@ -136,7 +135,7 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly decimalSeparator: '.' | ','
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
-  public readonly gpuMode: PossibleGPUMode
+  public readonly gpuMode: GPUMode
   public readonly leapYear1900: boolean
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
