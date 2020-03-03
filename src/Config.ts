@@ -44,6 +44,7 @@ type PossibleGPUMode = GPUMode | GPUInternalMode
 export interface ConfigParams {
   accentSensitive: boolean,
   caseSensitive: boolean,
+  caseFirst: 'upper' | 'lower' | 'false'
   chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
@@ -72,6 +73,7 @@ export class Config implements ParserConfig {
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
     caseSensitive: false,
+    caseFirst: 'lower',
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
@@ -133,6 +135,7 @@ export class Config implements ParserConfig {
 
   public readonly accentSensitive: boolean
   public readonly caseSensitive: boolean
+  public readonly caseFirst: string
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
@@ -160,6 +163,7 @@ export class Config implements ParserConfig {
     {
       accentSensitive,
       caseSensitive,
+      caseFirst,
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
@@ -185,6 +189,7 @@ export class Config implements ParserConfig {
   ) {
     this.accentSensitive = typeof accentSensitive === 'boolean' ? accentSensitive : Config.defaultConfig.accentSensitive
     this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
+    this.caseFirst = typeof caseFirst === 'string' ? caseFirst : Config.defaultConfig.caseFirst
     this.ignorePunctuation = typeof ignorePunctuation === 'boolean' ? ignorePunctuation : Config.defaultConfig.ignorePunctuation
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
