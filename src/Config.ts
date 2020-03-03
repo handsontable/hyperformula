@@ -41,7 +41,7 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {ParserConfig} from './parser/ParserConfig'
 
 type PossibleGPUMode = GPUMode | GPUInternalMode
-const PossibleGPUModeString: Array<PossibleGPUMode> = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headlessgl']
+const PossibleGPUModeString: PossibleGPUMode[] = ['gpu', 'cpu', 'dev', 'webgl', 'webgl2', 'headlessgl']
 
 export interface ConfigParams {
   caseSensitive: boolean,
