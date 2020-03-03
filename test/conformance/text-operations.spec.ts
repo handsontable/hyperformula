@@ -128,7 +128,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
   })
 
-  it('"Żółcią", "ąęćńóśżź" should be supported by all operatorswith case', () => {
+  it('"Żółcią", "ąęćńóśżź" should be supported by all operators with case sensetive and PL language', () => {
     const engine = HyperFormula.buildFromArray([
       ['Żółcią', 'ąęćńóśżź', ...data],
     ], new Config({ caseSensitive : true, language: plPL}))
@@ -263,7 +263,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP 
   })
 
-  it('Turkish name İnanç compared with "aaaaa" with caseSensetive', () => {
+  it('Turkish name İnanç compared with "aaaaa" with case sensetive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['İnanç', 'aaaaa', ...data],
     ], new Config({ caseSensitive : true }))
@@ -282,7 +282,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
   })
 
-  it('Turkish name İnanç compared with "aaaaa" without caseSensetive', () => {
+  it('Turkish name İnanç compared with "aaaaa" without case sensetive', () => {
     const engine = HyperFormula.buildFromArray([
       ['İnanç', 'aaaaa', ...data],
     ], new Config({ caseSensitive : false }))
@@ -301,7 +301,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
   })
 
-  it('Turkish name İnanç compared with "aaaaa" with caseSensetive & PL', () => {
+  it('Turkish name İnanç compared with "aaaaa" with case sensetive & PL', () => {
     const engine = HyperFormula.buildFromArray([
       ['İnanç', 'aaaaa', ...data],
     ], new Config({ caseSensitive : true, language: plPL }))
