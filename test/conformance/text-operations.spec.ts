@@ -319,6 +319,67 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //EXP
     expect(engine.getCellValue(adr('N1'))).toEqual('İnançaaaaa') // CONCAT 
   })
+
+  it('Chinese characters compared among themselves with case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['人名', '人名', ...data],
+    ], new Config({ caseSensitive : true, language: plPL }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(true)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(false) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('人名人名') // CONCAT 
+    expect(engine.getCellValue(adr('O1'))).toEqual('人名') // UNARY PLUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // UNARY MINUS 
+    expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
+  })
+
+  it('Chinese characters compared among themselves ', () => { //based on E
+    const engine = HyperFormula.buildFromArray([
+      ['人名', '發', ...data],
+    ], new Config({ caseSensitive : false, language: plPL }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('人名發') // CONCAT 
+  })
+
+  it('Traditional Chinese character compared with a simplified one', () => { ////based on E
+    const engine = HyperFormula.buildFromArray([
+      ['發', '发', ...data],
+    ], new Config({ caseSensitive : false, language: plPL }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('發发') // CONCAT 
+  })
+
   
 
   
