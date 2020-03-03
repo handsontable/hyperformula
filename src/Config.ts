@@ -1,4 +1,4 @@
-import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {GPUMode,} from 'gpu.js'
 import {ErrorType} from './Cell'
 import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
