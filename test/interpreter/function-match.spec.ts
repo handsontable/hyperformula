@@ -171,6 +171,7 @@ describe('Function MATCH', () => {
   })
 
   it('uses binsearch', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([
@@ -187,6 +188,7 @@ describe('Function MATCH', () => {
   })
 
   it('uses indexOf', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spy = jest.spyOn(ColumnBinarySearch.prototype as any, 'computeListOfValuesInRange')
 
     const engine = HyperFormula.buildFromArray([

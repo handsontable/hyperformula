@@ -314,6 +314,21 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual('=FOOBAR(1,2,3)')
   })
+
+  it('unparsing numbers with decimal separator', () => {
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const lexerConfig = buildLexerConfig(config)
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(config, sheetMapping.get)
+    const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+    const formula = '=1+1234,567'
+
+    const ast = parser.parse(formula, adr('A1')).ast
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
 })
 
 describe('whitespaces', () => {

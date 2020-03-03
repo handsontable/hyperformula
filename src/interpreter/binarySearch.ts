@@ -7,7 +7,7 @@ import {DependencyGraph} from '../DependencyGraph'
 * Otherwise returns first index of greatest element smaller than key
 * assuming sorted values in range
 * */
-export function rangeLowerBound(range: AbsoluteCellRange, key: any, dependencyGraph: DependencyGraph): number {
+export function rangeLowerBound(range: AbsoluteCellRange, key: InternalCellValue, dependencyGraph: DependencyGraph): number {
   let start = range.start.row
   let end = range.end.row
 

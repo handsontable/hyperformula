@@ -17,9 +17,12 @@ export class RangeVertex {
   /** Cache for criterion-based functions. */
   private criterionFunctionCache: Map<string, CriterionCache>
 
+  private dependentCacheRanges: Set<RangeVertex>
+
   constructor(public range: AbsoluteCellRange) {
     this.functionCache = new Map()
     this.criterionFunctionCache = new Map()
+    this.dependentCacheRanges = new Set()
   }
 
   public get start() {
@@ -84,12 +87,20 @@ export class RangeVertex {
     this.criterionFunctionCache.set(cacheKey, values)
   }
 
+  public addDependentCacheRange(dependentRange: RangeVertex) {
+    if (dependentRange !== this) {
+      this.dependentCacheRanges.add(dependentRange)
+    }
+  }
+
   /**
    * Clears function cache
    */
   public clearCache() {
     this.functionCache.clear()
     this.criterionFunctionCache.clear()
+    this.dependentCacheRanges.forEach(range => range.criterionFunctionCache.clear())
+    this.dependentCacheRanges.clear()
   }
 
   /**

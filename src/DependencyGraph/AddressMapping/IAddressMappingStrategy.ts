@@ -3,7 +3,7 @@ import {ColumnsSpan} from '../../ColumnsSpan'
 import {RowsSpan} from '../../RowsSpan'
 import {CellVertex} from '../Vertex'
 
-export type IAddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
+export type AddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
 /**
  * Interface for mapping from sheet addresses to vertices.
  */

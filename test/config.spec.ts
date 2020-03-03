@@ -25,4 +25,18 @@ describe('Config', () => {
 
     expect(config.getFunctionTranslationFor('SUM')).toEqual('SUMA')
   })
+
+  it('should throw error when there is a conflict between separators', () => {
+    expect(() => {
+      new Config({ decimalSeparator: ',', functionArgSeparator: ',' })
+    }).toThrow('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+  })
+
+  it('should throw error when decimal separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ decimalSeparator: ';' })
+    }).toThrow('Config initialization failed. Decimal separator can take \'.\' or \',\' as a value.')
+  })
 })

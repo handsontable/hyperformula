@@ -49,7 +49,6 @@ import {
   MinusOp,
   MultiplicationOp,
   NotEqualOp,
-  NumberLiteral,
   PercentOp,
   PlusOp,
   PowerOp,
@@ -80,13 +79,6 @@ import {
  * P -> SUM(..) <br/>
  */
 export class FormulaParser extends EmbeddedActionsParser {
-  /**
-   * Entry rule
-   */
-  public formula: AstRule = this.RULE('formula', () => {
-    this.CONSUME(EqualsOp)
-    return this.SUBRULE(this.booleanExpression)
-  })
   private lexerConfig: ILexerConfig
 
   /**
@@ -100,6 +92,55 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Cache for positiveAtomicExpression alternatives
    */
   private atomicExpCache: OrArg | undefined
+
+  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
+    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
+    this.lexerConfig = lexerConfig
+    this.sheetMapping = sheetMapping
+    this.performSelfAnalysis()
+  }
+
+  /**
+   * Entry rule
+   */
+  public formula: AstRule = this.RULE('formula', () => {
+    this.CONSUME(EqualsOp)
+    return this.SUBRULE(this.booleanExpression)
+  })
+
+  /**
+   * Parses tokenized formula and builds abstract syntax tree
+   *
+   * @param tokens - tokenized formula
+   * @param formulaAddress - address of the cell in which formula is located
+   */
+  public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): Ast {
+    this.input = tokens
+
+    const ast = this.formulaWithContext(formulaAddress)
+    const errors = this.errors
+
+    if (errors.length > 0) {
+      return buildErrorAst(errors.map((e) =>
+        ({
+          type: ParsingErrorType.ParserError,
+          message: e.message,
+        }),
+      ))
+    }
+
+    return ast
+  }
+
+  /**
+   * Entry rule wrapper that sets formula address
+   *
+   * @param address - address of the cell in which formula is located
+   */
+  private formulaWithContext(address: SimpleCellAddress): Ast {
+    this.formulaAddress = address
+    return this.formula()
+  }
 
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
@@ -278,8 +319,8 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
       {
         ALT: () => {
-          const number = this.CONSUME(NumberLiteral) as IExtendedToken
-          return buildNumberAst(number)
+          const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
+          return buildNumberAst(this.lexerConfig.numericStringToNumber(number.image), number.leadingWhitespace)
         },
       },
       {
@@ -453,47 +494,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
-
-  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
-    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
-    this.lexerConfig = lexerConfig
-    this.sheetMapping = sheetMapping
-    this.performSelfAnalysis()
-  }
-
-  /**
-   * Parses tokenized formula and builds abstract syntax tree
-   *
-   * @param tokens - tokenized formula
-   * @param formulaAddress - address of the cell in which formula is located
-   */
-  public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): Ast {
-    this.input = tokens
-
-    const ast = this.formulaWithContext(formulaAddress)
-    const errors = this.errors
-
-    if (errors.length > 0) {
-      return buildErrorAst(errors.map((e) =>
-        ({
-          type: ParsingErrorType.ParserError,
-          message: e.message,
-        }),
-      ))
-    }
-
-    return ast
-  }
-
-  /**
-   * Entry rule wrapper that sets formula address
-   *
-   * @param address - address of the cell in which formula is located
-   */
-  private formulaWithContext(address: SimpleCellAddress): Ast {
-    this.formulaAddress = address
-    return this.formula()
-  }
 
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments

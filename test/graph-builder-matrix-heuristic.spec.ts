@@ -1,9 +1,12 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {Array2d, findMatrices} from '../src/GraphBuilderMatrixHeuristic'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function gen(arr: number[][]): any[][] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result: any[][] = []
   arr.forEach((row) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newrow: any[] = []
     row.forEach((elem) => {
       if (elem !== 0) {
