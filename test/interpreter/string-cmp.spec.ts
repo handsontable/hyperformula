@@ -107,7 +107,7 @@ describe('string comparison', () => {
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
       ['Aa', 'aa', '=A4>B4'],
-    ], new Config({caseSensitive: true, caseFirst: 'lower'}))
+    ], new Config({caseSensitive: true, caseFirst: 'upper'}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(true)
     expect(engine.getCellValue(adr('C2'))).toBe(true)
