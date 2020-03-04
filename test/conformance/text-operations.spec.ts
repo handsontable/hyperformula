@@ -440,7 +440,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('O1'))).toEqual('名人') // UNARY PLUS
   })
     
-  it('"名人" in Chinese compared to `Aa` without case sensetive ', () => { //https://r12a.github.io/scripts/chinese/
+  it('"名人" in Chinese compared to `Aa` without case sensetive ', () => { //pending on #225
     const engine = HyperFormula.buildFromArray([
       ['名人', 'Aa', ...data],
     ], new Config({ caseSensitive : false }))
@@ -459,7 +459,97 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('名人Aa') // CONCAT
     expect(engine.getCellValue(adr('O1'))).toEqual('名人') // UNARY PLUS
   })
+})
 
-  
+describe('Escaped strings', () => {
+  it('should handle escaped strings without case sensetive', () => { 
+    const engine = HyperFormula.buildFromArray([
+      ['aaa"aaaa', 'Aaa"aaaa', ...data],
+    ], new Config({ caseSensitive : false }))
+    
+    expect(engine.getCellValue(adr('C1'))).toEqual(true) // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(false) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('aaa"aaaaAaa"aaaa') // CONCAT
+    expect(engine.getCellValue(adr('O1'))).toEqual('aaa"aaaa') // UNARY PLUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS 
+    expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
+  })
+
+  xit('should handle escaped strings with case sensetive', () => { //pending on #225
+    const engine = HyperFormula.buildFromArray([
+      ['aaa"aaaa', 'Aaa"aaaa', ...data],
+    ], new Config({ caseSensitive : true }))
+    
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    //expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
+    //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    //expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('aaa"aaaaAaa"aaaa') // CONCAT
+    expect(engine.getCellValue(adr('O1'))).toEqual('aaa"aaaa') // UNARY PLUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS 
+    expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
+  })
+
+  xit('should handle escaped quotes with case sensitive', () => { 
+    const engine = HyperFormula.buildFromArray([
+      ['"Hello "World.""', " 'Hello \"World.\" ' ", ...data],
+    ], new Config({ caseSensitive : true }))
+    
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    //expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
+    //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    //expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual("\"Hello \"World.\"\" 'Hello \"World.\" ' ") // CONCAT
+    expect(engine.getCellValue(adr('O1'))).toEqual('"Hello "World.""') // UNARY PLUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS 
+    expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
+  })
+
+  xit('should handle escaped quotes without case sensitive', () => { 
+    const engine = HyperFormula.buildFromArray([
+      ['"Hello "World.""', '"Hello \"World.\""', ...data],
+    ], new Config({ caseSensitive : false }))
+    
+    //expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
+    //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    //expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP
+    expect(engine.getCellValue(adr('N1'))).toEqual('"Hello "World."""Hello "World.""') // CONCAT
+    expect(engine.getCellValue(adr('O1'))).toEqual('"Hello "World.""') // UNARY PLUS
+    expect(engine.getCellValue(adr('P1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS 
+    expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
+  })
+
+
 })
 
