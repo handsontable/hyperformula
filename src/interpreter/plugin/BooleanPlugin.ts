@@ -1,4 +1,4 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceToMaybeNumber} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -233,7 +233,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if(vals[i] instanceof CellError) {
         continue
       }
-      if( this.interpreter.compare(vals[0], vals[i]) === 0 ) {
+      if( this.interpreter.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
         return vals[i+1]
       }
     }
