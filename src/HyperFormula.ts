@@ -202,6 +202,19 @@ export class HyperFormula {
   }
 
   /**
+   * Returns map containing values of all sheets.
+   *
+   */
+  public getAllSheetsValues(): Map<string, CellValue[][]> {
+    const sheetValues: Map<string, CellValue[][]> = new Map<string, CellValue[][]>()
+    for (const sheetName of this.sheetMapping.displayNames()) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      sheetValues.set(sheetName, this.getValues(sheetId))
+    }
+    return sheetValues
+  }
+
+  /**
    * Returns snapshot of a computation time statistics.
    */
   public getStats(): Map<StatType, number> {

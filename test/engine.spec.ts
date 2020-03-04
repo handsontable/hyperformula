@@ -35,6 +35,17 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
 
+  it('getAllValues', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[1]],
+      Foo: [],
+    })
+
+    expect(engine.getAllSheetsValues().get('Sheet1')).toEqual([[1]])
+    expect(engine.getAllSheetsValues().get('Foo')).toEqual([])
+    expect(engine.getAllSheetsValues().size).toBe(2)
+  })
+
   it('handle different input types', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 
