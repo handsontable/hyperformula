@@ -71,7 +71,7 @@ export function coerceBooleanToNumber(arg: boolean): number {
 
 export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
   if(typeof arg === 'string') {
-    return ""
+    return ''
   } else if(typeof arg === 'number') {
     return 0
   } else if(typeof arg === 'boolean') {
