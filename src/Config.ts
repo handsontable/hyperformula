@@ -125,104 +125,171 @@ export class Config implements ParserConfig {
     CorrelPlugin,
   ]
   /*
-   * whether string comparison is case-sensitive or not
+   * Specifies if the string comparison is case-sensitive or not. 
+   *
+   * False by default.
    */
   public readonly caseSensitive: boolean
   /*
-  * determines which addess mapping policy will be used. Built in implementations:
+  * Determines which address mapping policy will be used. Built in implementations:
+  *
   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-  * AlwaysDense - will use DenseStrategy for all sheets
-  * AlwaysSparse - will use SparseStrategy for all sheets
+  * 
+  * AlwaysDense - will use DenseStrategy for all sheets.
+  * 
+  * AlwaysSparse - will use SparseStrategy for all sheets.
+  * 
+  * AlwaysDense by default.
   * */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   /*
-   * list of date formats that are supported by date parsing functions
+   * A list of date formats that are supported by date parsing functions.
+   *
+   * ['MM/DD/YYYY', 'MM/DD/YY'] by default
    */
   public readonly dateFormats: string[]
   /*
-  * separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
+  * A separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
+  *
+  * A coma - ',' by default.
   * */
   public readonly functionArgSeparator: string
   /*
-  * decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
+  * A decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
+  *
+  * A full stop - '.' by default.
   * */
   public readonly decimalSeparator: '.' | ','
   /*
-  * translation package with translations of function and error names.
+  * Translation package with translations of function and error names.
   * */
   public readonly language: TranslationPackage
   /*
-  * list of additional function plugins to use by formula interpreter.
+  * A list of additional function plugins to use by formula interpreter.
+  *
+  * Set as an empty array by default.
   * */
   public readonly functionPlugins: any[]
   /*
-  * when set to 'gpu' (by default) it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+  * Allows to set GPU or CPU for use in matrix calculations.
+  *
+  * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+  *
   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+  * 
+  * 'gpu' set by default.
   * */
   public readonly gpuMode: PossibleGPUMode
   /*
-   * year 1900 was not leap, but in lotus 1-2-3 it was faulty interpreted as leap.
-   * this error was inherited by excel, and we have this option for compatibility
+   * Preserves an option for setting 1900 as a leap year.
+   *
+   * 1900 was not a leap year, but in lotus 1-2-3 it was faulty interpreted as leap.
+   * 
+   * This error was inherited by excel, and we have this option for compatibility
+   * 
+   * False by default.
    */
   public readonly leapYear1900: boolean
   /*
-  * enables numeric matrix detection feature when set to 'true'.
+  * Enables numeric matrix detection feature when set to 'true'.
+  *
   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
+  * 
   * Some CRUD operations may break numeric matrices into individual vertices if needed.
+  * 
+  * Set true by default.
   * */
   public readonly matrixDetection: boolean
   /*
-  * specifies how many cells an area must have in order to be treated as matrix. Relevant only if matrixDetection is set to true.
+  * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if matrixDetection is set to true.
+  * 
+  * Set to 100 by default.
   * */
   public readonly matrixDetectionThreshold: number
   /*
-   * two-digit values when interpreted as year can be either 19xx or 20xx. If xx<=nullYear its latter, otherwise its former.
+   * Two-digit values when interpreted as a year can be either 19xx or 20xx.
+   *
+   * If xx<=nullYear its latter, otherwise its former.
+   * 
+   * Set to 30 by default.
    */
   public readonly nullYear: number
   /*
-   * function that takes string representing date and parses it into actual date
+   * Allows to provide a function that takes string representing date and parses it into actual date.
+   *
+   * Uses a default function for date parsing if not set.
    */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
   /*
-   * function that takes date (represented as a number) and prints it into string
+   * Allows to provide a function that takes date (represented as a number) and prints it into string.
+   *
+   * Uses a default function for stringifying dates if not set.
    */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   /*
-   * precisionEpsilon controls how far two numerical values need to be from each other so we treat them as non-equal
+   * precisionEpsilon controls how far two numerical values need to be from each other to be treated as non-equal.
+   *
    * a and b are equal if they are of the same sign and:
+   * 
    * abs(a) <= (1+precisionEpsilon) * abs(b)
+   * 
    * and
+   * 
    * abs(b) <= (1+precisionEpsilon) * abs(a)
    *
-   * it also controls snap-to-zero behaviour for additions/subtractions:
+   * It also controls snap-to-zero behavior for additions/subtractions:
+   * 
    * for c=a+b or c=a-b, if abs(c) <= precisionEpsilon * abs(a), then c is set to 0
+   * 
+   * Set to 1e-13 as default.
    */
   public readonly precisionEpsilon: number
   /*
-   * numerical outputs are rounded to precisionRounding many digits after decimal
+   * Sets how precise the calculation should be.
+   *
+   * Numerical outputs are rounded to precisionRounding many digits after decimal.
+   * 
+   * Set to 14 as default
    */
   public readonly precisionRounding: number
   /*
-   * if false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon)
+   * Sets the rounding.
+   *
+   * If false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon)
    */
   public readonly smartRounding: boolean
   /*
-  * switches column search strategy from binary search to column index. Used by VLOOKUP and MATCH procedures.
-  * Using column index may improve time efficency but it will increase memory usage. In some scenarios column index may fall back to binary search
-  * despite of this flag.
+  * Switches column search strategy from binary search to column index. 
+  *
+  * Used by VLOOKUP and MATCH procedures.
+  * 
+  * Using column index may improve time efficiency but it will increase memory usage. 
+  * 
+  * In some scenarios column index may fall back to binary search despite of this flag.
+  * 
+  * Set to false as default.
   * */
   public readonly useColumnIndex: boolean
   /*
-  * determines minimum number of elements a range must have in order to use binary search. Shorter ranges will be searched naively.
+  * Determines minimum number of elements a range must have in order to use binary search. 
+  *
+  * Shorter ranges will be searched naively.
+  * 
   * Used by VLOOKUP and MATCH procedures.
+  * 
+  * Set to 20 as default.
   * */
   public readonly vlookupThreshold: number
   /*
-   * dates are represented internally as number of days that passed since nullDate
+   * Allows to set a specific date from which the number of days will be counted.
+   *
+   * Dates are represented internally as number of days that passed since this nullDate.
+   * 
+   * Set to {year: 1899, month: 12, day: 30} as default.
    */
   public readonly nullDate: SimpleDate
   /*
-  * built automatically based on translation package.
+  * Built automatically based on translation package.
   * */
   public readonly errorMapping: Record<string, ErrorType>
 
