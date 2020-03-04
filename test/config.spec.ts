@@ -84,7 +84,7 @@ describe('Config', () => {
     expect(() => new Config({dateFormats: {}})).toThrow('Expected value of type: array for config parameter: dateFormats')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({gpuMode: 'abcd'})).toThrow('Expected: \'gpu\', \'cpu\', \'dev\' for config parameter: gpuMode')
+    expect(() => new Config({gpuMode: 'abcd'})).toThrow('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
   })
 
   it('should throw error when there is a conflict between separators', () => {
@@ -98,6 +98,6 @@ describe('Config', () => {
       // eslint-disable-next-line
       // @ts-ignore
       new Config({ decimalSeparator: ';' })
-    }).toThrow('Expected: \'.\', \',\' for config parameter: decimalSeparator')
+    }).toThrow('Expected one of \'.\' \',\' for config parameter: decimalSeparator')
   })
 })

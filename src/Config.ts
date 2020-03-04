@@ -1,4 +1,4 @@
-import {GPUMode,} from 'gpu.js'
+import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
 import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
@@ -280,7 +280,7 @@ export class Config implements ConfigParams, ParserConfig{
       if(expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\''+val+'\'').join(', '), paramName)
+        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\''+val+'\'').join(' '), paramName)
       }
     }
   }
