@@ -149,7 +149,7 @@ export class HyperFormula {
    * 
    * Returned value can be either number or string or boolean or a Symbol() for empty values.
    * 
-   * Throws an error if the given sheet ID does not exist.
+   * @throws Throws an error if the given sheet ID does not exist.
    * 
    * Applies rounding and post-processing.
    *
@@ -191,7 +191,7 @@ export class HyperFormula {
    *
    * Applies rounding and post-processing.
    * 
-   * Throws an error if the given sheet ID does not exist.
+   * @throws Throws an error if the given sheet ID does not exist.
    * 
    * @param sheet - sheet ID number
    * 
@@ -239,7 +239,7 @@ export class HyperFormula {
    * 
    * The sheet dimensions is represented with numbers: width and height.
    * 
-   * Throws an error if the given sheet ID does not exist.
+   * @throws Throws an error if the given sheet ID does not exist.
    *
    * @param sheet - sheet ID number
    * 
@@ -1058,7 +1058,7 @@ export class HyperFormula {
    * 
    * If both are same does nothing.
    * 
-   * Throws an error if the provided sheet ID does not exists.
+   * @throws Throws an error if the provided sheet ID does not exists.
    * 
    */
   public renameSheet(sheetId: number, newName: string): void {
@@ -1087,7 +1087,7 @@ export class HyperFormula {
    * 
    * The method accepts expression name as the first parameter and formula string as the second.
    * 
-   * Checks if the named expression is valid and available, if not throws errors.
+   * @throws Throws an error if the named expression is not valid and available.
    *
    * @param expressionName
    * @param formulaString
@@ -1130,7 +1130,7 @@ export class HyperFormula {
    * 
    * The method accepts expression name as a first parameter and a new formula as a second parameter.
    * 
-   * Checks whether the given expression exist, throws an error if does not.
+   * @throws Throws an error if the given expression does not exist.
    *
    * @param expressionName - expression name
    * @param newFormulaString - a new formula
@@ -1177,7 +1177,7 @@ export class HyperFormula {
   /**
    * Normalizes the formula.
    * 
-   * Throws an error if the provided parameter is not a valid formula.
+   * @throws Throws an error if the provided parameter is not a valid formula.
    *
    * @param formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
