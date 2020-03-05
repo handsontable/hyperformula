@@ -127,7 +127,7 @@ export class Config implements ParserConfig {
   /*
    * Specifies if the string comparison is case-sensitive or not. 
    *
-   * False by default.
+   * @default false
    */
   public readonly caseSensitive: boolean
   /*
@@ -139,35 +139,36 @@ export class Config implements ParserConfig {
   * 
   * AlwaysSparse - will use SparseStrategy for all sheets.
   * 
-  * AlwaysDense by default.
+  *  @default AlwaysDense
   * */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   /*
    * A list of date formats that are supported by date parsing functions.
    *
-   * ['MM/DD/YYYY', 'MM/DD/YY'] by default
+   * @default ['MM/DD/YYYY', 'MM/DD/YY']
    */
   public readonly dateFormats: string[]
   /*
   * A separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
   *
-  * A coma - ',' by default.
+  * @default a coma - ','
   * */
   public readonly functionArgSeparator: string
   /*
   * A decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
   *
-  * A full stop - '.' by default.
+  * @default a full stop - '.'
   * */
   public readonly decimalSeparator: '.' | ','
   /*
   * Translation package with translations of function and error names.
+  * @default enGB
   * */
   public readonly language: TranslationPackage
   /*
   * A list of additional function plugins to use by formula interpreter.
   *
-  * Set as an empty array by default.
+  * @default []
   * */
   public readonly functionPlugins: any[]
   /*
@@ -177,7 +178,7 @@ export class Config implements ParserConfig {
   *
   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
   * 
-  * 'gpu' set by default.
+  * @default 'gpu'
   * */
   public readonly gpuMode: PossibleGPUMode
   /*
@@ -187,7 +188,7 @@ export class Config implements ParserConfig {
    * 
    * This error was inherited by the Excel, and we have this option for compatibility
    * 
-   * False by default.
+   * @default false
    */
   public readonly leapYear1900: boolean
   /*
@@ -197,13 +198,13 @@ export class Config implements ParserConfig {
   * 
   * Some CRUD operations may break numeric matrices into individual vertices if needed.
   * 
-  * Set true by default.
+  * @default true
   * */
   public readonly matrixDetection: boolean
   /*
   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if matrixDetection is set to true.
   * 
-  * Set to 100 by default.
+  * @default 100
   * */
   public readonly matrixDetectionThreshold: number
   /*
@@ -211,19 +212,19 @@ export class Config implements ParserConfig {
    *
    * If xx<=nullYear its latter, otherwise its former.
    * 
-   * Set to 30 by default.
+   * @default 30
    */
   public readonly nullYear: number
   /*
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
-   * Uses a default function for date parsing if not set.
+   * @default built-in default function for date parsing
    */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
   /*
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
-   * Uses a default function for stringifying dates if not set.
+   * @default built-in function for stringifying dates
    */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   /*
@@ -241,7 +242,7 @@ export class Config implements ParserConfig {
    * 
    * for c=a+b or c=a-b, if abs(c) <= precisionEpsilon * abs(a), then c is set to 0
    * 
-   * Set to 1e-13 as default.
+   * @default 1e-13
    */
   public readonly precisionEpsilon: number
   /*
@@ -249,13 +250,15 @@ export class Config implements ParserConfig {
    *
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    * 
-   * Set to 14 as default
+   * @default 14
    */
   public readonly precisionRounding: number
   /*
    * Sets the rounding.
    *
-   * If false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon)
+   * If false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon).
+   * 
+   * @default true
    */
   public readonly smartRounding: boolean
   /*
@@ -267,7 +270,7 @@ export class Config implements ParserConfig {
   * 
   * In some scenarios column index may fall back to binary search despite of this flag.
   * 
-  * Set to false as default.
+  * @default false
   * */
   public readonly useColumnIndex: boolean
   /*
@@ -277,7 +280,7 @@ export class Config implements ParserConfig {
   * 
   * Used by VLOOKUP and MATCH procedures.
   * 
-  * Set to 20 as default.
+  * @default 20
   * */
   public readonly vlookupThreshold: number
   /*
