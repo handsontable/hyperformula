@@ -194,14 +194,14 @@ export class HyperFormula {
    * Returns map containing dimensions of all sheets.
    *
    */
-  public getSheetsDimensions(): Map<string, { width: number, height: number }> {
-    const sheetDimensions = new Map<string, { width: number, height: number }>()
+  public getSheetsDimensions(): Record<string, { width: number, height: number }> {
+    const sheetDimensions : Record<string, { width: number, height: number}> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetDimensions.set(sheetName, {
+      sheetDimensions[sheetName] =  {
         width: this.dependencyGraph.getSheetWidth(sheetId),
         height: this.dependencyGraph.getSheetHeight(sheetId),
-      })
+      }
     }
     return sheetDimensions
   }
