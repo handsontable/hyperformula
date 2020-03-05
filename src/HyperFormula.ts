@@ -128,7 +128,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellValue(address: SimpleCellAddress): CellValue {
+  public getCellValue = (address: SimpleCellAddress): CellValue => {
     return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
   }
 
@@ -137,7 +137,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula(address: SimpleCellAddress): string | undefined {
+  public getCellFormula = (address: SimpleCellAddress): string | undefined => {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -151,42 +151,40 @@ export class HyperFormula {
     return undefined
   }
 
+  public getSerializedCell = (address: SimpleCellAddress): CellValue => {
+    return this.getCellFormula(address) || this.getCellValue(address)
+  }
+
   /**
    * Returns array with values of all cells from Sheet
    *
    * @param sheet - sheet id number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
-    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
-
-    const arr: CellValue[][] = new Array(sheetHeight)
-    for (let i = 0; i < sheetHeight; i++) {
-      arr[i] = new Array(sheetWidth)
-
-      for (let j = 0; j < sheetWidth; j++) {
-        const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.getCellValue(address)
-      }
-    }
-
-    return arr
+    return this.genericSheetGetter(sheet, this.getCellValue)
   }
 
   public getSheetFormulas(sheet: number): (string | undefined)[][] {
+    return this.genericSheetGetter(sheet, this.getCellFormula)
+  }
+
+  public getSerializedSheet(sheet: number): CellValue[][] {
+    return this.genericSheetGetter(sheet, this.getSerializedCell)
+  }
+
+  private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
-    const arr: (string | undefined)[][] = new Array(sheetHeight)
+    const arr: T[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.getCellFormula(address)
+        arr[i][j] = getter(address)
       }
     }
-
     return arr
   }
 
@@ -198,10 +196,7 @@ export class HyperFormula {
     const sheetDimensions: Record<string, { width: number, height: number}> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetDimensions[sheetName] =  {
-        width: this.dependencyGraph.getSheetWidth(sheetId),
-        height: this.dependencyGraph.getSheetHeight(sheetId),
-      }
+      sheetDimensions[sheetName] =  this.getSheetDimensions(sheetId)
     }
     return sheetDimensions
   }
