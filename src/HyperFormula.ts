@@ -152,7 +152,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns array with values of all cells.
+   * Returns array with values of all cells from Sheet
    *
    * @param sheet - sheet id number
    */
@@ -166,7 +166,24 @@ export class HyperFormula {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+        arr[i][j] = this.getCellValue(address)
+      }
+    }
+
+    return arr
+  }
+
+  public getSheetFormulas(sheet: number): (string | undefined)[][] {
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+
+    const arr: (string | undefined)[][] = new Array(sheetHeight)
+    for (let i = 0; i < sheetHeight; i++) {
+      arr[i] = new Array(sheetWidth)
+
+      for (let j = 0; j < sheetWidth; j++) {
+        const address = simpleCellAddress(sheet, j, i)
+        arr[i][j] = this.getCellFormula(address)
       }
     }
 
@@ -212,6 +229,15 @@ export class HyperFormula {
       sheetValues.set(sheetName, this.getSheetValues(sheetId))
     }
     return sheetValues
+  }
+
+  public getAllFormulas(): Map<string, (string | undefined)[][]> {
+    const sheetFormulas: Map<string, (string | undefined)[][]> = new Map<string, (string | undefined)[][]>()
+    for (const sheetName of this.sheetMapping.displayNames()) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      sheetFormulas.set(sheetName, this.getSheetFormulas(sheetId))
+    }
+    return sheetFormulas
   }
 
   /**
