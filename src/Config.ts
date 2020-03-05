@@ -183,7 +183,7 @@ export class Config implements ParserConfig {
   /*
    * Preserves an option for setting 1900 as a leap year.
    *
-   * 1900 was not a leap year, but in lotus 1-2-3 it was faulty interpreted as leap.
+   * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
    * 
    * This error was inherited by excel, and we have this option for compatibility
    * 
