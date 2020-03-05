@@ -156,7 +156,7 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getValues(sheet: number): CellValue[][] {
+  public getSheetValues(sheet: number): CellValue[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
@@ -209,7 +209,7 @@ export class HyperFormula {
     const sheetValues: Map<string, CellValue[][]> = new Map<string, CellValue[][]>()
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetValues.set(sheetName, this.getValues(sheetId))
+      sheetValues.set(sheetName, this.getSheetValues(sheetId))
     }
     return sheetValues
   }

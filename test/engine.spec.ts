@@ -46,6 +46,13 @@ describe('Integration', () => {
     expect(engine.getAllSheetsValues().size).toBe(2)
   })
 
+  it('getAllValues2', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A2'], ['1']],
+    })
+    const a = engine.getAllSheetsValues()
+  })
+
   it('handle different input types', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 
