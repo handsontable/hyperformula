@@ -41,16 +41,16 @@ describe('Integration', () => {
       Foo: [],
     })
 
-    expect(engine.getAllSheetsValues().get('Sheet1')).toEqual([[1]])
-    expect(engine.getAllSheetsValues().get('Foo')).toEqual([])
-    expect(engine.getAllSheetsValues().size).toBe(2)
+    expect(engine.getAllValues().get('Sheet1')).toEqual([[1]])
+    expect(engine.getAllValues().get('Foo')).toEqual([])
+    expect(engine.getAllValues().size).toBe(2)
   })
 
   it('getAllValues2', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [['=A2'], ['1']],
     })
-    const a = engine.getAllSheetsValues()
+    const a = engine.getAllValues()
   })
 
   it('handle different input types', () => {

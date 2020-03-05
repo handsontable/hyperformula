@@ -205,7 +205,7 @@ export class HyperFormula {
    * Returns map containing values of all sheets.
    *
    */
-  public getAllSheetsValues(): Map<string, CellValue[][]> {
+  public getAllValues(): Map<string, CellValue[][]> {
     const sheetValues: Map<string, CellValue[][]> = new Map<string, CellValue[][]>()
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
