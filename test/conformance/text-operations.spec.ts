@@ -485,7 +485,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it('"Hello \"World\"." vs. "Hello \"World\"." should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : true }))
@@ -504,7 +504,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual('Hello \"World\".Hello \"World\".') // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('"Hello \"World\"." vs. "\'Hello \\"World\\".\'" should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : false }))
@@ -523,7 +523,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \"World\".Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operationswith case sensitive', () => { 
+  it('"Hello \"World\"." vs. "\'Hello \\"World\\".\'" should handle comparison operationswith case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : true }))
@@ -545,7 +545,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
   
-  it('should handle comparison operationswithout case sensitive', () => { 
+  it('"Hello \"World\"." vs. "'Hello \\\"World\\\".'"' should handle comparison operationswithout case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
@@ -564,7 +564,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \"World\".Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it('"Hello \"World\"." vs. "'Hello \\\"World\\\".'"' should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
@@ -586,7 +586,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('\'Hello \\"World\\".\' vs. "Hello \"World\"." should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : false }))
@@ -608,7 +608,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. "Hello \"World\"." should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : true }))
@@ -627,7 +627,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \"World\".") // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. "\'Hello \\"World\\".\'" should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : false }))
@@ -647,7 +647,7 @@ xdescribe('Escaped strings', () => {
 
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. \'Hello \\"World\\".\' should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : true }))
@@ -666,7 +666,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. Hello \\\"World\\\".'  should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
@@ -685,7 +685,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. "Hello \\\"World\\\". should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
@@ -704,7 +704,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it(' "''Hello \\\"World\\\".'"' vs. 'Hello \"World\".'' should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : false }))
@@ -726,7 +726,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it(' ''Hello \\\"World\\\". vs. "Hello \"World\"." should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : true }))
@@ -745,7 +745,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \"World\".") // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('"Hello \\\"World\\\".'" vs. \'Hello \\World\\".\' should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : false }))
@@ -783,7 +783,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations without case sensitive', () => { 
+  it('"Hello \\\"World\\\".'" vs. 'Hello \\\"World\\\".' should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
@@ -802,7 +802,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('should handle comparison operations with case sensitive', () => { 
+  it(' "Hello \\\"World\\\"." vs. "Hello \\\"World\\\".'" should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
