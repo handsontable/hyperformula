@@ -1084,7 +1084,6 @@ export class HyperFormula {
   }
 
   /**
-<<<<<<< HEAD
    * Adds a specified named expression.
    * 
    * The method accepts expression name as the first parameter and formula string as the second.
@@ -1096,10 +1095,6 @@ export class HyperFormula {
    * 
    * @return An array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
    * 
-=======
-   * Add named expression
-   *
->>>>>>> develop
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.isNameValid(expressionName)) {
