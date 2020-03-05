@@ -215,7 +215,7 @@ export class Config implements ParserConfig {
    */
   public readonly nullYear: number
   /*
-   * Allows to provide a function that takes string representing date and parses it into actual date.
+   * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
    * Uses a default function for date parsing if not set.
    */
@@ -247,7 +247,7 @@ export class Config implements ParserConfig {
   /*
    * Sets how precise the calculation should be.
    *
-   * Numerical outputs are rounded to precisionRounding many digits after decimal.
+   * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    * 
    * Set to 14 as default
    */

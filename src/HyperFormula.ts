@@ -164,8 +164,7 @@ export class HyperFormula {
 
   /**
    * Returns a normalized formula string from the cell of a given address
-   * 
-   * or undefined for address that does not exist and empty values.
+   * or undefined for an address that does not exist and empty values.
    * 
    * Unparses AST.
    * 
@@ -273,7 +272,7 @@ export class HyperFormula {
    * 
    * If returns true, doing this operation won't throw any errors.
    * 
-   * @return true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
+   * @return `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist
    * 
    *
    * @param address - cell coordinates (top left corner)
@@ -749,7 +748,7 @@ export class HyperFormula {
    * 
    * The method accepts sheet name as a string.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns true, doing {@link removeSheet} operation won't throw any errors.
    *
    * @param name - sheet name
    * 
