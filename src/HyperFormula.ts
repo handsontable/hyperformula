@@ -841,7 +841,7 @@ export class HyperFormula {
    * 
    * The method accepts sheet name and an array of new values to be put in a given sheet.
    * 
-   * The new value is to be provided as an array of: Date, string, number, boolean, {EmptyValueType}, null, undefined
+   * The new value is to be provided as an array of arrays of {@link RawCellContent}
    * 
    * The method finds sheet ID based on the provided sheet name.
    *
