@@ -851,12 +851,12 @@ export class HyperFormula {
   }
 
   /**
-   * Change named expression formula
+   * Change named expression expression
    *
    * @param expressionName - an expression name
-   * @param newFormulaString - a new formula
+   * @param newExpression - a new expression
    */
-  public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
+  public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
       throw new NamedExpressionDoesNotExist(expressionName)
     }
