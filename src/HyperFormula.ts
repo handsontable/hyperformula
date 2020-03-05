@@ -195,7 +195,7 @@ export class HyperFormula {
    *
    */
   public getSheetsDimensions(): Record<string, { width: number, height: number }> {
-    const sheetDimensions : Record<string, { width: number, height: number}> = {}
+    const sheetDimensions: Record<string, { width: number, height: number}> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetDimensions[sheetName] =  {
