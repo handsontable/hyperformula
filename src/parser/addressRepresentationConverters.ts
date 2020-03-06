@@ -23,13 +23,13 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   const col = columnLabelToIndex(result[6])
 
   const maybeSheetName = result[3] || result[4]
-  let sheet
+
+  let sheet = null
+
   if (maybeSheetName) {
     sheet = sheetMapping(maybeSheetName)
   } else if (overrideSheet !== undefined) {
     sheet = overrideSheet
-  } else {
-    sheet = baseAddress.sheet
   }
 
   if (sheet === undefined) {

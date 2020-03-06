@@ -35,19 +35,19 @@ export class Unparser {
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
-        if (ast.reference.sheet === address.sheet) {
-          image = cellAddressToString(ast.reference, address)
-        } else {
+        if (ast.reference.sheet !== null) {
           image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+        } else {
+          image = cellAddressToString(ast.reference, address)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
         let image
-        if (ast.start.sheet === address.sheet) {
-          image = cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
-        } else {
+        if (ast.start.sheet !== null) {
           image = this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
+        } else {
+          image = cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }

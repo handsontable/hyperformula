@@ -179,18 +179,19 @@ export class ParserWithCaching {
 }
 
 export const cellHashFromToken = (cellAddress: CellAddress): string => {
+  const sheetPart = cellAddress.sheet === null ? '' : `#${cellAddress.sheet}`
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
-      return `#${cellAddress.sheet}#${cellAddress.row}R${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}R${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
-      return `#${cellAddress.sheet}#${cellAddress.row}A${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}A${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
-      return `#${cellAddress.sheet}#${cellAddress.row}AC${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}AC${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
-      return `#${cellAddress.sheet}#${cellAddress.row}AR${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
 }
