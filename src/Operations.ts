@@ -53,7 +53,8 @@ export class Operations {
   public removeRows(cmd: RemoveRowsCommand): RowsRemoval[] {
     const rowsRemovals: RowsRemoval[] = []
     for (const index of cmd.normalizedIndexes()) {
-      const rowsRemoval = this.doRemoveRows(cmd.sheet, index[0], index[0] + index[1] - 1)
+      const rowsToRemove = RowsSpan.fromNumberOfRows(cmd.sheet, index[0], index[1])
+      const rowsRemoval = this.doRemoveRows(rowsToRemove)
       if (rowsRemoval) {
         rowsRemovals.push(rowsRemoval)
       }
@@ -69,26 +70,24 @@ export class Operations {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): RowsRemoval | undefined {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
+  private doRemoveRows(rowsToRemove: RowsSpan): RowsRemoval | undefined {
+    if (this.rowEffectivelyNotInSheet(rowsToRemove.rowStart, rowsToRemove.sheet)) {
       return
     }
 
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
     const removedCells: RemovedCell[] = []
-    for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
+    for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(rowsToRemove)) {
       removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
 
-    this.dependencyGraph.removeRows(removedRows)
+    this.dependencyGraph.removeRows(rowsToRemove)
 
     let version : number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
+      RemoveRowsDependencyTransformer.transform(rowsToRemove, this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addRemoveRowsTransformation(rowsToRemove)
     })
-    return { version: version!, removedCells, rowFrom: rowStart, rowCount: rowEnd - rowStart + 1 }
+    return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
   }
 
   private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
