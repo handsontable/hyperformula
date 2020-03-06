@@ -10,9 +10,11 @@ export class AbsoluteCellRange {
   }
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+    const startSheet = x.start.sheet === null ? baseAddress.sheet : x.start.sheet
+    const endSheet = x.end.sheet === null ? startSheet : x.end.sheet
     return new AbsoluteCellRange(
-      new CellAddress(x.start.sheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
-      new CellAddress(x.end.sheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(startSheet, x.start.col, x.start.row, x.start.type).toSimpleCellAddress(baseAddress),
+      new CellAddress(endSheet, x.end.col, x.end.row, x.end.type).toSimpleCellAddress(baseAddress),
     )
   }
 
