@@ -32,6 +32,7 @@ import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -140,7 +141,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula = (address: SimpleCellAddress): string | undefined => {
+  public getCellFormula = (address: SimpleCellAddress): Maybe<string> => {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -169,7 +170,7 @@ export class HyperFormula {
     return this.genericSheetGetter(sheet, this.getCellValue)
   }
 
-  public getSheetFormulas(sheet: number): (string | undefined)[][] {
+  public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, this.getCellFormula)
   }
 
@@ -226,8 +227,8 @@ export class HyperFormula {
     return sheetValues
   }
 
-  public getAllFormulas(): Map<string, (string | undefined)[][]> {
-    const sheetFormulas: Map<string, (string | undefined)[][]> = new Map<string, (string | undefined)[][]>()
+  public getAllFormulas(): Map<string, Maybe<string>[][]> {
+    const sheetFormulas: Map<string, Maybe<string>[][]> = new Map<string, Maybe<string>[][]>()
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
       sheetFormulas.set(sheetName, this.getSheetFormulas(sheetId))
@@ -747,7 +748,7 @@ export class HyperFormula {
    * @param address - object representation of absolute address
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
-  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
+  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): Maybe<string> {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
@@ -759,7 +760,7 @@ export class HyperFormula {
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
    */
-  public getSheetName(sheetId: number): string | undefined {
+  public getSheetName(sheetId: number): Maybe<string> {
     return this.sheetMapping.getDisplayName(sheetId)
   }
 
@@ -771,7 +772,7 @@ export class HyperFormula {
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
    */
-  public getSheetId(sheetName: string): number | undefined {
+  public getSheetId(sheetName: string): Maybe<number> {
     return this.sheetMapping.get(sheetName)
   }
 

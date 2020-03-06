@@ -1,13 +1,14 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
+import {Maybe} from '../Maybe'
 import {RowsSpan} from '../RowsSpan'
 import {MatrixVertex} from './'
 
 export class MatrixMapping {
   public readonly matrixMapping: Map<string, MatrixVertex> = new Map()
 
-  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
+  public getMatrix(range: AbsoluteCellRange): Maybe<MatrixVertex> {
     return this.matrixMapping.get(range.toString())
   }
 

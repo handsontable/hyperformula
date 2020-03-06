@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalCellValue} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MatrixSize} from '../Matrix'
+import {Maybe} from '../Maybe'
 
 export class ArrayData {
   constructor(
@@ -41,7 +42,7 @@ export class ArrayData {
 }
 
 export class OnlyRangeData {
-  public data: InternalCellValue[][] | undefined
+  public data: Maybe<InternalCellValue[][]>
   public _hasOnlyNumbers?: boolean
 
   constructor(
@@ -184,7 +185,7 @@ export class SimpleRangeValue {
     return this.data.rawNumbers()
   }
 
-  public range(): AbsoluteCellRange | undefined {
+  public range(): Maybe<AbsoluteCellRange> {
     return this.data.range()
   }
 

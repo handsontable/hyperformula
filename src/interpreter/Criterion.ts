@@ -1,4 +1,5 @@
 import {InternalCellValue} from '../Cell'
+import {Maybe} from '../Maybe'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -16,7 +17,7 @@ export const buildCriterion = (operator: CriterionType, value: number | string) 
 
 export class CriterionPackage {
 
-  public static fromCellValue(raw: InternalCellValue): CriterionPackage | undefined {
+  public static fromCellValue(raw: InternalCellValue): Maybe<CriterionPackage> {
     if (typeof raw !== 'string') {
       return undefined
     }
