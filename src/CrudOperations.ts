@@ -35,6 +35,18 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
+export interface RemovedCell {
+  address: SimpleCellAddress,
+  cellType: ClipboardCell,
+}
+
+export interface RowsRemoval {
+  rowFrom: number,
+  rowCount: number,
+  version: number,
+  removedCells: RemovedCell[]
+}
+
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
@@ -70,17 +82,8 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeRemovedIndexes(indexes)
-    this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
-    this.clipboardOperations.abortCut()
-    const versions = []
-    for (const index of normalizedIndexes) {
-      const result = this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
-      if (result) {
-        versions.push(result)
-      }
-    }
-    this.undoRedo.saveOperationRemoveRows(sheet, normalizedIndexes, versions)
+    const rowsRemovals = this.reallyDoRemoveRows(sheet, indexes)
+    this.undoRedo.saveOperationRemoveRows(sheet, rowsRemovals)
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
@@ -469,6 +472,20 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
+  private reallyDoRemoveRows(sheet: number, indexes: Index[]): RowsRemoval[] {
+    const normalizedIndexes = normalizeRemovedIndexes(indexes)
+    this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+    this.clipboardOperations.abortCut()
+    const rowsRemovals: RowsRemoval[] = []
+    for (const index of normalizedIndexes) {
+      const rowsRemoval = this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
+      if (rowsRemoval) {
+        rowsRemovals.push(rowsRemoval)
+      }
+    }
+    return rowsRemovals
+  }
+
   /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
@@ -500,16 +517,16 @@ export class CrudOperations implements IBatchExecutor {
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
    * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): [number, [SimpleCellAddress, ClipboardCell][]] | undefined {
+  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): RowsRemoval | undefined {
     if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
       return
     }
 
     const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
 
-    const vertices: [SimpleCellAddress, ClipboardCell][] = []
+    const removedCells: RemovedCell[] = []
     for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
-      vertices.push([address, this.getClipboardCell(address)])
+      removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
 
     this.dependencyGraph.removeRows(removedRows)
@@ -519,7 +536,7 @@ export class CrudOperations implements IBatchExecutor {
       RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
     })
-    return [version!, vertices]
+    return { version: version!, removedCells, rowFrom: rowStart, rowCount: rowEnd - rowStart + 1 }
   }
 
   /**
