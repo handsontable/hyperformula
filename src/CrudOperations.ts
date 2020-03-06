@@ -73,6 +73,10 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
+    this.reallyDoAddRows(sheet, indexes)
+  }
+
+  public reallyDoAddRows(sheet: number, indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
     this.clipboardOperations.abortCut()

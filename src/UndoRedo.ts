@@ -32,7 +32,7 @@ export class UndoRedo {
     const { sheet, rowsRemovals } = this.undoStack.pop()!
     for (let i = rowsRemovals.length - 1; i >= 0; --i) {
       const rowsRemoval = rowsRemovals[i]
-      this.crudOperations!.addRows(sheet, [rowsRemoval.rowFrom, rowsRemoval.rowCount])
+      this.crudOperations!.reallyDoAddRows(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]])
 
       for (let { address, cellType } of rowsRemoval.removedCells) {
         switch (cellType.type) {
