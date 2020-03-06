@@ -167,13 +167,13 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=(1+2)')
   })
 
-  it('#unparse forgets about unnecessary sheet reference', () => {
+  it('#unparse do not forgets about sheet reference', () => {
     const formula = '=Sheet1!C3'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=C3')
+    expect(unparsed).toEqual('=Sheet1!C3')
   })
 
   it('#unparse necessary parenthesis from left subtree', () => {
