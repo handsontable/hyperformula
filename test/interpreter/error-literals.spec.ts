@@ -24,7 +24,7 @@ describe('Error literals', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('#UNKNOWN!')
-    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it( 'error #N/A! with every combination should be supported by all comparison operators', () => {

@@ -201,43 +201,6 @@ describe('ParserWithCaching', () => {
     expect(float.value).toBe(3.14)
   })
 
-  it('lexing error - unexpected token', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=A', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
-    expect(ast.args[0].message).toMatch(/unexpected character/)
-  })
-
-  it('lexing error - unexpected token', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=SUM(A)', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
-    expect(ast.args[0].message).toMatch(/unexpected character/)
-
-  })
-
-  it('parsing error - not all input parsed', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    expect(ast.args[0].type).toBe(ParsingErrorType.ParserError)
-  })
-
-  it('errors - lexing errors', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const input = ["='foo'", "=foo'bar", "=''''''", '=@']
-
-    input.forEach((formula) => {
-      const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-      expect(ast.type).toBe(AstNodeType.ERROR)
-      expect(ast.args[0].type).toBe(ParsingErrorType.LexingError)
-    })
-  })
-
   it('functions should not be case sensitive', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
     const ast = parser.parse('=sum(1)', CellAddress.absolute(0, 0, 0)).ast as ProcedureAst
@@ -271,14 +234,6 @@ describe('ParserWithCaching', () => {
     const ast = parser.parse('=#rEf!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
-  })
-
-  it('unknown error literal', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast = parser.parse('=#FOO!', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.error).toBeUndefined()
   })
 })
 
@@ -466,6 +421,61 @@ describe('cell references and ranges', () => {
     expect(ast.start.sheet).toEqual(1)
     expect(ast.end.sheet).toEqual(2)
   })
+})
+
+
+describe('Parsing errors', () => {
+  it('errors - lexing errors', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const input = ["='foo'", "=foo'bar", "=''''''", '=@']
+
+    input.forEach((formula) => {
+      const { ast, errors } = parser.parse(formula, CellAddress.absolute(0, 0, 0))
+      expect(ast.type).toBe(AstNodeType.ERROR)
+      expect(errors[0].type).toBe(ParsingErrorType.LexingError)
+    })
+  })
+
+  it('lexing error - unexpected token', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const { ast, errors } = parser.parse('=A', CellAddress.absolute(0, 0, 0))
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
+    expect(errors[0].message).toMatch(/unexpected character/)
+  })
+
+  it('lexing error - unexpected token', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const { ast, errors } = parser.parse('=SUM(A)', CellAddress.absolute(0, 0, 0))
+    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
+    expect(errors[0].message).toMatch(/unexpected character/)
+
+  })
+
+  it('parsing error - not all input parsed', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const { errors } = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0))
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+  })
+
+  it('unknown error literal', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const { ast, errors } = parser.parse('=#FOO!', CellAddress.absolute(0, 0, 0))
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+  })
+
+  it('should throw', () => {
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+
+    const ast1 = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0)).ast
+    const ast2 = parser.parse('=1', CellAddress.absolute(0, 0, 0)).ast
+  })
 
   // weird error
   it('cell range with unexisting end sheet', () => {
@@ -474,9 +484,9 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
-    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    const { ast, errors } = parser.parse('=Sheet2!A1:Sheet3!B2', CellAddress.absolute(0, 0, 0))
 
     expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
+    expect(errors[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
   })
 })

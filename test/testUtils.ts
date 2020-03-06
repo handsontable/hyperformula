@@ -72,9 +72,9 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
   return simpleCellAddress(sheet, col, row)
 }
 
-export function detailedError(errorType: ErrorType, config?: Config): DetailedCellError {
+export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
   config = config || new Config()
-  const error = new CellError(errorType)
+  const error = new CellError(errorType, message)
   return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
 }
 

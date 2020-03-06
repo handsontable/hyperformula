@@ -6,7 +6,6 @@ import {
   EmptyValue,
   ErrorType,
   getCellValueType,
-  InternalCellValue,
   invalidSimpleCellAddress, NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
@@ -16,7 +15,7 @@ import {DateHelper} from '../DateHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
+import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceBooleanToNumber, coerceEmptyToValue, coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
@@ -240,14 +239,7 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, formulaAddress)
       }
       case AstNodeType.ERROR: {
-        if (ast.error !== undefined) {
-          return ast.error
-        }
-        /* TODO tidy up parsing errors */
-        if (ast.args.length > 0 && ast.args[0].type === ParsingErrorType.StaticOffsetOutOfRangeError) {
-          return new CellError(ErrorType.REF)
-        }
-        return new CellError(ErrorType.NAME)
+        return ast.error
       }
     }
   }

@@ -19,6 +19,9 @@ export enum ErrorType {
 
   /* Wrong address reference. */
   REF = 'REF',
+
+  /* Generic error */
+  ERROR = 'ERROR'
 }
 
 export const EmptyValue = Symbol()
@@ -97,6 +100,10 @@ export class CellError {
     public readonly type: ErrorType,
     public readonly message?: string,
   ) {
+  }
+
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, 'Parsing error')
   }
 }
 

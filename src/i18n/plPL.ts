@@ -111,6 +111,7 @@ export const plPL: TranslationPackage = {
     NA: '#N/A',
     CYCLE: '#CYKL!',
     REF: '#ADR!',
+    ERROR: '#BŁĄD!',
   },
   interface: {
     NEW_SHEET_PREFIX: 'Arkusz',
