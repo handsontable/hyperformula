@@ -21,9 +21,9 @@ import {
   Graph,
   MatrixMapping,
   MatrixVertex,
+  ParsingErrorVertex,
   RangeMapping,
   SheetMapping,
-  SparseStrategy,
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
@@ -150,6 +150,8 @@ export class HyperFormula {
       if (formula) {
         return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
       }
+    } else if (formulaVertex instanceof ParsingErrorVertex) {
+      return formulaVertex.getFormula()
     }
     return undefined
   }
@@ -961,7 +963,13 @@ export class HyperFormula {
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       return [false, exampleTemporaryFormulaAddress]
     }
-    const {ast} = this.parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+
+    const { ast, errors } = this.parser.parse(parsedCellContent.formula, exampleTemporaryFormulaAddress)
+
+    if (errors.length > 0) {
+      return [false, exampleTemporaryFormulaAddress]
+    }
+
     return [ast, exampleTemporaryFormulaAddress]
   }
 

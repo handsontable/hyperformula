@@ -108,7 +108,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, CellAddress.absolute(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=#ERR!')
+    expect(unparsed).toEqual('=#ERROR!')
   })
 
   it('#unparse with known error', () => {

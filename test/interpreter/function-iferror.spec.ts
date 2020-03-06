@@ -29,7 +29,7 @@ describe('Function IFERROR', () => {
   })
 
   it('when both-error', () => {
-    const engine = HyperFormula.buildFromArray([['=IFERROR(#UNKNOWN!, 1/0)']])
+    const engine = HyperFormula.buildFromArray([['=IFERROR(#VALUE!, 1/0)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
@@ -44,5 +44,11 @@ describe('Function IFERROR', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR(B1, 1)', '=B1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('when left-parsing error', () => {
+    const engine = HyperFormula.buildFromArray([['=IFERROR(B1, 1/0)', '=SUM(']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })

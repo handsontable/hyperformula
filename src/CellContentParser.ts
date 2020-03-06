@@ -38,6 +38,10 @@ export namespace CellContent {
 
   export class MatrixFormula {
     constructor(public readonly formula: string) { }
+
+    public formulaWithBraces(): string {
+      return '{' + this.formula + '}'
+    }
   }
 
   export class Error {
