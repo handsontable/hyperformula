@@ -75,3 +75,18 @@ describe('UndoRedo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 })
+
+describe('UndoRedo - adding rows', () => {
+  it('works', () => {
+    const sheet = [
+      ['1'], // add after that
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.addRows(0, [1, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})

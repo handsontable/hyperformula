@@ -41,6 +41,11 @@ export interface RowsRemoval {
   removedCells: ChangedCell[]
 }
 
+export interface RowsAddition {
+  afterRow: number,
+  rowCount: number,
+}
+
 export class Operations {
   constructor(
     private readonly dependencyGraph: DependencyGraph,

@@ -3,7 +3,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
-import {Operations, RemoveRowsCommand, normalizeRemovedIndexes} from './Operations'
+import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, RowsAddition} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -39,7 +39,7 @@ export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
-  private operations: Operations
+  public readonly operations: Operations
 
   constructor(
     /** Engine config */
@@ -63,16 +63,22 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
-    this.reallyDoAddRows(sheet, indexes)
+    const rowsAdditions = this.reallyDoAddRows(sheet, indexes)
+    this.undoRedo.saveOperationAddRows(sheet, rowsAdditions)
   }
 
-  public reallyDoAddRows(sheet: number, indexes: Index[]): void {
+  public reallyDoAddRows(sheet: number, indexes: Index[]): RowsAddition[] {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
     this.clipboardOperations.abortCut()
+    const rowsAdditions: RowsAddition[] = []
     for (const index of normalizedIndexes) {
-      this.doAddRows(sheet, index[0], index[1])
+      const rowAddition = this.doAddRows(sheet, index[0], index[1])
+      if (rowAddition) {
+        rowsAdditions.push(rowAddition)
+      }
     }
+    return rowsAdditions
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
@@ -477,7 +483,7 @@ export class CrudOperations implements IBatchExecutor {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
+  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): RowsAddition | undefined {
     if (this.rowEffectivelyNotInSheet(row, sheet)) {
       return
     }
@@ -490,6 +496,8 @@ export class CrudOperations implements IBatchExecutor {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
+
+    return { afterRow: row, rowCount: numberOfRowsToAdd }
   }
 
   /**
