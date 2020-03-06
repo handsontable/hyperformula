@@ -3,6 +3,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
+import {Operations, RemoveRowsCommand, normalizeRemovedIndexes} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -23,7 +24,6 @@ import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColum
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
@@ -35,34 +35,11 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
-export class RemoveRowsCommand {
-  constructor(
-    public readonly sheet: number,
-    public readonly indexes: Index[]
-  ) {
-  }
-
-  public normalizedIndexes() {
-    return normalizeRemovedIndexes(this.indexes)
-  }
-}
-
-export interface RemovedCell {
-  address: SimpleCellAddress,
-  cellType: ClipboardCell,
-}
-
-export interface RowsRemoval {
-  rowFrom: number,
-  rowCount: number,
-  version: number,
-  removedCells: RemovedCell[]
-}
-
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
+  private operations: Operations
 
   constructor(
     /** Engine config */
@@ -82,6 +59,7 @@ export class CrudOperations implements IBatchExecutor {
     private readonly undoRedo: UndoRedo,
   ) {
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
+    this.operations = new Operations(this.dependencyGraph, this.parser, this.stats, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -101,7 +79,7 @@ export class CrudOperations implements IBatchExecutor {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    const rowsRemovals = this.reallyDoRemoveRows(removeRowsCommand)
+    const rowsRemovals = this.operations.removeRows(removeRowsCommand)
     this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
   }
 
@@ -491,17 +469,6 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  private reallyDoRemoveRows(cmd: RemoveRowsCommand): RowsRemoval[] {
-    const rowsRemovals: RowsRemoval[] = []
-    for (const index of cmd.normalizedIndexes()) {
-      const rowsRemoval = this.doRemoveRows(cmd.sheet, index[0], index[0] + index[1] - 1)
-      if (rowsRemoval) {
-        rowsRemovals.push(rowsRemoval)
-      }
-    }
-    return rowsRemovals
-  }
-
   /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
@@ -523,36 +490,6 @@ export class CrudOperations implements IBatchExecutor {
       AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
-  }
-
-  /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
-   * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): RowsRemoval | undefined {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return
-    }
-
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    const removedCells: RemovedCell[] = []
-    for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(removedRows)) {
-      removedCells.push({ address, cellType: this.getClipboardCell(address) })
-    }
-
-    this.dependencyGraph.removeRows(removedRows)
-
-    let version : number
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
-    })
-    return { version: version!, removedCells, rowFrom: rowStart, rowCount: rowEnd - rowStart + 1 }
   }
 
   /**
@@ -603,15 +540,8 @@ export class CrudOperations implements IBatchExecutor {
     })
   }
 
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
-   * @param row - row number
-   * @param sheet - sheet id number
-   */
   private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    const height = this.addressMapping.getHeight(sheet)
-    return row >= height
+    return this.operations.rowEffectivelyNotInSheet(row, sheet)
   }
 
   /**
@@ -631,23 +561,6 @@ export class CrudOperations implements IBatchExecutor {
 
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
-  }
-
-  private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
-    const vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex === null || vertex instanceof EmptyCellVertex) {
-      return { type: ClipboardCellType.EMPTY }
-    } else if (vertex instanceof ValueCellVertex) {
-      /* TODO should we copy errors? */
-      return { type: ClipboardCellType.VALUE, value: vertex.getCellValue() }
-    } else if (vertex instanceof MatrixVertex) {
-      return { type: ClipboardCellType.VALUE, value: vertex.getMatrixCellValue(address) }
-    } else if (vertex instanceof FormulaCellVertex) {
-      return { type: ClipboardCellType.FORMULA, hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService)) }
-    }
-
-    throw Error('Trying to copy unsupported type')
   }
 }
 
@@ -673,37 +586,6 @@ export function normalizeAddedIndexes(indexes: Index[]): Index[] {
   let shift = 0
   for (let i = 0; i < merged.length; ++i) {
     merged[i][0] += shift
-    shift += merged[i][1]
-  }
-
-  return merged
-}
-
-export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
-  if (indexes.length <= 1) {
-    return indexes
-  }
-
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
-
-  /* merge overlapping and adjacent indexes */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
-    const previous = acc[acc.length - 1]
-    const lastIndex = previous[0] + previous[1]
-
-    if (startIndex <= lastIndex) {
-      previous[1] += Math.max(0, amount - (lastIndex - startIndex))
-    } else {
-      acc.push([startIndex, amount])
-    }
-
-    return acc
-  }, [sorted[0]])
-
-  /* shift further indexes */
-  let shift = 0
-  for (let i = 0; i < merged.length; ++i) {
-    merged[i][0] -= shift
     shift += merged[i][1]
   }
 

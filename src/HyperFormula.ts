@@ -13,7 +13,8 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
-import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
+import {CrudOperations, normalizeAddedIndexes} from './CrudOperations'
+import {normalizeRemovedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,

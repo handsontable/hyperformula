@@ -1,6 +1,7 @@
 import {SimpleCellAddress} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {CrudOperations, RowsRemoval, RemoveRowsCommand} from './CrudOperations'
+import {Operations, RowsRemoval, RemoveRowsCommand} from './Operations'
+import {CrudOperations} from './CrudOperations'
 import {Index} from './HyperFormula'
 
 export class UndoRedo {
