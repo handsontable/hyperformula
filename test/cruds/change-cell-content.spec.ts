@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, InvalidAddressError, NoSheetWithIdError, ExportedCellChange} from '../../src'
+import {Config, EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -472,6 +472,65 @@ describe('changing cell content', () => {
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 0, 0), 7 ))
+  })
+
+  it('update empty cell to parsing error ', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update dependecy value cell to parsing error ', () => {
+    const sheet = [
+      ['1', '=SUM(A1)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update formula cell to parsing error ', () => {
+    const sheet = [
+      ['1', '=SUM(A1)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('B1'), '=SUM(')
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+  })
+
+  it('update parsing error to formula', () => {
+    const sheet = [
+      ['1', '=SUM('],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    engine.setCellContents(adr('B1'), '=SUM(A1)')
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+  })
+
+  it('update empty cell to unparsable matrix formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '{=TRANSPOSE(}')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
   })
 })
 
