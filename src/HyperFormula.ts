@@ -166,15 +166,15 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getSheetValues(sheet: number): CellValue[][] {
+  public getSheetValues = (sheet: number): CellValue[][] => {
     return this.genericSheetGetter(sheet, this.getCellValue)
   }
 
-  public getSheetFormulas(sheet: number): Maybe<string>[][] {
+  public getSheetFormulas = (sheet: number): Maybe<string>[][] => {
     return this.genericSheetGetter(sheet, this.getCellFormula)
   }
 
-  public getSheetSerialized(sheet: number): CellValue[][] {
+  public getSheetSerialized = (sheet: number): CellValue[][] => {
     return this.genericSheetGetter(sheet, this.getCellSerialized)
   }
 
@@ -218,22 +218,16 @@ export class HyperFormula {
    * Returns map containing values of all sheets.
    *
    */
-  public getAllValues(): Map<string, CellValue[][]> {
-    const sheetValues: Map<string, CellValue[][]> = new Map<string, CellValue[][]>()
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetValues.set(sheetName, this.getSheetValues(sheetId))
-    }
-    return sheetValues
+  public getAllValues(): Record<string, CellValue[][]> {
+    return this.genericAllGetter(this.getSheetValues)
   }
 
-  public getAllFormulas(): Map<string, Maybe<string>[][]> {
-    const sheetFormulas: Map<string, Maybe<string>[][]> = new Map<string, Maybe<string>[][]>()
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetFormulas.set(sheetName, this.getSheetFormulas(sheetId))
-    }
-    return sheetFormulas
+  public getAllFormulas(): Record<string, Maybe<string>[][]> {
+    return this.genericAllGetter(this.getSheetFormulas)
+  }
+
+  public getAllSerialized(): Record<string, CellValue[][]> {
+    return this.genericAllGetter(this.getSheetSerialized)
   }
 
   private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {

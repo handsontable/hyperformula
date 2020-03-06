@@ -37,13 +37,29 @@ describe('Integration', () => {
 
   it('getAllValues', () => {
     const engine = HyperFormula.buildFromSheets({
-      Sheet1: [[1]],
-      Foo: [],
+      Sheet1: [],
+      Foo: [[1]],
     })
 
-    expect(engine.getAllValues().get('Sheet1')).toEqual([[1]])
-    expect(engine.getAllValues().get('Foo')).toEqual([])
-    expect(engine.getAllValues().size).toBe(2)
+    expect(engine.getAllValues()).toEqual({'Foo': [[1]], 'Sheet1': []})
+  })
+
+  it('getAllFormulas', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getAllFormulas()).toEqual({'Foo': [[undefined]], 'Sheet1': [['=A()']]})
+  })
+
+  it('getAllSerialized', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getAllSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
   })
 
   it('handle different input types', () => {
