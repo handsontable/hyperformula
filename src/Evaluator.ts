@@ -13,7 +13,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import Collator = Intl.Collator
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
-export class SingleThreadEvaluator {
+export class Evaluator {
   private interpreter: Interpreter
 
   constructor(
