@@ -217,7 +217,7 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const hash = parser.computeHashFromAst(ast)
-    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
+    expect(hash).toEqual('=SUM(#0R0, #1R0)')
   })
 
   it('should work with decimal separator', () => {

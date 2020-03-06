@@ -434,6 +434,14 @@ describe('cell references and ranges', () => {
     expect(ast.start.sheet).toEqual(1)
     expect(ast.end.sheet).toEqual(2)
   })
+
+  it('offset has relative sheet reference', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const ast = parser.parse('=OFFSET(A1, 1, 2)', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
+
+    expect(ast.reference.sheet).toBe(null)
+  })
 })
 
 

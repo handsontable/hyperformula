@@ -561,7 +561,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
-      this.formulaAddress!.sheet,
+      null,
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
       cellArg.reference.type,
@@ -586,7 +586,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-        this.formulaAddress!.sheet,
+        null,
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
         topLeftCorner.type,
