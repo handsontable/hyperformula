@@ -1,6 +1,6 @@
 import {SimpleCellAddress} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {CrudOperations, RowsRemoval} from './CrudOperations'
+import {CrudOperations, RowsRemoval, RemoveRowsCommand} from './CrudOperations'
 import {Index} from './HyperFormula'
 
 export class UndoRedo {
@@ -16,8 +16,8 @@ export class UndoRedo {
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
-  public saveOperationRemoveRows(sheet: number, rowsRemovals: RowsRemoval[]) {
-    this.undoStack.push({ sheet, rowsRemovals })
+  public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
+    this.undoStack.push({ sheet: removeRowsCommand.sheet, rowsRemovals })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {

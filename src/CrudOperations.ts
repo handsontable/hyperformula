@@ -35,6 +35,18 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
+export class RemoveRowsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes() {
+    return normalizeRemovedIndexes(this.indexes)
+  }
+}
+
 export interface RemovedCell {
   address: SimpleCellAddress,
   cellType: ClipboardCell,
@@ -86,8 +98,9 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
-    const rowsRemovals = this.reallyDoRemoveRows(sheet, indexes)
-    this.undoRedo.saveOperationRemoveRows(sheet, rowsRemovals)
+    const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
+    const rowsRemovals = this.reallyDoRemoveRows(removeRowsCommand)
+    this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
@@ -476,13 +489,12 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
-  private reallyDoRemoveRows(sheet: number, indexes: Index[]): RowsRemoval[] {
-    const normalizedIndexes = normalizeRemovedIndexes(indexes)
-    this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+  private reallyDoRemoveRows(cmd: RemoveRowsCommand): RowsRemoval[] {
+    this.ensureItIsPossibleToRemoveRows(cmd.sheet, ...cmd.normalizedIndexes())
     this.clipboardOperations.abortCut()
     const rowsRemovals: RowsRemoval[] = []
-    for (const index of normalizedIndexes) {
-      const rowsRemoval = this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
+    for (const index of cmd.normalizedIndexes()) {
+      const rowsRemoval = this.doRemoveRows(cmd.sheet, index[0], index[0] + index[1] - 1)
       if (rowsRemoval) {
         rowsRemovals.push(rowsRemoval)
       }
