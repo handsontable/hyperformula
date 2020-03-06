@@ -19,7 +19,7 @@ describe('UndoRedo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-  it('works', () => {
+  it('works for simple values', () => {
     const sheet = [
       ['1'],
       ['2'], // remove
