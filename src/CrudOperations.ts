@@ -99,6 +99,8 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
     const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
+    this.ensureItIsPossibleToRemoveRows(cmd.sheet, ...cmd.normalizedIndexes())
+    this.clipboardOperations.abortCut()
     const rowsRemovals = this.reallyDoRemoveRows(removeRowsCommand)
     this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
   }
@@ -490,8 +492,6 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   private reallyDoRemoveRows(cmd: RemoveRowsCommand): RowsRemoval[] {
-    this.ensureItIsPossibleToRemoveRows(cmd.sheet, ...cmd.normalizedIndexes())
-    this.clipboardOperations.abortCut()
     const rowsRemovals: RowsRemoval[] = []
     for (const index of cmd.normalizedIndexes()) {
       const rowsRemoval = this.doRemoveRows(cmd.sheet, index[0], index[0] + index[1] - 1)
