@@ -83,7 +83,8 @@ export class CellAddress {
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
-    return new CellAddress(toSheet, this.col + toRight, this.row + toBottom, this.type)
+    const newSheet = this.sheet === null ? null : toSheet
+    return new CellAddress(newSheet, this.col + toRight, this.row + toBottom, this.type)
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {

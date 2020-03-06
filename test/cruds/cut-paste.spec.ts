@@ -185,7 +185,7 @@ describe('Move cells', () => {
     engine.paste(adr('B1', 1))
 
     const reference = extractReference(engine, adr('A2'))
-    expect(reference).toEqual(CellAddress.relative(1, 1, -1))
+    expect(reference).toEqual(CellAddress.relative(null, 1, -1))
   })
 
   it('should override and remove formula', () => {
