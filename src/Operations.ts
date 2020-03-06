@@ -29,7 +29,7 @@ export class RemoveRowsCommand {
   }
 }
 
-export interface RemovedCell {
+export interface ChangedCell {
   address: SimpleCellAddress,
   cellType: ClipboardCell,
 }
@@ -38,7 +38,7 @@ export interface RowsRemoval {
   rowFrom: number,
   rowCount: number,
   version: number,
-  removedCells: RemovedCell[]
+  removedCells: ChangedCell[]
 }
 
 export class Operations {
@@ -75,7 +75,7 @@ export class Operations {
       return
     }
 
-    const removedCells: RemovedCell[] = []
+    const removedCells: ChangedCell[] = []
     for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(rowsToRemove)) {
       removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
