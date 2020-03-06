@@ -115,15 +115,15 @@ describe('computeHashFromTokens', () => {
   })
 
   it('should work with whitespaces', () => {
-    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( A1, A1:A2 )'
+    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( Sheet1!A1, A1:A2 )'
     const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
-    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 )')
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0R0:#1R0 )')
   })
 
   it('should skip whitespaces inside range ', () => {
     const formula = '=SUM( A1 : A2 )'
     const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
-    expect(hash).toEqual('=SUM( #0#0R0:#0#1R0 )')
+    expect(hash).toEqual('=SUM( #0R0:#1R0 )')
   })
 
   it('should skip trailing whitespace', () => {
@@ -135,6 +135,6 @@ describe('computeHashFromTokens', () => {
   it('should skip whitespaces before function args separators', () => {
     const formula = '=SUM(A1 , A2)'
     const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
-    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
+    expect(hash).toEqual('=SUM(#0R0, #1R0)')
   })
 })
