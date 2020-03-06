@@ -24,7 +24,7 @@ import {
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
 import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
-import {Evaluator} from './Evaluator'
+import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -141,7 +141,7 @@ export class HyperFormula implements TypedEmitter {
     private unparser: Unparser,
     private cellContentParser: CellContentParser,
     /** Formula evaluator. */
-    public evaluator: Evaluator,
+    public evaluator: SingleThreadEvaluator,
     /** Service handling postponed CRUD transformations. */
     public lazilyTransformingAstService: LazilyTransformingAstService,
     public undoRedo: UndoRedo,

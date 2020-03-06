@@ -4,7 +4,6 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
-import {Evaluator} from './Evaluator'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
@@ -14,7 +13,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import Collator = Intl.Collator
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
-export class SingleThreadEvaluator implements Evaluator {
+export class SingleThreadEvaluator {
   private interpreter: Interpreter
 
   constructor(
