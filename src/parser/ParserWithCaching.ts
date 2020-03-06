@@ -98,7 +98,7 @@ export class ParserWithCaching {
         if (cellAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
-          hash = hash.concat(cellHashFromToken(cellAddress))
+          hash = hash.concat(referenceHashFromCellAddress(cellAddress))
         }
         idx++
       } else if (tokenMatcher(token, ProcedureName)) {
@@ -141,11 +141,11 @@ export class ParserWithCaching {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return imageWithWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
+        return imageWithWhitespace(referenceHashFromCellAddress(ast.reference), ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
-        const start = cellHashFromToken(ast.start)
-        const end = cellHashFromToken(ast.end)
+        const start = referenceHashFromCellAddress(ast.start)
+        const end = referenceHashFromCellAddress(ast.end)
         return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -178,7 +178,7 @@ export class ParserWithCaching {
   }
 }
 
-export const cellHashFromToken = (cellAddress: CellAddress): string => {
+export const referenceHashFromCellAddress = (cellAddress: CellAddress): string => {
   const sheetPart = cellAddress.sheet === null ? '' : `#${cellAddress.sheet}`
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {

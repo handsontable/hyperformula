@@ -209,7 +209,7 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const hash = parser.computeHashFromAst(ast)
-    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 ) + #DIV/0!')
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0R0, #0R0:#1R0 ) + #DIV/0!')
   })
 
   it('should skip whitespaces before function args separators', () => {

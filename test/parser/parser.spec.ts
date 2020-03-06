@@ -405,6 +405,19 @@ describe('cell references and ranges', () => {
 
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.start.sheet).toEqual(1)
+    expect(ast.end.sheet).toEqual(null)
+  })
+
+  it('cell range may have only sheet specified in end address', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.start.sheet).toEqual(null)
     expect(ast.end.sheet).toEqual(1)
   })
 

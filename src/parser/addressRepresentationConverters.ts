@@ -14,10 +14,9 @@ const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${a
  * @param sheetMapping - mapping function needed to change name of a sheet to index
  * @param stringAddress - string representation of cell address, e.g. 'C64'
  * @param baseAddress - base address for R0C0 conversion
- * @param overrideSheet - override sheet index regardless of sheet mapping
  * @returns object representation of address
  */
-export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): Maybe<CellAddress> => {
+export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<CellAddress> => {
   const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
@@ -28,12 +27,9 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   if (maybeSheetName) {
     sheet = sheetMapping(maybeSheetName)
-  } else if (overrideSheet !== undefined) {
-    sheet = overrideSheet
-  }
-
-  if (sheet === undefined) {
-    return undefined
+    if (sheet === undefined) {
+      return undefined
+    }
   }
 
   const row = Number(result[8]) - 1
