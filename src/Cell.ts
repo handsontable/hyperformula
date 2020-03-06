@@ -119,6 +119,10 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
+export const absoluteSheetReference = (address: CellAddress, baseAddress: SimpleCellAddress): number => {
+  return address.sheet === null ? baseAddress.sheet : address.sheet
+}
+
 export interface SheetCellAddress {
   col: number,
   row: number,
