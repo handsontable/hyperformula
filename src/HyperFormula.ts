@@ -151,7 +151,7 @@ export class HyperFormula {
     return undefined
   }
 
-  public getSerializedCell = (address: SimpleCellAddress): CellValue => {
+  public getCellSerialized = (address: SimpleCellAddress): CellValue => {
     return this.getCellFormula(address) || this.getCellValue(address)
   }
 
@@ -168,8 +168,8 @@ export class HyperFormula {
     return this.genericSheetGetter(sheet, this.getCellFormula)
   }
 
-  public getSerializedSheet(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, this.getSerializedCell)
+  public getSheetSerialized(sheet: number): CellValue[][] {
+    return this.genericSheetGetter(sheet, this.getCellSerialized)
   }
 
   private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -193,12 +193,7 @@ export class HyperFormula {
    *
    */
   public getSheetsDimensions(): Record<string, { width: number, height: number }> {
-    const sheetDimensions: Record<string, { width: number, height: number}> = {}
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetDimensions[sheetName] =  this.getSheetDimensions(sheetId)
-    }
-    return sheetDimensions
+    return this.genericAllGetter(this.getSheetDimensions)
   }
 
   /**
@@ -206,7 +201,7 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getSheetDimensions(sheet: number): { width: number, height: number } {
+  public getSheetDimensions = (sheet: number): { width: number, height: number } => {
     return {
       width: this.dependencyGraph.getSheetWidth(sheet),
       height: this.dependencyGraph.getSheetHeight(sheet),
@@ -233,6 +228,15 @@ export class HyperFormula {
       sheetFormulas.set(sheetName, this.getSheetFormulas(sheetId))
     }
     return sheetFormulas
+  }
+
+  private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
+    const ret: Record<string, T> = {}
+    for (const sheetName of this.sheetMapping.displayNames()) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      ret[sheetName] =  sheetGetter(sheetId)
+    }
+    return ret
   }
 
   /**

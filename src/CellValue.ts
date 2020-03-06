@@ -3,6 +3,8 @@ import {CellValueChange} from './ContentChanges'
 import {Config} from './Config'
 import {NamedExpressions} from './NamedExpressions'
 
+export type Maybe<T> = T | undefined
+
 export type CellValue = NoErrorCellValue | DetailedCellError
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
