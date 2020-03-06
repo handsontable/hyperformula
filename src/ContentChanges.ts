@@ -52,6 +52,10 @@ export class ContentChanges {
     return this.changes
   }
 
+  public isEmpty(): boolean {
+    return this.changes === []
+  }
+
   private addSingleCellValue(value: InternalCellValue, address: SimpleCellAddress) {
     this.add({
       sheet: address.sheet,

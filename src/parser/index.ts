@@ -48,7 +48,7 @@ export {
 
   buildProcedureAst,
   buildCellRangeAst,
-  buildErrorAst,
+  buildParsingErrorAst,
   buildCellErrorAst,
 } from './Ast'
 

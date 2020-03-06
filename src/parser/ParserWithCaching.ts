@@ -1,8 +1,8 @@
 import {IToken, tokenMatcher} from 'chevrotain'
-import {SimpleCellAddress} from '../Cell'
-import {RelativeDependency} from './'
+import {ErrorType, SimpleCellAddress} from '../Cell'
+import {buildParsingErrorAst, RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
-import {Ast, AstNodeType, buildErrorAst, imageWithWhitespace, ParsingErrorType} from './Ast'
+import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
@@ -13,6 +13,7 @@ import {formatNumber} from './Unparser'
 
 export interface ParsingResult {
   ast: Ast,
+  errors: ParsingError[],
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
@@ -48,13 +49,13 @@ export class ParserWithCaching {
     const lexerResult = this.lexer.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
-      const ast = buildErrorAst(lexerResult.errors.map((e) =>
+      const errors = lexerResult.errors.map((e) =>
         ({
           type: ParsingErrorType.LexingError,
           message: e.message,
         }),
-      ))
-      return {ast, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: []}
+      )
+      return { ast: buildParsingErrorAst(), errors, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: [] }
     }
 
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
@@ -65,11 +66,16 @@ export class ParserWithCaching {
     } else {
       const processedTokens = bindWhitespacesToTokens(lexerResult.tokens)
       const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
-      cacheResult = this.cache.set(hash, parsingResult)
+
+      if (parsingResult.errors.length > 0) {
+        return { ...parsingResult, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: [] }
+      } else {
+        cacheResult = this.cache.set(hash, parsingResult.ast)
+      }
     }
     const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
   }
 
   public fetchCachedResult(hash: string): ParsingResult {
@@ -78,7 +84,7 @@ export class ParserWithCaching {
       throw new Error('There is no AST with such key in the cache')
     } else {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
     }
   }
 
@@ -156,7 +162,7 @@ export class ParserWithCaching {
         if (ast.error) {
           image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          image = '#ERR!'
+          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }

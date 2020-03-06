@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from '../Cell'
+import {ErrorType, SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
 import {Ast, AstNodeType, imageWithWhitespace} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -67,7 +67,7 @@ export class Unparser {
         if (ast.error) {
           image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          image = '#ERR!'
+          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
