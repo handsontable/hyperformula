@@ -116,7 +116,7 @@ export class Operations {
     }
 
     const removedCells: ChangedCell[] = []
-    for (const [address, vertex] of this.dependencyGraph.addressMapping.entriesFromRowsSpan(rowsToRemove)) {
+    for (const [address, vertex] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
       removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
 
