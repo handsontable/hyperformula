@@ -56,38 +56,46 @@ export class UndoRedo {
   }
 
   public undo() {
-    const operation = this.undoStack.pop()!
+    const operation = this.undoStack.pop()
+    if (!operation) {
+      throw "Attempted to undo without operation on stack"
+    }
 
-    if (operation.type === UndoStackElementType.REMOVE_ROWS) {
-      const { sheet, rowsRemovals } = operation
-      for (let i = rowsRemovals.length - 1; i >= 0; --i) {
-        const rowsRemoval = rowsRemovals[i]
-        this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+    switch(operation.type) {
+      case UndoStackElementType.REMOVE_ROWS: {
+        const { sheet, rowsRemovals } = operation
+        for (let i = rowsRemovals.length - 1; i >= 0; --i) {
+          const rowsRemoval = rowsRemovals[i]
+          this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
 
-        for (let { address, cellType } of rowsRemoval.removedCells) {
-          switch (cellType.type) {
-            case ClipboardCellType.VALUE: {
-              this.crudOperations?.setValueToCell(cellType.value, address)
-              break
-            }
-            case ClipboardCellType.FORMULA: {
-              this.crudOperations?.setFormulaToCellFromCache(cellType.hash, address)
-              break
+          for (let { address, cellType } of rowsRemoval.removedCells) {
+            switch (cellType.type) {
+              case ClipboardCellType.VALUE: {
+                this.crudOperations?.setValueToCell(cellType.value, address)
+                break
+              }
+              case ClipboardCellType.FORMULA: {
+                this.crudOperations?.setFormulaToCellFromCache(cellType.hash, address)
+                break
+              }
             }
           }
-        }
 
-        const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
-        for (const entryToRestore of oldDataToRestore) {
-          const [ address, hash ] = entryToRestore
-          this.crudOperations!.setFormulaToCellFromCache(hash, address)
+          const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
+          for (const entryToRestore of oldDataToRestore) {
+            const [ address, hash ] = entryToRestore
+            this.crudOperations!.setFormulaToCellFromCache(hash, address)
+          }
         }
+        break;
       }
-    } else {
-      const { sheet, rowsAdditions } = operation
-      for (let i = rowsAdditions.length - 1; i >= 0; --i) {
-        const rowsAddition = rowsAdditions[i]
-        this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
+      case UndoStackElementType.ADD_ROWS: {
+        const { sheet, rowsAdditions } = operation
+        for (let i = rowsAdditions.length - 1; i >= 0; --i) {
+          const rowsAddition = rowsAdditions[i]
+          this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
+        }
+        break;
       }
     }
   }
