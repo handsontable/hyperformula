@@ -1,6 +1,6 @@
 import {SimpleCellAddress} from './Cell'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {Operations, RowsRemoval, RemoveRowsCommand, RowsAddition} from './Operations'
+import {Operations, RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
 import {Index} from './HyperFormula'
 
@@ -49,7 +49,7 @@ export class UndoRedo {
       const { sheet, rowsRemovals } = operation
       for (let i = rowsRemovals.length - 1; i >= 0; --i) {
         const rowsRemoval = rowsRemovals[i]
-        this.crudOperations!.reallyDoAddRows(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]])
+        this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
 
         for (let { address, cellType } of rowsRemoval.removedCells) {
           switch (cellType.type) {

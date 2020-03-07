@@ -3,7 +3,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
-import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, RowsAddition} from './Operations'
+import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, RowsAddition, AddRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -21,7 +21,6 @@ import {
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
@@ -63,22 +62,11 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
-    const rowsAdditions = this.reallyDoAddRows(sheet, indexes)
-    this.undoRedo.saveOperationAddRows(sheet, rowsAdditions)
-  }
-
-  public reallyDoAddRows(sheet: number, indexes: Index[]): RowsAddition[] {
-    const normalizedIndexes = normalizeAddedIndexes(indexes)
-    this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+    const addRowsCommand = new AddRowsCommand(sheet, indexes)
+    this.ensureItIsPossibleToAddRows(sheet, ...addRowsCommand.normalizedIndexes())
     this.clipboardOperations.abortCut()
-    const rowsAdditions: RowsAddition[] = []
-    for (const index of normalizedIndexes) {
-      const rowAddition = this.doAddRows(sheet, index[0], index[1])
-      if (rowAddition) {
-        rowsAdditions.push(rowAddition)
-      }
-    }
-    return rowsAdditions
+    const rowsAdditions = this.operations.addRows(addRowsCommand)
+    this.undoRedo.saveOperationAddRows(sheet, rowsAdditions)
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
@@ -476,31 +464,6 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   /**
-   * Add multiple rows to sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
-   */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): RowsAddition | undefined {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return
-    }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
-    })
-
-    return { afterRow: row, rowCount: numberOfRowsToAdd }
-  }
-
-  /**
    * Add multiple columns to sheet </br>
    * Does nothing if columns are outside of effective sheet size
    *
@@ -548,10 +511,6 @@ export class CrudOperations implements IBatchExecutor {
     })
   }
 
-  private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    return this.operations.rowEffectivelyNotInSheet(row, sheet)
-  }
-
   /**
    * Returns true if row number is outside of given sheet.
    *
@@ -570,34 +529,6 @@ export class CrudOperations implements IBatchExecutor {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
-}
-
-export function normalizeAddedIndexes(indexes: Index[]): Index[] {
-  if (indexes.length <= 1) {
-    return indexes
-  }
-
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
-
-  /* merge indexes with same start */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
-    const previous = acc[acc.length - 1]
-    if (startIndex === previous[0]) {
-      previous[1] = Math.max(previous[1], amount)
-    } else {
-      acc.push([startIndex, amount])
-    }
-    return acc
-  }, [sorted[0]])
-
-  /* shift further indexes */
-  let shift = 0
-  for (let i = 0; i < merged.length; ++i) {
-    merged[i][0] += shift
-    shift += merged[i][1]
-  }
-
-  return merged
 }
 
 function isPositiveInteger(x: number): boolean {

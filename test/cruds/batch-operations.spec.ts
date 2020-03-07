@@ -1,6 +1,5 @@
 import {EmptyValue, HyperFormula} from '../../src'
-import {normalizeAddedIndexes} from '../../src/CrudOperations'
-import {normalizeRemovedIndexes} from '../../src/Operations'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
 import '../testConfig'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 

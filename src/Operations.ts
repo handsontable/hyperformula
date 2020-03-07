@@ -16,6 +16,7 @@ import {
 } from './DependencyGraph'
 import {ParserWithCaching} from './parser'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
+import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 
 export class RemoveRowsCommand {
   constructor(
@@ -26,6 +27,18 @@ export class RemoveRowsCommand {
 
   public normalizedIndexes() {
     return normalizeRemovedIndexes(this.indexes)
+  }
+}
+
+export class AddRowsCommand {
+  constructor(
+    public readonly sheet: number,
+    public readonly indexes: Index[]
+  ) {
+  }
+
+  public normalizedIndexes() {
+    return normalizeAddedIndexes(this.indexes)
   }
 }
 
@@ -67,6 +80,17 @@ export class Operations {
     return rowsRemovals
   }
 
+  public addRows(cmd: AddRowsCommand): RowsAddition[] {
+    const rowsAdditions: RowsAddition[] = []
+    for (const index of cmd.normalizedIndexes()) {
+      const rowAddition = this.doAddRows(cmd.sheet, index[0], index[1])
+      if (rowAddition) {
+        rowsAdditions.push(rowAddition)
+      }
+    }
+    return rowsAdditions
+  }
+
   /**
    * Removes multiple rows from sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
@@ -93,6 +117,31 @@ export class Operations {
       version = this.lazilyTransformingAstService.addRemoveRowsTransformation(rowsToRemove)
     })
     return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
+  }
+
+  /**
+   * Add multiple rows to sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param row - row number above which the rows will be added
+   * @param numberOfRowsToAdd - number of rows to add
+   */
+  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): RowsAddition | undefined {
+    if (this.rowEffectivelyNotInSheet(row, sheet)) {
+      return
+    }
+
+    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
+
+    this.dependencyGraph.addRows(addedRows)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
+    })
+
+    return { afterRow: row, rowCount: numberOfRowsToAdd }
   }
 
   private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
@@ -149,6 +198,34 @@ export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
   let shift = 0
   for (let i = 0; i < merged.length; ++i) {
     merged[i][0] -= shift
+    shift += merged[i][1]
+  }
+
+  return merged
+}
+
+export function normalizeAddedIndexes(indexes: Index[]): Index[] {
+  if (indexes.length <= 1) {
+    return indexes
+  }
+
+  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
+
+  /* merge indexes with same start */
+  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
+    const previous = acc[acc.length - 1]
+    if (startIndex === previous[0]) {
+      previous[1] = Math.max(previous[1], amount)
+    } else {
+      acc.push([startIndex, amount])
+    }
+    return acc
+  }, [sorted[0]])
+
+  /* shift further indexes */
+  let shift = 0
+  for (let i = 0; i < merged.length; ++i) {
+    merged[i][0] += shift
     shift += merged[i][1]
   }
 
