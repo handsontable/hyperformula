@@ -25,8 +25,14 @@ export class RemoveRowsCommand {
   ) {
   }
 
-  public normalizedIndexes() {
+  public normalizedIndexes(): Index[] {
     return normalizeRemovedIndexes(this.indexes)
+  }
+
+  public rowsSpans(): RowsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      RowsSpan.fromNumberOfRows(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
   }
 }
 
@@ -37,8 +43,14 @@ export class AddRowsCommand {
   ) {
   }
 
-  public normalizedIndexes() {
+  public normalizedIndexes(): Index[] {
     return normalizeAddedIndexes(this.indexes)
+  }
+
+  public rowsSpans(): RowsSpan[] {
+    return this.normalizedIndexes().map(normalizedIndex =>
+      RowsSpan.fromNumberOfRows(this.sheet, normalizedIndex[0], normalizedIndex[1])
+    )
   }
 }
 
@@ -70,8 +82,7 @@ export class Operations {
 
   public removeRows(cmd: RemoveRowsCommand): RowsRemoval[] {
     const rowsRemovals: RowsRemoval[] = []
-    for (const index of cmd.normalizedIndexes()) {
-      const rowsToRemove = RowsSpan.fromNumberOfRows(cmd.sheet, index[0], index[1])
+    for (const rowsToRemove of cmd.rowsSpans()) {
       const rowsRemoval = this.doRemoveRows(rowsToRemove)
       if (rowsRemoval) {
         rowsRemovals.push(rowsRemoval)
@@ -82,8 +93,7 @@ export class Operations {
 
   public addRows(cmd: AddRowsCommand): RowsAddition[] {
     const rowsAdditions: RowsAddition[] = []
-    for (const index of cmd.normalizedIndexes()) {
-      const addedRows = RowsSpan.fromNumberOfRows(cmd.sheet, index[0], index[1])
+    for (const addedRows of cmd.rowsSpans()) {
       const rowAddition = this.doAddRows(addedRows)
       if (rowAddition) {
         rowsAdditions.push(rowAddition)
