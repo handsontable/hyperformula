@@ -4,30 +4,43 @@ import {Operations, RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand
 import {CrudOperations} from './CrudOperations'
 import {Index} from './HyperFormula'
 
+enum UndoStackElementType {
+  REMOVE_ROWS = 'REMOVE_ROWS',
+  ADD_ROWS = 'ADD_ROWS',
+}
+
+interface RemoveRowsUndoData {
+  type: UndoStackElementType.REMOVE_ROWS,
+  sheet: number,
+  rowsRemovals: RowsRemoval[],
+}
+
+interface AddRowsUndoData {
+  type: UndoStackElementType.ADD_ROWS,
+  sheet: number,
+  rowsAdditions: RowsAddition[],
+}
+
+type UndoStackElement
+  = RemoveRowsUndoData
+  | AddRowsUndoData
+
 export class UndoRedo {
 
   constructor() {
   }
 
-  public readonly undoStack: ({
-    type: 'remove-rows',
-    sheet: number,
-    rowsRemovals: RowsRemoval[],
-  } | {
-    type: 'add-rows',
-    sheet: number,
-    rowsAdditions: RowsAddition[],
-  })[] = []
+  public readonly undoStack: UndoStackElement[] = []
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
 
   public saveOperationRemoveRows(removeRowsCommand: RemoveRowsCommand, rowsRemovals: RowsRemoval[]) {
-    this.undoStack.push({ type: 'remove-rows', sheet: removeRowsCommand.sheet, rowsRemovals })
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, sheet: removeRowsCommand.sheet, rowsRemovals })
   }
 
   public saveOperationAddRows(sheet: number, rowsAdditions: RowsAddition[]) {
-    this.undoStack.push({ type: 'add-rows', sheet: sheet, rowsAdditions })
+    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: sheet, rowsAdditions })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -45,7 +58,7 @@ export class UndoRedo {
   public undo() {
     const operation = this.undoStack.pop()!
 
-    if (operation.type === "remove-rows") {
+    if (operation.type === UndoStackElementType.REMOVE_ROWS) {
       const { sheet, rowsRemovals } = operation
       for (let i = rowsRemovals.length - 1; i >= 0; --i) {
         const rowsRemoval = rowsRemovals[i]
