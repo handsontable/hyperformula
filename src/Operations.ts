@@ -83,7 +83,8 @@ export class Operations {
   public addRows(cmd: AddRowsCommand): RowsAddition[] {
     const rowsAdditions: RowsAddition[] = []
     for (const index of cmd.normalizedIndexes()) {
-      const rowAddition = this.doAddRows(cmd.sheet, index[0], index[1])
+      const addedRows = RowsSpan.fromNumberOfRows(cmd.sheet, index[0], index[1])
+      const rowAddition = this.doAddRows(addedRows)
       if (rowAddition) {
         rowsAdditions.push(rowAddition)
       }
@@ -127,12 +128,10 @@ export class Operations {
    * @param row - row number above which the rows will be added
    * @param numberOfRowsToAdd - number of rows to add
    */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): RowsAddition | undefined {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
+  private doAddRows(addedRows: RowsSpan): RowsAddition | undefined {
+    if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
       return
     }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
 
     this.dependencyGraph.addRows(addedRows)
 
@@ -141,7 +140,7 @@ export class Operations {
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
 
-    return { afterRow: row, rowCount: numberOfRowsToAdd }
+    return { afterRow: addedRows.rowStart, rowCount: addedRows.numberOfRows }
   }
 
   private getClipboardCell(address: SimpleCellAddress): ClipboardCell {
