@@ -39,8 +39,8 @@ export class UndoRedo {
     this.undoStack.push({ type: UndoStackElementType.REMOVE_ROWS, sheet: removeRowsCommand.sheet, rowsRemovals })
   }
 
-  public saveOperationAddRows(sheet: number, rowsAdditions: RowsAddition[]) {
-    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: sheet, rowsAdditions })
+  public saveOperationAddRows(addRowsCommand: AddRowsCommand, rowsAdditions: RowsAddition[]) {
+    this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: addRowsCommand.sheet, rowsAdditions })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {

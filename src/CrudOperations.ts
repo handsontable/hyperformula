@@ -66,7 +66,7 @@ export class CrudOperations implements IBatchExecutor {
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     const rowsAdditions = this.operations.addRows(addRowsCommand)
-    this.undoRedo.saveOperationAddRows(sheet, rowsAdditions)
+    this.undoRedo.saveOperationAddRows(addRowsCommand, rowsAdditions)
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
