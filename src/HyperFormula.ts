@@ -300,6 +300,10 @@ export class HyperFormula {
     this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isThereSomethingToUndo() {
+    return !this.undoRedo.isUndoStackEmpty()
+  }
+
   /**
    * Returns information whether its possible to change content in a rectangular idea bounded by the box
    *

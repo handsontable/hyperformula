@@ -100,3 +100,18 @@ describe("UndoRedo", () => {
     }).toThrowError(new NoOperationToUndo())
   })
 })
+
+describe("UndoRedo - #isThereSomethingToUndo", () => {
+  it("when there is no operation to undo", () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.isThereSomethingToUndo()).toBe(false)
+  })
+
+  it("when there is some operation to undo", () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeRows(0, [1, 1])
+
+    expect(engine.isThereSomethingToUndo()).toBe(true)
+  })
+})
