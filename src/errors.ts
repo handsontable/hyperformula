@@ -42,6 +42,12 @@ export class NamedExpressionDoesNotExist extends Error {
   }
 }
 
+export class NoOperationToUndo extends Error {
+  constructor() {
+    super("There is no operation to undo")
+  }
+}
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':

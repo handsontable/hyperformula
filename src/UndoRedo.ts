@@ -38,6 +38,10 @@ export class UndoRedo {
     currentOldData.push([address, astHash])
   }
 
+  public isUndoStackEmpty(): boolean {
+    return this.undoStack.length === 0
+  }
+
   public undo() {
     const operation = this.undoStack.pop()!
 

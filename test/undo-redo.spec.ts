@@ -1,4 +1,4 @@
-import {Config, HyperFormula, ExportedCellChange} from '../src'
+import {Config, HyperFormula, NoOperationToUndo, ExportedCellChange} from '../src'
 import './testConfig'
 import {
   expectEngineToBeTheSameAs,
@@ -88,5 +88,15 @@ describe('UndoRedo - adding rows', () => {
     engine.undo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
+describe("UndoRedo", () => {
+  it("when there is no operation to undo", () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.undo()
+    }).toThrowError(new NoOperationToUndo())
   })
 })
