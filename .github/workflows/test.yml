@@ -4,10 +4,19 @@ on: [push]
 
 jobs:
   build:
+    strategy:
+      matrix:
+        python: [ '2.7' ]
+        os: [ 'ubuntu-latest' ]
     name: Unit
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Use Python 2.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
 
       - name: Use Node.js 13
         uses: actions/setup-node@b6651e20e530d6e6b845a9828606779e89f5529c # https://github.com/actions/setup-node/releases/tag/v1.3.0
@@ -17,6 +26,9 @@ jobs:
       - name: Install Yarn
         run: |
           npm install -g yarn@legacy
+
+      - name: Install `gl` os dependencies
+        run: sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
 
       - name: Install dependencies
         run: |
