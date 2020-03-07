@@ -4,20 +4,34 @@ on: [push]
 
 jobs:
   build:
-    name: NPM audit
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ '13' ]
+        os: [ 'ubuntu-latest' ]
+        python: [ '2.7' ]
+    name: AUDIT
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+      - uses: actions/checkout@v2
 
-      - name: Use Node.js 13
-        uses: actions/setup-node@b6651e20e530d6e6b845a9828606779e89f5529c # https://github.com/actions/setup-node/releases/tag/v1.3.0
+      - name: Use Python ${{ matrix.python }}
+        uses: actions/setup-python@v1
         with:
-          node-version: '13.x'
+          python-version: ${{ matrix.python }}
 
-      - name: NPM install
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install OS dependencies for `headless-gl`
+          run: |
+            sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
+
+      - name: Install dependencies
         run: |
           npm install
 
-      - name: NPM audit
+      - name: Run audit
         run: |
           npm audit
