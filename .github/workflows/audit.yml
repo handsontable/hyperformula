@@ -25,8 +25,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install OS dependencies for `headless-gl`
-          run: |
-            sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
+        run: |
+          sudo apt-get install -y build-essential libxi-dev libglu1-mesa-dev libglew-dev pkg-config
 
       - name: Install dependencies
         run: |
