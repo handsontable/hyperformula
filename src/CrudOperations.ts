@@ -63,7 +63,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public addRows(sheet: number, ...indexes: Index[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
-    this.ensureItIsPossibleToAddRows(sheet, ...addRowsCommand.normalizedIndexes())
+    this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     const rowsAdditions = this.operations.addRows(addRowsCommand)
     this.undoRedo.saveOperationAddRows(sheet, rowsAdditions)
@@ -79,7 +79,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
-    this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+    this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
@@ -88,7 +88,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
-    this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+    this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
