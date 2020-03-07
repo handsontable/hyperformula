@@ -86,6 +86,21 @@ describe('UndoRedo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('works for more removal segments', () => {
+    const sheet = [
+      ['1'],
+      ['2'],
+      ['3'],
+      ['4'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeRows(0, [1, 1], [3, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('UndoRedo - adding rows', () => {
@@ -108,6 +123,20 @@ describe('UndoRedo - adding rows', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.addRows(0, [1000, 1])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for more addition segments', () => {
+    const sheet = [
+      ['1'],
+      ['2'],
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.addRows(0, [1, 1], [2, 1])
 
     engine.undo()
 
