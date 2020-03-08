@@ -87,6 +87,15 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
+  public getDisplayNameByName(expressionName: string): string | undefined {
+    const namedExpression = this.workbookStore.get(expressionName)
+    if (namedExpression) {
+      return namedExpression.name
+    } else {
+      return undefined
+    }
+  }
+
   public isNameValid(expressionName: string): boolean {
     if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
       return false
@@ -116,13 +125,14 @@ export class NamedExpressions {
     }
   }
 
-  public removeNamedExpression(expressionName: string): void {
+  public removeNamedExpression(expressionName: string): boolean {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      return
+      return false
     }
     this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
     this.workbookStore.remove(expressionName)
+    return true
   }
 
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {

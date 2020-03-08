@@ -9,7 +9,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
@@ -66,6 +66,14 @@ export class DependencyGraph {
     if (hasStructuralChangeFunction) {
       this.markAsDependentOnStructureChange(newVertex)
     }
+  }
+
+  public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
+    const vertex = this.addressMapping.getCell(address)
+    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.graph.exchangeOrAddNode(vertex, errorVertex)
+    this.addressMapping.setCell(address, errorVertex)
+    this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
   }
 
   public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {

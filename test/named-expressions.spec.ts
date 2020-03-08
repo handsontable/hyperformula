@@ -142,7 +142,7 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.changeNamedExpressionExpression('myName', '=Sheet1!A1+11')
+    engine.changeNamedExpression('myName', '=Sheet1!A1+11')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
@@ -153,7 +153,7 @@ describe('Named expressions', () => {
     ])
     engine.addNamedExpression('myName', '=Sheet1!A1+10')
 
-    engine.changeNamedExpressionExpression('myName', 58)
+    engine.changeNamedExpression('myName', 58)
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(58)
   })
@@ -164,7 +164,7 @@ describe('Named expressions', () => {
     engine.addNamedExpression('myName', '=42')
 
     expect(() => {
-      engine.changeNamedExpressionExpression('myName', '{=TRANSPOSE(A1:B2)}')
+      engine.changeNamedExpression('myName', '{=TRANSPOSE(A1:B2)}')
     }).toThrowError(/not supported/)
   })
 
@@ -172,7 +172,7 @@ describe('Named expressions', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
-      engine.changeNamedExpressionExpression('myName', '=42')
+      engine.changeNamedExpression('myName', '=42')
     }).toThrowError("Named Expression 'myName' does not exist")
   })
 
@@ -196,7 +196,7 @@ describe('Named expressions', () => {
 
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
     expect(() => {
-      engine.changeNamedExpressionExpression('MYname', '=43')
+      engine.changeNamedExpression('MYname', '=43')
     }).not.toThrow()
     expect(() => {
       engine.removeNamedExpression('MYname')

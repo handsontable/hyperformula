@@ -19,10 +19,10 @@ describe('Parser - range offset', () => {
   it('OFFSET - range offset not allowed', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
-    const ast = parser.parse('=A1:OFFSET(B2, 0, 0, 2, 2)', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
-    const ast2 = parser.parse('=OFFSET(A1,0,0,2,2):A2', CellAddress.absolute(0, 0, 0)).ast as ErrorAst
+    const { errors: errors1 } = parser.parse('=A1:OFFSET(B2, 0, 0, 2, 2)', CellAddress.absolute(0, 0, 0))
+    const { errors: errors2 } = parser.parse('=OFFSET(A1,0,0,2,2):A2', CellAddress.absolute(0, 0, 0))
 
-    expect(ast.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
-    expect(ast2.args[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
+    expect(errors1[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
+    expect(errors2[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
   })
 })
