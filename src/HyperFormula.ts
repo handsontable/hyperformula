@@ -150,13 +150,13 @@ export class HyperFormula {
   /**
    * Returns the cell value of a given address.
    * 
-   * Returned value can be either number or string or boolean or a Symbol() for empty values.
-   * 
    * @throws Throws an error if the given sheet ID does not exist.
    * 
    * Applies rounding and post-processing.
    *
    * @param {SimpleCellAddress} address - cell coordinates
+   * 
+   * @returns a {@link CellValue}
    * 
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
@@ -300,7 +300,7 @@ export class HyperFormula {
   /**
    * Sets the content for a block of cells of a given coordinates.
    * 
-   * The method accepts address which is the cell coordinates, width and height of the block.
+   * The method accepts address which is the cell coordinates, width and height of the block, and {@link RawCellContent}
    * 
    *
    * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
@@ -1048,7 +1048,7 @@ export class HyperFormula {
    * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns a {@link CellType} which is a named constant
+   * @returns a {@link CellValueType} which is a named constant
    * */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
     const value = this.dependencyGraph.getCellValue(address)

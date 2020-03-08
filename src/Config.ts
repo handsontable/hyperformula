@@ -154,13 +154,13 @@ export class Config implements ConfigParams, ParserConfig{
   /*
   * A separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
   *
-  * @default a coma - ','
+  * @default ','
   * */
   public readonly functionArgSeparator: string
   /*
   * A decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
   *
-  * @default a full stop - '.'
+  * @default '.'
   * */
   public readonly decimalSeparator: '.' | ','
   /*
@@ -221,13 +221,13 @@ export class Config implements ConfigParams, ParserConfig{
   /*
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
-   * @default built-in default function for date parsing
+   * @default defaultParseDate
    */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
   /*
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
-   * @default built-in function for stringifying dates
+   * @default defaultStringifyDate
    */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   /*
