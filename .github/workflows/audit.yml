@@ -12,15 +12,15 @@ jobs:
     name: AUDIT
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
       - name: Use Python ${{ matrix.python }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@9ac730844c47e52575257e93faf193c4530bc095 # https://github.com/actions/setup-python/releases/tag/v1.2.0
         with:
           python-version: ${{ matrix.python }}
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@b6651e20e530d6e6b845a9828606779e89f5529c # https://github.com/actions/setup-node/releases/tag/v1.3.0
         with:
           node-version: ${{ matrix.node-version }}
 
