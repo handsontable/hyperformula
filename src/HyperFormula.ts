@@ -302,7 +302,8 @@ export class HyperFormula {
    * 
    * The method accepts address which is the cell coordinates, width and height of the block, and {@link RawCellContent}
    * 
-   *
+   * Note that this method may trigger dependency graph recalculation.
+   * 
    * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
    * @param {(RawCellContent[][]|RawCellContent)} cellContents - array with content
    * 
@@ -368,6 +369,8 @@ export class HyperFormula {
    * The method accepts sheet ID in which addRows is to be called and array of coordinates where the rows should be added.
    * 
    * Does nothing if rows are outside of effective sheet size.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -409,6 +412,8 @@ export class HyperFormula {
    * The method accepts sheet ID in which removeRows is to be called and array of coordinates of rows to be removed.
    * 
    * Does nothing if rows are outside of the effective sheet size.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
@@ -451,6 +456,8 @@ export class HyperFormula {
    * The method accepts sheet ID in which addColumns is to be called and array of coordinates of columns to be added.
    * 
    * Does nothing if the columns are outside of the effective sheet size.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -493,6 +500,8 @@ export class HyperFormula {
    * The method accepts sheet ID in which removeColumns is to be called and array of coordinates of columns to be removed.
    * 
    * Does nothing if columns are outside of the effective sheet size.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
@@ -535,6 +544,8 @@ export class HyperFormula {
    * Moves the content of a cell block from source to the target location.
    * 
    * The method accepts source location, dimensions and the target location of the block.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
@@ -579,6 +590,8 @@ export class HyperFormula {
    * Moves a particular number of rows to a specified position in a given sheet.
    * 
    * The method accepts source location, dimensions and the target location of the block.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -621,6 +634,8 @@ export class HyperFormula {
    * Moves a particular number of columns to a specified position in a given sheet.
    * 
    * The method accepts source location, dimensions and the target location of the block.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
@@ -683,6 +698,8 @@ export class HyperFormula {
    * Does nothing if the clipboard is empty.
    * 
    * The method accepts source location of the selected block.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    * 
    * @param {SimpleCellAddress} targetLeftCorner - upper left address of the target cell block
    * 
@@ -774,6 +791,8 @@ export class HyperFormula {
 
   /**
    * Removes sheet with a specified name.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} name - sheet name
    * 
@@ -815,6 +834,8 @@ export class HyperFormula {
    * Based on that the method finds the ID of a sheet to be cleared.
    * 
    * Double-checks if the sheet exists.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} name - sheet name
    * 
@@ -1044,8 +1065,6 @@ export class HyperFormula {
    * 
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    * 
-   * Gives an empty value if the vertex is null.
-   * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns a {@link CellValueType} which is a named constant
@@ -1092,6 +1111,8 @@ export class HyperFormula {
    * 
    * @param {(e: IBatchExecutor) => void} batchOperations
    * 
+   * Note that this method may trigger dependency graph recalculation.
+   * 
    * @returns an array of {@link ExportedChange}
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
@@ -1110,6 +1131,8 @@ export class HyperFormula {
    * The method accepts expression name as the first parameter and expression as the second.
    * 
    * @throws Throws an error if the named expression is not valid and available.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - a name of the expression to be added
    * @param {RawCellContent} expression - the expression
@@ -1137,7 +1160,7 @@ export class HyperFormula {
    *
    * @param {string} expressionName - expression name
    * 
-   * @returns a {@link CellValue} or null
+   * @returns a {@link CellValue} or null if the given named expression does not exists
    *
    */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
@@ -1155,6 +1178,8 @@ export class HyperFormula {
    * The method accepts expression name as a first parameter and a new formula as a second parameter.
    * 
    * @throws Throws an error if the given expression does not exist.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name
    * @param {RawCellContent} newExpression - a new expression
@@ -1176,6 +1201,8 @@ export class HyperFormula {
    * Removes a named expression.
    * 
    * The method accepts string with expression name to be removed as a parameter.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name
    * 
@@ -1246,11 +1273,11 @@ export class HyperFormula {
    * 
    * The method accepts string with a formula as a parameter.
    * 
-   * If the provided string starts with "=" the method returns true.
+   * If the provided string starts with "=" and is a parsable formula the method returns true.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @returns true if the formula can be executed outside of a regular worksheet
+   * @returns true if the string is a parsable formula
    */
   public validateFormula(formulaString: string): boolean {
     const [ast, address] = this.extractTemporaryFormula(formulaString)
@@ -1306,7 +1333,7 @@ export class HyperFormula {
   /**
    *  Destroys instance of HyperFormula.
    * 
-   *  Dependency graph, columns search, evaluator, parser, transforming AST, stats and CRUD operations are removed.
+   *  Dependency graph, optimization indexes, statistics and parser are removed.
    * 
    * */
   public destroy(): void {
@@ -1322,7 +1349,9 @@ export class HyperFormula {
   /**
    * Runs a recomputation starting from recently changed vertices.
    * 
-   * @returns an array of objects that consist of sheets, rows and columns numbers, and internal value of cells {InternalCellValue}
+   * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @returns an array of {@link ExportedChange}
    * 
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
