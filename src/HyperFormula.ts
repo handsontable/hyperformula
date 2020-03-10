@@ -157,6 +157,17 @@ export class HyperFormula {
     return undefined
   }
 
+  /**
+   * Returns a serialized content of the cell of a given address
+   *
+   * either a cell formula or an explicit value.
+   *
+   * Unparses AST. Applies post-processing.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or undefined
+   */
   public getCellSerialized(address: SimpleCellAddress): CellValue {
     return this.getCellFormula(address) || this.getCellValue(address)
   }
@@ -170,10 +181,32 @@ export class HyperFormula {
     return this.genericSheetGetter(sheet, (...args) => this.getCellValue(...args))
   }
 
+  /**
+   * Returns an array with normalized formula strings from Sheet,
+   *
+   * or undefined for a cells that have no value.
+   *
+   * Unparses AST.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or undefined
+   */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
   }
 
+  /**
+   * Returns an array with serialized content of cells from Sheet,
+   *
+   * either a cell formula or an explicit value.
+   *
+   * Unparses AST. Applies post-processing.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or undefined
+   */
   public getSheetSerialized(sheet: number): CellValue[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
   }
@@ -222,10 +255,18 @@ export class HyperFormula {
     return this.genericAllGetter((...args) => this.getSheetValues(...args))
   }
 
+  /**
+   * Returns map containing formulas of all sheets.
+   *
+   */
   public getSheetsFormulas(): Record<string, Maybe<string>[][]> {
     return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
   }
 
+  /**
+   * Returns map containing formulas or values of all sheets.
+   *
+   */
   public getSheetsSerialized(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
   }
