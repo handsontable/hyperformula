@@ -57,9 +57,18 @@ describe('Integration', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [['=A()']],
       Foo: [[1]],
+      Err1: [['=A1']],
+      Err2: [['234.23141234.2314']],
+      Err3: [['#DIV/0!']],
     })
 
-    expect(engine.getSheetsSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
+    expect(engine.getSheetsSerialized()).toEqual({
+      'Foo': [[1]],
+      'Sheet1': [['=A()']],
+      'Err1': [['=A1']],
+      'Err2': [['234.23141234.2314']],
+      'Err3': [['#DIV/0!']],
+    })
   })
 
   it('handle different input types', () => {

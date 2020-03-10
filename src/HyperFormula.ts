@@ -173,7 +173,7 @@ export class HyperFormula {
     if( formula !== undefined ) {
       return formula
     } else {
-      const value : CellValue = this.getCellValue(address)
+      const value: CellValue = this.getCellValue(address)
       if(value instanceof DetailedCellError) {
         return this.config.getErrorTranslationFor(value.error.type)
       } else {
