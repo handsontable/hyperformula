@@ -141,7 +141,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula = (address: SimpleCellAddress): Maybe<string> => {
+  public getCellFormula (address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
