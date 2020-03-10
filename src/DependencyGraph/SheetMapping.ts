@@ -1,4 +1,5 @@
 import {TranslationPackage} from '../i18n'
+import {Maybe} from '../Maybe'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -57,7 +58,7 @@ export class SheetMapping {
     return sheet.id
   }
 
-  public get = (sheetName: string): number | undefined => {
+  public get = (sheetName: string): Maybe<number> => {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.id
@@ -70,7 +71,7 @@ export class SheetMapping {
     return this.fetchSheetById(sheetId).displayName
   }
 
-  public getDisplayName(sheetId: number): string | undefined {
+  public getDisplayName(sheetId: number): Maybe<string> {
     const sheet = this.mappingFromId.get(sheetId)
     if (sheet) {
       return sheet.displayName
@@ -79,7 +80,7 @@ export class SheetMapping {
     }
   }
 
-  public getDisplayNameByName(sheetName: string): string | undefined {
+  public getDisplayNameByName(sheetName: string): Maybe<string> {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.displayName

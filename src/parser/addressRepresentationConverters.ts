@@ -1,9 +1,10 @@
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {Maybe} from '../Maybe'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {additionalCharactersAllowedInQuotes} from './LexerConfig'
 
-export type SheetMappingFn = (sheetName: string) => number | undefined
-export type SheetIndexMappingFn = (sheetIndex: number) => string | undefined
+export type SheetMappingFn = (sheetName: string) => Maybe<number>
+export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
 const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
 
@@ -16,7 +17,7 @@ const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${a
  * @param overrideSheet - override sheet index regardless of sheet mapping
  * @returns object representation of address
  */
-export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): CellAddress | undefined => {
+export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, overrideSheet?: number): Maybe<CellAddress> => {
   const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
@@ -65,7 +66,7 @@ export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCel
  * @param sheetContext - sheet in context of which we should parse the address
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): SimpleCellAddress | undefined => {
+export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellAddress> => {
   const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
@@ -94,7 +95,7 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
  * @param address - object representation of absolute address
  * @param sheetIndex - if is not equal with address sheet index, string representation will contain sheet name
  * */
-export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): string | undefined => {
+export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
   const sheetName = sheetIndexMapping(address.sheet)
 
