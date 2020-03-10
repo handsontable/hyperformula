@@ -198,7 +198,7 @@ export class HyperFormula {
    * Returns map containing dimensions of all sheets.
    *
    */
-  public getAllDimensions(): Record<string, { width: number, height: number }> {
+  public getSheetsDimensions(): Record<string, { width: number, height: number }> {
     return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
   }
 
@@ -218,15 +218,15 @@ export class HyperFormula {
    * Returns map containing values of all sheets.
    *
    */
-  public getAllValues(): Record<string, CellValue[][]> {
+  public getSheetsValues(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetValues(...args))
   }
 
-  public getAllFormulas(): Record<string, Maybe<string>[][]> {
+  public getSheetsFormulas(): Record<string, Maybe<string>[][]> {
     return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
   }
 
-  public getAllSerialized(): Record<string, CellValue[][]> {
+  public getSheetsSerialized(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
   }
 
