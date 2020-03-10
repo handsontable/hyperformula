@@ -113,7 +113,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
         return add(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
-          this.config.precisionEpsilon)
+          this.config.smartRounding ? this.config.precisionEpsilon : 0)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -131,7 +131,7 @@ export class Interpreter {
           return new CellError(ErrorType.VALUE)
         }
         return subtract(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
-          this.config.precisionEpsilon)
+          this.config.smartRounding ? this.config.precisionEpsilon : 0)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -294,7 +294,7 @@ export class Interpreter {
       const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
       if (typeof leftTmp === 'number' && typeof rightTmp === 'number') {
-        return floatCmp(leftTmp, rightTmp, this.config.precisionEpsilon)
+        return floatCmp(leftTmp, rightTmp, this.config.smartRounding ? this.config.precisionEpsilon : 0)
       }
     }
 
@@ -313,7 +313,7 @@ export class Interpreter {
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
     } else if ( typeof left === 'number' && typeof right === 'number' ) {
-      return floatCmp(left, right, this.config.precisionEpsilon)
+      return floatCmp(left, right, this.config.smartRounding ? this.config.precisionEpsilon : 0)
     } else if ( left === EmptyValue && right === EmptyValue ) {
       return 0
     } else {

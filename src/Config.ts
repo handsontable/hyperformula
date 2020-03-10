@@ -189,9 +189,6 @@ export class Config implements ConfigParams, ParserConfig{
     this.nullYear = this.valueFromParam(nullYear, fallback, 'number', 'nullYear')
     this.precisionRounding = this.valueFromParam(precisionRounding, fallback, 'number', 'precisionRounding')
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, fallback, 'number', 'precisionEpsilon')
-    if (!this.smartRounding) {
-      this.precisionEpsilon = 0
-    }
     this.useColumnIndex = this.valueFromParam(useColumnIndex, fallback, 'boolean', 'useColumnIndex')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, fallback, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
