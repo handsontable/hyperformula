@@ -6,6 +6,7 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
+import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
@@ -523,7 +524,7 @@ export class DependencyGraph {
     return this.addressMapping.getWidth(sheet)
   }
 
-  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
+  public getMatrix(range: AbsoluteCellRange): Maybe<MatrixVertex> {
     return this.matrixMapping.getMatrix(range)
   }
 

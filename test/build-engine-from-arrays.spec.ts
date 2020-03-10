@@ -32,6 +32,6 @@ describe('Building engine from arrays', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([], config)
 
-    expect(Array.from(engine.getSheetsDimensions().keys())).toEqual(['Sheet1'])
+    expect(engine.getSheetsDimensions()).toEqual({'Sheet1': {'height': 0, 'width': 0}})
   })
 })

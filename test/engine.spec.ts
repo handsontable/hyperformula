@@ -35,6 +35,33 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
 
+  it('getAllValues', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [],
+      Foo: [[1]],
+    })
+
+    expect(engine.getSheetsValues()).toEqual({'Foo': [[1]], 'Sheet1': []})
+  })
+
+  it('getAllFormulas', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getSheetsFormulas()).toEqual({'Foo': [[undefined]], 'Sheet1': [['=A()']]})
+  })
+
+  it('getAllSerialized', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getSheetsSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
+  })
+
   it('handle different input types', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 

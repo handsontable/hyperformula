@@ -2,6 +2,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {SimpleCellAddress, simpleCellAddress, InternalCellValue} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
+import {Maybe} from './Maybe'
 import {ParserWithCaching} from './parser'
 import {CrudOperations} from './CrudOperations'
 
@@ -30,11 +31,11 @@ class NamedExpressionsStore {
     this.rowMapping.set(namedExpression.row, namedExpression)
   }
 
-  public get(expressionName: string): NamedExpression | undefined {
+  public get(expressionName: string): Maybe<NamedExpression> {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
-  public getByRow(row: number): NamedExpression | undefined {
+  public getByRow(row: number): Maybe<NamedExpression> {
     return this.rowMapping.get(row)
   }
 
@@ -87,7 +88,7 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
-  public getDisplayNameByName(expressionName: string): string | undefined {
+  public getDisplayNameByName(expressionName: string): Maybe<string> {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression) {
       return namedExpression.name

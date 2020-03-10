@@ -1,5 +1,6 @@
 
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import { ProcedureAst} from '../../parser'
 import {coerceToRange} from '../coerce'
 import { CriterionPackage} from '../Criterion'
@@ -24,7 +25,7 @@ class AverageResult {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
   }
 
-  public averageValue(): number | undefined {
+  public averageValue(): Maybe<number> {
     if (this.count > 0) {
       return this.sum / this.count
     } else {

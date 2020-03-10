@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
@@ -50,7 +51,7 @@ class AverageResult {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
   }
 
-  public averageValue(): number | undefined {
+  public averageValue(): Maybe<number> {
     if (this.count > 0) {
       return this.sum / this.count
     } else {
