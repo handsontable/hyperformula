@@ -173,35 +173,40 @@ export class Config implements ConfigParams, ParserConfig{
       vlookupThreshold,
       nullDate,
     }: Partial<ConfigParams> = {},
+    fallback: ConfigParams = Config.defaultConfig
   ) {
-    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
-    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
-    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
-    this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
-    this.language = language || Config.defaultConfig.language
-    this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
-    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig, 'number', 'matrixDetectionThreshold')
-    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig, 'number', 'nullYear')
-    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig, 'number', 'precisionRounding')
-    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig, 'number', 'precisionEpsilon')
+    this.caseSensitive = this.valueFromParam(caseSensitive, fallback, 'boolean', 'caseSensitive')
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || fallback.chooseAddressMappingPolicy
+    this.dateFormats = this.valueFromParamCheck(dateFormats, fallback, Array.isArray, 'array', 'dateFormats')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, fallback, 'string', 'functionArgSeparator')
+    this.decimalSeparator = this.valueFromParam(decimalSeparator, fallback, ['.', ','], 'decimalSeparator')
+    this.language = language || fallback.language
+    this.functionPlugins = functionPlugins || fallback.functionPlugins
+    this.gpuMode = this.valueFromParam(gpuMode, fallback, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = this.valueFromParam(smartRounding, fallback, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, fallback, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, fallback, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, fallback, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, fallback, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, fallback, 'number', 'precisionEpsilon')
     if (!this.smartRounding) {
       this.precisionEpsilon = 0
     }
-    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig, 'boolean', 'useColumnIndex')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig, 'number', 'vlookupThreshold')
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, fallback, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, fallback, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
-    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfSimpleDate, 'IDate', 'nullDate' )
-    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
+    this.parseDate = this.valueFromParam(parseDate, fallback, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, fallback, 'function', 'stringifyDate')
+    this.nullDate = this.valueFromParamCheck(nullDate, fallback, instanceOfSimpleDate, 'IDate', 'nullDate' )
+    this.leapYear1900 = this.valueFromParam(leapYear1900, fallback, 'boolean', 'leapYear1900')
 
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
     }
+  }
+
+  public updateConfig(init: Partial<ConfigParams>): Config {
+    return new Config(init, this)
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
