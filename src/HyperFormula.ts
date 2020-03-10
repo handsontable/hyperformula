@@ -231,12 +231,12 @@ export class HyperFormula {
   }
 
   private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
-    const ret: Record<string, T> = {}
+    const result: Record<string, T> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      ret[sheetName] =  sheetGetter(sheetId)
+      result[sheetName] =  sheetGetter(sheetId)
     }
-    return ret
+    return result
   }
 
   /**
