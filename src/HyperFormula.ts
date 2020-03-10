@@ -132,7 +132,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellValue = (address: SimpleCellAddress): CellValue => {
+  public getCellValue(address: SimpleCellAddress): CellValue {
     return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
   }
 
@@ -141,7 +141,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula (address: SimpleCellAddress): Maybe<string> {
+  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -157,7 +157,7 @@ export class HyperFormula {
     return undefined
   }
 
-  public getCellSerialized = (address: SimpleCellAddress): CellValue => {
+  public getCellSerialized(address: SimpleCellAddress): CellValue {
     return this.getCellFormula(address) || this.getCellValue(address)
   }
 
@@ -166,15 +166,15 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getSheetValues = (sheet: number): CellValue[][] => {
+  public getSheetValues(sheet: number): CellValue[][] {
     return this.genericSheetGetter(sheet, this.getCellValue)
   }
 
-  public getSheetFormulas = (sheet: number): Maybe<string>[][] => {
+  public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, this.getCellFormula)
   }
 
-  public getSheetSerialized = (sheet: number): CellValue[][] => {
+  public getSheetSerialized(sheet: number): CellValue[][] {
     return this.genericSheetGetter(sheet, this.getCellSerialized)
   }
 
@@ -207,7 +207,7 @@ export class HyperFormula {
    *
    * @param sheet - sheet id number
    */
-  public getSheetDimensions = (sheet: number): { width: number, height: number } => {
+  public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
       width: this.dependencyGraph.getSheetWidth(sheet),
       height: this.dependencyGraph.getSheetHeight(sheet),
@@ -234,7 +234,7 @@ export class HyperFormula {
     const result: Record<string, T> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter(sheetId)
+      result[sheetName] =  sheetGetter.call(this, sheetId)
     }
     return result
   }
