@@ -198,7 +198,7 @@ export class HyperFormula {
    * Returns map containing dimensions of all sheets.
    *
    */
-  public getSheetsDimensions(): Record<string, { width: number, height: number }> {
+  public getAllDimensions(): Record<string, { width: number, height: number }> {
     return this.genericAllGetter(this.getSheetDimensions)
   }
 
