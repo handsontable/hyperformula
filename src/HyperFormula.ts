@@ -188,7 +188,7 @@ export class HyperFormula {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = getter(address)
+        arr[i][j] = getter.call(this, address)
       }
     }
     return arr
