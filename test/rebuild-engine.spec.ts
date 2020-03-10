@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {Config, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {adr, detailedError} from './testUtils'
 
@@ -28,5 +28,15 @@ describe('Rebuild config', () => {
     expect(engine2.getCellFormula(adr('C1'))).toBe('=SUM(A1:B1)')
     expect(engine2.getCellFormula(adr('B2'))).toBe('=B2')
     expect(engine2.getCellFormula(adr('C2'))).toBe('=F(')
+  })
+
+  it('simple reload preserves values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1.00000000000001', '1', '=A1-B1'],
+    ], new Config({smartRounding: false}))
+    const engine2 = engine.rebuildWithConfig({smartRounding: true})
+
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
+    expect(engine2.getCellValue(adr('C1'))).toEqual(0)
   })
 })

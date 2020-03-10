@@ -142,11 +142,15 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
+  public getCellFormula(address: SimpleCellAddress, customUnparser?: Unparser): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      return this.unparser.unparse(formula, address)
+      if(customUnparser === undefined) {
+        return this.unparser.unparse(formula, address)
+      } else {
+        return customUnparser.unparse(formula, address)
+      }
     } else if (formulaVertex instanceof MatrixVertex) {
       const formula = formulaVertex.getFormula()
       if (formula) {
@@ -169,8 +173,8 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or value or undefined
    */
-  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
-    const formula: Maybe<string> = this.getCellFormula(address)
+  public getCellSerialized(address: SimpleCellAddress, customUnparser?: Unparser): NoErrorCellValue {
+    const formula: Maybe<string> = this.getCellFormula(address, customUnparser)
     if( formula !== undefined ) {
       return formula
     } else {
@@ -218,8 +222,10 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or undefined
    */
-  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
+  public getSheetSerialized(sheet: number, customUnparser?: Unparser): NoErrorCellValue[][] {
+    // eslint-disable-next-line
+    // @ts-ignore
+    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args, customUnparser))
   }
 
   private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -278,11 +284,13 @@ export class HyperFormula {
    * Returns map containing formulas or values of all sheets.
    *
    */
-  public getSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
-    return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
+  public getSheetsSerialized(customUnparser?: Unparser): Record<string, NoErrorCellValue[][]> {
+    // eslint-disable-next-line
+    // @ts-ignore
+    return this.genericAllGetter((...args: any[]) => this.getSheetSerialized(...args, customUnparser))
   }
 
-  private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
+  private genericAllGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
