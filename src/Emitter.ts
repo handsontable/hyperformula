@@ -1,11 +1,29 @@
-import {ExportedChange} from './CellValue'
+import { ExportedChange } from './CellValue'
 
 export enum Events {
+  /**
+   * @event Events#SheetAdded
+   */
   SheetAdded = 'sheetAdded',
+  /**
+ * @event Events#SheetRemoved
+ */
   SheetRemoved = 'sheetRemoved',
+  /**
+ * @event Events#SheetRenamed
+ */
   SheetRenamed = 'sheetRenamed',
+  /**
+ * @event Events#NamedExpressionAdded
+ */
   NamedExpressionAdded = 'namedExpressionAdded',
+  /**
+ * @event Events#NamedExpressionRemoved
+ */
   NamedExpressionRemoved = 'namedExpressionRemoved',
+  /**
+ * @event Events#ValuesUpdated
+ */
   ValuesUpdated = 'valuesUpdated',
 }
 export type SheetAddedHandler = (addedSheetDisplayName: string) => any
