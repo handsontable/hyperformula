@@ -5,12 +5,12 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
-  InternalCellValue,
+  InternalCellValue, NoErrorCellValue,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {CellValue, ExportedChange, Exporter} from './CellValue'
+import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
@@ -168,9 +168,18 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or value or undefined
    */
-  public getCellSerialized(address: SimpleCellAddress): CellValue {
+  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
-    return formula !== undefined ? formula : this.getCellValue(address)
+    if( formula !== undefined ) {
+      return formula
+    } else {
+      const value : CellValue = this.getCellValue(address)
+      if(value instanceof DetailedCellError) {
+        return this.config.getErrorTranslationFor(value.error.type)
+      } else {
+        return value
+      }
+    }
   }
 
   /**
@@ -208,7 +217,7 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or undefined
    */
-  public getSheetSerialized(sheet: number): CellValue[][] {
+  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
   }
 
@@ -268,7 +277,7 @@ export class HyperFormula {
    * Returns map containing formulas or values of all sheets.
    *
    */
-  public getSheetsSerialized(): Record<string, CellValue[][]> {
+  public getSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
   }
 
