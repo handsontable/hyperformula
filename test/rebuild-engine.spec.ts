@@ -1,5 +1,6 @@
 import {Config, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 
 describe('Rebuild config', () => {
@@ -38,5 +39,17 @@ describe('Rebuild config', () => {
 
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
     expect(engine2.getCellValue(adr('C1'))).toEqual(0)
+  })
+  it('language reload', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
+    ])
+    const engine2 = engine.rebuildWithConfig({language: plPL})
+
+    expect(engine2.getCellFormula(adr('A1'))).toBe('=FOO()')
+    expect(engine2.getCellFormula(adr('B1'))).toBe('=SUMA()')
+    expect(engine2.getCellFormula(adr('C1'))).toBe('=SUMA()')
+    expect(engine2.getCellFormula(adr('D1'))).toBe(undefined)
+    expect(engine2.getCellFormula(adr('E1'))).toBe('=SUM(')
   })
 })
