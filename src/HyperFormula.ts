@@ -167,15 +167,15 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, this.getCellValue)
+    return this.genericSheetGetter(sheet, (...args) => this.getCellValue(...args))
   }
 
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return this.genericSheetGetter(sheet, this.getCellFormula)
+    return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
   }
 
   public getSheetSerialized(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, this.getCellSerialized)
+    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
   }
 
   private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -188,7 +188,7 @@ export class HyperFormula {
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = getter.call(this, address)
+        arr[i][j] = getter(address)
       }
     }
     return arr
@@ -199,7 +199,7 @@ export class HyperFormula {
    *
    */
   public getAllDimensions(): Record<string, { width: number, height: number }> {
-    return this.genericAllGetter(this.getSheetDimensions)
+    return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
   }
 
   /**
@@ -219,22 +219,22 @@ export class HyperFormula {
    *
    */
   public getAllValues(): Record<string, CellValue[][]> {
-    return this.genericAllGetter(this.getSheetValues)
+    return this.genericAllGetter((...args) => this.getSheetValues(...args))
   }
 
   public getAllFormulas(): Record<string, Maybe<string>[][]> {
-    return this.genericAllGetter(this.getSheetFormulas)
+    return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
   }
 
   public getAllSerialized(): Record<string, CellValue[][]> {
-    return this.genericAllGetter(this.getSheetSerialized)
+    return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
   }
 
   private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter.call(this, sheetId)
+      result[sheetName] =  sheetGetter(sheetId)
     }
     return result
   }
