@@ -12,7 +12,7 @@ import {
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {Config} from './Config'
+import {Config, ConfigParams} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
   AddressMapping,
@@ -35,6 +35,7 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
+import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
@@ -288,6 +289,10 @@ export class HyperFormula {
       result[sheetName] =  sheetGetter(sheetId)
     }
     return result
+  }
+
+  public rebuildWithConfig(newParams: Partial<ConfigParams>): HyperFormula {
+    return new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
   }
 
   /**

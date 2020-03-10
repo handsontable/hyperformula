@@ -5,10 +5,9 @@ import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
-import {Statistics, StatType} from './statistics/Statistics'
+import {StatType} from './statistics/Statistics'
 
 export class RebuildEngineWithConfigFactory {
   public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
