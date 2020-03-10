@@ -166,10 +166,11 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    *
-   * @returns {string} in a specific format or undefined
+   * @returns {string} in a specific format or value or undefined
    */
   public getCellSerialized(address: SimpleCellAddress): CellValue {
-    return this.getCellFormula(address) || this.getCellValue(address)
+    const formula: Maybe<string> = this.getCellFormula(address)
+    return formula !== undefined ? formula : this.getCellValue(address)
   }
 
   /**
