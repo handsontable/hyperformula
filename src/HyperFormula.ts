@@ -304,7 +304,7 @@ export class HyperFormula {
    * 
    * The method accepts no parameters.
    * 
-   * @returns an object type whose property keys are strings and values are arrays of arrays of {@link CellValue}
+   * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
    *
    */
   public getSheetsValues(): Record<string, CellValue[][]> {
@@ -316,7 +316,7 @@ export class HyperFormula {
    * 
    * The method accepts no parameters.
    * 
-   * @returns an object type whose property keys are strings and values are arrays of arrays of strings or possibly undefined
+   * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly undefined
    *
    */
   public getSheetsFormulas(): Record<string, Maybe<string>[][]> {
@@ -328,7 +328,7 @@ export class HyperFormula {
    * 
    * The method accepts no parameters.
    * 
-   * @returns an object type whose property keys are strings and values are arrays of arrays of {@link CellValue}
+   * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
    *
    */
   public getSheetsSerialized(): Record<string, CellValue[][]> {
