@@ -20,7 +20,7 @@ jobs:
 
       - name: Generate package-lock
         run: |
-          npm install --package-lock-only
+          npm install --package-lock-only --no-audit
 
       - name: Run audit
         run: |
