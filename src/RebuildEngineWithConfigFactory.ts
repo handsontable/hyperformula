@@ -12,7 +12,7 @@ import {StatType} from './statistics/Statistics'
 export class RebuildEngineWithConfigFactory {
   public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
     const stats = oldEngine.stats
-    const config: Config = oldEngine.config.updateConfig(newParams)
+    const config: Config = oldEngine.config.mergeConfig(newParams)
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
@@ -21,7 +21,7 @@ export class RebuildEngineWithConfigFactory {
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
-    const oldConfigNewLanguage = oldEngine.config.updateConfig( {language: newParams.language} )
+    const oldConfigNewLanguage = oldEngine.config.mergeConfig( {language: newParams.language} )
     const actualUnparser = new Unparser(oldConfigNewLanguage, buildLexerConfig(oldConfigNewLanguage), oldEngine.dependencyGraph.sheetMapping.fetchDisplayName)
     const sheets = oldEngine.getAllSheetsSerialized(actualUnparser)
     for (const sheetName in sheets) {

@@ -202,7 +202,7 @@ export class Config implements ConfigParams, ParserConfig{
     }
   }
 
-  public updateConfig(init: Partial<ConfigParams>): Config {
+  public mergeConfig(init: Partial<ConfigParams>): Config {
     return new Config(init, this)
   }
 

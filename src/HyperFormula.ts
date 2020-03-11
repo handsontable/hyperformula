@@ -99,26 +99,26 @@ export class HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
   }
 
-  private readonly crudOperations: CrudOperations
-  private readonly exporter: Exporter
-  private readonly namedExpressions: NamedExpressions
+  private crudOperations: CrudOperations
+  private exporter: Exporter
+  private namedExpressions: NamedExpressions
   private readonly emitter: TinyEmitter = new TinyEmitter()
 
   constructor(
     /** Engine config */
-    public readonly config: Config,
+    public config: Config,
     /** Statistics module for benchmarking */
-    public readonly stats: Statistics,
+    public stats: Statistics,
     /** Dependency graph storing sheets structure */
-    public readonly dependencyGraph: DependencyGraph,
+    public dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin */
-    public readonly columnSearch: ColumnSearchStrategy,
+    public columnSearch: ColumnSearchStrategy,
     /** Parser with caching */
-    private readonly parser: ParserWithCaching,
-    private readonly unparser: Unparser,
-    private readonly cellContentParser: CellContentParser,
+    private parser: ParserWithCaching,
+    private unparser: Unparser,
+    private cellContentParser: CellContentParser,
     /** Formula evaluator */
-    public readonly evaluator: Evaluator,
+    public evaluator: Evaluator,
     /** Service handling postponed CRUD transformations */
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
@@ -299,8 +299,18 @@ export class HyperFormula {
     return result
   }
 
-  public rebuildWithConfig(newParams: Partial<ConfigParams>): HyperFormula {
-    return new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
+  public rebuildWithConfig(newParams: Partial<ConfigParams>): void {
+    const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
+    this.crudOperations = newEngine.crudOperations
+    this.exporter = newEngine.exporter
+    this.namedExpressions = newEngine.namedExpressions
+    this.config = newEngine.config
+    this.dependencyGraph = newEngine.dependencyGraph
+    this.columnSearch = newEngine.columnSearch
+    this.parser = newEngine.parser
+    this.unparser = newEngine.unparser
+    this.cellContentParser = newEngine.cellContentParser
+    this.evaluator = newEngine.evaluator
   }
 
   /**
