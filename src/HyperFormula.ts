@@ -15,7 +15,7 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
-  AddressMapping,
+  AddressMapping, CellVertex,
   DependencyGraph,
   FormulaCellVertex,
   Graph,
@@ -571,7 +571,7 @@ export class HyperFormula {
   * */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -586,7 +586,7 @@ export class HyperFormula {
    * */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -613,11 +613,37 @@ export class HyperFormula {
    *
    * @param range
    */
-  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
-    return this.dependencyGraph.getValuesInRange(range).map(
-      (subarray: InternalCellValue[]) => subarray.map(
-        (arg) => this.exporter.exportValue(arg),
-      ),
+  public getRangeValues(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellValue(address)
+      )
+    )
+  }
+
+  /**
+   * Returns cell formulas in given range
+   *
+   * @param range
+   */
+  public getRangeFormulas(range: AbsoluteCellRange): Maybe<string>[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellFormula(address)
+      )
+    )
+  }
+
+  /**
+   * Returns serialized cell in given range
+   *
+   * @param range
+   */
+  public getRangeSerialized(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellSerialized(address)
+      )
     )
   }
 
