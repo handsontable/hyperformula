@@ -45,8 +45,10 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
 
 export const expectCellToHaveFormula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
   const address = cellAddressFromString(engine.sheetMapping.fetch, addressString, CellAddress.absolute(0, 0, 0))
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const formula = (engine.addressMapping.fetchCell(address!) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
   const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.fetchDisplayName)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,6 +58,7 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
 
   let col

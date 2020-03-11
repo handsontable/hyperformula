@@ -248,7 +248,7 @@ export class HyperFormula {
    * Returns map containing dimensions of all sheets.
    *
    */
-  public getSheetsDimensions(): Record<string, { width: number, height: number }> {
+  public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
     return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
   }
 
@@ -268,7 +268,7 @@ export class HyperFormula {
    * Returns map containing values of all sheets.
    *
    */
-  public getSheetsValues(): Record<string, CellValue[][]> {
+  public getAllSheetsValues(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetValues(...args))
   }
 
@@ -276,7 +276,7 @@ export class HyperFormula {
    * Returns map containing formulas of all sheets.
    *
    */
-  public getSheetsFormulas(): Record<string, Maybe<string>[][]> {
+  public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
     return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
   }
 
@@ -284,7 +284,7 @@ export class HyperFormula {
    * Returns map containing formulas or values of all sheets.
    *
    */
-  public getSheetsSerialized(customUnparser?: Unparser): Record<string, NoErrorCellValue[][]> {
+  public getAllSheetsSerialized(customUnparser?: Unparser): Record<string, NoErrorCellValue[][]> {
     // eslint-disable-next-line
     // @ts-ignore
     return this.genericAllGetter((...args: any[]) => this.getSheetSerialized(...args, customUnparser))

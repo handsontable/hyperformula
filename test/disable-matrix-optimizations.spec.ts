@@ -61,6 +61,7 @@ describe('Disable matrix optimizatoins', () => {
     ]
 
     const engine = HyperFormula.buildFromArray(sheet, config)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
 
     engine.disableNumericMatrices()
