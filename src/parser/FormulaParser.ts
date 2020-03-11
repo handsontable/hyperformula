@@ -480,6 +480,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!, sheet)
     })
     if (address === undefined) {
@@ -561,6 +562,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.formulaAddress!.sheet,
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
@@ -576,6 +578,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       absoluteCol = absoluteCol + this.formulaAddress!.col
     }
 
@@ -586,6 +589,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.formulaAddress!.sheet,
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
