@@ -18,9 +18,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install dependencies
+      - name: Generate package-lock
         run: |
-          npm install
+          npm install --package-lock-only
 
       - name: Run audit
         run: |
