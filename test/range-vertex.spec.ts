@@ -14,9 +14,11 @@ describe('RangeVertex with cache', () => {
     const rangeVertex = new RangeVertex(new AbsoluteCellRange(adr('B2'), adr('B11')))
 
     const criterionString1 = '>=0'
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const criterion1 = buildCriterionLambda(parseCriterion(criterionString1)!)
 
     const criterionString2 = '=1'
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const criterion2 = buildCriterionLambda(parseCriterion(criterionString2)!)
 
     const criterionCache: CriterionCache = new Map()

@@ -1,5 +1,5 @@
 import {IToken} from 'chevrotain'
-import {CellError, ErrorType} from '../Cell'
+import {CellError} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {IExtendedToken} from './FormulaParser'
