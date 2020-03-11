@@ -3,13 +3,13 @@ import {ErrorType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 
-describe('Rebuild config', () => {
+describe('update config', () => {
   it('simple reload preserves values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
-    engine.rebuildWithConfig({})
+    engine.updateConfig({})
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
@@ -23,7 +23,7 @@ describe('Rebuild config', () => {
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
-    engine.rebuildWithConfig({})
+    engine.updateConfig({})
 
     expect(engine.getCellFormula(adr('B1'))).toBe('=A1')
     expect(engine.getCellFormula(adr('C1'))).toBe('=SUM(A1:B1)')
@@ -37,7 +37,7 @@ describe('Rebuild config', () => {
     ], new Config({smartRounding: false}))
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
 
-    engine.rebuildWithConfig({smartRounding: true})
+    engine.updateConfig({smartRounding: true})
 
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
@@ -45,7 +45,7 @@ describe('Rebuild config', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
     ])
-    engine.rebuildWithConfig({language: plPL})
+    engine.updateConfig({language: plPL})
 
     expect(engine.getCellFormula(adr('A1'))).toBe('=FOO()')
     expect(engine.getCellFormula(adr('B1'))).toBe('=SUMA()')

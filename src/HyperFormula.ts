@@ -299,7 +299,7 @@ export class HyperFormula {
     return result
   }
 
-  public rebuildWithConfig(newParams: Partial<ConfigParams>): void {
+  public updateConfig(newParams: Partial<ConfigParams>): void {
     const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
     this.crudOperations = newEngine.crudOperations
     this.exporter = newEngine.exporter
