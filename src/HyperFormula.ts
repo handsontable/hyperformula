@@ -5,7 +5,6 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
-  InternalCellValue,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
@@ -15,7 +14,7 @@ import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
 import {
-  AddressMapping, CellVertex,
+  AddressMapping,
   DependencyGraph,
   FormulaCellVertex,
   Graph,
@@ -569,7 +568,7 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
     return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
@@ -584,7 +583,7 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
     return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
