@@ -23,7 +23,7 @@ export class RebuildEngineWithConfigFactory {
     const addressMapping = dependencyGraph.addressMapping
     const oldConfigNewLanguage = oldEngine.config.updateConfig( {language: newParams.language} )
     const actualUnparser = new Unparser(oldConfigNewLanguage, buildLexerConfig(oldConfigNewLanguage), oldEngine.dependencyGraph.sheetMapping.fetchDisplayName)
-    const sheets = oldEngine.getSheetsSerialized(actualUnparser)
+    const sheets = oldEngine.getAllSheetsSerialized(actualUnparser)
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
