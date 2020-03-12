@@ -536,20 +536,6 @@ export class DependencyGraph {
     return this.rangeMapping.getRange(start, end)
   }
 
-  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
-    const result: InternalCellValue[][] = []
-
-    for (let y = 0; y < range.height(); ++y) {
-      result[y] = []
-      for (let x = 0; x < range.width(); ++x) {
-        const value = this.getCellValue(simpleCellAddress(range.sheet, range.start.col + x, range.start.row + y))
-        result[y].push(value)
-      }
-    }
-
-    return result
-  }
-
   public topSortWithScc(): TopSortResult<Vertex> {
     return this.graph.topSortWithScc()
   }
