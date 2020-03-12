@@ -19,6 +19,10 @@ export class InformationPlugin extends FunctionPlugin {
       translationKey: 'COLUMNS',
       isDependentOnSheetStructureChange: true,
     },
+    rows: {
+      translationKey: 'ROWS',
+      isDependentOnSheetStructureChange: true,
+    },
     index: {
       translationKey: 'INDEX',
     },
@@ -79,6 +83,26 @@ export class InformationPlugin extends FunctionPlugin {
     const rangeAst = ast.args[0]
     if (rangeAst.type === AstNodeType.CELL_RANGE) {
       return (rangeAst.end.col - rangeAst.start.col + 1)
+    } else {
+      return new CellError(ErrorType.VALUE)
+    }
+  }
+
+  /**
+   * Corresponds to ROWS(range)
+   *
+   * Returns number of rows in provided range of cells
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length !== 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const rangeAst = ast.args[0]
+    if (rangeAst.type === AstNodeType.CELL_RANGE) {
+      return (rangeAst.end.row - rangeAst.start.row + 1)
     } else {
       return new CellError(ErrorType.VALUE)
     }

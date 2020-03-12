@@ -38,7 +38,7 @@ const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) 
       collectDependenciesFn(ast.right, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
-      if (ast.procedureName !== 'COLUMNS') {
+      if (ast.procedureName !== 'COLUMNS' && ast.procedureName !== 'ROWS') {
         ast.args.forEach((argAst: Ast) => collectDependenciesFn(argAst, dependenciesSet))
       }
       return
