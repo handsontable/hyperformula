@@ -30,7 +30,7 @@ export const extractRange = (engine: HyperFormula, address: SimpleCellAddress): 
 export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
   const formula = (engine.addressMapping.fetchCell(address) as MatrixVertex).getFormula() as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
-  return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
+  return AbsoluteCellRange.fromCellRange(rangeAst, address)
 }
 
 export const expectReferenceToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
