@@ -151,9 +151,9 @@ export class HyperFormula {
   /**
    * Returns the cell value of a given address.
    * 
-   * @throws Throws an error if the given sheet ID does not exist.
-   * 
    * Applies rounding and post-processing.
+   * 
+   * @throws Throws an error if the given sheet ID does not exist.
    *
    * @param {SimpleCellAddress} address - cell coordinates
    * 
@@ -302,8 +302,6 @@ export class HyperFormula {
   /**
    * Returns map containing values of all sheets.
    * 
-   * The method accepts no parameters.
-   * 
    * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
    *
    */
@@ -314,8 +312,6 @@ export class HyperFormula {
   /**
    * Returns map containing formulas of all sheets.
    * 
-   * The method accepts no parameters.
-   * 
    * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly undefined
    *
    */
@@ -325,8 +321,6 @@ export class HyperFormula {
 
   /**
    * Returns map containing formulas or values of all sheets.
-   * 
-   * The method accepts no parameters.
    * 
    * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
    *
@@ -347,8 +341,6 @@ export class HyperFormula {
   /**
    * Returns snapshot of a computation time statistics.
    * 
-   * The method accepts no parameters.
-   * 
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
    * 
    * @returns which is a Map with {@link StatType} as keys, and {number} as values
@@ -360,9 +352,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * 
-   * The method accepts address which is the cell coordinates, width and height of the block.
-   * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    * 
    * @param {SimpleCellAddress} address - cell coordinates (top left corner)
    * @param {number} width - width of the box
@@ -387,12 +377,12 @@ export class HyperFormula {
   /**
    * Sets the content for a block of cells of a given coordinates.
    * 
-   * The method accepts address which is the cell coordinates, width and height of the block, and {@link RawCellContent}
-   * 
    * Note that this method may trigger dependency graph recalculation.
    * 
    * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
    * @param {(RawCellContent[][]|RawCellContent)} cellContents - array with content
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -429,11 +419,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to add rows into a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which addRows is to be called and array of coordinates where the rows should be added.
-   * 
    * Checks against particular rules to ascertain that addRows can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    * 
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -453,14 +441,14 @@ export class HyperFormula {
   /**
    * Adds multiple rows into a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which addRows is to be called and array of coordinates where the rows should be added.
-   * 
    * Does nothing if rows are outside of effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    */
@@ -472,11 +460,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to remove rows from a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which removeRows is to be called and array of coordinates of rows to be removed.
-   * 
    * Checks against particular rules to ascertain that removeRows can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
@@ -496,14 +482,14 @@ export class HyperFormula {
   /**
    * Removes multiple rows from a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which removeRows is to be called and array of coordinates of rows to be removed.
-   * 
    * Does nothing if rows are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * */
@@ -515,11 +501,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to add columns into a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which addColumns is to be called and array of coordinates of columns to be added.
-   * 
    * Checks against particular rules to ascertain that addColumns can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -540,14 +524,14 @@ export class HyperFormula {
   /**
    * Adds multiple columns into a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which addColumns is to be called and array of coordinates of columns to be added.
-   * 
    * Does nothing if the columns are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * */
@@ -559,11 +543,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to remove columns from a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which removeColumns is to be called and array of coordinates of columns to be removed.
-   * 
    * Checks against particular rules to ascertain that removeColumns can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
@@ -584,14 +566,14 @@ export class HyperFormula {
   /**
    * Removes multiple columns from a specified position in a given sheet.
    * 
-   * The method accepts sheet ID in which removeColumns is to be called and array of coordinates of columns to be removed.
-   * 
    * Does nothing if columns are outside of the effective sheet size.
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount]
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -604,18 +586,16 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to move cells to a specified position in a given sheet.
    * 
-   * The method accepts source location, dimensions and the target location of the block.
-   * 
    * Checks against particular rules to ascertain that moveCells can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    * 
-   * @returns true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
+   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    * 
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
@@ -630,14 +610,14 @@ export class HyperFormula {
   /**
    * Moves the content of a cell block from source to the target location.
    * 
-   * The method accepts source location, dimensions and the target location of the block.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
    * @param {number} height - height of the cell block that is being moved
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -650,11 +630,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to move a particular number of rows to a specified position in a given sheet.
    * 
-   * The method accepts source location, dimensions and the target location of the block.
-   * 
    * Checks against particular rules to ascertain that moveRows can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -676,14 +654,14 @@ export class HyperFormula {
   /**
    * Moves a particular number of rows to a specified position in a given sheet.
    * 
-   * The method accepts source location, dimensions and the target location of the block.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
    * @param {number} numberOfRows - number of rows to move
    * @param {number} targetRow - row number before which rows will be moved
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -698,14 +676,14 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveColumns can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
    * 
-   * @returns true if the action is possible, false if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
+   * @returns `true` if the action is possible, `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside the selected columns, the target location has matrix or the provided address is invalid.
    * 
    */
   public isItPossibleToMoveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): boolean {
@@ -720,14 +698,14 @@ export class HyperFormula {
   /**
    * Moves a particular number of columns to a specified position in a given sheet.
    * 
-   * The method accepts source location, dimensions and the target location of the block.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
    * @param {number} numberOfColumns - number of columns to move
    * @param {number} targetColumn - column number before which columns will be moved
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -739,8 +717,6 @@ export class HyperFormula {
 
   /**
    * Stores a copy of the cell block in internal clipboard for the further paste.
-   * 
-   * The method accepts source location and the dimensions of the selected block.
    * 
    * Returns values of cells for use in external clipboard.
    *
@@ -764,8 +740,6 @@ export class HyperFormula {
    * 
    * Returns values of cells for use in external clipboard.
    * 
-   * The method accepts source location and the dimensions of the selected block.
-   *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
@@ -784,11 +758,11 @@ export class HyperFormula {
    * 
    * Does nothing if the clipboard is empty.
    * 
-   * The method accepts source location of the selected block.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    * 
    * @param {SimpleCellAddress} targetLeftCorner - upper left address of the target cell block
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * */
@@ -822,11 +796,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to add a sheet to the engine.
    * 
-   * The method accepts sheet name as a string.
-   * 
    * Checks against particular rules to ascertain that addSheet can be called.
    * 
-   * If returns true, doing this operation won't throw any errors.
+   * If returns `true`, doing this operation won't throw any errors.
    * 
    * @param {string} name absolute cell range
    * 
@@ -844,8 +816,6 @@ export class HyperFormula {
   /**
    * Adds a new sheet to the engine.
    * 
-   * The method accepts the name of a new sheet.
-   *
    * @param {string} name - if not specified, name will be autogenerated
    * 
    * @fires Events#sheetAdded
@@ -861,13 +831,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to remove sheet for the engine.
    * 
-   * The method accepts sheet name as a string.
-   * 
    * If returns true, doing {@link removeSheet} operation won't throw any errors.
    * 
-   * Parameter is case insensitive.
-   *
-   * @param {string} name - sheet name
+   * @param {string} name - sheet name, case insensitive
    * 
    * @returns true if the provided name of a sheet exists and then it can be removed, false if there is no sheet with a given name
    */
@@ -885,11 +851,10 @@ export class HyperFormula {
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * Parameter is case insensitive.
-   *
-   * @param {string} name - sheet name
+   * @param {string} name - sheet name, case insensitive
    * 
    * @fires Events#sheetRemoved
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    */
@@ -904,13 +869,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to clear a specified sheet.
    * 
-   * The method accepts sheet name as a string.
+   * If returns `true`, doing this operation won't throw any errors.
    * 
-   * If returns true, doing this operation won't throw any errors.
-   * 
-   * Parameter is case insensitive.
-   *
-   * @param {string} name - sheet name
+   * @param {string} name - sheet name, case insensitive.
    * 
    * @returns true if the provided name of a sheet exists and then its content can be cleared, false if there is no sheet with a given name
    */
@@ -926,17 +887,15 @@ export class HyperFormula {
   /**
    * Clears the sheet content.
    * 
-   * The method accepts sheet name.
-   * 
    * Based on that the method finds the ID of a sheet to be cleared.
    * 
    * Double-checks if the sheet exists.
    * 
    * Note that this method may trigger dependency graph recalculation.
    * 
-   * Parameter is case insensitive.
+   * @param {string} name - sheet name, case insensitive.
    * 
-   * @param {string} name - sheet name
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * */
@@ -949,13 +908,9 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to replace the sheet content.
    * 
-   * The method accepts sheet name as a string.
-   * 
-   * If returns true, doing this operation won't throw any errors.
-   * 
-   * Parameter is case insensitive.
+   * If returns `true`, doing this operation won't throw any errors.
    *
-   * @param {string} name - sheet name
+   * @param {string} name - sheet name, case insensitive.
    * 
    * @returns true if the provided name of a sheet exists and then its content can be replaced, false if there is no sheet with a given name
    */
@@ -970,8 +925,6 @@ export class HyperFormula {
 
   /**
    * Replaces the sheet content with new values.
-   * 
-   * The method accepts sheet name and an array of new values to be put in a given sheet.
    * 
    * The new value is to be provided as an array of arrays of {@link RawCellContent}
    * 
@@ -1029,7 +982,6 @@ export class HyperFormula {
    * If sheet name is not present in string representation, returns {@param sheet} as a sheet number.
    *
    * @param {string} stringAddress - string representation of cell address, e.g. 'C64'
-   * 
    * @param {number} sheet - override sheet index regardless of sheet mapping
    * 
    * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
@@ -1041,14 +993,10 @@ export class HyperFormula {
   /**
    * Returns string representation of an absolute address.
    * 
-   * Accepts cell address and sheet ID or sheet name.
-   * 
-   * If the sheet index is not present in the engine, returns undefined.
-   *
    * @param {SimpleCellAddress} address - object representation of an absolute address
    * @param {number} sheet - if is not equal with address sheet index, string representation will contain sheet name
    * 
-   * @returns absolute address in string or undefined 
+   * @returns absolute address in string or undefined if the sheet index is not present in the engine
    * */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): Maybe<string> {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
@@ -1058,8 +1006,6 @@ export class HyperFormula {
    * Returns a unique sheet name assigned to the sheet of a given ID.
    * 
    * Or undefined if the there is no sheet with a given ID.
-   * 
-   * The method accepts sheet ID as a parameter.
    * 
    * @param {number} sheetId - ID of the sheet, for which we want to retrieve name
    * 
@@ -1074,11 +1020,7 @@ export class HyperFormula {
    * 
    * Returns undefined if the there's no sheet with a given name.
    * 
-   * The method accepts sheet name as a parameter.
-   * 
-   * Parameter is case insensitive.
-   * 
-   * @param {string} sheetName - name of the sheet, for which we want to retrieve ID
+   * @param {string} sheetName - name of the sheet, for which we want to retrieve ID, case insensitive.
    * 
    * @returns ID of the sheet or undefined if the sheet does not exist
    */
@@ -1091,9 +1033,7 @@ export class HyperFormula {
    * 
    * The methods accepts sheet name to be checked.
    * 
-   * Parameter is case insensitive.
-   * 
-   * @param {string} sheetName - name of the sheet
+   * @param {string} sheetName - name of the sheet, case insensitive.
    * 
    * @returns true if a given sheet exists
    */
@@ -1182,9 +1122,8 @@ export class HyperFormula {
   /**
    * Returns the number of existing sheets.
    * 
-   * The method does not accept any parameters.
-   * 
    * @returns which is a number of sheets
+   * 
    */
   public countSheets(): number {
     return this.sheetMapping.numberOfSheets()
@@ -1193,13 +1132,8 @@ export class HyperFormula {
   /**
    * Renames a specified sheet.
    * 
-   * The method accepts sheet ID as the first parameter and a new name of a sheet to be given as the second.
-   * 
    * @param {number} sheetId - a sheet number
-   * 
-   * @param {string} newName - a name of the sheet to be given
-   * 
-   * If both are same does nothing.
+   * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    * 
    * @fires Events#sheetRenamed
    * 
@@ -1216,9 +1150,10 @@ export class HyperFormula {
   /**
    * Runs multiple operations and recomputes formulas at the end.
    * 
-   * @param {(e: IBatchExecutor) => void} batchOperations
-   * 
    * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @param {(e: IBatchExecutor) => void} batchOperations
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    */
@@ -1235,8 +1170,6 @@ export class HyperFormula {
   /**
    * Adds a specified named expression.
    * 
-   * The method accepts expression name as the first parameter and expression as the second.
-   * 
    * @throws Throws an error if the named expression is not valid and available.
    * 
    * Note that this method may trigger dependency graph recalculation.
@@ -1245,6 +1178,7 @@ export class HyperFormula {
    * @param {RawCellContent} expression - the expression
    * 
    * @fires Events#namedExpressionAdded
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -1264,12 +1198,8 @@ export class HyperFormula {
 
   /**
    * Gets specified named expression value.
-   * 
-   * The method accepts expression name string as a parameter.
-   * 
-   * Parameter is case insensitive.
    *
-   * @param {string} expressionName - expression name
+   * @param {string} expressionName - expression name, case insensitive.
    * 
    * @returns a {@link CellValue} or null if the given named expression does not exists
    *
@@ -1286,14 +1216,14 @@ export class HyperFormula {
   /**
    * Changes a given named expression to a specified formula.
    * 
-   * The method accepts expression name as a first parameter and a new formula as a second parameter.
-   * 
    * @throws Throws an error if the given expression does not exist.
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name
    * @param {RawCellContent} newExpression - a new expression
+   * 
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -1311,13 +1241,12 @@ export class HyperFormula {
   /**
    * Removes a named expression.
    * 
-   * The method accepts string with expression name to be removed as a parameter.
-   * 
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - expression name
    * 
    * @fires Events#namedExpressionRemoved
+   * @fires Events#ValuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -1386,8 +1315,6 @@ export class HyperFormula {
   /**
    * Validates the formula.
    * 
-   * The method accepts string with a formula as a parameter.
-   * 
    * If the provided string starts with "=" and is a parsable formula the method returns true.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
@@ -1422,43 +1349,75 @@ export class HyperFormula {
   }
 
   /**
-  * @fires Events#sheetAdded
-  */
+   * A method that listens on adding a sheet event.
+   * 
+   * @param {SheetAddedHandler} handler handler of adding sheet event
+   * 
+   * @listens Events#sheetAdded
+   * 
+   * */
   public onSheetAdded(handler: SheetAddedHandler): void {
     this.emitter.on(Events.SheetAdded, handler)
   }
 
   /**
- * @fires Events#sheetRemoved
- */
+   * A method that listens on removing a sheet event.
+   * 
+   * @param {SheetRemovedHandler} handler handler of removing sheet event
+   * 
+   * @listens Events#sheetRemoved
+   * 
+   * */
   public onSheetRemoved(handler: SheetRemovedHandler): void {
     this.emitter.on(Events.SheetRemoved, handler)
   }
-
+  
   /**
- * @fires Events#sheetRenamed
- */
+   * 
+   * A method that listens on renaming a sheet event.
+   * 
+   * 
+   * @param {SheetRenamedHandler} handler handler of renaming sheet event
+   * 
+   * @listens Events#sheetRenamed
+   * 
+   * */
   public onSheetRenamed(handler: SheetRenamedHandler): void {
     this.emitter.on(Events.SheetRenamed, handler)
   }
 
   /**
-   * @fires Events#namedExpressionAdded
-   */
+   * A method that listens on adding a named expression event.
+   * 
+   * @param {NamedExpressionAddedHandler} handler handler of adding named expression event
+   * 
+   * @listens Events#namedExpressionAdded
+   * 
+   * */
   public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
     this.emitter.on(Events.NamedExpressionAdded, handler)
   }
 
   /**
-  * @fires Events#namedExpressionRemoved
-  */
+   * A method that listens on removing a named expression event.
+   *  
+   * @param {NamedExpressionRemovedHandler} handler handler of removing named expression event
+   * 
+   * @listens Events#namedExpressionRemoved
+   * 
+   * */
   public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
     this.emitter.on(Events.NamedExpressionRemoved, handler)
   }
 
   /**
-  * @fires Events#valuesUpdated
-  */
+   * A method that listens on updating the values event.
+   * 
+   * @param {ValuesUpdatedHandler} handler handler of updating values event
+   * 
+   * @listens Events#valuesUpdated
+   * 
+   * */
   public onValuesUpdated(handler: ValuesUpdatedHandler): void {
     this.emitter.on(Events.ValuesUpdated, handler)
   }

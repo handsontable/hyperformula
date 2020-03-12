@@ -189,7 +189,7 @@ export class Config implements ConfigParams, ParserConfig{
    *
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
    * 
-   * This error was inherited by the Excel, and we have this option for compatibility
+   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See {@link nullDate} for complete solution.
    * 
    * @default false
    */
@@ -213,7 +213,7 @@ export class Config implements ConfigParams, ParserConfig{
   /*
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    *
-   * If xx<=nullYear its latter, otherwise its former.
+   * If `xx <= nullYear` its latter, otherwise its former.
    * 
    * @default 30
    */
@@ -233,9 +233,9 @@ export class Config implements ConfigParams, ParserConfig{
   /*
    * precisionEpsilon controls how far two numerical values need to be from each other to be treated as non-equal.
    *
-   * a and b are equal if they are of the same sign and:
+   * `a` and `b` are equal if they are of the same sign and:
    * 
-   * abs(a) <= (1+precisionEpsilon) * abs(b)
+   * `abs(a) <= (1+precisionEpsilon) * abs(b)`
    * 
    * and
    * 
