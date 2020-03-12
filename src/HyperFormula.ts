@@ -5,9 +5,8 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
-  InternalCellValue, NoErrorCellValue,
+  NoErrorCellValue, SimpleCellAddress,
   simpleCellAddress,
-  SimpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
@@ -601,9 +600,9 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -616,9 +615,9 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -645,11 +644,37 @@ export class HyperFormula {
    *
    * @param range
    */
-  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
-    return this.dependencyGraph.getValuesInRange(range).map(
-      (subarray: InternalCellValue[]) => subarray.map(
-        (arg) => this.exporter.exportValue(arg),
-      ),
+  public getRangeValues(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellValue(address)
+      )
+    )
+  }
+
+  /**
+   * Returns cell formulas in given range
+   *
+   * @param range
+   */
+  public getRangeFormulas(range: AbsoluteCellRange): Maybe<string>[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellFormula(address)
+      )
+    )
+  }
+
+  /**
+   * Returns serialized cell in given range
+   *
+   * @param range
+   */
+  public getRangeSerialized(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellSerialized(address)
+      )
     )
   }
 
