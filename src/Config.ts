@@ -128,8 +128,10 @@ export class Config implements ConfigParams, ParserConfig{
     CorrelPlugin,
   ]
   /*
-   * Specifies if the string comparison is case-sensitive or not. 
+   * Specifies if the string comparison is case-sensitive or not.
    *
+   * Applies to comparison operators only.
+   * 
    * @default false
    */
   public readonly caseSensitive: boolean
@@ -152,7 +154,7 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly dateFormats: string[]
   /*
-  * A separator character used to separate arguments of procedures in formulas. Must be different from decimalSeparator.
+  * A separator character used to separate arguments of procedures in formulas. Can be either '.' or ',' and must be different from decimalSeparator.
   *
   * @default ','
   * */
@@ -165,6 +167,7 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly decimalSeparator: '.' | ','
   /*
   * Translation package with translations of function and error names.
+  *
   * @default enGB
   * */
   public readonly language: TranslationPackage
@@ -205,7 +208,7 @@ export class Config implements ConfigParams, ParserConfig{
   * */
   public readonly matrixDetection: boolean
   /*
-  * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if matrixDetection is set to true.
+  * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
   * 
   * @default 100
   * */
@@ -231,7 +234,7 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
   /*
-   * precisionEpsilon controls how far two numerical values need to be from each other to be treated as non-equal.
+   * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
    * `a` and `b` are equal if they are of the same sign and:
    * 
@@ -239,11 +242,11 @@ export class Config implements ConfigParams, ParserConfig{
    * 
    * and
    * 
-   * abs(b) <= (1+precisionEpsilon) * abs(a)
+   * `abs(b) <= (1+precisionEpsilon) * abs(a)`
    *
    * It also controls snap-to-zero behavior for additions/subtractions:
    * 
-   * for c=a+b or c=a-b, if abs(c) <= precisionEpsilon * abs(a), then c is set to 0
+   * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
    * 
    * @default 1e-13
    */
@@ -259,7 +262,7 @@ export class Config implements ConfigParams, ParserConfig{
   /*
    * Sets the rounding.
    *
-   * If false, no rounding happens, and numbers are equal if and only if they are truly identical value (see: precisionEpsilon).
+   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: {@link precisionEpsilon}).
    * 
    * @default true
    */
@@ -291,7 +294,8 @@ export class Config implements ConfigParams, ParserConfig{
    *
    * Dates are represented internally as number of days that passed since this nullDate.
    * 
-   * Set to {year: 1899, month: 12, day: 30} as default.
+   * @default {year: 1899, month: 12, day: 30}
+   * 
    */
   public readonly nullDate: SimpleDate
   /*

@@ -34,7 +34,7 @@ export type SheetRemovedHandler = (removedSheetDisplayName: string, changes: Exp
   * @event sheetRenamed
   * 
   * @param {string} oldDisplayName the old name of a sheet before renaming
-  * @param {string} newDisplayName  the new name of the sheet after renaming 
+  * @param {string} newDisplayName the new name of the sheet after renaming 
   */
 export type SheetRenamedHandler = (oldDisplayName: string, newDisplayName: string) => any
 
@@ -50,6 +50,7 @@ export type NamedExpressionAddedHandler = (namedExpressionName: string, changes:
 
 /**
   * Removing named expression event.
+  * 
   * @event namedExpressionRemoved
   * 
   * @param {string} namedExpressionName the name of removed expression

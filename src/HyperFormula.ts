@@ -79,7 +79,7 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
-   * @param {Config=} maybeConfig - engine configuration
+   * @param {Config} [maybeConfig] - engine configuration
    * 
    * @returns an instance of {@link HyperFormula}
    */
@@ -97,7 +97,7 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Config=} maybeConfig - engine configuration
+   * @param {Config} [maybeConfig]- engine configuration
    * 
    * @returns an instance of {@link HyperFormula}
    */
@@ -112,7 +112,7 @@ export class HyperFormula {
    * 
    * If not specified the engine will be built with the default configuration.
    *
-   * @param {Config=} maybeConfig - engine configuration
+   * @param {Config} [maybeConfig] - engine configuration
    * 
    * @returns an instance of {@link HyperFormula}
    */
@@ -157,7 +157,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns a {@link CellValue}
+   * @returns a {@link CellValue} which is a value of a cell or an error
    * 
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
@@ -200,7 +200,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    *
-   * @returns a {@link CellValue}
+   * @returns a {@link CellValue} which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): CellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
@@ -216,7 +216,7 @@ export class HyperFormula {
    * 
    * @param {number} sheet - sheet ID number
    * 
-   * @returns a {@link CellValue}
+   * @returns a {@link CellValue} which is a value of a cell or an error
    * 
    */
   public getSheetValues(sheet: number): CellValue[][] {
@@ -290,7 +290,7 @@ export class HyperFormula {
    *
    * @param {number} sheet - sheet ID number
    * 
-   * @returns @param {number} width and @param {number} height of the sheet
+   * @returns {number} width and @param {number} height of the sheet
    */
   public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
@@ -352,7 +352,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link clearSheet} operation won't throw any errors.
    * 
    * @param {SimpleCellAddress} address - cell coordinates (top left corner)
    * @param {number} width - width of the box
@@ -1246,7 +1246,7 @@ export class HyperFormula {
    * @param {string} expressionName - expression name
    * 
    * @fires Events#namedExpressionRemoved
-   * @fires Events#ValuesUpdated
+   * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
@@ -1353,8 +1353,6 @@ export class HyperFormula {
    * 
    * @param {SheetAddedHandler} handler handler of adding sheet event
    * 
-   * @listens Events#sheetAdded
-   * 
    * */
   public onSheetAdded(handler: SheetAddedHandler): void {
     this.emitter.on(Events.SheetAdded, handler)
@@ -1364,8 +1362,6 @@ export class HyperFormula {
    * A method that listens on removing a sheet event.
    * 
    * @param {SheetRemovedHandler} handler handler of removing sheet event
-   * 
-   * @listens Events#sheetRemoved
    * 
    * */
   public onSheetRemoved(handler: SheetRemovedHandler): void {
@@ -1379,8 +1375,6 @@ export class HyperFormula {
    * 
    * @param {SheetRenamedHandler} handler handler of renaming sheet event
    * 
-   * @listens Events#sheetRenamed
-   * 
    * */
   public onSheetRenamed(handler: SheetRenamedHandler): void {
     this.emitter.on(Events.SheetRenamed, handler)
@@ -1390,8 +1384,6 @@ export class HyperFormula {
    * A method that listens on adding a named expression event.
    * 
    * @param {NamedExpressionAddedHandler} handler handler of adding named expression event
-   * 
-   * @listens Events#namedExpressionAdded
    * 
    * */
   public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
@@ -1403,8 +1395,6 @@ export class HyperFormula {
    *  
    * @param {NamedExpressionRemovedHandler} handler handler of removing named expression event
    * 
-   * @listens Events#namedExpressionRemoved
-   * 
    * */
   public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
     this.emitter.on(Events.NamedExpressionRemoved, handler)
@@ -1414,8 +1404,6 @@ export class HyperFormula {
    * A method that listens on updating the values event.
    * 
    * @param {ValuesUpdatedHandler} handler handler of updating values event
-   * 
-   * @listens Events#valuesUpdated
    * 
    * */
   public onValuesUpdated(handler: ValuesUpdatedHandler): void {
