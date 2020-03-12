@@ -18,10 +18,12 @@ export class InformationPlugin extends FunctionPlugin {
     columns: {
       translationKey: 'COLUMNS',
       isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
     },
     rows: {
       translationKey: 'ROWS',
       isDependentOnSheetStructureChange: true,
+      doesNotNeedArgumentsToBeComputed: true,
     },
     index: {
       translationKey: 'INDEX',
