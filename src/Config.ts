@@ -250,6 +250,20 @@ export class Config implements ConfigParams, ParserConfig{
     return structuralChangeFunctions
   }
 
+  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
+    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
+
+    for (const plugin of this.allFunctionPlugins()) {
+      for (const functionKey in plugin.implementedFunctions) {
+        const pluginFunctionData = plugin.implementedFunctions[functionKey]
+        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
+          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+        }
+      }
+    }
+    return functionsWhichDoesNotNeedArgumentsToBeComputed
+  }
+
   public getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {

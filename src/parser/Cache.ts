@@ -15,11 +15,12 @@ export class Cache {
   constructor(
     private readonly volatileFunctions: Set<string>,
     private readonly structuralChangeFunctions: Set<string>,
+    private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>
   ) {
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
-    const astRelativeDependencies = collectDependencies(ast)
+    const astRelativeDependencies = collectDependencies(ast, this.functionsWhichDoesNotNeedArgumentsToBeComputed)
     const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.volatileFunctions), doesContainFunctions(ast, this.structuralChangeFunctions))
     this.cache.set(hash, cacheEntry)
     return cacheEntry

@@ -32,11 +32,12 @@ export class DependencyGraph {
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed())),
       new SheetMapping(config.language),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
+      config.functionsWhichDoesNotNeedArgumentsToBeComputed(),
     )
   }
 
@@ -48,6 +49,7 @@ export class DependencyGraph {
     public readonly matrixMapping: MatrixMapping,
     public readonly stats: Statistics = new Statistics(),
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
   ) {
   }
 
@@ -414,7 +416,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -434,7 +436,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)

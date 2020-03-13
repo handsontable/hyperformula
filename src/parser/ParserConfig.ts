@@ -8,6 +8,7 @@ export interface ParserConfig {
   errorMapping: Record<string, ErrorType>,
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,
+  functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string>,
   getErrorTranslationFor(errorType: ErrorType): string,
   getFunctionTranslationFor(functionName: string): string,
   numericStringToNumber: (input: string) => number,
