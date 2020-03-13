@@ -1,4 +1,4 @@
-import {Config, EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {buildConfig, EmptyValue, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {EmptyCellVertex, MatrixVertex} from '../../src/DependencyGraph'
@@ -34,7 +34,7 @@ describe('Changing cell content - checking if its possible', () => {
   })
 
   it('yes if numeric matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -347,7 +347,7 @@ describe('changing cell content', () => {
   })
 
   it('change numeric value inside matrix to another number', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -471,7 +471,7 @@ describe('changing cell content', () => {
       ['1', '2'],
       ['3', '4'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet, new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    const engine = HyperFormula.buildFromArray(sheet, buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     const changes = engine.setCellContents(adr('A1'), '7')
 
@@ -635,7 +635,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], new Config({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
+    ], buildConfig({matrixDetection: false, vlookupThreshold: 1, useColumnIndex: true}))
 
     engine.setCellContents(adr('B2'), '8')
 
@@ -647,7 +647,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1, vlookupThreshold: 1, useColumnIndex: true}))
 
     engine.setCellContents(adr('B2'), '8')
 
@@ -661,7 +661,7 @@ describe('numeric matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     engine.setCellContents(adr('A1'), '7')
 
@@ -674,7 +674,7 @@ describe('numeric matrices', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     engine.setCellContents(adr('A1'), 'foo')
 
@@ -690,7 +690,7 @@ describe('numeric matrices', () => {
       [null],
       ['5', '6'],
       ['7', '8'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     engine.setCellContents(adr('A1'), 'foo')
 

@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../src'
+import {buildConfig, HyperFormula} from '../src'
 import {enGB, languages, plPL} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
@@ -8,10 +8,10 @@ describe('i18n', () => {
   it('using functions in different languages', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],
-    ], new Config({language: plPL}))
+    ], buildConfig({language: plPL}))
     const engineEN = HyperFormula.buildFromArray([
       ['=SUM(42)'],
-    ], new Config({language: enGB}))
+    ], buildConfig({language: enGB}))
 
     expect(enginePL.getCellValue(adr('A1'))).toBe(42)
     expect(engineEN.getCellValue(adr('A1'))).toBe(42)
@@ -23,13 +23,13 @@ describe('i18n', () => {
       ['1'],
       ['2'],
       ['=LICZ.JEŻELI(A1:A3, ">=1")'],
-    ], new Config({language: plPL}))
+    ], buildConfig({language: plPL}))
     const engineEN = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
       ['=COUNTIF(A1:A3, ">=1")'],
-    ], new Config({language: enGB}))
+    ], buildConfig({language: enGB}))
 
     expect(enginePL.getCellValue(adr('A4'))).toBe(2)
     expect(engineEN.getCellValue(adr('A4'))).toBe(2)
@@ -38,7 +38,7 @@ describe('i18n', () => {
   it('translation works for parser hardcoded offset procedure', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=PRZESUNIĘCIE(A1, 1, 1)'],
-    ], new Config({language: plPL}))
+    ], buildConfig({language: plPL}))
     const engineEN = HyperFormula.buildFromArray([
       ['=OFFSET(A1, 1, 1)'],
     ])
@@ -57,7 +57,7 @@ describe('i18n', () => {
   })
 
   it('all translation packages should translate all implemented functions', () => {
-    const implementedFunctions = (new Config()).getRegisteredFunctions()
+    const implementedFunctions = (buildConfig()).getRegisteredFunctions()
     implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
     for (const lang in languages) {

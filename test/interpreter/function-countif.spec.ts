@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
@@ -115,7 +115,7 @@ describe('Function COUNTIF', () => {
       ['1'],
       ['2'],
       ['=COUNTIF(A1:A2, ">0")'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], buildConfig({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })

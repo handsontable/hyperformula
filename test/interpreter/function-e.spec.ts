@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -11,7 +11,7 @@ describe('Function E', () => {
   it('should return E with proper precision', () => {
     const engine = HyperFormula.buildFromArray([
       ['=E()'],
-    ], new Config({ smartRounding : false}))
+    ], buildConfig({ smartRounding : false}))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2.71828182845905)
   })

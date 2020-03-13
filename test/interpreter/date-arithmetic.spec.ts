@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import '../testConfig'
 import {adr} from '../testUtils'
 
@@ -93,7 +93,7 @@ describe('Date arithmetic', () => {
   it('functions on dates', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISEVEN("02/02/2020")', '=COS("02/02/2020")', '=BITOR("02/02/2020","08/16/1985")'],
-    ], new Config({ smartRounding : false}))
+    ], buildConfig({ smartRounding : false}))
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(0.9965266857693633)

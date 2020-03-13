@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {buildConfig, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import { simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -71,7 +71,7 @@ describe('Adding column - checking if its possible', () => {
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -248,7 +248,7 @@ describe('Adding column', () => {
 
 describe('Adding column', () => {
   it('add column inside numeric matrix, expand matrix', () => {
-    const config = new Config({ matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({ matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -323,7 +323,7 @@ describe('Adding column - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
-    ], new Config({ useColumnIndex: true }))
+    ], buildConfig({ useColumnIndex: true }))
     const index = (engine.columnSearch as ColumnIndex)
 
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)

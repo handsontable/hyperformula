@@ -1,9 +1,9 @@
-import {Config} from '../../src'
+import {buildConfig} from '../../src'
 import {DateHelper} from '../../src/DateHelper'
 import {format} from '../../src/format/format'
 
 describe('FormatInterpreter', () => {
-  const config = new Config()
+  const config = buildConfig()
   const dateHelper = new DateHelper(config)
   it('works for expression without significant tokens', () => {
     expect(format(2, 'Foo', config, dateHelper)).toEqual('Foo')

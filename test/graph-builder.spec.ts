@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {Config} from '../src'
+import {buildConfig} from '../src'
 import {
   EmptyCellVertex,
   MatrixVertex,
@@ -139,7 +139,7 @@ describe('GraphBuilder with matrix detection', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    ], buildConfig({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     expect(engine.addressMapping.fetchCell(adr('A2'))).toBe(a1)
@@ -154,7 +154,7 @@ describe('GraphBuilder with matrix detection', () => {
   it('matrix detection strategy and regular values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', 'foobar'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 2 }))
+    ], buildConfig({ matrixDetection: true, matrixDetectionThreshold: 2 }))
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
@@ -168,7 +168,7 @@ describe('GraphBuilder with matrix detection', () => {
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 6 }))
+    ], buildConfig({ matrixDetection: true, matrixDetectionThreshold: 6 }))
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B2'))).toBeInstanceOf(ValueCellVertex)

@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../src'
+import {buildConfig, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
@@ -6,7 +6,7 @@ import {adr} from './testUtils'
 
 describe('Disable matrix optimizatoins', () => {
   it('should split matrix into value cell vertices', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -27,7 +27,7 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between matrix and range', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -53,7 +53,7 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between numeric matrix and formula matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -77,7 +77,7 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between matrix and formulas', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
@@ -105,7 +105,7 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should not change edges not related to matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],

@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ConfigParams} from '../../src/Config'
 import {Sheet} from '../../src/GraphBuilder'
@@ -241,7 +241,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 describe('ColumnIndex strategy', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, buildConfig({
       useColumnIndex: true,
       ...config,
     }))
@@ -251,7 +251,7 @@ describe('ColumnIndex strategy', () => {
 describe('BinarySearchStrategy', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, new Config({
+    return HyperFormula.buildFromArray(sheet, buildConfig({
       useColumnIndex: false,
       ...config,
     }))
@@ -268,7 +268,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], new Config({ useColumnIndex: false, vlookupThreshold: 1}))
+    ], buildConfig({ useColumnIndex: false, vlookupThreshold: 1}))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
@@ -284,7 +284,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], new Config({ useColumnIndex: false }))
+    ], buildConfig({ useColumnIndex: false }))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })

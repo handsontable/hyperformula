@@ -1,10 +1,10 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {buildConfig, EmptyValue, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
 import '../testConfig.ts'
 import {adr, detailedError} from '../testUtils'
 
-const configWithMatrixPlugin = new Config({functionPlugins: [MatrixPlugin]})
+const configWithMatrixPlugin = buildConfig({functionPlugins: [MatrixPlugin]})
 
 describe('Matrix plugin', () => {
   it('matrix multiplication', () => {

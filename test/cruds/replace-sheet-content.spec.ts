@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {buildConfig, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
@@ -86,7 +86,7 @@ describe('Replace sheet content', () => {
         ['=Sheet1!A1'],
         ['=Sheet1!B1'],
       ],
-    }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    }, buildConfig({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     engine.setSheetContent('Sheet1', [['3']])
 
