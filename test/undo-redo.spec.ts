@@ -144,8 +144,8 @@ describe('UndoRedo - adding rows', () => {
   })
 })
 
-describe("UndoRedo", () => {
-  it("when there is no operation to undo", () => {
+describe('UndoRedo', () => {
+  it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
@@ -154,14 +154,14 @@ describe("UndoRedo", () => {
   })
 })
 
-describe("UndoRedo - #isThereSomethingToUndo", () => {
-  it("when there is no operation to undo", () => {
+describe('UndoRedo - #isThereSomethingToUndo', () => {
+  it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(engine.isThereSomethingToUndo()).toBe(false)
   })
 
-  it("when there is some operation to undo", () => {
+  it('when there is some operation to undo', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.removeRows(0, [1, 1])
 

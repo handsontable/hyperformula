@@ -63,7 +63,7 @@ export interface RowsRemoval {
   rowFrom: number,
   rowCount: number,
   version: number,
-  removedCells: ChangedCell[]
+  removedCells: ChangedCell[],
 }
 
 export interface RowsAddition {
@@ -122,7 +122,7 @@ export class Operations {
 
     this.dependencyGraph.removeRows(rowsToRemove)
 
-    let version : number
+    let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       RemoveRowsDependencyTransformer.transform(rowsToRemove, this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addRemoveRowsTransformation(rowsToRemove)

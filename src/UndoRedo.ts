@@ -58,17 +58,17 @@ export class UndoRedo {
   public undo() {
     const operation = this.undoStack.pop()
     if (!operation) {
-      throw "Attempted to undo without operation on stack"
+      throw 'Attempted to undo without operation on stack'
     }
 
     switch(operation.type) {
       case UndoStackElementType.REMOVE_ROWS: {
         this.undoRemoveRows(operation)
-        break;
+        break
       }
       case UndoStackElementType.ADD_ROWS: {
         this.undoAddRows(operation)
-        break;
+        break
       }
     }
   }
@@ -79,7 +79,7 @@ export class UndoRedo {
       const rowsRemoval = rowsRemovals[i]
       this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
 
-      for (let { address, cellType } of rowsRemoval.removedCells) {
+      for (const { address, cellType } of rowsRemoval.removedCells) {
         switch (cellType.type) {
           case ClipboardCellType.VALUE: {
             this.crudOperations?.setValueToCell(cellType.value, address)

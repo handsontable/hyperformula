@@ -44,7 +44,7 @@ export class NamedExpressionDoesNotExist extends Error {
 
 export class NoOperationToUndo extends Error {
   constructor() {
-    super("There is no operation to undo")
+    super('There is no operation to undo')
   }
 }
 
