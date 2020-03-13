@@ -3,21 +3,20 @@ import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
 
-describe('Function ISLOGICAL', () => {
-  it('should return true for boolean', () => {
+describe('Function ISTEXT', () => {
+  it('should return true for text', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISLOGICAL(1<1)', '=ISLOGICAL(ISLOGICAL(A1))', '=ISLOGICAL(A2)'],
-      [false],
+      ['=ISTEXT("abcd")', '=ISTEXT(A2)'],
+      ['abcd'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)
     expect(engine.getCellValue(adr('B1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
   })
 
-  it('should return false for non-boolean', () => {
+  it('should return false for nontext', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISLOGICAL(-0)', '=ISLOGICAL(A2)',  '=ISLOGICAL("foo")'],
+      ['=ISTEXT(-0)', '=ISTEXT(A2)',  '=ISTEXT(1<1)'],
       [null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -27,7 +26,7 @@ describe('Function ISLOGICAL', () => {
 
   it('takes exactly one argument', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISLOGICAL(1, 2)', '=ISLOGICAL()'],
+      ['=ISTEXT(1, 2)', '=ISTEXT()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
@@ -37,7 +36,7 @@ describe('Function ISLOGICAL', () => {
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
       ['=4/1'],
-      ['=4/0', '=ISLOGICAL(A1:A3)'],
+      ['=4/0', '=ISTEXT(A1:A3)'],
       ['=4/2'],
     ])
 
