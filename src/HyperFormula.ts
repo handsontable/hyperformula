@@ -352,7 +352,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * 
-   * If returns `true`, doing {@link clearSheet} operation won't throw any errors.
+   * If returns `true`, doing {@link setCellContents} operation won't throw any errors.
    * 
    * @param {SimpleCellAddress} address - cell coordinates (top left corner)
    * @param {number} width - width of the box
@@ -421,7 +421,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addRows can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link addRows} operation won't throw any errors.
    * 
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -462,7 +462,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that removeRows can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link removeRows} operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
@@ -503,7 +503,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addColumns can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link addColumns} operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -545,7 +545,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that removeColumns can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link removeColumns} operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
@@ -588,7 +588,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveCells can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link moveCells} operation won't throw any errors.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
@@ -632,7 +632,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveRows can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link moveRows} operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -676,7 +676,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveColumns can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link moveColumns} operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
@@ -798,7 +798,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addSheet can be called.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link addSheet} operation won't throw any errors.
    * 
    * @param {string} name absolute cell range
    * 
@@ -869,7 +869,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to clear a specified sheet.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link clearSheet} operation won't throw any errors.
    * 
    * @param {string} name - sheet name, case insensitive.
    * 
@@ -908,7 +908,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to replace the sheet content.
    * 
-   * If returns `true`, doing this operation won't throw any errors.
+   * If returns `true`, doing {@link setSheetContent} operation won't throw any errors.
    *
    * @param {string} name - sheet name, case insensitive.
    * 
@@ -1220,14 +1220,13 @@ export class HyperFormula {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {string} expressionName - an expression name
+   * @param {string} expressionName - an expression name, case insensitive.
    * @param {RawCellContent} newExpression - a new expression
    * 
    * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
    * 
-   *
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.doesNamedExpressionExist(expressionName)) {
