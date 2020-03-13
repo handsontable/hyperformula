@@ -425,7 +425,7 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
 
     engine.removeColumns(0, [0, 1])
 
-    expect(extractReference(engine, adr('B1', 2))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('B1', 2))).toEqual(CellAddress.relative(1, -1, 0))
   })
 })
 

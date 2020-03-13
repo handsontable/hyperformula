@@ -22,10 +22,12 @@ export namespace RemoveColumnsDependencyTransformer {
 
   const cellRangeTransformer = (removedColumns: ColumnsSpan, transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
+      const dependencyRangeStartSheet = absoluteSheetReference(dependencyRangeStart, address)
+
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
 
-      if (removedColumns.sheet === dependencyRangeStart.sheet) {
+      if (removedColumns.sheet === dependencyRangeStartSheet) {
         const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
         const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
 
