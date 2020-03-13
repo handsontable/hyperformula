@@ -7,29 +7,29 @@ import {InvalidArgumentsError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching} from './parser'
 
-type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty
+export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty
 
 enum ClipboardOperationType {
   COPY,
   CUT,
 }
 
-enum ClipboardCellType {
+export enum ClipboardCellType {
   VALUE,
   EMPTY,
   FORMULA,
 }
 
-interface ClipboardCellValue {
+export interface ClipboardCellValue {
   type: ClipboardCellType.VALUE,
   value: ValueCellVertexValue,
 }
 
-interface ClipboardCellEmpty {
+export interface ClipboardCellEmpty {
   type: ClipboardCellType.EMPTY,
 }
 
-interface ClipboardCellFormula {
+export interface ClipboardCellFormula {
   type: ClipboardCellType.FORMULA,
   hash: string,
 }
