@@ -196,7 +196,7 @@ export class HyperFormula {
    * @param sheet - sheet id number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellValue(...args))
+    return this.genericSheetGetter(sheet, (arg) => this.getCellValue(arg))
   }
 
   /**
@@ -211,7 +211,7 @@ export class HyperFormula {
    * @returns {string} in a specific format or undefined
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
+    return this.genericSheetGetter(sheet, (arg) => this.getCellFormula(arg))
   }
 
   /**
@@ -226,9 +226,7 @@ export class HyperFormula {
    * @returns {string} in a specific format or undefined
    */
   public getSheetSerialized(sheet: number, customUnparser?: Unparser): NoErrorCellValue[][] {
-    // eslint-disable-next-line
-    // @ts-ignore
-    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args, customUnparser))
+    return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg, customUnparser))
   }
 
   private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -252,7 +250,7 @@ export class HyperFormula {
    *
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
-    return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
+    return this.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
   }
 
   /**
@@ -272,7 +270,7 @@ export class HyperFormula {
    *
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    return this.genericAllGetter((...args) => this.getSheetValues(...args))
+    return this.genericAllSheetsGetter((arg) => this.getSheetValues(arg))
   }
 
   /**
@@ -280,7 +278,7 @@ export class HyperFormula {
    *
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
-    return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
+    return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
   /**
@@ -288,12 +286,10 @@ export class HyperFormula {
    *
    */
   public getAllSheetsSerialized(customUnparser?: Unparser): Record<string, NoErrorCellValue[][]> {
-    // eslint-disable-next-line
-    // @ts-ignore
-    return this.genericAllGetter((...args: any[]) => this.getSheetSerialized(...args, customUnparser))
+    return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg, customUnparser))
   }
 
-  private genericAllGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
+  private genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
     for (const sheetName of this.sheetMapping.displayNames()) {
       const sheetId = this.sheetMapping.fetch(sheetName)
