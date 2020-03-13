@@ -75,7 +75,7 @@ export interface TypedEmitter {
   emit<Event extends keyof Listeners>(s: Event, ...args: Parameters<Listeners[Event]>): void,
 }
 
-export interface TypedListener {
+export interface Listenable {
   on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
