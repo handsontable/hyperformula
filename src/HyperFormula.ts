@@ -1306,6 +1306,10 @@ export class HyperFormula implements Listenable {
     this.emitter.on(event, listener)
   }
 
+  public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.once(event, listener)
+  }
+
   /**
    *  Destroys instance of HyperFormula.
    * 

@@ -136,3 +136,16 @@ describe('Events', () => {
     expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 42)])
   })
 })
+
+describe('Subscribing only once', () => {
+  it('works', function() {
+    const engine = HyperFormula.buildEmpty()
+    const handler = jest.fn()
+
+    engine.once(Events.SheetAdded, handler)
+    engine.addSheet('FooBar1')
+    engine.addSheet('FooBar2')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+  })
+})
