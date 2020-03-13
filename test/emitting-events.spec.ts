@@ -1,4 +1,5 @@
 import {HyperFormula, ExportedCellChange, ExportedNamedExpressionChange} from '../src'
+import {Events} from '../src/Emitter'
 import {ErrorType} from '../src/Cell'
 import './testConfig'
 import { adr, detailedError } from './testUtils'
@@ -8,7 +9,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildEmpty()
     const handler = jest.fn()
     
-    engine.onSheetAdded(handler)
+    engine.on(Events.SheetAdded, handler)
     engine.addSheet('FooBar')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -22,7 +23,7 @@ describe('Events', () => {
     })
     const handler = jest.fn()
 
-    engine.onSheetRemoved(handler)
+    engine.on(Events.SheetRemoved, handler)
     engine.removeSheet('Sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -36,7 +37,7 @@ describe('Events', () => {
     })
     const handler = jest.fn()
 
-    engine.onSheetRemoved(handler)
+    engine.on(Events.SheetRemoved, handler)
     engine.removeSheet('sheet2')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -47,7 +48,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildFromArray([[]])
     const handler = jest.fn()
 
-    engine.onSheetRenamed(handler)
+    engine.on(Events.SheetRenamed, handler)
     engine.renameSheet(0, 'SomeNewName')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -58,7 +59,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildFromArray([[]])
     const handler = jest.fn()
 
-    engine.onSheetRenamed(handler)
+    engine.on(Events.SheetRenamed, handler)
     engine.renameSheet(0, 'Sheet1')
 
     expect(handler).not.toHaveBeenCalled()
@@ -68,7 +69,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildEmpty()
     const handler = jest.fn()
 
-    engine.onNamedExpressionAdded(handler)
+    engine.on(Events.NamedExpressionAdded, handler)
     engine.addNamedExpression('myName', 'foobarbaz')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -80,7 +81,7 @@ describe('Events', () => {
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jest.fn()
 
-    engine.onNamedExpressionRemoved(handler)
+    engine.on(Events.NamedExpressionRemoved, handler)
     engine.removeNamedExpression('myName')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -91,7 +92,7 @@ describe('Events', () => {
     const engine = HyperFormula.buildEmpty()
     const handler = jest.fn()
 
-    engine.onNamedExpressionRemoved(handler)
+    engine.on(Events.NamedExpressionRemoved, handler)
     engine.removeNamedExpression('myName')
 
     expect(handler).toHaveBeenCalledTimes(0)
@@ -102,7 +103,7 @@ describe('Events', () => {
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jest.fn()
 
-    engine.onNamedExpressionRemoved(handler)
+    engine.on(Events.NamedExpressionRemoved, handler)
     engine.removeNamedExpression('MYNAME')
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -115,7 +116,7 @@ describe('Events', () => {
     ])
     const handler = jest.fn()
 
-    engine.onValuesUpdated(handler)
+    engine.on(Events.ValuesUpdated, handler)
     engine.setCellContents(adr('A1'), [['43']])
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -128,7 +129,7 @@ describe('Events', () => {
     ])
     const handler = jest.fn()
 
-    engine.onValuesUpdated(handler)
+    engine.on(Events.ValuesUpdated, handler)
     engine.setCellContents(adr('A1'), [['42']])
 
     expect(handler).toHaveBeenCalledTimes(1)
