@@ -153,6 +153,18 @@ export class DenseStrategy implements IAddressMappingStrategy {
     }
   }
 
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    for (let x = 0; x < this.width; ++x) {
+      for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
+        const vertex = this.getCellVertex(x, y)
+        if (vertex) {
+          yield [simpleCellAddress(rowsSpan.sheet, x, y), vertex]
+        }
+      }
+    }
+  }
+
+
   public* vertices(): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
       for (let x = 0; x < this.width; ++x) {

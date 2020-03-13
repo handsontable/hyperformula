@@ -38,6 +38,15 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('.13')).toStrictEqual(new CellContent.Number(0.13))
   })
 
+  it( 'boolean', () => {
+    expect(cellContentParser.parse('true')).toStrictEqual(new CellContent.Boolean(true))
+    expect(cellContentParser.parse('false')).toStrictEqual(new CellContent.Boolean(false))
+    expect(cellContentParser.parse('TRUE')).toStrictEqual(new CellContent.Boolean(true))
+    expect(cellContentParser.parse('FALSE')).toStrictEqual(new CellContent.Boolean(false))
+    expect(cellContentParser.parse('TrUe')).toStrictEqual(new CellContent.Boolean(true))
+    expect(cellContentParser.parse('faLSE')).toStrictEqual(new CellContent.Boolean(false))
+  })
+
   it('numbers with different decimal separators', () => {
     const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const cellContentParser = new CellContentParser(config, new DateHelper(config))

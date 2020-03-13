@@ -220,6 +220,10 @@ export class AddressMapping {
     }
   }
 
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.mapping.get(rowsSpan.sheet)!.entriesFromRowsSpan(rowsSpan)
+  }
+
   public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)

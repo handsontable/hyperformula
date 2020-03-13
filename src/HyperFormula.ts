@@ -12,7 +12,8 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
-import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
+import {CrudOperations} from './CrudOperations'
+import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -26,7 +27,7 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -38,6 +39,7 @@ import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
+import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
 
@@ -120,8 +122,10 @@ export class HyperFormula {
     public evaluator: Evaluator,
     /** Service handling postponed CRUD transformations */
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly undoRedo: UndoRedo,
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
+    undoRedo.crudOperations = this.crudOperations
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
   }
@@ -317,6 +321,18 @@ export class HyperFormula {
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
+  }
+
+  public undo() {
+    if (this.undoRedo.isUndoStackEmpty()) {
+      throw new NoOperationToUndo()
+    }
+    this.undoRedo.undo()
+    this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  public isThereSomethingToUndo() {
+    return !this.undoRedo.isUndoStackEmpty()
   }
 
   /**

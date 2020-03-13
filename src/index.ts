@@ -6,6 +6,7 @@ import {
   InvalidArgumentsError,
   NoSheetWithIdError,
   NoSheetWithNameError,
+  NoOperationToUndo,
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
@@ -18,6 +19,7 @@ class HyperFormulaNS extends HyperFormula {
   public static InvalidAddressError = InvalidAddressError
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
+  public static NoOperationToUndo = NoOperationToUndo
   public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -40,4 +42,5 @@ export {
   LazilyTransformingAstService,
   ExportedCellChange,
   ExportedNamedExpressionChange,
+  NoOperationToUndo,
 }

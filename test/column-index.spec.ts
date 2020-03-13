@@ -8,6 +8,7 @@ import {Matrix} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
 import {adr} from './testUtils'
+import {UndoRedo} from '../src/UndoRedo'
 
 describe('ColumnIndex#add', () => {
   const statistics = new Statistics()
