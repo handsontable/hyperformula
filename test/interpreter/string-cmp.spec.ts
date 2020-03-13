@@ -4,11 +4,11 @@ import {adr} from '../testUtils'
 describe('string comparison', () => {
   const hasFullICU = (() => {
     try {
-      const january = new Date(9e8);
-      const spanish = new Intl.DateTimeFormat('es', { month: 'long' });
-      return spanish.format(january) === 'enero';
+      const january = new Date(9e8)
+      const spanish = new Intl.DateTimeFormat('es', { month: 'long' })
+      return spanish.format(january) === 'enero'
     } catch (err) {
-      return false;
+      return false
     }
   })()
   it('comparison default', () => {
