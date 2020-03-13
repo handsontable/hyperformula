@@ -72,12 +72,13 @@ export interface Listeners {
 
 export interface TypedEmitter {
   on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
-  emit<Event extends keyof Listeners>(s: Event, ...args: Parameters<Listeners[Event]>): void,
-}
-
-export interface Listenable {
-  on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+  off<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+  once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
 export class Emitter extends TinyEmitter implements TypedEmitter {
+  public emit<Event extends keyof Listeners>(event: Event, ...args: Parameters<Listeners[Event]>): this {
+    super.emit(event, ...args)
+    return this
+  }
 }

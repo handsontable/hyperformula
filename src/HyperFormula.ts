@@ -43,7 +43,7 @@ import {
   Serialization
 } from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
-import {Emitter, Listenable, Listeners, Events} from './Emitter'
+import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
@@ -51,7 +51,7 @@ export type Index = [number, number]
 /**
  * Engine for one sheet
  */
-export class HyperFormula implements Listenable {
+export class HyperFormula implements TypedEmitter {
 
   public static version = (process.env.HT_VERSION || '')
   public static buildDate = (process.env.HT_BUILD_DATE || '')
