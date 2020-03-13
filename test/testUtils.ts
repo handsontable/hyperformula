@@ -1,6 +1,6 @@
 import {CellValue, Config, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress, InternalCellValue} from '../src/Cell'
+import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {DateHelper} from '../src/DateHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDate} from '../src/format/format'
@@ -12,7 +12,7 @@ import {
   cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
-  ProcedureAst, simpleCellAddressFromString,
+  ProcedureAst,
   Unparser,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
@@ -50,6 +50,7 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
 
   let col

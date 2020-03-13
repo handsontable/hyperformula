@@ -36,16 +36,19 @@ class AverageResult {
 
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
 
 function averageifCacheKey(conditions: Condition[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['AVERAGEIF', ...conditionsStrings].join(',')
 }
 
 function countifsCacheKey(conditions: Condition[]): string {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
   return ['COUNTIFS', ...conditionsStrings].join(',')
 }

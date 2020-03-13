@@ -41,7 +41,7 @@ describe('Integration', () => {
       Foo: [[1]],
     })
 
-    expect(engine.getSheetsValues()).toEqual({'Foo': [[1]], 'Sheet1': []})
+    expect(engine.getAllSheetsValues()).toEqual({'Foo': [[1]], 'Sheet1': []})
   })
 
   it('getAllFormulas', () => {
@@ -50,7 +50,7 @@ describe('Integration', () => {
       Foo: [[1]],
     })
 
-    expect(engine.getSheetsFormulas()).toEqual({'Foo': [[undefined]], 'Sheet1': [['=A()']]})
+    expect(engine.getAllSheetsFormulas()).toEqual({'Foo': [[undefined]], 'Sheet1': [['=A()']]})
   })
 
   it('getAllSerialized', () => {
@@ -59,7 +59,7 @@ describe('Integration', () => {
       Foo: [[1]],
     })
 
-    expect(engine.getSheetsSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
+    expect(engine.getAllSheetsSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
   })
 
   it('handle different input types', () => {

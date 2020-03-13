@@ -493,6 +493,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const startSheet = this.ACTION(() => start.reference.sheet)
     const cell = this.CONSUME(CellReference) as IExtendedToken
     let end = this.ACTION(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
     })
 
@@ -605,6 +606,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       absoluteCol = absoluteCol + this.formulaAddress!.col
     }
 

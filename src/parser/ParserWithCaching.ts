@@ -36,7 +36,7 @@ export class ParserWithCaching {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
-    this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions())
+    this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions(), this.config.functionsWhichDoesNotNeedArgumentsToBeComputed())
   }
 
   /**

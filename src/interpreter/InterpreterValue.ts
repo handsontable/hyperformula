@@ -59,6 +59,7 @@ export class OnlyRangeData {
   public raw(): InternalCellValue[][] {
     this.ensureThatComputed()
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.data!
   }
 
@@ -91,6 +92,7 @@ export class OnlyRangeData {
 
     for (let i = 0; i < this.size.height; i++) {
       for (let j = 0; j < this.size.width; j++) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         yield this.data![i][j]
       }
     }
