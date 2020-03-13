@@ -44,10 +44,10 @@ bundle-commonjs: compile ## Transpiles files to CommonJS
 	@yarn cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs
 
 bundle-development: compile ## Transpiles and bundles files to UMD format (without minification)
-	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=development env-cmd -f ht.config.js webpack ./lib/index.js
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=development env-cmd -f ht.config.js webpack ./lib/src/index.js
 
 bundle-production: compile ## Transpiles and bundles files to UMD format (with minification)
-	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=production env-cmd -f ht.config.js webpack ./lib/index.js
+	@yarn cross-env-shell BABEL_ENV=commonjs NODE_ENV=production env-cmd -f ht.config.js webpack ./lib/src/index.js
 
 bundle-typings: ## Generates TypeScript declaration files
 	@yarn tsc --emitDeclarationOnly -d --outDir typings

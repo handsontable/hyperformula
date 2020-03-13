@@ -6,9 +6,12 @@ import {DependencyGraph} from './DependencyGraph'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics} from './statistics/Statistics'
+import {collatorFromConfig} from './StringHelper'
+import {UndoRedo} from './UndoRedo'
 
 export class EmptyEngineFactory {
   public build(config: Config = new Config()): HyperFormula {
+    const undoRedo = new UndoRedo()
     const stats = new Statistics()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
@@ -16,9 +19,13 @@ export class EmptyEngineFactory {
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
+    const collator = collatorFromConfig(config)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
     const cellContentParser = new CellContentParser(config, dateHelper)
+
     lazilyTransformingAstService.parser = parser
+    lazilyTransformingAstService.undoRedo = undoRedo
+
     const engine = new HyperFormula(
       config,
       stats,
@@ -29,7 +36,9 @@ export class EmptyEngineFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
+      undoRedo,
     )
+
     return engine
   }
 }

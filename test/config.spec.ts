@@ -1,4 +1,4 @@
-import {Config} from '../src'
+import {Config, EmptyValue} from '../src'
 import {plPL} from '../src/i18n'
 
 describe('Config', () => {
@@ -27,6 +27,12 @@ describe('Config', () => {
   })
 
   it( 'validation: boolean params', () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect( () => new Config({ignorePunctuation: 1})).toThrow('Expected value of type: boolean for config parameter: ignorePunctuation')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(() => new Config({accentSensitive: 'abcd'})).toThrow('Expected value of type: boolean for config parameter: accentSensitive')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({caseSensitive: 'abcd'})).toThrow('Expected value of type: boolean for config parameter: caseSensitive')
@@ -63,6 +69,9 @@ describe('Config', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({functionArgSeparator: 123})).toThrow('Expected value of type: string for config parameter: functionArgSeparator')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(() => new Config({localeLang: EmptyValue})).toThrow('Expected value of type: string for config parameter: localeLang')
   })
 
   it( 'validation: function params', () => {
@@ -85,6 +94,9 @@ describe('Config', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({gpuMode: 'abcd'})).toThrow('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(() => new Config({caseFirst: 'abcd'})).toThrow('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
   it('should throw error when there is a conflict between separators', () => {

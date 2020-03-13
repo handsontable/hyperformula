@@ -43,15 +43,20 @@ import {ParserConfig} from './parser/ParserConfig'
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
+  accentSensitive: boolean,
   caseSensitive: boolean,
+  caseFirst: 'upper' | 'lower' | 'false',
   chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
   language: TranslationPackage,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   gpuMode: GPUMode,
+  ignorePunctuation: boolean,
   leapYear1900: boolean,
+  localeLang: string,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
@@ -70,7 +75,10 @@ type ConfigParamsList = keyof ConfigParams
 export class Config implements ConfigParams, ParserConfig{
 
   public static defaultConfig: ConfigParams = {
+    accentSensitive: false,
     caseSensitive: false,
+    caseFirst: 'lower',
+    ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
@@ -80,6 +88,7 @@ export class Config implements ConfigParams, ParserConfig{
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
+    localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
@@ -92,6 +101,7 @@ export class Config implements ConfigParams, ParserConfig{
     nullDate: {year: 1899, month: 12, day: 30},
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static defaultPlugins: any[] = [
     SumifPlugin,
     TextPlugin,
@@ -147,6 +157,21 @@ export class Config implements ConfigParams, ParserConfig{
    *  @default AlwaysDense
    */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
+
+  /**
+   * TODO
+   * 
+   * 
+   * @default false
+   */
+  public readonly accentSensitive: boolean
+
+  /**
+   * TODO
+   * 
+   * @default 'lower'
+   */
+  public readonly caseFirst: 'upper' | 'lower' | 'false'
   /**
    * A list of date formats that are supported by date parsing functions.
    * 
@@ -182,6 +207,7 @@ export class Config implements ConfigParams, ParserConfig{
    *
    * @default []
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
@@ -213,6 +239,18 @@ export class Config implements ConfigParams, ParserConfig{
    * @default true
    */
   public readonly matrixDetection: boolean
+  /**
+   * TODO
+   * 
+   * @default false
+   */
+  public readonly ignorePunctuation: boolean
+  /**
+   * TODO
+   * 
+   * @default 'en''
+   */
+  public readonly localeLang: string
   /*
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
    * 
@@ -312,7 +350,9 @@ export class Config implements ConfigParams, ParserConfig{
 
   constructor(
     {
+      accentSensitive,
       caseSensitive,
+      caseFirst,
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
@@ -320,7 +360,9 @@ export class Config implements ConfigParams, ParserConfig{
       language,
       functionPlugins,
       gpuMode,
+      ignorePunctuation,
       leapYear1900,
+      localeLang,
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
@@ -334,12 +376,16 @@ export class Config implements ConfigParams, ParserConfig{
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
+    this.accentSensitive = this.valueFromParam(accentSensitive, Config.defaultConfig, 'boolean', 'accentSensitive')
     this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
+    this.caseFirst = this.valueFromParam(caseFirst, Config.defaultConfig, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, Config.defaultConfig, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
     this.language = language || Config.defaultConfig.language
+    this.localeLang = this.valueFromParam(localeLang, Config.defaultConfig, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
@@ -377,6 +423,7 @@ export class Config implements ConfigParams, ParserConfig{
     return Number(normalized)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
   }
@@ -410,6 +457,20 @@ export class Config implements ConfigParams, ParserConfig{
     return structuralChangeFunctions
   }
 
+  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
+    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
+
+    for (const plugin of this.allFunctionPlugins()) {
+      for (const functionKey in plugin.implementedFunctions) {
+        const pluginFunctionData = plugin.implementedFunctions[functionKey]
+        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
+          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+        }
+      }
+    }
+    return functionsWhichDoesNotNeedArgumentsToBeComputed
+  }
+
   public getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {
@@ -427,6 +488,7 @@ export class Config implements ConfigParams, ParserConfig{
     }, {} as Record<string, ErrorType>)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
     if(typeof inputValue === 'undefined') {
       return baseConfig[paramName]
@@ -445,6 +507,7 @@ export class Config implements ConfigParams, ParserConfig{
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue

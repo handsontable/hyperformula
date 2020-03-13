@@ -449,6 +449,7 @@ describe('Parsing errors', () => {
   it('lexing error - unexpected token', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { ast, errors } = parser.parse('=SUM(A)', CellAddress.absolute(0, 0, 0))
     expect(errors[0].type).toBe(ParsingErrorType.LexingError)
     expect(errors[0].message).toMatch(/unexpected character/)
@@ -468,13 +469,6 @@ describe('Parsing errors', () => {
     const { ast, errors } = parser.parse('=#FOO!', CellAddress.absolute(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
-  })
-
-  it('should throw', () => {
-    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
-
-    const ast1 = parser.parse('=A1B1', CellAddress.absolute(0, 0, 0)).ast
-    const ast2 = parser.parse('=1', CellAddress.absolute(0, 0, 0)).ast
   })
 
   // weird error

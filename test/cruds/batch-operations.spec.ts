@@ -1,5 +1,5 @@
 import {EmptyValue, HyperFormula} from '../../src'
-import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/CrudOperations'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
 import '../testConfig'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
@@ -12,6 +12,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
 
     engine.batch((e) => {
@@ -33,6 +34,7 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
 
     try {
