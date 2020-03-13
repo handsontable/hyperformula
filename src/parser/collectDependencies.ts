@@ -14,9 +14,6 @@ const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) 
       if (ast.start.sheet === ast.end.sheet) {
         dependenciesSet.push([ast.start, ast.end])
       }
-      if (ast.start.sheet !== null && ast.end.sheet === null) {
-        dependenciesSet.push([ast.start, new CellAddress(ast.start.sheet, ast.end.col, ast.end.row, ast.end.type)])
-      }
       return
     }
     case AstNodeType.PERCENT_OP:
