@@ -395,7 +395,7 @@ describe('cell references and ranges', () => {
     expect(ast.end.sheet).toEqual(1)
   })
 
-  it('cell range may have only sheet specified in start address', () => {
+  it('cell range may have only sheet specified in start address but end of range is also absolute', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -405,20 +405,18 @@ describe('cell references and ranges', () => {
 
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.start.sheet).toEqual(1)
-    expect(ast.end.sheet).toEqual(null)
+    expect(ast.end.sheet).toEqual(1)
   })
 
-  it('cell range may have only sheet specified in end address', () => {
+  it('cell range with absolute sheet only on end side is a parsing error', () => {
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(new Config(), sheetMapping.get)
 
-    const ast = parser.parse('=A1:Sheet2!B2', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
+    const { errors } = parser.parse('=A1:Sheet2!B2', simpleCellAddress(0, 0, 0))
 
-    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
-    expect(ast.start.sheet).toEqual(null)
-    expect(ast.end.sheet).toEqual(1)
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('cell range with different start and end sheets', () => {
@@ -441,6 +439,18 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=OFFSET(A1, 1, 2)', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
 
     expect(ast.reference.sheet).toBe(null)
+  })
+
+  it('cell range with unexisting end sheet should return REF', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast as ErrorAst
+
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error.type).toBe(ErrorType.REF)
   })
 })
 
@@ -496,18 +506,5 @@ describe('Parsing errors', () => {
 
     const ast1 = parser.parse('=A1B1', simpleCellAddress(0, 0, 0)).ast
     const ast2 = parser.parse('=1', simpleCellAddress(0, 0, 0)).ast
-  })
-
-  // weird error
-  it('cell range with unexisting end sheet', () => {
-    const sheetMapping = new SheetMapping(enGB)
-    sheetMapping.addSheet('Sheet1')
-    sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
-
-    const { ast, errors } = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0))
-
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(errors[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
   })
 })

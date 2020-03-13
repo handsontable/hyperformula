@@ -68,6 +68,7 @@ export interface FormulaParserResult {
   ast: Ast,
   errors: ParsingError[],
 }
+
 /**
  * LL(k) formula parser described using Chevrotain DSL
  *
@@ -443,7 +444,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const end = this.SUBRULE(this.endOfRangeExpression, {ARGS: [sheet]})
 
     if (end.type !== AstNodeType.CELL_REFERENCE) {
-      return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+      return end
     }
 
     return buildCellRangeAst(start.reference, end.reference, start.leadingWhitespace)
@@ -458,7 +459,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          return this.SUBRULE(this.cellReference, {ARGS: [sheet]})
+          return this.SUBRULE(this.endRangeReference, {ARGS: [sheet]})
         },
       },
       {
@@ -477,13 +478,31 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
-  private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
+  private cellReference: AstRule = this.RULE('cellReference', () => {
+    const cell = this.CONSUME(CellReference) as IExtendedToken
+    const address = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
+    })
+    if (address === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return buildCellReferenceAst(address, cell.leadingWhitespace)
+    }
+  })
+
+  /**
+   * Rule for end range reference expression with additional checks considering range start
+   */
+  private endRangeReference: AstRule = this.RULE('endRangeReference', (sheet) => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!, sheet)
     })
+
     if (address === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else if (sheet === null && address.sheet !== null) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
