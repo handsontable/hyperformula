@@ -102,6 +102,7 @@ export const enGB: TranslationPackage = {
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
     CHOOSE: 'CHOOSE',
+    ROWS: 'ROWS',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',

@@ -5,7 +5,6 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
-  InternalCellValue,
   simpleCellAddress,
   SimpleCellAddress,
 } from './Cell'
@@ -13,7 +12,8 @@ import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellCo
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
-import {CrudOperations, normalizeAddedIndexes, normalizeRemovedIndexes} from './CrudOperations'
+import {CrudOperations} from './CrudOperations'
+import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
@@ -27,16 +27,18 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
 import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
+import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
 
@@ -119,8 +121,10 @@ export class HyperFormula {
     public readonly evaluator: Evaluator,
     /** Service handling postponed CRUD transformations */
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly undoRedo: UndoRedo,
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService)
+    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
+    undoRedo.crudOperations = this.crudOperations
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
   }
@@ -140,7 +144,7 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula(address: SimpleCellAddress): string | undefined {
+  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -157,24 +161,73 @@ export class HyperFormula {
   }
 
   /**
-   * Returns array with values of all cells.
+   * Returns a serialized content of the cell of a given address
+   *
+   * either a cell formula or an explicit value.
+   *
+   * Unparses AST. Applies post-processing.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or value or undefined
+   */
+  public getCellSerialized(address: SimpleCellAddress): CellValue {
+    const formula: Maybe<string> = this.getCellFormula(address)
+    return formula !== undefined ? formula : this.getCellValue(address)
+  }
+
+  /**
+   * Returns array with values of all cells from Sheet
    *
    * @param sheet - sheet id number
    */
-  public getValues(sheet: number): CellValue[][] {
+  public getSheetValues(sheet: number): CellValue[][] {
+    return this.genericSheetGetter(sheet, (...args) => this.getCellValue(...args))
+  }
+
+  /**
+   * Returns an array with normalized formula strings from Sheet,
+   *
+   * or undefined for a cells that have no value.
+   *
+   * Unparses AST.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or undefined
+   */
+  public getSheetFormulas(sheet: number): Maybe<string>[][] {
+    return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
+  }
+
+  /**
+   * Returns an array with serialized content of cells from Sheet,
+   *
+   * either a cell formula or an explicit value.
+   *
+   * Unparses AST. Applies post-processing.
+   *
+   * @param {SimpleCellAddress} address - cell coordinates
+   *
+   * @returns {string} in a specific format or undefined
+   */
+  public getSheetSerialized(sheet: number): CellValue[][] {
+    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
+  }
+
+  private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
-    const arr: CellValue[][] = new Array(sheetHeight)
+    const arr: T[][] = new Array(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
       arr[i] = new Array(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+        arr[i][j] = getter(address)
       }
     }
-
     return arr
   }
 
@@ -182,16 +235,8 @@ export class HyperFormula {
    * Returns map containing dimensions of all sheets.
    *
    */
-  public getSheetsDimensions(): Map<string, { width: number, height: number }> {
-    const sheetDimensions = new Map<string, { width: number, height: number }>()
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      sheetDimensions.set(sheetName, {
-        width: this.dependencyGraph.getSheetWidth(sheetId),
-        height: this.dependencyGraph.getSheetHeight(sheetId),
-      })
-    }
-    return sheetDimensions
+  public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
+    return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
   }
 
   /**
@@ -207,10 +252,55 @@ export class HyperFormula {
   }
 
   /**
+   * Returns map containing values of all sheets.
+   *
+   */
+  public getAllSheetsValues(): Record<string, CellValue[][]> {
+    return this.genericAllGetter((...args) => this.getSheetValues(...args))
+  }
+
+  /**
+   * Returns map containing formulas of all sheets.
+   *
+   */
+  public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
+    return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
+  }
+
+  /**
+   * Returns map containing formulas or values of all sheets.
+   *
+   */
+  public getAllSheetsSerialized(): Record<string, CellValue[][]> {
+    return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
+  }
+
+  private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
+    const result: Record<string, T> = {}
+    for (const sheetName of this.sheetMapping.displayNames()) {
+      const sheetId = this.sheetMapping.fetch(sheetName)
+      result[sheetName] =  sheetGetter(sheetId)
+    }
+    return result
+  }
+
+  /**
    * Returns snapshot of a computation time statistics.
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
+  }
+
+  public undo() {
+    if (this.undoRedo.isUndoStackEmpty()) {
+      throw new NoOperationToUndo()
+    }
+    this.undoRedo.undo()
+    this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  public isThereSomethingToUndo() {
+    return !this.undoRedo.isUndoStackEmpty()
   }
 
   /**
@@ -494,9 +584,9 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
   * */
-  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -509,9 +599,9 @@ export class HyperFormula {
    * @param width - width of the cell block being copied
    * @param height - height of the cell block being copied
    * */
-  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
+  public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
-    return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
+    return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
   }
 
   /**
@@ -538,11 +628,37 @@ export class HyperFormula {
    *
    * @param range
    */
-  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
-    return this.dependencyGraph.getValuesInRange(range).map(
-      (subarray: InternalCellValue[]) => subarray.map(
-        (arg) => this.exporter.exportValue(arg),
-      ),
+  public getRangeValues(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellValue(address)
+      )
+    )
+  }
+
+  /**
+   * Returns cell formulas in given range
+   *
+   * @param range
+   */
+  public getRangeFormulas(range: AbsoluteCellRange): Maybe<string>[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellFormula(address)
+      )
+    )
+  }
+
+  /**
+   * Returns serialized cell in given range
+   *
+   * @param range
+   */
+  public getRangeSerialized(range: AbsoluteCellRange): CellValue[][] {
+    return range.arrayOfAddressesInRange().map(
+      (subarray) => subarray.map(
+        (address) => this.getCellSerialized(address)
+      )
     )
   }
 
@@ -709,7 +825,7 @@ export class HyperFormula {
    * @param address - object representation of absolute address
    * @param sheet - if is not equal with address sheet index, string representation will contain sheet name
    * */
-  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): string | undefined {
+  public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): Maybe<string> {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
 
@@ -721,7 +837,7 @@ export class HyperFormula {
    * @param sheetId - ID of the sheet, for which we want to retrieve name
    * @returns name of the sheet
    */
-  public getSheetName(sheetId: number): string | undefined {
+  public getSheetName(sheetId: number): Maybe<string> {
     return this.sheetMapping.getDisplayName(sheetId)
   }
 
@@ -733,7 +849,7 @@ export class HyperFormula {
    * @param sheetName - name of the sheet, for which we want to retrieve ID
    * @returns ID of the sheet
    */
-  public getSheetId(sheetName: string): number | undefined {
+  public getSheetId(sheetName: string): Maybe<number> {
     return this.sheetMapping.get(sheetName)
   }
 

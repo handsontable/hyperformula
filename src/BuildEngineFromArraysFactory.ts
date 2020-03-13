@@ -8,6 +8,7 @@ import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
+import {UndoRedo} from './UndoRedo'
 
 export class BuildEngineFromArraysFactory {
   public buildFromSheets(sheets: Sheets, config: Config = new Config()): HyperFormula {
@@ -31,12 +32,15 @@ export class BuildEngineFromArraysFactory {
     const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
+    const undoRedo = new UndoRedo()
+
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
     lazilyTransformingAstService.parser = parser
+    lazilyTransformingAstService.undoRedo = undoRedo
 
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
     evaluator.run()
@@ -53,6 +57,7 @@ export class BuildEngineFromArraysFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
+      undoRedo,
     )
 
     return engine

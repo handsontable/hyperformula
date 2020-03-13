@@ -1,5 +1,6 @@
 import {IToken} from 'chevrotain'
-import {CellError, ErrorType} from '../Cell'
+import {CellError} from '../Cell'
+import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {IExtendedToken} from './FormulaParser'
 
@@ -346,7 +347,7 @@ export const buildParsingErrorAst = (): ErrorAst => ({
   error: CellError.parsingError()
 })
 
-function extractImage(token: IToken | undefined): string | undefined {
+function extractImage(token: Maybe<IToken>): Maybe<string> {
   return token !== undefined ? token.image : undefined
 }
 

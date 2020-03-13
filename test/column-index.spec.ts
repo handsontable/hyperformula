@@ -8,6 +8,7 @@ import {Matrix} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
 import {adr} from './testUtils'
+import {UndoRedo} from '../src/UndoRedo'
 
 describe('ColumnIndex#add', () => {
   const statistics = new Statistics()
@@ -20,6 +21,7 @@ describe('ColumnIndex#add', () => {
     const columnMap = index.getColumnMap(0, 1)
 
     expect(columnMap.size).toBe(1)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(columnMap.get(1)!.index[0]).toBe(4)
   })
 
@@ -32,6 +34,7 @@ describe('ColumnIndex#add', () => {
     const columnMap = index.getColumnMap(0, 0)
 
     expect(columnMap.size).toBe(1)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(columnMap.get(1)!.index[0]).toBe(0)
   })
 
@@ -46,6 +49,7 @@ describe('ColumnIndex#add', () => {
     const columnMap = index.getColumnMap(0, 0)
 
     expect(columnMap.size).toBe(1)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(columnMap.get(1)!.index.length).toBe(2)
   })
 
@@ -73,6 +77,7 @@ describe('ColumnIndex change/remove', () => {
 
     index.remove(1, simpleCellAddress(0, 0, 1))
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(1)!
     expect(valueIndex.index.length).toBe(2)
     expect(valueIndex.index).toContain(0)
@@ -87,6 +92,7 @@ describe('ColumnIndex change/remove', () => {
 
     index.remove(null, simpleCellAddress(0, 0, 1))
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(1)!
     expect(valueIndex.index.length).toBe(3)
     expect(valueIndex.index).toContain(0)
@@ -101,6 +107,7 @@ describe('ColumnIndex change/remove', () => {
     index.change(1, 2, simpleCellAddress(0, 0, 0))
 
     expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const valueIndex = index.getColumnMap(0, 0).get(2)!
     expect(valueIndex.index).toContain(0)
   })

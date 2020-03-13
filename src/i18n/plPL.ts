@@ -102,6 +102,7 @@ export const plPL: TranslationPackage = {
     IFERROR: 'JEŻELI.BŁĄD',
     IFNA: 'JEŻELI.ND',
     CHOOSE: 'WYBIERZ',
+    ROWS: 'ILE.WIERSZY',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

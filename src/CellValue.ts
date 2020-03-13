@@ -1,6 +1,6 @@
 import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellValueChange} from './ContentChanges'
 import {Config} from './Config'
+import {CellValueChange} from './ContentChanges'
 import {NamedExpressions} from './NamedExpressions'
 
 export type CellValue = NoErrorCellValue | DetailedCellError

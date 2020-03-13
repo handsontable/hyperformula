@@ -1,6 +1,7 @@
 import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {Maybe} from '../Maybe'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   Ast,
@@ -100,7 +101,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Cache for positiveAtomicExpression alternatives
    */
-  private atomicExpCache: OrArg | undefined
+  private atomicExpCache: Maybe<OrArg>
 
   constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
@@ -309,7 +310,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     const percentage = this.OPTION(() => {
       return this.CONSUME(PercentOp)
-    }) as IExtendedToken | undefined
+    }) as Maybe<IExtendedToken>
 
     if (percentage) {
       return buildPercentOpAst(positiveAtomicExpression, percentage.leadingWhitespace)
@@ -394,7 +395,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
     const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
 
-    let end: Ast | undefined
+    let end: Maybe<Ast>
     this.OPTION(() => {
       this.CONSUME(RangeSeparator)
       end = this.SUBRULE(this.endOfRangeExpression)
@@ -479,6 +480,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!, sheet)
     })
     if (address === undefined) {
@@ -560,6 +562,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.formulaAddress!.sheet,
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
@@ -575,6 +578,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       absoluteCol = absoluteCol + this.formulaAddress!.col
     }
 
@@ -585,6 +589,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.formulaAddress!.sheet,
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,

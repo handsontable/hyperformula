@@ -93,6 +93,7 @@ describe('processWhitespaces', () => {
     const tokens = lexer.tokenizeFormula('= SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[1].leadingWhitespace!.image).toBe(' ')
   })
 
@@ -100,6 +101,7 @@ describe('processWhitespaces', () => {
     const tokens = lexer.tokenizeFormula('=    SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[1].leadingWhitespace!.image).toBe('    ')
   })
 
@@ -107,6 +109,7 @@ describe('processWhitespaces', () => {
     const tokens = lexer.tokenizeFormula(' =SUM(A1:A2)').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(processed[0].leadingWhitespace!.image).toBe(' ')
   })
 

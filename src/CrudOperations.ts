@@ -2,18 +2,27 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {ClipboardOperations} from './ClipboardOperations'
+import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
+import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, RowsAddition, AddRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {AddressMapping, DependencyGraph, MatrixVertex, ParsingErrorVertex, SheetMapping, ValueCellVertex} from './DependencyGraph'
+import {
+  AddressMapping, CellVertex,
+  DependencyGraph,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  SheetMapping,
+  ValueCellVertex,
+  ParsingErrorVertex,
+  Vertex,
+} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
@@ -23,11 +32,13 @@ import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
+import {UndoRedo} from './UndoRedo'
 
 export class CrudOperations implements IBatchExecutor {
 
   private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
+  public readonly operations: Operations
 
   constructor(
     /** Engine config */
@@ -44,31 +55,31 @@ export class CrudOperations implements IBatchExecutor {
     private readonly cellContentParser: CellContentParser,
     /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly undoRedo: UndoRedo,
   ) {
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
+    this.operations = new Operations(this.dependencyGraph, this.parser, this.stats, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeAddedIndexes(indexes)
-    this.ensureItIsPossibleToAddRows(sheet, ...normalizedIndexes)
+    const addRowsCommand = new AddRowsCommand(sheet, indexes)
+    this.ensureItIsPossibleToAddRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doAddRows(sheet, index[0], index[1])
-    }
+    const rowsAdditions = this.operations.addRows(addRowsCommand)
+    this.undoRedo.saveOperationAddRows(addRowsCommand, rowsAdditions)
   }
 
   public removeRows(sheet: number, ...indexes: Index[]): void {
-    const normalizedIndexes = normalizeRemovedIndexes(indexes)
-    this.ensureItIsPossibleToRemoveRows(sheet, ...normalizedIndexes)
+    const removeRowsCommand = new RemoveRowsCommand(sheet, indexes)
+    this.ensureItIsPossibleToRemoveRows(sheet, ...indexes)
     this.clipboardOperations.abortCut()
-    for (const index of normalizedIndexes) {
-      this.doRemoveRows(sheet, index[0], index[0] + index[1] - 1)
-    }
+    const rowsRemovals = this.operations.removeRows(removeRowsCommand)
+    this.undoRedo.saveOperationRemoveRows(removeRowsCommand, rowsRemovals)
   }
 
   public addColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeAddedIndexes(indexes)
-    this.ensureItIsPossibleToAddColumns(sheet, ...normalizedIndexes)
+    this.ensureItIsPossibleToAddColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doAddColumns(sheet, index[0], index[1])
@@ -77,7 +88,7 @@ export class CrudOperations implements IBatchExecutor {
 
   public removeColumns(sheet: number, ...indexes: Index[]): void {
     const normalizedIndexes = normalizeRemovedIndexes(indexes)
-    this.ensureItIsPossibleToRemoveColumns(sheet, ...normalizedIndexes)
+    this.ensureItIsPossibleToRemoveColumns(sheet, ...indexes)
     this.clipboardOperations.abortCut()
     for (const index of normalizedIndexes) {
       this.doRemoveColumns(sheet, index[0], index[0] + index[1] - 1)
@@ -453,52 +464,6 @@ export class CrudOperations implements IBatchExecutor {
   }
 
   /**
-   * Add multiple rows to sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
-   */
-  private doAddRows(sheet: number, row: number, numberOfRowsToAdd: number = 1): void {
-    if (this.rowEffectivelyNotInSheet(row, sheet)) {
-      return
-    }
-
-    const addedRows = RowsSpan.fromNumberOfRows(sheet, row, numberOfRowsToAdd)
-
-    this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
-    })
-  }
-
-  /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
-   * */
-  private doRemoveRows(sheet: number, rowStart: number, rowEnd: number = rowStart): void {
-    if (this.rowEffectivelyNotInSheet(rowStart, sheet) || rowEnd < rowStart) {
-      return
-    }
-
-    const removedRows = RowsSpan.fromRowStartAndEnd(sheet, rowStart, rowEnd)
-
-    this.dependencyGraph.removeRows(removedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(removedRows, this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveRowsTransformation(removedRows)
-    })
-  }
-
-  /**
    * Add multiple columns to sheet </br>
    * Does nothing if columns are outside of effective sheet size
    *
@@ -549,17 +514,6 @@ export class CrudOperations implements IBatchExecutor {
   /**
    * Returns true if row number is outside of given sheet.
    *
-   * @param row - row number
-   * @param sheet - sheet id number
-   */
-  private rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    const height = this.addressMapping.getHeight(sheet)
-    return row >= height
-  }
-
-  /**
-   * Returns true if row number is outside of given sheet.
-   *
    * @param column - row number
    * @param sheet - sheet id number
    */
@@ -575,65 +529,6 @@ export class CrudOperations implements IBatchExecutor {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
-}
-
-export function normalizeAddedIndexes(indexes: Index[]): Index[] {
-  if (indexes.length <= 1) {
-    return indexes
-  }
-
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
-
-  /* merge indexes with same start */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
-    const previous = acc[acc.length - 1]
-    if (startIndex === previous[0]) {
-      previous[1] = Math.max(previous[1], amount)
-    } else {
-      acc.push([startIndex, amount])
-    }
-    return acc
-  }, [sorted[0]])
-
-  /* shift further indexes */
-  let shift = 0
-  for (let i = 0; i < merged.length; ++i) {
-    merged[i][0] += shift
-    shift += merged[i][1]
-  }
-
-  return merged
-}
-
-export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
-  if (indexes.length <= 1) {
-    return indexes
-  }
-
-  const sorted = indexes.sort(([a], [b]) => (a < b) ? -1 : (a > b) ? 1 : 0)
-
-  /* merge overlapping and adjacent indexes */
-  const merged = sorted.reduce((acc: Index[], [startIndex, amount]: Index) => {
-    const previous = acc[acc.length - 1]
-    const lastIndex = previous[0] + previous[1]
-
-    if (startIndex <= lastIndex) {
-      previous[1] += Math.max(0, amount - (lastIndex - startIndex))
-    } else {
-      acc.push([startIndex, amount])
-    }
-
-    return acc
-  }, [sorted[0]])
-
-  /* shift further indexes */
-  let shift = 0
-  for (let i = 0; i < merged.length; ++i) {
-    merged[i][0] -= shift
-    shift += merged[i][1]
-  }
-
-  return merged
 }
 
 function isPositiveInteger(x: number): boolean {

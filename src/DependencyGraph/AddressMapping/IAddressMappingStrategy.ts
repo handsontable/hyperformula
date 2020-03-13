@@ -60,5 +60,7 @@ export interface IAddressMappingStrategy {
 
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
 
+  entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
+
   vertices(): IterableIterator<CellVertex>,
 }
