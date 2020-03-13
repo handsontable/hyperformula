@@ -75,6 +75,24 @@ describe('computeHashFromTokens', () => {
     expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3R-1:#14R0')
   })
 
+  it('cell range with sheet on the left', () => {
+    const code = '=Sheet1!A5:B16'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#3R-1:#14R0')
+  })
+
+  it('cell range with sheet on the right', () => {
+    const code = '=A5:Sheet1!B16'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3R-1:#0#14R0')
+  })
+
+  it('cell range with sheet on both sides', () => {
+    const code = '=Sheet1!A5:Sheet2!B16'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#3R-1:#1#14R0')
+  })
+
   it('do not ignores whitespace', () => {
     const code = '= 42'
 
