@@ -81,7 +81,7 @@ export class HyperFormula {
    * @param {Sheet} sheet - two-dimensional array representation of sheet
    * @param {Config} [maybeConfig] - engine configuration
    * 
-   * @returns an instance of {@link HyperFormula}
+   * @returns an instance of [[HyperFormula]]
    */
   public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
@@ -99,7 +99,7 @@ export class HyperFormula {
    * @param {Sheet} sheets - object with sheets definition
    * @param {Config} [maybeConfig]- engine configuration
    * 
-   * @returns an instance of {@link HyperFormula}
+   * @returns an instance of [[HyperFormula]]
    */
   public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
     return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
@@ -114,7 +114,7 @@ export class HyperFormula {
    *
    * @param {Config} [maybeConfig] - engine configuration
    * 
-   * @returns an instance of {@link HyperFormula}
+   * @returns an instance of [[HyperFormula]]
    */
   public static buildEmpty(maybeConfig?: Config): HyperFormula {
     return new EmptyEngineFactory().build(maybeConfig)
@@ -157,7 +157,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns a {@link CellValue} which is a value of a cell or an error
+   * @returns a [[CellValue]] which is a value of a cell or an error
    * 
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
@@ -200,7 +200,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    *
-   * @returns a {@link CellValue} which is a value of a cell or an error
+   * @returns a [[CellValue]] which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): CellValue {
     const formula: Maybe<string> = this.getCellFormula(address)
@@ -216,7 +216,7 @@ export class HyperFormula {
    * 
    * @param {number} sheet - sheet ID number
    * 
-   * @returns a {@link CellValue} which is a value of a cell or an error
+   * @returns a [[CellValue]] which is a value of a cell or an error
    * 
    */
   public getSheetValues(sheet: number): CellValue[][] {
@@ -302,7 +302,7 @@ export class HyperFormula {
   /**
    * Returns map containing values of all sheets.
    * 
-   * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
+   * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    *
    */
   public getSheetsValues(): Record<string, CellValue[][]> {
@@ -322,7 +322,7 @@ export class HyperFormula {
   /**
    * Returns map containing formulas or values of all sheets.
    * 
-   * @returns an object which property keys are strings and values are arrays of arrays of {@link CellValue}
+   * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    *
    */
   public getSheetsSerialized(): Record<string, CellValue[][]> {
@@ -343,7 +343,7 @@ export class HyperFormula {
    * 
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)
    * 
-   * @returns which is a Map with {@link StatType} as keys, and {number} as values
+   * @returns which is a Map with [[StatType]] as keys, and {number} as values
    */
   public getStats(): Map<StatType, number> {
     return this.stats.snapshot()
@@ -352,7 +352,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * 
-   * If returns `true`, doing {@link setCellContents} operation won't throw any errors.
+   * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
    * 
    * @param {SimpleCellAddress} address - cell coordinates (top left corner)
    * @param {number} width - width of the box
@@ -384,7 +384,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
@@ -421,7 +421,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addRows can be called.
    * 
-   * If returns `true`, doing {@link addRows} operation won't throw any errors.
+   * If returns `true`, doing [[addRows]] operation won't throw any errors.
    * 
    * @param {number} sheet - sheet ID in which rows will be added
    * @param {Index[]} indexes - non-contiguous indexes with format [row, amount], where row is a row number above which the rows will be added
@@ -450,7 +450,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public addRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.addRows(sheet, ...indexes)
@@ -462,7 +462,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that removeRows can be called.
    * 
-   * If returns `true`, doing {@link removeRows} operation won't throw any errors.
+   * If returns `true`, doing [[removeRows]] operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which rows will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
@@ -491,7 +491,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * */
   public removeRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.removeRows(sheet, ...indexes)
@@ -503,7 +503,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addColumns can be called.
    * 
-   * If returns `true`, doing {@link addColumns} operation won't throw any errors.
+   * If returns `true`, doing [[addColumns]] operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID in which columns will be added
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
@@ -533,7 +533,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * */
   public addColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.addColumns(sheet, ...indexes)
@@ -545,7 +545,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that removeColumns can be called.
    * 
-   * If returns `true`, doing {@link removeColumns} operation won't throw any errors.
+   * If returns `true`, doing [[removeColumns]] operation won't throw any errors.
    *
    * @param {number} sheet - sheet ID from which columns will be removed
    * @param {Index[]} indexes - non-contiguous indexes with format [column, amount]
@@ -575,7 +575,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public removeColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
@@ -588,7 +588,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveCells can be called.
    * 
-   * If returns `true`, doing {@link moveCells} operation won't throw any errors.
+   * If returns `true`, doing [[moveCells]] operation won't throw any errors.
    *
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a moved block
    * @param {number} width - width of the cell block that is being moved
@@ -619,7 +619,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
@@ -632,7 +632,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveRows can be called.
    * 
-   * If returns `true`, doing {@link moveRows} operation won't throw any errors.
+   * If returns `true`, doing [[moveRows]] operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startRow - number of the first row to move
@@ -663,7 +663,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
@@ -676,7 +676,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that moveColumns can be called.
    * 
-   * If returns `true`, doing {@link moveColumns} operation won't throw any errors.
+   * If returns `true`, doing [[moveColumns]] operation won't throw any errors.
    *
    * @param {number} sheet - a sheet number in which the operation will be performed
    * @param {number} startColumn - number of the first column to move
@@ -707,7 +707,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
@@ -724,7 +724,7 @@ export class HyperFormula {
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
    * 
-   * @returns an array of arrays of {@link InternalCellValue}
+   * @returns an array of arrays of [[InternalCellValue]]
    */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
@@ -734,7 +734,7 @@ export class HyperFormula {
   /**
    * Stores information of the cell block in internal clipboard for further paste.
    * 
-   * Calling {@link paste} right after this method is equivalent to call {@link moveCells}.
+   * Calling [[paste]] right after this method is equivalent to call [[moveCells]].
    * 
    * Almost any CRUD operation called after this method will abort the cut operation.
    * 
@@ -744,7 +744,7 @@ export class HyperFormula {
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
    * 
-   * @returns an array of arrays of {@link InternalCellValue}
+   * @returns an array of arrays of [[InternalCellValue]]
    */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
@@ -752,9 +752,9 @@ export class HyperFormula {
   }
 
   /**
-   * When called after {@link copy} it will paste copied values and formulas into a cell block.
+   * When called after [[copy]] it will paste copied values and formulas into a cell block.
    * 
-   * When called after {@link paste} it will perform {@link moveCells} operation into the cell block.
+   * When called after [[paste]] it will perform [[moveCells]] operation into the cell block.
    * 
    * Does nothing if the clipboard is empty.
    * 
@@ -764,7 +764,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
     this.crudOperations.paste(targetLeftCorner)
@@ -779,11 +779,11 @@ export class HyperFormula {
   }
 
   /**
-   * Returns the cell content of a given range in a {@link InternalCellValue[][]} format.
+   * Returns the cell content of a given range in a [[InternalCellValue]][][] format.
    *
    * @param {AbsoluteCellRange} range absolute cell range
    * 
-   * @returns an array of arrays of {@link InternalCellValue}
+   * @returns an array of arrays of [[InternalCellValue]]
    */
   public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
     return this.dependencyGraph.getValuesInRange(range).map(
@@ -798,7 +798,7 @@ export class HyperFormula {
    * 
    * Checks against particular rules to ascertain that addSheet can be called.
    * 
-   * If returns `true`, doing {@link addSheet} operation won't throw any errors.
+   * If returns `true`, doing [[addSheet]] operation won't throw any errors.
    * 
    * @param {string} name absolute cell range
    * 
@@ -831,7 +831,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to remove sheet for the engine.
    * 
-   * If returns true, doing {@link removeSheet} operation won't throw any errors.
+   * If returns true, doing [[removeSheet]] operation won't throw any errors.
    * 
    * @param {string} name - sheet name, case insensitive
    * 
@@ -856,7 +856,7 @@ export class HyperFormula {
    * @fires Events#sheetRemoved
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public removeSheet(name: string): ExportedChange[] {
     const displayName = this.sheetMapping.getDisplayNameByName(name)!
@@ -869,7 +869,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to clear a specified sheet.
    * 
-   * If returns `true`, doing {@link clearSheet} operation won't throw any errors.
+   * If returns `true`, doing [[clearSheet]] operation won't throw any errors.
    * 
    * @param {string} name - sheet name, case insensitive.
    * 
@@ -897,7 +897,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public clearSheet(name: string): ExportedChange[] {
     this.crudOperations.ensureSheetExists(name)
@@ -908,7 +908,7 @@ export class HyperFormula {
   /**
    * Returns information whether it is possible to replace the sheet content.
    * 
-   * If returns `true`, doing {@link setSheetContent} operation won't throw any errors.
+   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors.
    *
    * @param {string} name - sheet name, case insensitive.
    * 
@@ -926,14 +926,14 @@ export class HyperFormula {
   /**
    * Replaces the sheet content with new values.
    * 
-   * The new value is to be provided as an array of arrays of {@link RawCellContent}
+   * The new value is to be provided as an array of arrays of [[RawCellContent]]
    * 
    * The method finds sheet ID based on the provided sheet name.
    *
    * @param {string} sheetName - sheet name
    * @param {RawCellContent[][]} values - array of new values
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
@@ -1048,7 +1048,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns a {@link CellType} which is a named constant
+   * @returns a [[CellType]] which is a named constant
    */
   public getCellType(address: SimpleCellAddress): CellType {
     const vertex = this.dependencyGraph.getCell(address)
@@ -1112,7 +1112,7 @@ export class HyperFormula {
    * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns a {@link CellValueType} which is a named constant
+   * @returns a [[CellValueType]] which is a named constant
    */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
     const value = this.dependencyGraph.getCellValue(address)
@@ -1155,7 +1155,7 @@ export class HyperFormula {
    * @param {(e: IBatchExecutor) => void} batchOperations
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
     try {
@@ -1180,7 +1180,7 @@ export class HyperFormula {
    * @fires Events#namedExpressionAdded
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
@@ -1201,7 +1201,7 @@ export class HyperFormula {
    *
    * @param {string} expressionName - expression name, case insensitive.
    * 
-   * @returns a {@link CellValue} or null if the given named expression does not exists
+   * @returns a [[CellValue]] or null if the given named expression does not exists
    *
    */
   public getNamedExpressionValue(expressionName: string): CellValue | null {
@@ -1225,7 +1225,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
@@ -1246,7 +1246,7 @@ export class HyperFormula {
    * @fires Events#namedExpressionRemoved
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   public removeNamedExpression(expressionName: string): ExportedChange[] {
@@ -1428,7 +1428,7 @@ export class HyperFormula {
    * 
    * @fires Events#valuesUpdated
    * 
-   * @returns an array of {@link ExportedChange}
+   * @returns an array of [[ExportedChange]]
    * 
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
