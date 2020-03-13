@@ -696,9 +696,9 @@ export class HyperFormula {
    * 
    * Returns values of cells for use in external clipboard.
    *
-   * @param sourceLeftCorner - address of the upper left corner of copied block
-   * @param width - width of the cell block being copied
-   * @param height - height of the cell block being copied
+   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
+   * @param {number} width - width of the cell block being copied
+   * @param {number} height - height of the cell block being copied
   * */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
@@ -714,9 +714,9 @@ export class HyperFormula {
    * 
    * Returns values of cells for use in external clipboard.
    *
-   * @param sourceLeftCorner - address of the upper left corner of copied block
-   * @param width - width of the cell block being copied
-   * @param height - height of the cell block being copied
+   * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
+   * @param {number} width - width of the cell block being copied
+   * @param {number} height - height of the cell block being copied
    * */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
