@@ -991,7 +991,7 @@ export class HyperFormula {
   }
 
   /**
-   * Returns string representation of an absolute address.
+   * Returns string representation of an absolute address in A1 notation.
    * 
    * @param {SimpleCellAddress} address - object representation of an absolute address
    * @param {number} sheet - if is not equal with address sheet index, string representation will contain sheet name
