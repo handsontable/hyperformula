@@ -5,6 +5,7 @@ import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {StatType} from './statistics/Statistics'
@@ -18,7 +19,7 @@ export class RebuildEngineWithConfigFactory {
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
-    const lazilyTransformingAstService = oldEngine.lazilyTransformingAstService
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
