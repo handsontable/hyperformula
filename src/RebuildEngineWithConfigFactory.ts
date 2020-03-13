@@ -8,6 +8,7 @@ import {HyperFormula} from './HyperFormula'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {StatType} from './statistics/Statistics'
+import {UndoRedo} from './UndoRedo'
 
 export class RebuildEngineWithConfigFactory {
   public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
@@ -34,12 +35,15 @@ export class RebuildEngineWithConfigFactory {
     const dateHelper = new DateHelper(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
+    const undoRedo = new UndoRedo()
+
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
       graphBuilder.buildGraph(sheets)
     })
 
     lazilyTransformingAstService.parser = parser
+    lazilyTransformingAstService.undoRedo = undoRedo
 
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
     evaluator.run()
@@ -56,6 +60,7 @@ export class RebuildEngineWithConfigFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
+      undoRedo
     )
 
     return engine
