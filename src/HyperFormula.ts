@@ -121,7 +121,7 @@ export class HyperFormula {
     /** Formula evaluator */
     public evaluator: Evaluator,
     /** Service handling postponed CRUD transformations */
-    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public lazilyTransformingAstService: LazilyTransformingAstService,
     public undoRedo: UndoRedo,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
@@ -314,6 +314,7 @@ export class HyperFormula {
     this.unparser = newEngine.unparser
     this.cellContentParser = newEngine.cellContentParser
     this.evaluator = newEngine.evaluator
+    this.lazilyTransformingAstService = newEngine.lazilyTransformingAstService
     this.undoRedo = newEngine.undoRedo
   }
 

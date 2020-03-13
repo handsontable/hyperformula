@@ -37,7 +37,7 @@ export class RebuildEngineWithConfigFactory {
     const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
-    const undoRedo = new UndoRedo()
+    const undoRedo = oldEngine.undoRedo
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
