@@ -149,3 +149,17 @@ describe('Subscribing only once', () => {
     expect(handler).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('Unsubsribing', () => {
+  it('works', function() {
+    const engine = HyperFormula.buildEmpty()
+    const handler = jest.fn()
+    engine.on(Events.SheetAdded, handler)
+    engine.addSheet('FooBar1')
+
+    engine.off(Events.SheetAdded, handler)
+    engine.addSheet('FooBar2')
+
+    expect(handler).toHaveBeenCalledTimes(1)
+  })
+})
