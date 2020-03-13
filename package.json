@@ -54,6 +54,7 @@
     "@typescript-eslint/parser": "^2.20.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "core-js": "^3.6.4",
     "cross-env": "^7.0.0",
     "env-cmd": "^10.1.0",
     "eslint": "^6.8.0",
@@ -61,6 +62,7 @@
     "jest": "^25.1.0",
     "license-checker": "^25.0.1",
     "moment": "^2.22.2",
+    "regenerator-runtime": "^0.13.3",
     "ts-jest": "^25.2.1",
     "ts-node": "^8.0.1",
     "typedoc": "^0.16.10",
@@ -71,9 +73,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
-    "core-js": "^3.6.4",
     "gpu.js": "2.3.0",
-    "regenerator-runtime": "^0.13.3",
     "tiny-emitter": "^2.1.0"
   }
 }
