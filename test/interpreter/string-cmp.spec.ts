@@ -2,7 +2,15 @@ import {Config, HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('string comparison', () => {
-  const hasICU = typeof Intl === 'object'
+  const hasFullICU = (() => {
+    try {
+      const january = new Date(9e8);
+      const spanish = new Intl.DateTimeFormat('es', { month: 'long' });
+      return spanish.format(january) === 'enero';
+    } catch (err) {
+      return false;
+    }
+  })()
   it('comparison default', () => {
     const engine = HyperFormula.buildFromArray([
       ['a', 'A', '=A1>B1'],
@@ -74,7 +82,7 @@ describe('string comparison', () => {
   })
 
   it('accents lang', () => {
-    if(hasICU) {
+    if(hasFullICU) {
       const engine = HyperFormula.buildFromArray([
         ['a', 'ä', '=A1>B1'],
         ['aa', 'ää', '=A2>B2'],
