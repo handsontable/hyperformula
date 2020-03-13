@@ -52,6 +52,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
@@ -68,6 +69,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)

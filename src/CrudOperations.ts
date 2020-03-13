@@ -2,22 +2,19 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {ClipboardCell, ClipboardCellType, ClipboardOperations} from './ClipboardOperations'
-import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, RowsAddition, AddRowsCommand} from './Operations'
+import {ClipboardOperations} from './ClipboardOperations'
+import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, AddRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {
-  AddressMapping, CellVertex,
+  AddressMapping,
   DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
   MatrixVertex,
   SheetMapping,
   ValueCellVertex,
   ParsingErrorVertex,
-  Vertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'

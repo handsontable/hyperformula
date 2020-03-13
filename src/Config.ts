@@ -51,6 +51,7 @@ export interface ConfigParams {
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
   language: TranslationPackage,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   gpuMode: GPUMode,
   ignorePunctuation: boolean,
@@ -100,6 +101,7 @@ export class Config implements ConfigParams, ParserConfig{
     nullDate: {year: 1899, month: 12, day: 30},
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static defaultPlugins: any[] = [
     SumifPlugin,
     TextPlugin,
@@ -144,6 +146,7 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly functionArgSeparator: string
   public readonly decimalSeparator: '.' | ','
   public readonly language: TranslationPackage
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
   public readonly gpuMode: GPUMode
   public readonly ignorePunctuation: boolean
@@ -239,6 +242,7 @@ export class Config implements ConfigParams, ParserConfig{
     return Number(normalized)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
   }
@@ -303,6 +307,7 @@ export class Config implements ConfigParams, ParserConfig{
     }, {} as Record<string, ErrorType>)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
     if(typeof inputValue === 'undefined') {
       return baseConfig[paramName]
@@ -321,6 +326,7 @@ export class Config implements ConfigParams, ParserConfig{
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue

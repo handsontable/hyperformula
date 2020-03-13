@@ -516,7 +516,9 @@ describe('Removing rows - reevaluation', () => {
     ])
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
@@ -531,6 +533,7 @@ describe('Removing rows - reevaluation', () => {
       ['1'],
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
@@ -546,6 +549,7 @@ describe('Removing rows - reevaluation', () => {
     ])
 
     const a3 = engine.addressMapping.getCell(adr('A3'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
 
     engine.removeRows(0, [0, 2])
@@ -795,6 +799,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['1'],
     ])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
     engine.removeRows(0, [1, 1])
     engine.removeRows(0, [10, 6])
