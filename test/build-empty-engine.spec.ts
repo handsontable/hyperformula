@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../src'
+import {buildConfig, HyperFormula} from '../src'
 import './testConfig.ts'
 
 describe('Building empty engine', () => {
@@ -8,7 +8,7 @@ describe('Building empty engine', () => {
   })
 
   it('accepts config', () => {
-    const config = new Config()
+    const config = buildConfig()
     const engine = HyperFormula.buildEmpty(config)
     expect(engine.config).toBe(config)
   })

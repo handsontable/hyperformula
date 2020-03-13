@@ -1,4 +1,4 @@
-import {CellError, Config, DetailedCellError, EmptyValue} from '../src'
+import {CellError, buildConfig, DetailedCellError, EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {enGB, plPL} from '../src/i18n'
@@ -9,7 +9,7 @@ const namedExpressionsMock = {} as NamedExpressions
 
 describe( 'rounding', () => {
   it( 'no rounding', () =>{
-    const config = new Config({ smartRounding : false })
+    const config = buildConfig({ smartRounding : false })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
     expect(cellValueExporter.exportValue(1.000000000000001)).toBe(1.000000000000001)
     expect(cellValueExporter.exportValue(-1.000000000000001)).toBe(-1.000000000000001)
@@ -23,7 +23,7 @@ describe( 'rounding', () => {
   })
 
   it( 'with rounding', () =>{
-    const config = new Config()
+    const config = buildConfig()
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
     expect(cellValueExporter.exportValue(1.0000000000001)).toBe(1.0000000000001)
     expect(cellValueExporter.exportValue(-1.0000000000001)).toBe(-1.0000000000001)
@@ -41,7 +41,7 @@ describe( 'rounding', () => {
 
 describe('detailed error', () => {
   it('should return detailed errors', () => {
-    const config = new Config({ language: enGB })
+    const config = buildConfig({ language: enGB })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
@@ -50,7 +50,7 @@ describe('detailed error', () => {
   })
 
   it('should return detailed errors with translation', () => {
-    const config = new Config({ language: plPL })
+    const config = buildConfig({ language: plPL })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError

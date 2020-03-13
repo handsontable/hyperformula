@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {buildConfig, EmptyValue, HyperFormula} from '../../src'
 import {NoSheetWithNameError} from '../../src'
 import {adr} from '../testUtils'
 
@@ -64,7 +64,7 @@ describe('Clear sheet content', () => {
         ['=Sheet1!A1'],
         ['=Sheet1!B1'],
       ],
-    }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    }, buildConfig({ matrixDetection: true, matrixDetectionThreshold: 1 }))
 
     const changes = engine.clearSheet('Sheet1')
 

@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -47,7 +47,7 @@ describe('Function POWER', () => {
       ['=POWER(2, 1024)'],
       ['=POWER(-2, 1023)'],
       ['=POWER(-2, 1024)'],
-    ], new Config({ smartRounding : false}))
+    ], buildConfig({ smartRounding : false}))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(8.98846567431158e+307)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NUM))
@@ -61,7 +61,7 @@ describe('Function POWER', () => {
       ['=POWER(2, 0)'],
       ['=POWER(2.4, 2.5)'],
       ['=POWER(3, -2.5)'],
-    ], new Config({ smartRounding : false}))
+    ], buildConfig({ smartRounding : false}))
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)

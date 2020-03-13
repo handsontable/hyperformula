@@ -11,7 +11,7 @@ import {
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {Config, ConfigParams} from './Config'
+import {buildConfig, Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {

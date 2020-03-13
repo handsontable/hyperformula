@@ -1,6 +1,6 @@
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {Config, ConfigParams} from './Config'
+import {buildConfig, Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder} from './GraphBuilder'

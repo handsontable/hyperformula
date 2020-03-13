@@ -1,4 +1,4 @@
-import {CellValue, Config, DetailedCellError, HyperFormula} from '../src'
+import {CellValue, buildConfig, Config, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress, InternalCellValue} from '../src/Cell'
 import {DateHelper} from '../src/DateHelper'
@@ -76,7 +76,7 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
 }
 
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
-  config = config || new Config()
+  config = config || buildConfig()
   const error = new CellError(errorType, message)
   return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
 }

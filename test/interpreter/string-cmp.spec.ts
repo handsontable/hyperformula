@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {buildConfig, HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('string comparison', () => {
@@ -45,7 +45,7 @@ describe('string comparison', () => {
       ['ää', 'áá', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
       ['ää', 'ŹŹ', '=A4>B4'],
-    ], new Config({accentSensitive: true}))
+    ], buildConfig({accentSensitive: true}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(false)
     expect(engine.getCellValue(adr('C2'))).toBe(true)
@@ -59,7 +59,7 @@ describe('string comparison', () => {
       ['áá', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
       ['ää', 'ŹŹ', '=A4>B4'],
-    ], new Config({accentSensitive: true, caseSensitive: true}))
+    ], buildConfig({accentSensitive: true, caseSensitive: true}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(true)
     expect(engine.getCellValue(adr('C2'))).toBe(false)
@@ -73,7 +73,7 @@ describe('string comparison', () => {
       ['áá', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
       ['ää', 'ŹŹ', '=A4>B4'],
-    ], new Config({accentSensitive: true, caseSensitive: true, caseFirst: 'upper'}))
+    ], buildConfig({accentSensitive: true, caseSensitive: true, caseFirst: 'upper'}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(false)
     expect(engine.getCellValue(adr('C2'))).toBe(false)
@@ -88,7 +88,7 @@ describe('string comparison', () => {
         ['aa', 'ää', '=A2>B2'],
         ['ää', 'ĄĄ', '=A3>B3'],
         ['ää', 'ZZ', '=A4>B4'],
-      ], new Config({localeLang: 'sv', accentSensitive: true}))
+      ], buildConfig({localeLang: 'sv', accentSensitive: true}))
 
       expect(engine.getCellValue(adr('C1'))).toBe(false)
       expect(engine.getCellValue(adr('C2'))).toBe(false)
@@ -106,7 +106,7 @@ describe('string comparison', () => {
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
       ['Aa', 'aa', '=A4>B4'],
-    ], new Config({caseSensitive: true}))
+    ], buildConfig({caseSensitive: true}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(false)
     expect(engine.getCellValue(adr('C2'))).toBe(false)
@@ -120,7 +120,7 @@ describe('string comparison', () => {
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
       ['Aa', 'aa', '=A4>B4'],
-    ], new Config({caseSensitive: true, caseFirst: 'upper'}))
+    ], buildConfig({caseSensitive: true, caseFirst: 'upper'}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(true)
     expect(engine.getCellValue(adr('C2'))).toBe(true)
@@ -134,7 +134,7 @@ describe('string comparison', () => {
       ['aa', '...AA', '=A2>B2'],
       ['aA', ';;;;aa', '=A3>B3'],
       ['Aa', '????aa', '=A4>B4'],
-    ], new Config({ignorePunctuation: true}))
+    ], buildConfig({ignorePunctuation: true}))
 
     expect(engine.getCellValue(adr('C1'))).toBe(false)
     expect(engine.getCellValue(adr('C2'))).toBe(false)

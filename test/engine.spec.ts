@@ -1,4 +1,4 @@
-import {Config, DetailedCellError, HyperFormula} from '../src'
+import {buildConfig, DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import {enGB, plPL} from '../src/i18n'
 import './testConfig.ts'
@@ -180,7 +180,7 @@ describe('Integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     expect(engine.getCellFormula(adr('A1'))).toEqual(undefined)
     expect(engine.getCellFormula(adr('A2'))).toEqual(undefined)
@@ -317,7 +317,7 @@ describe('Integration', () => {
   it('#getCellType numeric matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], new Config({matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], buildConfig({matrixDetection: true, matrixDetectionThreshold: 1}))
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.VALUE)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.VALUE)
@@ -417,7 +417,7 @@ describe('Integration', () => {
   it('exporting translated errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#VALUE!'],
-    ], new Config({language: enGB}))
+    ], buildConfig({language: enGB}))
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)
@@ -427,7 +427,7 @@ describe('Integration', () => {
   it('exporting detailed errors with translations', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#ARG!'],
-    ], new Config({language: plPL}))
+    ], buildConfig({language: plPL}))
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)

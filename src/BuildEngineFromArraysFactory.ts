@@ -1,4 +1,4 @@
-import {Config, HyperFormula, LazilyTransformingAstService} from './'
+import {buildConfig, Config, HyperFormula, LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DateHelper} from './DateHelper'
@@ -11,7 +11,7 @@ import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export class BuildEngineFromArraysFactory {
-  public buildFromSheets(sheets: Sheets, config: Config = new Config()): HyperFormula {
+  public buildFromSheets(sheets: Sheets, config: Config = buildConfig()): HyperFormula {
     const stats = new Statistics()
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
@@ -63,7 +63,7 @@ export class BuildEngineFromArraysFactory {
     return engine
   }
 
-  public buildFromSheet(sheet: Sheet, config: Config = new Config()): HyperFormula {
+  public buildFromSheet(sheet: Sheet, config: Config = buildConfig()): HyperFormula {
     return this.buildFromSheets({Sheet1: sheet}, config)
   }
 }

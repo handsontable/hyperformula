@@ -1,4 +1,4 @@
-import {Config, HyperFormula, ExportedCellChange} from '../../src'
+import {buildConfig, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
@@ -71,7 +71,7 @@ describe('Removing columns - checking if its possible', () => {
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -512,7 +512,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove column from numeric matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
@@ -526,7 +526,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove columns when partial overlap', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -539,7 +539,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -552,7 +552,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph, more cols', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -566,7 +566,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('does not remove matrix vertices from graph', function() {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
@@ -577,7 +577,7 @@ describe('Removing columns - matrices', () => {
   })
 
   it('reevaluates cells dependent on matrix vertex', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
+    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '1', '1'],
       ['2', '2', '2'],
@@ -777,7 +777,7 @@ describe('Removing columns - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-    ], new Config({ useColumnIndex: true }))
+    ], buildConfig({ useColumnIndex: true }))
 
     engine.removeColumns(0, [0, 1])
 
