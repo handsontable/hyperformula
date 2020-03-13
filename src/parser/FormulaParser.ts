@@ -458,7 +458,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          return this.SUBRULE(this.cellReference)
+          return this.SUBRULE(this.cellReference, {ARGS: [sheet]})
         },
       },
       {
@@ -477,10 +477,10 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
-  private cellReference: AstRule = this.RULE('cellReference', () => {
+  private cellReference: AstRule = this.RULE('cellReference', (sheet) => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!, sheet)
     })
     if (address === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
