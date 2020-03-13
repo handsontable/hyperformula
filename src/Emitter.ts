@@ -79,4 +79,5 @@ export interface TypedListener {
   on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
-export const buildEmitter: (() => TypedEmitter) = () => (new TinyEmitter())
+export class Emitter extends TinyEmitter implements TypedEmitter {
+}

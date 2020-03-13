@@ -43,7 +43,7 @@ import {
   Serialization
 } from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
-import {buildEmitter, TypedEmitter, TypedListener, Listeners, Events} from './Emitter'
+import {Emitter, TypedListener, Listeners, Events} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
@@ -124,7 +124,7 @@ export class HyperFormula implements TypedListener {
   private crudOperations: CrudOperations
   private exporter: Exporter
   private namedExpressions: NamedExpressions
-  private readonly emitter: TypedEmitter = buildEmitter()
+  private readonly emitter: Emitter = new Emitter()
   public serialization: Serialization
 
   constructor(
