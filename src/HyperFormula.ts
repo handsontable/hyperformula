@@ -149,7 +149,7 @@ export class HyperFormula {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        return this.unparser.unparse(formula, address)
+      return this.unparser.unparse(formula, address)
     } else if (formulaVertex instanceof MatrixVertex) {
       const formula = formulaVertex.getFormula()
       if (formula) {
