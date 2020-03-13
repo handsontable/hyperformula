@@ -103,6 +103,8 @@ export const plPL: TranslationPackage = {
     IFNA: 'JEŻELI.ND',
     CHOOSE: 'WYBIERZ',
     ROWS: 'ILE.WIERSZY',
+    ISNUMBER: 'CZY.LICZBA',
+    ISLOGICAL: 'CZY.LOGICZNA',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',

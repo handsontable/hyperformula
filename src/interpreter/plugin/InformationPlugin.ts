@@ -15,6 +15,12 @@ export class InformationPlugin extends FunctionPlugin {
     isblank: {
       translationKey: 'ISBLANK',
     },
+    isnumber: {
+      translationKey: 'ISNUMBER',
+    },
+    islogical: {
+      translationKey: 'ISLOGICAL',
+    },
     columns: {
       translationKey: 'COLUMNS',
       isDependentOnSheetStructureChange: true,
@@ -68,6 +74,46 @@ export class InformationPlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
     return (value === EmptyValue)
+  }
+
+  /**
+   * Corresponds to ISNUMBER(value)
+   *
+   * Checks whether provided cell reference is a number
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value ===  'number')
+  }
+
+  /**
+   * Corresponds to ISLOGICAL(value)
+   *
+   * Checks whether provided cell reference is of logical type
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value ===  'boolean')
   }
 
   /**
