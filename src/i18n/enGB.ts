@@ -105,6 +105,8 @@ export const enGB: TranslationPackage = {
     ROWS: 'ROWS',
     ISNUMBER: 'ISNUMBER',
     ISLOGICAL: 'ISLOGICAL',
+    ISTEXT: 'ISTEXT',
+    ISNONTEXT: 'ISNONTEXT',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
