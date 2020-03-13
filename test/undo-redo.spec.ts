@@ -1,4 +1,4 @@
-import {Config, HyperFormula, NoOperationToUndo, ExportedCellChange} from '../src'
+import {HyperFormula, NoOperationToUndo} from '../src'
 import './testConfig'
 import {
   expectEngineToBeTheSameAs,

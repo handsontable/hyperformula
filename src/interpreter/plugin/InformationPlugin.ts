@@ -78,6 +78,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
@@ -98,6 +99,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)

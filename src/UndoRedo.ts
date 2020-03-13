@@ -1,8 +1,7 @@
 import {SimpleCellAddress} from './Cell'
-import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {Operations, RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
+import {ClipboardCellType} from './ClipboardOperations'
+import {RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
-import {Index} from './HyperFormula'
 
 enum UndoStackElementType {
   REMOVE_ROWS = 'REMOVE_ROWS',

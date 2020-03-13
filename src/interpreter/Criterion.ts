@@ -42,7 +42,7 @@ export const parseCriterion = (criterion: InternalCellValue): Criterion | null =
   if (typeof criterion === 'number') {
     return buildCriterion(CriterionType.EQUAL, criterion)
   } else if (typeof criterion === 'string') {
-    const regexResult = criterion.match(ANY_CRITERION_REGEX)
+    const regexResult = ANY_CRITERION_REGEX.exec(criterion)
 
     if (regexResult) {
       const value = Number(regexResult[2])
