@@ -145,15 +145,27 @@ export class HyperFormula {
    *
    * @param address - cell coordinates
    */
-  public getCellFormula(address: SimpleCellAddress, customUnparser?: Unparser): Maybe<string> {
+  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      if(customUnparser === undefined) {
         return this.unparser.unparse(formula, address)
-      } else {
-        return customUnparser.unparse(formula, address)
+    } else if (formulaVertex instanceof MatrixVertex) {
+      const formula = formulaVertex.getFormula()
+      if (formula) {
+        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
       }
+    } else if (formulaVertex instanceof ParsingErrorVertex) {
+      return formulaVertex.getFormula()
+    }
+    return undefined
+  }
+
+  private getCellFormulaWithUnparser(address: SimpleCellAddress, customUnparser: Unparser): Maybe<string> {
+    const formulaVertex = this.dependencyGraph.getCell(address)
+    if (formulaVertex instanceof FormulaCellVertex) {
+      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+      return customUnparser.unparse(formula, address)
     } else if (formulaVertex instanceof MatrixVertex) {
       const formula = formulaVertex.getFormula()
       if (formula) {
@@ -176,8 +188,22 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or value or undefined
    */
-  public getCellSerialized(address: SimpleCellAddress, customUnparser?: Unparser): NoErrorCellValue {
-    const formula: Maybe<string> = this.getCellFormula(address, customUnparser)
+  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+    const formula: Maybe<string> = this.getCellFormula(address)
+    if( formula !== undefined ) {
+      return formula
+    } else {
+      const value: CellValue = this.getCellValue(address)
+      if(value instanceof DetailedCellError) {
+        return this.config.getErrorTranslationFor(value.error.type)
+      } else {
+        return value
+      }
+    }
+  }
+
+  private getCellSerializedWithUnparser(address: SimpleCellAddress, customUnparser: Unparser): NoErrorCellValue {
+    const formula: Maybe<string> = this.getCellFormulaWithUnparser(address, customUnparser)
     if( formula !== undefined ) {
       return formula
     } else {
@@ -225,8 +251,12 @@ export class HyperFormula {
    *
    * @returns {string} in a specific format or undefined
    */
-  public getSheetSerialized(sheet: number, customUnparser?: Unparser): NoErrorCellValue[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg, customUnparser))
+  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
+  }
+
+  public getSheetSerializedWithUnparser(sheet: number, customUnparser: Unparser): NoErrorCellValue[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellSerializedWithUnparser(arg, customUnparser))
   }
 
   private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -285,8 +315,12 @@ export class HyperFormula {
    * Returns map containing formulas or values of all sheets.
    *
    */
-  public getAllSheetsSerialized(customUnparser?: Unparser): Record<string, NoErrorCellValue[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg, customUnparser))
+  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+    return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
+  }
+
+  public getAllSheetsSerializedWithUnparser(customUnparser: Unparser): Record<string, NoErrorCellValue[][]> {
+    return this.genericAllSheetsGetter((arg) => this.getSheetSerializedWithUnparser(arg, customUnparser))
   }
 
   private genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
