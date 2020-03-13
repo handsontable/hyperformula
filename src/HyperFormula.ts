@@ -577,7 +577,7 @@ export class HyperFormula {
    * 
    * @returns an array of {@link ExportedChange}
    * 
-   * */
+   */
   public removeColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.removeColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -725,7 +725,7 @@ export class HyperFormula {
    * @param {number} height - height of the cell block being copied
    * 
    * @returns an array of arrays of {@link InternalCellValue}
-  * */
+   */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
@@ -745,7 +745,7 @@ export class HyperFormula {
    * @param {number} height - height of the cell block being copied
    * 
    * @returns an array of arrays of {@link InternalCellValue}
-   * */
+   */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): InternalCellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
     return this.getValuesInRange(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
@@ -765,7 +765,7 @@ export class HyperFormula {
    * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
-   * */
+   */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
     this.crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -773,7 +773,7 @@ export class HyperFormula {
 
   /**
    * Clears the clipboard content by setting the content to undefined.
-   * */
+   */
   public clearClipboard(): void {
     this.crudOperations.clearClipboard()
   }
@@ -898,7 +898,7 @@ export class HyperFormula {
    * @fires Events#valuesUpdated
    * 
    * @returns an array of {@link ExportedChange}
-   * */
+   */
   public clearSheet(name: string): ExportedChange[] {
     this.crudOperations.ensureSheetExists(name)
     this.crudOperations.clearSheet(name)
@@ -934,7 +934,7 @@ export class HyperFormula {
    * @param {RawCellContent[][]} values - array of new values
    * 
    * @returns an array of {@link ExportedChange}
-   * */
+   */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
     this.crudOperations.ensureSheetExists(sheetName)
 
@@ -997,7 +997,7 @@ export class HyperFormula {
    * @param {number} sheet - if is not equal with address sheet index, string representation will contain sheet name
    * 
    * @returns absolute address in string or undefined if the sheet index is not present in the engine
-   * */
+   */
   public simpleCellAddressToString(address: SimpleCellAddress, sheet: number): Maybe<string> {
     return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, address, sheet)
   }
@@ -1049,7 +1049,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns a {@link CellType} which is a named constant
-   * */
+   */
   public getCellType(address: SimpleCellAddress): CellType {
     const vertex = this.dependencyGraph.getCell(address)
     return getCellType(vertex)
@@ -1063,7 +1063,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns true if cell contains a simple value
-   * */
+   */
   public doesCellHaveSimpleValue(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.VALUE
   }
@@ -1089,7 +1089,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns true if the cell is empty
-   * */
+   */
   public isCellEmpty(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.EMPTY
   }
@@ -1100,7 +1100,7 @@ export class HyperFormula {
    * The methods accepts cell coordinates as object with column, row and sheet numbers.
    *
    * @param {SimpleCellAddress} address - cell coordinates
-   * */
+   */
   public isCellPartOfMatrix(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.MATRIX
   }
@@ -1113,7 +1113,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns a {@link CellValueType} which is a named constant
-   * */
+   */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
     const value = this.dependencyGraph.getCellValue(address)
     return getCellValueType(value)
@@ -1227,7 +1227,6 @@ export class HyperFormula {
    * 
    * @returns an array of {@link ExportedChange}
    * 
-   * Change named expression expression
    *
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent): ExportedChange[] {
@@ -1353,7 +1352,7 @@ export class HyperFormula {
    * 
    * @param {SheetAddedHandler} handler handler of adding sheet event
    * 
-   * */
+   */
   public onSheetAdded(handler: SheetAddedHandler): void {
     this.emitter.on(Events.SheetAdded, handler)
   }
@@ -1363,7 +1362,7 @@ export class HyperFormula {
    * 
    * @param {SheetRemovedHandler} handler handler of removing sheet event
    * 
-   * */
+   */
   public onSheetRemoved(handler: SheetRemovedHandler): void {
     this.emitter.on(Events.SheetRemoved, handler)
   }
@@ -1375,7 +1374,7 @@ export class HyperFormula {
    * 
    * @param {SheetRenamedHandler} handler handler of renaming sheet event
    * 
-   * */
+   */
   public onSheetRenamed(handler: SheetRenamedHandler): void {
     this.emitter.on(Events.SheetRenamed, handler)
   }
@@ -1385,7 +1384,7 @@ export class HyperFormula {
    * 
    * @param {NamedExpressionAddedHandler} handler handler of adding named expression event
    * 
-   * */
+   */
   public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
     this.emitter.on(Events.NamedExpressionAdded, handler)
   }
@@ -1395,7 +1394,7 @@ export class HyperFormula {
    *  
    * @param {NamedExpressionRemovedHandler} handler handler of removing named expression event
    * 
-   * */
+   */
   public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
     this.emitter.on(Events.NamedExpressionRemoved, handler)
   }
@@ -1405,7 +1404,7 @@ export class HyperFormula {
    * 
    * @param {ValuesUpdatedHandler} handler handler of updating values event
    * 
-   * */
+   */
   public onValuesUpdated(handler: ValuesUpdatedHandler): void {
     this.emitter.on(Events.ValuesUpdated, handler)
   }
@@ -1415,7 +1414,7 @@ export class HyperFormula {
    * 
    *  Dependency graph, optimization indexes, statistics and parser are removed.
    * 
-   * */
+   */
   public destroy(): void {
     this.dependencyGraph.destroy()
     this.columnSearch.destroy()

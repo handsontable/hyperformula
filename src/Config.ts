@@ -127,7 +127,7 @@ export class Config implements ConfigParams, ParserConfig{
     ErrorFunctionPlugin,
     CorrelPlugin,
   ]
-  /*
+  /**
    * Specifies if the string comparison is case-sensitive or not.
    *
    * Applies to comparison operators only.
@@ -135,59 +135,65 @@ export class Config implements ConfigParams, ParserConfig{
    * @default false
    */
   public readonly caseSensitive: boolean
-  /*
-  * Determines which address mapping policy will be used. Built in implementations:
-  *
-  * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-  * 
-  * AlwaysDense - will use DenseStrategy for all sheets.
-  * 
-  * AlwaysSparse - will use SparseStrategy for all sheets.
-  * 
-  *  @default AlwaysDense
-  * */
+  /**
+   * Determines which address mapping policy will be used. Built in implementations:
+   *
+   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
+   * 
+   * AlwaysDense - will use DenseStrategy for all sheets.
+   * 
+   * AlwaysSparse - will use SparseStrategy for all sheets.
+   * 
+   *  @default AlwaysDense
+   */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
-  /*
+  /**
    * A list of date formats that are supported by date parsing functions.
+   * 
+   * The separator is ignored and it can be any non-alpha-numeric symbol.
+   * 
+   * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    */
   public readonly dateFormats: string[]
-  /*
-  * A separator character used to separate arguments of procedures in formulas. Can be either '.' or ',' and must be different from decimalSeparator.
-  *
-  * @default ','
-  * */
+  /**
+   * A separator character used to separate arguments of procedures in formulas. Must be different from {@link decimalSeparator}.
+   *
+   * @default ','
+   */
   public readonly functionArgSeparator: string
-  /*
-  * A decimal separator used for parsing numeric literals. Must be different from functionArgSeparator.
-  *
-  * @default '.'
-  * */
+  /**
+   * A decimal separator used for parsing numeric literals. 
+   *
+   * Can be either '.' or ',' and must be different from {@link functionArgSeparator}.
+   *
+   * @default '.'
+   */
   public readonly decimalSeparator: '.' | ','
-  /*
-  * Translation package with translations of function and error names.
-  *
-  * @default enGB
-  * */
+  /**
+   * Translation package with translations of function and error names.
+   *
+   * @default enGB
+   */
   public readonly language: TranslationPackage
-  /*
-  * A list of additional function plugins to use by formula interpreter.
-  *
-  * @default []
-  * */
+  /**
+   * A list of additional function plugins to use by formula interpreter.
+   *
+   * @default []
+   */
   public readonly functionPlugins: any[]
-  /*
-  * Allows to set GPU or CPU for use in matrix calculations.
-  *
-  * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
-  *
-  * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
-  * 
-  * @default 'gpu'
-  * */
+  /**
+   * Allows to set GPU or CPU for use in matrix calculations.
+   *
+   * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+   *
+   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+   * 
+   * @default 'gpu'
+   */
   public readonly gpuMode: GPUMode
-  /*
+  /**
    * Preserves an option for setting 1900 as a leap year.
    *
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
@@ -197,23 +203,23 @@ export class Config implements ConfigParams, ParserConfig{
    * @default false
    */
   public readonly leapYear1900: boolean
-  /*
-  * Enables numeric matrix detection feature when set to 'true'.
-  *
-  * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-  * 
-  * Some CRUD operations may break numeric matrices into individual vertices if needed.
-  * 
-  * @default true
-  * */
+  /**
+   * Enables numeric matrix detection feature when set to 'true'.
+   *
+   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
+   * 
+   * Some CRUD operations may break numeric matrices into individual vertices if needed.
+   * 
+   * @default true
+   */
   public readonly matrixDetection: boolean
   /*
-  * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
-  * 
-  * @default 100
-  * */
+   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
+   * 
+   * @default 100
+   */
   public readonly matrixDetectionThreshold: number
-  /*
+  /**
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    *
    * If `xx <= nullYear` its latter, otherwise its former.
@@ -221,19 +227,19 @@ export class Config implements ConfigParams, ParserConfig{
    * @default 30
    */
   public readonly nullYear: number
-  /*
+  /**
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
    * @default defaultParseDate
    */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
-  /*
+  /**
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
    * @default defaultStringifyDate
    */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
-  /*
+  /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
    * `a` and `b` are equal if they are of the same sign and:
@@ -251,7 +257,7 @@ export class Config implements ConfigParams, ParserConfig{
    * @default 1e-13
    */
   public readonly precisionEpsilon: number
-  /*
+  /**
    * Sets how precise the calculation should be.
    *
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
@@ -259,7 +265,7 @@ export class Config implements ConfigParams, ParserConfig{
    * @default 14
    */
   public readonly precisionRounding: number
-  /*
+  /**
    * Sets the rounding.
    *
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: {@link precisionEpsilon}).
@@ -267,29 +273,29 @@ export class Config implements ConfigParams, ParserConfig{
    * @default true
    */
   public readonly smartRounding: boolean
-  /*
-  * Switches column search strategy from binary search to column index. 
-  *
-  * Used by VLOOKUP and MATCH procedures.
-  * 
-  * Using column index may improve time efficiency but it will increase memory usage. 
-  * 
-  * In some scenarios column index may fall back to binary search despite of this flag.
-  * 
-  * @default false
-  * */
+  /**
+   * Switches column search strategy from binary search to column index. 
+   *
+   * Used by VLOOKUP and MATCH procedures.
+   * 
+   * Using column index may improve time efficiency but it will increase memory usage. 
+   * 
+   * In some scenarios column index may fall back to binary search despite of this flag.
+   * 
+   * @default false
+   */
   public readonly useColumnIndex: boolean
-  /*
-  * Determines minimum number of elements a range must have in order to use binary search. 
-  *
-  * Shorter ranges will be searched naively.
-  * 
-  * Used by VLOOKUP and MATCH procedures.
-  * 
-  * @default 20
-  * */
+  /**
+   * Determines minimum number of elements a range must have in order to use binary search. 
+   *
+   * Shorter ranges will be searched naively.
+   * 
+   * Used by VLOOKUP and MATCH procedures.
+   * 
+   * @default 20
+   */
   public readonly vlookupThreshold: number
-  /*
+  /**
    * Allows to set a specific date from which the number of days will be counted.
    *
    * Dates are represented internally as number of days that passed since this nullDate.
@@ -298,9 +304,9 @@ export class Config implements ConfigParams, ParserConfig{
    * 
    */
   public readonly nullDate: SimpleDate
-  /*
-  * Built automatically based on translation package.
-  * */
+  /**
+   * Built automatically based on translation package.
+   */
   public readonly errorMapping: Record<string, ErrorType>
 
 
