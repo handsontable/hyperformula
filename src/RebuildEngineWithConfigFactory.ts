@@ -1,6 +1,6 @@
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {buildConfig, Config, ConfigParams} from './Config'
+import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder} from './GraphBuilder'
@@ -10,7 +10,6 @@ import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
-import {UndoRedo} from './UndoRedo'
 
 export class RebuildEngineWithConfigFactory {
   public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
