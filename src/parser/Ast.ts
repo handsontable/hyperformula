@@ -132,7 +132,7 @@ export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress,
-  sheetReferenceType: RangeSheetReferenceType
+  sheetReferenceType: RangeSheetReferenceType,
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => ({

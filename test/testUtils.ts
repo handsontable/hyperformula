@@ -43,12 +43,6 @@ export const expectFunctionToHaveRefError = (engine: HyperFormula, address: Simp
   expect(formula.args.find((arg) => arg.type === AstNodeType.ERROR)).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
 }
 
-export const expectCellToHaveFormula = (engine: HyperFormula, addressString: string, expectedFormula: string) => {
-  const address = simpleCellAddressFromString(engine.sheetMapping.fetch, addressString, 0)!
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService)
-  const unparser = new Unparser(engine.config, buildLexerConfig(engine.config), engine.sheetMapping.fetchDisplayName)
-  expect(unparser.unparse(formula, address!)).toEqual(expectedFormula)
-}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual.length).toBe(expected.length)
