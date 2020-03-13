@@ -69,10 +69,6 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('cell range with sheet on the right', () => {
-    const formula = '=A5:Sheet1!B16'
-    expectHashFromAstMatchHashFromTokens(formula)
-  })
 
   it('cell range with sheet on both sides', () => {
     const formula = '=Sheet1!A5:Sheet2!B16'

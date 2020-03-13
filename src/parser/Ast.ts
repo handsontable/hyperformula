@@ -81,6 +81,12 @@ export enum AstNodeType {
   PARSING_ERROR = 'PARSING_ERROR',
 }
 
+export enum RangeSheetReferenceType {
+  RELATIVE,
+  START_ABSOLUTE,
+  BOTH_ABSOLUTE
+}
+
 export interface AstWithWhitespace {
   leadingWhitespace?: string,
 }
@@ -126,12 +132,14 @@ export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress,
+  sheetReferenceType: RangeSheetReferenceType
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress, leadingWhitespace?: string): CellRangeAst => ({
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => ({
   type: AstNodeType.CELL_RANGE,
   start,
   end,
+  sheetReferenceType,
   leadingWhitespace,
 })
 

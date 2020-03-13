@@ -87,6 +87,10 @@ export class CellAddress {
     return new CellAddress(newSheet, this.col + toRight, this.row + toBottom, this.type)
   }
 
+  public withAbsoluteSheet(sheet: number): CellAddress {
+    return new CellAddress(sheet, this.col, this.row, this.type)
+  }
+
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnAbsolute() ? this.col : this.col + toRight
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
