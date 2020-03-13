@@ -2,9 +2,7 @@ import {Config} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
-import {buildLexerConfig, ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser'
-import {Unparser} from '../../src/parser'
+import {buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Unparse', () => {
@@ -72,7 +70,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('#unparse  cell ref in string with escape', () => {
+  it('#unparse cell ref in string with escape', () => {
     const formula = '="fdsaf\\"A5"'
     const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
@@ -305,6 +303,15 @@ describe('Unparse', () => {
     const unparsed = unparser.unparse(ast, adr('A1', 0))
 
     expect(unparsed).toEqual('=Sheet2!A1:B1')
+  })
+
+  it('unparsing range with sheet name on both sides', () => {
+    const formula = '=Sheet1!A1:Sheet2!B1'
+    const ast = parser.parse(formula, simpleCellAddress(0, 0, 0)).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1', 0))
+
+    expect(unparsed).toEqual('=Sheet1!A1:Sheet2!B1')
   })
 
   it('unparsing function without translation should unparse to canonical name', () => {
