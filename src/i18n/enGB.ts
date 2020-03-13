@@ -103,6 +103,10 @@ export const enGB: TranslationPackage = {
     IFNA: 'IFNA',
     CHOOSE: 'CHOOSE',
     ROWS: 'ROWS',
+    ISNUMBER: 'ISNUMBER',
+    ISLOGICAL: 'ISLOGICAL',
+    ISTEXT: 'ISTEXT',
+    ISNONTEXT: 'ISNONTEXT',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
