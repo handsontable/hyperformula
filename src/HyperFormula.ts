@@ -290,7 +290,7 @@ export class HyperFormula {
    *
    * @param {number} sheet - sheet ID number
    * 
-   * @returns {number} width and @param {number} height of the sheet
+   * @returns {object} width and @param {number} height of the sheet
    */
   public getSheetDimensions(sheet: number): { width: number, height: number } {
     return {
@@ -979,7 +979,7 @@ export class HyperFormula {
    * 
    * If sheet name is present in string representation but not present in the engine, returns undefined.
    * 
-   * If sheet name is not present in string representation, returns {@param sheet} as a sheet number.
+   * If sheet name is not present in string representation, returns the sheet number.
    *
    * @param {string} stringAddress - string representation of cell address, e.g. 'C64'
    * @param {number} sheet - override sheet index regardless of sheet mapping
@@ -1367,7 +1367,6 @@ export class HyperFormula {
   /**
    * 
    * A method that listens on renaming a sheet event.
-   * 
    * 
    * @param {SheetRenamedHandler} handler handler of renaming sheet event
    * 
