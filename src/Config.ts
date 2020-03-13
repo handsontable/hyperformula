@@ -43,7 +43,9 @@ import {ParserConfig} from './parser/ParserConfig'
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
+  accentSensitive: boolean,
   caseSensitive: boolean,
+  caseFirst: 'upper' | 'lower' | 'false',
   chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
@@ -51,7 +53,9 @@ export interface ConfigParams {
   language: TranslationPackage,
   functionPlugins: any[],
   gpuMode: GPUMode,
+  ignorePunctuation: boolean,
   leapYear1900: boolean,
+  localeLang: string,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
@@ -70,7 +74,10 @@ type ConfigParamsList = keyof ConfigParams
 export class Config implements ConfigParams, ParserConfig{
 
   public static defaultConfig: ConfigParams = {
+    accentSensitive: false,
     caseSensitive: false,
+    caseFirst: 'lower',
+    ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
@@ -80,6 +87,7 @@ export class Config implements ConfigParams, ParserConfig{
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
+    localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
@@ -128,7 +136,9 @@ export class Config implements ConfigParams, ParserConfig{
     CorrelPlugin,
   ]
 
+  public readonly accentSensitive: boolean
   public readonly caseSensitive: boolean
+  public readonly caseFirst: 'upper' | 'lower' | 'false'
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   public readonly dateFormats: string[]
   public readonly functionArgSeparator: string
@@ -136,7 +146,9 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly language: TranslationPackage
   public readonly functionPlugins: any[]
   public readonly gpuMode: GPUMode
+  public readonly ignorePunctuation: boolean
   public readonly leapYear1900: boolean
+  public readonly localeLang: string
   public readonly matrixDetection: boolean
   public readonly matrixDetectionThreshold: number
   public readonly nullYear: number
@@ -152,7 +164,9 @@ export class Config implements ConfigParams, ParserConfig{
 
   constructor(
     {
+      accentSensitive,
       caseSensitive,
+      caseFirst,
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
@@ -160,7 +174,9 @@ export class Config implements ConfigParams, ParserConfig{
       language,
       functionPlugins,
       gpuMode,
+      ignorePunctuation,
       leapYear1900,
+      localeLang,
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
@@ -174,12 +190,16 @@ export class Config implements ConfigParams, ParserConfig{
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
+    this.accentSensitive = this.valueFromParam(accentSensitive, Config.defaultConfig, 'boolean', 'accentSensitive')
     this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
+    this.caseFirst = this.valueFromParam(caseFirst, Config.defaultConfig, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, Config.defaultConfig, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
     this.language = language || Config.defaultConfig.language
+    this.localeLang = this.valueFromParam(localeLang, Config.defaultConfig, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
