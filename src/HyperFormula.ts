@@ -1294,10 +1294,8 @@ export class HyperFormula {
    * Calculates fire-and-forget formula
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
-   * @param {string} sheetName - a name of the sheet in context of which we evaluate formula
+   * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    * 
-   * Parameter {@link sheetName} is case insensitive.
-   *
    * @returns value of the formula
    */
   public calculateFormula(formulaString: string, sheetName: string): CellValue {
