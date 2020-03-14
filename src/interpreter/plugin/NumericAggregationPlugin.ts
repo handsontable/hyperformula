@@ -3,7 +3,7 @@ import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
+import {coerceBooleanToNumber, coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -15,6 +15,14 @@ export type MapOperation<T> = (arg: InternalCellValue) => T
 
 function idMap(arg: InternalCellValue): InternalCellValue {
   return arg
+}
+
+function booleanToNumber(arg: InternalCellValue): InternalCellValue {
+  if(typeof arg === 'boolean') {
+    return coerceBooleanToNumber(arg)
+  } else {
+    return arg
+  }
 }
 
 function square(arg: InternalCellValue): InternalCellValue {

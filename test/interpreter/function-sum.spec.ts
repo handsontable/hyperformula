@@ -43,6 +43,15 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(3)
   })
 
+  it('explicitly called does coercions',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=SUM(2,TRUE())'],
+      ['=SUM(2,"foo",TRUE())'],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+  })
+
   it('doesnt take value from range if it does not store cached value for that function',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['1'],
