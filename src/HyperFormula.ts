@@ -784,7 +784,7 @@ export class HyperFormula {
    * 
    * If returns `true`, doing [[addSheet]] operation won't throw any errors.
    * 
-   * @param {string} name absolute cell range
+   * @param {string} name - sheet name, case insensitive
    * 
    * @returns `true` if it possible to add sheet with provided name, meaning the name does not already exists in the instance, `false` if the chosen name is already used
    */
@@ -910,7 +910,7 @@ export class HyperFormula {
    * 
    * The method finds sheet ID based on the provided sheet name.
    *
-   * @param {string} sheetName - sheet name
+   * @param {string} sheetName - sheet name, case insensitive.
    * @param {RawCellContent[][]} values - array of new values
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
@@ -1204,7 +1204,7 @@ export class HyperFormula {
    * 
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {string} expressionName - expression name
+   * @param {string} expressionName - expression name, case insensitive.
    * 
    * @fires Events#namedExpressionRemoved
    * @fires Events#valuesUpdated
