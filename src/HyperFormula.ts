@@ -166,8 +166,6 @@ export class HyperFormula {
    * Unparses AST.
    * 
    * @param {SimpleCellAddress} address - cell coordinates
-   * 
-   * @returns {(string | undefined)} in a specific format which is a formula starting with "{" and ending with "}"
    */
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
@@ -222,8 +220,6 @@ export class HyperFormula {
    * Unparses AST.
    *
    * @param {SimpleCellAddress} address - cell coordinates
-   *
-   * @returns {(string[][]| undefined)} in a specific format, which is an array of arrays of formulas starting with "{" and ending with "}"
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
