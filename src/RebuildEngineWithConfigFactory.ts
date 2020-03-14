@@ -23,9 +23,7 @@ export class RebuildEngineWithConfigFactory {
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
-    const oldConfigNewLanguage = oldEngine.config.mergeConfig( {language: newParams.language} )
-    const actualUnparser = new Unparser(oldConfigNewLanguage, buildLexerConfig(oldConfigNewLanguage), oldEngine.dependencyGraph.sheetMapping.fetchDisplayName)
-    const sheets = oldEngine.getAllSheetsSerializedWithUnparser(actualUnparser)
+    const sheets = oldEngine.getAllSheetsSerializedWithLanguage(newParams.language ? newParams.language : config.language)
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])

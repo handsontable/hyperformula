@@ -13,6 +13,7 @@ import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValu
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
+import {TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -34,7 +35,15 @@ import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
-import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
+import {
+  AstNodeType,
+  ParserWithCaching,
+  simpleCellAddressFromString,
+  simpleCellAddressToString,
+  Unparser,
+  Ast,
+  buildLexerConfig
+} from './parser'
 import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
@@ -321,6 +330,12 @@ export class HyperFormula {
 
   private getAllSheetsSerializedWithUnparser(customUnparser: Unparser): Record<string, NoErrorCellValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerializedWithUnparser(arg, customUnparser))
+  }
+
+  public getAllSheetsSerializedWithLanguage(language: TranslationPackage): Record<string, NoErrorCellValue[][]> {
+    const configNewLanguage = this.config.mergeConfig( {language} )
+    const actualUnparser = new Unparser(configNewLanguage, buildLexerConfig(configNewLanguage), this.dependencyGraph.sheetMapping.fetchDisplayName)
+    return this.getAllSheetsSerializedWithUnparser(actualUnparser)
   }
 
   private genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
