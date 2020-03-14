@@ -186,7 +186,7 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly dateFormats: string[]
   /**
-   * A separator character used to separate arguments of procedures in formulas. Must be different from {@link decimalSeparator}.
+   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]].
    *
    * @default ','
    */
@@ -194,7 +194,7 @@ export class Config implements ConfigParams, ParserConfig{
   /**
    * A decimal separator used for parsing numeric literals. 
    *
-   * Can be either '.' or ',' and must be different from {@link functionArgSeparator}.
+   * Can be either '.' or ',' and must be different from [[functionArgSeparator]].
    *
    * @default '.'
    */
@@ -227,7 +227,7 @@ export class Config implements ConfigParams, ParserConfig{
    *
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
    * 
-   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See {@link nullDate} for complete solution.
+   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
    * 
    * @default false
    */
@@ -243,19 +243,19 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly matrixDetection: boolean
   /**
-   * Specifies whether punctuation should be ignored.
+   * Specifies whether punctuation should be ignored in string comparison.
    * 
    * @default false
    */
   public readonly ignorePunctuation: boolean
   /**
-   * Sets the locale using a BCP 47 code language tag.
+   * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
    * 
-   * @default 'en''
+   * @default 'en'
    */
   public readonly localeLang: string
   /**
-   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
+   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
    * 
    * @default 100
    */
@@ -309,7 +309,7 @@ export class Config implements ConfigParams, ParserConfig{
   /**
    * Sets the rounding.
    *
-   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: {@link precisionEpsilon}).
+   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
    * 
    * @default true
    */
@@ -339,7 +339,7 @@ export class Config implements ConfigParams, ParserConfig{
   /**
    * Allows to set a specific date from which the number of days will be counted.
    *
-   * Dates are represented internally as number of days that passed since this nullDate.
+   * Dates are represented internally as a number of days that passed since this `nullDate`.
    * 
    * @default {year: 1899, month: 12, day: 30}
    * 

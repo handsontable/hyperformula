@@ -167,7 +167,7 @@ export class HyperFormula {
    * 
    * @param {SimpleCellAddress} address - cell coordinates
    * 
-   * @returns {string} in a specific format or `undefined`
+   * @returns {(string | undefined)} in a specific format which is a formula starting with "{" and ending with "}"
    */
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
@@ -223,7 +223,7 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    *
-   * @returns {string} in a specific format or `undefined`
+   * @returns {(string[][]| undefined)} in a specific format, which is an array of arrays of formulas starting with "{" and ending with "}"
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
@@ -237,8 +237,6 @@ export class HyperFormula {
    * Unparses AST. Applies post-processing.
    *
    * @param {SimpleCellAddress} address - cell coordinates
-   *
-   * @returns {string} in a specific format or `undefined`
    */
   public getSheetSerialized(sheet: number): CellValue[][] {
     return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
@@ -291,7 +289,6 @@ export class HyperFormula {
    * Returns map containing values of all sheets.
    * 
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
-   *
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetValues(...args))
@@ -301,7 +298,6 @@ export class HyperFormula {
    * Returns map containing formulas of all sheets.
    * 
    * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
-   *
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
     return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
@@ -311,7 +307,6 @@ export class HyperFormula {
    * Returns map containing formulas or values of all sheets.
    * 
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
-   *
    */
   public getAllSheetsSerialized(): Record<string, CellValue[][]> {
     return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
@@ -382,7 +377,6 @@ export class HyperFormula {
    * @fires Events#valuesUpdated
    * 
    * @returns an array of [[ExportedChange]]
-   * 
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
     if (!(cellContents instanceof Array)) {
@@ -485,7 +479,7 @@ export class HyperFormula {
    * @param {Index[]} indexes - non-contiguous indexes with format: [row, amount]
    * 
    * @fires Events#valuesUpdated
-   * */
+   */
   public removeRows(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.removeRows(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -525,7 +519,7 @@ export class HyperFormula {
    * @param {Index[]} indexes - non-contiguous indexes with format: [column, amount], where column is a column number from which new columns will be added
    * 
    * @fires Events#valuesUpdated
-   * */
+   */
   public addColumns(sheet: number, ...indexes: Index[]): ExportedChange[] {
     this.crudOperations.addColumns(sheet, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -699,7 +693,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
-  * */
+  */
   public copy(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.copy(sourceLeftCorner, width, height)
     return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
@@ -717,7 +711,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} sourceLeftCorner - address of the upper left corner of a copied block
    * @param {number} width - width of the cell block being copied
    * @param {number} height - height of the cell block being copied
-   * */
+   */
   public cut(sourceLeftCorner: SimpleCellAddress, width: number, height: number): CellValue[][] {
     this.crudOperations.cut(sourceLeftCorner, width, height)
     return this.getRangeValues(AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height))
@@ -1062,7 +1056,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    * 
    * @returns `true` if cell contains a formula
-   * */
+   */
   public doesCellHaveFormula(address: SimpleCellAddress): boolean {
     return this.getCellType(address) === CellType.FORMULA
   }
