@@ -159,15 +159,18 @@ export class Config implements ConfigParams, ParserConfig{
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
 
   /**
-   * TODO
+   * Specifies if the string comparison is accent sensitive or not.
    * 
+   * Applies to comparison operators only.
    * 
    * @default false
    */
   public readonly accentSensitive: boolean
 
   /**
-   * TODO
+   * Allows to define if upper case or lower case should sort first.
+   * 
+   * When set to `false` uses the locale's default.
    * 
    * @default 'lower'
    */
@@ -240,18 +243,18 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly matrixDetection: boolean
   /**
-   * TODO
+   * Specifies whether punctuation should be ignored.
    * 
    * @default false
    */
   public readonly ignorePunctuation: boolean
   /**
-   * TODO
+   * Sets the locale using a BCP 47 code language tag.
    * 
    * @default 'en''
    */
   public readonly localeLang: string
-  /*
+  /**
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if {@link matrixDetection} is set to `true`.
    * 
    * @default 100
