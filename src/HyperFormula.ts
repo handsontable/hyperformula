@@ -255,7 +255,7 @@ export class HyperFormula {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
-  public getSheetSerializedWithUnparser(sheet: number, customUnparser: Unparser): NoErrorCellValue[][] {
+  private getSheetSerializedWithUnparser(sheet: number, customUnparser: Unparser): NoErrorCellValue[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerializedWithUnparser(arg, customUnparser))
   }
 
@@ -319,7 +319,7 @@ export class HyperFormula {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
-  public getAllSheetsSerializedWithUnparser(customUnparser: Unparser): Record<string, NoErrorCellValue[][]> {
+  private getAllSheetsSerializedWithUnparser(customUnparser: Unparser): Record<string, NoErrorCellValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerializedWithUnparser(arg, customUnparser))
   }
 
