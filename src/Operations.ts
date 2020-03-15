@@ -1,18 +1,15 @@
 import {Statistics, StatType} from './statistics/Statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {SimpleCellAddress} from './Cell'
 import {RowsSpan} from './RowsSpan'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
 import {
-  AddressMapping, CellVertex,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
   MatrixVertex,
-  SheetMapping,
   ValueCellVertex,
-  Vertex,
 } from './DependencyGraph'
 import {ParserWithCaching} from './parser'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'

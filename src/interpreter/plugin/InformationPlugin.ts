@@ -15,6 +15,18 @@ export class InformationPlugin extends FunctionPlugin {
     isblank: {
       translationKey: 'ISBLANK',
     },
+    isnumber: {
+      translationKey: 'ISNUMBER',
+    },
+    islogical: {
+      translationKey: 'ISLOGICAL',
+    },
+    istext: {
+      translationKey: 'ISTEXT',
+    },
+    isnontext: {
+      translationKey: 'ISNONTEXT',
+    },
     columns: {
       translationKey: 'COLUMNS',
       isDependentOnSheetStructureChange: true,
@@ -71,6 +83,86 @@ export class InformationPlugin extends FunctionPlugin {
   }
 
   /**
+   * Corresponds to ISNUMBER(value)
+   *
+   * Checks whether provided cell reference is a number
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isnumber(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value ===  'number')
+  }
+
+  /**
+   * Corresponds to ISLOGICAL(value)
+   *
+   * Checks whether provided cell reference is of logical type
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public islogical(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value ===  'boolean')
+  }
+
+  /**
+   * Corresponds to ISTEXT(value)
+   *
+   * Checks whether provided cell reference is of logical type
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public istext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value ===  'string')
+  }
+
+  /**
+   * Corresponds to ISNONTEXT(value)
+   *
+   * Checks whether provided cell reference is of logical type
+   *
+   * @param ast
+   * @param formulaAddress
+   */
+  public isnontext(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
+    if (ast.args.length != 1) {
+      return new CellError(ErrorType.NA)
+    }
+    const arg = ast.args[0]
+    const value = this.evaluateAst(arg, formulaAddress)
+    if (value instanceof SimpleRangeValue) {
+      return new CellError(ErrorType.VALUE)
+    }
+    return (typeof value !==  'string')
+  }
+
+  /**
    * Corresponds to COLUMNS(range)
    *
    * Returns number of columns in provided range of cells
@@ -78,6 +170,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public columns(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)
@@ -98,6 +191,7 @@ export class InformationPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public rows(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA)

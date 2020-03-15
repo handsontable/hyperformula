@@ -15,6 +15,7 @@ export class MathConstantsPlugin extends FunctionPlugin {
     },
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public pi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
@@ -22,6 +23,7 @@ export class MathConstantsPlugin extends FunctionPlugin {
     return PI
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public e(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)

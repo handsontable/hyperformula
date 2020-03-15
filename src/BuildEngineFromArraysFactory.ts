@@ -7,6 +7,7 @@ import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
+import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export class BuildEngineFromArraysFactory {
@@ -28,6 +29,7 @@ export class BuildEngineFromArraysFactory {
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
+    const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
     const undoRedo = new UndoRedo()
@@ -40,7 +42,7 @@ export class BuildEngineFromArraysFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)

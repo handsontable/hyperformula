@@ -58,11 +58,13 @@ export class Graph<T> {
     if (!this.nodes.has(toNode)) {
       throw new Error(`Unknown node ${toNode}`)
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.edges.get(fromNode)!.add(toNode)
   }
 
   public removeEdge(fromNode: T, toNode: T) {
     if (this.existsEdge(fromNode, toNode)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.edges.get(fromNode)!.delete(toNode)
     } else {
       throw new Error('Edge does not exist')
@@ -88,6 +90,7 @@ export class Graph<T> {
    * @param node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodes(node: T): Set<T> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.edges.get(node)!
   }
 
@@ -217,6 +220,7 @@ export class Graph<T> {
         if ( processed.has(u) ) { // leaving this DFS subtree
           const pu = parent.get(u)
           if ( pu !==  null ) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
           DFSstack.pop()
@@ -225,6 +229,7 @@ export class Graph<T> {
           this.adjacentNodes(u).forEach( (t: T) => {
             if (disc.get(t) !== undefined) { // forward edge or backward edge
               if (onStack.has(t)) { // backward edge
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 low.set(u, Math.min(low.get(u)!, disc.get(t)!))
               }
             } else {
@@ -251,15 +256,19 @@ export class Graph<T> {
         sccMap.set(v, v)
         sccInnerEdgeCnt.set(v, 0)
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sccMap.set(v, sccMap.get(parent.get(v) as T)!)
       }
     })
 
     this.edges.forEach( (targets: Set<T>, v: T) => {
       targets.forEach( (u: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const uRepr = sccMap.get(u)!
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const vRepr = sccMap.get(v)!
         if (uRepr === vRepr) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)! + 1)
         }
       })
@@ -271,6 +280,7 @@ export class Graph<T> {
     const cycled: T[] = []
     deepOrder.reverse().forEach( (arr: T[]) =>
       arr.forEach( (t: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const tRepr = sccMap.get(t)!
         if (sccInnerEdgeCnt.get(tRepr) === 0) {
           sorted.push(t)
