@@ -1,5 +1,4 @@
 import {HyperFormula} from '../src'
-import {buildConfig} from '../src'
 import {enGB, extendFunctions} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
 import './testConfig.ts'
@@ -24,7 +23,7 @@ describe('Plugins', () => {
     })
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
-    ], buildConfig({functionPlugins: [FooPlugin], language: enGBextended}))
+    ], {functionPlugins: [FooPlugin], language: enGBextended})
 
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })

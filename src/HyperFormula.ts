@@ -90,10 +90,10 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
-   * @param {Config} [maybeConfig] - engine configuration
+   * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
-  public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
+  public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
+    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, configInput)
   }
 
   /**
@@ -106,10 +106,10 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Config} [maybeConfig]- engine configuration
+   * @param {Partial<ConfigParams>} [configInput]- engine configuration
    */
-  public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
+  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
+    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, configInput)
   }
 
   /**
@@ -119,10 +119,10 @@ export class HyperFormula {
    * 
    * If not specified the engine will be built with the default configuration.
    *
-   * @param {Config} [maybeConfig] - engine configuration
+   * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
-  public static buildEmpty(maybeConfig?: Config): HyperFormula {
-    return new EmptyEngineFactory().build(maybeConfig)
+  public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
+    return new EmptyEngineFactory().build(configInput)
   }
 
   private crudOperations: CrudOperations

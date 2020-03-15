@@ -1,19 +1,17 @@
-import {CellValue, buildConfig, Config, DetailedCellError, HyperFormula} from '../src'
+import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {Config} from '../src/Config'
 import {DateHelper} from '../src/DateHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
-  buildLexerConfig,
   CellAddress,
-  cellAddressFromString,
   CellRangeAst,
   CellReferenceAst,
   ProcedureAst,
-  Unparser,
 } from '../src/parser'
 import {EngineComparator} from './graphComparator'
 
@@ -68,7 +66,7 @@ export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress
 }
 
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
-  config = config || buildConfig()
+  config = new Config(config)
   const error = new CellError(errorType, message)
   return new DetailedCellError(error, config.getErrorTranslationFor(errorType))
 }

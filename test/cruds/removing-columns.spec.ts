@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula, ExportedCellChange} from '../../src'
+import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
 import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
@@ -71,11 +71,10 @@ describe('Removing columns - checking if its possible', () => {
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
@@ -512,11 +511,10 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove column from numeric matrix', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.removeColumns(0, [1, 1])
 
@@ -526,11 +524,10 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove columns when partial overlap', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.removeColumns(0, [1, 3])
     const matrix = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
@@ -539,11 +536,10 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 2])
@@ -552,12 +548,11 @@ describe('Removing columns - matrices', () => {
   })
 
   it('should remove MatrixVertex completely from graph, more cols', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['foo', 'bar'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(Array.from(engine.matrixMapping.numericMatrices()).length).toBe(1)
     engine.removeColumns(0, [0, 3])
@@ -566,23 +561,21 @@ describe('Removing columns - matrices', () => {
   })
 
   it('does not remove matrix vertices from graph', function() {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['1', '2', '3'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.graph.nodes.size).toBe(1)
     engine.removeColumns(0, [1, 1])
     expect(engine.graph.nodes.size).toBe(1)
   })
 
   it('reevaluates cells dependent on matrix vertex', () => {
-    const config = buildConfig({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '1', '1'],
       ['2', '2', '2'],
       ['=SUM(A1:C2)'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A3'))).toEqual(9)
 
@@ -777,7 +770,7 @@ describe('Removing columns - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-    ], buildConfig({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.removeColumns(0, [0, 1])
 

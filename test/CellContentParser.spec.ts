@@ -1,10 +1,12 @@
-import {buildConfig, EmptyValue} from '../src'
+import {EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
+import {Config} from '../src/Config'
 import {DateHelper} from '../src/DateHelper'
 
 describe('CellContentParser', () => {
-  const cellContentParser = new CellContentParser(buildConfig(), new DateHelper(buildConfig()))
+  const config = new Config()
+  const cellContentParser = new CellContentParser(config, new DateHelper(config))
 
   it('a matrix', () => {
     expect(cellContentParser.parse('{=FOO()}')).toStrictEqual(new CellContent.MatrixFormula('=FOO()'))
@@ -48,7 +50,7 @@ describe('CellContentParser', () => {
   })
 
   it('numbers with different decimal separators', () => {
-    const config = buildConfig({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const cellContentParser = new CellContentParser(config, new DateHelper(config))
 
     expect(cellContentParser.parse('42')).toStrictEqual(new CellContent.Number(42))

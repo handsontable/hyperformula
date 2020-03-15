@@ -1,6 +1,7 @@
-import {buildConfig, Config, HyperFormula, LazilyTransformingAstService} from './'
+import {HyperFormula, LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
@@ -10,7 +11,8 @@ import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export class EmptyEngineFactory {
-  public build(config: Config = buildConfig()): HyperFormula {
+  public build(configInput?: Partial<ConfigParams>): HyperFormula {
+    const config = new Config(configInput)
     const undoRedo = new UndoRedo()
     const stats = new Statistics()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)

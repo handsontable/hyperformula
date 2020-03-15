@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
@@ -34,7 +34,7 @@ describe('update config', () => {
   it('simple reload preserves values', () => {
     const engine = HyperFormula.buildFromArray([
       ['1.00000000000001', '1', '=A1-B1'],
-    ], buildConfig({smartRounding: false}))
+    ], {smartRounding: false})
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
 
     engine.updateConfig({smartRounding: true})

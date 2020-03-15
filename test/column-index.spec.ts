@@ -1,9 +1,10 @@
 import {deepStrictEqual} from 'assert'
-import {CellError, buildConfig, LazilyTransformingAstService} from '../src'
+import {CellError, LazilyTransformingAstService} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../src/Cell'
 import {ColumnIndex} from '../src/ColumnSearch/ColumnIndex'
 import {ColumnsSpan} from '../src/ColumnsSpan'
+import {Config} from '../src/Config'
 import {Matrix} from '../src/Matrix'
 import {RowsSpan} from '../src/RowsSpan'
 import {Statistics} from '../src/statistics/Statistics'
@@ -14,7 +15,7 @@ describe('ColumnIndex#add', () => {
   const transformingService = new LazilyTransformingAstService(statistics)
 
   it('should add value to empty index', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('B5'))
 
     const columnMap = index.getColumnMap(0, 1)
@@ -25,7 +26,7 @@ describe('ColumnIndex#add', () => {
   })
 
   it('should keep values in sorted order', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A3'))
     index.add(1, adr('A5'))
     index.add(1, adr('A1'))
@@ -38,7 +39,7 @@ describe('ColumnIndex#add', () => {
   })
 
   it('should not store duplicates', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A5'))
     index.add(1, adr('A5'))
@@ -53,7 +54,7 @@ describe('ColumnIndex#add', () => {
   })
 
   it('should ignore CellErrors', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     const error = new CellError(ErrorType.DIV_BY_ZERO)
 
     index.add(error, adr('A1'))
@@ -69,7 +70,7 @@ describe('ColumnIndex change/remove', () => {
   const transformingService = new LazilyTransformingAstService(statistics)
 
   it('should remove value from index', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
@@ -84,7 +85,7 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should do nothing if passed value is null', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
@@ -100,7 +101,7 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should change value in index', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     index.change(1, 2, simpleCellAddress(0, 0, 0))
@@ -112,7 +113,7 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should do nothing when changing to the same value', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     const spyRemove = spyOn(index, 'remove')
@@ -125,7 +126,7 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should change matrix values', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     const matrix = new Matrix([
       [1, 2],
       [3, 4],
@@ -156,7 +157,7 @@ describe('ColumnIndex change/remove', () => {
   })
 
   it('should ignore CellErrors', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     const error = new CellError(ErrorType.DIV_BY_ZERO)
@@ -172,7 +173,7 @@ describe('ColumnIndex#addColumns', () => {
   const transformingService = new LazilyTransformingAstService(statistics)
 
   it('should add column to index', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     index.addColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
@@ -182,7 +183,7 @@ describe('ColumnIndex#addColumns', () => {
   })
 
   it('should add columns in the middle', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('B1'))
     index.add(1, adr('C1'))
@@ -195,7 +196,7 @@ describe('ColumnIndex#addColumns', () => {
   })
 
   it('should add columns only in one sheet', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('B1'))
     index.add(1, adr('B1', 1))
 
@@ -212,7 +213,7 @@ describe('ColumnIndex#removeColumns', () => {
   const transformingService = new LazilyTransformingAstService(statistics)
 
   it('should remove column', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
@@ -221,7 +222,7 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should work when empty index', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
 
     index.removeColumns(ColumnsSpan.fromNumberOfColumns(0, 0, 1))
 
@@ -229,7 +230,7 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should remove multiple columns in the middle ', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(2, adr('B1'))
     index.add(3, adr('C1'))
@@ -244,7 +245,7 @@ describe('ColumnIndex#removeColumns', () => {
   })
 
   it('should remove columns only in one sheet ', () => {
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1', 0))
     index.add(1, adr('A1', 1))
 
@@ -260,7 +261,7 @@ describe('ColumnIndex#find', () => {
   const transformService = new LazilyTransformingAstService(stats)
 
   it('should find row number', function() {
-    const index = ColumnIndex.buildEmpty(transformService, buildConfig(), stats)
+    const index = ColumnIndex.buildEmpty(transformService, new Config(), stats)
 
     index.add(1, adr('A2'))
     const row = index.find(1, new AbsoluteCellRange(adr('A1'), adr('A3')), true)
@@ -269,7 +270,7 @@ describe('ColumnIndex#find', () => {
   })
 
   it('should find smallest row number for value', function() {
-    const index = ColumnIndex.buildEmpty(transformService, buildConfig(), stats)
+    const index = ColumnIndex.buildEmpty(transformService, new Config(), stats)
 
     index.add(1, adr('A4'))
     index.add(1, adr('A10'))
@@ -283,7 +284,7 @@ describe('ColumnIndex#addRows', () => {
   it('should add row', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(2, adr('B3'))
 
@@ -299,7 +300,7 @@ describe('ColumnIndex#addRows', () => {
   it('should not shift row', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     transformingService.addAddRowsTransformation(RowsSpan.fromNumberOfRows(0, 1, 1))
@@ -311,7 +312,7 @@ describe('ColumnIndex#addRows', () => {
   it('should add rows in the middle', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
@@ -326,7 +327,7 @@ describe('ColumnIndex#addRows', () => {
   it('should add rows for all columns', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A2'))
     index.add(1, adr('B2'))
     index.add(2, adr('C2'))
@@ -344,7 +345,7 @@ describe('ColumnIndex#addRows', () => {
   it('should add rows for different values', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(2, adr('A2'))
     index.add(3, adr('A3'))
@@ -368,7 +369,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove rows', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
 
     transformingService.addRemoveRowsTransformation(RowsSpan.fromNumberOfRows(0, 0, 1))
@@ -380,7 +381,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove rows in the middle ', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A2'))
     index.add(1, adr('A3'))
@@ -395,7 +396,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove rows in every column', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A2'))
     index.add(1, adr('B2'))
     index.add(1, adr('C2'))
@@ -413,7 +414,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove rows for different values', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A2'))
     index.add(2, adr('A3'))
     index.add(3, adr('A4'))
@@ -434,7 +435,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove rows only in one sheet', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A2'))
     index.add(1, adr('A2', 1))
 
@@ -449,7 +450,7 @@ describe('ColumnIndex#removeRows', () => {
   it('should remove proper rows', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
-    const index = ColumnIndex.buildEmpty(transformingService, buildConfig(), statistics)
+    const index = ColumnIndex.buildEmpty(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(1, adr('A3'))
     index.add(1, adr('A4'))
@@ -466,7 +467,7 @@ describe('ColumnIndex - lazy cruds', () => {
   it('should add rows only in specific column after find', function() {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
-    const index = ColumnIndex.buildEmpty(transformService, buildConfig(), stats)
+    const index = ColumnIndex.buildEmpty(transformService, new Config(), stats)
     index.add(1, adr('A1'))
     index.add(1, adr('B1'))
 
@@ -486,7 +487,7 @@ describe('ColumnIndex - lazy cruds', () => {
   it('should add rows only for specific value after find', function() {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
-    const index = ColumnIndex.buildEmpty(transformService, buildConfig(), stats)
+    const index = ColumnIndex.buildEmpty(transformService, new Config(), stats)
     index.add(1, adr('A1'))
     index.add(2, adr('A2'))
 

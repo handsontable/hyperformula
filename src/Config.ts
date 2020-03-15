@@ -380,7 +380,7 @@ export class Config implements ConfigParams, ParserConfig{
       vlookupThreshold,
       nullDate,
     }: Partial<ConfigParams> = {},
-    fallback: ConfigParams
+    fallback: ConfigParams = Config.defaultConfig
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, fallback, 'boolean', 'accentSensitive')
     this.caseSensitive = this.valueFromParam(caseSensitive, fallback, 'boolean', 'caseSensitive')
