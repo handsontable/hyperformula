@@ -102,9 +102,16 @@ describe('Config', () => {
 
   it('should throw error when there is a conflict between separators', () => {
     expect(() => {
-      new Config({ decimalSeparator: ',', functionArgSeparator: ',' })
+      new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' ' })
     }).toThrow('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+    expect(() => {
+      new Config({ decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ',' })
+    }).toThrow('Config initialization failed. Thousand separator and decimal separator needs to differ.')
+    expect(() => {
+      new Config({ decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ',' })
+    }).toThrow('Config initialization failed. Function argument separator and thousand separator needs to differ.')
   })
+
 
   it('should throw error when decimal separator is not correct', () => {
     expect(() => {
@@ -112,5 +119,13 @@ describe('Config', () => {
       // @ts-ignore
       new Config({ decimalSeparator: ';' })
     }).toThrow('Expected one of \'.\' \',\' for config parameter: decimalSeparator')
+  })
+
+  it('should throw error when thousand separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ thousandSeparator: ';' })
+    }).toThrow('Expected one of \'\' \',\' \' \' for config parameter: thousandSeparator')
   })
 })

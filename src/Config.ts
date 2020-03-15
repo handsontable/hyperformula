@@ -50,6 +50,7 @@ export interface ConfigParams {
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
+  thousandSeparator:  '' | ',' | ' ',
   language: TranslationPackage,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -83,6 +84,7 @@ export class Config implements ConfigParams, ParserConfig{
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
+    thousandSeparator: '',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
@@ -186,7 +188,7 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly dateFormats: string[]
   /**
-   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]].
+   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
    */
@@ -194,11 +196,19 @@ export class Config implements ConfigParams, ParserConfig{
   /**
    * A decimal separator used for parsing numeric literals. 
    *
-   * Can be either '.' or ',' and must be different from [[functionArgSeparator]].
+   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    */
   public readonly decimalSeparator: '.' | ','
+  /**
+   * A thousand separator used for parsing numeric literals.
+   *
+   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   *
+   * @default ''
+   */
+  public readonly thousandSeparator: '' | ',' | ' '
   /**
    * Translation package with translations of function and error names.
    *
@@ -360,6 +370,7 @@ export class Config implements ConfigParams, ParserConfig{
       dateFormats,
       functionArgSeparator,
       decimalSeparator,
+      thousandSeparator,
       language,
       functionPlugins,
       gpuMode,
@@ -387,6 +398,7 @@ export class Config implements ConfigParams, ParserConfig{
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' '], 'thousandSeparator')
     this.language = language || Config.defaultConfig.language
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
@@ -408,14 +420,20 @@ export class Config implements ConfigParams, ParserConfig{
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
     }
+    if (this.decimalSeparator === this.thousandSeparator) {
+      throw Error('Config initialization failed. Thousand separator and decimal separator needs to differ.')
+    }
+    if (this.functionArgSeparator === this.thousandSeparator) {
+      throw Error('Config initialization failed. Function argument separator and thousand separator needs to differ.')
+    }
   }
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig = Object.assign({}, this.getConfig(), init)
-    
+
     return new Config(mergedConfig)
   }
-  
+
   public getConfig(): ConfigParams {
     return this
   }
