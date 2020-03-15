@@ -2,15 +2,6 @@ import {Config, HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('string comparison', () => {
-  const hasFullICU = (() => {
-    try {
-      const january = new Date(9e8)
-      const spanish = new Intl.DateTimeFormat('es', { month: 'long' })
-      return spanish.format(january) === 'enero'
-    } catch (err) {
-      return false
-    }
-  })()
   it('comparison default', () => {
     const engine = HyperFormula.buildFromArray([
       ['a', 'A', '=A1>B1'],
@@ -82,21 +73,17 @@ describe('string comparison', () => {
   })
 
   it('accents lang', () => {
-    if(hasFullICU) {
-      const engine = HyperFormula.buildFromArray([
-        ['a', 'ä', '=A1>B1'],
-        ['aa', 'ää', '=A2>B2'],
-        ['ää', 'ĄĄ', '=A3>B3'],
-        ['ää', 'ZZ', '=A4>B4'],
-      ], new Config({localeLang: 'sv', accentSensitive: true}))
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'ä', '=A1>B1'],
+      ['aa', 'ää', '=A2>B2'],
+      ['ää', 'ĄĄ', '=A3>B3'],
+      ['ää', 'ZZ', '=A4>B4'],
+    ], new Config({localeLang: 'sv', accentSensitive: true}))
 
-      expect(engine.getCellValue(adr('C1'))).toBe(false)
-      expect(engine.getCellValue(adr('C2'))).toBe(false)
-      expect(engine.getCellValue(adr('C3'))).toBe(true)
-      expect(engine.getCellValue(adr('C4'))).toBe(true)
-    } else {
-      console.warn('You\'re running tests without ICU support. String comparison may work differently. Please, use Node v13+.')
-    }
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('C2'))).toBe(false)
+    expect(engine.getCellValue(adr('C3'))).toBe(true)
+    expect(engine.getCellValue(adr('C4'))).toBe(true)
   })
 
 
