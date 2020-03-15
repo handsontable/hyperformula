@@ -52,7 +52,7 @@
     "compile": "tsc",
     "coverage": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --coverage",
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
-    "test:ci": "jest --maxWorkers=2",
+    "test:ci": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --maxWorkers=2",
     "docs:build": "typedoc --options .typedoc.js",
     "docs:serve": "http-server doc -p 5005",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
