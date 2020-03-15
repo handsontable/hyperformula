@@ -1,4 +1,4 @@
-import {ErrorType, SimpleCellAddress} from '../Cell'
+import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
@@ -22,10 +22,12 @@ export namespace RemoveColumnsDependencyTransformer {
 
   const cellRangeTransformer = (removedColumns: ColumnsSpan, transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
     return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
+      const dependencyRangeStartSheet = absoluteSheetReference(dependencyRangeStart, address)
+
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
 
-      if (removedColumns.sheet === dependencyRangeStart.sheet) {
+      if (removedColumns.sheet === dependencyRangeStartSheet) {
         const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
         const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
 
@@ -56,13 +58,14 @@ export namespace RemoveColumnsDependencyTransformer {
 
   function cellAddressTransformer(removedColumns: ColumnsSpan): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+      const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
       // Case 4
-      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet !== dependencyAddress.sheet) {
+      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet !== absoluteDependencySheet) {
         return false
       }
 
       // Case 3 -- removed column in same sheet where dependency is but formula in different
-      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet === dependencyAddress.sheet) {
+      if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet === absoluteDependencySheet) {
         const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
         if (absoluteDependencyAddress.col < removedColumns.columnStart) { // 3.ARa
           return false
@@ -72,7 +75,7 @@ export namespace RemoveColumnsDependencyTransformer {
       }
 
       // Case 2 -- removed column in same sheet where formula but dependency in different sheet
-      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet !== dependencyAddress.sheet) {
+      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet !== absoluteDependencySheet) {
         if (dependencyAddress.isColumnAbsolute()) { // 2.A
           return false
         } else {
@@ -85,7 +88,7 @@ export namespace RemoveColumnsDependencyTransformer {
       }
 
       // Case 1 -- same sheet
-      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet === dependencyAddress.sheet) {
+      if (removedColumns.sheet === formulaAddress.sheet && removedColumns.sheet === absoluteDependencySheet) {
         if (dependencyAddress.isColumnAbsolute()) {
           if (dependencyAddress.col < removedColumns.columnStart) { // 1.Aa
             return false

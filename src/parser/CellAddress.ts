@@ -1,4 +1,4 @@
-import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {absoluteSheetReference, simpleCellAddress, SimpleCellAddress} from '../Cell'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -17,23 +17,23 @@ export enum CellReferenceType {
 
 export class CellAddress {
 
-  public static relative(sheet: number, col: number, row: number) {
+  public static relative(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)
   }
 
-  public static absolute(sheet: number, col: number, row: number) {
+  public static absolute(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE)
   }
 
-  public static absoluteCol(sheet: number, col: number, row: number) {
+  public static absoluteCol(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
-  public static absoluteRow(sheet: number, col: number, row: number) {
+  public static absoluteRow(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
   constructor(
-    public readonly sheet: number,
+    public readonly sheet: number | null,
     public readonly col: number,
     public readonly row: number,
     public readonly type: CellReferenceType,
@@ -46,14 +46,15 @@ export class CellAddress {
    * @param baseAddress - base address for R0C0 shifts
    */
   public toSimpleCellAddress(baseAddress: SimpleCellAddress): SimpleCellAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
     if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) {
-      return simpleCellAddress(this.sheet, this.col, this.row)
+      return simpleCellAddress(sheet, this.col, this.row)
     } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-      return simpleCellAddress(this.sheet, baseAddress.col + this.col, this.row)
+      return simpleCellAddress(sheet, baseAddress.col + this.col, this.row)
     } else if (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-      return simpleCellAddress(this.sheet, this.col, baseAddress.row + this.row)
+      return simpleCellAddress(sheet, this.col, baseAddress.row + this.row)
     } else {
-      return simpleCellAddress(this.sheet, baseAddress.col + this.col, baseAddress.row + this.row)
+      return simpleCellAddress(sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
   }
 
@@ -82,7 +83,12 @@ export class CellAddress {
   }
 
   public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
-    return new CellAddress(toSheet, this.col + toRight, this.row + toBottom, this.type)
+    const newSheet = this.sheet === null ? null : toSheet
+    return new CellAddress(newSheet, this.col + toRight, this.row + toBottom, this.type)
+  }
+
+  public withAbsoluteSheet(sheet: number): CellAddress {
+    return new CellAddress(sheet, this.col, this.row, this.type)
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {

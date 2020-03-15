@@ -103,10 +103,10 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A2'), 1, 4, adr('B1'))
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(0, 0, -1))
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(0, -1, 0))
-    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(0, 0, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(null, 0, -1))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(null, -1, 0))
+    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(null, 0, 0))
   })
 
   it('should return #REF when overriding referred dependency to external cell', () => {
@@ -144,7 +144,7 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(adr('A1'), 2, 2, adr('B2'))
 
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(0, 1, 2))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(null, 1, 2))
   })
 
   it('should update coordinates to internal dependency', () => {
@@ -155,14 +155,14 @@ describe('Address dependencies, moved formulas', () => {
       ['4', '=$A$4'],
     ])
 
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(0, -1, 2))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(null, -1, 2))
 
     engine.moveCells(adr('A1'), 2, 4, adr('B2'))
 
-    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, -1, 0))
-    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
-    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(0, -1, 3))
-    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(0, 1, 4))
+    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(null, -1, 0))
+    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
+    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(null, -1, 3))
+    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(null, 1, 4))
   })
 
   it('should evaluate formula when overriding external formula dependency', () => {
@@ -206,7 +206,7 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A2'), 1, 1, adr('B1', 1))
 
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('should update reference', () => {
@@ -220,10 +220,10 @@ describe('Move cells', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 1, -1))
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(0, 1, -2))
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(0, 1, 0))
-    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(0, 1, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(null, 1, -1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(null, 1, -2))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(null, 1, 0))
+    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(null, 1, 0))
   })
 
   it('value moved has appropriate edges', () => {
@@ -250,7 +250,7 @@ describe('Move cells', () => {
     engine.moveCells(adr('A1'), 1, 1, adr('B1', 1))
 
     const reference = extractReference(engine, adr('A2'))
-    expect(reference).toEqual(CellAddress.relative(1, 1, -1))
+    expect(reference).toEqual(CellAddress.relative(null, 1, -1))
   })
 
   it('should override and remove formula', () => {

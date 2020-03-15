@@ -13,7 +13,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(null, 0, 0))
     })
 
     it('same sheet, case Aa, absolute row and col', () => {
@@ -23,7 +23,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute(0, 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute(null, 0, 0))
     })
 
     it('same sheet, case Ab', () => {
@@ -33,7 +33,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 2, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(null, 2, 0))
     })
 
     it('same sheet, case Raa', () => {
@@ -43,7 +43,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
     })
 
     it('same sheet, case Rab', () => {
@@ -53,7 +53,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.relative(0, -2, 0))
+      expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.relative(null, -2, 0))
     })
 
     it('same sheet, case Rba', () => {
@@ -63,7 +63,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 3, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 3, 0))
     })
 
     it('same sheet, case Rbb', () => {
@@ -73,7 +73,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(0, 1, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(null, 1, 0))
     })
 
     it('same sheet, same column', () => {
@@ -84,7 +84,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, 0, -1))
+      expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(null, 0, -1))
     })
   })
 
@@ -210,7 +210,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(1, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
     })
   })
 
