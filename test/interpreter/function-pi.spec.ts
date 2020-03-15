@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -11,7 +11,7 @@ describe('Function PI', () => {
   it('should return PI with proper precision', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PI()'],
-    ], buildConfig({ smartRounding : false}))
+    ], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3.14159265358979)
   })

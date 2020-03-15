@@ -1,5 +1,5 @@
-import {buildConfig} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {AstNodeType, MinusUnaryOpAst, ParserWithCaching, PlusUnaryOpAst, PlusOpAst} from '../../src/parser'
@@ -7,7 +7,7 @@ import {PercentOpAst, TimesOpAst} from '../../src/parser/Ast'
 
 describe('percent', () => {
   it('should parse % as operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1%', simpleCellAddress(0, 0, 0)).ast as PercentOpAst
     expect(ast.type).toBe(AstNodeType.PERCENT_OP)
@@ -15,7 +15,7 @@ describe('percent', () => {
   })
 
   it('% over unary minus', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=-1%', simpleCellAddress(0, 0, 0)).ast as MinusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
@@ -23,7 +23,7 @@ describe('percent', () => {
   })
 
   it('% over unary plus', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=+1%', simpleCellAddress(0, 0, 0)).ast as PlusUnaryOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_UNARY_OP)
@@ -31,7 +31,7 @@ describe('percent', () => {
   })
 
   it('% over addition op', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=42+1%', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
@@ -39,7 +39,7 @@ describe('percent', () => {
   })
 
   it('% over multiplication op', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=42*1%', simpleCellAddress(0, 0, 0)).ast as TimesOpAst
     expect(ast.type).toBe(AstNodeType.TIMES_OP)
@@ -47,7 +47,7 @@ describe('percent', () => {
   })
 
   it('% on the left', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1%+42', simpleCellAddress(0, 0, 0)).ast as PlusOpAst
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
@@ -55,7 +55,7 @@ describe('percent', () => {
   })
 
   it('% after procedure', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=SUM(1,2)%', simpleCellAddress(0, 0, 0)).ast as PercentOpAst
     expect(ast.type).toBe(AstNodeType.PERCENT_OP)
@@ -63,7 +63,7 @@ describe('percent', () => {
   })
 
   it('%% should not parse', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=100%%', simpleCellAddress(0, 0, 0)).ast as PercentOpAst
     expect(ast.type).toBe(AstNodeType.ERROR)

@@ -1,11 +1,11 @@
-import {buildConfig} from '../../src'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
-  const config = buildConfig()
+  const config = new Config()
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
   sheetMapping.addSheet('Sheet2')
@@ -105,7 +105,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure hash using canonical name', () => {
-    const config = buildConfig({ language: plPL })
+    const config = new Config({ language: plPL })
     const sheetMapping = new SheetMapping(plPL)
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -122,7 +122,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure name with missing translation', () => {
-    const config = buildConfig({ language: plPL })
+    const config = new Config({ language: plPL })
     const sheetMapping = new SheetMapping(plPL)
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -155,7 +155,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('should work with decimal separator', () => {
-    const config = buildConfig({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const sheetMapping = new SheetMapping(plPL)
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))

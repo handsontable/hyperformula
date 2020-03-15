@@ -3,7 +3,7 @@ import {CellError, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {buildConfig, Config} from './Config'
+import {Config} from './Config'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex, Vertex} from './DependencyGraph'
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize} from './Matrix'
@@ -39,7 +39,7 @@ export class GraphBuilder {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
-    private readonly config: Config = buildConfig(),
+    private readonly config: Config,
     private readonly stats: Statistics = new Statistics(),
   ) {
     if (this.config.matrixDetection) {

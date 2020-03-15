@@ -72,8 +72,6 @@ export interface ConfigParams {
 
 type ConfigParamsList = keyof ConfigParams
 
-export const buildConfig = (params = {}) => (new Config(params, Config.defaultConfig))
-
 export class Config implements ConfigParams, ParserConfig{
 
   public static defaultConfig: ConfigParams = {

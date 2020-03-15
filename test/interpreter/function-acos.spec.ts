@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
@@ -24,7 +24,7 @@ describe('Function ACOS', () => {
 
   it('for -1 (edge)', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(-1)']],
-      buildConfig({ smartRounding : false }))
+      { smartRounding : false })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(Math.PI)
   })

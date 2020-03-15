@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -34,7 +34,7 @@ describe('Function SQRT', () => {
       ['=SQRT(0)'],
       ['=SQRT(16)'],
       ['=SQRT(2)'],
-    ], buildConfig({ smartRounding : false}))
+    ], { smartRounding : false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual(4)

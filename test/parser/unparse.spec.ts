@@ -1,12 +1,12 @@
-import {buildConfig} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Unparse', () => {
-  const config = buildConfig()
+  const config = new Config()
   const lexerConfig = buildLexerConfig(config)
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')
@@ -119,7 +119,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse with known error with translation', () => {
-    const config = buildConfig({language: plPL})
+    const config = new Config({language: plPL})
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
@@ -264,8 +264,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = buildConfig({language: enGB})
-    const configPL = buildConfig({language: plPL})
+    const configEN = new Config({language: enGB})
+    const configPL = new Config({language: plPL})
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 
@@ -324,7 +324,7 @@ describe('Unparse', () => {
   })
 
   it('unparsing numbers with decimal separator', () => {
-    const config = buildConfig({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
     const lexerConfig = buildLexerConfig(config)
     const sheetMapping = new SheetMapping(enGB)
     sheetMapping.addSheet('Sheet1')
@@ -340,7 +340,7 @@ describe('Unparse', () => {
 })
 
 describe('whitespaces', () => {
-  const config = buildConfig()
+  const config = new Config()
   const lexerConfig = buildLexerConfig(config)
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')

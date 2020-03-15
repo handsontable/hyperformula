@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ColumnBinarySearch} from '../../src/ColumnSearch/ColumnBinarySearch'
 import '../testConfig.ts'
@@ -181,7 +181,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], buildConfig({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(spy).not.toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -198,7 +198,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], buildConfig({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(spy).toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -212,7 +212,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], buildConfig({ vlookupThreshold: 1 }))
+    ], { vlookupThreshold: 1 })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })

@@ -1,6 +1,5 @@
 import { CellError, EmptyValue } from './Cell'
 import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
-import {buildConfig, Config} from './Config'
 import {
   InvalidAddressError,
   InvalidArgumentsError,

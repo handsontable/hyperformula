@@ -1,4 +1,4 @@
-import {buildConfig, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
@@ -32,7 +32,7 @@ describe('Interpreter - SWITCH function', () => {
     const engine = HyperFormula.buildFromArray([
       ['abc', '1', '3', 'ABC', '5'],
       ['=SWITCH(A1,B1,C1,D1,E1)']
-    ], buildConfig({caseSensitive: false}))
+    ], {caseSensitive: false})
     expect(engine.getCellValue(adr('A2'))).toEqual(5)
   })
   it('Should fail with error in first argument', () => {

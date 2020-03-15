@@ -1,4 +1,4 @@
-import {buildConfig, EmptyValue, HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula} from '../../src'
 import {plPL} from '../../src/i18n'
 import '../testConfig'
 import {adr} from '../testUtils'

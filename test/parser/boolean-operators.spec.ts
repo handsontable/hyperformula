@@ -1,5 +1,5 @@
-import {buildConfig} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {
@@ -16,7 +16,7 @@ import {CellAddress} from '../../src/parser'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1=2', simpleCellAddress(0, 0, 0)).ast as EqualsOpAst
 
@@ -24,7 +24,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Not equal operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1<>2', simpleCellAddress(0, 0, 0)).ast as NotEqualOpAst
 
@@ -32,7 +32,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1>2', simpleCellAddress(0, 0, 0)).ast as GreaterThanOpAst
 
@@ -40,7 +40,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1<2', simpleCellAddress(0, 0, 0)).ast as LessThanOpAst
 
@@ -48,7 +48,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Greater than or equal operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1>=2', simpleCellAddress(0, 0, 0)).ast as GreaterThanOrEqualOpAst
 
@@ -56,7 +56,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Less than or equal operator', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1<=2', simpleCellAddress(0, 0, 0)).ast as LessThanOrEqualOpAst
 
@@ -64,7 +64,7 @@ describe('Parser - Boolean operators', () => {
   })
 
   it('Boolean operator with more complex childs', () => {
-    const parser = new ParserWithCaching(buildConfig(), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const ast = parser.parse('=1+2=1+2*6', simpleCellAddress(0, 0, 0)).ast as EqualsOpAst
 
