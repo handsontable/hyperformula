@@ -2,7 +2,7 @@ import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
-import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType} from './Ast'
+import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
@@ -98,7 +98,7 @@ export class ParserWithCaching {
         if (cellAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
-          hash = hash.concat(cellHashFromToken(cellAddress))
+          hash = hash.concat(referenceHashFromCellAddress(cellAddress, true))
         }
         idx++
       } else if (tokenMatcher(token, ProcedureName)) {
@@ -141,11 +141,11 @@ export class ParserWithCaching {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return imageWithWhitespace(cellHashFromToken(ast.reference), ast.leadingWhitespace)
+        return imageWithWhitespace(referenceHashFromCellAddress(ast.reference, true), ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
-        const start = cellHashFromToken(ast.start)
-        const end = cellHashFromToken(ast.end)
+        const start = referenceHashFromCellAddress(ast.start, ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+        const end = referenceHashFromCellAddress(ast.end, ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
         return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
       case AstNodeType.MINUS_UNARY_OP: {
@@ -178,19 +178,20 @@ export class ParserWithCaching {
   }
 }
 
-export const cellHashFromToken = (cellAddress: CellAddress): string => {
+export const referenceHashFromCellAddress = (cellAddress: CellAddress, withSheet: boolean): string => {
+  const sheetPart = withSheet && cellAddress.sheet !== null ? `#${cellAddress.sheet}` : ''
   switch (cellAddress.type) {
     case CellReferenceType.CELL_REFERENCE_RELATIVE: {
-      return `#${cellAddress.sheet}#${cellAddress.row}R${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}R${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
-      return `#${cellAddress.sheet}#${cellAddress.row}A${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}A${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
-      return `#${cellAddress.sheet}#${cellAddress.row}AC${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}AC${cellAddress.col}`
     }
     case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
-      return `#${cellAddress.sheet}#${cellAddress.row}AR${cellAddress.col}`
+      return `${sheetPart}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
 }

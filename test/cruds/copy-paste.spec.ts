@@ -1,7 +1,6 @@
 import {buildConfig, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
-import {CellReferenceType} from '../../src/parser/CellAddress'
 import '../testConfig'
 import {adr, detailedError, expectArrayWithSameContent, extractReference} from '../testUtils'
 
@@ -283,13 +282,11 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 2, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
-    expect(extractReference(engine, adr('B1', 1))).toEqual(new CellAddress(1, -1, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 1))
   })
 
-  /* Inconsistency with Product 1
-   * We should think about distinction of relative and absolute sheet addresses */
-  it('sheet id should not be adjusted when copying "relative" sheet reference to other sheet', () => {
+  it('sheet reference should stay "relative" to other sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['=A2']],
       'Sheet2': []
@@ -298,7 +295,7 @@ describe('Copy - paste integration', () => {
     engine.copy(adr('A1'), 1, 1)
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(new CellAddress(0, 0, 1, CellReferenceType.CELL_REFERENCE_RELATIVE))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(null, 0, 1))
   })
 
   it('should do nothing when clipboard is cleard after copy', () => {

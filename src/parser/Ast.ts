@@ -5,28 +5,28 @@ import {CellAddress} from './CellAddress'
 import {IExtendedToken} from './FormulaParser'
 
 export type Ast =
-  NumberAst
-  | StringAst
-  | CellReferenceAst
-  | CellRangeAst
-  | ConcatenateOpAst
-  | MinusUnaryOpAst
-  | PlusUnaryOpAst
-  | PercentOpAst
-  | EqualsOpAst
-  | NotEqualOpAst
-  | GreaterThanOpAst
-  | LessThanOpAst
-  | LessThanOrEqualOpAst
-  | GreaterThanOrEqualOpAst
-  | PlusOpAst
-  | MinusOpAst
-  | TimesOpAst
-  | DivOpAst
-  | PowerOpAst
-  | ProcedureAst
-  | ParenthesisAst
-  | ErrorAst
+    NumberAst
+    | StringAst
+    | CellReferenceAst
+    | CellRangeAst
+    | ConcatenateOpAst
+    | MinusUnaryOpAst
+    | PlusUnaryOpAst
+    | PercentOpAst
+    | EqualsOpAst
+    | NotEqualOpAst
+    | GreaterThanOpAst
+    | LessThanOpAst
+    | LessThanOrEqualOpAst
+    | GreaterThanOrEqualOpAst
+    | PlusOpAst
+    | MinusOpAst
+    | TimesOpAst
+    | DivOpAst
+    | PowerOpAst
+    | ProcedureAst
+    | ParenthesisAst
+    | ErrorAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -81,6 +81,12 @@ export enum AstNodeType {
   PARSING_ERROR = 'PARSING_ERROR',
 }
 
+export enum RangeSheetReferenceType {
+  RELATIVE,
+  START_ABSOLUTE,
+  BOTH_ABSOLUTE
+}
+
 export interface AstWithWhitespace {
   leadingWhitespace?: string,
 }
@@ -126,14 +132,25 @@ export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress,
+  sheetReferenceType: RangeSheetReferenceType,
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress, leadingWhitespace?: string): CellRangeAst => ({
-  type: AstNodeType.CELL_RANGE,
-  start,
-  end,
-  leadingWhitespace,
-})
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => {
+  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+    throw new Error('Start address inconsistent with end address')
+  }
+  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+      || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+    throw new Error('Sheet address inconsistent with sheet reference type')
+  }
+  return {
+    type: AstNodeType.CELL_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace
+  }
+}
 
 export interface BinaryOpAst extends AstWithWhitespace {
   left: Ast,
@@ -305,7 +322,7 @@ export const buildPercentOpAst = (value: Ast, leadingWhitespace?: IToken): Perce
   leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-export interface ProcedureAst  extends AstWithInternalWhitespace {
+export interface ProcedureAst extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[],

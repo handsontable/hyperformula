@@ -337,8 +337,8 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         throw err
       }
     }
-    const rangeStart = ast.start.toSimpleCellAddress(formulaAddress)
-    const rangeEnd = ast.end.toSimpleCellAddress(formulaAddress)
+    const rangeStart = range.start
+    const rangeEnd = range.end
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
     assert.ok(rangeVertex, 'Range does not exists in graph')
 
