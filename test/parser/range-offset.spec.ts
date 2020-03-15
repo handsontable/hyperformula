@@ -3,7 +3,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {AstNodeType, CellRangeAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
-import {CellAddress} from '../../src/parser'
+import {RangeSheetReferenceType} from '../../src/parser/Ast'
 
 describe('Parser - range offset', () => {
   it('OFFSET - usage with range', () => {
@@ -25,5 +25,25 @@ describe('Parser - range offset', () => {
 
     expect(errors1[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
     expect(errors2[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
+  })
+
+  it('OFFSET - sheet reference in range with offset start is ABSOLUTE', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const ast = parser.parse('=OFFSET(A1,0,0):OFFSET(B2,0,0)', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toEqual(AstNodeType.CELL_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.RELATIVE)
+  })
+
+  it('OFFSET - sheet reference in range with absolute start is START_ABSOLUTE', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const ast = parser.parse('=Sheet1!A1:OFFSET(B2,0,0)', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
+
+    expect(ast.type).toEqual(AstNodeType.CELL_RANGE)
+    expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
   })
 })

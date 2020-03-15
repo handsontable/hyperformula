@@ -475,8 +475,13 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => {
           const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-            /* TODO set proper RangeSheetReferenceType */
-            return buildCellRangeAst(start.reference, offsetProcedure.reference, RangeSheetReferenceType.RELATIVE, start.leadingWhitespace)
+            let end = offsetProcedure.reference
+            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+            if (start.reference.sheet !== null) {
+              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+              end = end.withAbsoluteSheet(start.reference.sheet)
+            }
+            return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
           } else {
             return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
           }
