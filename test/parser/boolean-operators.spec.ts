@@ -12,7 +12,6 @@ import {
   NotEqualOpAst,
   ParserWithCaching,
 } from '../../src/parser'
-import {CellAddress} from '../../src/parser'
 
 describe('Parser - Boolean operators', () => {
   it('Equals operator', () => {

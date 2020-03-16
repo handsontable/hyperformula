@@ -6,23 +6,18 @@ import {
   getCellType,
   getCellValueType,
   NoErrorCellValue, SimpleCellAddress,
-  simpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
-import {CellValue, DetailedCellError, ExportedChange, Exporter} from './CellValue'
+import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
-  FormulaCellVertex,
   Graph,
   MatrixMapping,
-  MatrixVertex,
-  ParsingErrorVertex,
   RangeMapping,
   SheetMapping,
   Vertex,
@@ -42,12 +37,10 @@ import {
   simpleCellAddressToString,
   Unparser,
   Ast,
-  buildLexerConfig
 } from './parser'
 import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {
   genericAllSheetsGetter, genericSheetGetter,
-  getAllSheetsSerializedFromEngine,
   getCellFormulaFromEngine,
   getCellSerializedFromEngine
 } from './Serialization'

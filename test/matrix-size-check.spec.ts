@@ -4,7 +4,7 @@ import {Config} from '../src/Config'
 import {SheetMapping} from '../src/DependencyGraph'
 import {enGB} from '../src/i18n'
 import {checkMatrixSize, MatrixSize} from '../src/Matrix'
-import {CellAddress, ParserWithCaching} from '../src/parser'
+import {ParserWithCaching} from '../src/parser'
 import './testConfig.ts'
 import {adr} from './testUtils'
 
