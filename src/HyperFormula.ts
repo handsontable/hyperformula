@@ -137,7 +137,7 @@ export class HyperFormula {
     /** Dependency graph storing sheets structure. */
     private dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
-    public columnSearch: ColumnSearchStrategy,
+    private columnSearch: ColumnSearchStrategy,
     /** Parser with caching. */
     private parser: ParserWithCaching,
     private unparser: Unparser,
