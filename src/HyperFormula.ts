@@ -133,7 +133,7 @@ export class HyperFormula {
     /** Engine configuration. */
     public config: Config,
     /** Statistics module for benchmarking. */
-    public stats: Statistics,
+    private stats: Statistics,
     /** Dependency graph storing sheets structure. */
     private dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
