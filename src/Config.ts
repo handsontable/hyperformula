@@ -412,7 +412,13 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
-    return new Config(init, this)
+    const mergedConfig = Object.assing({}, this.getConfig(), init)
+    
+    return new Config(mergedConfig)
+  }
+  
+  public getConfig(): ConfigParams {
+  
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
