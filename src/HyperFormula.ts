@@ -45,6 +45,12 @@ import {
   buildLexerConfig
 } from './parser'
 import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
+import {
+  genericAllSheetsGetter, genericSheetGetter,
+  getAllSheetsSerializedFromEngine,
+  getCellFormulaFromEngine,
+  getCellSerializedFromEngine
+} from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
@@ -178,35 +184,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
-    const formulaVertex = this.dependencyGraph.getCell(address)
-    if (formulaVertex instanceof FormulaCellVertex) {
-      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      return this.unparser.unparse(formula, address)
-    } else if (formulaVertex instanceof MatrixVertex) {
-      const formula = formulaVertex.getFormula()
-      if (formula) {
-        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
-      }
-    } else if (formulaVertex instanceof ParsingErrorVertex) {
-      return formulaVertex.getFormula()
-    }
-    return undefined
-  }
-
-  private getCellFormulaWithUnparser(address: SimpleCellAddress, customUnparser: Unparser): Maybe<string> {
-    const formulaVertex = this.dependencyGraph.getCell(address)
-    if (formulaVertex instanceof FormulaCellVertex) {
-      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      return customUnparser.unparse(formula, address)
-    } else if (formulaVertex instanceof MatrixVertex) {
-      const formula = formulaVertex.getFormula()
-      if (formula) {
-        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
-      }
-    } else if (formulaVertex instanceof ParsingErrorVertex) {
-      return formulaVertex.getFormula()
-    }
-    return undefined
+    return getCellFormulaFromEngine(this, address, this.unparser)
   }
 
   /**
@@ -221,31 +199,7 @@ export class HyperFormula {
    * @returns a [[CellValue]] which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
-    const formula: Maybe<string> = this.getCellFormula(address)
-    if( formula !== undefined ) {
-      return formula
-    } else {
-      const value: CellValue = this.getCellValue(address)
-      if(value instanceof DetailedCellError) {
-        return this.config.getErrorTranslationFor(value.error.type)
-      } else {
-        return value
-      }
-    }
-  }
-
-  private getCellSerializedWithUnparser(address: SimpleCellAddress, customUnparser: Unparser): NoErrorCellValue {
-    const formula: Maybe<string> = this.getCellFormulaWithUnparser(address, customUnparser)
-    if( formula !== undefined ) {
-      return formula
-    } else {
-      const value: CellValue = this.getCellValue(address)
-      if(value instanceof DetailedCellError) {
-        return this.config.getErrorTranslationFor(value.error.type)
-      } else {
-        return value
-      }
-    }
+    return getCellSerializedFromEngine(this, address, this.unparser)
   }
 
   /**
@@ -258,7 +212,7 @@ export class HyperFormula {
    * @param {number} sheet - sheet ID number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellValue(arg))
+    return genericSheetGetter(this, sheet, (arg) => this.getCellValue(arg))
   }
 
   /**
@@ -271,7 +225,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellFormula(arg))
+    return genericSheetGetter(this, sheet, (arg) => this.getCellFormula(arg))
   }
 
   /**
@@ -284,27 +238,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
-  }
-
-  private getSheetSerializedWithUnparser(sheet: number, customUnparser: Unparser): NoErrorCellValue[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellSerializedWithUnparser(arg, customUnparser))
-  }
-
-  private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
-    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
-    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
-
-    const arr: T[][] = new Array(sheetHeight)
-    for (let i = 0; i < sheetHeight; i++) {
-      arr[i] = new Array(sheetWidth)
-
-      for (let j = 0; j < sheetWidth; j++) {
-        const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = getter(address)
-      }
-    }
-    return arr
+    return genericSheetGetter(this, sheet, (arg) => this.getCellSerialized(arg))
   }
 
   /**
@@ -315,7 +249,7 @@ export class HyperFormula {
    * @returns key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
+    return genericAllSheetsGetter(this,(arg) => this.getSheetDimensions(arg))
   }
 
   /**
@@ -340,7 +274,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetValues(arg))
+    return genericAllSheetsGetter(this,(arg) => this.getSheetValues(arg))
   }
 
   /**
@@ -349,7 +283,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
+    return genericAllSheetsGetter(this, (arg) => this.getSheetFormulas(arg))
   }
 
   /**
@@ -358,28 +292,14 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
+    return genericAllSheetsGetter(this, (arg) => this.getSheetSerialized(arg))
   }
 
-  private getAllSheetsSerializedWithUnparser(customUnparser: Unparser): Record<string, NoErrorCellValue[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetSerializedWithUnparser(arg, customUnparser))
-  }
-
-  public getAllSheetsSerializedWithLanguage(language: TranslationPackage): Record<string, NoErrorCellValue[][]> {
-    const configNewLanguage = this.config.mergeConfig( {language} )
-    const actualUnparser = new Unparser(configNewLanguage, buildLexerConfig(configNewLanguage), this.dependencyGraph.sheetMapping.fetchDisplayName)
-    return this.getAllSheetsSerializedWithUnparser(actualUnparser)
-  }
-
-  private genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
-    const result: Record<string, T> = {}
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter(sheetId)
-    }
-    return result
-  }
-
+  /**
+   * Updates the config with given new parameters.
+   *
+   * @param {newParams} Partial<ConfigParams> - set of new config parameters
+   */
   public updateConfig(newParams: Partial<ConfigParams>): void {
     const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
     this.crudOperations = newEngine.crudOperations
