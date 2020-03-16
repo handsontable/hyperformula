@@ -102,6 +102,11 @@ export const enGB: TranslationPackage = {
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
     CHOOSE: 'CHOOSE',
+    ROWS: 'ROWS',
+    ISNUMBER: 'ISNUMBER',
+    ISLOGICAL: 'ISLOGICAL',
+    ISTEXT: 'ISTEXT',
+    ISNONTEXT: 'ISNONTEXT',
   },
   errors: {
     DIV_BY_ZERO: '#DIV/0!',
@@ -111,6 +116,7 @@ export const enGB: TranslationPackage = {
     NA: '#N/A',
     CYCLE: '#CYCLE!',
     REF: '#REF!',
+    ERROR: '#ERROR!'
   },
   interface: {
     NEW_SHEET_PREFIX: 'Sheet',

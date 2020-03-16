@@ -83,6 +83,18 @@ export class AbsoluteCellRange {
     return false
   }
 
+  public arrayOfAddressesInRange(): SimpleCellAddress[][] {
+    const result: SimpleCellAddress[][] = []
+    for (let y = 0; y < this.height(); ++y) {
+      result[y] = []
+      for (let x = 0; x < this.width(); ++x) {
+        const value = simpleCellAddress(this.sheet, this.start.col + x, this.start.row + y)
+        result[y].push(value)
+      }
+    }
+    return result
+  }
+
   public containsRange(range: AbsoluteCellRange): boolean {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
   }

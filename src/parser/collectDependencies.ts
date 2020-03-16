@@ -1,6 +1,6 @@
-import {Ast, AstNodeType, RelativeDependency} from './'
+import {Ast, AstNodeType, CellAddress, RelativeDependency} from './'
 
-const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) => {
+const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:
@@ -19,7 +19,7 @@ const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) 
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
     case AstNodeType.MINUS_UNARY_OP: {
-      collectDependenciesFn(ast.value, dependenciesSet)
+      collectDependenciesFn(ast.value, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       return
     }
     case AstNodeType.CONCATENATE_OP:
@@ -34,19 +34,19 @@ const collectDependenciesFn = (ast: Ast, dependenciesSet: RelativeDependency[]) 
     case AstNodeType.TIMES_OP:
     case AstNodeType.DIV_OP:
     case AstNodeType.POWER_OP:
-      collectDependenciesFn(ast.left, dependenciesSet)
-      collectDependenciesFn(ast.right, dependenciesSet)
+      collectDependenciesFn(ast.left, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
+      collectDependenciesFn(ast.right, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet)
       return
     case AstNodeType.FUNCTION_CALL:
-      if (ast.procedureName !== 'COLUMNS') {
-        ast.args.forEach((argAst: Ast) => collectDependenciesFn(argAst, dependenciesSet))
+      if (!functionsWhichDoesNotNeedArgumentsToBeComputed.has(ast.procedureName)) {
+        ast.args.forEach((argAst: Ast) => collectDependenciesFn(argAst, functionsWhichDoesNotNeedArgumentsToBeComputed, dependenciesSet))
       }
       return
   }
 }
 
-export const collectDependencies = (ast: Ast) => {
+export const collectDependencies = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>) => {
   const result = new Array<RelativeDependency>()
-  collectDependenciesFn(ast, result)
+  collectDependenciesFn(ast, functionsWhichDoesNotNeedArgumentsToBeComputed, result)
   return result
 }

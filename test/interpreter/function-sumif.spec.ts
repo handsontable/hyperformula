@@ -394,3 +394,86 @@ describe('Function SUMIFS - calcultions on more than one criteria', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 })
+
+describe('Function SUMIF - cache recalculation after cruds', () => {
+  it('recalculates SUMIF if changes in summed range', () => {
+    const sheet = [
+      ['10', '10'],
+      ['5', '6'],
+      ['=SUMIF(A2:B2, ">=1", A1:B1)', '0'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+    expect(changes.length).toEqual(3)
+    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 4]))
+  })
+
+  it('recalculates SUMIF if changes in tested range', () => {
+    const sheet = [
+      ['10', '10'],
+      ['5', '6'],
+      ['0', '=SUMIF(A1:B1, ">=2", A2:B2)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+
+    expect(engine.getCellValue(adr('B3'))).toEqual(6)
+    expect(changes.length).toEqual(3)
+    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 6]))
+  })
+
+  it('recalculates SUMIF if summed range same as tested range', () => {
+    const sheet = [
+      ['10', '10'],
+      ['0', '=SUMIF(A1:B1, ">=2", A1:B1)'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    expect(engine.getCellValue(adr('B2'))).toEqual(20)
+
+    const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(changes.length).toEqual(3)
+    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 3]))
+  })
+})
+
+describe('Function SUMIFS - cache recalculation after cruds', () => {
+  it('recalculates SUMIFS if changes in summed range', () => {
+    const sheet = [
+      ['10', '10'],
+      ['5', '6'],
+      ['7', '8'],
+      ['=SUMIFS(A1:B1, A2:B2, ">=5", A3:B3, ">=7")'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+
+    const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(changes.length).toEqual(3)
+    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 3, 4]))
+  })
+
+  it('recalculates SUMIFS if changes in one of the tested range', () => {
+    const sheet = [
+      ['10', '10'],
+      ['5', '6'],
+      ['7', '8'],
+      ['=SUMIFS(A1:B1, A2:B2, ">=5", A3:B3, ">=7")'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    expect(engine.getCellValue(adr('A4'))).toEqual(20)
+
+    const changes = engine.setCellContents(adr('A3'), [['1', '7']])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(changes.length).toEqual(3)
+    expect(changes.map((change) => change.newValue)).toEqual(expect.arrayContaining([1, 7, 10]))
+  })
+})

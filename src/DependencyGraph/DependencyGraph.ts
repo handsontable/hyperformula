@@ -6,10 +6,11 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Config} from '../Config'
 import {findSmallerRange} from '../interpreter/plugin/SumprodPlugin'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
+import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics/Statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'
@@ -31,11 +32,12 @@ export class DependencyGraph {
     return new DependencyGraph(
       addressMapping,
       rangeMapping,
-      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService)),
+      new Graph<Vertex>(new GetDependenciesQuery(rangeMapping, addressMapping, lazilyTransformingAstService, config.functionsWhichDoesNotNeedArgumentsToBeComputed())),
       new SheetMapping(config.language),
       new MatrixMapping(),
       stats,
       lazilyTransformingAstService,
+      config.functionsWhichDoesNotNeedArgumentsToBeComputed(),
     )
   }
 
@@ -47,6 +49,7 @@ export class DependencyGraph {
     public readonly matrixMapping: MatrixMapping,
     public readonly stats: Statistics = new Statistics(),
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
   ) {
   }
 
@@ -66,6 +69,14 @@ export class DependencyGraph {
     if (hasStructuralChangeFunction) {
       this.markAsDependentOnStructureChange(newVertex)
     }
+  }
+
+  public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
+    const vertex = this.addressMapping.getCell(address)
+    this.ensureThatVertexIsNonMatrixCellVertex(vertex)
+    this.graph.exchangeOrAddNode(vertex, errorVertex)
+    this.addressMapping.setCell(address, errorVertex)
+    this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
   }
 
   public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
@@ -405,7 +416,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCell(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -425,7 +436,7 @@ export class DependencyGraph {
     }
 
     for (const adjacentNode of adjacentNodes.values()) {
-      const nodeDependencies = collectAddressesDependentToMatrix(adjacentNode, matrixVertex, this.lazilyTransformingAstService)
+      const nodeDependencies = collectAddressesDependentToMatrix(this.functionsWhichDoesNotNeedArgumentsToBeComputed, adjacentNode, matrixVertex, this.lazilyTransformingAstService)
       for (const address of nodeDependencies) {
         const vertex = this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, adjacentNode)
@@ -475,6 +486,10 @@ export class DependencyGraph {
     }
   }
 
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.addressMapping.entriesFromRowsSpan(rowsSpan)
+  }
+
   public existsVertex(address: SimpleCellAddress): boolean {
     return this.addressMapping.has(address)
   }
@@ -515,7 +530,7 @@ export class DependencyGraph {
     return this.addressMapping.getWidth(sheet)
   }
 
-  public getMatrix(range: AbsoluteCellRange): MatrixVertex | undefined {
+  public getMatrix(range: AbsoluteCellRange): Maybe<MatrixVertex> {
     return this.matrixMapping.getMatrix(range)
   }
 
@@ -525,20 +540,6 @@ export class DependencyGraph {
 
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex | null {
     return this.rangeMapping.getRange(start, end)
-  }
-
-  public getValuesInRange(range: AbsoluteCellRange): InternalCellValue[][] {
-    const result: InternalCellValue[][] = []
-
-    for (let y = 0; y < range.height(); ++y) {
-      result[y] = []
-      for (let x = 0; x < range.width(); ++x) {
-        const value = this.getCellValue(simpleCellAddress(range.sheet, range.start.col + x, range.start.row + y))
-        result[y].push(value)
-      }
-    }
-
-    return result
   }
 
   public topSortWithScc(): TopSortResult<Vertex> {

@@ -58,11 +58,13 @@ export class Graph<T> {
     if (!this.nodes.has(toNode)) {
       throw new Error(`Unknown node ${toNode}`)
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.edges.get(fromNode)!.add(toNode)
   }
 
   public removeEdge(fromNode: T, toNode: T) {
     if (this.existsEdge(fromNode, toNode)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.edges.get(fromNode)!.delete(toNode)
     } else {
       throw new Error('Edge does not exist')
@@ -88,6 +90,7 @@ export class Graph<T> {
    * @param node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodes(node: T): Set<T> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this.edges.get(node)!
   }
 
@@ -217,6 +220,7 @@ export class Graph<T> {
         if ( processed.has(u) ) { // leaving this DFS subtree
           const pu = parent.get(u)
           if ( pu !==  null ) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             low.set(pu!, Math.min(low.get(pu!)!, low.get(u)!))
           }
           DFSstack.pop()
@@ -225,6 +229,7 @@ export class Graph<T> {
           this.adjacentNodes(u).forEach( (t: T) => {
             if (disc.get(t) !== undefined) { // forward edge or backward edge
               if (onStack.has(t)) { // backward edge
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 low.set(u, Math.min(low.get(u)!, disc.get(t)!))
               }
             } else {
@@ -251,15 +256,19 @@ export class Graph<T> {
         sccMap.set(v, v)
         sccInnerEdgeCnt.set(v, 0)
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         sccMap.set(v, sccMap.get(parent.get(v) as T)!)
       }
     })
 
     this.edges.forEach( (targets: Set<T>, v: T) => {
       targets.forEach( (u: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const uRepr = sccMap.get(u)!
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const vRepr = sccMap.get(v)!
         if (uRepr === vRepr) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           sccInnerEdgeCnt.set(uRepr, sccInnerEdgeCnt.get(uRepr)! + 1)
         }
       })
@@ -271,6 +280,7 @@ export class Graph<T> {
     const cycled: T[] = []
     deepOrder.reverse().forEach( (arr: T[]) =>
       arr.forEach( (t: T) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const tRepr = sccMap.get(t)!
         if (sccInnerEdgeCnt.get(tRepr) === 0) {
           sorted.push(t)
@@ -314,74 +324,5 @@ export class Graph<T> {
     for (const dependentNode of dependentNodes) {
       this.softRemoveEdge(dependentNode, node)
     }
-  }
-
-  private findCycles(nodes: Set<T>, nodesWithNoIncomingEdge: T[], incomingEdges: Map<T, number>): T[] {
-    if (nodesWithNoIncomingEdge.length !== nodes.size) {
-      const nodesOnCycle: T[] = []
-      for (const [node, incomingEdgesCount] of incomingEdges) {
-        if (incomingEdgesCount !== 0) {
-          nodesOnCycle.push(node)
-        }
-      }
-      return nodesOnCycle
-    } else {
-      return []
-    }
-  }
-
-  private nodesWithNoIncomingEdge(incomingEdges: Map<T, number>): T[] {
-    const result: T[] = []
-    incomingEdges.forEach((currentCount, targetNode) => {
-      if (currentCount === 0) {
-        result.push(targetNode)
-      }
-    })
-    return result
-  }
-
-  private computeSubgraphNodes(vertices: T[]): Set<T> {
-    const result = new Set(vertices)
-    const queue = Array.from(vertices)
-    let currentNodeIndex = 0
-    while (currentNodeIndex < queue.length) {
-      const vertex = queue[currentNodeIndex]
-      for (const adjacentNode of this.adjacentNodes(vertex)) {
-        if (!result.has(adjacentNode)) {
-          result.add(adjacentNode)
-          queue.push(adjacentNode)
-        }
-      }
-      currentNodeIndex++
-    }
-    return result
-  }
-
-  /**
-   * Builds a mapping from nodes to the count of their incoming edges.
-   */
-  private incomingEdges(): Map<T, number> {
-    const incomingEdges: Map<T, number> = new Map()
-    this.nodes.forEach((node, id) => (incomingEdges.set(node, 0)))
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      adjacentNodes.forEach((targetNode) => {
-        incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
-      })
-    })
-    return incomingEdges
-  }
-
-  private incomingEdgesForSubgraph(subgraphNodes: Set<T>): Map<T, number> {
-    const incomingEdges: Map<T, number> = new Map()
-    subgraphNodes.forEach((node) => (incomingEdges.set(node, 0)))
-    subgraphNodes.forEach((sourceNode) => {
-      const adjacentNodes = this.edges.get(sourceNode)!
-      adjacentNodes.forEach((targetNode) => {
-        if (subgraphNodes.has(targetNode) && subgraphNodes.has(sourceNode)) {
-          incomingEdges.set(targetNode, incomingEdges.get(targetNode)! + 1)
-        }
-      })
-    })
-    return incomingEdges
   }
 }

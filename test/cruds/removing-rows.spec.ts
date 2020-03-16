@@ -105,7 +105,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(null, 0, 1))
   })
 
   it('case Ab: absolute dependency below removed row should be shifted', () => {
@@ -117,7 +117,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(null, 0, 1))
   })
 
   it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
@@ -140,7 +140,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(null, 0, -1))
   })
 
   it('case Rab: relative address should be shifted when only formula is moving', () => {
@@ -153,7 +153,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 2])
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, -1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(null, 0, -1))
   })
 
   it('case Rba: relative address should be shifted when only dependency is moving', () => {
@@ -166,7 +166,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 0, 1))
   })
 
   it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
@@ -178,7 +178,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
     ])
 
     engine.removeRows(0, [0, 2])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 0, 1))
   })
 
   it('case Rca: relative dependency in deleted row range should be replaced by #REF', () => {
@@ -358,7 +358,7 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 
     engine.removeRows(0, [0, 1])
 
-    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(1, 0, -1))
+    expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(null, 0, -1))
   })
 
   it('should not affect dependency when removing rows in not relevant sheet, more sheets', function() {
@@ -516,7 +516,9 @@ describe('Removing rows - reevaluation', () => {
     ])
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const b1setCellValueSpy = jest.spyOn(b1 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
@@ -531,6 +533,7 @@ describe('Removing rows - reevaluation', () => {
       ['1'],
     ])
     const c1 = engine.addressMapping.getCell(adr('C1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
     engine.removeRows(0, [1, 1])
@@ -546,6 +549,7 @@ describe('Removing rows - reevaluation', () => {
     ])
 
     const a3 = engine.addressMapping.getCell(adr('A3'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
 
     engine.removeRows(0, [0, 2])
@@ -795,6 +799,7 @@ describe('Removing rows - sheet dimensions', () => {
       ['1'],
     ])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
     engine.removeRows(0, [1, 1])
     engine.removeRows(0, [10, 6])

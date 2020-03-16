@@ -1,4 +1,5 @@
 import {TranslationPackage} from '../i18n'
+import {Maybe} from '../Maybe'
 
 function canonicalize(sheetDisplayName: string): string {
   return sheetDisplayName.toLowerCase()
@@ -17,6 +18,8 @@ class Sheet {
 }
 
 export class SheetMapping {
+  public static NO_CHANGE = Symbol()
+
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string = 'Sheet'
@@ -55,7 +58,7 @@ export class SheetMapping {
     return sheet.id
   }
 
-  public get = (sheetName: string): number | undefined => {
+  public get = (sheetName: string): Maybe<number> => {
     const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.id
@@ -68,8 +71,17 @@ export class SheetMapping {
     return this.fetchSheetById(sheetId).displayName
   }
 
-  public getDisplayName(sheetId: number): string | undefined {
+  public getDisplayName(sheetId: number): Maybe<string> {
     const sheet = this.mappingFromId.get(sheetId)
+    if (sheet) {
+      return sheet.displayName
+    } else {
+      return undefined
+    }
+  }
+
+  public getDisplayNameByName(sheetName: string): Maybe<string> {
+    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
     if (sheet) {
       return sheet.displayName
     } else {
@@ -95,12 +107,12 @@ export class SheetMapping {
     return this.mappingFromCanonicalName.has(canonicalize(sheetName))
   }
 
-  public renameSheet(sheetId: number, newDisplayName: string): void {
+  public renameSheet(sheetId: number, newDisplayName: string): string | typeof SheetMapping.NO_CHANGE {
     const sheet = this.fetchSheetById(sheetId)
 
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
-      return
+      return SheetMapping.NO_CHANGE
     }
 
     const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
@@ -113,6 +125,7 @@ export class SheetMapping {
 
     sheet.displayName = newDisplayName
     this.store(sheet)
+    return currentDisplayName
   }
 
   public destroy(): void {

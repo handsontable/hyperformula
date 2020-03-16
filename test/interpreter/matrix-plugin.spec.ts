@@ -92,6 +92,15 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(12)
   })
 
+  it('mmult wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=MMULT(A1:A2)}', '{=MMULT(A1:A2, B1:B2, C1:C2)}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+  })
+
   it('matrix multiplication by sumproduct', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
@@ -143,6 +152,15 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue(adr('D6'))).toBeCloseTo(33)
   })
 
+  it('maxpool wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=MAXPOOL(A1:A2)}', '{=MAXPOOL(A1:A2, 0,0,0)}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
+  })
+
   it('matrix medianpool on even square', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '1', '2', '1', '5'],
@@ -153,6 +171,15 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2.5)
     expect(engine.getCellValue(adr('B3'))).toBeCloseTo(2.5)
     expect(engine.getCellValue(adr('C3'))).toBeCloseTo(5.5)
+  })
+
+  it('medianpool wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['{=MEDIANPOOL(A1:A2)}', '{=MEDIANPOOL(A1:A2, 0,0,0)}'],
+    ], configWithMatrixPlugin)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.NA))
   })
 
   it('matrix medianpool on odd square', () => {
@@ -211,9 +238,9 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
-  xit('transpose wrong number of arguments', () => {
+  it('transpose wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE()}'],
+      ['{=TRANSPOSE()}', '{=TRANSPOSE(A1:A2, B1:B2)}'],
     ], configWithMatrixPlugin)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NA))

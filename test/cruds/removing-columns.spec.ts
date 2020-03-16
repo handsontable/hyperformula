@@ -99,7 +99,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [2, 1])
 
-    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
   })
 
   it('case Ab: absolute dependency after removed column should be shifted', () => {
@@ -109,7 +109,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(null, 1, 0))
   })
 
   it('case Ac: absolute dependency in removed column range should be replaced by #REF', () => {
@@ -129,7 +129,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [2, 1])
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('case Rab: relative address should be shifted when only formula is moving', () => {
@@ -139,7 +139,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 2])
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1, 0))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('case Rba: relative address should be shifted when only dependency is moving', () => {
@@ -149,7 +149,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
   })
 
   it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
@@ -159,7 +159,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [0, 2])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(null, 1, 0))
   })
 
   it('case Rca: relative dependency in deleted column range should be replaced by #REF', () => {
@@ -407,7 +407,7 @@ describe('Address dependencies, Case 4: remove columns in sheet different than f
 
     engine.removeColumns(0, [0, 1])
 
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 0))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(null, -1, 0))
   })
 
   it('should not affect dependency when removing columns in not relevant sheet, more sheets', function() {
@@ -449,7 +449,9 @@ describe('Removing columns - reevaluation', () => {
     ])
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a2setCellValueSpy = jest.spyOn(a2 as any, 'setCellValue')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a3setCellValueSpy = jest.spyOn(a3 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
@@ -463,6 +465,7 @@ describe('Removing columns - reevaluation', () => {
       ['1', '2', '3', '=COLUMNS(A1:C1)'],
     ])
     const d1 = engine.addressMapping.getCell(adr('D1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const d1setCellValueSpy = jest.spyOn(d1 as any, 'setCellValue')
 
     engine.removeColumns(0, [1, 1])
@@ -477,6 +480,7 @@ describe('Removing columns - reevaluation', () => {
     ])
 
     const c1 = engine.addressMapping.getCell(adr('C1'))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = jest.spyOn(c1 as any, 'setCellValue')
 
     engine.removeColumns(0, [0, 2])
@@ -748,6 +752,7 @@ describe('Removing columns - sheet dimensions', () => {
       ['1'],
     ])
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recalcSpy = jest.spyOn(engine.evaluator as any, 'partialRun')
     engine.removeColumns(0, [1, 1])
     engine.removeColumns(0, [10, 6])

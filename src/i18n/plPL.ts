@@ -102,6 +102,11 @@ export const plPL: TranslationPackage = {
     IFERROR: 'JEŻELI.BŁĄD',
     IFNA: 'JEŻELI.ND',
     CHOOSE: 'WYBIERZ',
+    ROWS: 'ILE.WIERSZY',
+    ISNUMBER: 'CZY.LICZBA',
+    ISLOGICAL: 'CZY.LOGICZNA',
+    ISTEXT: 'CZY.TEKST',
+    ISNONTEXT: 'CZY.NIE.TEKST',
   },
   errors: {
     DIV_BY_ZERO: '#DZIEL/0!',
@@ -111,6 +116,7 @@ export const plPL: TranslationPackage = {
     NA: '#N/A',
     CYCLE: '#CYKL!',
     REF: '#ADR!',
+    ERROR: '#BŁĄD!',
   },
   interface: {
     NEW_SHEET_PREFIX: 'Arkusz',

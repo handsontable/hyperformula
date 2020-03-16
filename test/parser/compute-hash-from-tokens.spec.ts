@@ -1,11 +1,11 @@
 import {Config} from '../../src'
+import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL, TranslationPackage} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser'
 
 describe('computeHashFromTokens', () => {
-  const computeFunc = (code: string, address: CellAddress, language: TranslationPackage = enGB): string => {
+  const computeFunc = (code: string, address: SimpleCellAddress, language: TranslationPackage = enGB): string => {
     const config = new Config({ language})
     const sheetMapping = new SheetMapping(language)
     sheetMapping.addSheet('Sheet1')
@@ -18,123 +18,135 @@ describe('computeHashFromTokens', () => {
   it('simple case', () => {
     const code = '=42'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=42')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=42')
   })
 
   it('cell relative reference', () => {
     const code = '=A5'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3R-1')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3R-1')
   })
 
   it('cell absolute reference', () => {
     const code = '=$A$5'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#4A0')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#4A0')
   })
 
   it('cell absolute col reference', () => {
     const code = '=$A5'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3AC0')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3AC0')
   })
 
   it('cell absolute row reference', () => {
     const code = '=A$5'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#4AR-1')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#4AR-1')
   })
 
   it('more addresses', () => {
     const code = '=A5+A7'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3R-1+#0#5R-1')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3R-1+#5R-1')
   })
 
   it('cell ref in string', () => {
     const code = '="A5"'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('="A5"')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('="A5"')
   })
 
   it('cell ref between strings', () => {
     const code = '="A5"+A4+"A6"'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('="A5"+#0#2R-1+"A6"')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('="A5"+#2R-1+"A6"')
   })
 
   it('cell ref in string with escape', () => {
     const code = '="fdsaf\\"A5"'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('="fdsaf\\"A5"')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('="fdsaf\\"A5"')
   })
 
   it('cell range', () => {
     const code = '=A5:B16'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#0#3R-1:#0#14R0')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#3R-1:#14R0')
+  })
+
+  it('cell range with sheet on the left', () => {
+    const code = '=Sheet1!A5:B16'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#3R-1:#14R0')
+  })
+
+  it('cell range with sheet on both sides', () => {
+    const code = '=Sheet1!A5:Sheet2!B16'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#0#3R-1:#1#14R0')
   })
 
   it('do not ignores whitespace', () => {
     const code = '= 42'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('= 42')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('= 42')
   })
 
   it('different hash for formulas with different namespace', () => {
     const code1 = '= 42 '
     const code2 = '=42'
 
-    const result1 = computeFunc(code1, CellAddress.absolute(0, 1, 1))
-    const result2 = computeFunc(code2, CellAddress.absolute(0, 1, 1))
+    const result1 = computeFunc(code1, simpleCellAddress(0, 1, 1))
+    const result2 = computeFunc(code2, simpleCellAddress(0, 1, 1))
     expect(result1).not.toEqual(result2)
   })
 
   it('support sheets', () => {
     const code = '=Sheet2!A5'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=#1#3R-1')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=#1#3R-1')
   })
 
   it('function call names are normalized', () => {
     const code = '=rAnd()'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1))).toEqual('=RAND()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=RAND()')
   })
 
   it('function call in canonical form', () => {
     const code = '=SUMA()'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=SUM()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=SUM()')
   })
 
   it('function call when missing translation', () => {
     const code = '=fooBAR()'
 
-    expect(computeFunc(code, CellAddress.absolute(0, 1, 1), plPL)).toEqual('=FOOBAR()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=FOOBAR()')
   })
 
   it('should work with whitespaces', () => {
-    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( A1, A1:A2 )'
-    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
-    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0#0R0:#0#1R0 )')
+    const formula = '= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( Sheet1!A1, A1:A2 )'
+    const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
+    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0R0:#1R0 )')
   })
 
   it('should skip whitespaces inside range ', () => {
     const formula = '=SUM( A1 : A2 )'
-    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
-    expect(hash).toEqual('=SUM( #0#0R0:#0#1R0 )')
+    const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
+    expect(hash).toEqual('=SUM( #0R0:#1R0 )')
   })
 
   it('should skip trailing whitespace', () => {
     const formula = '=1 '
-    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
+    const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
     expect(hash).toEqual('=1')
   })
 
   it('should skip whitespaces before function args separators', () => {
     const formula = '=SUM(A1 , A2)'
-    const hash = computeFunc(formula, CellAddress.absolute(0, 0, 0))
-    expect(hash).toEqual('=SUM(#0#0R0, #0#1R0)')
+    const hash = computeFunc(formula, simpleCellAddress(0, 0, 0))
+    expect(hash).toEqual('=SUM(#0R0, #1R0)')
   })
 })

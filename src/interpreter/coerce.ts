@@ -69,6 +69,18 @@ export function coerceBooleanToNumber(arg: boolean): number {
   return Number(arg)
 }
 
+export function coerceEmptyToValue(arg: NoErrorCellValue): NoErrorCellValue {
+  if(typeof arg === 'string') {
+    return ''
+  } else if(typeof arg === 'number') {
+    return 0
+  } else if(typeof arg === 'boolean') {
+    return false
+  } else {
+    return EmptyValue
+  }
+}
+
 /**
  * Coerce scalar value to boolean if possible, or error if value is an error
  *

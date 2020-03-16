@@ -1,5 +1,5 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateHelper} from './DateHelper'
@@ -11,18 +11,20 @@ import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
+import Collator = Intl.Collator
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
     private readonly dateHelper: DateHelper,
+    private readonly collator: Collator
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.collator)
   }
 
   public run() {
@@ -39,7 +41,7 @@ export class SingleThreadEvaluator implements Evaluator {
     const changes = new ContentChanges()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      const cycled = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
+      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
           if (vertex instanceof FormulaCellVertex) {
             const address = vertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)

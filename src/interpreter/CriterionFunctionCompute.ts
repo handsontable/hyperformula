@@ -2,6 +2,7 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, simpleCellAddress} from '../Cell'
 import {CriterionCache, DependencyGraph, RangeVertex} from '../DependencyGraph'
 import {split} from '../generatorUtils'
+import {Maybe} from '../Maybe'
 import { CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
 import { SimpleRangeValue} from './InterpreterValue'
@@ -66,6 +67,11 @@ export class CriterionFunctionCompute<T> {
       }
 
       valuesRangeVertex.setCriterionFunctionValues(this.cacheKey(conditions), cache)
+      conditionsVertices.forEach(range => {
+        if (range !== undefined) {
+          range.addDependentCacheRange(valuesRangeVertex)
+        }
+      })
 
       return cache.get(fullCriterionString)![0]
     } else {
@@ -73,7 +79,7 @@ export class CriterionFunctionCompute<T> {
     }
   }
 
-  private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): RangeVertex | undefined {
+  private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): Maybe<RangeVertex> {
     const maybeRange = rangeValue.range()
     if (maybeRange === undefined) {
       return undefined

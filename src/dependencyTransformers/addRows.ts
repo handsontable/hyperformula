@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from '../Cell'
+import {absoluteSheetReference, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {RowsSpan} from '../RowsSpan'
@@ -22,8 +22,9 @@ export namespace AddRowsDependencyTransformer {
 
   function cellAddressTransformer(addedRows: RowsSpan): CellAddressTransformerFunction {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+      const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
       // Case 4 and 5
-      if ((dependencyAddress.sheet !== addedRows.sheet)
+      if ((absoluteDependencySheet !== addedRows.sheet)
           && (formulaAddress.sheet !== addedRows.sheet)) {
         return false
       }
@@ -31,7 +32,7 @@ export namespace AddRowsDependencyTransformer {
       const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
 
       // Case 3
-      if ((dependencyAddress.sheet === addedRows.sheet)
+      if ((absoluteDependencySheet === addedRows.sheet)
           && (formulaAddress.sheet !== addedRows.sheet)) {
         if (addedRows.rowStart <= absolutizedDependencyAddress.row) {
           return dependencyAddress.shiftedByRows(addedRows.numberOfRows)
@@ -42,7 +43,7 @@ export namespace AddRowsDependencyTransformer {
 
       // Case 2
       if ((formulaAddress.sheet === addedRows.sheet)
-          && (dependencyAddress.sheet !== addedRows.sheet)) {
+          && (absoluteDependencySheet !== addedRows.sheet)) {
         if (dependencyAddress.isRowAbsolute()) {
           return false
         }

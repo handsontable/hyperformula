@@ -2,6 +2,7 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {SimpleCellAddress, simpleCellAddress, InternalCellValue} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {DependencyGraph, AddressMapping, SparseStrategy} from './DependencyGraph'
+import {Maybe} from './Maybe'
 import {ParserWithCaching} from './parser'
 import {CrudOperations} from './CrudOperations'
 
@@ -30,11 +31,11 @@ class NamedExpressionsStore {
     this.rowMapping.set(namedExpression.row, namedExpression)
   }
 
-  public get(expressionName: string): NamedExpression | undefined {
+  public get(expressionName: string): Maybe<NamedExpression> {
     return this.mapping.get(this.normalizeExpressionName(expressionName))
   }
 
-  public getByRow(row: number): NamedExpression | undefined {
+  public getByRow(row: number): Maybe<NamedExpression> {
     return this.rowMapping.get(row)
   }
 
@@ -87,6 +88,15 @@ export class NamedExpressions {
     return namedExpression.name
   }
 
+  public getDisplayNameByName(expressionName: string): Maybe<string> {
+    const namedExpression = this.workbookStore.get(expressionName)
+    if (namedExpression) {
+      return namedExpression.name
+    } else {
+      return undefined
+    }
+  }
+
   public isNameValid(expressionName: string): boolean {
     if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
       return false
@@ -116,13 +126,14 @@ export class NamedExpressions {
     }
   }
 
-  public removeNamedExpression(expressionName: string): void {
+  public removeNamedExpression(expressionName: string): boolean {
     const namedExpression = this.workbookStore.get(expressionName)
     if (namedExpression === undefined) {
-      return
+      return false
     }
     this.dependencyGraph.setCellEmpty(this.buildAddress(namedExpression.row))
     this.workbookStore.remove(expressionName)
+    return true
   }
 
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent): void {
@@ -156,7 +167,7 @@ export class NamedExpressions {
     if (parsedCellContent instanceof CellContent.MatrixFormula) {
       throw new Error('Matrix formulas are not supported')
     } else if (parsedCellContent instanceof CellContent.Formula) {
-      const {ast, hash, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
       this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.crudOperations.setCellEmpty(address)

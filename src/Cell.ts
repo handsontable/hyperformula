@@ -19,6 +19,9 @@ export enum ErrorType {
 
   /* Wrong address reference. */
   REF = 'REF',
+
+  /* Generic error */
+  ERROR = 'ERROR'
 }
 
 export const EmptyValue = Symbol()
@@ -98,6 +101,10 @@ export class CellError {
     public readonly message?: string,
   ) {
   }
+
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, 'Parsing error')
+  }
 }
 
 export interface SimpleCellAddress {
@@ -110,6 +117,10 @@ export const simpleCellAddress = (sheet: number, col: number, row: number): Simp
 export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean => (address.col < 0 || address.row < 0)
 export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
+}
+
+export const absoluteSheetReference = (address: CellAddress, baseAddress: SimpleCellAddress): number => {
+  return address.sheet === null ? baseAddress.sheet : address.sheet
 }
 
 export interface SheetCellAddress {

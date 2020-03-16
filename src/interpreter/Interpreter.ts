@@ -5,19 +5,19 @@ import {
   CellValueTypeOrd,
   EmptyValue,
   ErrorType,
-  getCellValueType, InternalCellValue,
-  invalidSimpleCellAddress,
+  getCellValueType,
+  invalidSimpleCellAddress, NoErrorCellValue,
   SimpleCellAddress,
 } from '../Cell'
-import {IColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, ParsingErrorType} from '../parser/Ast'
+import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
-import {coerceBooleanToNumber,  coerceScalarToNumberOrError} from './coerce'
+import {coerceBooleanToNumber, coerceEmptyToValue, coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {
   add,
@@ -25,11 +25,12 @@ import {
   floatCmp,
   multiply, numberCmp,
   percent,
-  power, strCmp,
+  power,
   subtract,
   unaryminus
 } from './scalar'
 import {concatenate} from './text'
+import Collator = Intl.Collator
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -37,10 +38,11 @@ export class Interpreter {
 
   constructor(
     public readonly dependencyGraph: DependencyGraph,
-    public readonly columnSearch: IColumnSearchStrategy,
+    public readonly columnSearch: ColumnSearchStrategy,
     public readonly config: Config,
     public readonly stats: Statistics,
     public readonly dateHelper: DateHelper,
+    public readonly collator: Collator
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())
   }
@@ -73,37 +75,37 @@ export class Interpreter {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) === 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0 : err
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) !== 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0 : err
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) > 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0 : err
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) < 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0 : err
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) >= 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0 : err
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
         const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as InternalCellValue, rightResult as InternalCellValue) <= 0 : err
+        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0 : err
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -248,14 +250,7 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, formulaAddress)
       }
       case AstNodeType.ERROR: {
-        if (ast.error !== undefined) {
-          return ast.error
-        }
-        /* TODO tidy up parsing errors */
-        if (ast.args.length > 0 && ast.args[0].type === ParsingErrorType.StaticOffsetOutOfRangeError) {
-          return new CellError(ErrorType.REF)
-        }
-        return new CellError(ErrorType.NAME)
+        return ast.error
       }
     }
   }
@@ -305,7 +300,7 @@ export class Interpreter {
     }
   }
 
-  public compare(left: InternalCellValue, right: InternalCellValue): number {
+  public compare(left: NoErrorCellValue, right: NoErrorCellValue): number {
     if (typeof left === 'string' || typeof right === 'string') {
       const leftTmp = typeof left === 'string' ? this.dateHelper.dateStringToDateNumber(left) : left
       const rightTmp = typeof right === 'string' ? this.dateHelper.dateStringToDateNumber(right) : right
@@ -314,12 +309,14 @@ export class Interpreter {
       }
     }
 
+    if(left === EmptyValue) {
+      left = coerceEmptyToValue(right)
+    } else if(right === EmptyValue) {
+      right = coerceEmptyToValue(left)
+    }
+
     if ( typeof left === 'string' && typeof right === 'string') {
-      if ( this.config.caseSensitive) {
-        return strCmp(left, right)
-      } else {
-        return strCmp(left.toLowerCase(), right.toLowerCase())
-      }
+      return this.collator.compare(left, right)
     } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
     } else if ( typeof left === 'number' && typeof right === 'number' ) {

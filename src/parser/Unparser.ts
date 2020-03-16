@@ -1,6 +1,6 @@
-import {SimpleCellAddress} from '../Cell'
+import {ErrorType, SimpleCellAddress} from '../Cell'
 import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType, imageWithWhitespace} from './Ast'
+import {Ast, AstNodeType, CellRangeAst, imageWithWhitespace, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -22,7 +22,7 @@ export class Unparser {
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.NUMBER: {
-        return imageWithWhitespace(ast.value.toString(), ast.leadingWhitespace)
+        return imageWithWhitespace(formatNumber(ast.value, this.config.decimalSeparator), ast.leadingWhitespace)
       }
       case AstNodeType.STRING: {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
@@ -35,21 +35,15 @@ export class Unparser {
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
-        if (ast.reference.sheet === address.sheet) {
-          image = cellAddressToString(ast.reference, address)
-        } else {
+        if (ast.reference.sheet !== null) {
           image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+        } else {
+          image = cellAddressToString(ast.reference, address)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_RANGE: {
-        let image
-        if (ast.start.sheet === address.sheet) {
-          image = cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
-        } else {
-          image = this.unparseSheetName(ast.start.sheet) + '!' + cellAddressToString(ast.start, address) + ':' + cellAddressToString(ast.end, address)
-        }
-        return imageWithWhitespace(image, ast.leadingWhitespace)
+        return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
@@ -67,7 +61,7 @@ export class Unparser {
         if (ast.error) {
           image = this.config.getErrorTranslationFor(ast.error.type)
         } else {
-          image = '#ERR!'
+          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
@@ -92,4 +86,24 @@ export class Unparser {
       return sheet
     }
   }
+
+  private formatRange(ast: CellRangeAst, baseAddress: SimpleCellAddress): string {
+    let startSheeet = ''
+    let endSheet = ''
+
+    if (ast.start.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+      startSheeet = this.unparseSheetName(ast.start.sheet) + '!'
+    }
+
+    if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
+      endSheet = this.unparseSheetName(ast.end.sheet) + '!'
+    }
+
+    return `${startSheeet}${cellAddressToString(ast.start, baseAddress)}:${endSheet}${cellAddressToString(ast.end, baseAddress)}`
+  }
+}
+
+export function formatNumber(number: number, decimalSeparator: string): string {
+  const numericString = number.toString()
+  return numericString.replace('.', decimalSeparator)
 }

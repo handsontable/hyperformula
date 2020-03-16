@@ -1,4 +1,4 @@
-import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, InternalCellValue, NoErrorCellValue, SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean, coerceToMaybeNumber} from '../coerce'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
@@ -52,6 +52,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public literalTrue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
@@ -68,6 +69,7 @@ export class BooleanPlugin extends FunctionPlugin {
    * @param ast
    * @param formulaAddress
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public literalFalse(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
     if (ast.args.length > 0) {
       return new CellError(ErrorType.NA)
@@ -233,7 +235,7 @@ export class BooleanPlugin extends FunctionPlugin {
       if(vals[i] instanceof CellError) {
         continue
       }
-      if( this.interpreter.compare(vals[0], vals[i]) === 0 ) {
+      if( this.interpreter.compare(vals[0], vals[i] as NoErrorCellValue) === 0 ) {
         return vals[i+1]
       }
     }

@@ -1,36 +1,41 @@
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
+import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {IExtendedToken} from './FormulaParser'
 
 export type Ast =
-  NumberAst
-  | StringAst
-  | CellReferenceAst
-  | CellRangeAst
-  | ConcatenateOpAst
-  | MinusUnaryOpAst
-  | PlusUnaryOpAst
-  | PercentOpAst
-  | EqualsOpAst
-  | NotEqualOpAst
-  | GreaterThanOpAst
-  | LessThanOpAst
-  | LessThanOrEqualOpAst
-  | GreaterThanOrEqualOpAst
-  | PlusOpAst
-  | MinusOpAst
-  | TimesOpAst
-  | DivOpAst
-  | PowerOpAst
-  | ProcedureAst
-  | ParenthesisAst
-  | ErrorAst
+    NumberAst
+    | StringAst
+    | CellReferenceAst
+    | CellRangeAst
+    | ConcatenateOpAst
+    | MinusUnaryOpAst
+    | PlusUnaryOpAst
+    | PercentOpAst
+    | EqualsOpAst
+    | NotEqualOpAst
+    | GreaterThanOpAst
+    | LessThanOpAst
+    | LessThanOrEqualOpAst
+    | GreaterThanOrEqualOpAst
+    | PlusOpAst
+    | MinusOpAst
+    | TimesOpAst
+    | DivOpAst
+    | PowerOpAst
+    | ProcedureAst
+    | ParenthesisAst
+    | ErrorAst
 
 export interface ParsingError {
   type: ParsingErrorType,
   message: string,
 }
+
+export const parsingError = (type: ParsingErrorType, message: string) => ({
+  type, message
+})
 
 export enum ParsingErrorType {
   LexingError = 'LexingError',
@@ -73,6 +78,13 @@ export enum AstNodeType {
   CELL_RANGE = 'CELL_RANGE',
 
   ERROR = 'ERROR',
+  PARSING_ERROR = 'PARSING_ERROR',
+}
+
+export enum RangeSheetReferenceType {
+  RELATIVE,
+  START_ABSOLUTE,
+  BOTH_ABSOLUTE
 }
 
 export interface AstWithWhitespace {
@@ -88,10 +100,10 @@ export interface NumberAst extends AstWithWhitespace {
   value: number,
 }
 
-export const buildNumberAst = (token: IExtendedToken): NumberAst => ({
+export const buildNumberAst = (value: number, leadingWhitespace?: IToken): NumberAst => ({
   type: AstNodeType.NUMBER,
-  value: parseFloat(token.image),
-  leadingWhitespace: extractImage(token.leadingWhitespace),
+  value: value,
+  leadingWhitespace: extractImage(leadingWhitespace),
 })
 
 export interface StringAst extends AstWithWhitespace {
@@ -120,14 +132,25 @@ export interface CellRangeAst extends AstWithWhitespace {
   type: AstNodeType.CELL_RANGE,
   start: CellAddress,
   end: CellAddress,
+  sheetReferenceType: RangeSheetReferenceType,
 }
 
-export const buildCellRangeAst = (start: CellAddress, end: CellAddress, leadingWhitespace?: string): CellRangeAst => ({
-  type: AstNodeType.CELL_RANGE,
-  start,
-  end,
-  leadingWhitespace,
-})
+export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => {
+  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+    throw new Error('Start address inconsistent with end address')
+  }
+  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+      || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+    throw new Error('Sheet address inconsistent with sheet reference type')
+  }
+  return {
+    type: AstNodeType.CELL_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace
+  }
+}
 
 export interface BinaryOpAst extends AstWithWhitespace {
   left: Ast,
@@ -299,7 +322,7 @@ export const buildPercentOpAst = (value: Ast, leadingWhitespace?: IToken): Perce
   leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-export interface ProcedureAst  extends AstWithInternalWhitespace {
+export interface ProcedureAst extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[],
@@ -327,19 +350,21 @@ export const buildParenthesisAst = (expression: Ast, leadingWhitespace?: IToken,
 
 export interface ErrorAst extends AstWithWhitespace {
   type: AstNodeType.ERROR,
-  args: ParsingError[],
-  error?: CellError,
+  error: CellError,
 }
-
-export const buildErrorAst = (args: ParsingError[]): ErrorAst => ({type: AstNodeType.ERROR, args})
 
 export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken): ErrorAst => ({
   type: AstNodeType.ERROR,
-  args: [], error,
+  error,
   leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-function extractImage(token: IToken | undefined): string | undefined {
+export const buildParsingErrorAst = (): ErrorAst => ({
+  type: AstNodeType.ERROR,
+  error: CellError.parsingError()
+})
+
+function extractImage(token: Maybe<IToken>): Maybe<string> {
   return token !== undefined ? token.image : undefined
 }
 

@@ -42,6 +42,12 @@ export class NamedExpressionDoesNotExist extends Error {
   }
 }
 
+export class NoOperationToUndo extends Error {
+  constructor() {
+    super('There is no operation to undo')
+  }
+}
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
@@ -64,3 +70,16 @@ export class UnableToParse extends Error {
     super(`Unable to parse value: ${JSON.stringify(value, replacer, 4)}`)
   }
 }
+
+export class ExpectedValueOfType extends Error {
+  constructor(expectedType: string, paramName: string) {
+    super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
+  }
+}
+
+export class ExpectedOneOfValues extends Error {
+  constructor(values: string, paramName: string) {
+    super(`Expected one of ${values} for config parameter: ${paramName}`)
+  }
+}
+

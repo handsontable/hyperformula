@@ -14,6 +14,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
     private readonly rangeMapping: RangeMapping,
     private readonly addressMapping: AddressMapping,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
   ) {
   }
 
@@ -31,7 +32,7 @@ export class GetDependenciesQuery implements IGetDependenciesQuery<Vertex> {
       return null
     }
 
-    const deps = collectDependencies(formula!)
+    const deps = collectDependencies(formula!, this.functionsWhichDoesNotNeedArgumentsToBeComputed)
     const absoluteDeps = absolutizeDependencies(deps, address)
     return new Set(absoluteDeps.map((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {

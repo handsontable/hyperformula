@@ -2,7 +2,7 @@ import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {IColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {DependencyGraph, MatrixVertex, Vertex} from './DependencyGraph'
 import {Sheets} from './GraphBuilder'
 import {Matrix, MatrixSize} from './Matrix'
@@ -58,7 +58,7 @@ export class GraphBuilderMatrixHeuristic {
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: IColumnSearchStrategy,
+    private readonly columnSearch: ColumnSearchStrategy,
     private readonly dependencies: Map<Vertex, CellDependency[]>,
     private readonly threshold: number,
     private readonly cellContentParser: CellContentParser,
@@ -73,6 +73,7 @@ export class GraphBuilderMatrixHeuristic {
     if (!this.mapping.has(cellAddress.sheet)) {
       throw Error(`Sheet with id: ${cellAddress.sheet} does not exists`)
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.mapping.get(cellAddress.sheet)!.set(cellAddress.col, cellAddress.row, true)
   }
 
@@ -139,8 +140,11 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
     for (let x = size.width - 1; x >= 0; --x) {
       const value = input.get(x, y)
 
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [right, rightColour] = [input.get(x + 1, y)!, colours.get(x + 1, y)!]
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [bottom, bottomColour] = [input.get(x, y + 1)!, colours.get(x, y + 1)!]
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const [diag, diagColour] = [input.get(x + 1, y + 1)!, colours.get(x + 1, y + 1)!]
 
       if (!value) {
@@ -149,6 +153,7 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
           // 0 1
           // 1 *
           if (result.has(rightColour)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             result.get(rightColour)!.isMatrix = false
           }
         }
@@ -158,6 +163,7 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
         colours.set(x, y, ++colour)
         result.set(colour, possibleMatrix(AbsoluteCellRange.fromCoordinates(sheet, x, y, x, y), true, [simpleCellAddress(sheet, x, y)]))
         if (result.has(rightColour)) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           result.get(rightColour)!.isMatrix = false
         }
       } else if (value !== diag) {
@@ -165,9 +171,11 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
           // 1 1
           // 1 0
           if (result.has(rightColour)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             result.get(rightColour)!.isMatrix = false
           }
           if (result.has(bottomColour)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             result.get(bottomColour)!.isMatrix = false
           }
           colours.set(x, y, ++colour)
@@ -175,8 +183,10 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
         } else if (right !== value && bottom === value) {
           // 1 0
           // 1 0
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           if (result.has(bottomColour) && result.get(bottomColour)!.isMatrix) {
             colours.set(x, y, bottomColour)
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const old = result.get(bottomColour)!
             old.cells.push(simpleCellAddress(sheet, x, y))
             result.set(bottomColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
@@ -188,6 +198,7 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
           // 1 1
           // 0 0
           colours.set(x, y, rightColour)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const old = result.get(rightColour)!
           old.cells.push(simpleCellAddress(sheet, x, y))
           result.set(rightColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))
@@ -199,6 +210,7 @@ export function findMatrices(sheet: number, input: Array2d<boolean>): IterableIt
         // 1 1
         // 1 1
         colours.set(x, y, rightColour)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const old = result.get(rightColour)!
         old.cells.push(simpleCellAddress(sheet, x, y))
         result.set(rightColour, possibleMatrix(old.range.withStart(simpleCellAddress(sheet, x, y)), true, old.cells))

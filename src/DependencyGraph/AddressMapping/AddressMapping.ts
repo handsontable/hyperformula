@@ -5,7 +5,7 @@ import {Sheet} from '../../GraphBuilder'
 import {RowsSpan} from '../../RowsSpan'
 import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
-import {IChooseAddressMapping} from './ChooseAddressMappingPolicy'
+import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
 /**
@@ -41,7 +41,7 @@ export class AddressMapping {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly policy: IChooseAddressMapping,
+    private readonly policy: ChooseAddressMapping,
   ) {
   }
 
@@ -191,11 +191,11 @@ export class AddressMapping {
   }
 
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
-    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan)
+    yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
-    yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan)
+    yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public* valuesFromSheet(sheet: number): IterableIterator<[InternalCellValue, SimpleCellAddress]> {
@@ -220,6 +220,10 @@ export class AddressMapping {
     }
   }
 
+  public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    yield* this.mapping.get(rowsSpan.sheet)!.entriesFromRowsSpan(rowsSpan)
+  }
+
   public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)
@@ -236,11 +240,11 @@ export class AddressMapping {
   }
 
   public* verticesFromColumn(sheet: number, column: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromColumn(column)
+    yield* this.mapping.get(sheet)!.verticesFromColumn(column) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public* verticesFromRow(sheet: number, row: number): IterableIterator<CellVertex> {
-    yield* this.mapping.get(sheet)!.verticesFromRow(row)
+    yield* this.mapping.get(sheet)!.verticesFromRow(row) // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public destroy(): void {

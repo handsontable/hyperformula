@@ -35,6 +35,33 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(EmptyValue)
   })
 
+  it('getAllValues', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [],
+      Foo: [[1]],
+    })
+
+    expect(engine.getAllSheetsValues()).toEqual({'Foo': [[1]], 'Sheet1': []})
+  })
+
+  it('getAllFormulas', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getAllSheetsFormulas()).toEqual({'Foo': [[undefined]], 'Sheet1': [['=A()']]})
+  })
+
+  it('getAllSerialized', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=A()']],
+      Foo: [[1]],
+    })
+
+    expect(engine.getAllSheetsSerialized()).toEqual({'Foo': [[1]], 'Sheet1': [['=A()']]})
+  })
+
   it('handle different input types', () => {
     const engine = HyperFormula.buildFromArray([['', null, undefined]])
 
@@ -79,7 +106,7 @@ describe('Integration', () => {
   it('#loadSheet - it should build graph without cycle but with formula with error', () => {
     const engine = HyperFormula.buildFromArray([['=A1B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.NAME))
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
   })
 
   it('#loadSheet - dependency before value', () => {
@@ -417,5 +444,35 @@ describe('Integration', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(255)
     expect(engine.getCellValue(adr('C1'))).toBe(10)
     expect(engine.getCellValue(adr('D1'))).toBe(1000000000000)
+  })
+
+  it('should allow to edit invalid formula', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents(adr('A1'), '=SUM(')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+  })
+
+  it('should allow to edit invalid matrix formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ '{=TRANSPOSE(}' ]
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('{=TRANSPOSE(}')
+  })
+
+  it('should propagate parsing errors', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(', '=A1']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
   })
 })

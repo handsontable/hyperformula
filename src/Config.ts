@@ -1,7 +1,8 @@
-import {GPUInternalMode, GPUMode} from 'gpu.js'
+import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, IDate} from './DateHelper'
-import {AlwaysDense, IChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
+import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
@@ -37,43 +38,57 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {ParserConfig} from './parser/ParserConfig'
 
-type PossibleGPUMode = GPUMode | GPUInternalMode
+const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
+  accentSensitive: boolean,
   caseSensitive: boolean,
-  chooseAddressMappingPolicy: IChooseAddressMapping,
+  caseFirst: 'upper' | 'lower' | 'false',
+  chooseAddressMappingPolicy: ChooseAddressMapping,
   dateFormats: string[],
   functionArgSeparator: string,
+  decimalSeparator: '.' | ',',
   language: TranslationPackage,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
-  gpuMode: PossibleGPUMode,
+  gpuMode: GPUMode,
+  ignorePunctuation: boolean,
   leapYear1900: boolean,
+  localeLang: string,
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null,
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null,
   precisionEpsilon: number,
   precisionRounding: number,
   stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
-  nullDate: IDate,
+  nullDate: SimpleDate,
 }
 
-export class Config {
+type ConfigParamsList = keyof ConfigParams
+
+export class Config implements ConfigParams, ParserConfig{
 
   public static defaultConfig: ConfigParams = {
+    accentSensitive: false,
     caseSensitive: false,
+    caseFirst: 'lower',
+    ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
+    decimalSeparator: '.',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
     leapYear1900: false,
     smartRounding: true,
+    localeLang: 'en',
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
@@ -86,6 +101,7 @@ export class Config {
     nullDate: {year: 1899, month: 12, day: 30},
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static defaultPlugins: any[] = [
     SumifPlugin,
     TextPlugin,
@@ -121,38 +137,235 @@ export class Config {
     ErrorFunctionPlugin,
     CorrelPlugin,
   ]
-
+  /**
+   * Specifies if the string comparison is case-sensitive or not.
+   *
+   * Applies to comparison operators only.
+   * 
+   * @default false
+   */
   public readonly caseSensitive: boolean
-  public readonly chooseAddressMappingPolicy: IChooseAddressMapping
+  /**
+   * Determines which address mapping policy will be used. Built in implementations:
+   *
+   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
+   * 
+   * AlwaysDense - will use DenseStrategy for all sheets.
+   * 
+   * AlwaysSparse - will use SparseStrategy for all sheets.
+   * 
+   *  @default AlwaysDense
+   */
+  public readonly chooseAddressMappingPolicy: ChooseAddressMapping
+
+  /**
+   * Specifies if the string comparison is accent sensitive or not.
+   * 
+   * Applies to comparison operators only.
+   * 
+   * @default false
+   */
+  public readonly accentSensitive: boolean
+
+  /**
+   * Allows to define if upper case or lower case should sort first.
+   * 
+   * When set to `false` uses the locale's default.
+   * 
+   * @default 'lower'
+   */
+  public readonly caseFirst: 'upper' | 'lower' | 'false'
+  /**
+   * A list of date formats that are supported by date parsing functions.
+   * 
+   * The separator is ignored and it can be any non-alpha-numeric symbol.
+   * 
+   * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
+   *
+   * @default ['MM/DD/YYYY', 'MM/DD/YY']
+   */
   public readonly dateFormats: string[]
+  /**
+   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]].
+   *
+   * @default ','
+   */
   public readonly functionArgSeparator: string
+  /**
+   * A decimal separator used for parsing numeric literals. 
+   *
+   * Can be either '.' or ',' and must be different from [[functionArgSeparator]].
+   *
+   * @default '.'
+   */
+  public readonly decimalSeparator: '.' | ','
+  /**
+   * Translation package with translations of function and error names.
+   *
+   * @default enGB
+   */
   public readonly language: TranslationPackage
+  /**
+   * A list of additional function plugins to use by formula interpreter.
+   *
+   * @default []
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
-  public readonly gpuMode: PossibleGPUMode
+  /**
+   * Allows to set GPU or CPU for use in matrix calculations.
+   *
+   * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+   *
+   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+   * 
+   * @default 'gpu'
+   */
+  public readonly gpuMode: GPUMode
+  /**
+   * Preserves an option for setting 1900 as a leap year.
+   *
+   * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
+   * 
+   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
+   * 
+   * @default false
+   */
   public readonly leapYear1900: boolean
+  /**
+   * Enables numeric matrix detection feature when set to 'true'.
+   *
+   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
+   * 
+   * Some CRUD operations may break numeric matrices into individual vertices if needed.
+   * 
+   * @default true
+   */
   public readonly matrixDetection: boolean
+  /**
+   * Specifies whether punctuation should be ignored in string comparison.
+   * 
+   * @default false
+   */
+  public readonly ignorePunctuation: boolean
+  /**
+   * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
+   * 
+   * @default 'en'
+   */
+  public readonly localeLang: string
+  /**
+   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
+   * 
+   * @default 100
+   */
   public readonly matrixDetectionThreshold: number
+  /**
+   * Two-digit values when interpreted as a year can be either 19xx or 20xx.
+   *
+   * If `xx <= nullYear` its latter, otherwise its former.
+   * 
+   * @default 30
+   */
   public readonly nullYear: number
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => IDate | null
+  /**
+   * Allows to provide a function that takes a string representing date and parses it into an actual date.
+   *
+   * @default defaultParseDate
+   */
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
+  /**
+   * Allows to provide a function that takes date (represented as a number) and prints it into string.
+   *
+   * @default defaultStringifyDate
+   */
   public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
+  /**
+   * Controls how far two numerical values need to be from each other to be treated as non-equal.
+   *
+   * `a` and `b` are equal if they are of the same sign and:
+   * 
+   * `abs(a) <= (1+precisionEpsilon) * abs(b)`
+   * 
+   * and
+   * 
+   * `abs(b) <= (1+precisionEpsilon) * abs(a)`
+   *
+   * It also controls snap-to-zero behavior for additions/subtractions:
+   * 
+   * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
+   * 
+   * @default 1e-13
+   */
   public readonly precisionEpsilon: number
+  /**
+   * Sets how precise the calculation should be.
+   *
+   * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
+   * 
+   * @default 14
+   */
   public readonly precisionRounding: number
+  /**
+   * Sets the rounding.
+   *
+   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
+   * 
+   * @default true
+   */
   public readonly smartRounding: boolean
+  /**
+   * Switches column search strategy from binary search to column index. 
+   *
+   * Used by VLOOKUP and MATCH procedures.
+   * 
+   * Using column index may improve time efficiency but it will increase memory usage. 
+   * 
+   * In some scenarios column index may fall back to binary search despite of this flag.
+   * 
+   * @default false
+   */
   public readonly useColumnIndex: boolean
+  /**
+   * Determines minimum number of elements a range must have in order to use binary search. 
+   *
+   * Shorter ranges will be searched naively.
+   * 
+   * Used by VLOOKUP and MATCH procedures.
+   * 
+   * @default 20
+   */
   public readonly vlookupThreshold: number
+  /**
+   * Allows to set a specific date from which the number of days will be counted.
+   *
+   * Dates are represented internally as a number of days that passed since this `nullDate`.
+   * 
+   * @default {year: 1899, month: 12, day: 30}
+   * 
+   */
+  public readonly nullDate: SimpleDate
+  /**
+   * Built automatically based on translation package.
+   */
   public readonly errorMapping: Record<string, ErrorType>
-  public readonly nullDate: IDate
+
 
   constructor(
     {
+      accentSensitive,
       caseSensitive,
+      caseFirst,
       chooseAddressMappingPolicy,
       dateFormats,
       functionArgSeparator,
+      decimalSeparator,
       language,
       functionPlugins,
       gpuMode,
+      ignorePunctuation,
       leapYear1900,
+      localeLang,
       smartRounding,
       matrixDetection,
       matrixDetectionThreshold,
@@ -166,29 +379,38 @@ export class Config {
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
-    this.caseSensitive = typeof caseSensitive === 'boolean' ? caseSensitive : Config.defaultConfig.caseSensitive
+    this.accentSensitive = this.valueFromParam(accentSensitive, Config.defaultConfig, 'boolean', 'accentSensitive')
+    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
+    this.caseFirst = this.valueFromParam(caseFirst, Config.defaultConfig, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, Config.defaultConfig, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = typeof dateFormats === 'undefined' ? Config.defaultConfig.dateFormats : dateFormats
-    this.functionArgSeparator = functionArgSeparator || Config.defaultConfig.functionArgSeparator
+    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
+    this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
     this.language = language || Config.defaultConfig.language
+    this.localeLang = this.valueFromParam(localeLang, Config.defaultConfig, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = gpuMode || Config.defaultConfig.gpuMode
-    this.smartRounding = typeof smartRounding === 'boolean' ? smartRounding : Config.defaultConfig.smartRounding
-    this.matrixDetection = typeof matrixDetection === 'boolean' ? matrixDetection : Config.defaultConfig.matrixDetection
-    this.matrixDetectionThreshold = typeof matrixDetectionThreshold === 'number' ? matrixDetectionThreshold : Config.defaultConfig.matrixDetectionThreshold
-    this.nullYear = typeof nullYear === 'number' ? nullYear : Config.defaultConfig.nullYear
-    this.precisionRounding = typeof precisionRounding === 'number' ? precisionRounding : Config.defaultConfig.precisionRounding
-    this.precisionEpsilon = typeof precisionEpsilon === 'number' ? precisionEpsilon : Config.defaultConfig.precisionEpsilon
+    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig, 'number', 'precisionEpsilon')
     if (!this.smartRounding) {
       this.precisionEpsilon = 0
     }
-    this.useColumnIndex = typeof useColumnIndex === 'boolean' ? useColumnIndex : Config.defaultConfig.useColumnIndex
-    this.vlookupThreshold = typeof vlookupThreshold === 'number' ? vlookupThreshold : Config.defaultConfig.vlookupThreshold
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = typeof parseDate === 'function' ? parseDate : Config.defaultConfig.parseDate
-    this.stringifyDate = typeof stringifyDate === 'function' ? stringifyDate : Config.defaultConfig.stringifyDate
-    this.nullDate = typeof nullDate === 'undefined' ? Config.defaultConfig.nullDate : nullDate
-    this.leapYear1900 = typeof leapYear1900 === 'boolean' ? leapYear1900 : Config.defaultConfig.leapYear1900
+    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
+    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfSimpleDate, 'IDate', 'nullDate' )
+    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
+
+    if (this.decimalSeparator === this.functionArgSeparator) {
+      throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+    }
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -199,6 +421,12 @@ export class Config {
     return this.language.errors[functionTranslationKey]
   }
 
+  public numericStringToNumber = (input: string): number => {
+    const normalized = input.replace(this.decimalSeparator, '.')
+    return Number(normalized)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
   }
@@ -232,6 +460,20 @@ export class Config {
     return structuralChangeFunctions
   }
 
+  public functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string> {
+    const functionsWhichDoesNotNeedArgumentsToBeComputed = new Set<string>()
+
+    for (const plugin of this.allFunctionPlugins()) {
+      for (const functionKey in plugin.implementedFunctions) {
+        const pluginFunctionData = plugin.implementedFunctions[functionKey]
+        if (pluginFunctionData.doesNotNeedArgumentsToBeComputed) {
+          functionsWhichDoesNotNeedArgumentsToBeComputed.add(this.getFunctionTranslationFor(pluginFunctionData.translationKey))
+        }
+      }
+    }
+    return functionsWhichDoesNotNeedArgumentsToBeComputed
+  }
+
   public getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {
@@ -247,5 +489,35 @@ export class Config {
       ret[language.errors[key as ErrorType]] = key as ErrorType
       return ret
     }, {} as Record<string, ErrorType>)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
+    if(typeof inputValue === 'undefined') {
+      return baseConfig[paramName]
+    } else if(typeof expectedType === 'string') {
+      if(typeof inputValue === expectedType) {
+        return inputValue
+      } else {
+        throw new ExpectedValueOfType(expectedType, paramName)
+      }
+    } else {
+      if(expectedType.includes(inputValue)) {
+        return inputValue
+      } else {
+        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\''+val+'\'').join(' '), paramName)
+      }
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
+    if (typeCheck(inputValue)) {
+      return inputValue
+    } else if (typeof inputValue === 'undefined') {
+      return baseConfig[paramName]
+    } else {
+      throw new ExpectedValueOfType(expectedType, paramName)
+    }
   }
 }
