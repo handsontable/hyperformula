@@ -476,7 +476,7 @@ export class Config implements ConfigParams, ParserConfig{
     return functionsWhichDoesNotNeedArgumentsToBeComputed
   }
 
-  public getRegisteredFunctions(): Set<String> {
+  public static getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {

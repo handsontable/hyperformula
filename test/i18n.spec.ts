@@ -58,7 +58,7 @@ describe('i18n', () => {
   })
 
   it('all translation packages should translate all implemented functions', () => {
-    const implementedFunctions = (new Config()).getRegisteredFunctions()
+    const implementedFunctions = Config.getRegisteredFunctions()
     implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
     for (const lang in languages) {
