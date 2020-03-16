@@ -249,7 +249,7 @@ export class HyperFormula {
    * @returns key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
-    return genericAllSheetsGetter(this,(arg) => this.getSheetDimensions(arg))
+    return genericAllSheetsGetter(this, (arg) => this.getSheetDimensions(arg))
   }
 
   /**
@@ -274,7 +274,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    return genericAllSheetsGetter(this,(arg) => this.getSheetValues(arg))
+    return genericAllSheetsGetter(this, (arg) => this.getSheetValues(arg))
   }
 
   /**
