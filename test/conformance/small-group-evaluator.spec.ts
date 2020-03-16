@@ -93,7 +93,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
     })
   })
 
-  xit('Functions should support ommiting optional parameters', () => {
+  it('Functions should support ommiting optional parameters', () => {
     const engine = createEngine([
       ['=PV(0.05,10,100,0,1)', '=PV(0.05,10,100,,1)'],
       ['=CONCATENATE("A","","B")', '=CONCATENATE("A",,"B")']
@@ -149,7 +149,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       ])
 
       expect(engine.getCellValue('A1')).toBe(0.1)
-      //expect(engine.getCellValue('B1')).toBe(0.2);
+      expect(engine.getCellValue('B1')).toBe(0.2);
     })
   })
 
@@ -163,7 +163,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
       ])
       //return number as logical, TRUE for <>0, FALSE for 0
       expect(engine.getCellValue('A1')).toBe(false)
-      //expect(engine.getCellValue('B1')).toBe(true) 
+      expect(engine.getCellValue('B1')).toBe(true) 
       expect(engine.getCellValue('C1')).toBe(true)
       expect(engine.getCellValue('D1')).toBe(false)
       // return logical as logical
@@ -200,7 +200,7 @@ describe('ODFF 1.3 Small Group Evaluator', () => {
     })
   })
 
-  xdescribe('Section D', () => {
+  describe('Section D', () => {
     it('6.3.5 Infix Operator Ordered Comparison ("<", "<=", ">", ">=")', () => {
       const engine = createEngine([
         ['=1<2', '=2<2'],

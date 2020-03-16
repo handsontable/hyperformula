@@ -15,13 +15,13 @@ function createEngine(sheetData: any[][], config?: Config) {
   }
 }
 
-xdescribe('Conversion to logical', () => {
+describe('Conversion to logical', () => {
   it('simple TRUE() should return TRUE', () => {
     const engine = createEngine([
       ['=TRUE()']
     ])
     
-    expect(engine.getCellValue('A1')).toBe('TRUE')
+    expect(engine.getCellValue('A1')).toBe(true)
   })
 
   it('simple FALSE() should return FALSE', () => {
@@ -29,7 +29,7 @@ xdescribe('Conversion to logical', () => {
       ['=FALSE()']
     ])
     
-    expect(engine.getCellValue('A1')).toBe('FALSE')
+    expect(engine.getCellValue('A1')).toBe(false)
   })
 
   it('simple TRUE() should return TRUE with caseSensetive', () => {
@@ -37,7 +37,7 @@ xdescribe('Conversion to logical', () => {
       ['=TRUE()']],
     new Config({ caseSensitive: true }))
     
-    expect(engine.getCellValue('A1')).toBe('TRUE')
+    expect(engine.getCellValue('A1')).toBe(true)
   })
 
   it('simple FALSE() should return FALSE with caseSensetive', () => {
@@ -45,22 +45,22 @@ xdescribe('Conversion to logical', () => {
       ['=FALSE()']],
     new Config({ caseSensitive: true }))
     
-    expect(engine.getCellValue('A1')).toBe('FALSE')
+    expect(engine.getCellValue('A1')).toBe(false)
   })
 
   it('string concat with logical function TRUE', () => {
     const engine = createEngine([
       ['="foo"&TRUE()']
     ])
-    expect(engine.getCellValue('A1')).toBe('fooTRUE')
+    expect(engine.getCellValue('A1')).toBe('footrue')
   })
 
-  it('string concat with logical function FALSE', () => {
+  xit('string concat with logical function FALSE', () => {
     const engine = createEngine([
-      ['="foo"&TRUE()']
+      ['="foo"&FALSE()']
 
     ])
-    expect(engine.getCellValue('A2')).toBe('fooTRUE')
+    expect(engine.getCellValue('A2')).toBe('foofalse') //return Symbol()
   })
 
   it('string concat with logical function FALSE', () => {
@@ -68,7 +68,7 @@ xdescribe('Conversion to logical', () => {
       ['=FALSE()'],
       ['="foo"&A1'],
     ])
-    expect(engine.getCellValue('A2')).toBe('fooFALSE')
+    expect(engine.getCellValue('A2')).toBe('foofalse')
   })
 
 

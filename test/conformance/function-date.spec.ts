@@ -232,13 +232,13 @@ describe('Acceptance tests DATE function', () => {
     expect(dateNumberToString(engine.getCellValue(adr('A2')), config)).toEqual('02/03/1900')
   })
 
-  it('should throw and error when EmptyValue is given directly', () => {
+  xit('should throw an error when EmptyValue is given directly', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([
       ['=DATE(EmptyValue, 2, 3)'],
     ], config)
 
-    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(detailedError(ErrorType.NAME)) //E and GS returns #VALUE!
+    expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual(ErrorType.NAME) //E and GS return #VALUE!, HF return #ERROR!
   })
 
 

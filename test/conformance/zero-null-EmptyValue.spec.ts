@@ -35,12 +35,12 @@ describe('Quality assurance of comparision of 0, null and EmptyValue', () => {
       [0, null, ...data]
     ])
 
-    //expect(engine.getCellValue('C1')).toEqual(true) // EQUAL
-    //expect(engine.getCellValue('D1')).toEqual(false) // GT    
+    expect(engine.getCellValue('C1')).toEqual(true) // EQUAL
+    expect(engine.getCellValue('D1')).toEqual(false) // GT    
     expect(engine.getCellValue('E1')).toEqual(false) // LT   true
     expect(engine.getCellValue('F1')).toEqual(true) // GTE   false
-    //expect(engine.getCellValue('G1')).toEqual(true) // LTE  false
-    //expect(engine.getCellValue('H1')).toEqual(false) // NOT EQUAL true
+    expect(engine.getCellValue('G1')).toEqual(true) // LTE  false
+    expect(engine.getCellValue('H1')).toEqual(false) // NOT EQUAL true
     expect(engine.getCellValue('I1')).toEqual(0) // ADD 
     expect(engine.getCellValue('J1')).toEqual(0) // SUB   
     expect(engine.getCellValue('K1')).toEqual(0) // MULT  
@@ -60,13 +60,12 @@ describe('Quality assurance of comparision of 0, null and EmptyValue', () => {
     expect(engine.getCellValue('A1')).toEqual(0) 
     expect(engine.getCellValue('B1')).toEqual(EmptyValue) 
     expect(engine.getCellValue('A2')).toEqual(EmptyValue) 
-    
-    //expect(engine.getCellValue('C1')).toEqual(true) // EQUAL
-    //expect(engine.getCellValue('D1')).toEqual(false) // GT    
-    //expect(engine.getCellValue('E1')).toEqual(false) // LT   true
-    //expect(engine.getCellValue('F1')).toEqual(true) // GTE   false
-    //expect(engine.getCellValue('G1')).toEqual(true) // LTE  
-    //expect(engine.getCellValue('H1')).toEqual(false) // NOT EQUAL true
+    expect(engine.getCellValue('C1')).toEqual(true) // EQUAL
+    expect(engine.getCellValue('D1')).toEqual(false) // GT    
+    expect(engine.getCellValue('E1')).toEqual(false) // LT   
+    expect(engine.getCellValue('F1')).toEqual(true) // GTE   
+    expect(engine.getCellValue('G1')).toEqual(true) // LTE  
+    expect(engine.getCellValue('H1')).toEqual(false) // NOT EQUAL 
     expect(engine.getCellValue('I1')).toEqual(0) // ADD 
     expect(engine.getCellValue('J1')).toEqual(0) // SUB   
     expect(engine.getCellValue('K1')).toEqual(0) // MULT  
@@ -85,7 +84,7 @@ describe('Quality assurance of comparision of 0, null and EmptyValue', () => {
     
     expect(engine.getCellValue('C1')).toEqual(true)  // EQUAL
     expect(engine.getCellValue('D1')).toEqual(false) // GT    
-    //expect(engine.getCellValue('E1')).toEqual(true) // LT   false
+    expect(engine.getCellValue('E1')).toEqual(false) // LT   
     expect(engine.getCellValue('F1')).toEqual(true) // GTE   
     expect(engine.getCellValue('G1')).toEqual(true) // LTE  
     expect(engine.getCellValue('H1')).toEqual(false) // NOT EQUAL 
@@ -93,7 +92,7 @@ describe('Quality assurance of comparision of 0, null and EmptyValue', () => {
     expect(engine.getCellValue('J1')).toEqual(0) // SUB   
     expect(engine.getCellValue('K1')).toEqual(0) // MULT  
     expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.DIV_BY_ZERO), '#DIV/0!')) // DIV 
-    expect(engine.getCellValue('M1')).toEqual(1) // EXP  //like GS, but is 0 in E
+    expect(engine.getCellValue('M1')).toEqual(1) // EXP  
     expect(engine.getCellValue('N1')).toEqual('00') // CONCAT
   })
 

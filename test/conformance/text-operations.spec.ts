@@ -107,7 +107,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
   })
 
-  xit('"jaźŃ", "ąęćńóśżź" should be supported by all operators', () => { //pending on #225
+  it('"jaźŃ", "ąęćńóśżź" should be supported by all operators', () => { //pending on #225
     const engine = HyperFormula.buildFromArray([
       ['jaźŃ', 'ąęćńóśżź', ...data],
     ], new Config({ caseSensitive : true, language: plPL}))
@@ -189,28 +189,9 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('aaaAAa') // CONCAT
   })
 
-  xit('"AAa", "aaa" should be supported by all operators with case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['AAa', 'aaa', ...data],
-    ], new Config({ caseSensitive : true }))
-
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
-    //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
-    //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
-    //expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
-    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
-    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
-    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
-    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
-    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
-    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP 
-    expect(engine.getCellValue(adr('N1'))).toEqual('AAaaaa') // CONCAT
-  })
-
   it('"AAa", "aaa" should be supported by all operators with case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
-      ['aaa', 'AAa', ...data],
+      ['AAa', 'aaa', ...data],
     ], new Config({ caseSensitive : true }))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
@@ -224,19 +205,38 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
     expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
     expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP 
+    expect(engine.getCellValue(adr('N1'))).toEqual('AAaaaa') // CONCAT
+  })
+
+  it('"aaa", "AAa" should be supported by all operators with case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['aaa', 'AAa', ...data],
+    ], new Config({ caseSensitive : true }))
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //DIV
+    expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //EXP 
     expect(engine.getCellValue(adr('N1'))).toEqual('aaaAAa') // CONCAT
   })
   
-  xit('"A", "a" should be supported by all operators with case sensitive', () => {
+  it('"A", "a" should be supported by all operators with case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['A', 'a', ...data],
     ], new Config({ caseSensitive : true }))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
-    //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
-    //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
-    //expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // SUB
@@ -510,7 +510,7 @@ xdescribe('Escaped strings', () => {
     ], new Config({ caseSensitive : false }))
     
     expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
     expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
@@ -529,7 +529,7 @@ xdescribe('Escaped strings', () => {
     ], new Config({ caseSensitive : true }))
     
     expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
     expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
@@ -545,7 +545,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
   
-  it('"Hello \"World\"." vs. "'Hello \\\"World\\\".'"' should handle comparison operationswithout case sensitive', () => { 
+  it('"Hello \"World\"." vs. 1 should handle comparison operationswithout case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
@@ -564,7 +564,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \"World\".Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('"Hello \"World\"." vs. "'Hello \\\"World\\\".'"' should handle comparison operations with case sensitive', () => { 
+  it('"Hello \"World\"." vs. 2 should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['Hello \"World\".', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
@@ -592,7 +592,7 @@ xdescribe('Escaped strings', () => {
     ], new Config({ caseSensitive : false }))
     
     expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
     //expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
@@ -614,7 +614,7 @@ xdescribe('Escaped strings', () => {
     ], new Config({ caseSensitive : true }))
     
     expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
+    expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
     //expect(engine.getCellValue(adr('G1'))).toEqual(true) // LTE
@@ -666,12 +666,12 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('"\'Hello \\"World\\".\'" vs. Hello \\\"World\\\".'  should handle comparison operations without case sensitive', () => { 
+  it('"\'Hello \\"World\\".\'" vs. 3  should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ['\'Hello \\"World\\".\'', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
     
-    //expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
@@ -690,7 +690,7 @@ xdescribe('Escaped strings', () => {
       ['\'Hello \\"World\\".\'', "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
     
-    //expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqual(false) // GT
     //expect(engine.getCellValue(adr('E1'))).toEqual(true) // LT
     //expect(engine.getCellValue(adr('F1'))).toEqual(false) // GTE
@@ -704,7 +704,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it(' "''Hello \\\"World\\\".'"' vs. 'Hello \"World\".'' should handle comparison operations without case sensitive', () => { 
+  it('1 vs. 2 should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : false }))
@@ -726,7 +726,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
 
-  it(' ''Hello \\\"World\\\". vs. "Hello \"World\"." should handle comparison operations with case sensitive', () => { 
+  it('Hello \\\"World\\\". vs. 2 should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", 'Hello \"World\".', ...data],
     ], new Config({ caseSensitive : true }))
@@ -745,12 +745,12 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \"World\".") // CONCAT
   })
 
-  it('"Hello \\\"World\\\".'" vs. \'Hello \\World\\".\' should handle comparison operations without case sensitive', () => { 
+  it('1 vs. \'Hello \\World\\".\' should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : false }))
     
-    //expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
     //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
     expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
@@ -769,7 +769,7 @@ xdescribe('Escaped strings', () => {
       ["'Hello \\\"World\\\".'", '\'Hello \\"World\\".\'', ...data],
     ], new Config({ caseSensitive : true }))
     
-    //expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
+    expect(engine.getCellValue(adr('C1'))).toEqual(false) // EQUAL
     //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
     expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
     expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
@@ -783,7 +783,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it('"Hello \\\"World\\\".'" vs. 'Hello \\\"World\\\".' should handle comparison operations without case sensitive', () => { 
+  it('"Hello \\\"World\\\"." vs. 2 should handle comparison operations without case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : false }))
@@ -802,7 +802,7 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 
-  it(' "Hello \\\"World\\\"." vs. "Hello \\\"World\\\".'" should handle comparison operations with case sensitive', () => { 
+  it(' "Hello \\\"World\\\"." vs. "Hello \\\"World\\\". should handle comparison operations with case sensitive', () => { 
     const engine = HyperFormula.buildFromArray([
       ["'Hello \\\"World\\\".'", "'Hello \\\"World\\\".'", ...data],
     ], new Config({ caseSensitive : true }))
@@ -821,4 +821,6 @@ xdescribe('Escaped strings', () => {
     expect(engine.getCellValue(adr('N1'))).toEqual("Hello \\\"World\\\".'Hello \\\"World\\\".'") // CONCAT
   })
 })
+
+
 
