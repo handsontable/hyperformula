@@ -378,33 +378,32 @@ export class Config implements ConfigParams, ParserConfig{
       vlookupThreshold,
       nullDate,
     }: Partial<ConfigParams> = {},
-    fallback: ConfigParams = Config.defaultConfig
   ) {
-    this.accentSensitive = this.valueFromParam(accentSensitive, fallback, 'boolean', 'accentSensitive')
-    this.caseSensitive = this.valueFromParam(caseSensitive, fallback, 'boolean', 'caseSensitive')
-    this.caseFirst = this.valueFromParam(caseFirst, fallback, ['upper', 'lower', 'false'], 'caseFirst')
-    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, fallback, 'boolean', 'ignorePunctuation')
-    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || fallback.chooseAddressMappingPolicy
-    this.dateFormats = this.valueFromParamCheck(dateFormats, fallback, Array.isArray, 'array', 'dateFormats')
-    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, fallback, 'string', 'functionArgSeparator')
-    this.decimalSeparator = this.valueFromParam(decimalSeparator, fallback, ['.', ','], 'decimalSeparator')
-    this.language = language || fallback.language
-    this.localeLang = this.valueFromParam(localeLang, fallback, 'string', 'localeLang')
-    this.functionPlugins = functionPlugins || fallback.functionPlugins
-    this.gpuMode = this.valueFromParam(gpuMode, fallback, PossibleGPUModeString, 'gpuMode')
-    this.smartRounding = this.valueFromParam(smartRounding, fallback, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, fallback, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, fallback, 'number', 'matrixDetectionThreshold')
-    this.nullYear = this.valueFromParam(nullYear, fallback, 'number', 'nullYear')
-    this.precisionRounding = this.valueFromParam(precisionRounding, fallback, 'number', 'precisionRounding')
-    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, fallback, 'number', 'precisionEpsilon')
-    this.useColumnIndex = this.valueFromParam(useColumnIndex, fallback, 'boolean', 'useColumnIndex')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, fallback, 'number', 'vlookupThreshold')
+    this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
+    this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
+    this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
+    this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
+    this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.language = language || Config.defaultConfig.language
+    this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
+    this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
+    this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, fallback, 'function', 'parseDate')
-    this.stringifyDate = this.valueFromParam(stringifyDate, fallback, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, fallback, instanceOfSimpleDate, 'IDate', 'nullDate' )
-    this.leapYear1900 = this.valueFromParam(leapYear1900, fallback, 'boolean', 'leapYear1900')
+    this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
+    this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate' )
+    this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
@@ -500,9 +499,9 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
+  private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList ) {
     if(typeof inputValue === 'undefined') {
-      return baseConfig[paramName]
+      return Config.defaultConfig[paramName]
     } else if(typeof expectedType === 'string') {
       if(typeof inputValue === expectedType) {
         return inputValue
@@ -519,11 +518,11 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
+  private valueFromParamCheck(inputValue: any,  typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue
     } else if (typeof inputValue === 'undefined') {
-      return baseConfig[paramName]
+      return Config.defaultConfig[paramName]
     } else {
       throw new ExpectedValueOfType(expectedType, paramName)
     }
