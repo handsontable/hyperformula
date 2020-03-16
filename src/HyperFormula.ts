@@ -131,7 +131,7 @@ export class HyperFormula {
 
   constructor(
     /** Engine configuration. */
-    public config: Config,
+    private config: Config,
     /** Statistics module for benchmarking. */
     private stats: Statistics,
     /** Dependency graph storing sheets structure. */
