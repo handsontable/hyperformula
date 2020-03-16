@@ -135,7 +135,7 @@ export class HyperFormula {
     /** Statistics module for benchmarking. */
     public stats: Statistics,
     /** Dependency graph storing sheets structure. */
-    public dependencyGraph: DependencyGraph,
+    private dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
     public columnSearch: ColumnSearchStrategy,
     /** Parser with caching. */
