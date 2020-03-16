@@ -2,8 +2,13 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
-import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
-import {coerceBooleanToNumber, coerceNonDateScalarToMaybeNumber, coerceToRange} from '../coerce'
+import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser'
+import {
+  coerceNonDateScalarToMaybeNumber,
+  coerceScalarToNumberOrError,
+  coerceToMaybeNumber,
+  coerceToRange
+} from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
 import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
@@ -15,14 +20,6 @@ export type MapOperation<T> = (arg: InternalCellValue) => T
 
 function idMap(arg: InternalCellValue): InternalCellValue {
   return arg
-}
-
-function booleanToNumber(arg: InternalCellValue): InternalCellValue {
-  if(typeof arg === 'boolean') {
-    return coerceBooleanToNumber(arg)
-  } else {
-    return arg
-  }
 }
 
 function square(arg: InternalCellValue): InternalCellValue {
@@ -291,17 +288,21 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param initialAccValue - initial accumulator value for reducing function
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
+   * @param mapFunction
    * */
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
       if (arg.type === AstNodeType.CELL_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
+      } else if (arg.type === AstNodeType.CELL_REFERENCE) {
+        value = this.evaluateReferenceAsRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
         if (value instanceof SimpleRangeValue) {
           value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()).map(mapFunction), initialAccValue, reducingFunction)
         } else {
+          value = coerceScalarToNumberOrError(value, this.interpreter.dateHelper)
           value = mapFunction(value)
         }
       }
@@ -334,7 +335,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst , formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
@@ -347,6 +348,32 @@ export class NumericAggregationPlugin extends FunctionPlugin {
     }
     const rangeStart = ast.start.toSimpleCellAddress(formulaAddress)
     const rangeEnd = ast.end.toSimpleCellAddress(formulaAddress)
+    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
+    assert.ok(rangeVertex, 'Range does not exists in graph')
+
+    let value = rangeVertex.getFunctionValue(functionName) as T
+    if (!value) {
+      const rangeValues = this.getRangeValues(functionName, range, mapFunction)
+      value = this.reduceRange(rangeValues, initialAccValue, reducingFunction)
+      rangeVertex.setFunctionValue(functionName, value)
+    }
+
+    return value
+  }
+
+  /**
+   * Performs range operation on a single cell reference
+   *
+   * @param ast - cell range ast
+   * @param formulaAddress - address of the cell in which formula is located
+   * @param initialAccValue - initial accumulator value for reducing function
+   * @param functionName - function name to use as cache key
+   * @param reducingFunction - reducing function
+   */
+  private evaluateReferenceAsRange<T>(ast: CellReferenceAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+    const range = AbsoluteCellRange.singleRangeFromCellAddress(ast.reference, formulaAddress)
+    const rangeStart = ast.reference.toSimpleCellAddress(formulaAddress)
+    const rangeEnd = ast.reference.toSimpleCellAddress(formulaAddress)
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
     assert.ok(rangeVertex, 'Range does not exists in graph')
 
