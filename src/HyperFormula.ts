@@ -376,32 +376,8 @@ export class HyperFormula implements TypedEmitter {
    * @returns an array of [[ExportedChange]]
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
-    if (!(cellContents instanceof Array)) {
-      this.crudOperations.setCellContent(topLeftCornerAddress, cellContents)
-      return this.recomputeIfDependencyGraphNeedsIt()
-    }
-    for (let i = 0; i < cellContents.length; i++) {
-      if (!(cellContents[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays or a raw cell value.')
-      }
-      for (let j = 0; j < cellContents[i].length; j++) {
-        if (isMatrix(cellContents[i][j])) {
-          throw new Error('Cant change matrices in batch operation')
-        }
-      }
-    }
-
-    return this.batch((e) => {
-      for (let i = 0; i < cellContents.length; i++) {
-        for (let j = 0; j < cellContents[i].length; j++) {
-          e.setCellContent({
-            sheet: topLeftCornerAddress.sheet,
-            row: topLeftCornerAddress.row + i,
-            col: topLeftCornerAddress.col + j,
-          }, cellContents[i][j])
-        }
-      }
-    })
+    this.crudOperations.setCellContents(topLeftCornerAddress, cellContents)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
