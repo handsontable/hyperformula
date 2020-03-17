@@ -7,7 +7,6 @@ import {GraphBuilder} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {getAllSheetsSerializedWithLanguageFromEngine} from './Serialization'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
@@ -24,7 +23,10 @@ export class RebuildEngineWithConfigFactory {
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
-    const sheets = getAllSheetsSerializedWithLanguageFromEngine(oldEngine, newParams.language ? newParams.language : config.language)
+
+    const language = newParams.language ? newParams.language : config.language
+    const configNewLanguage = oldEngine.config.mergeConfig( {language} )
+    const sheets = oldEngine.serialization.withNewConfig(configNewLanguage).getAllSheetsSerializedFromEngine()
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])

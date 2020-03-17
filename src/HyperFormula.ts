@@ -40,9 +40,7 @@ import {
 } from './parser'
 import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {
-  genericAllSheetsGetter, genericSheetGetter,
-  getCellFormulaFromEngine,
-  getCellSerializedFromEngine
+  Serialization
 } from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
@@ -128,6 +126,7 @@ export class HyperFormula {
   private exporter: Exporter
   private namedExpressions: NamedExpressions
   private readonly emitter: TinyEmitter = new TinyEmitter()
+  public serialization: Serialization
 
   constructor(
     /** Engine configuration. */
@@ -152,6 +151,7 @@ export class HyperFormula {
     undoRedo.crudOperations = this.crudOperations
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
+    this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
   }
 
   /**
@@ -164,7 +164,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.serialization.getCellValueFromEngine(address)
   }
 
   /**
@@ -177,7 +177,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
-    return getCellFormulaFromEngine(this, address, this.unparser)
+    return this.serialization.getCellFormulaFromEngine(address)
   }
 
   /**
@@ -192,7 +192,7 @@ export class HyperFormula {
    * @returns a [[CellValue]] which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
-    return getCellSerializedFromEngine(this, address, this.unparser)
+    return this.serialization.getCellSerializedFromEngine(address)
   }
 
   /**
@@ -205,7 +205,7 @@ export class HyperFormula {
    * @param {number} sheet - sheet ID number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    return genericSheetGetter(this, sheet, (arg) => this.getCellValue(arg))
+    return this.serialization.genericSheetGetter(sheet, (arg) => this.getCellValue(arg))
   }
 
   /**
@@ -218,7 +218,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return genericSheetGetter(this, sheet, (arg) => this.getCellFormula(arg))
+    return this.serialization.genericSheetGetter(sheet, (arg) => this.getCellFormula(arg))
   }
 
   /**
@@ -231,7 +231,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
-    return genericSheetGetter(this, sheet, (arg) => this.getCellSerialized(arg))
+    return this.serialization.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
   /**
@@ -242,7 +242,7 @@ export class HyperFormula {
    * @returns key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
-    return genericAllSheetsGetter(this, (arg) => this.getSheetDimensions(arg))
+    return this.serialization.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
   }
 
   /**
@@ -267,7 +267,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    return genericAllSheetsGetter(this, (arg) => this.getSheetValues(arg))
+    return this.serialization.genericAllSheetsGetter((arg) => this.getSheetValues(arg))
   }
 
   /**
@@ -276,7 +276,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
-    return genericAllSheetsGetter(this, (arg) => this.getSheetFormulas(arg))
+    return this.serialization.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
   /**
@@ -285,7 +285,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
-    return genericAllSheetsGetter(this, (arg) => this.getSheetSerialized(arg))
+    return this.serialization.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
   /**
@@ -307,6 +307,7 @@ export class HyperFormula {
     this.evaluator = newEngine.evaluator
     this.lazilyTransformingAstService = newEngine.lazilyTransformingAstService
     this.undoRedo = newEngine.undoRedo
+    this.serialization = newEngine.serialization
   }
 
   /**
