@@ -83,7 +83,7 @@ export class ExpectedOneOfValues extends Error {
   }
 }
 
-export class PendingComputationError extends Error {
+export class EvaluationSuspendedError extends Error {
   constructor() {
     super('Computations are suspended')
   }

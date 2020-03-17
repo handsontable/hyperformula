@@ -23,7 +23,7 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, PendingComputationError} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -171,7 +171,7 @@ export class HyperFormula implements TypedEmitter {
 
   private ensureComputationIsNotSuspended() {
     if (this.evaluationSuspended) {
-      throw new PendingComputationError()
+      throw new EvaluationSuspendedError()
     }
   }
 

@@ -1,4 +1,4 @@
-import {HyperFormula, PendingComputationError, ExportedCellChange} from '../src'
+import {HyperFormula, EvaluationSuspendedError, ExportedCellChange} from '../src'
 import './testConfig'
 import {adr} from './testUtils'
 
@@ -22,7 +22,7 @@ describe('Evaluation suspension', () => {
 
     expect(() => {
       engine.getCellValue(adr('C1'))
-    }).toThrow(new PendingComputationError())
+    }).toThrow(new EvaluationSuspendedError())
   })
 
   it('when evaluation is stopped, #getCellFormula is possible', () => {
