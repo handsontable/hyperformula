@@ -125,7 +125,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return add(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
+        return add(coerceScalarToNumberOrError(leftResult, this.dateHelper, this.numberLiteralsHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper, this.numberLiteralsHelper),
           this.config.smartRounding ? this.config.precisionEpsilon : 0)
       }
       case AstNodeType.MINUS_OP: {
@@ -143,7 +143,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return subtract(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper),
+        return subtract(coerceScalarToNumberOrError(leftResult, this.dateHelper, this.numberLiteralsHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper, this.numberLiteralsHelper),
           this.config.smartRounding ? this.config.precisionEpsilon : 0)
       }
       case AstNodeType.TIMES_OP: {
@@ -161,7 +161,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return multiply(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
+        return multiply(coerceScalarToNumberOrError(leftResult, this.dateHelper, this.numberLiteralsHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper, this.numberLiteralsHelper))
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -178,7 +178,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return power(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
+        return power(coerceScalarToNumberOrError(leftResult, this.dateHelper, this.numberLiteralsHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper, this.numberLiteralsHelper))
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -195,7 +195,7 @@ export class Interpreter {
         if (rightResult instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        return divide(coerceScalarToNumberOrError(leftResult, this.dateHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper))
+        return divide(coerceScalarToNumberOrError(leftResult, this.dateHelper, this.numberLiteralsHelper), coerceScalarToNumberOrError(rightResult, this.dateHelper, this.numberLiteralsHelper))
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, formulaAddress)
@@ -210,7 +210,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return unaryminus(coerceScalarToNumberOrError(result, this.dateHelper))
+          return unaryminus(coerceScalarToNumberOrError(result, this.dateHelper, this.numberLiteralsHelper))
         }
       }
       case AstNodeType.PERCENT_OP: {
@@ -218,7 +218,7 @@ export class Interpreter {
         if (result instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         } else {
-          return percent(coerceScalarToNumberOrError(result, this.dateHelper))
+          return percent(coerceScalarToNumberOrError(result, this.dateHelper, this.numberLiteralsHelper))
         }
       }
       case AstNodeType.FUNCTION_CALL: {

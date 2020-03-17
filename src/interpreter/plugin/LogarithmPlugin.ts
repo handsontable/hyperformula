@@ -43,12 +43,12 @@ export class LogarithmPlugin extends FunctionPlugin {
         if (logarithmicBase instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        coercedLogarithmicBase = coerceScalarToNumberOrError(logarithmicBase, this.interpreter.dateHelper)
+        coercedLogarithmicBase = coerceScalarToNumberOrError(logarithmicBase, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
       } else {
         coercedLogarithmicBase = 10
       }
 
-      const coercedArg = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+      const coercedArg = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
       if (coercedArg instanceof CellError) {
         return coercedArg
       } else if (coercedLogarithmicBase instanceof CellError) {

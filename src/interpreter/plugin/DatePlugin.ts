@@ -57,9 +57,9 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedYear = coerceScalarToNumberOrError(year, this.interpreter.dateHelper)
-    const coercedMonth = coerceScalarToNumberOrError(month, this.interpreter.dateHelper)
-    const coercedDay = coerceScalarToNumberOrError(day, this.interpreter.dateHelper)
+    const coercedYear = coerceScalarToNumberOrError(year, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const coercedMonth = coerceScalarToNumberOrError(month, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const coercedDay = coerceScalarToNumberOrError(day, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
 
     if (coercedYear instanceof CellError) {
       return coercedYear
@@ -101,7 +101,7 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
@@ -110,7 +110,7 @@ export class DatePlugin extends FunctionPlugin {
     if (numberOfMonthsToShiftValue instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const numberOfMonthsToShift = coerceScalarToNumberOrError(numberOfMonthsToShiftValue, this.interpreter.dateHelper)
+    const numberOfMonthsToShift = coerceScalarToNumberOrError(numberOfMonthsToShiftValue, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (numberOfMonthsToShift instanceof CellError) {
       return numberOfMonthsToShift
     }
@@ -128,7 +128,7 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
@@ -144,7 +144,7 @@ export class DatePlugin extends FunctionPlugin {
     if (endDate instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const endDateNumber = coerceScalarToNumberOrError(endDate, this.interpreter.dateHelper)
+    const endDateNumber = coerceScalarToNumberOrError(endDate, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (endDateNumber instanceof CellError) {
       return endDateNumber
     }
@@ -153,7 +153,7 @@ export class DatePlugin extends FunctionPlugin {
     if (startDate instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const startDateNumber = coerceScalarToNumberOrError(startDate, this.interpreter.dateHelper)
+    const startDateNumber = coerceScalarToNumberOrError(startDate, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (startDateNumber instanceof CellError) {
       return startDateNumber
     }
@@ -178,7 +178,7 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
@@ -203,7 +203,7 @@ export class DatePlugin extends FunctionPlugin {
     if (arg instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+    const dateNumber = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
@@ -230,7 +230,7 @@ export class DatePlugin extends FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const numberRepresentation = coerceScalarToNumberOrError(dateArg, this.interpreter.dateHelper)
+    const numberRepresentation = coerceScalarToNumberOrError(dateArg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
     if (numberRepresentation instanceof CellError) {
       return numberRepresentation
     }

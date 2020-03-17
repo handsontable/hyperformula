@@ -167,12 +167,12 @@ export class RoundingPlugin extends FunctionPlugin {
         if (places instanceof SimpleRangeValue) {
           return new CellError(ErrorType.VALUE)
         }
-        coercedPlaces = coerceScalarToNumberOrError(places, this.interpreter.dateHelper)
+        coercedPlaces = coerceScalarToNumberOrError(places, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
       } else {
         coercedPlaces = 0
       }
 
-      const coercedNumberToRound = coerceScalarToNumberOrError(numberToRound, this.interpreter.dateHelper)
+      const coercedNumberToRound = coerceScalarToNumberOrError(numberToRound, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
       if (coercedNumberToRound instanceof CellError) {
         return coercedNumberToRound
       } else if (coercedPlaces instanceof CellError) {

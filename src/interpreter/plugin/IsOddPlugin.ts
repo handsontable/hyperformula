@@ -20,7 +20,7 @@ export class IsOddPlugin extends FunctionPlugin {
         return new CellError(ErrorType.VALUE)
       }
 
-      const coercedValue = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+      const coercedValue = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
       if (coercedValue instanceof CellError) {
         return coercedValue
       } else {
