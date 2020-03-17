@@ -23,7 +23,7 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, PendingComputationError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -126,6 +126,7 @@ export class HyperFormula implements TypedEmitter {
   private namedExpressions: NamedExpressions
   private readonly emitter: Emitter = new Emitter()
   public serialization: Serialization
+  private computationSuspended: boolean
 
   constructor(
     /** Engine configuration. */
@@ -151,6 +152,7 @@ export class HyperFormula implements TypedEmitter {
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
     this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
+    this.computationSuspended = false
   }
 
   /**
@@ -163,7 +165,14 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
+    this.ensureComputationIsNotSuspended()
     return this.serialization.getCellValue(address)
+  }
+
+  private ensureComputationIsNotSuspended() {
+    if (this.computationSuspended) {
+      throw new PendingComputationError()
+    }
   }
 
   /**
@@ -1129,6 +1138,10 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public suspendComputation(): void {
+    this.computationSuspended = true
+  }
+
   /**
    * Adds a specified named expression.
    * 
@@ -1337,20 +1350,24 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
-    const changes = this.crudOperations.getAndClearContentChanges()
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-    this.dependencyGraph.clearRecentlyChangedVertices()
+    if (!this.computationSuspended) {
+      const changes = this.crudOperations.getAndClearContentChanges()
+      const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+      this.dependencyGraph.clearRecentlyChangedVertices()
 
-    if (verticesToRecomputeFrom.length > 0) {
-      changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+      if (verticesToRecomputeFrom.length > 0) {
+        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+      }
+
+      const exportedChanges = changes.exportChanges(this.exporter)
+
+      if (!changes.isEmpty()) {
+        this.emitter.emit(Events.ValuesUpdated, exportedChanges)
+      }
+
+      return exportedChanges
+    } else {
+      return []
     }
-
-    const exportedChanges = changes.exportChanges(this.exporter)
-
-    if (!changes.isEmpty()) {
-      this.emitter.emit(Events.ValuesUpdated, exportedChanges)
-    }
-
-    return exportedChanges
   }
 }
