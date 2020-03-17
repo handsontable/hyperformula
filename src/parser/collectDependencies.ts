@@ -1,4 +1,4 @@
-import {Ast, AstNodeType, CellAddress, RelativeDependency} from './'
+import {Ast, AstNodeType, RelativeDependency} from './'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {

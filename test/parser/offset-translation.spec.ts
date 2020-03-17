@@ -1,5 +1,6 @@
-import {CellError, Config} from '../../src'
+import {CellError} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst, ParserWithCaching} from '../../src/parser'

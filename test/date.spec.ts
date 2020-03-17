@@ -1,4 +1,4 @@
-import {Config} from '../src'
+import {Config} from '../src/Config'
 import {DateHelper, SimpleDate} from '../src/DateHelper'
 import moment from 'moment'
 

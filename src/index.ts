@@ -1,6 +1,5 @@
 import { CellError, EmptyValue } from './Cell'
 import { CellValue, DetailedCellError, ExportedCellChange, ExportedNamedExpressionChange } from './CellValue'
-import {Config} from './Config'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -13,7 +12,6 @@ import {HyperFormula} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 class HyperFormulaNS extends HyperFormula {
-  public static Config = Config
   public static HyperFormula = HyperFormula
   public static NoSheetWithIdError = NoSheetWithIdError
   public static InvalidAddressError = InvalidAddressError
@@ -29,7 +27,6 @@ export default HyperFormulaNS
 
 export {
   Sheets,
-  Config,
   HyperFormula,
   NoSheetWithIdError,
   InvalidAddressError,

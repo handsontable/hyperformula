@@ -1,8 +1,8 @@
-import {Config} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
-import {AstNodeType, CellAddress, ErrorAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
+import {AstNodeType, ErrorAst, ParserWithCaching, ParsingErrorType} from '../../src/parser'
 
 describe('Parsing error literals', () => {
   it('should parse error literals', () => {

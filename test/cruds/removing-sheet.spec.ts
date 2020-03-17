@@ -1,4 +1,4 @@
-import {Config, HyperFormula, ExportedCellChange} from '../../src'
+import {HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -125,7 +125,7 @@ describe('remove sheet', () => {
       Sheet1: [
         ['1', '2'],
       ],
-    }, new Config({ matrixDetection: true, matrixDetectionThreshold: 1 }))
+    }, { matrixDetection: true, matrixDetectionThreshold: 1 })
 
     engine.removeSheet('Sheet1')
 
@@ -288,7 +288,7 @@ describe('remove sheet - adjust column index', () => {
   it('should remove sheet from index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
     const index = engine.columnSearch as ColumnIndex
     const removeSheetSpy = jest.spyOn(index, 'removeSheet')
 
