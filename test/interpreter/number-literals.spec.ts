@@ -1,7 +1,8 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {Config} from '../../src/Config'
 
 describe('Number literals', () => {
   it('should work for integer', () => {

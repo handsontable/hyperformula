@@ -23,7 +23,7 @@ export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: 
 }
 
 export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralsHelper): number | null {
-  const ret = coerceNonDateScalarToMaybeNumber(arg)
+  const ret = coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper)
   if (ret != null) {
     return ret
   }
@@ -36,15 +36,19 @@ export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelpe
   return null
 }
 
-export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): number | null {
+export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLiteralsHelper: NumberLiteralsHelper): number | null {
   if (arg === EmptyValue) {
     return 0
   }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    return null
+  if (typeof arg === 'string' && numberLiteralsHelper.isNumber(arg)) {
+    return numberLiteralsHelper.numericStringToNumber(arg)
   } else {
-    return coercedNumber
+    const coercedNumber = Number(arg)
+    if (isNaN(coercedNumber)) {
+      return null
+    } else {
+      return coercedNumber
+    }
   }
 }
 

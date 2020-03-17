@@ -2,19 +2,24 @@ import {Config} from './Config'
 
 export class NumberLiteralsHelper {
   private readonly numberPattern: RegExp
+  private readonly allThousandSeparatorsRegex: RegExp
 
   constructor(
     private readonly config: Config
   ) {
-    this.numberPattern = new RegExp(`^[\+|-]?\\d*[${this.config.thousandSeparator}\\d{3,}]*[${this.config.decimalSeparator}]?\\d+$`)
+    this.numberPattern = new RegExp(`^([\+-]?((\\${this.config.decimalSeparator}\\d+)|(\\d+(${this.config.thousandSeparator}\\d{3,})*(\\${this.config.decimalSeparator}\\d+)?)))$`)
+    this.allThousandSeparatorsRegex = new RegExp(`${this.config.thousandSeparator}`, 'g')
   }
-
+  
   public isNumber(input: string): boolean {
-    return this.numberPattern.test(input)
+    const match =  this.numberPattern.test(input)
+    return match
   }
 
   public numericStringToNumber(input: string): number {
-    const normalized = input.replace(this.config.decimalSeparator, '.').replace(this.config.thousandSeparator, '')
+    const normalized = input
+      .replace(this.config.decimalSeparator, '.')
+      .replace(this.allThousandSeparatorsRegex, '')
     return Number(normalized)
   }
 }

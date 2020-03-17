@@ -267,7 +267,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
       } else if (arg instanceof CellError) {
         return arg
       } else {
-        const coercedArg = coerceNonDateScalarToMaybeNumber(arg)
+        const coercedArg = coerceNonDateScalarToMaybeNumber(arg, this.interpreter.numberLiteralsHelper)
         if (coercedArg === null) {
           return AverageResult.empty
         } else {

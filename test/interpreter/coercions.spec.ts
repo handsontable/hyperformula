@@ -14,17 +14,18 @@ import {adr, detailedError} from '../testUtils'
 import {NumberLiteralsHelper} from '../../src/NumberLiteralsHelper'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
+  const numberLiteralsHelper = new NumberLiteralsHelper(new Config())
   it('works', () => {
-    expect(coerceNonDateScalarToMaybeNumber(42)).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber(' 42')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42 ')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('0000042')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42foo')).toEqual(null)
-    expect(coerceNonDateScalarToMaybeNumber('foo42')).toEqual(null)
-    expect(coerceNonDateScalarToMaybeNumber(true)).toBe(1)
-    expect(coerceNonDateScalarToMaybeNumber(false)).toBe(0)
-    expect(coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(42, numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber(' 42', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42 ', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('0000042', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42foo', numberLiteralsHelper)).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber('foo42', numberLiteralsHelper)).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber(true, numberLiteralsHelper)).toBe(1)
+    expect(coerceNonDateScalarToMaybeNumber(false, numberLiteralsHelper)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(EmptyValue, numberLiteralsHelper)).toBe(0)
   })
 })
 
