@@ -1,4 +1,4 @@
-import {HyperFormula, PendingComputationError} from '../src'
+import {HyperFormula, PendingComputationError, ExportedCellChange} from '../src'
 import './testConfig'
 import {adr} from './testUtils'
 
@@ -33,5 +33,18 @@ describe('Computation suspension', () => {
     engine.setCellContents(adr('C1'), [['=A1+78']])
 
     expect(engine.getCellFormula(adr('C1'))).toEqual("=A1+78")
+  })
+
+  it('resuming computation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A1'],
+    ])
+    engine.suspendComputation()
+    engine.setCellContents(adr('C1'), [['=B1']])
+
+    const changes = engine.resumeComputation()
+
+    expect(engine.getCellValue(adr('C1'))).toBe(2)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 2))
   })
 })

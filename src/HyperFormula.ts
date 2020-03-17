@@ -1142,6 +1142,11 @@ export class HyperFormula implements TypedEmitter {
     this.computationSuspended = true
   }
 
+  public resumeComputation(): ExportedChange[] {
+    this.computationSuspended = false
+    return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
   /**
    * Adds a specified named expression.
    * 
