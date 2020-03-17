@@ -304,12 +304,12 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         if(value instanceof SimpleRangeValue) {
           value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()).map(mapFunction), initialAccValue, reducingFunction)
         } else if (arg.type === AstNodeType.CELL_REFERENCE) {
-            value = mapFunction(value)
-            value = reducingFunction(initialAccValue, value)
-          } else {
-            value = coerceScalarToNumberOrError(value, this.interpreter.dateHelper)
-            value = mapFunction(value)
-          }
+          value = mapFunction(value)
+          value = reducingFunction(initialAccValue, value)
+        } else {
+          value = coerceScalarToNumberOrError(value, this.interpreter.dateHelper)
+          value = mapFunction(value)
+        }
 
       }
 
@@ -341,7 +341,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst , formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
       range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
