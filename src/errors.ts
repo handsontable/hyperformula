@@ -85,6 +85,6 @@ export class ExpectedOneOfValues extends Error {
 
 export class PendingComputationError extends Error {
   constructor() {
-    super(`Computations are suspended`)
+    super('Computations are suspended')
   }
 }

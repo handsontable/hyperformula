@@ -32,7 +32,7 @@ describe('Evaluation suspension', () => {
     engine.suspendEvaluation()
     engine.setCellContents(adr('C1'), [['=A1+78']])
 
-    expect(engine.getCellFormula(adr('C1'))).toEqual("=A1+78")
+    expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
   })
 
   it('resuming evaluation', () => {
