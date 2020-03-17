@@ -1,8 +1,8 @@
-import {Config} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
-import {AstNodeType, CellAddress, MinusUnaryOpAst, ParserWithCaching, PlusUnaryOpAst, PlusOpAst} from '../../src/parser'
+import {AstNodeType, MinusUnaryOpAst, ParserWithCaching, PlusUnaryOpAst, PlusOpAst} from '../../src/parser'
 import {PercentOpAst, TimesOpAst} from '../../src/parser/Ast'
 
 describe('percent', () => {

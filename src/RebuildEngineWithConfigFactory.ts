@@ -1,20 +1,20 @@
-import {HyperFormula, LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {GraphBuilder} from './GraphBuilder'
+import {HyperFormula} from './HyperFormula'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
-import {Statistics, StatType} from './statistics/Statistics'
+import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
-import {UndoRedo} from './UndoRedo'
 
-export class BuildEngineFromArraysFactory {
-  public buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
-    const config = new Config(configInput)
-    const stats = new Statistics()
+export class RebuildEngineWithConfigFactory {
+  public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
+    const stats = oldEngine.stats
+    const config: Config = oldEngine.config.mergeConfig(newParams)
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
@@ -23,6 +23,10 @@ export class BuildEngineFromArraysFactory {
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
+
+    const language = newParams.language ? newParams.language : config.language
+    const configNewLanguage = oldEngine.config.mergeConfig( {language} )
+    const sheets = oldEngine.serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
@@ -34,7 +38,7 @@ export class BuildEngineFromArraysFactory {
     const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper)
 
-    const undoRedo = new UndoRedo()
+    const undoRedo = oldEngine.undoRedo
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
@@ -59,13 +63,9 @@ export class BuildEngineFromArraysFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
-      undoRedo,
+      undoRedo
     )
 
     return engine
-  }
-
-  public buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
-    return this.buildFromSheets({Sheet1: sheet}, configInput)
   }
 }

@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
 import './testConfig.ts'
@@ -6,13 +6,12 @@ import {adr} from './testUtils'
 
 describe('Disable matrix optimizatoins', () => {
   it('should split matrix into value cell vertices', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(MatrixVertex)
 
@@ -27,14 +26,13 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between matrix and range', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['=SUM(A1:B1)'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
     let range = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
     expect(engine.graph.getDependencies(range).length).toBe(1)
     expect(engine.dependencyGraph.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).not.toBe(undefined)
@@ -53,14 +51,13 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between numeric matrix and formula matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['{=TRANSPOSE(A1)}'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
 
@@ -77,14 +74,13 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should update edges between matrix and formulas', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['=A1+B2'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
     const a1 = engine.addressMapping.fetchCell(adr('A1')) as MatrixVertex
     const b2 = engine.addressMapping.fetchCell(adr('B2')) as MatrixVertex
     expect(a1).toBeInstanceOf(MatrixVertex)
@@ -105,14 +101,13 @@ describe('Disable matrix optimizatoins', () => {
   })
 
   it('should not change edges not related to matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const sheet = [
       ['1', '2'],
       ['3', '4'],
       ['=A1+C1'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet, config)
+    const engine = HyperFormula.buildFromArray(sheet, {matrixDetection: true, matrixDetectionThreshold: 1})
 
     const a3 = engine.addressMapping.fetchCell(adr('A3')) as ValueCellVertex
     const a1 = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
