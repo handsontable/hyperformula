@@ -31,7 +31,7 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
-export class CrudOperations implements IBatchExecutor {
+export class CrudOperations {
 
   private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
