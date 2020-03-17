@@ -12,6 +12,7 @@ import {Matrix} from './Matrix'
 import {Ast} from './parser'
 import {Statistics, StatType} from './statistics/Statistics'
 import Collator = Intl.Collator
+import {NumberLiteralsHelper} from './NumberLiteralsHelper'
 
 export class SingleThreadEvaluator implements Evaluator {
   private interpreter: Interpreter
@@ -22,9 +23,10 @@ export class SingleThreadEvaluator implements Evaluator {
     private readonly config: Config,
     private readonly stats: Statistics,
     private readonly dateHelper: DateHelper,
+    private readonly numberLiteralsHelper: NumberLiteralsHelper,
     private readonly collator: Collator
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.collator)
+    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.collator)
   }
 
   public run() {

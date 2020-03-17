@@ -24,7 +24,7 @@ export class EmptyEngineFactory {
     const dateHelper = new DateHelper(config)
     const numberLiteralHelper = new NumberLiteralsHelper(config)
     const collator = collatorFromConfig(config)
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
     lazilyTransformingAstService.parser = parser
