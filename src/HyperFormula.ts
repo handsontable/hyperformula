@@ -291,7 +291,7 @@ export class HyperFormula {
   /**
    * Updates the config with given new parameters.
    *
-   * @param {newParams} Partial<ConfigParams> - set of new config parameters
+   * @param newParams
    */
   public updateConfig(newParams: Partial<ConfigParams>): void {
     const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
