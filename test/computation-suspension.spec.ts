@@ -47,4 +47,21 @@ describe('Evaluation suspension', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 2))
   })
+
+  it('#isEvaluationSuspended when evaluation is suspended', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A1'],
+    ])
+    engine.suspendEvaluation()
+
+    expect(engine.isEvaluationSuspended()).toBe(true)
+  })
+
+  it('#isEvaluationSuspended when evaluation is resumed', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A1'],
+    ])
+
+    expect(engine.isEvaluationSuspended()).toBe(false)
+  })
 })

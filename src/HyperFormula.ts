@@ -1104,6 +1104,10 @@ export class HyperFormula implements TypedEmitter {
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  public isEvaluationSuspended(): boolean {
+    return this.evaluationSuspended
+  }
+
   /**
    * Adds a specified named expression.
    * 
