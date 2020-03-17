@@ -126,7 +126,7 @@ export class HyperFormula implements TypedEmitter {
   private namedExpressions: NamedExpressions
   private readonly emitter: Emitter = new Emitter()
   public serialization: Serialization
-  private computationSuspended: boolean
+  private evaluationSuspended: boolean
 
   constructor(
     /** Engine configuration. */
@@ -152,7 +152,7 @@ export class HyperFormula implements TypedEmitter {
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
     this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
-    this.computationSuspended = false
+    this.evaluationSuspended = false
   }
 
   /**
@@ -170,7 +170,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   private ensureComputationIsNotSuspended() {
-    if (this.computationSuspended) {
+    if (this.evaluationSuspended) {
       throw new PendingComputationError()
     }
   }
@@ -1085,22 +1085,22 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
-    this.suspendComputation()
+    this.suspendEvaluation()
     try {
       batchOperations(this)
     } catch (e) {
-      this.resumeComputation()
+      this.resumeEvaluation()
       throw (e)
     }
-    return this.resumeComputation()
+    return this.resumeEvaluation()
   }
 
-  public suspendComputation(): void {
-    this.computationSuspended = true
+  public suspendEvaluation(): void {
+    this.evaluationSuspended = true
   }
 
-  public resumeComputation(): ExportedChange[] {
-    this.computationSuspended = false
+  public resumeEvaluation(): ExportedChange[] {
+    this.evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -1312,7 +1312,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
-    if (!this.computationSuspended) {
+    if (!this.evaluationSuspended) {
       const changes = this.crudOperations.getAndClearContentChanges()
       const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
