@@ -14,7 +14,7 @@ export class Serialization {
     public readonly exporter: Exporter
   ) {
   }
-  public getCellFormulaFromEngine(address: SimpleCellAddress): Maybe<string> {
+  public getCellFormula(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
@@ -30,12 +30,12 @@ export class Serialization {
     return undefined
   }
 
-  public getCellSerializedFromEngine(address: SimpleCellAddress): NoErrorCellValue {
-    const formula: Maybe<string> = this.getCellFormulaFromEngine(address)
+  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+    const formula: Maybe<string> = this.getCellFormula(address)
     if( formula !== undefined ) {
       return formula
     } else {
-      const value: CellValue = this.getCellValueFromEngine(address)
+      const value: CellValue = this.getCellValue(address)
       if(value instanceof DetailedCellError) {
         return this.config.getErrorTranslationFor(value.error.type)
       } else {
@@ -44,8 +44,16 @@ export class Serialization {
     }
   }
 
-  public getCellValueFromEngine(address: SimpleCellAddress): CellValue {
+  public getCellValue(address: SimpleCellAddress): CellValue {
     return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+  }
+
+  public getSheetValues(sheet: number): CellValue[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellValue(arg))
+  }
+
+  public getSheetFormulas(sheet: number): Maybe<string>[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellFormula(arg))
   }
 
   public genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
@@ -73,12 +81,20 @@ export class Serialization {
     return result
   }
 
-  public getSheetSerializedFromEngine(sheet: number): NoErrorCellValue[][] {
-    return this.genericSheetGetter(sheet, (arg) => this.getCellSerializedFromEngine(arg))
+  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
-  public getAllSheetsSerializedFromEngine(): Record<string, NoErrorCellValue[][]> {
-    return this.genericAllSheetsGetter((arg) => this.getSheetSerializedFromEngine(arg))
+  public getAllSheetsValues(): Record<string, CellValue[][]> {
+    return this.genericAllSheetsGetter((arg) => this.getSheetValues(arg))
+  }
+
+  public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
+    return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
+  }
+
+  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+    return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
   public withNewConfig(newConfig: Config): Serialization {

@@ -26,7 +26,7 @@ export class RebuildEngineWithConfigFactory {
 
     const language = newParams.language ? newParams.language : config.language
     const configNewLanguage = oldEngine.config.mergeConfig( {language} )
-    const sheets = oldEngine.serialization.withNewConfig(configNewLanguage).getAllSheetsSerializedFromEngine()
+    const sheets = oldEngine.serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
