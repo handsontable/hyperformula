@@ -891,28 +891,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent[][]} values - array of new values
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
-    this.crudOperations.ensureSheetExists(sheetName)
-
-    const sheetId = this.getSheetId(sheetName)!
-
-    return this.batch((e) => {
-      e.clearSheet(sheetName)
-      if (!(values instanceof Array)) {
-        throw new Error('Expected an array of arrays.')
-      }
-      for (let i = 0; i < values.length; i++) {
-        if (!(values[i] instanceof Array)) {
-          throw new Error('Expected an array of arrays.')
-        }
-        for (let j = 0; j < values[i].length; j++) {
-          e.setCellContent({
-            sheet: sheetId,
-            row: i,
-            col: j,
-          }, values[i][j])
-        }
-      }
-    })
+    this.crudOperations.setSheetContent(sheetName, values)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**

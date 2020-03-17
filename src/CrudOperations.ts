@@ -231,6 +231,28 @@ export class CrudOperations implements IBatchExecutor {
     }
   }
 
+  public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
+    this.ensureSheetExists(sheetName)
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.clearSheet(sheetName)
+    if (!(values instanceof Array)) {
+      throw new Error('Expected an array of arrays.')
+    }
+    for (let i = 0; i < values.length; i++) {
+      if (!(values[i] instanceof Array)) {
+        throw new Error('Expected an array of arrays.')
+      }
+      for (let j = 0; j < values[i].length; j++) {
+        this.setCellContent({
+          sheet: sheetId,
+          row: i,
+          col: j,
+        }, values[i][j])
+      }
+    }
+  }
+
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
     this.clipboardOperations.abortCut()
