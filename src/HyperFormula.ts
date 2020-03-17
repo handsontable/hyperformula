@@ -1085,13 +1085,14 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
+    this.suspendComputation()
     try {
-      batchOperations(this.crudOperations)
+      batchOperations(this)
     } catch (e) {
-      this.recomputeIfDependencyGraphNeedsIt()
+      this.resumeComputation()
       throw (e)
     }
-    return this.recomputeIfDependencyGraphNeedsIt()
+    return this.resumeComputation()
   }
 
   public suspendComputation(): void {
