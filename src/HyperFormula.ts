@@ -131,13 +131,13 @@ export class HyperFormula {
 
   constructor(
     /** Engine configuration. */
-    private config: Config,
+    public config: Config,
     /** Statistics module for benchmarking. */
-    private stats: Statistics,
+    public stats: Statistics,
     /** Dependency graph storing sheets structure. */
-    private dependencyGraph: DependencyGraph,
+    public dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
-    private columnSearch: ColumnSearchStrategy,
+    public columnSearch: ColumnSearchStrategy,
     /** Parser with caching. */
     private parser: ParserWithCaching,
     private unparser: Unparser,
@@ -146,7 +146,7 @@ export class HyperFormula {
     public evaluator: Evaluator,
     /** Service handling postponed CRUD transformations. */
     public lazilyTransformingAstService: LazilyTransformingAstService,
-    private undoRedo: UndoRedo,
+    public undoRedo: UndoRedo,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
     undoRedo.crudOperations = this.crudOperations
