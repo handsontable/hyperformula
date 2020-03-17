@@ -24,4 +24,14 @@ describe('Computation suspension', () => {
       engine.getCellValue(adr('C1'))
     }).toThrow(new PendingComputationError())
   })
+
+  it('when recomputation is stopped, #getCellFormula is possible', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A1+42'],
+    ])
+    engine.suspendComputation()
+    engine.setCellContents(adr('C1'), [['=A1+78']])
+
+    expect(engine.getCellFormula(adr('C1'))).toEqual("=A1+78")
+  })
 })
