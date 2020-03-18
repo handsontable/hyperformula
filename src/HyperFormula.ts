@@ -129,11 +129,11 @@ export class HyperFormula {
   public serialization: Serialization
 
   constructor(
-    /** Engine configuration. */
-    public config: Config,
-    /** Statistics module for benchmarking. */
-    public stats: Statistics,
-    /** Dependency graph storing sheets structure. */
+    /* Engine configuration. */
+    private config: Config,
+    /* Statistics module for benchmarking. */
+    private stats: Statistics,
+    /* Dependency graph storing sheets structure. */
     public dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
     public columnSearch: ColumnSearchStrategy,
@@ -308,6 +308,13 @@ export class HyperFormula {
     this.lazilyTransformingAstService = newEngine.lazilyTransformingAstService
     this.undoRedo = newEngine.undoRedo
     this.serialization = newEngine.serialization
+  }
+
+  /**
+   * Returns current configuration of the engine instance.
+   */
+  public getConfig(): ConfigParams {
+    return this.config.getConfig()
   }
 
   /**

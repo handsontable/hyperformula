@@ -2,6 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
+import {StatType} from '../../src/statistics/Statistics'
 
 describe('Function COUNTIFS', () => {
   it('validates number of arguments', () => {
@@ -48,7 +49,7 @@ describe('Function COUNTIFS', () => {
 
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
     expect(engine.getCellValue(adr('B4'))).toEqual(3)
-    expect(engine.stats.criterionFunctionPartialCacheUsed).toEqual(1)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(1)
   })
 
   it('use full cache',  () => {
@@ -60,7 +61,7 @@ describe('Function COUNTIFS', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
-    expect(engine.stats.criterionFunctionFullCacheUsed).toEqual(1)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(1)
   })
 
   it('works for only one cell',  () => {

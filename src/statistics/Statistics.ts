@@ -15,25 +15,41 @@ export enum StatType {
   ADJUSTING_MATRIX_MAPPING = 'ADJUSTING_MATRIX_MAPPING',
   ADJUSTING_RANGES = 'ADJUSTING_RANGES',
   ADJUSTING_GRAPH = 'ADJUSTING_GRAPH',
+  /* criterion cache */
+  CRITERION_FUNCTION_FULL_CACHE_USED = 'CRITERION_FUNCTION_FULL_CACHE_USED',
+  CRITERION_FUNCTION_PARTIAL_CACHE_USED = 'CRITERION_FUNCTION_PARTIAL_CACHE_USED',
 }
 
 /**
  * Provides tracking performance statistics to the engine
  */
 export class Statistics {
-  public criterionFunctionFullCacheUsed = 0
-  public criterionFunctionPartialCacheUsed = 0
-  private readonly stats: Map<StatType, number> = new Map<StatType, number>()
+  private readonly stats: Map<StatType, number> = new Map<StatType, number>([
+    [StatType.CRITERION_FUNCTION_FULL_CACHE_USED, 0],
+    [StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, 0],
+  ])
   private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
+
+  public incrementCriterionFunctionFullCacheUsed() {
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED) || 0) + 1
+
+    this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, newValue)
+  }
+
+  public incrementCriterionFunctionPartialCacheUsed() {
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED) || 0) + 1
+
+    this.stats.set(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, newValue)
+  }
 
   /**
    * Resets statistics
    */
   public reset(): void {
-    this.criterionFunctionFullCacheUsed = 0
-    this.criterionFunctionPartialCacheUsed = 0
     this.stats.clear()
     this.startTimes.clear()
+    this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, 0)
+    this.stats.set(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, 0)
   }
 
   /**
@@ -92,5 +108,6 @@ export class Statistics {
 
   public destroy() {
     this.stats.clear()
+    this.startTimes.clear()
   }
 }
