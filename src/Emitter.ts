@@ -9,13 +9,7 @@ export enum Events {
   ValuesUpdated = 'valuesUpdated',
 }
 
-/**
-* The event is triggered upon adding a sheet anywhere inside the workbook.
-* 
-* @event sheetAdded
-* 
-* @param {string} addedSheetDisplayName the name of added sheet
-*/
+
 export type SheetAddedHandler = (addedSheetDisplayName: string) => any
 
 /**
