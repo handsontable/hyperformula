@@ -1,6 +1,7 @@
-import { Config, HyperFormula } from '../../src'
+import { HyperFormula } from '../../src'
 import '../testConfig'
 import { adr } from '../testUtils'
+import { Config } from '../../src/Config'
 
 function createEngine(sheetData: any[][], config?: Config) {
   const engine = HyperFormula.buildFromArray(sheetData, config)

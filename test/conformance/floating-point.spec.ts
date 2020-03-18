@@ -1,8 +1,9 @@
-import { Config, HyperFormula, DetailedCellError } from '../../src'
+import { HyperFormula, DetailedCellError } from '../../src'
 import '../testConfig'
 import { adr } from '../testUtils'
 import { CellError, ErrorType } from '../../src/Cell'
 import { EmptyValue } from '../../src/Cell'
+import { Config } from '../../src/Config'
 
 // Test cases based on https://github.com/MicrosoftDocs/OfficeDocs-Support/blob/public/Office/Client/excel/floating-point-arithmetic-inaccurate-result.md
 const data =
@@ -52,3 +53,5 @@ describe('Quality assurance of floating point', () => {
 
 
 })
+
+

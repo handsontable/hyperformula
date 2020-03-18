@@ -1,7 +1,8 @@
-import { Config, HyperFormula, DetailedCellError } from '../../src'
+import { HyperFormula, DetailedCellError } from '../../src'
 import { CellError, ErrorType, CellType, EmptyValue } from '../../src/Cell'
 import '../testConfig'
 import { adr, dateNumberToString, detailedError } from '../testUtils'
+import { Config } from '../../src/Config'
 
 // Data and test scenarios were part of the working draft for OpenFormula standard
 // https://www.oasis-open.org/committees/download.php/16826/openformula-spec-20060221.html#DATE

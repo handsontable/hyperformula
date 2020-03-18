@@ -1,9 +1,9 @@
-import { Config, HyperFormula, DetailedCellError } from '../../src'
+import { HyperFormula, DetailedCellError } from '../../src'
 import '../testConfig'
 import { adr } from '../testUtils'
 import { CellError, ErrorType } from '../../src/Cell'
 import { plPL } from '../../src/i18n'
-import { truncate } from 'fs'
+import { Config } from '../../src/Config'
 
 const data =
     ['=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
