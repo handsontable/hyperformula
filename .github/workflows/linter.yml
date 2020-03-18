@@ -4,24 +4,24 @@ on: [push]
 
 jobs:
   build:
-    name: TS
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ '12' ]
+        os: [ 'ubuntu-latest' ]
+    name: ESLINT
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Use Node.js 10
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@b6651e20e530d6e6b845a9828606779e89f5529c # https://github.com/actions/setup-node/releases/tag/v1.3.0
         with:
-          node-version: '10.x'
-
-      - name: Install Yarn
-        run: |
-          npm install -g yarn@legacy
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: |
-          make setup
+          npm ci
 
       - name: JavaScript lint
         run: |
-          make lint
+          npm run lint
