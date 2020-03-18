@@ -5,7 +5,6 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} fr
 import {Maybe} from './Maybe'
 import {buildLexerConfig, Unparser} from './parser'
 
-
 export class Serialization {
   constructor(
     public readonly dependencyGraph: DependencyGraph,

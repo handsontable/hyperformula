@@ -135,15 +135,15 @@ export class HyperFormula {
     private stats: Statistics,
     /* Dependency graph storing sheets structure. */
     public dependencyGraph: DependencyGraph,
-    /** Column search strategy used by VLOOKUP plugin. */
+    /* Column search strategy used by VLOOKUP plugin. */
     public columnSearch: ColumnSearchStrategy,
-    /** Parser with caching. */
+    /* Parser with caching. */
     private parser: ParserWithCaching,
     private unparser: Unparser,
     private cellContentParser: CellContentParser,
-    /** Formula evaluator. */
+    /* Formula evaluator. */
     public evaluator: Evaluator,
-    /** Service handling postponed CRUD transformations. */
+    /* Service handling postponed CRUD transformations. */
     public lazilyTransformingAstService: LazilyTransformingAstService,
     public undoRedo: UndoRedo,
   ) {
@@ -215,7 +215,7 @@ export class HyperFormula {
    *
    * Unparses AST.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} sheet - sheet ID number
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.serialization.getSheetFormulas(sheet)
@@ -228,7 +228,7 @@ export class HyperFormula {
    *
    * Unparses AST. Applies post-processing.
    *
-   * @param {SimpleCellAddress} address - cell coordinates
+   * @param {SimpleCellAddress} sheet - sheet ID number
    */
   public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
     return this.serialization.getSheetSerialized(sheet)
