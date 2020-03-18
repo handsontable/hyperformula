@@ -1190,6 +1190,7 @@ export class HyperFormula {
    * @param {RawCellContent} expression - the expression
    * 
    * @fires Events#namedExpressionAdded
+   * @fires Events#valuesUpdated
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.isNameValid(expressionName)) {
