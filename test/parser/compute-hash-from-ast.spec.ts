@@ -1,5 +1,4 @@
-import {Config} from '../../src'
-import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'

@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula} from '../../src'
 import {plPL} from '../../src/i18n'
 import '../testConfig'
 import {adr} from '../testUtils'
@@ -51,7 +51,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should add sheet with translated sheet name', function() {
-    const engine = HyperFormula.buildEmpty(new Config({ language: plPL }))
+    const engine = HyperFormula.buildEmpty({ language: plPL })
 
     engine.addSheet()
 

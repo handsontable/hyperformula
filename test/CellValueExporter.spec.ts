@@ -1,6 +1,7 @@
-import {CellError, Config, DetailedCellError, EmptyValue} from '../src'
+import {CellError, DetailedCellError, EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
+import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'

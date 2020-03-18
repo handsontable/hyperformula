@@ -379,38 +379,45 @@ export class Config implements ConfigParams, ParserConfig{
       nullDate,
     }: Partial<ConfigParams> = {},
   ) {
-    this.accentSensitive = this.valueFromParam(accentSensitive, Config.defaultConfig, 'boolean', 'accentSensitive')
-    this.caseSensitive = this.valueFromParam(caseSensitive, Config.defaultConfig, 'boolean', 'caseSensitive')
-    this.caseFirst = this.valueFromParam(caseFirst, Config.defaultConfig, ['upper', 'lower', 'false'], 'caseFirst')
-    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, Config.defaultConfig, 'boolean', 'ignorePunctuation')
+    this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
+    this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
+    this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
+    this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = this.valueFromParamCheck(dateFormats, Config.defaultConfig, Array.isArray, 'array', 'dateFormats')
-    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, Config.defaultConfig, 'string', 'functionArgSeparator')
-    this.decimalSeparator = this.valueFromParam(decimalSeparator, Config.defaultConfig, ['.', ','], 'decimalSeparator')
+    this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
+    this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = language || Config.defaultConfig.language
-    this.localeLang = this.valueFromParam(localeLang, Config.defaultConfig, 'string', 'localeLang')
+    this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
-    this.gpuMode = this.valueFromParam(gpuMode, Config.defaultConfig, PossibleGPUModeString, 'gpuMode')
-    this.smartRounding = this.valueFromParam(smartRounding, Config.defaultConfig, 'boolean', 'smartRounding')
-    this.matrixDetection = this.valueFromParam(matrixDetection, Config.defaultConfig, 'boolean', 'matrixDetection')
-    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, Config.defaultConfig, 'number', 'matrixDetectionThreshold')
-    this.nullYear = this.valueFromParam(nullYear, Config.defaultConfig, 'number', 'nullYear')
-    this.precisionRounding = this.valueFromParam(precisionRounding, Config.defaultConfig, 'number', 'precisionRounding')
-    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, Config.defaultConfig, 'number', 'precisionEpsilon')
-    if (!this.smartRounding) {
-      this.precisionEpsilon = 0
-    }
-    this.useColumnIndex = this.valueFromParam(useColumnIndex, Config.defaultConfig, 'boolean', 'useColumnIndex')
-    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, Config.defaultConfig, 'number', 'vlookupThreshold')
+    this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
+    this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
+    this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
+    this.matrixDetectionThreshold = this.valueFromParam(matrixDetectionThreshold, 'number', 'matrixDetectionThreshold')
+    this.nullYear = this.valueFromParam(nullYear, 'number', 'nullYear')
+    this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
+    this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
+    this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
+    this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, Config.defaultConfig, 'function', 'parseDate')
-    this.stringifyDate = this.valueFromParam(stringifyDate, Config.defaultConfig, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, Config.defaultConfig, instanceOfSimpleDate, 'IDate', 'nullDate' )
-    this.leapYear1900 = this.valueFromParam(leapYear1900, Config.defaultConfig, 'boolean', 'leapYear1900')
+    this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
+    this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate' )
+    this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 
     if (this.decimalSeparator === this.functionArgSeparator) {
       throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
     }
+  }
+
+  public mergeConfig(init: Partial<ConfigParams>): Config {
+    const mergedConfig = Object.assign({}, this.getConfig(), init)
+    
+    return new Config(mergedConfig)
+  }
+  
+  public getConfig(): ConfigParams {
+    return this
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
@@ -474,7 +481,7 @@ export class Config implements ConfigParams, ParserConfig{
     return functionsWhichDoesNotNeedArgumentsToBeComputed
   }
 
-  public getRegisteredFunctions(): Set<String> {
+  public static getRegisteredFunctions(): Set<String> {
     const ret = new Set<String>()
     for (const pluginClass of Config.defaultPlugins) {
       Object.keys(pluginClass.implementedFunctions).forEach((pluginFunction) => {
@@ -492,9 +499,9 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParam(inputValue: any, baseConfig: ConfigParams, expectedType: string | string[], paramName: ConfigParamsList ) {
+  private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList ) {
     if(typeof inputValue === 'undefined') {
-      return baseConfig[paramName]
+      return Config.defaultConfig[paramName]
     } else if(typeof expectedType === 'string') {
       if(typeof inputValue === expectedType) {
         return inputValue
@@ -511,11 +518,11 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParamCheck(inputValue: any, baseConfig: ConfigParams, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
+  private valueFromParamCheck(inputValue: any,  typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
     if (typeCheck(inputValue)) {
       return inputValue
     } else if (typeof inputValue === 'undefined') {
-      return baseConfig[paramName]
+      return Config.defaultConfig[paramName]
     } else {
       throw new ExpectedValueOfType(expectedType, paramName)
     }

@@ -1,6 +1,7 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import {ErrorType, SimpleCellAddress} from '../../src/Cell'
 import '../testConfig'
+import {Config} from '../../src/Config'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, dateString: string) => {

@@ -56,35 +56,28 @@ You can find more examples in [examples/](examples/) folder.
 
 ## Installation
 
-Note: make sure to use a recent (at least 10.x) version of node js. We have observed a significant performance drop even in some 8.x versions.
-
-Install yarn:
-
-```
-npm install -g yarn
-```
+Note: make sure to use a recent (at least 12.x) version of node js. We have observed a significant performance drop even in some 8.x versions.
 
 Install all dependencies:
 
 ```
-make setup
+npm install
 ```
 
 Run tests to make sure that everything is working properly:
 ```
-make test
+npm run test
 ```
 
-See other useful `make` commands available in [Makefile](Makefile) or listed with `make help` command.
+See other useful scripts available in [package.json](package.json).
 
 ## Demos
 
 ### Browser Benchmarks demo
 
 1. Make [Installation](#installation) step above
-2. `make bundle`, to build code artifacts
-3. `cd dist/browser && live-server` to run the server with demos, which will be available under [http://localhost:8080]
-
+2. `npm run bundle-all`, to build code artifacts
+3. `cd dist/browser && $(npm bin)/http-server` to run the local server with demos, which will be available under [http://localhost:8080]
 
 ## Basic usage
 

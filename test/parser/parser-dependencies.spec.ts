@@ -1,17 +1,16 @@
-import {Config} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {absolutizeDependencies} from '../../src/absolutizeDependencies'
 import {simpleCellAddress} from '../../src/Cell'
+import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB} from '../../src/i18n'
 import {ParserWithCaching} from '../../src/parser'
-import {CellAddress} from '../../src/parser'
 import {adr} from '../testUtils'
 
 describe('Parsing collecting dependencies', () => {
   it('works for CELL_REFERENCE with relative dependency', () => {
-    const formulaAddress = simpleCellAddress(0, 1, 1)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 1, 1)
 
     const parseResult = parser.parse('=B2', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -20,8 +19,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('works with absolute dependencies', () => {
-    const formulaAddress = simpleCellAddress(0, 1, 1)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 1, 1)
 
     const parseResult = parser.parse('=$B$2', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -31,8 +30,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('works for CELL_RANGE', () => {
-    const formulaAddress = simpleCellAddress(0, 0, 0)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 0, 0)
 
     const parseResult = parser.parse('=B2:C4', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -43,8 +42,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside unary minus', () => {
-    const formulaAddress = simpleCellAddress(0, 0, 0)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 0, 0)
 
     const parseResult = parser.parse('=-B2', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -55,8 +54,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside plus operator', () => {
-    const formulaAddress = simpleCellAddress(0, 0, 0)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 0, 0)
 
     const parseResult = parser.parse('=B2+C3', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -68,8 +67,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('goes inside function call arguments', () => {
-    const formulaAddress = simpleCellAddress(0, 0, 0)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 0, 0)
 
     const parseResult = parser.parse('=SUM(B2, C3)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -81,8 +80,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('OFFSET call is correctly found as dependency', () => {
-    const formulaAddress = simpleCellAddress(0, 1, 1)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 1, 1)
 
     const parseResult = parser.parse('=OFFSET(D4, 0, 0)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
@@ -92,8 +91,8 @@ describe('Parsing collecting dependencies', () => {
   })
 
   it('COLUMNS arguments are not dependencies', () => {
-    const formulaAddress = simpleCellAddress(0, 1, 1)
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
+    const formulaAddress = simpleCellAddress(0, 1, 1)
 
     const parseResult = parser.parse('=COLUMNS(A1:B3)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
