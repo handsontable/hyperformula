@@ -1,5 +1,4 @@
 import { AbsoluteCellRange } from './AbsoluteCellRange'
-import { BuildEngineFromArraysFactory } from './BuildEngineFromArraysFactory'
 import {
   CellType,
   CellValueType,
@@ -22,7 +21,6 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import {EmptyEngineFactory} from './EmptyEngineFactory'
 import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
@@ -38,7 +36,6 @@ import {
   Unparser,
   Ast,
 } from './parser'
-import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
 import {
   Serialization
 } from './Serialization'
@@ -46,6 +43,7 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {TinyEmitter} from 'tiny-emitter'
 import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
 import {UndoRedo} from './UndoRedo'
+import {BuildEngineFactory, Engine} from './BuildEngineFactory'
 
 export type Index = [number, number]
 
@@ -77,6 +75,25 @@ export class HyperFormula {
     return this.dependencyGraph.addressMapping
   }
 
+  private static buildFromObject(engine: Engine): HyperFormula {
+    return new HyperFormula(
+      engine.config,
+      engine.stats,
+      engine.dependencyGraph,
+      engine.columnSearch,
+      engine.parser,
+      engine.unparser,
+      engine.cellContentParser,
+      engine.evaluator,
+      engine.lazilyTransformingAstService,
+      engine.undoRedo,
+      engine.crudOperations,
+      engine.exporter,
+      engine.namedExpressions,
+      engine.serialization
+    )
+  }
+
   /**
    * Builds the engine for sheet from a two-dimensional array representation.
    * 
@@ -90,7 +107,7 @@ export class HyperFormula {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
   public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, configInput)
+    return this.buildFromObject(BuildEngineFactory.buildFromSheet(sheet, configInput))
   }
 
   /**
@@ -106,7 +123,7 @@ export class HyperFormula {
    * @param {Partial<ConfigParams>} [configInput]- engine configuration
    */
   public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, configInput)
+    return this.buildFromObject(BuildEngineFactory.buildFromSheets(sheets, configInput))
   }
 
   /**
@@ -119,16 +136,12 @@ export class HyperFormula {
    * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
   public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
-    return new EmptyEngineFactory().build(configInput)
+    return this.buildFromObject(BuildEngineFactory.buildEmpty(configInput))
   }
 
-  private crudOperations: CrudOperations
-  private exporter: Exporter
-  private namedExpressions: NamedExpressions
   private readonly emitter: TinyEmitter = new TinyEmitter()
-  public serialization: Serialization
 
-  constructor(
+  protected constructor(
     /* Engine configuration. */
     private config: Config,
     /* Statistics module for benchmarking. */
@@ -145,13 +158,12 @@ export class HyperFormula {
     public evaluator: Evaluator,
     /* Service handling postponed CRUD transformations. */
     public lazilyTransformingAstService: LazilyTransformingAstService,
-    public undoRedo: UndoRedo,
+    private undoRedo: UndoRedo,
+    private crudOperations: CrudOperations,
+    private exporter: Exporter,
+    private namedExpressions: NamedExpressions,
+    private serialization: Serialization
   ) {
-    this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
-    undoRedo.crudOperations = this.crudOperations
-    this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
-    this.exporter = new Exporter(config, this.namedExpressions)
-    this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
   }
 
   /**
@@ -294,20 +306,14 @@ export class HyperFormula {
    * @param newParams
    */
   public updateConfig(newParams: Partial<ConfigParams>): void {
-    const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
-    this.crudOperations = newEngine.crudOperations
-    this.exporter = newEngine.exporter
-    this.namedExpressions = newEngine.namedExpressions
-    this.config = newEngine.config
-    this.dependencyGraph = newEngine.dependencyGraph
-    this.columnSearch = newEngine.columnSearch
-    this.parser = newEngine.parser
-    this.unparser = newEngine.unparser
-    this.cellContentParser = newEngine.cellContentParser
-    this.evaluator = newEngine.evaluator
-    this.lazilyTransformingAstService = newEngine.lazilyTransformingAstService
-    this.undoRedo = newEngine.undoRedo
-    this.serialization = newEngine.serialization
+    const newConfig = this.config.mergeConfig(newParams)
+
+    const configNewLanguage = newParams.language ? this.config.mergeConfig({language: newParams.language}) : this.config
+    const serializedSheets = this.serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
+
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this.stats, this.undoRedo)
+
+    Object.assign(this, newEngine)
   }
 
   /**
