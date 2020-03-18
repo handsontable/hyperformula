@@ -10,7 +10,7 @@ export enum Events {
 }
 
 /**
-* Adding sheet event.
+* The event is triggered upon adding a sheet anywhere inside the workbook.
 * 
 * @event sheetAdded
 * 
@@ -19,7 +19,7 @@ export enum Events {
 export type SheetAddedHandler = (addedSheetDisplayName: string) => any
 
 /**
-* Removing sheet event. 
+* The event is triggered upon removing a sheet from anywhere inside the workbook.
 * 
 * @event sheetRemoved
 * 
@@ -29,7 +29,7 @@ export type SheetAddedHandler = (addedSheetDisplayName: string) => any
 export type SheetRemovedHandler = (removedSheetDisplayName: string, changes: ExportedChange[]) => any
 
 /**
-* Renaming sheet event.
+* The event is triggered upon renaming a sheet anywhere inside the workbook.
 *  
 * @event sheetRenamed
 * 
@@ -39,7 +39,7 @@ export type SheetRemovedHandler = (removedSheetDisplayName: string, changes: Exp
 export type SheetRenamedHandler = (oldDisplayName: string, newDisplayName: string) => any
 
 /**
-* Adding named expression event.
+* The event is triggered upon adding a named expression with specified values and location.
 * 
 * @event namedExpressionAdded
 * 
@@ -49,7 +49,7 @@ export type SheetRenamedHandler = (oldDisplayName: string, newDisplayName: strin
 export type NamedExpressionAddedHandler = (namedExpressionName: string, changes: ExportedChange[]) => any
 
 /**
-* Removing named expression event.
+* The event is triggered upon removing a named expression with specified values and from an indicated location.
 * 
 * @event namedExpressionRemoved
 * 
@@ -59,7 +59,7 @@ export type NamedExpressionAddedHandler = (namedExpressionName: string, changes:
 export type NamedExpressionRemovedHandler = (namedExpressionName: string, changes: ExportedChange[]) => any
 
 /**
-* Updated values event.
+* The event is triggered upon changing values in a specified location.
 * 
 * @event valuesUpdated
 * 

@@ -47,25 +47,67 @@ export type Index = [number, number]
  */
 export class HyperFormula {
 
+  /**
+   * Version of the HyperFormula.
+   */
   public static version = (process.env.HT_VERSION || '')
+
+  /**
+   * Latest build date.
+   */
   public static buildDate = (process.env.HT_BUILD_DATE || '')
 
+  /**
+   * Calls the `graph` method on the dependency graph.
+   * 
+   * Allows to execute `graph` directly without a need to refer to `dependencyGraph`.
+   * 
+   * @internal
+   */
   public get graph(): Graph<Vertex> {
     return this.dependencyGraph.graph
   }
 
+  /**
+   * Calls the `rangeMapping` method on the dependency graph.
+   * 
+   * Allows to execute `rangeMapping` directly without a need to refer to `dependencyGraph`.
+   * 
+   * @internal
+   */
   public get rangeMapping(): RangeMapping {
     return this.dependencyGraph.rangeMapping
   }
 
+  /**
+   * Calls the `matrixMapping` method on the dependency graph.
+   * 
+   * Allows to execute `matrixMapping` directly without a need to refer to `dependencyGraph`.
+   * 
+   * @internal
+   */
   public get matrixMapping(): MatrixMapping {
     return this.dependencyGraph.matrixMapping
   }
 
+  /**
+   * Calls the `sheetMapping` method on the dependency graph.
+   * 
+   * Allows to execute `sheetMapping` directly without a need to refer to `dependencyGraph`.
+   * 
+   * @internal
+   */
   public get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
 
+  /**
+   * Calls the `addressMapping` method on the dependency graph.
+   * 
+   * Allows to execute `addressMapping` directly without a need to refer to dependencyGraph.
+   * 
+   * @internal
+   */
   public get addressMapping(): AddressMapping {
     return this.dependencyGraph.addressMapping
   }
@@ -1148,7 +1190,6 @@ export class HyperFormula {
    * @param {RawCellContent} expression - the expression
    * 
    * @fires Events#namedExpressionAdded
-   * @fires Events#valuesUpdated
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent): ExportedChange[] {
     if (!this.namedExpressions.isNameValid(expressionName)) {
