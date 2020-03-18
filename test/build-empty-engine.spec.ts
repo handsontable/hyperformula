@@ -7,9 +7,10 @@ describe('Building empty engine', () => {
     const engine = HyperFormula.buildEmpty()
     expect(engine).toBeInstanceOf(HyperFormula)
   })
-  xit('accepts config params', () => {
-    const config = new Config()
+
+  it('accepts config params', () => {
+    const config = { dateFormats: ['MM'] }
     const engine = HyperFormula.buildEmpty(config)
-    expect(engine.config).toBe(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 })

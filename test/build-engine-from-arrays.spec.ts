@@ -18,20 +18,20 @@ describe('Building engine from arrays', () => {
     expect(engine.getAllSheetsDimensions()).toEqual({'Sheet1': {'height': 0, 'width': 0}})
   })
 
-  xit('#buildFromSheets accepts config', () => {
-    const config = new Config()
+  it('#buildFromSheets accepts config', () => {
+    const config = { dateFormats: ['MM'] }
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [],
       Sheet2: [],
     }, config)
 
-    expect(engine.config).toBe(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 
-  xit('#buildFromSheet accepts config', () => {
-    const config = new Config()
+  it('#buildFromSheet accepts config', () => {
+    const config = { dateFormats: ['MM'] }
     const engine = HyperFormula.buildFromArray([], config)
 
-    expect(engine.config).toBe(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 })
