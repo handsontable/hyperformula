@@ -2,11 +2,10 @@ import assert from 'assert'
 import {AbsoluteCellRange, DIFFERENT_SHEETS_ERROR} from '../../AbsoluteCellRange'
 import {CellError, EmptyValue, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
-import {AstNodeType, CellRangeAst, CellReferenceAst, ProcedureAst} from '../../parser'
+import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {
   coerceNonDateScalarToMaybeNumber,
   coerceScalarToNumberOrError,
-  coerceToMaybeNumber,
   coerceToRange
 } from '../coerce'
 import { SimpleRangeValue} from '../InterpreterValue'
@@ -307,7 +306,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
           value = mapFunction(value)
           value = reducingFunction(initialAccValue, value)
         } else {
-          value = coerceScalarToNumberOrError(value, this.interpreter.dateHelper)
+          value = coerceFunction(value)
           value = mapFunction(value)
         }
 
