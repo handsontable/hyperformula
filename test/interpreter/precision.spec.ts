@@ -210,3 +210,21 @@ describe( 'Value-fixed', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(0.3)
   })
 })
+
+describe( 'tests', () => {
+  it('addition of small numbers with smartRounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0.000123456789', '1', '=A1+B1'],
+    ],  { smartRounding: true })
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)
+  })
+
+  it('addition of small numbers with smartRounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0.000123456789', '1', '=A1+B1'],
+    ], { smartRounding: true, precisionRounding: 9 })
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123457) //as GS and E
+  })
+})
