@@ -12,8 +12,7 @@ import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 
 export class BuildEngineFromArraysFactory {
-  public buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
-    const config = new Config(configInput)
+  private buildWithConfig(sheets: Sheets, config: Config): HyperFormula {
     const stats = new Statistics()
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
@@ -65,8 +64,14 @@ export class BuildEngineFromArraysFactory {
     return engine
   }
 
+  public buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
+    const config = new Config(configInput)
+    return this.buildWithConfig(sheets, config)
+  }
+
   public buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
-    const newsheetprefix = new Config(configInput).language.interface.NEW_SHEET_PREFIX + '1'
-    return this.buildFromSheets({[newsheetprefix]: sheet}, configInput)
+    const config = new Config(configInput)
+    const newsheetprefix = config.language.interface.NEW_SHEET_PREFIX + '1'
+    return this.buildWithConfig({[newsheetprefix]: sheet}, config)
   }
 }
