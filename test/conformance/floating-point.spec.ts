@@ -1,7 +1,6 @@
 import { HyperFormula } from '../../src'
 import '../testConfig'
 import { adr } from '../testUtils'
-
 import { Config } from '../../src/Config'
 
 // Test cases based on https://github.com/MicrosoftDocs/OfficeDocs-Support/blob/public/Office/Client/excel/floating-point-arithmetic-inaccurate-result.md
