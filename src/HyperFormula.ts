@@ -945,20 +945,6 @@ export class HyperFormula {
   }
 
   /**
-   * Forces engine to recompute postponed transformations. Useful during testing.
-   */
-  public forceApplyPostponedTransformations(): void {
-    this.dependencyGraph.forceApplyPostponedTransformations()
-  }
-
-  /**
-   * Disables numeric arrays detected during graph build phase and replaces them with ordinary numeric cells.
-   */
-  public disableNumericMatrices(): void {
-    this.dependencyGraph.disableNumericMatrices()
-  }
-
-  /**
    * Computes simple (absolute) address of a cell address based on its string representation.
    * 
    * If sheet name is present in string representation but not present in the engine, returns `undefined`.
