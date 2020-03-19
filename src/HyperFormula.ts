@@ -43,8 +43,7 @@ import {
   Serialization
 } from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
-import {TinyEmitter} from 'tiny-emitter'
-import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
+import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
@@ -52,7 +51,7 @@ export type Index = [number, number]
 /**
  * Engine for one sheet
  */
-export class HyperFormula {
+export class HyperFormula implements TypedEmitter {
 
   public static version = (process.env.HT_VERSION || '')
   public static buildDate = (process.env.HT_BUILD_DATE || '')
@@ -125,7 +124,7 @@ export class HyperFormula {
   private crudOperations: CrudOperations
   private exporter: Exporter
   private namedExpressions: NamedExpressions
-  private readonly emitter: TinyEmitter = new TinyEmitter()
+  private readonly emitter: Emitter = new Emitter()
   public serialization: Serialization
 
   constructor(
@@ -1107,7 +1106,7 @@ export class HyperFormula {
    */
   public renameSheet(sheetId: number, newName: string): void {
     const oldName = this.sheetMapping.renameSheet(sheetId, newName)
-    if (oldName !== SheetMapping.NO_CHANGE) {
+    if (oldName !== undefined) {
       this.emitter.emit(Events.SheetRenamed, oldName, newName)
     }
   }
@@ -1298,58 +1297,21 @@ export class HyperFormula {
   }
 
   /**
-   * A method that listens on adding a sheet event.
+   * A method that listens on events.
    * 
-   * @param {SheetAddedHandler} handler handler of adding sheet event
+   * @param {Event} event to listen on
+   * @param {Listener} handler to be called on event
    */
-  public onSheetAdded(handler: SheetAddedHandler): void {
-    this.emitter.on(Events.SheetAdded, handler)
+  public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.on(event, listener)
   }
 
-  /**
-   * A method that listens on removing a sheet event.
-   * 
-   * @param {SheetRemovedHandler} handler handler of removing sheet event
-   */
-  public onSheetRemoved(handler: SheetRemovedHandler): void {
-    this.emitter.on(Events.SheetRemoved, handler)
-  }
-  
-  /**
-   * 
-   * A method that listens on renaming a sheet event.
-   * 
-   * @param {SheetRenamedHandler} handler handler of renaming sheet event
-   */
-  public onSheetRenamed(handler: SheetRenamedHandler): void {
-    this.emitter.on(Events.SheetRenamed, handler)
+  public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.once(event, listener)
   }
 
-  /**
-   * A method that listens on adding a named expression event.
-   * 
-   * @param {NamedExpressionAddedHandler} handler handler of adding named expression event
-   */
-  public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
-    this.emitter.on(Events.NamedExpressionAdded, handler)
-  }
-
-  /**
-   * A method that listens on removing a named expression event.
-   *  
-   * @param {NamedExpressionRemovedHandler} handler handler of removing named expression event
-   */
-  public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
-    this.emitter.on(Events.NamedExpressionRemoved, handler)
-  }
-
-  /**
-   * A method that listens on updating the values event.
-   * 
-   * @param {ValuesUpdatedHandler} handler handler of updating values event
-   */
-  public onValuesUpdated(handler: ValuesUpdatedHandler): void {
-    this.emitter.on(Events.ValuesUpdated, handler)
+  public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.off(event, listener)
   }
 
   /**
