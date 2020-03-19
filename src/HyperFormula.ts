@@ -1106,8 +1106,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public renameSheet(sheetId: number, newName: string): void {
     const oldName = this.sheetMapping.renameSheet(sheetId, newName)
-    if (oldName !== SheetMapping.NO_CHANGE) {
-      this.emitter.emit(Events.SheetRenamed, oldName as string, newName)
+    if (oldName !== undefined) {
+      this.emitter.emit(Events.SheetRenamed, oldName, newName)
     }
   }
 
