@@ -4,7 +4,7 @@ import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
-import {HyperFormula} from './HyperFormula'
+import {HyperFormula} from './index'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
