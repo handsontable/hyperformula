@@ -1,7 +1,7 @@
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB, plPL} from '../../src/i18n'
+import {enGB} from '../../src/i18n'
 import {buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 

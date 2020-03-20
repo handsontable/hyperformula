@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {enGB, languages, plPL} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
@@ -61,8 +60,9 @@ describe('i18n', () => {
     const implementedFunctions = Config.getRegisteredFunctions()
     implementedFunctions.add('OFFSET') // HARDCODED FUNCTION
 
-    for (const lang in languages) {
-      const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
+    for (const lang of HyperFormula.getRegisteredLanguages()) {
+      const functions = HyperFormula.getLanguage(lang).functions
+      const translatedFunctionsInLang = new Set(Object.keys(functions))
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
   })

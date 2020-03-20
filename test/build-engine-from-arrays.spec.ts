@@ -1,7 +1,6 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
 import {Config} from '../src/Config'
-import {plPL} from '../src/i18n'
 
 describe('Building engine from arrays', () => {
   it('works', () => {

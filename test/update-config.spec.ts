@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
