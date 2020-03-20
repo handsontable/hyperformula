@@ -7,7 +7,7 @@ import {GraphBuilder} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Evaluator} from './Evaluator'
 import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -50,7 +50,7 @@ export class RebuildEngineWithConfigFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralsHelper, collator)
+    const evaluator = new Evaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralsHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)

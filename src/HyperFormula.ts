@@ -23,7 +23,7 @@ import {
   Vertex,
 } from './DependencyGraph'
 import {EmptyEngineFactory} from './EmptyEngineFactory'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -126,6 +126,7 @@ export class HyperFormula implements TypedEmitter {
   private namedExpressions: NamedExpressions
   private readonly emitter: Emitter = new Emitter()
   public serialization: Serialization
+  private evaluationSuspended: boolean
 
   constructor(
     /** Engine configuration. */
@@ -151,6 +152,7 @@ export class HyperFormula implements TypedEmitter {
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
     this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
+    this.evaluationSuspended = false
   }
 
   /**
@@ -163,7 +165,14 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getCellValue(address)
+  }
+
+  private ensureEvaluationIsNotSuspended() {
+    if (this.evaluationSuspended) {
+      throw new EvaluationSuspendedError()
+    }
   }
 
   /**
@@ -191,6 +200,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns a [[CellValue]] which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getCellSerialized(address)
   }
 
@@ -204,6 +214,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheet - sheet ID number
    */
   public getSheetValues(sheet: number): CellValue[][] {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getSheetValues(sheet)
   }
 
@@ -230,6 +241,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getSheetSerialized(sheet)
   }
 
@@ -266,6 +278,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getAllSheetsValues()
   }
 
@@ -284,6 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getAllSheetsSerialized()
   }
 
@@ -367,32 +381,8 @@ export class HyperFormula implements TypedEmitter {
    * @returns an array of [[ExportedChange]]
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
-    if (!(cellContents instanceof Array)) {
-      this.crudOperations.setCellContent(topLeftCornerAddress, cellContents)
-      return this.recomputeIfDependencyGraphNeedsIt()
-    }
-    for (let i = 0; i < cellContents.length; i++) {
-      if (!(cellContents[i] instanceof Array)) {
-        throw new Error('Expected an array of arrays or a raw cell value.')
-      }
-      for (let j = 0; j < cellContents[i].length; j++) {
-        if (isMatrix(cellContents[i][j])) {
-          throw new Error('Cant change matrices in batch operation')
-        }
-      }
-    }
-
-    return this.batch((e) => {
-      for (let i = 0; i < cellContents.length; i++) {
-        for (let j = 0; j < cellContents[i].length; j++) {
-          e.setCellContent({
-            sheet: topLeftCornerAddress.sheet,
-            row: topLeftCornerAddress.row + i,
-            col: topLeftCornerAddress.col + j,
-          }, cellContents[i][j])
-        }
-      }
-    })
+    this.crudOperations.setCellContents(topLeftCornerAddress, cellContents)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -719,6 +709,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureEvaluationIsNotSuspended()
     this.crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -906,28 +897,8 @@ export class HyperFormula implements TypedEmitter {
    * @param {RawCellContent[][]} values - array of new values
    */
   public setSheetContent(sheetName: string, values: RawCellContent[][]): ExportedChange[] {
-    this.crudOperations.ensureSheetExists(sheetName)
-
-    const sheetId = this.getSheetId(sheetName)!
-
-    return this.batch((e) => {
-      e.clearSheet(sheetName)
-      if (!(values instanceof Array)) {
-        throw new Error('Expected an array of arrays.')
-      }
-      for (let i = 0; i < values.length; i++) {
-        if (!(values[i] instanceof Array)) {
-          throw new Error('Expected an array of arrays.')
-        }
-        for (let j = 0; j < values[i].length; j++) {
-          e.setCellContent({
-            sheet: sheetId,
-            row: i,
-            col: j,
-          }, values[i][j])
-        }
-      }
-    })
+    this.crudOperations.setSheetContent(sheetName, values)
+    return this.recomputeIfDependencyGraphNeedsIt()
   }
 
   /**
@@ -1081,6 +1052,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
+    this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(address)
     return getCellValueType(value)
   }
@@ -1120,13 +1092,27 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
+    this.suspendEvaluation()
     try {
-      batchOperations(this.crudOperations)
+      batchOperations(this)
     } catch (e) {
-      this.recomputeIfDependencyGraphNeedsIt()
+      this.resumeEvaluation()
       throw (e)
     }
+    return this.resumeEvaluation()
+  }
+
+  public suspendEvaluation(): void {
+    this.evaluationSuspended = true
+  }
+
+  public resumeEvaluation(): ExportedChange[] {
+    this.evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
+  }
+
+  public isEvaluationSuspended(): boolean {
+    return this.evaluationSuspended
   }
 
   /**
@@ -1337,20 +1323,24 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
-    const changes = this.crudOperations.getAndClearContentChanges()
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-    this.dependencyGraph.clearRecentlyChangedVertices()
+    if (!this.evaluationSuspended) {
+      const changes = this.crudOperations.getAndClearContentChanges()
+      const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+      this.dependencyGraph.clearRecentlyChangedVertices()
 
-    if (verticesToRecomputeFrom.length > 0) {
-      changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+      if (verticesToRecomputeFrom.length > 0) {
+        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+      }
+
+      const exportedChanges = changes.exportChanges(this.exporter)
+
+      if (!changes.isEmpty()) {
+        this.emitter.emit(Events.ValuesUpdated, exportedChanges)
+      }
+
+      return exportedChanges
+    } else {
+      return []
     }
-
-    const exportedChanges = changes.exportChanges(this.exporter)
-
-    if (!changes.isEmpty()) {
-      this.emitter.emit(Events.ValuesUpdated, exportedChanges)
-    }
-
-    return exportedChanges
   }
 }

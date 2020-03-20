@@ -6,7 +6,7 @@ import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Evaluator} from './Evaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
@@ -45,7 +45,7 @@ export class BuildEngineFromArraysFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
+    const evaluator = new Evaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
