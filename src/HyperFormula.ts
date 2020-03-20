@@ -125,7 +125,7 @@ export class HyperFormula implements TypedEmitter {
   private static registeredLanguages: Record<string, TranslationPackage> = {}
 
   public static getLanguage(name: string): TranslationPackage {
-    if(!HyperFormula.registeredLanguages.hasOwnProperty(name)) {
+    if(!(name in HyperFormula.registeredLanguages)) {
       throw new Error('Language not registered.')
     } else {
       return HyperFormula.registeredLanguages[name]
@@ -133,7 +133,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   public static registerLanguage(name: string, lang: TranslationPackage): void {
-    if(HyperFormula.registeredLanguages.hasOwnProperty(name)) {
+    if(name in HyperFormula.registeredLanguages) {
       throw new Error('Language already registered.')
     } else {
       this.registeredLanguages[name] = lang
@@ -141,7 +141,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   public static registerLanguages(languages: Record<string, TranslationPackage>): void {
-    for(let key in languages) {
+    for(const key in languages) {
       HyperFormula.registerLanguage(key, languages[key])
     }
   }
