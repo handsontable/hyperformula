@@ -1,6 +1,6 @@
 import {Config} from './Config'
 
-export class NumberLiteralsHelper {
+export class NumberLiteralHelper {
   private readonly numberPattern: RegExp
   private readonly allThousandSeparatorsRegex: RegExp
 

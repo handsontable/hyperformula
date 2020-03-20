@@ -31,7 +31,7 @@ import {
 } from './scalar'
 import {concatenate} from './text'
 import Collator = Intl.Collator
-import {NumberLiteralsHelper} from '../NumberLiteralsHelper'
+import {NumberLiteralHelper} from '../NumberLiteralHelper'
 
 export class Interpreter {
   private gpu?: GPU.GPU
@@ -43,7 +43,7 @@ export class Interpreter {
     public readonly config: Config,
     public readonly stats: Statistics,
     public readonly dateHelper: DateHelper,
-    public readonly numberLiteralsHelper: NumberLiteralsHelper,
+    public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly collator: Collator
   ) {
     this.registerPlugins(this.config.allFunctionPlugins())

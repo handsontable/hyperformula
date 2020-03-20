@@ -3,7 +3,7 @@ import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 import {UnableToParse} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
-import {NumberLiteralsHelper} from './NumberLiteralsHelper'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
@@ -92,7 +92,7 @@ export class CellContentParser {
   constructor(
     private readonly config: Config,
     private readonly dateHelper: DateHelper,
-    private readonly numberLiteralsHelper: NumberLiteralsHelper) {
+    private readonly numberLiteralsHelper: NumberLiteralHelper) {
   }
 
   public parse(content: RawCellContent): CellContent.Type {

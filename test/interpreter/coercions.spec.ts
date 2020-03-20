@@ -11,10 +11,10 @@ import {
 } from '../../src/interpreter/coerce'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
-import {NumberLiteralsHelper} from '../../src/NumberLiteralsHelper'
+import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
-  const numberLiteralsHelper = new NumberLiteralsHelper(new Config())
+  const numberLiteralsHelper = new NumberLiteralHelper(new Config())
   it('works', () => {
     expect(coerceNonDateScalarToMaybeNumber(42, numberLiteralsHelper)).toBe(42)
     expect(coerceNonDateScalarToMaybeNumber('42', numberLiteralsHelper)).toBe(42)
@@ -38,7 +38,7 @@ describe('#coerceBooleanToNumber', () => {
   it('behaves the same as more general coercion', () => {
     const config = new Config()
     const dateHelper = new DateHelper(config)
-    const numberLiteralsHelper = new NumberLiteralsHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
     expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumberOrError(true, dateHelper, numberLiteralsHelper))
     expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumberOrError(false, dateHelper, numberLiteralsHelper))
   })
@@ -73,7 +73,7 @@ describe('#coerceScalarToNumberOrError', () => {
   it('works', () => {
     const config = new Config()
     const dateHelper = new DateHelper(config)
-    const numberLiteralsHelper = new NumberLiteralsHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
     expect(coerceScalarToNumberOrError(1, dateHelper, numberLiteralsHelper)).toEqual(1)
 
     expect(coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO), dateHelper, numberLiteralsHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))

@@ -10,7 +10,7 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
-import {NumberLiteralsHelper} from './NumberLiteralsHelper'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export class BuildEngineFromArraysFactory {
   private buildWithConfig(sheets: Sheets, config: Config): HyperFormula {
@@ -31,7 +31,7 @@ export class BuildEngineFromArraysFactory {
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
-    const numberLiteralHelper = new NumberLiteralsHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 

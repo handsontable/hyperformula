@@ -3,7 +3,7 @@ import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
-import {NumberLiteralsHelper} from './NumberLiteralsHelper'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
@@ -22,7 +22,7 @@ export class EmptyEngineFactory {
     const parser = new ParserWithCaching(config, dependencyGraph.sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), dependencyGraph.sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
-    const numberLiteralHelper = new NumberLiteralsHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
     const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
     const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
