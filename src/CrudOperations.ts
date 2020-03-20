@@ -43,7 +43,6 @@ import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransf
 
 export class CrudOperations {
 
-  private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
   public readonly operations: Operations
 
@@ -65,7 +64,7 @@ export class CrudOperations {
     private readonly undoRedo: UndoRedo,
   ) {
     this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
-    this.operations = new Operations(this.dependencyGraph, this.parser, this.stats, this.lazilyTransformingAstService)
+    this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -216,7 +215,9 @@ export class CrudOperations {
 
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
     if (!(cellContents instanceof Array)) {
-      this.setCellContent(topLeftCornerAddress, cellContents)
+      this.ensureItIsPossibleToChangeContent(topLeftCornerAddress)
+      this.clipboardOperations.abortCut()
+      this.operations.setCellContent(topLeftCornerAddress, cellContents)
       return
     }
     for (let i = 0; i < cellContents.length; i++) {
@@ -232,11 +233,14 @@ export class CrudOperations {
 
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
-        this.setCellContent({
+        const address = {
           sheet: topLeftCornerAddress.sheet,
           row: topLeftCornerAddress.row + i,
           col: topLeftCornerAddress.col + j,
-        }, cellContents[i][j])
+        }
+        this.ensureItIsPossibleToChangeContent(address)
+        this.clipboardOperations.abortCut()
+        this.operations.setCellContent(address, cellContents[i][j])
       }
     }
   }
@@ -254,85 +258,16 @@ export class CrudOperations {
         throw new Error('Expected an array of arrays.')
       }
       for (let j = 0; j < values[i].length; j++) {
-        this.setCellContent({
+        const address = {
           sheet: sheetId,
           row: i,
           col: j,
-        }, values[i][j])
-      }
-    }
-  }
-
-  private setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
-    this.ensureItIsPossibleToChangeContent(address)
-    this.clipboardOperations.abortCut()
-
-    const parsedCellContent = this.cellContentParser.parse(newCellContent)
-
-    let vertex = this.dependencyGraph.getCell(address)
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
-      this.dependencyGraph.breakNumericMatrix(vertex)
-      vertex = this.dependencyGraph.getCell(address)
-    }
-
-    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
-      const newValue = parsedCellContent.value
-      const oldValue = this.dependencyGraph.getCellValue(address)
-      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
-      vertex.setMatrixCellValue(address, newValue)
-      this.columnSearch.change(oldValue, newValue, address)
-      this.changes.addChange(newValue, address)
-    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
-      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-      if (errors.length > 0) {
-        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
-      } else {
-        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
-        if (newVertex instanceof ValueCellVertex) {
-          throw Error('What if new matrix vertex is not properly constructed?')
         }
-        this.dependencyGraph.addNewMatrixVertex(newVertex)
-        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
-        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+        this.ensureItIsPossibleToChangeContent(address)
+        this.clipboardOperations.abortCut()
+        this.operations.setCellContent(address, values[i][j])
       }
-    } else if (!(vertex instanceof MatrixVertex)) {
-      if (parsedCellContent instanceof CellContent.Formula) {
-        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-        if (errors.length > 0) {
-          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
-        } else {
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
-        }
-      } else if (parsedCellContent instanceof CellContent.Empty) {
-        this.setCellEmpty(address)
-      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
-        throw new Error('Cant happen')
-      } else {
-        this.setValueToCell(parsedCellContent.value, address)
-      }
-    } else {
-      throw new Error('Illegal operation')
     }
-  }
-
-  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
-    this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(oldValue, value, address)
-    this.changes.addChange(value, address)
-  }
-
-  public setCellEmpty(address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
-    this.columnSearch.remove(oldValue, address)
-    this.changes.addChange(EmptyValue, address)
-    this.dependencyGraph.setCellEmpty(address)
-  }
-
-  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
-    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   public ensureItIsPossibleToAddRows(sheet: number, ...indexes: Index[]): void {
@@ -507,9 +442,7 @@ export class CrudOperations {
   }
 
   public getAndClearContentChanges(): ContentChanges {
-    const changes = this.changes
-    this.changes = ContentChanges.empty()
-    return changes
+    return this.operations.getAndClearContentChanges()
   }
 
   public ensureSheetExists(sheetName: string): void {

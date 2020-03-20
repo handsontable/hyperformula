@@ -105,11 +105,11 @@ export class ClipboardOperations {
 
         for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
           if (clipboardCell.type === ClipboardCellType.VALUE) {
-            this.crudOperations.setValueToCell(clipboardCell.value, address)
+            this.crudOperations.operations.setValueToCell(clipboardCell.value, address)
           } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
-            this.crudOperations.setCellEmpty(address)
+            this.crudOperations.operations.setCellEmpty(address)
           } else {
-            this.crudOperations.setFormulaToCellFromCache(clipboardCell.hash, address)
+            this.crudOperations.operations.setFormulaToCellFromCache(clipboardCell.hash, address)
           }
         }
         break

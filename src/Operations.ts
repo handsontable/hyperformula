@@ -5,12 +5,18 @@
 
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress, EmptyValue} from './Cell'
+import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
+import {ContentChanges} from './ContentChanges'
+import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
+import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
-import {ParserWithCaching} from './parser'
+import {buildMatrixVertex} from './GraphBuilder'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {ParserWithCaching, ProcedureAst} from './parser'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 
@@ -68,8 +74,12 @@ export interface RowsAddition {
 }
 
 export class Operations {
+  private changes: ContentChanges = ContentChanges.empty()
+
   constructor(
     private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: ColumnSearchStrategy,
+    private readonly cellContentParser: CellContentParser,
     private readonly parser: ParserWithCaching,
     private readonly stats: Statistics,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
@@ -168,6 +178,75 @@ export class Operations {
     throw Error('Trying to copy unsupported type')
   }
 
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
+    const parsedCellContent = this.cellContentParser.parse(newCellContent)
+
+    let vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && !(parsedCellContent instanceof CellContent.Number)) {
+      this.dependencyGraph.breakNumericMatrix(vertex)
+      vertex = this.dependencyGraph.getCell(address)
+    }
+
+    if (vertex instanceof MatrixVertex && !vertex.isFormula() && parsedCellContent instanceof CellContent.Number) {
+      const newValue = parsedCellContent.value
+      const oldValue = this.dependencyGraph.getCellValue(address)
+      this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(vertex)
+      vertex.setMatrixCellValue(address, newValue)
+      this.columnSearch.change(oldValue, newValue, address)
+      this.changes.addChange(newValue, address)
+    } else if (!(vertex instanceof MatrixVertex) && parsedCellContent instanceof CellContent.MatrixFormula) {
+      const {ast, errors, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+      if (errors.length > 0) {
+        this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formulaWithBraces()))
+      } else {
+        const newVertex = buildMatrixVertex(ast as ProcedureAst, address)
+        if (newVertex instanceof ValueCellVertex) {
+          throw Error('What if new matrix vertex is not properly constructed?')
+        }
+        this.dependencyGraph.addNewMatrixVertex(newVertex)
+        this.dependencyGraph.processCellDependencies(absolutizeDependencies(dependencies, address), newVertex)
+        this.dependencyGraph.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+      }
+    } else if (!(vertex instanceof MatrixVertex)) {
+      if (parsedCellContent instanceof CellContent.Formula) {
+        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
+        if (errors.length > 0) {
+          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
+        } else {
+          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+        }
+      } else if (parsedCellContent instanceof CellContent.Empty) {
+        this.setCellEmpty(address)
+      } else if (parsedCellContent instanceof CellContent.MatrixFormula) {
+        throw new Error('Cant happen')
+      } else {
+        this.setValueToCell(parsedCellContent.value, address)
+      }
+    } else {
+      throw new Error('Illegal operation')
+    }
+  }
+
+  public setValueToCell(value: ValueCellVertexValue, address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.dependencyGraph.setValueToCell(address, value)
+    this.columnSearch.change(oldValue, value, address)
+    this.changes.addChange(value, address)
+  }
+
+  public setCellEmpty(address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.remove(oldValue, address)
+    this.changes.addChange(EmptyValue, address)
+    this.dependencyGraph.setCellEmpty(address)
+  }
+
+  public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), hasVolatileFunction, hasStructuralChangeFunction)
+  }
+
   /**
    * Returns true if row number is outside of given sheet.
    *
@@ -177,6 +256,12 @@ export class Operations {
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.dependencyGraph.addressMapping.getHeight(sheet)
     return row >= height
+  }
+
+  public getAndClearContentChanges(): ContentChanges {
+    const changes = this.changes
+    this.changes = ContentChanges.empty()
+    return changes
   }
 }
 

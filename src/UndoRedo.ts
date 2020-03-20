@@ -92,11 +92,11 @@ export class UndoRedo {
       for (const { address, cellType } of rowsRemoval.removedCells) {
         switch (cellType.type) {
           case ClipboardCellType.VALUE: {
-            this.crudOperations?.setValueToCell(cellType.value, address)
+            this.crudOperations!.operations.setValueToCell(cellType.value, address)
             break
           }
           case ClipboardCellType.FORMULA: {
-            this.crudOperations?.setFormulaToCellFromCache(cellType.hash, address)
+            this.crudOperations!.operations.setFormulaToCellFromCache(cellType.hash, address)
             break
           }
         }
@@ -105,7 +105,7 @@ export class UndoRedo {
       const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
       for (const entryToRestore of oldDataToRestore) {
         const [ address, hash ] = entryToRestore
-        this.crudOperations!.setFormulaToCellFromCache(hash, address)
+        this.crudOperations!.operations.setFormulaToCellFromCache(hash, address)
       }
     }
   }
