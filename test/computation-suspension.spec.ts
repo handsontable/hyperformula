@@ -138,4 +138,40 @@ describe('Evaluation suspension', () => {
 
     expect(engine.isEvaluationSuspended()).toBe(false)
   })
+
+  describe('clipboard operations depend on values, so they are forbidden', () => {
+    it('copy', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '=A1'],
+      ])
+      engine.suspendEvaluation()
+
+      expect(() => {
+        engine.copy(adr('A1'), 2, 2)
+      }).toThrow(new EvaluationSuspendedError())
+    })
+
+    it('cut', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '=A1'],
+      ])
+      engine.suspendEvaluation()
+
+      expect(() => {
+        engine.cut(adr('A1'), 2, 2)
+      }).toThrow(new EvaluationSuspendedError())
+    })
+
+    it('paste', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '=A1'],
+      ])
+      engine.copy(adr('A1'), 2, 2)
+      engine.suspendEvaluation()
+
+      expect(() => {
+        engine.paste(adr('A3'))
+      }).toThrow(new EvaluationSuspendedError())
+    })
+  })
 })

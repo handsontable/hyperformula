@@ -709,6 +709,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires Events#valuesUpdated
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureEvaluationIsNotSuspended()
     this.crudOperations.paste(targetLeftCorner)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
