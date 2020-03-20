@@ -103,13 +103,16 @@ describe('Config', () => {
   it('should throw error when there is a conflict between separators', () => {
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' ' })
-    }).toThrow('Config initialization failed. Function argument separator and decimal separator needs to differ.')
+    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator]')
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ',' })
-    }).toThrow('Config initialization failed. Thousand separator and decimal separator needs to differ.')
+    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,thousandSeparator]')
     expect(() => {
       new Config({ decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ',' })
-    }).toThrow('Config initialization failed. Function argument separator and thousand separator needs to differ.')
+    }).toThrow('Config initialization failed. Parameters in conflict: [functionArgSeparator,thousandSeparator]')
+    expect(() => {
+      new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ',' })
+    }).toThrow('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
   })
 
 
