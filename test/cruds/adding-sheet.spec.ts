@@ -51,7 +51,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should add sheet with translated sheet name', function() {
-    const engine = HyperFormula.buildEmpty({ language: plPL })
+    const engine = HyperFormula.buildEmpty({ language: 'plPL' })
 
     engine.addSheet()
 

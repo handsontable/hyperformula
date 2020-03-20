@@ -4,6 +4,7 @@ import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
+import {HyperFormula} from './HyperFormula'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -50,7 +51,7 @@ export interface ConfigParams {
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
-  language: TranslationPackage,
+  language: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   gpuMode: GPUMode,
@@ -83,7 +84,7 @@ export class Config implements ConfigParams, ParserConfig{
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
-    language: enGB,
+    language: 'enGB',
     functionPlugins: [],
     gpuMode: 'gpu',
     leapYear1900: false,
@@ -200,11 +201,11 @@ export class Config implements ConfigParams, ParserConfig{
    */
   public readonly decimalSeparator: '.' | ','
   /**
-   * Translation package with translations of function and error names.
+   * Code for translation package with translations of function and error names.
    *
-   * @default enGB
+   * @default 'enGB'
    */
-  public readonly language: TranslationPackage
+  public readonly language: string
   /**
    * A list of additional function plugins to use by formula interpreter.
    *
@@ -349,7 +350,10 @@ export class Config implements ConfigParams, ParserConfig{
    * Built automatically based on translation package.
    */
   public readonly errorMapping: Record<string, ErrorType>
-
+  /**
+   * Built automatically based on language.
+   */
+  public readonly translationPackage: TranslationPackage
 
   constructor(
     {
@@ -387,7 +391,7 @@ export class Config implements ConfigParams, ParserConfig{
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
-    this.language = language || Config.defaultConfig.language
+    this.language = this.valueFromParam(language, 'string', 'language')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
@@ -399,7 +403,8 @@ export class Config implements ConfigParams, ParserConfig{
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.errorMapping = this.buildErrorMapping(this.language)
+    this.translationPackage = HyperFormula.getLanguage(this.language)
+    this.errorMapping = this.buildErrorMapping(this.translationPackage)
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate' )
@@ -421,11 +426,11 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
-    return this.language.functions[functionTranslationKey]
+    return this.translationPackage.functions[functionTranslationKey]
   }
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
-    return this.language.errors[functionTranslationKey]
+    return this.translationPackage.errors[functionTranslationKey]
   }
 
   public numericStringToNumber = (input: string): number => {

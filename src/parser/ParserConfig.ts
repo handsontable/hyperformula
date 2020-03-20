@@ -4,7 +4,7 @@ import {TranslationPackage} from '../i18n'
 export interface ParserConfig {
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
-  language: TranslationPackage,
+  translationPackage: TranslationPackage,
   errorMapping: Record<string, ErrorType>,
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,

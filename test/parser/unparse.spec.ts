@@ -119,7 +119,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse with known error with translation', () => {
-    const config = new Config({language: plPL})
+    const config = new Config({language: 'plPL'})
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const formula = '=#ADR!'
@@ -264,8 +264,8 @@ describe('Unparse', () => {
   })
 
   it('#unparse use language configuration', () => {
-    const configEN = new Config({language: enGB})
-    const configPL = new Config({language: plPL})
+    const configEN = new Config({language: 'enGB'})
+    const configPL = new Config({language: 'plPL'})
 
     const parser = new ParserWithCaching(configPL, sheetMapping.get)
 

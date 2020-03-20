@@ -42,7 +42,7 @@ describe( 'rounding', () => {
 
 describe('detailed error', () => {
   it('should return detailed errors', () => {
-    const config = new Config({ language: enGB })
+    const config = new Config({ language: 'enGB' })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
@@ -51,7 +51,7 @@ describe('detailed error', () => {
   })
 
   it('should return detailed errors with translation', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({ language: 'plPL' })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError

@@ -113,9 +113,9 @@ export interface ILexerConfig {
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
-  const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
+  const offsetProcedureNameLiteral = config.translationPackage.functions.OFFSET || 'OFFSET'
   const errorMapping = config.errorMapping
-  const functionMapping = buildFunctionMapping(config.language)
+  const functionMapping = buildFunctionMapping(config.translationPackage)
   const numericStringToNumber = config.numericStringToNumber
 
   /* configurable tokens */

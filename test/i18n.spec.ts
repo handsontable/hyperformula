@@ -9,10 +9,10 @@ describe('i18n', () => {
   it('using functions in different languages', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['=SUM(42)'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     expect(enginePL.getCellValue(adr('A1'))).toBe(42)
     expect(engineEN.getCellValue(adr('A1'))).toBe(42)
@@ -24,13 +24,13 @@ describe('i18n', () => {
       ['1'],
       ['2'],
       ['=LICZ.JEŻELI(A1:A3, ">=1")'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
       ['=COUNTIF(A1:A3, ">=1")'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     expect(enginePL.getCellValue(adr('A4'))).toBe(2)
     expect(engineEN.getCellValue(adr('A4'))).toBe(2)
@@ -39,7 +39,7 @@ describe('i18n', () => {
   it('translation works for parser hardcoded offset procedure', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=PRZESUNIĘCIE(A1, 1, 1)'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
     const engineEN = HyperFormula.buildFromArray([
       ['=OFFSET(A1, 1, 1)'],
     ])
@@ -49,8 +49,8 @@ describe('i18n', () => {
   })
 
   it('all function translation keys has to be upper cased', () => {
-    for (const lang in languages) {
-      const translationPackage = languages[lang]
+    for (const lang of HyperFormula.getRegisteredLanguages()) {
+      const translationPackage = HyperFormula.getLanguage(lang)
       for (const translationKey in translationPackage.functions) {
         expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
       }

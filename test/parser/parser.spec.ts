@@ -100,7 +100,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('function with dot separator', () => {
-    const parser = new ParserWithCaching(new Config({ language: plPL }), new SheetMapping(plPL).get)
+    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(plPL).get)
     const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('EOMONTH')
@@ -108,7 +108,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('function name should be translated during parsing', () => {
-    const parser = new ParserWithCaching(new Config({ language: plPL }), new SheetMapping(plPL).get)
+    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(plPL).get)
     const ast = parser.parse('=SUMA()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -123,7 +123,7 @@ describe('ParserWithCaching', () => {
   })
 
   it('should leave original name if procedure translation not known', () => {
-    const parser = new ParserWithCaching(new Config({ language: plPL }), new SheetMapping(plPL).get)
+    const parser = new ParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(plPL).get)
     const ast = parser.parse('=FOOBAR()', simpleCellAddress(0, 0, 0)).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('FOOBAR')

@@ -105,7 +105,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure hash using canonical name', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({ language: 'plPL' })
     const sheetMapping = new SheetMapping(plPL)
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -122,7 +122,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure name with missing translation', () => {
-    const config = new Config({ language: plPL })
+    const config = new Config({ language: 'plPL' })
     const sheetMapping = new SheetMapping(plPL)
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))

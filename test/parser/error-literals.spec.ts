@@ -27,21 +27,21 @@ describe('Parsing error literals', () => {
   })
 
   it('should parse error in other languages', () => {
-    const parser = new ParserWithCaching(new Config({language: plPL}), new SheetMapping(plPL).get)
+    const parser = new ParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(plPL).get)
     const ast = parser.parse('=#ARG!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.VALUE)
   })
 
   it('should parse #DIV/0!', () => {
-    const parser = new ParserWithCaching(new Config({language: enGB}), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config({language: 'enGB'}), new SheetMapping(enGB).get)
     const ast = parser.parse('=#DIV/0!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.DIV_BY_ZERO)
   })
 
   it('should return parser error', () => {
-    const parser = new ParserWithCaching(new Config({language: enGB}), new SheetMapping(enGB).get)
+    const parser = new ParserWithCaching(new Config({language: 'enGB'}), new SheetMapping(enGB).get)
     const { ast, errors } = parser.parse('=#UNKNOWN!', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)

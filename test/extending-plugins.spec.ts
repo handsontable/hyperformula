@@ -21,9 +21,10 @@ describe('Plugins', () => {
     const enGBextended = extendFunctions(enGB, {
       FOO: 'FOO',
     })
+    HyperFormula.registerLanguages({enGBextended})
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
-    ], {functionPlugins: [FooPlugin], language: enGBextended})
+    ], {functionPlugins: [FooPlugin], language: 'enGBextended'})
 
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })

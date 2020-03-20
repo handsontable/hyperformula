@@ -147,7 +147,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   public static getRegisteredLanguages(): string[] {
-    return Array.from(Object.keys(HyperFormula.registeredLanguages))
+    return Object.keys(HyperFormula.registeredLanguages)
   }
 
   private crudOperations: CrudOperations

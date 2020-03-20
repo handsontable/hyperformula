@@ -20,7 +20,7 @@ describe('Building engine from arrays', () => {
   })
 
   it('#buildFromSheet adds default sheet Sheet1, in different languages', () => {
-    const engine = HyperFormula.buildFromArray([], { language: plPL })
+    const engine = HyperFormula.buildFromArray([], { language: 'plPL' })
 
     expect(engine.getAllSheetsDimensions()).toEqual({'Arkusz1': {'height': 0, 'width': 0}})
   })

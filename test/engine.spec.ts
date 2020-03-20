@@ -417,7 +417,7 @@ describe('Integration', () => {
   it('exporting translated errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#VALUE!'],
-    ], {language: enGB})
+    ], {language: 'enGB'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)
@@ -427,7 +427,7 @@ describe('Integration', () => {
   it('exporting detailed errors with translations', () => {
     const engine = HyperFormula.buildFromArray([
       ['=#ARG!'],
-    ], {language: plPL})
+    ], {language: 'plPL'})
 
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)

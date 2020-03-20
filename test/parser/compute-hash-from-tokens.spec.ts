@@ -1,3 +1,4 @@
+import {HyperFormula} from '../../src'
 import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
@@ -5,9 +6,9 @@ import {enGB, plPL, TranslationPackage} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 
 describe('computeHashFromTokens', () => {
-  const computeFunc = (code: string, address: SimpleCellAddress, language: TranslationPackage = enGB): string => {
-    const config = new Config({ language})
-    const sheetMapping = new SheetMapping(language)
+  const computeFunc = (code: string, address: SimpleCellAddress, language: string = 'enGB'): string => {
+    const config = new Config({language})
+    const sheetMapping = new SheetMapping(HyperFormula.getLanguage(language))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
     const parser = new ParserWithCaching(config, sheetMapping.get)
@@ -117,13 +118,13 @@ describe('computeHashFromTokens', () => {
   it('function call in canonical form', () => {
     const code = '=SUMA()'
 
-    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=SUM()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), 'plPL')).toEqual('=SUM()')
   })
 
   it('function call when missing translation', () => {
     const code = '=fooBAR()'
 
-    expect(computeFunc(code, simpleCellAddress(0, 1, 1), plPL)).toEqual('=FOOBAR()')
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1), 'plPL')).toEqual('=FOOBAR()')
   })
 
   it('should work with whitespaces', () => {

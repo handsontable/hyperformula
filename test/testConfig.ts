@@ -6,7 +6,7 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   dateFormats: ['MM/DD/YYYY'],
   functionArgSeparator: ',',
-  language: enGB,
+  language: 'enGB',
   functionPlugins: [],
   gpuMode: 'cpu',
   matrixDetection: false,

@@ -44,12 +44,13 @@ describe('Documentation example spec', () => {
     const enGBextended = extendFunctions(enGB, {
       SQUARE: 'SQUARE',
     })
+    HyperFormula.registerLanguages({enGBextended})
     const engine = HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
-    ], { functionPlugins: [SquarePlugin], language: enGBextended })
+    ], { functionPlugins: [SquarePlugin], language: 'enGBextended' })
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))
