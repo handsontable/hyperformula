@@ -166,6 +166,9 @@ export class ParserWithCaching {
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
+      case AstNodeType.ERROR_WITH_RAW_INPUT: {
+        return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
+      }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)
         const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)

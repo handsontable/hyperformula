@@ -11,7 +11,7 @@ import {
   buildCellReferenceAst,
   buildConcatenateOpAst,
   buildDivOpAst,
-  buildEqualsOpAst,
+  buildEqualsOpAst, buildErrorWithRawInputAst,
   buildGreaterThanOpAst,
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
@@ -453,7 +453,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
     })
     if (address === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
@@ -503,7 +503,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
 
     if (end === undefined) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
     } else if (startSheet === null && end.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
