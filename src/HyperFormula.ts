@@ -520,6 +520,10 @@ export class HyperFormula implements TypedEmitter {
     return !this._undoRedo.isUndoStackEmpty()
   }
 
+  public isThereSomethingToRedo() {
+    return !this.undoRedo.isRedoStackEmpty()
+  }
+
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.

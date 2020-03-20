@@ -60,6 +60,10 @@ export class UndoRedo {
     return this.undoStack.length === 0
   }
 
+  public isRedoStackEmpty(): boolean {
+    return this.redoStack.length === 0
+  }
+
   public undo() {
     const operation = this.undoStack.pop()
     if (!operation) {

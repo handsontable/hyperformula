@@ -185,6 +185,22 @@ describe('UndoRedo - #isThereSomethingToUndo', () => {
   })
 })
 
+describe('UndoRedo - #isThereSomethingToRedo', () => {
+  it('when there is no operation to redo', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('when there is some operation to redo', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeRows(0, [1, 1])
+    engine.undo()
+
+    expect(engine.isThereSomethingToRedo()).toBe(true)
+  })
+})
+
 describe('Redo - removing rows', () => {
   it('works for empty row', () => {
     const engine = HyperFormula.buildFromArray([
