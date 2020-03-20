@@ -1,5 +1,5 @@
 module.exports = {
-  ...require('.typedoc.ts'),
+  ...require('./.typedoc.ts'),
   "theme": "vuepress",
   "out": "docs/api",
   "readme": "./docs/api.md",
