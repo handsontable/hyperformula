@@ -263,7 +263,7 @@ export class CrudOperations {
     }
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
+  private setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
     this.ensureItIsPossibleToChangeContent(address)
     this.clipboardOperations.abortCut()
 
