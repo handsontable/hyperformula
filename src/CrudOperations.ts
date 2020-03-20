@@ -1,7 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
+import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
 import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, AddRowsCommand} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
@@ -31,7 +31,7 @@ import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
-export class CrudOperations implements IBatchExecutor {
+export class CrudOperations {
 
   private changes: ContentChanges = ContentChanges.empty()
   private readonly clipboardOperations: ClipboardOperations
@@ -202,6 +202,55 @@ export class CrudOperations implements IBatchExecutor {
     this.dependencyGraph.clearSheet(sheetId)
 
     this.columnSearch.removeSheet(sheetId)
+  }
+
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
+    if (!(cellContents instanceof Array)) {
+      this.setCellContent(topLeftCornerAddress, cellContents)
+      return
+    }
+    for (let i = 0; i < cellContents.length; i++) {
+      if (!(cellContents[i] instanceof Array)) {
+        throw new Error('Expected an array of arrays or a raw cell value.')
+      }
+      for (let j = 0; j < cellContents[i].length; j++) {
+        if (isMatrix(cellContents[i][j])) {
+          throw new Error('Cant change matrices in batch operation')
+        }
+      }
+    }
+
+    for (let i = 0; i < cellContents.length; i++) {
+      for (let j = 0; j < cellContents[i].length; j++) {
+        this.setCellContent({
+          sheet: topLeftCornerAddress.sheet,
+          row: topLeftCornerAddress.row + i,
+          col: topLeftCornerAddress.col + j,
+        }, cellContents[i][j])
+      }
+    }
+  }
+
+  public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
+    this.ensureSheetExists(sheetName)
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.clearSheet(sheetName)
+    if (!(values instanceof Array)) {
+      throw new Error('Expected an array of arrays.')
+    }
+    for (let i = 0; i < values.length; i++) {
+      if (!(values[i] instanceof Array)) {
+        throw new Error('Expected an array of arrays.')
+      }
+      for (let j = 0; j < values[i].length; j++) {
+        this.setCellContent({
+          sheet: sheetId,
+          row: i,
+          col: j,
+        }, values[i][j])
+      }
+    }
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {

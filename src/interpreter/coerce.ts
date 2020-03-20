@@ -1,6 +1,7 @@
 import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
 import {DateHelper} from '../DateHelper'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
+import {NumberLiteralHelper} from '../NumberLiteralHelper'
 
 /**
  * Coerce scalar value to number if possible
@@ -9,11 +10,11 @@ import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
  * @param arg - cell value
  * @param config
  */
-export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper): number | CellError {
+export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): number | CellError {
   if (arg instanceof CellError) {
     return arg
   }
-  const ret = coerceToMaybeNumber(arg, dateHelper)
+  const ret = coerceToMaybeNumber(arg, dateHelper, numberLiteralsHelper)
   if (ret != null) {
     return ret
   } else {
@@ -21,8 +22,8 @@ export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: 
   }
 }
 
-export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper): number | null {
-  const ret = coerceNonDateScalarToMaybeNumber(arg)
+export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): number | null {
+  const ret = coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper)
   if (ret != null) {
     return ret
   }
@@ -35,15 +36,19 @@ export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelpe
   return null
 }
 
-export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue): number | null {
+export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLiteralsHelper: NumberLiteralHelper): number | null {
   if (arg === EmptyValue) {
     return 0
   }
-  const coercedNumber = Number(arg)
-  if (isNaN(coercedNumber)) {
-    return null
+  if (typeof arg === 'string' && numberLiteralsHelper.isNumber(arg)) {
+    return numberLiteralsHelper.numericStringToNumber(arg)
   } else {
-    return coercedNumber
+    const coercedNumber = Number(arg)
+    if (isNaN(coercedNumber)) {
+      return null
+    } else {
+      return coercedNumber
+    }
   }
 }
 

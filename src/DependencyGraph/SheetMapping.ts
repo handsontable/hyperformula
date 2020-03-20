@@ -107,12 +107,12 @@ export class SheetMapping {
     return this.mappingFromCanonicalName.has(canonicalize(sheetName))
   }
 
-  public renameSheet(sheetId: number, newDisplayName: string): string | typeof SheetMapping.NO_CHANGE {
+  public renameSheet(sheetId: number, newDisplayName: string): Maybe<string> {
     const sheet = this.fetchSheetById(sheetId)
 
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
-      return SheetMapping.NO_CHANGE
+      return undefined
     }
 
     const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))

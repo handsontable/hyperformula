@@ -12,15 +12,15 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
+    const evaluatorSpy = jest.spyOn(engine.evaluator, 'partialRun')
 
     engine.batch((e) => {
+      e.setCellContents(adr('B1'), [['=A1']])
       e.addRows(0, [0, 1], [1, 1])
       e.removeRows(0, [0, 1])
     })
 
-    expect(recomputeSpy).toBeCalledTimes(1)
+    expect(evaluatorSpy).toBeCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
@@ -34,11 +34,11 @@ describe('batch cruds', () => {
       ['bar'],
     ])
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recomputeSpy = jest.spyOn(engine as any, 'recomputeIfDependencyGraphNeedsIt')
+    const evaluatorSpy = jest.spyOn(engine.evaluator, 'partialRun')
 
     try {
       engine.batch((e) => {
+        e.setCellContents(adr('B1'), [['=A1']])
         e.addRows(0, [0, 1], [1, 1])
         e.removeRows(0, [0, 1])
         e.addRows(1, [0, 1]) // fail
@@ -48,7 +48,7 @@ describe('batch cruds', () => {
       // empty line
     }
 
-    expect(recomputeSpy).toBeCalledTimes(1)
+    expect(evaluatorSpy).toBeCalledTimes(1)
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
