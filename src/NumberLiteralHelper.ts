@@ -7,8 +7,12 @@ export class NumberLiteralHelper {
   constructor(
     private readonly config: Config
   ) {
-    this.numberPattern = new RegExp(`^([\+-]?((\\${this.config.decimalSeparator}\\d+)|(\\d+(${this.config.thousandSeparator}\\d{3,})*(\\${this.config.decimalSeparator}\\d+)?)))$`)
-    this.allThousandSeparatorsRegex = new RegExp(`${this.config.thousandSeparator}`, 'g')
+    const thousandSeparator = this.config.thousandSeparator === '.' ? `\\${this.config.thousandSeparator}` : this.config.thousandSeparator
+    const decimalSeparator = this.config.decimalSeparator === '.' ? `\\${this.config.decimalSeparator}` : this.config.decimalSeparator
+
+    this.numberPattern = new RegExp(`^([\+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d+)?)))$`)
+    this.allThousandSeparatorsRegex = new RegExp(`${thousandSeparator}`, 'g')
+    console.log()
   }
   
   public isNumber(input: string): boolean {
@@ -18,8 +22,8 @@ export class NumberLiteralHelper {
 
   public numericStringToNumber(input: string): number {
     const normalized = input
-      .replace(this.config.decimalSeparator, '.')
       .replace(this.allThousandSeparatorsRegex, '')
+      .replace(this.config.decimalSeparator, '.')
     return Number(normalized)
   }
 }

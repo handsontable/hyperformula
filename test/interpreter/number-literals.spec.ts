@@ -56,4 +56,11 @@ describe('Number literals', () => {
     }))
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
+
+  it('should work for number with dot as thousand separator', () => {
+    const engine = HyperFormula.buildFromArray([['="1.000,3" + 2']], new Config({
+      thousandSeparator: '.', decimalSeparator: ',', functionArgSeparator: ';'
+    }))
+    expect(engine.getCellValue(adr('A1'))).toEqual(1002.3)
+  })
 })

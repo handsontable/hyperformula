@@ -129,6 +129,6 @@ describe('Config', () => {
       // eslint-disable-next-line
       // @ts-ignore
       new Config({ thousandSeparator: ';' })
-    }).toThrow('Expected one of \'\' \',\' \' \' for config parameter: thousandSeparator')
+    }).toThrow('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
   })
 })

@@ -50,7 +50,7 @@ export interface ConfigParams {
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
-  thousandSeparator: '' | ',' | ' ',
+  thousandSeparator: '' | ',' | ' ' | '.',
   language: TranslationPackage,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -208,7 +208,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default ''
    */
-  public readonly thousandSeparator: '' | ',' | ' '
+  public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /**
    * Translation package with translations of function and error names.
    *
@@ -398,7 +398,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
-    this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' '], 'thousandSeparator')
+    this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.language = language || Config.defaultConfig.language
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
