@@ -168,3 +168,20 @@ describe('UndoRedo - #isThereSomethingToUndo', () => {
     expect(engine.isThereSomethingToUndo()).toBe(true)
   })
 })
+
+describe('Redo - removing rows', () => {
+  it('works for empty row', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      [null], // remove
+      ['3'],
+    ])
+    engine.removeRows(0, [1, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})

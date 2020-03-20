@@ -35,6 +35,7 @@ export class UndoRedo {
   }
 
   public readonly undoStack: UndoStackElement[] = []
+  public readonly redoStack: UndoStackElement[] = []
   public crudOperations?: CrudOperations
 
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
@@ -75,6 +76,7 @@ export class UndoRedo {
         break
       }
     }
+    this.redoStack.push(operation)
   }
 
   private undoRemoveRows(operation: RemoveRowsUndoData) {
@@ -110,5 +112,26 @@ export class UndoRedo {
       const rowsAddition = rowsAdditions[i]
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
     }
+  }
+
+  public redo() {
+    const operation = this.redoStack.pop()
+
+    if (!operation) {
+      throw 'Attempted to redo without operation on stack'
+    }
+
+    switch(operation.type) {
+      case UndoStackElementType.REMOVE_ROWS: {
+        this.redoRemoveRows(operation)
+        break
+      }
+    }
+  }
+
+  private redoRemoveRows(operation: RemoveRowsUndoData) {
+    const { sheet, rowsRemovals } = operation
+    const rowsRemoval = rowsRemovals[0]
+    this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
   }
 }

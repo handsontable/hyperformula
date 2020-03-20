@@ -512,6 +512,10 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @category UndoRedo
    */
+  public redo() {
+    this.undoRedo.redo()
+  }
+
   public isThereSomethingToUndo() {
     return !this._undoRedo.isUndoStackEmpty()
   }
