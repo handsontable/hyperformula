@@ -27,7 +27,6 @@ module.exports = {
         "@typescript-eslint/camelcase": "error",
         "@typescript-eslint/semi": ["error", "never"],
         "@typescript-eslint/brace-style": "error", // wtf
-        "@typescript-eslint/indent": ["error", 2],
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["error"],
         "@typescript-eslint/no-extra-non-null-assertion": ["error"],
         "@typescript-eslint/array-type": ["error"],
