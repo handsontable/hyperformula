@@ -174,4 +174,17 @@ describe('Evaluation suspension', () => {
       }).toThrow(new EvaluationSuspendedError())
     })
   })
+
+  it('undo-redo works when computation suspended', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A2+42'],
+      ['42']
+    ])
+    engine.suspendEvaluation()
+    engine.addRows(0, [1, 1])
+
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('C1'))).toEqual('=A2+42')
+  })
 })
