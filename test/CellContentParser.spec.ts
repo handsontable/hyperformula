@@ -88,10 +88,10 @@ describe('CellContentParser', () => {
 
   it('string', () => {
     expect(cellContentParser.parse('f42')).toStrictEqual(new CellContent.String('f42'))
-    // expect(cellContentParser.parse('42f')).toStrictEqual(new CellContent.String('42f'))
-    // expect(cellContentParser.parse(' =FOO()')).toStrictEqual(new CellContent.String(' =FOO()'))
-    // expect(cellContentParser.parse(' ')).toStrictEqual(new CellContent.String(' '))
-    // expect(cellContentParser.parse('')).toStrictEqual(new CellContent.String(''))
+    expect(cellContentParser.parse('42f')).toStrictEqual(new CellContent.String('42f'))
+    expect(cellContentParser.parse(' =FOO()')).toStrictEqual(new CellContent.String(' =FOO()'))
+    expect(cellContentParser.parse(' ')).toStrictEqual(new CellContent.String(' '))
+    expect(cellContentParser.parse('')).toStrictEqual(new CellContent.String(''))
   })
 
   it('errors', () => {
