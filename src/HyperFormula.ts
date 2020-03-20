@@ -12,6 +12,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
+import {languages, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -119,6 +120,34 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
     return new EmptyEngineFactory().build(configInput)
+  }
+
+  private static registeredLanguages: Record<string, TranslationPackage> = {}
+
+  public static getLanguage(name: string): TranslationPackage {
+    if(!HyperFormula.registeredLanguages.hasOwnProperty(name)) {
+      throw new Error('Language not registered.')
+    } else {
+      return HyperFormula.registeredLanguages[name]
+    }
+  }
+
+  public static registerLanguage(name: string, lang: TranslationPackage): void {
+    if(HyperFormula.registeredLanguages.hasOwnProperty(name)) {
+      throw new Error('Language already registered.')
+    } else {
+      this.registeredLanguages[name] = lang
+    }
+  }
+
+  public static registerLanguages(languages: Record<string, TranslationPackage>): void {
+    for(let key in languages) {
+      HyperFormula.registerLanguage(key, languages[key])
+    }
+  }
+
+  public static getRegisteredLanguages(): string[] {
+    return Array.from(Object.keys(HyperFormula.registeredLanguages))
   }
 
   private crudOperations: CrudOperations
@@ -1354,3 +1383,5 @@ export class HyperFormula implements TypedEmitter {
     return exportedChanges
   }
 }
+
+HyperFormula.registerLanguages(languages)
