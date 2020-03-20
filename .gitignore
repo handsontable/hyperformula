@@ -2,7 +2,12 @@
 commonjs/
 coverage/
 dist/
-doc/
+docs/api/
+docs/functions/
+docs/.vuepress/dist/
+docs/.vuepress/api-sidebar-relative.json
+docs/.vuepress/api-sidebar.json
+typedoc/
 es/
 lib/
 node_modules/

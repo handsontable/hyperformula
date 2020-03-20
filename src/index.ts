@@ -11,6 +11,7 @@ import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
+/** @internal */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static NoSheetWithIdError = NoSheetWithIdError

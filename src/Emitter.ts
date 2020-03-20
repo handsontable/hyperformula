@@ -1,4 +1,4 @@
-import { ExportedChange } from './CellValue'
+import {ExportedChange} from './CellValue'
 import {TinyEmitter} from 'tiny-emitter'
 
 export enum Events {
@@ -13,38 +13,38 @@ export enum Events {
 export interface Listeners {
   /**
    * Adding sheet event.
-   * 
-   * @event sheetAdded
-   * 
+   *
+   * @event
+   *
    * @param {string} addedSheetDisplayName the name of added sheet
    */
   sheetAdded: (addedSheetDisplayName: string) => any,
 
   /**
-   * Removing sheet event. 
-   * 
-   * @event sheetRemoved
-   * 
+   * Removing sheet event.
+   *
+   * @event
+   *
    * @param {string} removedSheetDisplayName the name of removed sheet
    * @param {ExportedChange[]} changes the values and location of applied changes
    */
   sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
 
   /**
-    * Renaming sheet event.
-    *  
-    * @event sheetRenamed
-    * 
-    * @param {string} oldDisplayName the old name of a sheet before renaming
-    * @param {string} newDisplayName the new name of the sheet after renaming 
+   * Renaming sheet event.
+   *
+   * @event
+   *
+   * @param {string} oldDisplayName the old name of a sheet before renaming
+   * @param {string} newDisplayName the new name of the sheet after renaming
    */
   sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
 
   /**
    * Adding named expression event.
-   * 
-   * @event namedExpressionAdded
-   * 
+   *
+   * @event
+   *
    * @param {string} namedExpressionName the name of added expression
    * @param {ExportedChange[]} changes the values and location of applied changes
    */
@@ -52,9 +52,9 @@ export interface Listeners {
 
   /**
    * Removing named expression event.
-   * 
-   * @event namedExpressionRemoved
-   * 
+   *
+   * @event
+   *
    * @param {string} namedExpressionName the name of removed expression
    * @param {ExportedChange[]} changes the values and location of applied changes
    */
@@ -62,20 +62,22 @@ export interface Listeners {
 
   /**
    * Updated values event.
-   * 
-   * @event valuesUpdated
-   * 
+   *
+   * @event
+   *
    * @param {ExportedChange[]} changes the values and location of applied changes
    */
   valuesUpdated: (changes: ExportedChange[]) => any,
 }
 
+/** @internal */
 export interface TypedEmitter {
   on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
   off<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
   once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
+/** @internal */
 export class Emitter extends TinyEmitter implements TypedEmitter {
   public emit<Event extends keyof Listeners>(event: Event, ...args: Parameters<Listeners[Event]>): this {
     super.emit(event, ...args)
