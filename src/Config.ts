@@ -442,11 +442,6 @@ export class Config implements ConfigParams, ParserConfig {
     return this.language.errors[functionTranslationKey]
   }
 
-  public numericStringToNumber = (input: string): number => {
-    const normalized = input.replace(this.decimalSeparator, '.')
-    return Number(normalized)
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public allFunctionPlugins(): any[] {
     return [...Config.defaultPlugins, ...this.functionPlugins]
