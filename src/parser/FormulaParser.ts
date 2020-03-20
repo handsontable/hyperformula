@@ -348,7 +348,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
-          return buildNumberAst(this.lexerConfig.numericStringToNumber(number.image), number.leadingWhitespace)
+          return buildNumberAst(this.numericStringToNumber(number.image), number.leadingWhitespace)
         },
       },
       {
@@ -634,6 +634,11 @@ export class FormulaParser extends EmbeddedActionsParser {
   private parsingError(type: ParsingErrorType, message: string): ErrorAst {
     this.customParsingError = parsingError(type, message)
     return buildParsingErrorAst()
+  }
+
+  public numericStringToNumber = (input: string): number => {
+    const normalized = input.replace(this.lexerConfig.decimalSeparator, '.')
+    return Number(normalized)
   }
 }
 
