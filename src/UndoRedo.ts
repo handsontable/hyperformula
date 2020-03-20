@@ -131,7 +131,8 @@ export class UndoRedo {
 
   private redoRemoveRows(operation: RemoveRowsUndoData) {
     const { sheet, rowsRemovals } = operation
-    const rowsRemoval = rowsRemovals[0]
-    this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+    for (const rowsRemoval of rowsRemovals) {
+      this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+    }
   }
 }

@@ -199,4 +199,33 @@ describe('Redo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('works for more removal segments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+      ['4'],
+    ])
+    engine.removeRows(0, [1, 1], [3, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('dummy operation should also be redoable', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+    engine.removeRows(0, [1000, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
 })
