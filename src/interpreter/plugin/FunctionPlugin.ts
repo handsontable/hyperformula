@@ -31,12 +31,14 @@ export abstract class FunctionPlugin {
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
+  protected coerceScalarToNumberOrError: (arg: InternalCellValue) => number | CellError
 
   protected constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
+    this.coerceScalarToNumberOrError = interpreter.coerceScalarToNumberOrError
   }
 
   protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
@@ -67,7 +69,7 @@ export abstract class FunctionPlugin {
   }
 
   protected templateWithOneCoercedToNumberArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: number) => InternalCellValue): InternalCellValue {
-    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalCellValue) => coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper), fn)
+    return this.templateWithOneArgumentCoercion(ast, formulaAddress, (arg: InternalCellValue) => this.coerceScalarToNumberOrError(arg), fn)
   }
 
   protected templateWithOneCoercedToStringArgument(ast: ProcedureAst, formulaAddress: SimpleCellAddress, fn: (arg: string) => InternalCellValue): InternalCellValue {
@@ -82,7 +84,7 @@ export abstract class FunctionPlugin {
     if (left instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     }
-    const coercedLeft = coerceScalarToNumberOrError(left, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const coercedLeft = this.coerceScalarToNumberOrError(left)
     if (coercedLeft instanceof CellError) {
       return coercedLeft
     }
@@ -92,7 +94,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const coercedRight = coerceScalarToNumberOrError(right, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const coercedRight = this.coerceScalarToNumberOrError(right)
     if (coercedRight instanceof CellError) {
       return coercedRight
     }
@@ -111,7 +113,7 @@ export abstract class FunctionPlugin {
       return new CellError(ErrorType.VALUE)
     }
 
-    const value = coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
+    const value = this.coerceScalarToNumberOrError(arg)
     if (typeof value === 'number' && min !== undefined && max !== undefined && (value < min || value > max)) {
       return new CellError(ErrorType.NUM)
     }
