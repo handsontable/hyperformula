@@ -13,6 +13,14 @@ export interface TranslationPackage {
   interface: TranslationSet,
 }
 
+export function getSheetPrefix(translationPackage: TranslationPackage): string {
+  if(!('interface' in translationPackage) || !('NEW_SHEET_PREFIX' in translationPackage.interface)) {
+    return enGB.interface.NEW_SHEET_PREFIX
+  } else {
+    return translationPackage.interface.NEW_SHEET_PREFIX
+  }
+}
+
 export const extendFunctions = (pkg: TranslationPackage, additionalFunctionTranslations: TranslationSet): TranslationPackage => {
   return {
     functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
