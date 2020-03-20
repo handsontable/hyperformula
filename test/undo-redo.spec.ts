@@ -152,6 +152,22 @@ describe('UndoRedo', () => {
       engine.undo()
     }).toThrowError(new NoOperationToUndo())
   })
+
+  it('redo operation is pushed back on undo stack (undo-redo-undo)', () => {
+    const sheet = [
+      ['1'],
+      ['2', '=A1'], // remove
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeRows(0, [1, 1])
+    engine.undo()
+    engine.redo()
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('UndoRedo - #isThereSomethingToUndo', () => {

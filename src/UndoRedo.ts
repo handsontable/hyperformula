@@ -127,6 +127,8 @@ export class UndoRedo {
         break
       }
     }
+
+    this.undoStack.push(operation)
   }
 
   private redoRemoveRows(operation: RemoveRowsUndoData) {
