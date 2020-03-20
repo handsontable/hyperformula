@@ -184,4 +184,19 @@ describe('Redo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
+
+  it('works for other values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2', '=A1'], // remove
+      ['3'],
+    ])
+    engine.removeRows(0, [1, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
 })
