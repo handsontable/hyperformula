@@ -118,7 +118,7 @@ describe('Unparse', () => {
     expect(unparsed).toEqual('=#REF!')
   })
 
-  it('#unparse errro with raw input', () => {
+  it('#unparse error with raw input', () => {
     const formula = '=NotExistingSheet!A1'
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
