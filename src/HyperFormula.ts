@@ -761,7 +761,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public isItPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): boolean {
     try {
-      this._crudOperations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+      this._crudOperations.operations.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
       return true
     } catch (e) {
       return false

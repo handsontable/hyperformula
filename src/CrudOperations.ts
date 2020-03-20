@@ -63,8 +63,8 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly undoRedo: UndoRedo,
   ) {
-    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this, this.parser, this.lazilyTransformingAstService)
     this.operations = new Operations(this.dependencyGraph, this.columnSearch, this.cellContentParser, this.parser, this.stats, this.lazilyTransformingAstService)
+    this.clipboardOperations = new ClipboardOperations(this.dependencyGraph, this.operations, this.parser, this.lazilyTransformingAstService)
   }
 
   public addRows(sheet: number, ...indexes: Index[]): void {
@@ -102,9 +102,8 @@ export class CrudOperations {
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
-    this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
-    this.clipboardOperations.abortCut()
     this.operations.moveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+    this.clipboardOperations.abortCut()
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
@@ -326,29 +325,6 @@ export class CrudOperations {
       if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
         throw Error('It is not possible to remove column within matrix')
       }
-    }
-  }
-
-  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
-    if (
-      invalidSimpleCellAddress(sourceLeftCorner) ||
-      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
-      invalidSimpleCellAddress(destinationLeftCorner) ||
-      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
-      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
-    ) {
-      throw new InvalidArgumentsError()
-    }
-
-    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
-    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new Error('It is not possible to move matrix')
-    }
-
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new Error('It is not possible to replace cells with matrix')
     }
   }
 

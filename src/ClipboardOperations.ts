@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CrudOperations} from './CrudOperations'
+import {Operations} from './Operations'
 import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError} from './errors'
@@ -67,7 +67,7 @@ export class ClipboardOperations {
 
   constructor(
     private readonly dependencyGraph: DependencyGraph,
-    private readonly crudOperations: CrudOperations,
+    private readonly operations: Operations,
     private readonly parser: ParserWithCaching,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
   ) {
@@ -105,17 +105,18 @@ export class ClipboardOperations {
 
         for (const [address, clipboardCell] of this.clipboard.getContent(destinationLeftCorner)) {
           if (clipboardCell.type === ClipboardCellType.VALUE) {
-            this.crudOperations.operations.setValueToCell(clipboardCell.value, address)
+            this.operations.setValueToCell(clipboardCell.value, address)
           } else if (clipboardCell.type === ClipboardCellType.EMPTY) {
-            this.crudOperations.operations.setCellEmpty(address)
+            this.operations.setCellEmpty(address)
           } else {
-            this.crudOperations.operations.setFormulaToCellFromCache(clipboardCell.hash, address)
+            this.operations.setFormulaToCellFromCache(clipboardCell.hash, address)
           }
         }
         break
       }
       case ClipboardOperationType.CUT: {
-        this.crudOperations.moveCells(this.clipboard.sourceLeftCorner, this.clipboard.width, this.clipboard.height, destinationLeftCorner)
+        this.operations.moveCells(this.clipboard.sourceLeftCorner, this.clipboard.width, this.clipboard.height, destinationLeftCorner)
+        this.abortCut()
       }
     }
   }

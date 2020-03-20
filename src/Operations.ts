@@ -5,7 +5,7 @@
 
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {SimpleCellAddress, EmptyValue} from './Cell'
+import {SimpleCellAddress, EmptyValue, invalidSimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
 import {ContentChanges} from './ContentChanges'
@@ -14,8 +14,9 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
 import {buildMatrixVertex} from './GraphBuilder'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, ParsingErrorVertex} from './DependencyGraph'
+import {DependencyGraph, SheetMapping, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex, ParsingErrorVertex} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
@@ -111,6 +112,8 @@ export class Operations {
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
+
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
@@ -133,6 +136,29 @@ export class Operations {
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    if (
+      invalidSimpleCellAddress(sourceLeftCorner) ||
+      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
+      invalidSimpleCellAddress(destinationLeftCorner) ||
+      !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
+      !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
+    ) {
+      throw new InvalidArgumentsError()
+    }
+
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
+      throw new Error('It is not possible to move matrix')
+    }
+
+    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
+      throw new Error('It is not possible to replace cells with matrix')
+    }
   }
 
   /**
@@ -290,6 +316,10 @@ export class Operations {
     this.changes = ContentChanges.empty()
     return changes
   }
+
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
 }
 
 export function normalizeRemovedIndexes(indexes: Index[]): Index[] {
@@ -349,4 +379,12 @@ export function normalizeAddedIndexes(indexes: Index[]): Index[] {
   }
 
   return merged
+}
+
+function isPositiveInteger(x: number): boolean {
+  return Number.isInteger(x) && x > 0
+}
+
+function isNonnegativeInteger(x: number): boolean {
+  return Number.isInteger(x) && x >= 0
 }
