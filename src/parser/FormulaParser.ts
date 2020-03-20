@@ -1,6 +1,6 @@
 import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpts, tokenMatcher} from 'chevrotain'
 
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
@@ -11,7 +11,8 @@ import {
   buildCellReferenceAst,
   buildConcatenateOpAst,
   buildDivOpAst,
-  buildEqualsOpAst, buildErrorWithRawInputAst,
+  buildEqualsOpAst,
+  buildErrorWithRawInputAst,
   buildGreaterThanOpAst,
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
@@ -94,7 +95,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Address of the cell in which formula is located
    */
-  private formulaAddress?: SimpleCellAddress
+  private formulaAddress: SimpleCellAddress
 
   private customParsingError?: ParsingError
 
@@ -109,6 +110,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping
+    this.formulaAddress = simpleCellAddress(0, 0, 0)
     this.performSelfAnalysis()
   }
 
@@ -407,7 +409,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
         end = this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
       } else {
-        end = this.SUBRULE(this.endOfRangeExpression, {ARGS: [offsetProcedure]})
+        end = this.SUBRULE(this.endOfRangeWithOffsetStartExpression, {ARGS: [offsetProcedure]})
       }
     })
 
@@ -439,7 +441,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
    */
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
-    const start = this.SUBRULE(this.cellReference) as CellReferenceAst
+    const start = this.CONSUME(CellReference)
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start]})
   })
@@ -450,7 +452,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress)
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
@@ -464,11 +466,48 @@ export class FormulaParser extends EmbeddedActionsParser {
    *
    * End of range may be a cell reference or OFFSET() function call
    */
-  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: CellReferenceAst) => {
+  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: IExtendedToken) => {
     return this.OR([
       {
         ALT: () => {
           return this.SUBRULE(this.endRangeReference, {ARGS: [start]})
+        },
+      },
+      {
+        ALT: () => {
+          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+          const startAddress = this.ACTION(() => {
+            return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+          })
+          if (startAddress === undefined) {
+            return buildCellErrorAst(new CellError(ErrorType.REF))
+          }
+          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+            let end = offsetProcedure.reference
+            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+            if (startAddress.sheet !== null) {
+              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+              end = end.withAbsoluteSheet(startAddress.sheet)
+            }
+            return buildCellRangeAst(startAddress, end, sheetReferenceType, start.leadingWhitespace?.image)
+          } else {
+            return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+          }
+        },
+      },
+    ])
+  })
+
+  /**
+   * Rule for end of range expression
+   *
+   * End of range may be a cell reference or OFFSET() function call
+   */
+  private endOfRangeWithOffsetStartExpression: AstRule = this.RULE('endOfRangeWithOffsetStartExpression', (start: CellReferenceAst) => {
+    return this.OR([
+      {
+        ALT: () => {
+          return this.SUBRULE(this.endRangeWithOffsetStartReference, {ARGS: [start]})
         },
       },
       {
@@ -494,35 +533,64 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
-  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: CellReferenceAst) => {
-    const startSheet = this.ACTION(() => start.reference.sheet)
-    const cell = this.CONSUME(CellReference) as IExtendedToken
-    let end = this.ACTION(() => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress!)
+  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: IExtendedToken) => {
+    const end = this.CONSUME(CellReference) as IExtendedToken
+
+    const startAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+    })
+    const endAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
     })
 
-    if (end === undefined) {
-      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
-    } else if (startSheet === null && end.sheet !== null) {
+    if (startAddress === undefined || endAddress === undefined) {
+      return this.ACTION(() => {
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
+      })
+    }
+
+    return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
+  })
+
+  /**
+   * Rule for end range reference expression starting with offset procedure with additional checks considering range start
+   */
+  private endRangeWithOffsetStartReference: AstRule = this.RULE('endRangeWithOffsetStartReference', (start: CellReferenceAst) => {
+    const end = this.CONSUME(CellReference) as IExtendedToken
+
+    const endAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+    })
+
+    if (endAddress === undefined) {
+      return this.ACTION(() => {
+        return buildCellErrorAst(new CellError(ErrorType.REF))
+      })
+    }
+
+    return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
+  })
+
+  private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
+    if (startAddress.sheet === null && endAddress.sheet !== null) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     let sheetReferenceType: RangeSheetReferenceType
-    if (startSheet === null) {
+    if (startAddress.sheet === null) {
       sheetReferenceType = RangeSheetReferenceType.RELATIVE
-    } else if (end.sheet === null) {
+    } else if (endAddress.sheet === null) {
       sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
     } else {
       sheetReferenceType = RangeSheetReferenceType.BOTH_ABSOLUTE
     }
 
-    if (startSheet !== null && end.sheet === null) {
-      end = end.withAbsoluteSheet(startSheet)
+    if (startAddress.sheet !== null && endAddress.sheet === null) {
+      endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
     }
 
-    return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
-  })
+    return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
+  }
 
   /**
    * Rule for parenthesis expression
@@ -607,12 +675,12 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
-      absoluteRow = absoluteRow + this.formulaAddress!.row
+      absoluteRow = absoluteRow + this.formulaAddress.row
     }
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      absoluteCol = absoluteCol + this.formulaAddress!.col
+      absoluteCol = absoluteCol + this.formulaAddress.col
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
