@@ -322,13 +322,13 @@ describe('cell references and ranges', () => {
     expect(ast.reference.row).toBe(0)
   })
 
-  // incompatibility with product 1
   it('using unknown sheet gives REF', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
-    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast as ErrorAst
+    const ast = parser.parse('=Sheet2!A1', simpleCellAddress(0, 0, 0)).ast as ErrorWithRawInputAst
 
-    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.type).toBe(AstNodeType.ERROR_WITH_RAW_INPUT)
+    expect(ast.rawInput).toBe('Sheet2!A1')
     expect(ast.error).toEqual(new CellError(ErrorType.REF))
   })
 

@@ -96,7 +96,7 @@ export class ParserWithCaching {
       if (tokenMatcher(token, CellReference)) {
         const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
         if (cellAddress === undefined) {
-          hash = hash.concat('!REF')
+          hash = hash.concat(token.image)
         } else {
           hash = hash.concat(referenceHashFromCellAddress(cellAddress, true))
         }
