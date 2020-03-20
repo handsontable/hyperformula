@@ -962,18 +962,6 @@ describe('aborting cut paste', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
   })
 
-  it('should be aborted when moveCells is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2']
-    ])
-
-    engine.cut(adr('A1'), 1, 1)
-    engine.moveCells(adr('B1'), 1, 1, adr('C1'))
-    engine.paste(adr('A2'))
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(EmptyValue)
-  })
-
   it('should be aborted when sheet is removed', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['1']],
