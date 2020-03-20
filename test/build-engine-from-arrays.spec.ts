@@ -48,7 +48,6 @@ describe('Building engine from arrays', () => {
 
     engine1.addSheet('Sheet2')
     engine1.setSheetContent('Sheet2', [['1']])
-    const a = engine1.getAllSheetsSerialized()
     engine1.updateConfig({})
 
     expect(engine1.getCellValue(adr('A1', 1))).toBe(1)

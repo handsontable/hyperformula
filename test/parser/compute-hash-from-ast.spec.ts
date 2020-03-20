@@ -104,6 +104,11 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
+  it('reference to not existing sheet', () => {
+    const formula = '=Sheet3!A1'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
   it('procedure hash using canonical name', () => {
     const config = new Config({ language: plPL })
     const sheetMapping = new SheetMapping(plPL)
