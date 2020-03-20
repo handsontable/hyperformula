@@ -302,7 +302,7 @@ export class Interpreter {
     }
   }
 
-  public coerceScalarToNumberOrError = (arg: InternalCellValue) => {
+  public coerceScalarToNumberOrError = (arg: InternalCellValue): number | CellError  => {
     return coerceScalarToNumberOrError(arg, this.dateHelper, this.numberLiteralsHelper)
   }
 

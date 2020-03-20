@@ -31,14 +31,12 @@ export abstract class FunctionPlugin {
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: ColumnSearchStrategy
   protected readonly config: Config
-  protected coerceScalarToNumberOrError: (arg: InternalCellValue) => number | CellError
 
   protected constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
-    this.coerceScalarToNumberOrError = interpreter.coerceScalarToNumberOrError
   }
 
   protected evaluateAst(ast: Ast, formulaAddress: SimpleCellAddress): InterpreterValue {
@@ -119,6 +117,10 @@ export abstract class FunctionPlugin {
     }
 
     return value
+  }
+
+  protected coerceScalarToNumberOrError(arg: InternalCellValue): number | CellError  {
+    return this.interpreter.coerceScalarToNumberOrError(arg)
   }
 
   private templateWithOneArgumentCoercion(
