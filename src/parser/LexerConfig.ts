@@ -109,14 +109,13 @@ export interface ILexerConfig {
   allTokens: TokenType[],
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
-  numericStringToNumber: (input: string) => number,
+  decimalSeparator: '.' | ',',
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.language.functions.OFFSET || 'OFFSET'
   const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.language)
-  const numericStringToNumber = config.numericStringToNumber
 
   /* configurable tokens */
   const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
@@ -169,7 +168,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     allTokens,
     errorMapping,
     functionMapping,
-    numericStringToNumber
+    decimalSeparator: config.decimalSeparator
   }
 }
 

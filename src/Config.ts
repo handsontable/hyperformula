@@ -50,6 +50,7 @@ export interface ConfigParams {
   dateFormats: string[],
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
+  thousandSeparator: '' | ',' | ' ' | '.',
   language: TranslationPackage,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -72,7 +73,7 @@ export interface ConfigParams {
 
 type ConfigParamsList = keyof ConfigParams
 
-export class Config implements ConfigParams, ParserConfig{
+export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
@@ -83,6 +84,7 @@ export class Config implements ConfigParams, ParserConfig{
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
+    thousandSeparator: '',
     language: enGB,
     functionPlugins: [],
     gpuMode: 'gpu',
@@ -141,7 +143,7 @@ export class Config implements ConfigParams, ParserConfig{
    * Specifies if the string comparison is case-sensitive or not.
    *
    * Applies to comparison operators only.
-   * 
+   *
    * @default false
    */
   public readonly caseSensitive: boolean
@@ -149,56 +151,64 @@ export class Config implements ConfigParams, ParserConfig{
    * Determines which address mapping policy will be used. Built in implementations:
    *
    * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-   * 
+   *
    * AlwaysDense - will use DenseStrategy for all sheets.
-   * 
+   *
    * AlwaysSparse - will use SparseStrategy for all sheets.
-   * 
+   *
    *  @default AlwaysDense
    */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
 
   /**
    * Specifies if the string comparison is accent sensitive or not.
-   * 
+   *
    * Applies to comparison operators only.
-   * 
+   *
    * @default false
    */
   public readonly accentSensitive: boolean
 
   /**
    * Allows to define if upper case or lower case should sort first.
-   * 
+   *
    * When set to `false` uses the locale's default.
-   * 
+   *
    * @default 'lower'
    */
   public readonly caseFirst: 'upper' | 'lower' | 'false'
   /**
    * A list of date formats that are supported by date parsing functions.
-   * 
+   *
    * The separator is ignored and it can be any non-alpha-numeric symbol.
-   * 
+   *
    * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    */
   public readonly dateFormats: string[]
   /**
-   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]].
+   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
    */
   public readonly functionArgSeparator: string
   /**
-   * A decimal separator used for parsing numeric literals. 
+   * A decimal separator used for parsing numeric literals.
    *
-   * Can be either '.' or ',' and must be different from [[functionArgSeparator]].
+   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
    */
   public readonly decimalSeparator: '.' | ','
+  /**
+   * A thousand separator used for parsing numeric literals.
+   *
+   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   *
+   * @default ''
+   */
+  public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /**
    * Translation package with translations of function and error names.
    *
@@ -210,7 +220,7 @@ export class Config implements ConfigParams, ParserConfig{
    *
    * @default []
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
   /**
    * Allows to set GPU or CPU for use in matrix calculations.
@@ -218,7 +228,7 @@ export class Config implements ConfigParams, ParserConfig{
    * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
    *
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
-   * 
+   *
    * @default 'gpu'
    */
   public readonly gpuMode: GPUMode
@@ -226,9 +236,9 @@ export class Config implements ConfigParams, ParserConfig{
    * Preserves an option for setting 1900 as a leap year.
    *
    * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
-   * 
+   *
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
-   * 
+   *
    * @default false
    */
   public readonly leapYear1900: boolean
@@ -236,27 +246,27 @@ export class Config implements ConfigParams, ParserConfig{
    * Enables numeric matrix detection feature when set to 'true'.
    *
    * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   * 
+   *
    * Some CRUD operations may break numeric matrices into individual vertices if needed.
-   * 
+   *
    * @default true
    */
   public readonly matrixDetection: boolean
   /**
    * Specifies whether punctuation should be ignored in string comparison.
-   * 
+   *
    * @default false
    */
   public readonly ignorePunctuation: boolean
   /**
    * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
-   * 
+   *
    * @default 'en'
    */
   public readonly localeLang: string
   /**
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
-   * 
+   *
    * @default 100
    */
   public readonly matrixDetectionThreshold: number
@@ -264,7 +274,7 @@ export class Config implements ConfigParams, ParserConfig{
    * Two-digit values when interpreted as a year can be either 19xx or 20xx.
    *
    * If `xx <= nullYear` its latter, otherwise its former.
-   * 
+   *
    * @default 30
    */
   public readonly nullYear: number
@@ -284,17 +294,17 @@ export class Config implements ConfigParams, ParserConfig{
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
    * `a` and `b` are equal if they are of the same sign and:
-   * 
+   *
    * `abs(a) <= (1+precisionEpsilon) * abs(b)`
-   * 
+   *
    * and
-   * 
+   *
    * `abs(b) <= (1+precisionEpsilon) * abs(a)`
    *
    * It also controls snap-to-zero behavior for additions/subtractions:
-   * 
+   *
    * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
-   * 
+   *
    * @default 1e-13
    */
   public readonly precisionEpsilon: number
@@ -302,7 +312,7 @@ export class Config implements ConfigParams, ParserConfig{
    * Sets how precise the calculation should be.
    *
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
-   * 
+   *
    * @default 14
    */
   public readonly precisionRounding: number
@@ -310,29 +320,29 @@ export class Config implements ConfigParams, ParserConfig{
    * Sets the rounding.
    *
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
-   * 
+   *
    * @default true
    */
   public readonly smartRounding: boolean
   /**
-   * Switches column search strategy from binary search to column index. 
+   * Switches column search strategy from binary search to column index.
    *
    * Used by VLOOKUP and MATCH procedures.
-   * 
-   * Using column index may improve time efficiency but it will increase memory usage. 
-   * 
+   *
+   * Using column index may improve time efficiency but it will increase memory usage.
+   *
    * In some scenarios column index may fall back to binary search despite of this flag.
-   * 
+   *
    * @default false
    */
   public readonly useColumnIndex: boolean
   /**
-   * Determines minimum number of elements a range must have in order to use binary search. 
+   * Determines minimum number of elements a range must have in order to use binary search.
    *
    * Shorter ranges will be searched naively.
-   * 
+   *
    * Used by VLOOKUP and MATCH procedures.
-   * 
+   *
    * @default 20
    */
   public readonly vlookupThreshold: number
@@ -340,9 +350,9 @@ export class Config implements ConfigParams, ParserConfig{
    * Allows to set a specific date from which the number of days will be counted.
    *
    * Dates are represented internally as a number of days that passed since this `nullDate`.
-   * 
+   *
    * @default {year: 1899, month: 12, day: 30}
-   * 
+   *
    */
   public readonly nullDate: SimpleDate
   /**
@@ -360,6 +370,7 @@ export class Config implements ConfigParams, ParserConfig{
       dateFormats,
       functionArgSeparator,
       decimalSeparator,
+      thousandSeparator,
       language,
       functionPlugins,
       gpuMode,
@@ -387,6 +398,7 @@ export class Config implements ConfigParams, ParserConfig{
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
+    this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.language = language || Config.defaultConfig.language
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
@@ -402,20 +414,22 @@ export class Config implements ConfigParams, ParserConfig{
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
-    this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate' )
+    this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 
-    if (this.decimalSeparator === this.functionArgSeparator) {
-      throw Error('Config initialization failed. Function argument separator and decimal separator needs to differ.')
-    }
+    this.checkIfParametersNotInConflict(
+      {value: this.decimalSeparator, name: 'decimalSeparator'},
+      {value: this.functionArgSeparator, name: 'functionArgSeparator'},
+      {value: this.thousandSeparator, name: 'thousandSeparator'}
+    )
   }
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig = Object.assign({}, this.getConfig(), init)
-    
+
     return new Config(mergedConfig)
   }
-  
+
   public getConfig(): ConfigParams {
     return this
   }
@@ -426,11 +440,6 @@ export class Config implements ConfigParams, ParserConfig{
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
     return this.language.errors[functionTranslationKey]
-  }
-
-  public numericStringToNumber = (input: string): number => {
-    const normalized = input.replace(this.decimalSeparator, '.')
-    return Number(normalized)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -499,32 +508,54 @@ export class Config implements ConfigParams, ParserConfig{
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList ) {
-    if(typeof inputValue === 'undefined') {
+  private valueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList) {
+    if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
-    } else if(typeof expectedType === 'string') {
-      if(typeof inputValue === expectedType) {
+    } else if (typeof expectedType === 'string') {
+      if (typeof inputValue === expectedType) {
         return inputValue
       } else {
         throw new ExpectedValueOfType(expectedType, paramName)
       }
     } else {
-      if(expectedType.includes(inputValue)) {
+      if (expectedType.includes(inputValue)) {
         return inputValue
       } else {
-        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\''+val+'\'').join(' '), paramName)
+        throw new ExpectedOneOfValues(expectedType.map((val: string) => '\'' + val + '\'').join(' '), paramName)
       }
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private valueFromParamCheck(inputValue: any,  typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList ) {
+  private valueFromParamCheck(inputValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList) {
     if (typeCheck(inputValue)) {
       return inputValue
     } else if (typeof inputValue === 'undefined') {
       return Config.defaultConfig[paramName]
     } else {
       throw new ExpectedValueOfType(expectedType, paramName)
+    }
+  }
+
+  private checkIfParametersNotInConflict(...params: { value: number | string | boolean, name: string }[]) {
+    const valuesMap: Map<number | string | boolean, string[]> = new Map()
+
+    params.forEach((param) => {
+      const names = valuesMap.get(param.value) || []
+      names.push(param.name)
+      valuesMap.set(param.value, names)
+    })
+
+    const duplicates: string[][] = []
+    for (const entry of valuesMap.values()) {
+      if (entry.length > 1) {
+        duplicates.push(entry)
+      }
+    }
+
+    if (duplicates.length > 0) {
+      const paramNames = duplicates.map(entry => `[${entry.sort()}]`).join('; ')
+      throw new Error(`Config initialization failed. Parameters in conflict: ${paramNames}`)
     }
   }
 }

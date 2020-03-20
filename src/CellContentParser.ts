@@ -3,6 +3,7 @@ import {Config} from './Config'
 import {DateHelper} from './DateHelper'
 import {UnableToParse} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export type RawCellContent = Date | string | number | boolean | EmptyValueType | null | undefined
 
@@ -14,11 +15,13 @@ export namespace CellContent {
   }
 
   export class String {
-    constructor(public readonly value: string) { }
+    constructor(public readonly value: string) {
+    }
   }
 
   export class Boolean {
-    constructor(public readonly value: boolean) { }
+    constructor(public readonly value: boolean) {
+    }
   }
 
   export class Empty {
@@ -29,15 +32,18 @@ export namespace CellContent {
       }
       return Empty.instance
     }
+
     private static instance: Empty
   }
 
   export class Formula {
-    constructor(public readonly formula: string) { }
+    constructor(public readonly formula: string) {
+    }
   }
 
   export class MatrixFormula {
-    constructor(public readonly formula: string) { }
+    constructor(public readonly formula: string) {
+    }
 
     public formulaWithBraces(): string {
       return '{' + this.formula + '}'
@@ -46,6 +52,7 @@ export namespace CellContent {
 
   export class Error {
     public readonly value: CellError
+
     constructor(errorType: ErrorType) {
       this.value = new CellError(errorType)
     }
@@ -69,7 +76,7 @@ export function isBoolean(text: string): boolean {
 }
 
 export function isMatrix(text: RawCellContent): boolean {
-  if(typeof text !== 'string') {
+  if (typeof text !== 'string') {
     return false
   }
   return (text.length > 1) && (text.startsWith('{')) && (text.endsWith('}'))
@@ -82,17 +89,17 @@ export function isError(text: string, errorMapping: Record<string, ErrorType>): 
 }
 
 export class CellContentParser {
-  private numberPattern: RegExp
-
-  constructor(private readonly config: Config, private readonly dateHelper: DateHelper) {
-    this.numberPattern = new RegExp(`^[\+|-]?[\\d]*[${this.config.decimalSeparator}]?[\\d]+\$`)
+  constructor(
+    private readonly config: Config,
+    private readonly dateHelper: DateHelper,
+    private readonly numberLiteralsHelper: NumberLiteralHelper) {
   }
 
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null || content === EmptyValue) {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
-      if( isNumberOverflow(content)) {
+      if (isNumberOverflow(content)) {
         return new CellContent.Error(ErrorType.NUM)
       } else {
         return new CellContent.Number(content)
@@ -100,9 +107,13 @@ export class CellContentParser {
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
-      return new CellContent.Number(this.dateHelper.dateToNumber({day: content.getDate(), month: content.getMonth() + 1, year: content.getFullYear()}))
+      return new CellContent.Number(this.dateHelper.dateToNumber({
+        day: content.getDate(),
+        month: content.getMonth() + 1,
+        year: content.getFullYear()
+      }))
     } else if (typeof content === 'string') {
-      if(isBoolean(content)) {
+      if (isBoolean(content)) {
         return new CellContent.Boolean(content.toLowerCase() === 'true')
       } else if (isMatrix(content)) {
         return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
@@ -112,8 +123,8 @@ export class CellContentParser {
         return new CellContent.Error(this.config.errorMapping[content.toUpperCase()])
       } else {
         const trimmedContent = content.trim()
-        if (this.isNumber(trimmedContent)) {
-          return new CellContent.Number(this.config.numericStringToNumber(trimmedContent))
+        if (this.numberLiteralsHelper.isNumber(trimmedContent)) {
+          return new CellContent.Number(this.numberLiteralsHelper.numericStringToNumber(trimmedContent))
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
         if (parsedDateNumber !== null) {
@@ -127,10 +138,6 @@ export class CellContentParser {
     } else {
       throw new UnableToParse(content)
     }
-  }
-
-  private isNumber(input: string): boolean {
-    return this.numberPattern.test(input)
   }
 }
 

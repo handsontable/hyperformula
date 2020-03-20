@@ -10,6 +10,7 @@ import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 
 export class BuildEngineFromArraysFactory {
   private buildWithConfig(sheets: Sheets, config: Config): HyperFormula {
@@ -30,8 +31,9 @@ export class BuildEngineFromArraysFactory {
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
-    const cellContentParser = new CellContentParser(config, dateHelper)
+    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
     const undoRedo = new UndoRedo()
 
@@ -43,7 +45,7 @@ export class BuildEngineFromArraysFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
