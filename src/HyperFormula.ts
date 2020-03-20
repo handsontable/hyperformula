@@ -165,11 +165,11 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getCellValue(address)
   }
 
-  private ensureComputationIsNotSuspended() {
+  private ensureEvaluationIsNotSuspended() {
     if (this.evaluationSuspended) {
       throw new EvaluationSuspendedError()
     }
@@ -200,7 +200,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns a [[CellValue]] which is a value of a cell or an error
    */
   public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getCellSerialized(address)
   }
 
@@ -214,7 +214,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheet - sheet ID number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getSheetValues(sheet)
   }
 
@@ -241,7 +241,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getSheetSerialized(sheet)
   }
 
@@ -278,7 +278,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getAllSheetsValues()
   }
 
@@ -297,7 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     return this.serialization.getAllSheetsSerialized()
   }
 
@@ -1051,7 +1051,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValueType(address: SimpleCellAddress): CellValueType {
-    this.ensureComputationIsNotSuspended()
+    this.ensureEvaluationIsNotSuspended()
     const value = this.dependencyGraph.getCellValue(address)
     return getCellValueType(value)
   }
