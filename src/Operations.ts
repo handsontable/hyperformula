@@ -19,6 +19,8 @@ import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 export class RemoveRowsCommand {
   constructor(
@@ -106,6 +108,31 @@ export class Operations {
       }
     }
     return rowsAdditions
+  }
+
+  public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
+    const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
+    const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
+
+    this.dependencyGraph.breakNumericMatricesInRange(sourceRange)
+    this.dependencyGraph.breakNumericMatricesInRange(targetRange)
+
+    const toRight = destinationLeftCorner.col - sourceLeftCorner.col
+    const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
+    const toSheet = destinationLeftCorner.sheet
+
+    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
+    this.columnSearch.removeValues(valuesToRemove)
+    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
+    this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
   }
 
   /**
