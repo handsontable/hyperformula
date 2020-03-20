@@ -12,18 +12,18 @@ export enum Events {
 
 export interface Listeners {
   /**
-   * Adding sheet event.
+   * The event is triggered upon adding a sheet anywhere inside the workbook.
    * 
-   * @event sheetAdded
+   * @event 
    * 
    * @param {string} addedSheetDisplayName the name of added sheet
    */
   sheetAdded: (addedSheetDisplayName: string) => any,
 
   /**
-   * Removing sheet event. 
+   * The event is triggered upon removing a sheet from anywhere inside the workbook.
    * 
-   * @event sheetRemoved
+   * @event 
    * 
    * @param {string} removedSheetDisplayName the name of removed sheet
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -31,9 +31,9 @@ export interface Listeners {
   sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
 
   /**
-    * Renaming sheet event.
+    * The event is triggered upon renaming a sheet anywhere inside the workbook.
     *  
-    * @event sheetRenamed
+    * @event 
     * 
     * @param {string} oldDisplayName the old name of a sheet before renaming
     * @param {string} newDisplayName the new name of the sheet after renaming 
@@ -41,9 +41,9 @@ export interface Listeners {
   sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
 
   /**
-   * Adding named expression event.
+   * The event is triggered upon adding a named expression with specified values and location.
    * 
-   * @event namedExpressionAdded
+   * @event 
    * 
    * @param {string} namedExpressionName the name of added expression
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -51,9 +51,9 @@ export interface Listeners {
   namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
-   * Removing named expression event.
+   * The event is triggered upon removing a named expression with specified values and from an indicated location.
    * 
-   * @event namedExpressionRemoved
+   * @event 
    * 
    * @param {string} namedExpressionName the name of removed expression
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -61,9 +61,9 @@ export interface Listeners {
   namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
-   * Updated values event.
+   * The event is triggered upon changing values in a specified location.
    * 
-   * @event valuesUpdated
+   * @event 
    * 
    * @param {ExportedChange[]} changes the values and location of applied changes
    */

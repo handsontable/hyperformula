@@ -357,6 +357,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly nullDate: SimpleDate
   /**
    * Built automatically based on translation package.
+   * 
+   * @internal
    */
   public readonly errorMapping: Record<string, ErrorType>
 
