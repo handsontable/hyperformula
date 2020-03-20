@@ -12,7 +12,6 @@ export class NumberLiteralHelper {
 
     this.numberPattern = new RegExp(`^([\+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d+)?)))$`)
     this.allThousandSeparatorsRegex = new RegExp(`${thousandSeparator}`, 'g')
-    console.log()
   }
   
   public isNumber(input: string): boolean {
