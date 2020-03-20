@@ -102,7 +102,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   }
 
   private coerceToNumber(arg: InternalCellValue): InternalCellValue {
-    return coerceScalarToNumberOrError(arg, this.interpreter.dateHelper)
+    return coerceScalarToNumberOrError(arg, this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
   }
 
   /**

@@ -10,6 +10,7 @@ import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
 import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
+import {NumberLiteralsHelper} from './NumberLiteralsHelper'
 
 export class RebuildEngineWithConfigFactory {
   public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
@@ -35,8 +36,9 @@ export class RebuildEngineWithConfigFactory {
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
+    const numberLiteralsHelper = new NumberLiteralsHelper(config)
     const collator = collatorFromConfig(config)
-    const cellContentParser = new CellContentParser(config, dateHelper)
+    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralsHelper)
 
     const undoRedo = oldEngine.undoRedo
 
@@ -48,7 +50,7 @@ export class RebuildEngineWithConfigFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, collator)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralsHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
