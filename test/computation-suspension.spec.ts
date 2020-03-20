@@ -35,6 +35,18 @@ describe('Evaluation suspension', () => {
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
   })
 
+  it('formulas are rebuild even if evaluation is suspended', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A2+42'],
+      ['42']
+    ])
+    engine.suspendEvaluation()
+
+    engine.addRows(0, [1, 1])
+
+    expect(engine.getCellFormula(adr('C1'))).toEqual('=A3+42')
+  })
+
   it('resuming evaluation', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=A1'],
