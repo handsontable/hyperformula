@@ -1,4 +1,4 @@
-import {HyperFormula, NoOperationToUndo} from '../src'
+import {HyperFormula, NoOperationToUndo, NoOperationToRedo} from '../src'
 import './testConfig'
 import {
   expectEngineToBeTheSameAs,
@@ -259,5 +259,15 @@ describe('Redo - removing rows', () => {
     engine.redo()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
+describe('Redo', () => {
+  it('when there is no operation to redo', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.redo()
+    }).toThrowError(new NoOperationToRedo())
   })
 })

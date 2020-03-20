@@ -11,6 +11,7 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NoOperationToUndo,
+  NoOperationToRedo,
   EvaluationSuspendedError,
   NotAFormulaError
 } from './errors'
@@ -27,6 +28,7 @@ class HyperFormulaNS extends HyperFormula {
   public static EmptyValue = EmptyValue
   public static DetailedCellError = DetailedCellError
   public static NoOperationToUndo = NoOperationToUndo
+  public static NoOperationToRedo = NoOperationToRedo
   public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
@@ -58,6 +60,7 @@ export {
   ExportedCellChange,
   ExportedNamedExpressionChange,
   NoOperationToUndo,
+  NoOperationToRedo,
   EvaluationSuspendedError,
   ErrorType
 }

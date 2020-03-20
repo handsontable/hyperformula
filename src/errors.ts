@@ -87,6 +87,12 @@ export class NoOperationToUndo extends Error {
   }
 }
 
+export class NoOperationToRedo extends Error {
+  constructor() {
+    super('There is no operation to redo')
+  }
+}
+
 function replacer(key: any, val: any): any {
   switch (typeof val) {
     case 'function':
