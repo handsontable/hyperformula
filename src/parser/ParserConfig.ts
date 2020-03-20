@@ -11,5 +11,4 @@ export interface ParserConfig {
   functionsWhichDoesNotNeedArgumentsToBeComputed(): Set<string>,
   getErrorTranslationFor(errorType: ErrorType): string,
   getFunctionTranslationFor(functionName: string): string,
-  numericStringToNumber: (input: string) => number,
 }

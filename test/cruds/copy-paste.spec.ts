@@ -1,4 +1,4 @@
-import {Config, EmptyValue, ExportedCellChange, HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
@@ -169,7 +169,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 2, 2)
@@ -186,7 +186,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['foo'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 1, 1)
@@ -201,7 +201,7 @@ describe('Copy - paste integration', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     engine.copy(adr('A1'), 2, 2)

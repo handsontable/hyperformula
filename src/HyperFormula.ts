@@ -5,23 +5,19 @@ import {
   CellValueType,
   getCellType,
   getCellValueType,
-  simpleCellAddress,
-  SimpleCellAddress,
+  NoErrorCellValue, SimpleCellAddress,
 } from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
-import {Config} from './Config'
+import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
   DependencyGraph,
-  FormulaCellVertex,
   Graph,
   MatrixMapping,
-  MatrixVertex,
-  ParsingErrorVertex,
   RangeMapping,
   SheetMapping,
   Vertex,
@@ -34,10 +30,20 @@ import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Maybe} from './Maybe'
 import {NamedExpressions} from './NamedExpressions'
-import {AstNodeType, ParserWithCaching, simpleCellAddressFromString, simpleCellAddressToString, Unparser, Ast} from './parser'
+import {
+  AstNodeType,
+  ParserWithCaching,
+  simpleCellAddressFromString,
+  simpleCellAddressToString,
+  Unparser,
+  Ast,
+} from './parser'
+import {RebuildEngineWithConfigFactory} from './RebuildEngineWithConfigFactory'
+import {
+  Serialization
+} from './Serialization'
 import {Statistics, StatType} from './statistics/Statistics'
-import {TinyEmitter} from 'tiny-emitter'
-import {Events, SheetAddedHandler, SheetRemovedHandler, SheetRenamedHandler, NamedExpressionAddedHandler, NamedExpressionRemovedHandler, ValuesUpdatedHandler} from './Emitter'
+import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 
 export type Index = [number, number]
@@ -45,7 +51,7 @@ export type Index = [number, number]
 /**
  * Engine for one sheet
  */
-export class HyperFormula {
+export class HyperFormula implements TypedEmitter {
 
   /**
    * Version of the HyperFormula.
@@ -122,10 +128,10 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheet - two-dimensional array representation of sheet
-   * @param {Config} [maybeConfig] - engine configuration
+   * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
-  public static buildFromArray(sheet: Sheet, maybeConfig?: Config): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, maybeConfig)
+  public static buildFromArray(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
+    return new BuildEngineFromArraysFactory().buildFromSheet(sheet, configInput)
   }
 
   /**
@@ -138,10 +144,10 @@ export class HyperFormula {
    * If not specified the engine will be built with the default configuration.
    *
    * @param {Sheet} sheets - object with sheets definition
-   * @param {Config} [maybeConfig]- engine configuration
+   * @param {Partial<ConfigParams>} [configInput]- engine configuration
    */
-  public static buildFromSheets(sheets: Sheets, maybeConfig?: Config): HyperFormula {
-    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, maybeConfig)
+  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
+    return new BuildEngineFromArraysFactory().buildFromSheets(sheets, configInput)
   }
 
   /**
@@ -151,40 +157,42 @@ export class HyperFormula {
    * 
    * If not specified the engine will be built with the default configuration.
    *
-   * @param {Config} [maybeConfig] - engine configuration
+   * @param {Partial<ConfigParams>} [configInput] - engine configuration
    */
-  public static buildEmpty(maybeConfig?: Config): HyperFormula {
-    return new EmptyEngineFactory().build(maybeConfig)
+  public static buildEmpty(configInput?: Partial<ConfigParams>): HyperFormula {
+    return new EmptyEngineFactory().build(configInput)
   }
 
-  private readonly crudOperations: CrudOperations
-  private readonly exporter: Exporter
-  private readonly namedExpressions: NamedExpressions
-  private readonly emitter: TinyEmitter = new TinyEmitter()
+  private crudOperations: CrudOperations
+  private exporter: Exporter
+  private namedExpressions: NamedExpressions
+  private readonly emitter: Emitter = new Emitter()
+  public serialization: Serialization
 
   constructor(
     /** Engine configuration. */
-    public readonly config: Config,
+    public config: Config,
     /** Statistics module for benchmarking. */
-    public readonly stats: Statistics,
+    public stats: Statistics,
     /** Dependency graph storing sheets structure. */
-    public readonly dependencyGraph: DependencyGraph,
+    public dependencyGraph: DependencyGraph,
     /** Column search strategy used by VLOOKUP plugin. */
-    public readonly columnSearch: ColumnSearchStrategy,
+    public columnSearch: ColumnSearchStrategy,
     /** Parser with caching. */
-    private readonly parser: ParserWithCaching,
-    private readonly unparser: Unparser,
-    private readonly cellContentParser: CellContentParser,
+    private parser: ParserWithCaching,
+    private unparser: Unparser,
+    private cellContentParser: CellContentParser,
     /** Formula evaluator. */
-    public readonly evaluator: Evaluator,
+    public evaluator: Evaluator,
     /** Service handling postponed CRUD transformations. */
-    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    public readonly undoRedo: UndoRedo,
+    public lazilyTransformingAstService: LazilyTransformingAstService,
+    public undoRedo: UndoRedo,
   ) {
     this.crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
     undoRedo.crudOperations = this.crudOperations
     this.namedExpressions = new NamedExpressions(this.addressMapping, this.cellContentParser, this.dependencyGraph, this.parser, this.crudOperations)
     this.exporter = new Exporter(config, this.namedExpressions)
+    this.serialization = new Serialization(this.dependencyGraph, this.unparser, this.config, this.exporter)
   }
 
   /**
@@ -197,7 +205,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellValue(address: SimpleCellAddress): CellValue {
-    return this.exporter.exportValue(this.dependencyGraph.getCellValue(address))
+    return this.serialization.getCellValue(address)
   }
 
   /**
@@ -210,19 +218,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getCellFormula(address: SimpleCellAddress): Maybe<string> {
-    const formulaVertex = this.dependencyGraph.getCell(address)
-    if (formulaVertex instanceof FormulaCellVertex) {
-      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      return this.unparser.unparse(formula, address)
-    } else if (formulaVertex instanceof MatrixVertex) {
-      const formula = formulaVertex.getFormula()
-      if (formula) {
-        return '{' + this.unparser.unparse(formula, formulaVertex.getAddress()) + '}'
-      }
-    } else if (formulaVertex instanceof ParsingErrorVertex) {
-      return formulaVertex.getFormula()
-    }
-    return undefined
+    return this.serialization.getCellFormula(address)
   }
 
   /**
@@ -236,9 +232,8 @@ export class HyperFormula {
    *
    * @returns a [[CellValue]] which is a value of a cell or an error
    */
-  public getCellSerialized(address: SimpleCellAddress): CellValue {
-    const formula: Maybe<string> = this.getCellFormula(address)
-    return formula !== undefined ? formula : this.getCellValue(address)
+  public getCellSerialized(address: SimpleCellAddress): NoErrorCellValue {
+    return this.serialization.getCellSerialized(address)
   }
 
   /**
@@ -251,7 +246,7 @@ export class HyperFormula {
    * @param {number} sheet - sheet ID number
    */
   public getSheetValues(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellValue(...args))
+    return this.serialization.getSheetValues(sheet)
   }
 
   /**
@@ -264,7 +259,7 @@ export class HyperFormula {
    * @param {SimpleCellAddress} address - cell coordinates
    */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellFormula(...args))
+    return this.serialization.getSheetFormulas(sheet)
   }
 
   /**
@@ -276,24 +271,8 @@ export class HyperFormula {
    *
    * @param {SimpleCellAddress} address - cell coordinates
    */
-  public getSheetSerialized(sheet: number): CellValue[][] {
-    return this.genericSheetGetter(sheet, (...args) => this.getCellSerialized(...args))
-  }
-
-  private genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
-    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
-    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
-
-    const arr: T[][] = new Array(sheetHeight)
-    for (let i = 0; i < sheetHeight; i++) {
-      arr[i] = new Array(sheetWidth)
-
-      for (let j = 0; j < sheetWidth; j++) {
-        const address = simpleCellAddress(sheet, j, i)
-        arr[i][j] = getter(address)
-      }
-    }
-    return arr
+  public getSheetSerialized(sheet: number): NoErrorCellValue[][] {
+    return this.serialization.getSheetSerialized(sheet)
   }
 
   /**
@@ -304,7 +283,7 @@ export class HyperFormula {
    * @returns key-value pairs where keys are sheet IDs and dimensions are returned as numbers, width and height respectively.
    */
   public getAllSheetsDimensions(): Record<string, { width: number, height: number }> {
-    return this.genericAllGetter((...args) => this.getSheetDimensions(...args))
+    return this.serialization.genericAllSheetsGetter((arg) => this.getSheetDimensions(arg))
   }
 
   /**
@@ -329,7 +308,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
-    return this.genericAllGetter((...args) => this.getSheetValues(...args))
+    return this.serialization.getAllSheetsValues()
   }
 
   /**
@@ -338,7 +317,7 @@ export class HyperFormula {
    * @returns an object which property keys are strings and values are arrays of arrays of strings or possibly `undefined`
    */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
-    return this.genericAllGetter((...args) => this.getSheetFormulas(...args))
+    return this.serialization.getAllSheetsFormulas()
   }
 
   /**
@@ -346,17 +325,30 @@ export class HyperFormula {
    * 
    * @returns an object which property keys are strings and values are arrays of arrays of [[CellValue]]
    */
-  public getAllSheetsSerialized(): Record<string, CellValue[][]> {
-    return this.genericAllGetter((...args) => this.getSheetSerialized(...args))
+  public getAllSheetsSerialized(): Record<string, NoErrorCellValue[][]> {
+    return this.serialization.getAllSheetsSerialized()
   }
 
-  private genericAllGetter<T>( sheetGetter: (sheet: number) => T): Record<string, T> {
-    const result: Record<string, T> = {}
-    for (const sheetName of this.sheetMapping.displayNames()) {
-      const sheetId = this.sheetMapping.fetch(sheetName)
-      result[sheetName] =  sheetGetter(sheetId)
-    }
-    return result
+  /**
+   * Updates the config with given new parameters.
+   *
+   * @param newParams
+   */
+  public updateConfig(newParams: Partial<ConfigParams>): void {
+    const newEngine = new RebuildEngineWithConfigFactory().rebuildWithConfig(this, newParams)
+    this.crudOperations = newEngine.crudOperations
+    this.exporter = newEngine.exporter
+    this.namedExpressions = newEngine.namedExpressions
+    this.config = newEngine.config
+    this.dependencyGraph = newEngine.dependencyGraph
+    this.columnSearch = newEngine.columnSearch
+    this.parser = newEngine.parser
+    this.unparser = newEngine.unparser
+    this.cellContentParser = newEngine.cellContentParser
+    this.evaluator = newEngine.evaluator
+    this.lazilyTransformingAstService = newEngine.lazilyTransformingAstService
+    this.undoRedo = newEngine.undoRedo
+    this.serialization = newEngine.serialization
   }
 
   /**
@@ -1156,7 +1148,7 @@ export class HyperFormula {
    */
   public renameSheet(sheetId: number, newName: string): void {
     const oldName = this.sheetMapping.renameSheet(sheetId, newName)
-    if (oldName !== SheetMapping.NO_CHANGE) {
+    if (oldName !== undefined) {
       this.emitter.emit(Events.SheetRenamed, oldName, newName)
     }
   }
@@ -1347,58 +1339,21 @@ export class HyperFormula {
   }
 
   /**
-   * A method that listens on adding a sheet event.
+   * A method that listens on events.
    * 
-   * @param {SheetAddedHandler} handler handler of adding sheet event
+   * @param {Event} event to listen on
+   * @param {Listener} handler to be called on event
    */
-  public onSheetAdded(handler: SheetAddedHandler): void {
-    this.emitter.on(Events.SheetAdded, handler)
+  public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.on(event, listener)
   }
 
-  /**
-   * A method that listens on removing a sheet event.
-   * 
-   * @param {SheetRemovedHandler} handler handler of removing sheet event
-   */
-  public onSheetRemoved(handler: SheetRemovedHandler): void {
-    this.emitter.on(Events.SheetRemoved, handler)
-  }
-  
-  /**
-   * 
-   * A method that listens on renaming a sheet event.
-   * 
-   * @param {SheetRenamedHandler} handler handler of renaming sheet event
-   */
-  public onSheetRenamed(handler: SheetRenamedHandler): void {
-    this.emitter.on(Events.SheetRenamed, handler)
+  public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.once(event, listener)
   }
 
-  /**
-   * A method that listens on adding a named expression event.
-   * 
-   * @param {NamedExpressionAddedHandler} handler handler of adding named expression event
-   */
-  public onNamedExpressionAdded(handler: NamedExpressionAddedHandler): void {
-    this.emitter.on(Events.NamedExpressionAdded, handler)
-  }
-
-  /**
-   * A method that listens on removing a named expression event.
-   *  
-   * @param {NamedExpressionRemovedHandler} handler handler of removing named expression event
-   */
-  public onNamedExpressionRemoved(handler: NamedExpressionRemovedHandler): void {
-    this.emitter.on(Events.NamedExpressionRemoved, handler)
-  }
-
-  /**
-   * A method that listens on updating the values event.
-   * 
-   * @param {ValuesUpdatedHandler} handler handler of updating values event
-   */
-  public onValuesUpdated(handler: ValuesUpdatedHandler): void {
-    this.emitter.on(Events.ValuesUpdated, handler)
+  public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
+    this.emitter.off(event, listener)
   }
 
   /**

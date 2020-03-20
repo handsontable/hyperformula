@@ -1,4 +1,4 @@
-import {Config} from '../src'
+import {Config} from '../src/Config'
 import {dateNumberToString} from './testUtils'
 
 describe('test utils', () => {

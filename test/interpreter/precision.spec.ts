@@ -1,4 +1,4 @@
-import {Config, HyperFormula} from '../../src'
+import {HyperFormula} from '../../src'
 import '../testConfig'
 import {adr} from '../testUtils'
 
@@ -16,7 +16,7 @@ describe('Imprecise comparisons', () => {
       ['=0'+chunk1+'<0', '=0'+chunk2+'<0'],
       ['=-0'+chunk1+'<0', '=-0'+chunk2+'<0'],
       ['=0<-0'+chunk1, '=0<-0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
@@ -48,7 +48,7 @@ describe('Imprecise comparisons', () => {
       ['=0'+chunk1+'>0', '=0'+chunk2+'>0'],
       ['=-0'+chunk1+'>0', '=-0'+chunk2+'>0'],
       ['=0>-0'+chunk1, '=0>-0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
@@ -80,7 +80,7 @@ describe('Imprecise comparisons', () => {
       ['=0'+chunk1+'>=0', '=0'+chunk2+'>=0'],
       ['=-0'+chunk1+'>=0', '=-0'+chunk2+'>=0'],
       ['=0>=-0'+chunk1, '=0>=-0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
@@ -112,7 +112,7 @@ describe('Imprecise comparisons', () => {
       ['=0'+chunk1+'<=0', '=0'+chunk2+'<=0'],
       ['=-0'+chunk1+'<=0', '=-0'+chunk2+'<=0'],
       ['=0<=-0'+chunk1, '=0<=-0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(true)
@@ -148,7 +148,7 @@ describe('Snap to zero', () => {
       ['=0'+chunk1+'-0', '=0'+chunk2+'-0'],
       ['=-0'+chunk1+'-0', '=-0'+chunk2+'-0'],
       ['=0--0'+chunk1, '=0--0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.dependencyGraph.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
     expect(engine.dependencyGraph.getCellValue(adr('B1'))).toEqual(0)
@@ -180,7 +180,7 @@ describe('Snap to zero', () => {
       ['=0'+chunk1+'+-0', '=0'+chunk2+'+-0'],
       ['=-0'+chunk1+'+-0', '=-0'+chunk2+'+-0'],
       ['=0+0'+chunk1, '=0+0'+chunk2],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.dependencyGraph.getCellValue(adr('A1'))).toBeCloseTo(0.0000000001, 5)
     expect(engine.dependencyGraph.getCellValue(adr('B1'))).toEqual(0)
@@ -205,8 +205,26 @@ describe( 'Value-fixed', () => {
   it('should correctly calculate 0.2 + 0.1 as 0.3', () => {
     const engine = HyperFormula.buildFromArray([
       ['=0.2+0.1'],
-    ], new Config({ smartRounding : true}))
+    ], { smartRounding : true})
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.3)
+  })
+})
+
+describe( 'tests', () => {
+  it('addition of small numbers with smartRounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0.000123456789', '1', '=A1+B1'],
+    ],  { smartRounding: true })
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)
+  })
+
+  it('addition of small numbers with smartRounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0.000123456789', '1', '=A1+B1'],
+    ], { smartRounding: true, precisionRounding: 9 })
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123457) //as GS and E
   })
 })

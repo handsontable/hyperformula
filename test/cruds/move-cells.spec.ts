@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula} from '../../src'
+import {EmptyValue, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -783,7 +783,7 @@ describe('column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['=VLOOKUP(1, A1:A1, 1, TRUE())'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.moveCells(adr('A1'), 1, 1, adr('B1'))
 
@@ -796,7 +796,7 @@ describe('column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.moveCells(adr('A1'), 1, 2, adr('B1'))
 
@@ -812,7 +812,7 @@ describe('column index', () => {
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.moveCells(adr('A1'), 2, 2, adr('B2'))
 
@@ -831,7 +831,7 @@ describe('column index', () => {
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.moveCells(adr('B2'), 2, 2, adr('A1'))
 
@@ -872,7 +872,7 @@ describe('move cells with matrices', () => {
   it('should be possible to move whole numeric matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.moveCells(adr('A1'), 2, 1, adr('A2'))
 
@@ -885,7 +885,7 @@ describe('move cells with matrices', () => {
   it('should be possible to move part of a numeric matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.moveCells(adr('B1'), 1, 1, adr('B2'))
 
@@ -902,7 +902,7 @@ describe('move cells with matrices', () => {
       ['1', '2'],
       ['foo'],
       ['3', '4'],
-    ], new Config({ matrixDetection: true, matrixDetectionThreshold: 1}))
+    ], { matrixDetection: true, matrixDetectionThreshold: 1})
 
     engine.moveCells(adr('A1'), 2, 1, adr('A3'))
 

@@ -1,20 +1,21 @@
-import {HyperFormula, LazilyTransformingAstService} from './'
 import {CellContentParser} from './CellContentParser'
 import {buildColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
-import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
+import {GraphBuilder} from './GraphBuilder'
+import {HyperFormula} from './HyperFormula'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {SingleThreadEvaluator} from './SingleThreadEvaluator'
-import {Statistics, StatType} from './statistics/Statistics'
+import {StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
-import {UndoRedo} from './UndoRedo'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 
-export class BuildEngineFromArraysFactory {
-  private buildWithConfig(sheets: Sheets, config: Config): HyperFormula {
-    const stats = new Statistics()
+export class RebuildEngineWithConfigFactory {
+  public rebuildWithConfig(oldEngine: HyperFormula, newParams: Partial<ConfigParams>): HyperFormula {
+    const stats = oldEngine.stats
+    const config: Config = oldEngine.config.mergeConfig(newParams)
 
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
@@ -23,6 +24,10 @@ export class BuildEngineFromArraysFactory {
     const columnIndex = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
+
+    const language = newParams.language ? newParams.language : config.language
+    const configNewLanguage = oldEngine.config.mergeConfig( {language} )
+    const sheets = oldEngine.serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
     for (const sheetName in sheets) {
       const sheetId = sheetMapping.addSheet(sheetName)
       addressMapping.autoAddSheet(sheetId, sheets[sheetName])
@@ -31,11 +36,11 @@ export class BuildEngineFromArraysFactory {
     const parser = new ParserWithCaching(config, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
-    const numberLiteralHelper = new NumberLiteralHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
-    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
+    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralsHelper)
 
-    const undoRedo = new UndoRedo()
+    const undoRedo = oldEngine.undoRedo
 
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnIndex, parser, cellContentParser, config, stats)
@@ -45,7 +50,7 @@ export class BuildEngineFromArraysFactory {
     lazilyTransformingAstService.parser = parser
     lazilyTransformingAstService.undoRedo = undoRedo
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralHelper, collator)
+    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnIndex, config, stats, dateHelper, numberLiteralsHelper, collator)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
@@ -60,20 +65,9 @@ export class BuildEngineFromArraysFactory {
       cellContentParser,
       evaluator,
       lazilyTransformingAstService,
-      undoRedo,
+      undoRedo
     )
 
     return engine
-  }
-
-  public buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): HyperFormula {
-    const config = new Config(configInput)
-    return this.buildWithConfig(sheets, config)
-  }
-
-  public buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
-    const config = new Config(configInput)
-    const newsheetprefix = config.language.interface.NEW_SHEET_PREFIX + '1'
-    return this.buildWithConfig({[newsheetprefix]: sheet}, config)
   }
 }

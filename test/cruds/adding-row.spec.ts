@@ -1,4 +1,4 @@
-import {Config, EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
+import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {ColumnIndex} from '../../src/ColumnSearch/ColumnIndex'
@@ -74,11 +74,10 @@ describe('Adding row - checking if its possible', () => {
   })
 
   it('yes if theres a numeric matrix in place where we add', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
     expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
 
     expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
@@ -283,11 +282,10 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
 describe('Adding row - matrices adjustments', () => {
   it('add row inside numeric matrix, expand matrix', () => {
-    const config = new Config({matrixDetection: true, matrixDetectionThreshold: 1})
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
-    ], config)
+    ], {matrixDetection: true, matrixDetectionThreshold: 1})
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
 
@@ -341,7 +339,7 @@ describe('Adding row - column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
       ['2'],
-    ], new Config({ useColumnIndex: true }))
+    ], { useColumnIndex: true })
 
     engine.addRows(0, [1, 1])
 

@@ -1,5 +1,7 @@
-import {Config, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import './testConfig.ts'
+import {Config} from '../src/Config'
+import {plPL} from '../src/i18n'
 
 describe('Building engine from arrays', () => {
   it('works', () => {
@@ -11,7 +13,19 @@ describe('Building engine from arrays', () => {
     expect(engine).toBeInstanceOf(HyperFormula)
   })
 
-  it('#buildFromSheets accepts config', () => {
+  it('#buildFromSheet adds default sheet Sheet1', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    expect(engine.getAllSheetsDimensions()).toEqual({'Sheet1': {'height': 0, 'width': 0}})
+  })
+
+  it('#buildFromSheet adds default sheet Sheet1, in different languages', () => {
+    const engine = HyperFormula.buildFromArray([], { language: plPL })
+
+    expect(engine.getAllSheetsDimensions()).toEqual({'Arkusz1': {'height': 0, 'width': 0}})
+  })
+
+  xit('#buildFromSheets accepts config', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [],
@@ -21,17 +35,10 @@ describe('Building engine from arrays', () => {
     expect(engine.config).toBe(config)
   })
 
-  it('#buildFromSheet accepts config', () => {
+  xit('#buildFromSheet accepts config', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([], config)
 
     expect(engine.config).toBe(config)
-  })
-
-  it('#buildFromSheet adds default sheet Sheet1', () => {
-    const config = new Config()
-    const engine = HyperFormula.buildFromArray([], config)
-
-    expect(engine.getAllSheetsDimensions()).toEqual({'Sheet1': {'height': 0, 'width': 0}})
   })
 })

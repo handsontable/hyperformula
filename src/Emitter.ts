@@ -1,4 +1,5 @@
 import { ExportedChange } from './CellValue'
+import {TinyEmitter} from 'tiny-emitter'
 
 export enum Events {
   SheetAdded = 'sheetAdded',
@@ -9,60 +10,75 @@ export enum Events {
   ValuesUpdated = 'valuesUpdated',
 }
 
-/**
-* The event is triggered upon adding a sheet anywhere inside the workbook.
-* 
-* @event sheetAdded
-* 
-* @param {string} addedSheetDisplayName the name of added sheet
-*/
-export type SheetAddedHandler = (addedSheetDisplayName: string) => any
+export interface Listeners {
+  /**
+   * Adding sheet event.
+   * 
+   * @event sheetAdded
+   * 
+   * @param {string} addedSheetDisplayName the name of added sheet
+   */
+  sheetAdded: (addedSheetDisplayName: string) => any,
 
-/**
-* The event is triggered upon removing a sheet from anywhere inside the workbook.
-* 
-* @event sheetRemoved
-* 
-* @param {string} removedSheetDisplayName the name of removed sheet
-* @param {ExportedChange[]} changes the values and location of applied changes
-*/
-export type SheetRemovedHandler = (removedSheetDisplayName: string, changes: ExportedChange[]) => any
+  /**
+   * Removing sheet event. 
+   * 
+   * @event sheetRemoved
+   * 
+   * @param {string} removedSheetDisplayName the name of removed sheet
+   * @param {ExportedChange[]} changes the values and location of applied changes
+   */
+  sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
 
-/**
-* The event is triggered upon renaming a sheet anywhere inside the workbook.
-*  
-* @event sheetRenamed
-* 
-* @param {string} oldDisplayName the old name of a sheet before renaming
-* @param {string} newDisplayName the new name of the sheet after renaming 
-*/
-export type SheetRenamedHandler = (oldDisplayName: string, newDisplayName: string) => any
+  /**
+    * Renaming sheet event.
+    *  
+    * @event sheetRenamed
+    * 
+    * @param {string} oldDisplayName the old name of a sheet before renaming
+    * @param {string} newDisplayName the new name of the sheet after renaming 
+   */
+  sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
 
-/**
-* The event is triggered upon adding a named expression with specified values and location.
-* 
-* @event namedExpressionAdded
-* 
-* @param {string} namedExpressionName the name of added expression
-* @param {ExportedChange[]} changes the values and location of applied changes
-*/
-export type NamedExpressionAddedHandler = (namedExpressionName: string, changes: ExportedChange[]) => any
+  /**
+   * Adding named expression event.
+   * 
+   * @event namedExpressionAdded
+   * 
+   * @param {string} namedExpressionName the name of added expression
+   * @param {ExportedChange[]} changes the values and location of applied changes
+   */
+  namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
-/**
-* The event is triggered upon removing a named expression with specified values and from an indicated location.
-* 
-* @event namedExpressionRemoved
-* 
-* @param {string} namedExpressionName the name of removed expression
-* @param {ExportedChange[]} changes the values and location of applied changes
-*/
-export type NamedExpressionRemovedHandler = (namedExpressionName: string, changes: ExportedChange[]) => any
+  /**
+   * Removing named expression event.
+   * 
+   * @event namedExpressionRemoved
+   * 
+   * @param {string} namedExpressionName the name of removed expression
+   * @param {ExportedChange[]} changes the values and location of applied changes
+   */
+  namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
-/**
-* The event is triggered upon changing values in a specified location.
-* 
-* @event valuesUpdated
-* 
-* @param {ExportedChange[]} changes the values and location of applied changes
-*/
-export type ValuesUpdatedHandler = (changes: ExportedChange[]) => any
+  /**
+   * Updated values event.
+   * 
+   * @event valuesUpdated
+   * 
+   * @param {ExportedChange[]} changes the values and location of applied changes
+   */
+  valuesUpdated: (changes: ExportedChange[]) => any,
+}
+
+export interface TypedEmitter {
+  on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+  off<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+  once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+}
+
+export class Emitter extends TinyEmitter implements TypedEmitter {
+  public emit<Event extends keyof Listeners>(event: Event, ...args: Parameters<Listeners[Event]>): this {
+    super.emit(event, ...args)
+    return this
+  }
+}
