@@ -60,6 +60,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('+42,13')).toStrictEqual(new CellContent.Number(42.13))
     expect(cellContentParser.parse(',13')).toStrictEqual(new CellContent.Number(0.13))
     expect(cellContentParser.parse('42.13')).toStrictEqual(new CellContent.String('42.13'))
+    expect(cellContentParser.parse('12,34,56')).toStrictEqual(new CellContent.String('12,34,56'))
   })
 
   it('numbers with thousand separators', () => {
@@ -74,6 +75,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('12 3456 789')).toStrictEqual(new CellContent.Number(123456789))
     expect(cellContentParser.parse('1 234 567.12')).toStrictEqual(new CellContent.Number(1234567.12))
     expect(cellContentParser.parse('12 34 56 7')).toStrictEqual(new CellContent.String('12 34 56 7'))
+    expect(cellContentParser.parse('1 234.12.12')).toStrictEqual(new CellContent.String('1 234.12.12'))
   })
 
   it( 'non-string', () => {
