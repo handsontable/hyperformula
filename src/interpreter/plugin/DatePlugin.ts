@@ -1,11 +1,7 @@
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
-import {
-  endOfMonth,
-  offsetMonth,
-} from '../../DateHelper'
+import {endOfMonth, offsetMonth} from '../../DateHelper'
 import {format} from '../../format/format'
 import {ProcedureAst} from '../../parser'
-import {coerceScalarToNumberOrError} from '../coerce'
 import {SimpleRangeValue} from '../InterpreterValue'
 import {FunctionPlugin} from './FunctionPlugin'
 

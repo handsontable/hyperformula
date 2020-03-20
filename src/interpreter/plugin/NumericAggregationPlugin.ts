@@ -5,10 +5,9 @@ import {Maybe} from '../../Maybe'
 import {AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {
   coerceNonDateScalarToMaybeNumber,
-  coerceScalarToNumberOrError,
   coerceToRange
 } from '../coerce'
-import { SimpleRangeValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../InterpreterValue'
 import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
@@ -46,10 +45,12 @@ class AverageResult {
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
+
   constructor(
     public readonly sum: number,
     public readonly count: number,
-  ) { }
+  ) {
+  }
 
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
@@ -296,7 +297,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
-        if(value instanceof SimpleRangeValue) {
+        if (value instanceof SimpleRangeValue) {
           value = this.reduceRange(Array.from(value.valuesFromTopLeftCorner()).map(mapFunction), initialAccValue, reducingFunction)
         } else if (arg.type === AstNodeType.CELL_REFERENCE) {
           value = mapFunction(value)

@@ -4,7 +4,7 @@ import {ColumnSearchStrategy} from '../../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
 import {Ast, ProcedureAst} from '../../parser'
-import {coerceScalarToNumberOrError, coerceScalarToString} from '../coerce'
+import {coerceScalarToString} from '../coerce'
 import {Interpreter} from '../Interpreter'
 import {InterpreterValue, SimpleRangeValue} from '../InterpreterValue'
 
