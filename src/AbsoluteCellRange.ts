@@ -1,10 +1,12 @@
-import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {absoluteSheetReference, CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {DependencyGraph} from './DependencyGraph'
 import {CellAddress} from './parser'
+import {ColumnRangeAst} from './parser/Ast'
+import {ColumnAddress} from './parser/ColumnAddress'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
 export class AbsoluteCellRange {
-
   public get sheet() {
     return this.start.sheet
   }
@@ -239,5 +241,47 @@ export class AbsoluteCellRange {
 
   public includesColumn(column: number) {
     return this.start.col < column && this.end.col >= column
+  }
+}
+
+export class AbsoluteColumnRange extends AbsoluteCellRange {
+  public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress, dependencyGraph: DependencyGraph): AbsoluteColumnRange {
+    return new AbsoluteColumnRange(
+      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, 0),
+      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, Number.POSITIVE_INFINITY),
+      dependencyGraph
+    )
+  }
+
+  private constructor(
+    public readonly start: SimpleCellAddress,
+    public readonly end: SimpleCellAddress,
+    public readonly dependencyGraph: DependencyGraph
+  ) {
+    super(start, end)
+  }
+
+  public height(): number {
+    return this.dependencyGraph.getSheetHeight(this.sheet)
+  }
+
+  public width(): number {
+    return this.end.col - this.start.col + 1
+  }
+
+  public shiftByRows(numberOfRows: number) {
+    return
+  }
+
+  public expandByRows(numberOfRows: number) {
+    return
+  }
+
+  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, 0), this.width(), this.height())
+  }
+
+  public removeRows(rowStart: number, rowEnd: number) {
+    return
   }
 }

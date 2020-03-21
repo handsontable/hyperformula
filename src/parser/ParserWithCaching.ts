@@ -148,6 +148,9 @@ export class ParserWithCaching {
         const end = referenceHashFromCellAddress(ast.end, ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
         return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE: {
+        throw Error("TODO")
+      }
       case AstNodeType.MINUS_UNARY_OP: {
         return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
       }

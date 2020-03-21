@@ -1,12 +1,14 @@
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress, CellReferenceType} from './CellAddress'
+import {ColumnAddress} from './ColumnAddress'
 import {additionalCharactersAllowedInQuotes} from './LexerConfig'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
 const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
+const columnRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -41,6 +43,23 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
   } else {
     return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
+  }
+}
+
+export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
+  const result = columnRegex.exec(stringAddress)!
+
+  const sheet = extractColumnNumber(result, sheetMapping)
+  if (sheet === undefined) {
+    return undefined
+  }
+
+  const col = columnLabelToIndex(result[6])
+
+  if (result[5] === '$') {
+    return ColumnAddress.absolute(sheet, col)
+  } else {
+    return ColumnAddress.relative(sheet, col)
   }
 }
 
@@ -137,4 +156,19 @@ function columnIndexToLabel(column: number) {
   }
 
   return result.toUpperCase()
+}
+
+function extractColumnNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
+  const maybeSheetName = regexResult[3] || regexResult[4]
+
+  let sheet = null
+
+  if (maybeSheetName) {
+    sheet = sheetMapping(maybeSheetName)
+    if (sheet === undefined) {
+      return undefined
+    }
+  }
+
+  return sheet
 }

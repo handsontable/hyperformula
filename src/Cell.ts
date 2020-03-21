@@ -134,5 +134,3 @@ export interface CellRange {
   start: CellAddress,
   end: CellAddress,
 }
-
-export const buildCellRange = (start: CellAddress, end: CellAddress): CellRange => ({start, end})

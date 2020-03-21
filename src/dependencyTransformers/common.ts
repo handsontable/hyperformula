@@ -41,6 +41,9 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
         return ast
       }
     }
+    case AstNodeType.COLUMN_RANGE: {
+      throw Error("TODO")
+    }
     case AstNodeType.ERROR:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING: {

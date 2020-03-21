@@ -45,6 +45,9 @@ export class Unparser {
       case AstNodeType.CELL_RANGE: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE: {
+        throw Error('TODO')
+      }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
         return imageWithWhitespace('+', ast.leadingWhitespace) + unparsedExpr

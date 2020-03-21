@@ -26,26 +26,26 @@ describe('tokenizeFormula', () => {
   it('should skip whitespace inside range', () => {
     const tokens = lexer.tokenizeFormula('=A1: A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'CellReference', 'RangeSeparator', 'CellReference'])
   })
 
   it('should skip whitespace inside range 2', () => {
     const tokens = lexer.tokenizeFormula('=A1 :A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'CellReference', 'RangeSeparator', 'CellReference'])
   })
 
   it('should skip whitespace inside range 3', () => {
     const tokens = lexer.tokenizeFormula('=A1 : A1').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
-    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'RelativeCell', 'RangeSeparator', 'RelativeCell'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'CellReference', 'RangeSeparator', 'CellReference'])
   })
 
   it('should skip whitespace before function args separator', () => {
     const tokens = lexer.tokenizeFormula('=SUM(A1 , A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
 
-    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'RelativeCell', 'ArgSeparator', 'WhiteSpace', 'RelativeCell', 'RParen'])
+    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'CellReference', 'ArgSeparator', 'WhiteSpace', 'CellReference', 'RParen'])
   })
 
   it('should treat space as whitespace', () => {
@@ -114,7 +114,7 @@ describe('processWhitespaces', () => {
   })
 
   it('should not include whitespaces directly on the list', () => {
-    const tokens = lexer.tokenizeFormula('=   SUM   (   A1:A2)   ').tokens
+    const tokens = lexer.tokenizeFormula('=   SUM(   A1:A2)   ').tokens
     const processed = bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
     expect(processed.map(token => token.tokenType).find(tokenType => tokenType === WhiteSpace)).toBe(undefined)

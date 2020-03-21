@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange} from '../AbsoluteCellRange'
 import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
@@ -129,7 +129,7 @@ export class DependencyGraph {
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
     cellDependencies.forEach((absStartCell: CellDependency) => {
-      if (absStartCell instanceof AbsoluteCellRange) {
+      if (absStartCell instanceof AbsoluteCellRange || absStartCell instanceof AbsoluteColumnRange) {
         const range = absStartCell
         let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
         if (rangeVertex === null) {
@@ -145,7 +145,10 @@ export class DependencyGraph {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }
 
-        const matrix = this.matrixMapping.getMatrix(restRange)
+        let matrix
+        if (restRange instanceof AbsoluteCellRange) {
+          matrix = this.matrixMapping.getMatrix(restRange)
+        }
         if (matrix !== undefined) {
           this.graph.addEdge(matrix, rangeVertex)
         } else {

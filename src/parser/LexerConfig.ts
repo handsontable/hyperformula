@@ -38,49 +38,20 @@ export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
 /* addresses */
-export const CellReference = createToken({name: 'CellReference', pattern: Lexer.NA})
 export const additionalCharactersAllowedInQuotes = ' ' // It's included in regexps, so escape characters which have special regexp semantics
 export const sheetNameRegexp = `([A-Za-z0-9_\u00C0-\u02AF]+|'[A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+')!`
-export const RelativeCell = createToken({
-  name: 'RelativeCell',
-  pattern: /[A-Za-z]+[0-9]+/,
-  categories: CellReference,
+
+export const CellReference = createToken({
+  name: 'CellReference',
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+\\$?[0-9]+`),
 })
-export const AbsoluteColCell = createToken({
-  name: 'AbsoluteColCell',
-  pattern: /\$[A-Za-z]+[0-9]+/,
-  categories: CellReference,
+
+export const ColumnReference = createToken({
+  name: 'ColumnReference',
+  pattern: new RegExp(`\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
 })
-export const AbsoluteRowCell = createToken({
-  name: 'AbsoluteRowCell',
-  pattern: /[A-Za-z]+\$[0-9]+/,
-  categories: CellReference,
-})
-export const AbsoluteCell = createToken({
-  name: 'AbsoluteCell',
-  pattern: /\$[A-Za-z]+\$[0-9]+/,
-  categories: CellReference,
-})
-export const SheetRelativeCell = createToken({
-  name: 'SheetRelativeCell',
-  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteColCell = createToken({
-  name: 'SheetAbsoluteColCell',
-  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteRowCell = createToken({
-  name: 'SheetAbsoluteRowCell',
-  pattern: new RegExp(`${sheetNameRegexp}[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference,
-})
-export const SheetAbsoluteCell = createToken({
-  name: 'SheetAbsoluteCell',
-  pattern: new RegExp(`${sheetNameRegexp}\\$[A-Za-z]+\\$[0-9]+`),
-  categories: CellReference,
-})
+
+
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
 
 /* parenthesis */
@@ -142,14 +113,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-    SheetAbsoluteCell,
-    SheetAbsoluteColCell,
-    SheetAbsoluteRowCell,
-    SheetRelativeCell,
-    AbsoluteCell,
-    AbsoluteColCell,
-    AbsoluteRowCell,
-    RelativeCell,
     ArgSeparator,
     NumberLiteral,
     StringLiteral,
@@ -159,6 +122,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     AdditionOp,
     MultiplicationOp,
     CellReference,
+    ColumnReference,
   ]
 
   return {

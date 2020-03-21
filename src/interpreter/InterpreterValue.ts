@@ -52,10 +52,6 @@ export class OnlyRangeData {
   ) {
   }
 
-  public range(): AbsoluteCellRange {
-    return this._range
-  }
-
   public raw(): InternalCellValue[][] {
     this.ensureThatComputed()
 
@@ -85,6 +81,10 @@ export class OnlyRangeData {
     }
 
     return this._hasOnlyNumbers
+  }
+
+  public range() {
+    return this._range
   }
 
   public* valuesFromTopLeftCorner(): IterableIterator<InternalCellValue> {
@@ -119,7 +119,7 @@ export class OnlyRangeData {
       }
       ++i
 
-      if (i % this._range.width() === 0) {
+      if (i % this.size.width === 0) {
         i = 0
         result.push([...row])
         row = []

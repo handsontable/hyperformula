@@ -452,6 +452,35 @@ describe('cell references and ranges', () => {
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toBe(ErrorType.REF)
   })
+
+  it('cell range with only columns', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=C:D', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
+    expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
+  })
+
+  it('offset has relative sheet reference', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+    const ast = parser.parse('=OFFSET(A1, 1, 2)', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
+
+    expect(ast.reference.sheet).toBe(null)
+  })
+
+  it('cell range with unexisting end sheet should return REF', () => {
+    const sheetMapping = new SheetMapping(enGB)
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
+
+    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast as ErrorAst
+
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(ast.error.type).toBe(ErrorType.REF)
+  })
 })
 
 
@@ -468,22 +497,19 @@ describe('Parsing errors', () => {
     })
   })
 
-  it('lexing error - unexpected token', () => {
+  it('parsing error - column name without whole range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-    expect(errors[0].message).toMatch(/unexpected character/)
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
-  it('lexing error - unexpected token', () => {
+  it('parsing error - column name in procedure without whole range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
-    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
-    expect(errors[0].message).toMatch(/unexpected character/)
-
+    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('parsing error - not all input parsed', () => {

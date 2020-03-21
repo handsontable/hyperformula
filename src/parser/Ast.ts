@@ -2,31 +2,33 @@ import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
+import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
 
 export type Ast =
-    NumberAst
-    | StringAst
-    | CellReferenceAst
-    | CellRangeAst
-    | ConcatenateOpAst
-    | MinusUnaryOpAst
-    | PlusUnaryOpAst
-    | PercentOpAst
-    | EqualsOpAst
-    | NotEqualOpAst
-    | GreaterThanOpAst
-    | LessThanOpAst
-    | LessThanOrEqualOpAst
-    | GreaterThanOrEqualOpAst
-    | PlusOpAst
-    | MinusOpAst
-    | TimesOpAst
-    | DivOpAst
-    | PowerOpAst
-    | ProcedureAst
-    | ParenthesisAst
-    | ErrorAst
+  NumberAst
+  | StringAst
+  | CellReferenceAst
+  | CellRangeAst
+  | ColumnRangeAst
+  | ConcatenateOpAst
+  | MinusUnaryOpAst
+  | PlusUnaryOpAst
+  | PercentOpAst
+  | EqualsOpAst
+  | NotEqualOpAst
+  | GreaterThanOpAst
+  | LessThanOpAst
+  | LessThanOrEqualOpAst
+  | GreaterThanOrEqualOpAst
+  | PlusOpAst
+  | MinusOpAst
+  | TimesOpAst
+  | DivOpAst
+  | PowerOpAst
+  | ProcedureAst
+  | ParenthesisAst
+  | ErrorAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -76,6 +78,7 @@ export enum AstNodeType {
   CELL_REFERENCE = 'CELL_REFERENCE',
 
   CELL_RANGE = 'CELL_RANGE',
+  COLUMN_RANGE = 'COLUMN_RANGE',
 
   ERROR = 'ERROR',
   PARSING_ERROR = 'PARSING_ERROR',
@@ -151,6 +154,22 @@ export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetRef
     leadingWhitespace
   }
 }
+
+
+export interface ColumnRangeAst extends AstWithWhitespace{
+  type: AstNodeType.COLUMN_RANGE,
+  start: ColumnAddress,
+  end: ColumnAddress,
+  sheetReferenceType: RangeSheetReferenceType,
+}
+
+export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): ColumnRangeAst => ({
+  type: AstNodeType.COLUMN_RANGE,
+  start,
+  end,
+  sheetReferenceType,
+  leadingWhitespace: extractImage(leadingWhitespace)
+})
 
 export interface BinaryOpAst extends AstWithWhitespace {
   left: Ast,

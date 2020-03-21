@@ -2,13 +2,14 @@ import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpt
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
+import {cellAddressFromString, columnAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
   buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
+  buildColumnRangeAst,
   buildConcatenateOpAst,
   buildDivOpAst,
   buildEqualsOpAst,
@@ -41,6 +42,7 @@ import {
   AdditionOp,
   BooleanOp,
   CellReference,
+  ColumnReference,
   ConcatenateOp,
   DivOp,
   EqualsOp,
@@ -337,6 +339,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.columnRangeExpression),
+      },
+      {
         ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
@@ -442,6 +447,28 @@ export class FormulaParser extends EmbeddedActionsParser {
     const start = this.SUBRULE(this.cellReference) as CellReferenceAst
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start]})
+  })
+
+  /*
+  * Rule for column cell range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+  * */
+  private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
+    const start = this.CONSUME(ColumnReference) as IExtendedToken
+    this.CONSUME2(RangeSeparator)
+    const end = this.CONSUME3(ColumnReference)
+
+    const columnStart = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, start.image, this.formulaAddress!)
+    })
+    const columnEnd = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, end.image, this.formulaAddress!)
+    })
+
+    if (columnStart === undefined || columnEnd === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+
+    return buildColumnRangeAst(columnStart, columnEnd, RangeSheetReferenceType.RELATIVE, start.leadingWhitespace)
   })
 
   /**

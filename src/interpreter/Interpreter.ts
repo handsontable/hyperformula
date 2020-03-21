@@ -1,5 +1,5 @@
 import GPU from 'gpu.js'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange} from '../AbsoluteCellRange'
 import {
   CellError,
   CellValueTypeOrd,
@@ -247,6 +247,10 @@ export class Interpreter {
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+      }
+      case AstNodeType.COLUMN_RANGE: {
+        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress, this.dependencyGraph)
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, formulaAddress)
