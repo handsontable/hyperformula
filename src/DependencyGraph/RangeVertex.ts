@@ -1,4 +1,4 @@
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {AbstractRange} from '../AbsoluteCellRange'
 import {SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 
@@ -19,7 +19,7 @@ export class RangeVertex {
 
   private dependentCacheRanges: Set<RangeVertex>
 
-  constructor(public range: AbsoluteCellRange) {
+  constructor(public range: AbstractRange) {
     this.functionCache = new Map()
     this.criterionFunctionCache = new Map()
     this.dependentCacheRanges = new Set()

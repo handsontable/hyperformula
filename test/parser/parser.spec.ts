@@ -461,26 +461,6 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=C:D', simpleCellAddress(0, 0, 0)).ast as CellRangeAst
     expect(ast.type).toEqual(AstNodeType.COLUMN_RANGE)
   })
-
-  it('offset has relative sheet reference', () => {
-    const sheetMapping = new SheetMapping(enGB)
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
-    const ast = parser.parse('=OFFSET(A1, 1, 2)', simpleCellAddress(0, 0, 0)).ast as CellReferenceAst
-
-    expect(ast.reference.sheet).toBe(null)
-  })
-
-  it('cell range with unexisting end sheet should return REF', () => {
-    const sheetMapping = new SheetMapping(enGB)
-    sheetMapping.addSheet('Sheet1')
-    sheetMapping.addSheet('Sheet2')
-    const parser = new ParserWithCaching(new Config(), sheetMapping.get)
-
-    const ast = parser.parse('=Sheet2!A1:Sheet3!B2', simpleCellAddress(0, 0, 0)).ast as ErrorAst
-
-    expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(ast.error.type).toBe(ErrorType.REF)
-  })
 })
 
 

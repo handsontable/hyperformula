@@ -588,7 +588,7 @@ export class DependencyGraph {
       if (rangeVertex.range.includesRow(row)) {
         const anyVertexInRow = this.addressMapping.getCell(simpleCellAddress(sheet, rangeVertex.start.col, row + numberOfRows))!
         if (this.graph.existsEdge(anyVertexInRow, rangeVertex)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, rangeVertex.start.col, row), rangeVertex.range.width(), numberOfRows)
+          const addedSubrangeInThatRange = rangeVertex.range.subrangeWithSameWidth(row, numberOfRows)
           for (const address of addedSubrangeInThatRange.addresses()) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
@@ -602,7 +602,7 @@ export class DependencyGraph {
       if (rangeVertex.range.includesColumn(column)) {
         const anyVertexInColumn = this.addressMapping.fetchCell(simpleCellAddress(sheet, column + numberOfColumns, rangeVertex.start.row))
         if (this.graph.existsEdge(anyVertexInColumn, rangeVertex)) {
-          const addedSubrangeInThatRange = AbsoluteCellRange.spanFrom(simpleCellAddress(sheet, column, rangeVertex.start.row), numberOfColumns, rangeVertex.range.height())
+          const addedSubrangeInThatRange = rangeVertex.range.subrangeWithSameHeight(column, numberOfColumns)
           for (const address of addedSubrangeInThatRange.addresses()) {
             this.graph.addEdge(this.fetchCellOrCreateEmpty(address), rangeVertex)
           }
