@@ -1,6 +1,19 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
-import {plPL} from '../src/i18n'
+import {plPL} from '../src/i18n';
+
+describe('Building empty engine', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine).toBeInstanceOf(HyperFormula)
+  })
+
+  it('accepts config params', () => {
+    const config = { dateFormats: ['MM'] }
+    const engine = HyperFormula.buildEmpty(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
+  })
+})
 
 describe('Building engine from arrays', () => {
   it('works', () => {
