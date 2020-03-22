@@ -44,6 +44,7 @@ describe('tokenizeFormula', () => {
   it('should skip whitespace before function args separator', () => {
     const tokens = lexer.tokenizeFormula('=SUM(A1 , A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
+
     expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'RelativeCell', 'ArgSeparator', 'WhiteSpace', 'RelativeCell', 'RParen'])
   })
 

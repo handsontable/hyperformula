@@ -1,4 +1,3 @@
-
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import { ProcedureAst} from '../../parser'

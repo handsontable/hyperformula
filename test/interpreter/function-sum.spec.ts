@@ -38,9 +38,28 @@ describe('SUM', () => {
       ['=TRUE()'],
       ['=CONCATENATE("1","0")'],
       ['=SUM(A1:A5)'],
+      ['=SUM(A3)'],
+      ['=SUM(A4)'],
+      ['=SUM(A5)'],
     ])
 
     expect(engine.getCellValue(adr('A6'))).toEqual(3)
+    expect(engine.getCellValue(adr('A7'))).toEqual(0)
+    expect(engine.getCellValue(adr('A8'))).toEqual(0)
+    expect(engine.getCellValue(adr('A9'))).toEqual(0)
+  })
+
+  it('explicitly called does coercions',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['=SUM(2,TRUE())'],
+      ['=SUM(2,"foo",TRUE())'],
+      ['=SUM(TRUE())'],
+      ['=SUM("10")']
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
   it('doesnt take value from range if it does not store cached value for that function',  () => {

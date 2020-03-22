@@ -6,16 +6,17 @@ import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
-import {SingleThreadEvaluator} from './SingleThreadEvaluator'
+import {Evaluator} from './Evaluator'
 import {Statistics, StatType} from './statistics/Statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
+import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {CrudOperations} from './CrudOperations'
 import {NamedExpressions} from './NamedExpressions'
 import {Exporter} from './CellValue'
 import {Serialization} from './Serialization'
 
-export type Engine = {
+export type EngineState = {
   config: Config,
   stats: Statistics,
   dependencyGraph: DependencyGraph,
@@ -23,7 +24,7 @@ export type Engine = {
   parser: ParserWithCaching,
   unparser: Unparser,
   cellContentParser: CellContentParser,
-  evaluator: SingleThreadEvaluator,
+  evaluator: Evaluator,
   lazilyTransformingAstService: LazilyTransformingAstService,
   undoRedo: UndoRedo,
   crudOperations: CrudOperations,
@@ -33,7 +34,7 @@ export type Engine = {
 }
 
 export class BuildEngineFactory {
-  private static buildEngine(config: Config, sheets?: Sheets, stats: Statistics = new Statistics(), undoRedo: UndoRedo = new UndoRedo()): Engine {
+  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = new Statistics(), undoRedo: UndoRedo = new UndoRedo()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
@@ -43,32 +44,30 @@ export class BuildEngineFactory {
     const addressMapping = dependencyGraph.addressMapping
 
     for (const sheetName in sheets) {
-      const sheetId = sheetMapping.addSheet(sheetName)
-      addressMapping.autoAddSheet(sheetId, sheets[sheetName])
+      if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
+        const sheetId = sheetMapping.addSheet(sheetName)
+        addressMapping.autoAddSheet(sheetId, sheets[sheetName])
+      }
     }
 
     const notEmpty = sheetMapping.numberOfSheets() > 0
     const parser = new ParserWithCaching(config, notEmpty ? sheetMapping.get : sheetMapping.fetch)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName)
     const dateHelper = new DateHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
     const collator = collatorFromConfig(config)
-    const cellContentParser = new CellContentParser(config, dateHelper)
+    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
 
-    if (sheets !== undefined) {
-      stats.measure(StatType.GRAPH_BUILD, () => {
-        const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
-        graphBuilder.buildGraph(sheets)
-      })
-    }
+    stats.measure(StatType.GRAPH_BUILD, () => {
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats)
+      graphBuilder.buildGraph(sheets)
+    })
 
     lazilyTransformingAstService.undoRedo = undoRedo
     lazilyTransformingAstService.parser = parser
 
-    const evaluator = new SingleThreadEvaluator(dependencyGraph, columnSearch, config, stats, dateHelper, collator)
-
-    if (notEmpty) {
-      evaluator.run()
-    }
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, collator)
+    evaluator.run()
 
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, undoRedo)
     undoRedo.crudOperations = crudOperations
@@ -96,19 +95,22 @@ export class BuildEngineFactory {
     }
   }
 
-  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): Engine {
-    return this.buildEngine(new Config(configInput), sheets)
+  public static buildFromSheets(sheets: Sheets, configInput?: Partial<ConfigParams>): EngineState {
+    const config = new Config(configInput)
+    return this.buildEngine(config, sheets)
   }
 
-  public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): Engine {
-    return this.buildEngine(new Config(configInput), {Sheet1: sheet})
+  public static buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): EngineState {
+    const config = new Config(configInput)
+    const newsheetprefix = config.language.interface.NEW_SHEET_PREFIX + '1'
+    return this.buildEngine(config, {[newsheetprefix]: sheet})
   }
 
-  public static buildEmpty(configInput?: Partial<ConfigParams>): Engine {
+  public static buildEmpty(configInput?: Partial<ConfigParams>): EngineState {
     return this.buildEngine(new Config(configInput))
   }
 
-  public static rebuildWithConfig(config: Config, sheets: Sheets, stats: Statistics, undoRedo: UndoRedo): Engine {
+  public static rebuildWithConfig(config: Config, sheets: Sheets, stats: Statistics, undoRedo: UndoRedo): EngineState {
     return this.buildEngine(config, sheets, stats, undoRedo)
   }
 }

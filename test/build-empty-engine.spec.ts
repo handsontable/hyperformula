@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
-import {Config} from '../src/Config'
 
 describe('Building empty engine', () => {
   it('works', () => {

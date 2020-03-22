@@ -11,19 +11,21 @@ import {
 } from '../../src/interpreter/coerce'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
+import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
+  const numberLiteralsHelper = new NumberLiteralHelper(new Config())
   it('works', () => {
-    expect(coerceNonDateScalarToMaybeNumber(42)).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber(' 42')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42 ')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('0000042')).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42foo')).toEqual(null)
-    expect(coerceNonDateScalarToMaybeNumber('foo42')).toEqual(null)
-    expect(coerceNonDateScalarToMaybeNumber(true)).toBe(1)
-    expect(coerceNonDateScalarToMaybeNumber(false)).toBe(0)
-    expect(coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(42, numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber(' 42', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42 ', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('0000042', numberLiteralsHelper)).toBe(42)
+    expect(coerceNonDateScalarToMaybeNumber('42foo', numberLiteralsHelper)).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber('foo42', numberLiteralsHelper)).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber(true, numberLiteralsHelper)).toBe(1)
+    expect(coerceNonDateScalarToMaybeNumber(false, numberLiteralsHelper)).toBe(0)
+    expect(coerceNonDateScalarToMaybeNumber(EmptyValue, numberLiteralsHelper)).toBe(0)
   })
 })
 
@@ -34,9 +36,11 @@ describe('#coerceBooleanToNumber', () => {
   })
 
   it('behaves the same as more general coercion', () => {
-    const dateHelper = new DateHelper(new Config())
-    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumberOrError(true, dateHelper))
-    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumberOrError(false, dateHelper))
+    const config = new Config()
+    const dateHelper = new DateHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    expect(coerceBooleanToNumber(true)).toBe(coerceScalarToNumberOrError(true, dateHelper, numberLiteralsHelper))
+    expect(coerceBooleanToNumber(false)).toBe(coerceScalarToNumberOrError(false, dateHelper, numberLiteralsHelper))
   })
 })
 
@@ -67,17 +71,19 @@ describe('#coerceScalarToBoolean', () => {
 
 describe('#coerceScalarToNumberOrError', () => {
   it('works', () => {
-    const dateHelper = new DateHelper(new Config())
-    expect(coerceScalarToNumberOrError(1, dateHelper)).toEqual(1)
+    const config = new Config()
+    const dateHelper = new DateHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    expect(coerceScalarToNumberOrError(1, dateHelper, numberLiteralsHelper)).toEqual(1)
 
-    expect(coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO), dateHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO), dateHelper, numberLiteralsHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(coerceScalarToNumberOrError('12/31/1899', dateHelper)).toEqual(1)
-    expect(coerceScalarToNumberOrError(true, dateHelper)).toEqual(1)
+    expect(coerceScalarToNumberOrError('12/31/1899', dateHelper, numberLiteralsHelper)).toEqual(1)
+    expect(coerceScalarToNumberOrError(true, dateHelper, numberLiteralsHelper)).toEqual(1)
 
-    expect(coerceScalarToNumberOrError('foo42', dateHelper)).toEqual(new CellError(ErrorType.VALUE))
+    expect(coerceScalarToNumberOrError('foo42', dateHelper, numberLiteralsHelper)).toEqual(new CellError(ErrorType.VALUE))
 
-    expect(coerceScalarToNumberOrError('1', dateHelper)).toEqual(1)
+    expect(coerceScalarToNumberOrError('1', dateHelper, numberLiteralsHelper)).toEqual(1)
   })
 
 })
@@ -243,5 +249,27 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(false)
     expect(engine.getCellValue(adr('E1'))).toEqual(true)
     expect(engine.getCellValue(adr('F1'))).toEqual(true)
+  })
+
+  it( 'order operations, 0 vs false', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ 0, false, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
+    ])
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)
+    expect(engine.getCellValue(adr('D1'))).toEqual(true)
+    expect(engine.getCellValue(adr('E1'))).toEqual(false)
+    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+    expect(engine.getCellValue(adr('G1'))).toEqual(false)
+  })
+
+  it( 'order operations, 1 vs true', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ 1, true, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
+    ])
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)
+    expect(engine.getCellValue(adr('D1'))).toEqual(true)
+    expect(engine.getCellValue(adr('E1'))).toEqual(false)
+    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+    expect(engine.getCellValue(adr('G1'))).toEqual(false)
   })
 })
