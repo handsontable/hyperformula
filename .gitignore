@@ -2,6 +2,7 @@
 commonjs/
 coverage/
 dist/
+doc/
 docs/api/
 docs/functions/
 docs/.vuepress/dist/

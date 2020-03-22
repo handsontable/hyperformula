@@ -1,6 +1,13 @@
+// Alias `excel-formula` plugin to `hf` and `formula` tags.
+Prism.languages.hf = Prism.languages['excel-formula'];
+Prism.languages.formula = Prism.languages['excel-formula'];
+
 module.exports = {
   title: 'HyperFormula',
   description: '⚡️ HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
+  head: [
+    ['meta', { name: 'robots', content: 'noindex,nofollow' }]
+  ],
   plugins: [
     ['@vuepress/search', {
       searchMaxSuggestions: 10

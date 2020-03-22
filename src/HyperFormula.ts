@@ -950,7 +950,7 @@ export class HyperFormula implements TypedEmitter {
    * Note that this method may trigger dependency graph recalculation.
    * 
    * @param {string} name - sheet name, case insensitive
-   * 
+   *
    * @fires [[sheetRemoved]]
    * @fires [[valuesUpdated]]
    *
@@ -1271,15 +1271,27 @@ export class HyperFormula implements TypedEmitter {
     return this.resumeEvaluation()
   }
 
+  /**
+   *
+   * @category Instance
+   */
   public suspendEvaluation(): void {
     this.evaluationSuspended = true
   }
 
+  /**
+   *
+   * @category Instance
+   */
   public resumeEvaluation(): ExportedChange[] {
     this.evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   *
+   * @category Instance
+   */
   public isEvaluationSuspended(): boolean {
     return this.evaluationSuspended
   }
@@ -1473,23 +1485,41 @@ export class HyperFormula implements TypedEmitter {
    * 
    * @param {Event} event to listen on
    * @param {Listener} handler to be called on event
+   *
+   * @category Events
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this.emitter.on(event, listener)
   }
 
+  /**
+   *
+   *
+   * @param {Event} event to listen on
+   * @param {Listener} handler to be called on event
+   *
+   * @category Events
+   */
   public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this.emitter.once(event, listener)
   }
 
+  /**
+   *
+   *
+   * @param {Event} event to listen on
+   * @param {Listener} handler to be called on event
+   *
+   * @category Events
+   */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this.emitter.off(event, listener)
   }
 
   /**
-   *  Destroys instance of HyperFormula.
+   * Destroys instance of HyperFormula.
    * 
-   *  Dependency graph, optimization indexes, statistics and parser are removed.
+   * Dependency graph, optimization indexes, statistics and parser are removed.
    *
    * @category Instance
    */
