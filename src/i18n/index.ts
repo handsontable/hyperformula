@@ -14,10 +14,11 @@ export interface TranslationPackage {
 }
 
 export function getSheetPrefix(translationPackage: TranslationPackage): string {
-  if(!('interface' in translationPackage) || !('NEW_SHEET_PREFIX' in translationPackage.interface)) {
+  const ret = translationPackage?.interface?.NEW_SHEET_PREFIX
+  if(ret === undefined) {
     return enGB.interface.NEW_SHEET_PREFIX
   } else {
-    return translationPackage.interface.NEW_SHEET_PREFIX
+    return ret
   }
 }
 
