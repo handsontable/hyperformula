@@ -12,7 +12,7 @@ export enum Events {
 
 export interface Listeners {
   /**
-   * Adding sheet event.
+   * The event is triggered upon adding a sheet anywhere inside the workbook.
    *
    * @event
    *
@@ -21,7 +21,7 @@ export interface Listeners {
   sheetAdded: (addedSheetDisplayName: string) => any,
 
   /**
-   * Removing sheet event.
+   * The event is triggered upon removing a sheet from anywhere inside the workbook.
    *
    * @event
    *
@@ -31,7 +31,7 @@ export interface Listeners {
   sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
 
   /**
-   * Renaming sheet event.
+   * The event is triggered upon renaming a sheet anywhere inside the workbook.
    *
    * @event
    *
@@ -41,7 +41,7 @@ export interface Listeners {
   sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
 
   /**
-   * Adding named expression event.
+   * The event is triggered upon adding a named expression with specified values and location.
    *
    * @event
    *
@@ -51,7 +51,7 @@ export interface Listeners {
   namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
-   * Removing named expression event.
+   * The event is triggered upon removing a named expression with specified values and from an indicated location.
    *
    * @event
    *
@@ -61,7 +61,7 @@ export interface Listeners {
   namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
-   * Updated values event.
+   * The event is triggered upon changing values in a specified location.
    *
    * @event
    *

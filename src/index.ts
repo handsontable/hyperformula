@@ -6,6 +6,7 @@ import {
   NoSheetWithIdError,
   NoSheetWithNameError,
   NoOperationToUndo,
+  EvaluationSuspendedError,
 } from './errors'
 import {Sheets} from './GraphBuilder'
 import {HyperFormula} from './HyperFormula'
@@ -22,6 +23,7 @@ class HyperFormulaNS extends HyperFormula {
   public static LazilyTransformingAstService = LazilyTransformingAstService
   public static ExportedCellChange = ExportedCellChange
   public static ExportedNamedExpressionChange = ExportedNamedExpressionChange
+  public static EvaluationSuspendedError = EvaluationSuspendedError
 }
 
 export default HyperFormulaNS
@@ -41,4 +43,5 @@ export {
   ExportedCellChange,
   ExportedNamedExpressionChange,
   NoOperationToUndo,
+  EvaluationSuspendedError,
 }
