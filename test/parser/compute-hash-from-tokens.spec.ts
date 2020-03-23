@@ -2,6 +2,7 @@ import {HyperFormula} from '../../src'
 import {simpleCellAddress, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
+import {plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
 
 describe('computeHashFromTokens', () => {
@@ -14,6 +15,7 @@ describe('computeHashFromTokens', () => {
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHashFromTokens(tokens, address)
   }
+  HyperFormula.registerLanguage('plPL', plPL)
 
   it('simple case', () => {
     const code = '=42'

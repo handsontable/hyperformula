@@ -1,7 +1,9 @@
-import {EmptyValue} from '../src'
+import {EmptyValue, HyperFormula} from '../src'
 import {Config} from '../src/Config'
+import {plPL} from '../src/i18n'
 
 describe('Config', () => {
+  HyperFormula.registerLanguage('plPL', plPL)
   it('works', () => {
     const config = new Config({language: 'plPL'})
 

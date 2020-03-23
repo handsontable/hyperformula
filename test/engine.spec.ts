@@ -1,6 +1,7 @@
 import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import './testConfig.ts'
+import {plPL} from '../src/i18n'
 import {adr, detailedError, expectReferenceToHaveRefError} from './testUtils'
 
 describe('Integration', () => {
@@ -424,6 +425,7 @@ describe('Integration', () => {
   })
 
   it('exporting detailed errors with translations', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
       ['=#ARG!'],
     ], {language: 'plPL'})

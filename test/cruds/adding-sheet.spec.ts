@@ -1,5 +1,6 @@
 import {EmptyValue, HyperFormula} from '../../src'
 import '../testConfig'
+import {plPL} from '../../src/i18n'
 import {adr} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
@@ -50,6 +51,7 @@ describe('add sheet to engine', () => {
   })
 
   it('should add sheet with translated sheet name', function() {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildEmpty({ language: 'plPL' })
 
     engine.addSheet()

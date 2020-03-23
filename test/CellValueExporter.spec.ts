@@ -1,7 +1,8 @@
-import {CellError, DetailedCellError, EmptyValue} from '../src'
+import {CellError, DetailedCellError, EmptyValue, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Exporter} from '../src/CellValue'
 import {Config} from '../src/Config'
+import {plPL} from '../src/i18n'
 import {detailedError} from './testUtils'
 import {NamedExpressions} from '../src/NamedExpressions'
 
@@ -50,6 +51,7 @@ describe('detailed error', () => {
   })
 
   it('should return detailed errors with translation', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const config = new Config({ language: 'plPL' })
     const cellValueExporter = new Exporter(config, namedExpressionsMock)
 

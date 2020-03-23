@@ -1,3 +1,4 @@
+import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
@@ -5,6 +6,7 @@ import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parse
 import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
+  HyperFormula.registerLanguage('plPL', plPL)
   const config = new Config()
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')

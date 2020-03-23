@@ -1,10 +1,12 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
+import {plPL} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
 
 describe('i18n', () => {
+  HyperFormula.registerLanguage('plPL', plPL)
   it('using functions in different languages', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],

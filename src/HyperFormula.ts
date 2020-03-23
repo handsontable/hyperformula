@@ -12,7 +12,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {languages, TranslationPackage} from './i18n'
+import {enGB, languages, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -122,32 +122,27 @@ export class HyperFormula implements TypedEmitter {
     return new EmptyEngineFactory().build(configInput)
   }
 
-  private static registeredLanguages: Record<string, TranslationPackage> = {}
+  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
 
   public static getLanguage(name: string): TranslationPackage {
-    if(!(name in HyperFormula.registeredLanguages)) {
+    const val = this.registeredLanguages.get(name)
+    if(val === undefined) {
       throw new Error('Language not registered.')
     } else {
-      return HyperFormula.registeredLanguages[name]
+      return val
     }
   }
 
   public static registerLanguage(name: string, lang: TranslationPackage): void {
-    if(name in HyperFormula.registeredLanguages) {
+    if(this.registeredLanguages.has(name)) {
       throw new Error('Language already registered.')
     } else {
-      this.registeredLanguages[name] = lang
-    }
-  }
-
-  public static registerLanguages(languages: Record<string, TranslationPackage>): void {
-    for(const key in languages) {
-      HyperFormula.registerLanguage(key, languages[key])
+      this.registeredLanguages.set(name, lang)
     }
   }
 
   public static getRegisteredLanguages(): string[] {
-    return Object.keys(HyperFormula.registeredLanguages)
+    return Array.from(this.registeredLanguages.keys())
   }
 
   private crudOperations: CrudOperations
@@ -1374,4 +1369,4 @@ export class HyperFormula implements TypedEmitter {
   }
 }
 
-HyperFormula.registerLanguages(languages)
+HyperFormula.registerLanguage('enGB', enGB)

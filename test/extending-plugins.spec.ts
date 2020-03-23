@@ -21,7 +21,7 @@ describe('Plugins', () => {
     const enGBextended = extendFunctions(enGB, {
       FOO: 'FOO',
     })
-    HyperFormula.registerLanguages({enGBextended})
+    HyperFormula.registerLanguage('enGBextended', enGBextended)
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin], language: 'enGBextended'})

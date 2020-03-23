@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
 import {Config} from '../src/Config'
+import {plPL} from '../src/i18n'
 
 describe('Building engine from arrays', () => {
   it('works', () => {
@@ -19,6 +20,7 @@ describe('Building engine from arrays', () => {
   })
 
   it('#buildFromSheet adds default sheet Sheet1, in different languages', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([], { language: 'plPL' })
 
     expect(engine.getAllSheetsDimensions()).toEqual({'Arkusz1': {'height': 0, 'width': 0}})

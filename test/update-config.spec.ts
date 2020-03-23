@@ -1,5 +1,6 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
+import {plPL} from '../src/i18n'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
@@ -41,6 +42,7 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
   it('language reload', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
       ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
     ])

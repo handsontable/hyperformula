@@ -1,7 +1,8 @@
+import {HyperFormula} from '../../src'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
-import {enGB} from '../../src/i18n'
+import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, ParserWithCaching, Unparser} from '../../src/parser'
 import {adr} from '../testUtils'
 
@@ -14,6 +15,7 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
+  HyperFormula.registerLanguage('plPL', plPL)
 
   it('#unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'

@@ -44,7 +44,7 @@ describe('Documentation example spec', () => {
     const enGBextended = extendFunctions(enGB, {
       SQUARE: 'SQUARE',
     })
-    HyperFormula.registerLanguages({enGBextended})
+    HyperFormula.registerLanguage('enGBextended', enGBextended)
     const engine = HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],

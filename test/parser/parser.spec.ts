@@ -1,3 +1,4 @@
+import {HyperFormula} from '../../src'
 import {CellError, ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
@@ -21,6 +22,7 @@ import {
 import {ParenthesisAst} from '../../src/parser/Ast'
 
 describe('ParserWithCaching', () => {
+  HyperFormula.registerLanguage('plPL', plPL)
   it('integer literal', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 

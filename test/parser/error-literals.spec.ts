@@ -1,3 +1,4 @@
+import {HyperFormula} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
@@ -27,6 +28,7 @@ describe('Parsing error literals', () => {
   })
 
   it('should parse error in other languages', () => {
+    HyperFormula.registerLanguage('plPL', plPL)
     const parser = new ParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(plPL).get)
     const ast = parser.parse('=#ARG!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
