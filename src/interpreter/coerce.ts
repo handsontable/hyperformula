@@ -1,5 +1,6 @@
 import {CellError, EmptyValue, ErrorType, InternalCellValue, NoErrorCellValue} from '../Cell'
 import {DateHelper} from '../DateHelper'
+import {Maybe} from '../Maybe'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
 
@@ -23,21 +24,18 @@ export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: 
   }
 }
 
-export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): number | null {
+export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
   const ret = coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper)
-  if (ret != null) {
+  if (ret !== undefined) {
     return ret
   }
   if (typeof arg === 'string') {
-    const parsedDateNumber = dateHelper.dateStringToDateNumber(arg)
-    if (parsedDateNumber !== undefined) {
-      return parsedDateNumber
-    }
+    return dateHelper.dateStringToDateNumber(arg)
   }
-  return null
+  return undefined
 }
 
-export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLiteralsHelper: NumberLiteralHelper): number | null {
+export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
   if (arg === EmptyValue) {
     return 0
   }
@@ -46,7 +44,7 @@ export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLi
   } else {
     const coercedNumber = Number(arg)
     if (isNaN(coercedNumber)) {
-      return null
+      return undefined
     } else {
       return coercedNumber
     }
