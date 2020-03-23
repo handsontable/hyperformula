@@ -1,6 +1,6 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
-import {TranslationPackage} from '../i18n'
+import {enGB, TranslationPackage} from '../i18n'
 import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
@@ -113,7 +113,7 @@ export interface ILexerConfig {
 }
 
 export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
-  const offsetProcedureNameLiteral = config.translationPackage.functions.OFFSET || 'OFFSET'
+  const offsetProcedureNameLiteral = config.translationPackage?.functions?.OFFSET ?? enGB.functions.OFFSET
   const errorMapping = config.errorMapping
   const functionMapping = buildFunctionMapping(config.translationPackage)
 

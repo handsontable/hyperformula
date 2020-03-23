@@ -12,7 +12,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {enGB, languages, TranslationPackage} from './i18n'
+import {enGB, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,

@@ -5,7 +5,7 @@ import {Config, ConfigParams} from './Config'
 import {DateHelper} from './DateHelper'
 import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
-import {getSheetPrefix} from './i18n'
+import {enGB} from './i18n'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Evaluator} from './Evaluator'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -74,7 +74,7 @@ export class BuildEngineFromArraysFactory {
 
   public buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
     const config = new Config(configInput)
-    const newsheetprefix = getSheetPrefix(config.translationPackage) + '1'
+    const newsheetprefix = (config.translationPackage?.interface?.NEW_SHEET_PREFIX ?? enGB.interface.NEW_SHEET_PREFIX) + '1'
     return this.buildWithConfig({[newsheetprefix]: sheet}, config)
   }
 }
