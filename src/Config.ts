@@ -398,14 +398,14 @@ export class Config implements ConfigParams, ParserConfig {
     this.caseSensitive = this.valueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = this.valueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
     this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
-    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
+    this.chooseAddressMappingPolicy = chooseAddressMappingPolicy ?? Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = this.valueFromParam(language, 'string', 'language')
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.localeLang = this.valueFromParam(localeLang, 'string', 'localeLang')
-    this.functionPlugins = functionPlugins || Config.defaultConfig.functionPlugins
+    this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
     this.gpuMode = this.valueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = this.valueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.matrixDetection = this.valueFromParam(matrixDetection, 'boolean', 'matrixDetection')
@@ -430,13 +430,9 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
-    const mergedConfig = Object.assign({}, this.getConfig(), init)
+    const mergedConfig: ConfigParams = Object.assign({}, this as ConfigParams, init)
 
     return new Config(mergedConfig)
-  }
-
-  public getConfig(): ConfigParams {
-    return this
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
