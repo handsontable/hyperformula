@@ -38,6 +38,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
@@ -61,10 +62,10 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null,
+  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => Maybe<SimpleDate>,
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
+  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => Maybe<string>,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -283,13 +284,13 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default defaultParseDate
    */
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
+  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => Maybe<SimpleDate>
   /**
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
    * @default defaultStringifyDate
    */
-  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
+  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => Maybe<string>
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *

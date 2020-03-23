@@ -1,6 +1,7 @@
 import {Config} from '../src/Config'
 import {DateHelper, SimpleDate} from '../src/DateHelper'
 import moment from 'moment'
+import {Maybe} from '../src/Maybe'
 
 describe('Date helpers', () => {
   it('#dateToNumber should return number representation of a date', () => {
@@ -35,7 +36,7 @@ describe('Date helpers', () => {
 
   it('#stringToDateNumber - excel compatibility', () => {
     const dateHelper = new DateHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('02/29/1900')).toBe(null)
+    expect(dateHelper.dateStringToDateNumber('02/29/1900')).toBe(undefined)
     const dateHelper2 = new DateHelper(new Config({leapYear1900: true}))
     expect(dateHelper2.dateStringToDateNumber('02/29/1900')).toBe(61)
   })
@@ -54,7 +55,7 @@ describe('Date helpers', () => {
 
   it('stringToDateNumber - other formats', () => {
     const dateHelper = new DateHelper(new Config({dateFormats : ['MM/DD/YYYY']}))
-    expect(dateHelper.dateStringToDateNumber('12/31/99')).toBe(null)
+    expect(dateHelper.dateStringToDateNumber('12/31/99')).toBe(undefined)
     const dateHelper1 = new DateHelper(new Config({dateFormats : ['YY/MM/DD']}))
     expect(dateHelper1.dateStringToDateNumber('99/12/31')).toBe(36525)
     const dateHelper2 = new DateHelper(new Config({dateFormats : ['MM/DD/YY', 'YY/MM/DD']}))
@@ -63,16 +64,16 @@ describe('Date helpers', () => {
 
   it('#stringToDateNumber - tests expected to return null', () => {
     const dateHelper = new DateHelper(new Config())
-    expect(dateHelper.dateStringToDateNumber('1/1/10000')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('5/29/1453')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('www')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('0')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('0/0/1999')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('13/13/2020')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('w8')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('www1')).toBe(null)
-    expect(dateHelper.dateStringToDateNumber('10/2020')).toBe(null)
+    expect(dateHelper.dateStringToDateNumber('1/1/10000')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('5/29/1453')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('www')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('0')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('0/0/1999')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('13/13/2020')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('w8')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('www1')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('10/2020')).toBe(undefined)
   })
 })
 
@@ -106,14 +107,14 @@ describe('Date helpers, other zero date', () => {
 
 describe('Custom date parsing', () => {
 
-  function customParseDate(dateString: string, dateFormats: string[]): SimpleDate | null {
+  function customParseDate(dateString: string, dateFormats: string[]): Maybe<SimpleDate> {
     for(const dateFormat of dateFormats) {
       const momentDate = moment(dateString, dateFormat, true)
       if(momentDate.isValid()){
         return {year: momentDate.year(), month: momentDate.month()+1, day: momentDate.date()}
       }
     }
-    return null
+    return undefined
   }
 
   it( 'moment-based custom parsing', () => {

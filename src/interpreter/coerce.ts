@@ -8,7 +8,8 @@ import {NumberLiteralHelper} from '../NumberLiteralHelper'
  * Date like literals will be converted to number representation (days after 12th Dec 1899)
  *
  * @param arg - cell value
- * @param config
+ * @param dateHelper
+ * @param numberLiteralsHelper
  */
 export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): number | CellError {
   if (arg instanceof CellError) {
@@ -29,7 +30,7 @@ export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelpe
   }
   if (typeof arg === 'string') {
     const parsedDateNumber = dateHelper.dateStringToDateNumber(arg)
-    if (parsedDateNumber !== null) {
+    if (parsedDateNumber !== undefined) {
       return parsedDateNumber
     }
   }

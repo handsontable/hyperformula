@@ -1,6 +1,7 @@
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
+import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
@@ -10,7 +11,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   } else {
     const expression = parseForNumberFormat(formatArg)
 
-    if (expression !== null) {
+    if (expression !== undefined) {
       return numberFormat(expression.tokens, value)
     } else {
       return formatArg
@@ -72,10 +73,10 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultStringifyDate(value: number, formatArg: string, dateHelper: DateHelper): string | null {
+export function defaultStringifyDate(value: number, formatArg: string, dateHelper: DateHelper): Maybe<string> {
   const expression = parseForDateFormat(formatArg)
-  if (expression === null) {
-    return null
+  if (expression === undefined) {
+    return undefined
   }
   const tokens = expression.tokens
   let result = ''

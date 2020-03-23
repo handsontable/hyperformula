@@ -1,4 +1,5 @@
 import {Config} from './Config'
+import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
@@ -43,9 +44,9 @@ export class DateHelper {
     return (dayNumber <= this.maxDateValue) && (dayNumber >= this.minDateValue)
   }
 
-  public dateStringToDateNumber(dateString: string): number | null {
+  public dateStringToDateNumber(dateString: string): Maybe<number> {
     const date = this.config.parseDate(dateString, this.config.dateFormats, this) // should point to defaultParseDate()
-    return date ? this.dateToNumber(date) : null
+    return date!==undefined ? this.dateToNumber(date) : undefined
   }
 
   public getNullYear() {
@@ -152,7 +153,7 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): SimpleDate | null {
+function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): Maybe<SimpleDate> {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
@@ -162,21 +163,21 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
   const yearIndexShort  = formatItems.indexOf('yy')
   if (!(monthIndex in dateItems) || !(dayIndex in dateItems) ||
     (!(yearIndexLong in dateItems) && !(yearIndexShort in dateItems))) {
-    return null
+    return undefined
   }
   if (yearIndexLong in dateItems && yearIndexShort in dateItems) {
-    return null
+    return undefined
   }
   let year
   if (yearIndexLong in dateItems) {
     year = Number(dateItems[yearIndexLong])
     if (year < 1000 || year > 9999) {
-      return null
+      return undefined
     }
   } else {
     year = Number(dateItems[yearIndexShort])
     if (year < 0 || year > 99) {
-      return null
+      return undefined
     }
     if (year < dateHelper.getNullYear()) {
       year += 2000
@@ -189,15 +190,15 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
 
   const date: SimpleDate = {year, month, day}
 
-  return dateHelper.isValidDate( date) ? date : null
+  return dateHelper.isValidDate( date) ? date : undefined
 }
 
-export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): SimpleDate | null {
+export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): Maybe<SimpleDate> {
   for (const dateFormat of dateFormats) {
     const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
-    if (date !== null) {
+    if (date !== undefined) {
       return date 
     }
   }
-  return null
+  return undefined
 }
