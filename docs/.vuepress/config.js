@@ -8,6 +8,7 @@ module.exports = {
   head: [
     ['meta', { name: 'robots', content: 'noindex,nofollow' }]
   ],
+  base: '/hyperformula/',
   plugins: [
     ['@vuepress/search', {
       searchMaxSuggestions: 10
