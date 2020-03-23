@@ -43,7 +43,7 @@ const hf = HyperFormula.buildFromArray(MY_DATA);
 
 ## Use
 
-If you chose the installation with `npm` or `yarn` you can import HyperFormula directly in the file and initialize the engine by feeding it some data:
+If you chose the installation with `npm` or `yarn` you can import **HyperFormula** directly in the file and initialize the engine by feeding it some data:
 
 ```js
 import { HyperFormula } from 'hyperformula';
