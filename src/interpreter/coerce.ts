@@ -16,23 +16,13 @@ export function coerceScalarToNumberOrError(arg: InternalCellValue, dateHelper: 
   if (arg instanceof CellError) {
     return arg
   }
-  const ret = coerceToMaybeNumber(arg, dateHelper, numberLiteralsHelper)
-  if (ret != null) {
-    return ret
-  } else {
-    return new CellError(ErrorType.VALUE)
-  }
+  return coerceToMaybeNumber(arg, dateHelper, numberLiteralsHelper) ?? new CellError(ErrorType.VALUE)
 }
 
 export function coerceToMaybeNumber(arg: NoErrorCellValue, dateHelper: DateHelper, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
-  const ret = coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper)
-  if (ret !== undefined) {
-    return ret
-  }
-  if (typeof arg === 'string') {
-    return dateHelper.dateStringToDateNumber(arg)
-  }
-  return undefined
+  return coerceNonDateScalarToMaybeNumber(arg, numberLiteralsHelper) ?? (
+      typeof arg === 'string' ? dateHelper.dateStringToDateNumber(arg) : undefined
+    )
 }
 
 export function coerceNonDateScalarToMaybeNumber(arg: NoErrorCellValue, numberLiteralsHelper: NumberLiteralHelper): Maybe<number> {
