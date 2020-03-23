@@ -1,4 +1,4 @@
-name: Publish Documentation
+name: Publish
 
 on:
   push:
@@ -17,8 +17,9 @@ jobs:
       - name: Build docs
         run: |
           npm run docs:build
-      - name: Publish docs
-        uses: malept/github-action-gh-pages@1b5c02254dc36eacd86e4e29bd18b6b1b9aadc67 # https://github.com/malept/github-action-gh-pages/releases/tag/v1.0.2
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@ba0b7df03e25ff29c924be8149041119e9421ea6 # https://github.com/peaceiris/actions-gh-pages/releases/tag/v3.5.6
         with:
-          docsPath: docs/.vuepress/dist
-          publishBranch: gh-pages
+          publish_dir: docs/.vuepress/dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
