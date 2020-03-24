@@ -52,7 +52,7 @@ export class DateHelper {
   }
 
   private parseDateSingleFormat(dateString: string, dateFormat: string): Maybe<SimpleDate> {
-    let date = this.parseDate(dateString, dateFormat)
+    const date = this.parseDate(dateString, dateFormat)
     if(date === undefined) {
       return undefined
     }
