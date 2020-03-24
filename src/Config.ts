@@ -3,7 +3,7 @@ import {ErrorType} from './Cell'
 import {DateHelper, defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDate} from './format/format'
+import {defaultPrintDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -65,7 +65,7 @@ export interface ConfigParams {
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => Maybe<string>,
+  printDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -96,7 +96,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetectionThreshold: 100,
     nullYear: 30,
     parseDate: defaultParseToDate,
-    stringifyDate: defaultStringifyDate,
+    printDate: defaultPrintDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -286,11 +286,11 @@ export class Config implements ConfigParams, ParserConfig {
    */
   public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /**
-   * Allows to provide a function that takes date (represented as a number) and prints it into string.
+   * Allows to provide a function that takes date and prints it into string.
    *
    * @default defaultStringifyDate
    */
-  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => Maybe<string>
+  public readonly printDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
@@ -385,7 +385,7 @@ export class Config implements ConfigParams, ParserConfig {
       matrixDetectionThreshold,
       nullYear,
       parseDate,
-      stringifyDate,
+      printDate,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -416,7 +416,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
-    this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
+    this.printDate = this.valueFromParam(printDate, 'function', 'printDate')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 

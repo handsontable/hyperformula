@@ -81,7 +81,7 @@ describe('Config', () => {
     expect(() => new Config({parseDate: true})).toThrow('Expected value of type: function for config parameter: parseDate')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({stringifyDate: 1})).toThrow('Expected value of type: function for config parameter: stringifyDate')
+    expect(() => new Config({printDate: 1})).toThrow('Expected value of type: function for config parameter: printDate')
   })
 
   it( 'validation: other params', () => {
