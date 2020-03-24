@@ -1,6 +1,6 @@
 import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {DateHelper, parseDateFromFormats, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
@@ -95,7 +95,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: defaultParseDate,
+    parseDate: parseDateFromFormats,
     stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
@@ -282,7 +282,7 @@ export class Config implements ConfigParams, ParserConfig {
   /**
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
-   * @default defaultParseDate
+   * @default parseDateFromFormats
    */
   public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => Maybe<SimpleDate>
   /**
