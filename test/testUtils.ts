@@ -4,7 +4,7 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAd
 import {Config} from '../src/Config'
 import {DateHelper} from '../src/DateHelper'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
-import {defaultStringifyDate} from '../src/format/format'
+import {defaultPrintDate} from '../src/format/format'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -81,7 +81,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
     return dateNumber
   }
   const dateHelper = new DateHelper(config)
-  const dateString = defaultStringifyDate(dateNumber as number, config.dateFormats[0], dateHelper)
+  const dateString = defaultPrintDate(dateHelper.numberToDate(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }
 

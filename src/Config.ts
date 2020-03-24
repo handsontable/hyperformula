@@ -1,9 +1,9 @@
 import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDate} from './format/format'
+import {defaultPrintDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -38,6 +38,7 @@ import {SumprodPlugin} from './interpreter/plugin/SumprodPlugin'
 import {TextPlugin} from './interpreter/plugin/TextPlugin'
 import {TrigonometryPlugin} from './interpreter/plugin/TrigonometryPlugin'
 import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
+import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
@@ -61,10 +62,10 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null,
+  parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   precisionEpsilon: number,
   precisionRounding: number,
-  stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => string | null,
+  stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -94,8 +95,8 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: defaultParseDate,
-    stringifyDate: defaultStringifyDate,
+    parseDate: defaultParseToDate,
+    stringifyDate: defaultPrintDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -281,15 +282,15 @@ export class Config implements ConfigParams, ParserConfig {
   /**
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
-   * @default defaultParseDate
+   * @default parseDateFromFormats
    */
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => SimpleDate | null
+  public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /**
-   * Allows to provide a function that takes date (represented as a number) and prints it into string.
+   * Allows to provide a function that takes date and prints it into string.
    *
    * @default defaultStringifyDate
    */
-  public readonly stringifyDate: (value: number, formatArg: string, dateHelper: DateHelper) => string | null
+  public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *

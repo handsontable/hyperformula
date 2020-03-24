@@ -265,7 +265,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
         return arg
       } else {
         const coercedArg = coerceNonDateScalarToMaybeNumber(arg, this.interpreter.numberLiteralsHelper)
-        if (coercedArg === null) {
+        if (coercedArg === undefined) {
           return AverageResult.empty
         } else {
           return AverageResult.single(coercedArg)
@@ -289,6 +289,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    * @param mapFunction
+   * @param coerceFunction
    * */
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
     return ast.args.reduce((acc: T, arg) => {

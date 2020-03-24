@@ -127,7 +127,7 @@ export class CellContentParser {
           return new CellContent.Number(this.numberLiteralsHelper.numericStringToNumber(trimmedContent))
         }
         const parsedDateNumber = this.dateHelper.dateStringToDateNumber(trimmedContent)
-        if (parsedDateNumber !== null) {
+        if (parsedDateNumber !== undefined) {
           return new CellContent.Number(parsedDateNumber)
         } else {
           return new CellContent.String(
