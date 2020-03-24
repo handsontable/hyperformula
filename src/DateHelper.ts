@@ -1,4 +1,5 @@
 import {Config} from './Config'
+import {Maybe} from './Maybe'
 
 const numDays: number[] = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 303, 334 ]
@@ -9,6 +10,14 @@ export interface SimpleDate {
   day: number,
 }
 
+export interface SimpleTime {
+  hour: number,
+  minute: number,
+  second: number,
+}
+
+export type SimpleDateTime = SimpleDate & SimpleTime
+
 export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
@@ -17,12 +26,25 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   }
 }
 
-export const maxDate = {year: 9999, month: 12, day: 31}
+export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'hour' in obj && typeof obj.hour === 'number' && 'minute' in obj && typeof obj.minute === 'number' && 'second' in obj && typeof obj.second === 'number'
+  } else {
+    return false
+  }
+}
+
+export function instanceOfSimpleDateTime(obj: any): obj is SimpleDateTime {
+  return instanceOfSimpleDate(obj) && instanceOfSimpleTime(obj)
+}
+
+export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
 export class DateHelper {
   private minDateValue: number
   private maxDateValue: number
   private epochYearZero: number
+  private parseDate: (dateString: string, dateFormat: string) => Maybe<SimpleDate>
   constructor(private readonly config: Config) {
     this.config = config
     this.minDateValue = this.dateToNumber(config.nullDate)
@@ -33,21 +55,46 @@ export class DateHelper {
     // add two days (this is the config default)
     // otherwise only one day
     if(!config.leapYear1900 && this.minDateValue <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
-      this.epochYearZero = this.dateNumberToYearNumber(2)
+      this.epochYearZero = this.numberToDate(2).year
     } else {
-      this.epochYearZero = this.dateNumberToYearNumber(1)
+      this.epochYearZero = this.numberToDate(1).year
     }
+    this.parseDate = config.parseDate
   }
 
   public getWithinBounds(dayNumber: number) {
     return (dayNumber <= this.maxDateValue) && (dayNumber >= this.minDateValue)
   }
 
-  public dateStringToDateNumber(dateString: string): number | null {
-    const date = this.config.parseDate(dateString, this.config.dateFormats, this) // should point to defaultParseDate()
-    return date ? this.dateToNumber(date) : null
+  public dateStringToDateNumber(dateString: string): Maybe<number> {
+    const date = this.parseDateFromFormats(dateString, this.config.dateFormats) // should point to parseDateFromFormats()
+    return date!==undefined ? this.dateToNumber(date) : undefined
   }
 
+  private parseDateSingleFormat(dateString: string, dateFormat: string): Maybe<SimpleDate> {
+    const date = this.parseDate(dateString, dateFormat)
+    if(date === undefined) {
+      return undefined
+    }
+    if(date.year >=0 && date.year < 100) {
+      if (date.year < this.getNullYear()) {
+        date.year += 2000
+      } else {
+        date.year += 1900
+      }
+    }
+    return this.isValidDate(date) ? date : undefined
+  }
+
+  private parseDateFromFormats(dateString: string, dateFormats: string[]): Maybe<SimpleDate> {
+    for (const dateFormat of dateFormats) {
+      const date = this.parseDateSingleFormat(dateString, dateFormat)
+      if (date !== undefined) {
+        return date
+      }
+    }
+    return undefined
+  }
   public getNullYear() {
     return this.config.nullYear
   }
@@ -95,17 +142,6 @@ export class DateHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
-  public dateNumberToDayNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).day
-  }
-
-  public dateNumberToMonthNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).month
-  }
-
-  public dateNumberToYearNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).year
-  }
   private leapYearsCount(year: number): number {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
@@ -152,7 +188,7 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): SimpleDate | null {
+export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
@@ -162,42 +198,28 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
   const yearIndexShort  = formatItems.indexOf('yy')
   if (!(monthIndex in dateItems) || !(dayIndex in dateItems) ||
     (!(yearIndexLong in dateItems) && !(yearIndexShort in dateItems))) {
-    return null
+    return undefined
   }
   if (yearIndexLong in dateItems && yearIndexShort in dateItems) {
-    return null
+    return undefined
   }
   let year
   if (yearIndexLong in dateItems) {
     year = Number(dateItems[yearIndexLong])
     if (year < 1000 || year > 9999) {
-      return null
+      return undefined
     }
   } else {
     year = Number(dateItems[yearIndexShort])
     if (year < 0 || year > 99) {
-      return null
-    }
-    if (year < dateHelper.getNullYear()) {
-      year += 2000
-    } else {
-      year += 1900
+      return undefined
     }
   }
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
-
-  const date: SimpleDate = {year, month, day}
-
-  return dateHelper.isValidDate( date) ? date : null
+  return {year, month, day}
 }
 
-export function defaultParseDate(dateString: string, dateFormats: string[], dateHelper: DateHelper): SimpleDate | null {
-  for (const dateFormat of dateFormats) {
-    const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
-    if (date !== null) {
-      return date 
-    }
-  }
-  return null
+export function isValidTime(time: SimpleTime) {
+
 }

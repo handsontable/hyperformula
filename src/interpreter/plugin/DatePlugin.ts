@@ -128,7 +128,7 @@ export class DatePlugin extends FunctionPlugin {
     if (dateNumber instanceof CellError) {
       return dateNumber
     }
-    return this.interpreter.dateHelper.dateNumberToDayNumber(dateNumber)
+    return this.interpreter.dateHelper.numberToDate(dateNumber).day
   }
 
   public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalCellValue {
@@ -179,7 +179,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return this.interpreter.dateHelper.dateNumberToMonthNumber(dateNumber)
+    return this.interpreter.dateHelper.numberToDate(dateNumber).month
   }
 
   /**
@@ -204,7 +204,7 @@ export class DatePlugin extends FunctionPlugin {
       return dateNumber
     }
 
-    return this.interpreter.dateHelper.dateNumberToYearNumber(dateNumber)
+    return this.interpreter.dateHelper.numberToDate(dateNumber).year
   }
 
   /**
