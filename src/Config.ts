@@ -1,6 +1,6 @@
 import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultPrintDate} from './format/format'
@@ -65,7 +65,7 @@ export interface ConfigParams {
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   precisionEpsilon: number,
   precisionRounding: number,
-  printDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
+  stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
   smartRounding: boolean,
   useColumnIndex: boolean,
   vlookupThreshold: number,
@@ -96,7 +96,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetectionThreshold: 100,
     nullYear: 30,
     parseDate: defaultParseToDate,
-    printDate: defaultPrintDate,
+    stringifyDate: defaultPrintDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -290,7 +290,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default defaultStringifyDate
    */
-  public readonly printDate: (date: SimpleDate, formatArg: string) => Maybe<string>
+  public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
@@ -385,7 +385,7 @@ export class Config implements ConfigParams, ParserConfig {
       matrixDetectionThreshold,
       nullYear,
       parseDate,
-      printDate,
+      stringifyDate,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -416,7 +416,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
-    this.printDate = this.valueFromParam(printDate, 'function', 'printDate')
+    this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 

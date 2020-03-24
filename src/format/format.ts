@@ -5,7 +5,7 @@ import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
-  const tryString = config.printDate(dateHelper.numberToDate(value), formatArg) // default points to defaultStringifyDate()
+  const tryString = config.stringifyDate(dateHelper.numberToDate(value), formatArg) // default points to defaultStringifyDate()
   if (tryString !== undefined) {
     return tryString
   } else {

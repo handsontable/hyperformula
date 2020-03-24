@@ -153,7 +153,7 @@ describe( 'Custom date printing', () => {
     const engine =  HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
-    ]], {printDate: customPrintDate})
+    ]], {stringifyDate: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('fancy 01/01/1900 fancy')
   })
@@ -163,7 +163,7 @@ describe( 'Custom date printing', () => {
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',
-    ]], {printDate: customPrintDate})
+    ]], {stringifyDate: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')

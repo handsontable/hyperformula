@@ -10,6 +10,14 @@ export interface SimpleDate {
   day: number,
 }
 
+export interface SimpleTime {
+  hour: number,
+  minute: number,
+  second: number,
+}
+
+export type SimpleDateTime = SimpleDate & SimpleTime
+
 export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
@@ -18,7 +26,19 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   }
 }
 
-export const maxDate = {year: 9999, month: 12, day: 31}
+export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
+  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    return 'hour' in obj && typeof obj.hour === 'number' && 'minute' in obj && typeof obj.minute === 'number' && 'second' in obj && typeof obj.second === 'number'
+  } else {
+    return false
+  }
+}
+
+export function instanceOfSimpleDateTime(obj: any): obj is SimpleDateTime {
+  return instanceOfSimpleDate(obj) && instanceOfSimpleTime(obj)
+}
+
+export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
 export class DateHelper {
   private minDateValue: number
@@ -35,9 +55,9 @@ export class DateHelper {
     // add two days (this is the config default)
     // otherwise only one day
     if(!config.leapYear1900 && this.minDateValue <= this.dateToNumber({year: 1900, month: 2, day: 28})) {
-      this.epochYearZero = this.dateNumberToYearNumber(2)
+      this.epochYearZero = this.numberToDate(2).year
     } else {
-      this.epochYearZero = this.dateNumberToYearNumber(1)
+      this.epochYearZero = this.numberToDate(1).year
     }
     this.parseDate = config.parseDate
   }
@@ -122,17 +142,6 @@ export class DateHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
-  public dateNumberToDayNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).day
-  }
-
-  public dateNumberToMonthNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).month
-  }
-
-  public dateNumberToYearNumber(dateNumber: number): number {
-    return this.numberToDate(dateNumber).year
-  }
   private leapYearsCount(year: number): number {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
@@ -211,3 +220,6 @@ export function defaultParseToDate(dateString: string, dateFormat: string): Mayb
   return {year, month, day}
 }
 
+export function isValidTime(time: SimpleTime) {
+
+}
