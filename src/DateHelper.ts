@@ -24,6 +24,7 @@ export class DateHelper {
   private minDateValue: number
   private maxDateValue: number
   private epochYearZero: number
+  private parseDate: (dateString: string, dateFormat: string) => Maybe<SimpleDate>
   constructor(private readonly config: Config) {
     this.config = config
     this.minDateValue = this.dateToNumber(config.nullDate)
@@ -38,6 +39,7 @@ export class DateHelper {
     } else {
       this.epochYearZero = this.dateNumberToYearNumber(1)
     }
+    this.parseDate = config.parseDate
   }
 
   public getWithinBounds(dayNumber: number) {
@@ -45,10 +47,34 @@ export class DateHelper {
   }
 
   public dateStringToDateNumber(dateString: string): Maybe<number> {
-    const date = this.config.parseDate(dateString, this.config.dateFormats, this) // should point to parseDateFromFormats()
+    const date = this.parseDateFromFormats(dateString, this.config.dateFormats) // should point to parseDateFromFormats()
     return date!==undefined ? this.dateToNumber(date) : undefined
   }
 
+  private parseDateSingleFormat(dateString: string, dateFormat: string): Maybe<SimpleDate> {
+    let date = this.parseDate(dateString, dateFormat)
+    if(date === undefined) {
+      return undefined
+    }
+    if(date.year >=0 && date.year < 100) {
+      if (date.year < this.getNullYear()) {
+        date.year += 2000
+      } else {
+        date.year += 1900
+      }
+    }
+    return this.isValidDate(date) ? date : undefined
+  }
+
+  private parseDateFromFormats(dateString: string, dateFormats: string[]): Maybe<SimpleDate> {
+    for (const dateFormat of dateFormats) {
+      const date = this.parseDateSingleFormat(dateString, dateFormat)
+      if (date !== undefined) {
+        return date
+      }
+    }
+    return undefined
+  }
   public getNullYear() {
     return this.config.nullYear
   }
@@ -153,11 +179,7 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-//function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
-
-//}
-
-function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelper: DateHelper): Maybe<SimpleDate> {
+export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
   const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
   const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
   const formatItems     = normalizedFormat.split('-')
@@ -184,27 +206,8 @@ function parseDateSingleFormat(dateString: string, dateFormat: string, dateHelpe
       return undefined
     }
   }
-  if(year >=0 && year < 100) {
-    if (year < dateHelper.getNullYear()) {
-      year += 2000
-    } else {
-      year += 1900
-    }
-  }
   const month = Number(dateItems[monthIndex])
   const day   = Number(dateItems[dayIndex])
-
-  const date: SimpleDate = {year, month, day}
-
-  return dateHelper.isValidDate( date) ? date : undefined
+  return {year, month, day}
 }
 
-export function parseDateFromFormats(dateString: string, dateFormats: string[], dateHelper: DateHelper): Maybe<SimpleDate> {
-  for (const dateFormat of dateFormats) {
-    const date = parseDateSingleFormat(dateString, dateFormat, dateHelper)
-    if (date !== undefined) {
-      return date 
-    }
-  }
-  return undefined
-}

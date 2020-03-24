@@ -1,6 +1,6 @@
 import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
-import {DateHelper, parseDateFromFormats, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {DateHelper, defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
@@ -62,7 +62,7 @@ export interface ConfigParams {
   matrixDetection: boolean,
   matrixDetectionThreshold: number,
   nullYear: number,
-  parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => Maybe<SimpleDate>,
+  parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   precisionEpsilon: number,
   precisionRounding: number,
   stringifyDate: (dateNumber: number, dateFormat: string, dateHelper: DateHelper) => Maybe<string>,
@@ -95,7 +95,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: parseDateFromFormats,
+    parseDate: defaultParseToDate,
     stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
@@ -284,7 +284,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default parseDateFromFormats
    */
-  public readonly parseDate: (dateString: string, dateFormats: string[], dateHelper: DateHelper) => Maybe<SimpleDate>
+  public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /**
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
