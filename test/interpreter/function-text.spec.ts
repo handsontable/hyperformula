@@ -1,6 +1,9 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
+import {SimpleDate} from '../../src/DateHelper'
+import {defaultPrintDate} from '../../src/format/format'
+import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
 describe('Text', () => {
@@ -29,12 +32,12 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
   })
 
-  xit('wrong date argument',  () => {
+  it('wrong date argument',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['=TEXT(TRUE(), "mm/dd/yyyy")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A1'))).toEqual('12/31/1899')
   })
 
   it('day formats',  () => {
@@ -135,4 +138,34 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
   })
 
+})
+
+describe( 'Custom date printing', () => {
+  function customPrintDate(date: SimpleDate, dateFormat: string): Maybe<string> {
+    const str = defaultPrintDate(date, dateFormat)
+    if(str === undefined) {
+      return undefined
+    } else {
+      return 'fancy ' + str + ' fancy'
+    }
+  }
+  it('works',  () => {
+    const engine =  HyperFormula.buildFromArray([[
+      '2',
+      '=TEXT(A1, "mm/dd/yyyy")',
+    ]], {printDate: customPrintDate})
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('fancy 01/01/1900 fancy')
+  })
+
+  it('no effect for number format',  () => {
+    const engine =  HyperFormula.buildFromArray([[
+      '12.45',
+      '=TEXT(A1, "###.###")',
+      '=TEXT(A1, "000.000")',
+    ]], {printDate: customPrintDate})
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
+    expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
+  })
 })
