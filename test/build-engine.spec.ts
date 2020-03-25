@@ -1,6 +1,6 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
-import {plPL} from '../src/i18n';
+import {plPL} from '../src/i18n'
 
 describe('Building empty engine', () => {
   it('works', () => {
