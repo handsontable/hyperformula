@@ -8,11 +8,11 @@ if (!fileToCheck) {
 }
 
 try {
-  const { HyperFormula, Config } = require(resolve(fileToCheck));
+  const { HyperFormula } = require(resolve(fileToCheck));
 
   const engine = HyperFormula.buildFromArray([
     ['42', '=A1 + 2']
-  ], new Config({ gpuMode: 'cpu' }))
+  ], { gpuMode: 'cpu' })
 
   const valueA1 = engine.getCellValue({ sheet: 0, row: 0, col: 0 })
   const valueB1 = engine.getCellValue({ sheet: 0, row: 0, col: 1 })

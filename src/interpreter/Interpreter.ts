@@ -14,6 +14,7 @@ import {Config} from '../Config'
 import {DateHelper} from '../DateHelper'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
+import {Maybe} from '../Maybe'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
@@ -67,38 +68,32 @@ export class Interpreter {
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) === 0
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) !== 0
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) > 0
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) < 0
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) >= 0
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
         const rightResult = this.evaluateAst(ast.right, formulaAddress)
-        const err = this.passErrors(leftResult, rightResult)
-        return (err === null) ? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0 : err
+        return this.passErrors(leftResult, rightResult) ?? this.compare( leftResult as NoErrorCellValue, rightResult as NoErrorCellValue) <= 0
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, formulaAddress)
@@ -280,7 +275,7 @@ export class Interpreter {
     }
   }
 
-  private passErrors(left: InterpreterValue, right: InterpreterValue): CellError | null {
+  private passErrors(left: InterpreterValue, right: InterpreterValue): Maybe<CellError> {
     if (left instanceof CellError) {
       return left
     } else if (left instanceof SimpleRangeValue) {
@@ -290,7 +285,7 @@ export class Interpreter {
     } else if (right instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE)
     } else {
-      return null
+      return undefined
     }
   }
 
