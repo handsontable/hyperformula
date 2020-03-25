@@ -48,7 +48,7 @@ describe('Building engine from arrays', () => {
 
     engine1.addSheet('Sheet2')
     engine1.setSheetContent('Sheet2', [['1']])
-    engine1.updateConfig({})
+    engine1.rebuildAndRecalculate()
 
     expect(engine1.getCellValue(adr('A1', 1))).toBe(1)
     expect(engine1.getCellValue(adr('A1', 0))).toBe(1)
