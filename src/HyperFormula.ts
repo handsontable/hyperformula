@@ -408,7 +408,7 @@ export class HyperFormula implements TypedEmitter {
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage).getAllSheetsSerialized()
 
-    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats, this._undoRedo)
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, this._stats)
 
     this._config = newEngine.config
     this._stats = newEngine.stats

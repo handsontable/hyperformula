@@ -34,9 +34,10 @@ export type EngineState = {
 }
 
 export class BuildEngineFactory {
-  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = new Statistics(), undoRedo: UndoRedo = new UndoRedo()): EngineState {
+  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = new Statistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const undoRedo: UndoRedo = new UndoRedo()
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
@@ -110,7 +111,7 @@ export class BuildEngineFactory {
     return this.buildEngine(new Config(configInput))
   }
 
-  public static rebuildWithConfig(config: Config, sheets: Sheets, stats: Statistics, undoRedo: UndoRedo): EngineState {
-    return this.buildEngine(config, sheets, stats, undoRedo)
+  public static rebuildWithConfig(config: Config, sheets: Sheets, stats: Statistics): EngineState {
+    return this.buildEngine(config, sheets, stats)
   }
 }
