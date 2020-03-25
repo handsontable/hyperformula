@@ -304,7 +304,7 @@ export class BooleanPlugin extends FunctionPlugin {
 
     const selector = coerceToMaybeNumber(vals[0], this.interpreter.dateHelper, this.interpreter.numberLiteralsHelper)
 
-    if(selector === null || selector != Math.round(selector) || selector < 1 || selector >= n) {
+    if(selector === undefined || selector != Math.round(selector) || selector < 1 || selector >= n) {
       return new CellError(ErrorType.NUM)
     }
     return vals[selector]

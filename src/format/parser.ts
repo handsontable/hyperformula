@@ -1,3 +1,5 @@
+import {Maybe} from '../Maybe'
+
 const dateFormatRegex = /(\\.|dddd|ddd|dd|d|DDDD|DDD|DD|D|mmmmm|mmmm|mmm|mm|m|MMMMM|MMMM|MMM|MM|M|YYYY|YY|yyyy|yy|HH|H|hh|h|ss|AM\/PM)/g
 const numberFormatRegex = /(\\.|[#0]+(\.[#0]*)?)/g
 
@@ -86,7 +88,7 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
   return tokens
 }
 
-export function parseForDateFormat(str: string): FormatExpression | null {
+export function parseForDateFormat(str: string): Maybe<FormatExpression> {
   const dateFormatTokens = matchDateFormat(str)
 
   if (dateFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
@@ -95,12 +97,11 @@ export function parseForDateFormat(str: string): FormatExpression | null {
       tokens: createTokens(dateFormatTokens, str),
     }
   } else {
-    return null
+    return undefined
   }
 }
 
-export function parseForNumberFormat(str: string): FormatExpression | null {
-
+export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   const numberFormatTokens = matchNumberFormat(str)
   if (numberFormatTokens.filter((elem) => !isEscapeToken(elem)).length > 0) {
     return {
@@ -108,21 +109,12 @@ export function parseForNumberFormat(str: string): FormatExpression | null {
       tokens: createTokens(numberFormatTokens, str),
     }
   } else {
-    return null
+    return undefined
   }
 }
 
 export function parse(str: string): FormatExpression {
-  const asDate = parseForDateFormat(str)
-  if (asDate !== null) {
-    return asDate
-  }
-  const asNumber = parseForNumberFormat(str)
-  if (asNumber !== null) {
-    return asNumber
-  }
-
-  return {
+  return parseForDateFormat(str) ?? parseForNumberFormat(str) ??  {
     type: FormatExpressionType.STRING,
     tokens: [{
       type: TokenType.FREE_TEXT,
