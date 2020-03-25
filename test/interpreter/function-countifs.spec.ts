@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {adr, detailedError} from '../testUtils'
-import {StatType} from '../../src/statistics/Statistics'
+import {StatType} from '../../src/statistics'
 
 describe('Function COUNTIFS', () => {
   it('validates number of arguments', () => {

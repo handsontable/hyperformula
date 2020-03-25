@@ -39,7 +39,7 @@ import {
 import {
   Serialization
 } from './Serialization'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import {Emitter, TypedEmitter, Listeners, Events} from './Emitter'
 import {UndoRedo} from './UndoRedo'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'

@@ -7,7 +7,7 @@ import {DependencyGraph} from './DependencyGraph'
 import {GraphBuilder, Sheet, Sheets} from './GraphBuilder'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Evaluator} from './Evaluator'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, EmptyStatistics, StatType} from './statistics'
 import {collatorFromConfig} from './StringHelper'
 import {UndoRedo} from './UndoRedo'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -34,7 +34,7 @@ export type EngineState = {
 }
 
 export class BuildEngineFactory {
-  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = new Statistics()): EngineState {
+  private static buildEngine(config: Config, sheets: Sheets = {}, stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const undoRedo: UndoRedo = new UndoRedo()
