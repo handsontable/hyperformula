@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {SimpleDate} from '../../src/DateHelper'
-import {defaultPrintDate} from '../../src/format/format'
+import {defaultStringifyDate} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
@@ -142,7 +142,7 @@ describe('Text', () => {
 
 describe( 'Custom date printing', () => {
   function customPrintDate(date: SimpleDate, dateFormat: string): Maybe<string> {
-    const str = defaultPrintDate(date, dateFormat)
+    const str = defaultStringifyDate(date, dateFormat)
     if(str === undefined) {
       return undefined
     } else {

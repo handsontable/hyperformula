@@ -2,7 +2,7 @@ import {ErrorType} from './Cell'
 import {defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultPrintDate} from './format/format'
+import {defaultStringifyDate} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -217,7 +217,7 @@ export interface ConfigParams {
   /**
    * Allows to provide a function that takes date and prints it into string.
    *
-   * @default defaultPrintDate
+   * @default defaultStringifyDate
    */
   stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
   /**
@@ -284,7 +284,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetectionThreshold: 100,
     nullYear: 30,
     parseDate: defaultParseToDate,
-    stringifyDate: defaultPrintDate,
+    stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,

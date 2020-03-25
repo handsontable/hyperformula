@@ -73,7 +73,7 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<string> {
+export function defaultStringifyDate(date: SimpleDate, formatArg: string): Maybe<string> {
   const expression = parseForDateFormat(formatArg)
   if (expression === undefined) {
     return undefined
