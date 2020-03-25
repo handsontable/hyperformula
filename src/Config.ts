@@ -78,7 +78,7 @@ export interface ConfigParams {
    *
    * AlwaysSparse - will use SparseStrategy for all sheets.
    *
-   *  @default AlwaysDense
+   * @default AlwaysDense
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
@@ -250,13 +250,12 @@ export interface ConfigParams {
    * @default 20
    */
   vlookupThreshold: number,
- /**
+  /**
    * Allows to set a specific date from which the number of days will be counted.
    *
    * Dates are represented internally as a number of days that passed since this `nullDate`.
    *
    * @default {year: 1899, month: 12, day: 30}
-   *
    */
   nullDate: SimpleDate,
 }
@@ -348,7 +347,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly language: TranslationPackage
   /** @inheritDoc */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
