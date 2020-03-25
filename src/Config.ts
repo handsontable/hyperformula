@@ -146,6 +146,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Applies to comparison operators only.
    *
    * @default false
+   * 
+   * @category String Property
    */
   public readonly caseSensitive: boolean
   /**
@@ -157,7 +159,9 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * AlwaysSparse - will use SparseStrategy for all sheets.
    *
-   *  @default AlwaysDense
+   * @default AlwaysDense
+   * 
+   * @category Engine Property
    */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
 
@@ -167,6 +171,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Applies to comparison operators only.
    *
    * @default false
+   * 
+   * @category String Property
    */
   public readonly accentSensitive: boolean
 
@@ -176,6 +182,8 @@ export class Config implements ConfigParams, ParserConfig {
    * When set to `false` uses the locale's default.
    *
    * @default 'lower'
+   * 
+   * @category String Property
    */
   public readonly caseFirst: 'upper' | 'lower' | 'false'
   /**
@@ -186,12 +194,16 @@ export class Config implements ConfigParams, ParserConfig {
    * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
+   * 
+   * @category Date Property
    */
   public readonly dateFormats: string[]
   /**
    * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
+   * 
+   * @category Syntax Property
    */
   public readonly functionArgSeparator: string
   /**
@@ -200,6 +212,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
+   * 
+   * @category Number Property
    */
   public readonly decimalSeparator: '.' | ','
   /**
@@ -208,18 +222,24 @@ export class Config implements ConfigParams, ParserConfig {
    * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
+   * 
+   * @category Number Property
    */
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /**
    * Translation package with translations of function and error names.
    *
    * @default enGB
+   * 
+   * @category Syntax Property
    */
   public readonly language: TranslationPackage
   /**
    * A list of additional function plugins to use by formula interpreter.
    *
    * @default []
+   * 
+   * @category Syntax Property
    */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
@@ -231,6 +251,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
    *
    * @default 'gpu'
+   * 
+   * @category Engine Property
    */
   public readonly gpuMode: GPUMode
   /**
@@ -241,6 +263,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
    *
    * @default false
+   * 
+   * @category Date Property
    */
   public readonly leapYear1900: boolean
   /**
@@ -251,24 +275,32 @@ export class Config implements ConfigParams, ParserConfig {
    * Some CRUD operations may break numeric matrices into individual vertices if needed.
    *
    * @default true
+   * 
+   * @category Engine Property
    */
   public readonly matrixDetection: boolean
   /**
    * Specifies whether punctuation should be ignored in string comparison.
    *
    * @default false
+   * 
+   * @category String Property
    */
   public readonly ignorePunctuation: boolean
   /**
    * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
    *
    * @default 'en'
+   * 
+   * @category String Property
    */
   public readonly localeLang: string
   /**
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
    *
    * @default 100
+   * 
+   * @category Engine Property
    */
   public readonly matrixDetectionThreshold: number
   /**
@@ -277,18 +309,24 @@ export class Config implements ConfigParams, ParserConfig {
    * If `xx <= nullYear` its latter, otherwise its former.
    *
    * @default 30
+   * 
+   * @category Date Property
    */
   public readonly nullYear: number
   /**
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
    * @default parseDateFromFormats
+   * 
+   * @category Date Property
    */
   public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /**
    * Allows to provide a function that takes date and prints it into string.
    *
    * @default defaultStringifyDate
+   * 
+   * @category Date Property
    */
   public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /**
@@ -307,6 +345,8 @@ export class Config implements ConfigParams, ParserConfig {
    * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
    *
    * @default 1e-13
+   * 
+   * @category Number Property
    */
   public readonly precisionEpsilon: number
   /**
@@ -315,6 +355,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    *
    * @default 14
+   * 
+   * @category Number Property
    */
   public readonly precisionRounding: number
   /**
@@ -323,6 +365,8 @@ export class Config implements ConfigParams, ParserConfig {
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
    *
    * @default true
+   * 
+   * @category Number Property
    */
   public readonly smartRounding: boolean
   /**
@@ -335,6 +379,8 @@ export class Config implements ConfigParams, ParserConfig {
    * In some scenarios column index may fall back to binary search despite of this flag.
    *
    * @default false
+   * 
+   * @category Engine Property
    */
   public readonly useColumnIndex: boolean
   /**
@@ -345,6 +391,8 @@ export class Config implements ConfigParams, ParserConfig {
    * Used by VLOOKUP and MATCH procedures.
    *
    * @default 20
+   * 
+   * @category Engine Property
    */
   public readonly vlookupThreshold: number
   /**
@@ -354,6 +402,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
+   * @category Date Property
    */
   public readonly nullDate: SimpleDate
   /**
