@@ -1,5 +1,5 @@
 import {Config} from '../src/Config'
-import {DateHelper, SimpleDate} from '../src/DateHelper'
+import {DateHelper, SimpleDate} from '../src/DateTime'
 import moment from 'moment'
 import {Maybe} from '../src/Maybe'
 

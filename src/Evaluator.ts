@@ -2,7 +2,7 @@ import {CellError, ErrorType, InternalCellValue, SimpleCellAddress} from './Cell
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {DateHelper} from './DateHelper'
+import {DateHelper} from './DateTime'
 import {DependencyGraph, FormulaCellVertex, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
 import {Interpreter} from './interpreter/Interpreter'
 import {SimpleRangeValue} from './interpreter/InterpreterValue'

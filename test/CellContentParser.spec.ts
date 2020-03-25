@@ -2,7 +2,7 @@ import {EmptyValue} from '../src'
 import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateHelper} from '../src/DateTime'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {

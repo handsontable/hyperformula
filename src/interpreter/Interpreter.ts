@@ -11,7 +11,7 @@ import {
 } from '../Cell'
 import {ColumnSearchStrategy} from '../ColumnSearch/ColumnSearchStrategy'
 import {Config} from '../Config'
-import {DateHelper} from '../DateHelper'
+import {DateHelper} from '../DateTime'
 import {DependencyGraph} from '../DependencyGraph'
 import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'

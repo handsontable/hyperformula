@@ -1,6 +1,6 @@
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateHelper, SimpleDate} from '../DateHelper'
+import {DateHelper, SimpleDate} from '../DateTime'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 

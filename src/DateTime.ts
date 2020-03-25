@@ -204,18 +204,36 @@ export function defaultParseToDateTime(dateString: string, dateFormat: string): 
   }
   let year
   if (yearIndexLong in dateItems) {
-    year = Number(dateItems[yearIndexLong])
-    if (year < 1000 || year > 9999) {
+    const yearString = dateItems[yearIndexLong]
+    if(/^\d+$/.test(yearString)) {
+      year = Number(yearString)
+      if (year < 1000 || year > 9999) {
+        return undefined
+      }
+    } else {
       return undefined
     }
   } else {
-    year = Number(dateItems[yearIndexShort])
-    if (year < 0 || year > 99) {
+    const yearString = dateItems[yearIndexShort]
+    if(/^\d+$/.test(yearString)) {
+      year = Number(yearString)
+      if (year < 0 || year > 99) {
+        return undefined
+      }
+    } else {
       return undefined
     }
   }
-  const month = Number(dateItems[monthIndex])
-  const day   = Number(dateItems[dayIndex])
+  const monthString = dateItems[monthIndex]
+  if(! /^\d+$/.test(monthString)) {
+    return undefined
+  }
+  const month = Number(monthString)
+  const dayString = dateItems[dayIndex]
+  if(! /^\d+$/.test(dayString)) {
+    return undefined
+  }
+  const day = Number(dayString)
   return {year, month, day}
 }
 

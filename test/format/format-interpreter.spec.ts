@@ -1,5 +1,5 @@
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateHelper'
+import {DateHelper} from '../../src/DateTime'
 import {format} from '../../src/format/format'
 
 describe('FormatInterpreter', () => {

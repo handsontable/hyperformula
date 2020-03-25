@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {CellError, EmptyValue, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {DateHelper} from '../../src/DateHelper'
+import {DateHelper} from '../../src/DateTime'
 import {
   coerceBooleanToNumber,
   coerceNonDateScalarToMaybeNumber,

@@ -2,7 +2,7 @@ import {CellValue, DetailedCellError, HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType, InternalCellValue, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
-import {DateHelper} from '../src/DateHelper'
+import {DateHelper} from '../src/DateTime'
 import {FormulaCellVertex, MatrixVertex} from '../src/DependencyGraph'
 import {defaultStringifyDate} from '../src/format/format'
 import {
