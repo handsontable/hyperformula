@@ -46,10 +46,11 @@ module.exports = {
           path: '/guide/',
         },
         {
-          title: 'Basic Guide',
+          title: 'Getting started',
           collapsable: false,
           children: [
             ['/guide/requirements', 'Requirements'],
+            ['/guide/compatibility', 'Browser Compatibility'],
             ['/guide/basic-usage', 'Basic Usage'],
             ['/guide/data-operations', 'Data Operations'],
             ['/guide/crud-operations', 'CRUD Operations Explained'],
@@ -58,11 +59,12 @@ module.exports = {
             ['/guide/working-with-events', 'Working with Events'],
             ['/guide/handling-errors', 'Handling Errors'],
             ['/guide/license-key', 'License Key'],
-            ['/guide/release-notes', 'Release Notes'],
+            ['/guide/release-notes', 'https://github.com/handsontable/hyperformula/releases'],
+            ['/guide/support', 'Support'],
           ]
         },
         {
-          title: 'Advanced Guide',
+          title: 'Going deeper',
           collapsable: false,
           children: [
             ['/guide/custom-language', 'Custom Language'],
@@ -75,16 +77,17 @@ module.exports = {
             ['/guide/data-types', 'Supported Data Types'],
             ['/guide/gpu-support', 'GPU Support'],
             ['/guide/integrations', 'Integrations'],
+            ['/guide/testing-hyperformula', 'Testing HF'],
           ],
         },
         {
-          title: 'Contributtor Guide',
+          title: 'Contributtor guide',
           collapsable: false,
           children: [
-            ['/guide/working-with-documentation', 'Working With Documentation'],
+            ['/guide/working-with-documentation', 'Working with the documentation'],
+            ['/guide/writing-tests', 'Writing testst for HF'],
             ['https://github.com/handsontable/hyperformula/blob/develop/CONTRIBUTING.md', 'CONTRIBUTING.md'],
             ['https://github.com/handsontable/hyperformula/blob/develop/CODE_OF_CONDUCT.md', 'CODE_OF_CONDUCT.md'],
-
           ],
         },
       ],
@@ -106,7 +109,7 @@ module.exports = {
         },
         {
           title: 'Errors',
-          collapsable: false,
+          collapsable: true,
           sidebarDepth: 0,
           children: [
             ['/api/classes/_errors_.expectedoneofvalues', 'ExpectedOneOfValues'],
@@ -124,7 +127,7 @@ module.exports = {
         },
         {
           title: 'Values',
-          collapsable: false,
+          collapsable: true,
           sidebarDepth: 0,
           children: [
             ['/api/classes/_cellvalue_.detailedcellerror', 'DetailedCellError'],
