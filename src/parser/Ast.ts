@@ -374,7 +374,6 @@ export const buildErrorWithRawInputAst = (rawInput: string, error: CellError, le
   leadingWhitespace: extractImage(leadingWhitespace),
 })
 
-
 export const buildParsingErrorAst = (): ErrorAst => ({
   type: AstNodeType.ERROR,
   error: CellError.parsingError()
