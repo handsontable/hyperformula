@@ -1,5 +1,5 @@
 import {ErrorType} from './Cell'
-import {defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
+import {defaultParseToDateTime, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
@@ -185,7 +185,7 @@ export interface ConfigParams {
   /**
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
-   * @default defaultParseToDate
+   * @default defaultParseToDateTime
    */
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   /**
@@ -283,7 +283,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: defaultParseToDate,
+    parseDate: defaultParseToDateTime,
     stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,

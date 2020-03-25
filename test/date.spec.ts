@@ -32,6 +32,9 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('01/15/2020')).toBe(43845)
     expect(dateHelper.dateStringToDateNumber('02/29/2000')).toBe(36585)
     expect(dateHelper.dateStringToDateNumber('12/31/2999')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('12 31 2999')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber(' 12 31 2999 ')).toBe(401768)
+    expect(dateHelper.dateStringToDateNumber('12  31 2999')).toBe(401768)
   })
 
   it('#stringToDateNumber - excel compatibility', () => {
@@ -62,7 +65,7 @@ describe('Date helpers', () => {
     expect(dateHelper2.dateStringToDateNumber('99/12/31')).toBe(36525)
   })
 
-  it('#stringToDateNumber - tests expected to return null', () => {
+  it('#stringToDateNumber - tests expected to return undefined', () => {
     const dateHelper = new DateHelper(new Config())
     expect(dateHelper.dateStringToDateNumber('1/1/10000')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('5/29/1453')).toBe(undefined)
@@ -74,6 +77,7 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('w8')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('www1')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('10/2020')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('12//31/2999')).toBe(undefined)
   })
 })
 

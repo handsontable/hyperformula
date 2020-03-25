@@ -188,10 +188,9 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
-export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
-  const dateItems = dateString.replace(/[^a-zA-Z0-9]/g, '-').split('-')
-  const normalizedFormat = dateFormat.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
-  const formatItems     = normalizedFormat.split('-')
+export function defaultParseToDateTime(dateString: string, dateFormat: string): Maybe<SimpleDate> {
+  const dateItems = dateString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
+  const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g )
   const monthIndex  = formatItems.indexOf('mm')
   const dayIndex    = formatItems.indexOf('dd')
   const yearIndexLong   = formatItems.indexOf('yyyy')
