@@ -23,28 +23,28 @@ describe('Quality assurance of floating point', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(1.20E+200)  
   })
 
-  it('addition of small numbers with smartRounding', () => {
+  it('addition of small numbers without smartRounding', () => {
     const engine = HyperFormula.buildFromArray([
       ['0.000123456789', '1', '=A1+B1'],
-    ], new Config({ smartRounding: false }))
+    ], ({ smartRounding: false }))
   
     expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)  
   })
 
-  xit('addition of small numbers with smartRounding', () => { //pending on #257
+  it('addition of small numbers with smartRounding', () => { 
     const engine = HyperFormula.buildFromArray([
       ['0.000123456789', '1', '=A1+B1'],
     ], new Config({ smartRounding: true }))
   
-    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123457) //as GS and E
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789) 
   })
 
-  xit('addition of small numbers with smartRounding and with precisionRounding=15', () => {
+  it('addition of small numbers with smartRounding and with precisionRounding=15', () => {
     const engine = HyperFormula.buildFromArray([
       ['0.000123456789', '1', '=A1+B1'],
     ], new Config({ precisionRounding: 15, smartRounding: true }))
   
-    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123457)  //as GS and E, now return 1.000123456789
+    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)  
   })
 
   it('adding a negative number with smartRounding', () => {
@@ -52,7 +52,7 @@ describe('Quality assurance of floating point', () => {
       ['=(43.1-43.2)+1'],
     ], new Config({ smartRounding: true }))
   
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.9)  //as GS and E
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.9)  
   })
 
   it('adding a negative number without smartRounding', () => {
@@ -60,7 +60,7 @@ describe('Quality assurance of floating point', () => {
       ['=(43.1-43.2)+1'],
     ], new Config({ smartRounding: false }))
   
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.8999999999999986)  //as GS and E
+    expect(engine.getCellValue(adr('A1'))).toEqual(0.8999999999999986)  
   })
 
   it('example when a value reaches zero without smartRounding', () => {
@@ -68,7 +68,7 @@ describe('Quality assurance of floating point', () => {
       ['=1.333+1.225-1.333-1.225'],
     ], new Config({ smartRounding: false }))
   
-    expect(engine.getCellValue(adr('A1'))).toEqual(-2.220446049250313E-16)  //as Gnumeric and E with scientific format
+    expect(engine.getCellValue(adr('A1'))).toEqual(-2.220446049250313E-16)  
   })
 
   it('Example when a value reaches zero with smartRounding', () => {
@@ -76,7 +76,7 @@ describe('Quality assurance of floating point', () => {
       ['=1.333+1.225-1.333-1.225'],
     ], new Config({ smartRounding: true }))
   
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)  //E and GS retun 0
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)  
   })
 
 })
