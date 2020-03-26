@@ -47,7 +47,7 @@ export class NamedExpressionNameIsAlreadyTaken extends Error {
 }
 
 /**
- * Error thrown when the given named expression is invalid.
+ * Error thrown when the name given for the named expression is invalid.
  */
 export class NamedExpressionNameIsInvalid extends Error {
   constructor(expressionName: string) {
@@ -65,7 +65,7 @@ export class NamedExpressionDoesNotExist extends Error {
 }
 
 /**
- * Error thrown when there are no operations to be undone.
+ * Error thrown when there are no operations to be undone by the [[undo]] method.
  */
 export class NoOperationToUndo extends Error {
   constructor() {
@@ -92,6 +92,12 @@ function replacer(key: any, val: any): any {
 
 /**
  * Error thrown when the given value cannot be parsed.
+ * 
+ * Checks against the validity in:
+ * 
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[setCellsContents]]
  */
 export class UnableToParse extends Error {
   constructor(value: any) {
@@ -103,6 +109,15 @@ export class UnableToParse extends Error {
  * Error thrown when the expected value type differs from the given value type.
  * 
  * It also displays the expected type.
+ * 
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * 
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
  */
 export class ExpectedValueOfType extends Error {
   constructor(expectedType: string, paramName: string) {
@@ -112,6 +127,17 @@ export class ExpectedValueOfType extends Error {
 
 /**
  * Error thrown when the value was expected to be set for a config parameter.
+ * 
+ * It also displays the expected value.
+ * 
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * 
+ * The following methods accept [[ConfigParams]] as a parameter:
+ * 
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
  */
 export class ExpectedOneOfValues extends Error {
   constructor(values: string, paramName: string) {
@@ -121,6 +147,14 @@ export class ExpectedOneOfValues extends Error {
 
 /**
  * Error thrown when computations become suspended.
+ * 
+ * To perform any other action wait for the batch to complete or resume the evaluation.
+ * 
+ * Relates to:
+ * 
+ * @see [[batch]]
+ * @see [[suspendEvaluation]]
+ * @see [[resumeEvaluation]]
  */
 export class EvaluationSuspendedError extends Error {
   constructor() {
