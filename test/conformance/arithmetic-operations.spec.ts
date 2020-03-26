@@ -18,7 +18,7 @@ function createEngine(data: any[][]) {
   }
 }
 
-describe('Quality assurance of negative numbers', () => { //pending on PR #203
+describe('Quality assurance of negative numbers', () => { 
   it('-1 and -1', () => {
     const engine = HyperFormula.buildFromArray([
       [-1, -1, ...data],
@@ -41,10 +41,10 @@ describe('Quality assurance of negative numbers', () => { //pending on PR #203
     expect(engine.getCellValue(adr('Q1'))).toEqual(-0.01) // PERCENTAGE
   })
 
-  xit('-1 and -1E+19', () => {
+  it('-1 and -1E+19 with smartRounding' , () => {
     const engine = HyperFormula.buildFromArray([
       [-1, -1E+19, ...data],
-    ], new Config({ smartRounding: false}))
+    ], new Config({ smartRounding: true }))
    
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
@@ -55,8 +55,27 @@ describe('Quality assurance of negative numbers', () => { //pending on PR #203
     expect(engine.getCellValue(adr('I1'))).toEqual(-1E+19) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(1E+19) // SUB
     expect(engine.getCellValue(adr('K1'))).toEqual(1E+19) // MULT
-    expect(engine.getCellValue(adr('L1'))).toEqual(1E-19) //DIV return 0
-    //expect(engine.getCellValue(adr('M1'))).toEqual(new DetailedCellError(new CellError(ErrorType.NUM), '#NUM!')) //EXP  //1
+    expect(engine.getCellValue(adr('L1'))).toEqual(0) //DIV return 0
+    expect(engine.getCellValue(adr('M1'))).toEqual(1) //EXP  //1
+    expect(engine.getCellValue(adr('N1'))).toEqual('-1-10000000000000000000') // CONCAT
+  })
+
+  it('-1 and -1E+19 without smartRounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      [-1, -1E+19, ...data],
+    ], new Config({ smartRounding: false }))
+   
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
+    expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
+    expect(engine.getCellValue(adr('I1'))).toEqual(-1E+19) // ADD
+    expect(engine.getCellValue(adr('J1'))).toEqual(1E+19) // SUB
+    expect(engine.getCellValue(adr('K1'))).toEqual(1E+19) // MULT
+    expect(engine.getCellValue(adr('L1'))).toEqual(1E-19) //DIV 
+    expect(engine.getCellValue(adr('M1'))).toEqual(1) //EXP  //1
     expect(engine.getCellValue(adr('N1'))).toEqual('-1-10000000000000000000') // CONCAT
   })
 
