@@ -147,7 +147,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default false
    * 
-   * @category String Property
+   * @category String
    */
   public readonly caseSensitive: boolean
   /**
@@ -161,7 +161,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default AlwaysDense
    * 
-   * @category Engine Property
+   * @category Engine
    */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
 
@@ -172,7 +172,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default false
    * 
-   * @category String Property
+   * @category String
    */
   public readonly accentSensitive: boolean
 
@@ -183,7 +183,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 'lower'
    * 
-   * @category String Property
+   * @category String
    */
   public readonly caseFirst: 'upper' | 'lower' | 'false'
   /**
@@ -195,7 +195,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    * 
-   * @category Date Property
+   * @category Date
    */
   public readonly dateFormats: string[]
   /**
@@ -203,7 +203,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default ','
    * 
-   * @category Syntax Property
+   * @category Syntax
    */
   public readonly functionArgSeparator: string
   /**
@@ -213,7 +213,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default '.'
    * 
-   * @category Number Property
+   * @category Number
    */
   public readonly decimalSeparator: '.' | ','
   /**
@@ -223,7 +223,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default ''
    * 
-   * @category Number Property
+   * @category Number
    */
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /**
@@ -231,7 +231,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default enGB
    * 
-   * @category Syntax Property
+   * @category Syntax
    */
   public readonly language: TranslationPackage
   /**
@@ -239,7 +239,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default []
    * 
-   * @category Syntax Property
+   * @category Syntax
    */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
@@ -252,7 +252,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 'gpu'
    * 
-   * @category Engine Property
+   * @category Engine
    */
   public readonly gpuMode: GPUMode
   /**
@@ -264,7 +264,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default false
    * 
-   * @category Date Property
+   * @category Date
    */
   public readonly leapYear1900: boolean
   /**
@@ -276,7 +276,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default true
    * 
-   * @category Engine Property
+   * @category Engine
    */
   public readonly matrixDetection: boolean
   /**
@@ -284,7 +284,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default false
    * 
-   * @category String Property
+   * @category String
    */
   public readonly ignorePunctuation: boolean
   /**
@@ -292,7 +292,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 'en'
    * 
-   * @category String Property
+   * @category String 
    */
   public readonly localeLang: string
   /**
@@ -300,7 +300,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 100
    * 
-   * @category Engine Property
+   * @category Engine 
    */
   public readonly matrixDetectionThreshold: number
   /**
@@ -310,7 +310,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 30
    * 
-   * @category Date Property
+   * @category Date 
    */
   public readonly nullYear: number
   /**
@@ -318,7 +318,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default parseDateFromFormats
    * 
-   * @category Date Property
+   * @category Date 
    */
   public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /**
@@ -326,7 +326,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default defaultStringifyDate
    * 
-   * @category Date Property
+   * @category Date 
    */
   public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /**
@@ -346,7 +346,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 1e-13
    * 
-   * @category Number Property
+   * @category Number 
    */
   public readonly precisionEpsilon: number
   /**
@@ -356,7 +356,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 14
    * 
-   * @category Number Property
+   * @category Number
    */
   public readonly precisionRounding: number
   /**
@@ -366,7 +366,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default true
    * 
-   * @category Number Property
+   * @category Number
    */
   public readonly smartRounding: boolean
   /**
@@ -380,7 +380,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default false
    * 
-   * @category Engine Property
+   * @category Engine
    */
   public readonly useColumnIndex: boolean
   /**
@@ -392,7 +392,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default 20
    * 
-   * @category Engine Property
+   * @category Engine
    */
   public readonly vlookupThreshold: number
   /**
@@ -402,7 +402,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
-   * @category Date Property
+   * @category Date
    */
   public readonly nullDate: SimpleDate
   /**
