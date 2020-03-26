@@ -51,8 +51,8 @@ describe('Quality assurance of cell, sheet and range references', () => {
     })
     expect(engine.getCellValue(adr('A4', 0))).toEqual(6)
     expect(engine.getCellValue(adr('A3', 1))).toEqual(110)
-    expect(engine.getCellValue(adr('A1', 2))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
-    expect(engine.getCellValue(adr('A2', 2))).toEqual(detailedError(ErrorType.ERROR, 'Parsing error'))
+    expect(engine.getCellValue(adr('A1', 2))).toEqual(12)
+    expect(engine.getCellValue(adr('A2', 2))).toEqual(220)
 
   })
 })
