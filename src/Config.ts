@@ -1,4 +1,3 @@
-import {GPUMode} from 'gpu.js'
 import {ErrorType} from './Cell'
 import {defaultParseToDate, instanceOfSimpleDate, SimpleDate} from './DateHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
@@ -41,34 +40,263 @@ import {VlookupPlugin} from './interpreter/plugin/VlookupPlugin'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
+type GPUMode = 'gpu' | 'cpu' | 'dev'
+
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 
 export interface ConfigParams {
+  /**
+   * Specifies if the string comparison is accent sensitive or not.
+   *
+   * Applies to comparison operators only.
+   *
+   * @default false
+   * 
+   * @category String
+   */
   accentSensitive: boolean,
+  /**
+   * Specifies if the string comparison is case-sensitive or not.
+   *
+   * Applies to comparison operators only.
+   *
+   * @default false
+   * 
+   * @category String
+   */
   caseSensitive: boolean,
+  /**
+   * Allows to define if upper case or lower case should sort first.
+   *
+   * When set to `false` uses the locale's default.
+   *
+   * @default 'lower'
+   * 
+   * @category String
+   */
   caseFirst: 'upper' | 'lower' | 'false',
+  /**
+   * Determines which address mapping policy will be used. Built in implementations:
+   *
+   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
+   *
+   * AlwaysDense - will use DenseStrategy for all sheets.
+   *
+   * AlwaysSparse - will use SparseStrategy for all sheets.
+   *
+   * @default AlwaysDense
+   */
   chooseAddressMappingPolicy: ChooseAddressMapping,
+  /**
+   * A list of date formats that are supported by date parsing functions.
+   *
+   * The separator is ignored and it can be any non-alpha-numeric symbol.
+   *
+   * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
+   *
+   * @default ['MM/DD/YYYY', 'MM/DD/YY']
+   * 
+   * @category Date
+   */
   dateFormats: string[],
+  /**
+   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
+   *
+   * @default ','
+   * 
+   * @category Syntax
+   */
   functionArgSeparator: string,
+  /**
+   * A decimal separator used for parsing numeric literals.
+   *
+   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   *
+   * @default '.'
+   * 
+   * @category Number
+   */
   decimalSeparator: '.' | ',',
+  /**
+   * A thousand separator used for parsing numeric literals.
+   *
+   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   *
+   * @default ''
+   * 
+   * @category Number
+   */
   thousandSeparator: '' | ',' | ' ' | '.',
+  /**
+   * Translation package with translations of function and error names.
+   *
+   * @default enGB
+   * 
+   * @category Syntax
+   */
   language: TranslationPackage,
+  /**
+   * A list of additional function plugins to use by formula interpreter.
+   *
+   * @default []
+   * 
+   * @category Syntax
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
+  /**
+   * Allows to set GPU or CPU for use in matrix calculations.
+   *
+   * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
+   *
+   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
+   *
+   * @default 'gpu'
+   * 
+   * @category Engine
+   */
   gpuMode: GPUMode,
+  /**
+   * Specifies whether punctuation should be ignored in string comparison.
+   *
+   * @default false
+   */
   ignorePunctuation: boolean,
+  /**
+   * Preserves an option for setting 1900 as a leap year.
+   *
+   * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
+   *
+   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
+   *
+   * @default false
+   * 
+   * @category Date
+   */
   leapYear1900: boolean,
+  /**
+   * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
+   *
+   * @default 'en'
+   */
   localeLang: string,
+  /**
+   * Enables numeric matrix detection feature when set to 'true'.
+   *
+   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
+   *
+   * Some CRUD operations may break numeric matrices into individual vertices if needed.
+   *
+   * @default true
+   * 
+   * @category Engine
+   */
   matrixDetection: boolean,
+  /**
+   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
+   *
+   * @default 100
+   * 
+   * @category Engine 
+   */
   matrixDetectionThreshold: number,
+  /**
+   * Two-digit values when interpreted as a year can be either 19xx or 20xx.
+   *
+   * If `xx <= nullYear` its latter, otherwise its former.
+   *
+   * @default 30
+   * 
+   * @category Date 
+   */
   nullYear: number,
+  /**
+   * Allows to provide a function that takes a string representing date and parses it into an actual date.
+   *
+   * @default defaultParseToDate
+   */
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
+  /**
+   * Controls how far two numerical values need to be from each other to be treated as non-equal.
+   *
+   * `a` and `b` are equal if they are of the same sign and:
+   *
+   * `abs(a) <= (1+precisionEpsilon) * abs(b)`
+   *
+   * and
+   *
+   * `abs(b) <= (1+precisionEpsilon) * abs(a)`
+   *
+   * It also controls snap-to-zero behavior for additions/subtractions:
+   *
+   * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
+   *
+   * @default 1e-13
+   * 
+   * @category Number 
+   */
   precisionEpsilon: number,
+  /**
+   * Sets how precise the calculation should be.
+   *
+   * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
+   *
+   * @default 14
+   * 
+   * @category Number
+   */
   precisionRounding: number,
-  stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
+  /**
+   * Allows to provide a function that takes date (represented as a number) and prints it into string.
+   *
+   * @default defaultStringifyDate
+   */
+  stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>,
+  /**
+   * Sets the rounding.
+   *
+   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
+   *
+   * @default true
+   * 
+   * @category Number
+   */
   smartRounding: boolean,
+  /**
+   * Switches column search strategy from binary search to column index.
+   *
+   * Used by VLOOKUP and MATCH procedures.
+   *
+   * Using column index may improve time efficiency but it will increase memory usage.
+   *
+   * In some scenarios column index may fall back to binary search despite of this flag.
+   *
+   * @default false
+   * 
+   * @category Engine
+   */
   useColumnIndex: boolean,
+  /**
+   * Determines minimum number of elements a range must have in order to use binary search.
+   *
+   * Shorter ranges will be searched naively.
+   *
+   * Used by VLOOKUP and MATCH procedures.
+   *
+   * @default 20
+   * 
+   * @category Engine
+   */
   vlookupThreshold: number,
+  /**
+   * Allows to set a specific date from which the number of days will be counted.
+   *
+   * Dates are represented internally as a number of days that passed since this `nullDate`.
+   *
+   * @default {year: 1899, month: 12, day: 30}
+   *
+   * @category Date
+   */
   nullDate: SimpleDate,
 }
 
@@ -140,270 +368,56 @@ export class Config implements ConfigParams, ParserConfig {
     ErrorFunctionPlugin,
     CorrelPlugin,
   ]
-  /**
-   * Specifies if the string comparison is case-sensitive or not.
-   *
-   * Applies to comparison operators only.
-   *
-   * @default false
-   * 
-   * @category String
-   */
+  /** @inheritDoc */
   public readonly caseSensitive: boolean
-  /**
-   * Determines which address mapping policy will be used. Built in implementations:
-   *
-   * DenseSparseChooseBasedOnThreshold - will choose address mapping for each sheet separately based on fill ratio.
-   *
-   * AlwaysDense - will use DenseStrategy for all sheets.
-   *
-   * AlwaysSparse - will use SparseStrategy for all sheets.
-   *
-   * @default AlwaysDense
-   * 
-   * @category Engine
-   */
+  /** @inheritDoc */
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
-
-  /**
-   * Specifies if the string comparison is accent sensitive or not.
-   *
-   * Applies to comparison operators only.
-   *
-   * @default false
-   * 
-   * @category String
-   */
+  /** @inheritDoc */
   public readonly accentSensitive: boolean
-
-  /**
-   * Allows to define if upper case or lower case should sort first.
-   *
-   * When set to `false` uses the locale's default.
-   *
-   * @default 'lower'
-   * 
-   * @category String
-   */
+  /** @inheritDoc */
   public readonly caseFirst: 'upper' | 'lower' | 'false'
-  /**
-   * A list of date formats that are supported by date parsing functions.
-   *
-   * The separator is ignored and it can be any non-alpha-numeric symbol.
-   *
-   * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
-   *
-   * @default ['MM/DD/YYYY', 'MM/DD/YY']
-   * 
-   * @category Date
-   */
+  /** @inheritDoc */
   public readonly dateFormats: string[]
-  /**
-   * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
-   *
-   * @default ','
-   * 
-   * @category Syntax
-   */
+  /** @inheritDoc */
   public readonly functionArgSeparator: string
-  /**
-   * A decimal separator used for parsing numeric literals.
-   *
-   * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
-   *
-   * @default '.'
-   * 
-   * @category Number
-   */
+  /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
-  /**
-   * A thousand separator used for parsing numeric literals.
-   *
-   * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
-   *
-   * @default ''
-   * 
-   * @category Number
-   */
+  /** @inheritDoc */
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
-  /**
-   * Translation package with translations of function and error names.
-   *
-   * @default enGB
-   * 
-   * @category Syntax
-   */
+  /** @inheritDoc */
   public readonly language: TranslationPackage
-  /**
-   * A list of additional function plugins to use by formula interpreter.
-   *
-   * @default []
-   * 
-   * @category Syntax
-   */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /** @inheritDoc */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: any[]
-  /**
-   * Allows to set GPU or CPU for use in matrix calculations.
-   *
-   * When set to 'gpu' it will try to use GPU for matrix calculations. Setting it to 'cpu' will force CPU usage.
-   *
-   * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
-   *
-   * @default 'gpu'
-   * 
-   * @category Engine
-   */
+  /** @inheritDoc */
   public readonly gpuMode: GPUMode
-  /**
-   * Preserves an option for setting 1900 as a leap year.
-   *
-   * 1900 was not a leap year, but in Lotus 1-2-3 it was faulty interpreted as a leap year.
-   *
-   * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
-   *
-   * @default false
-   * 
-   * @category Date
-   */
+  /** @inheritDoc */
   public readonly leapYear1900: boolean
-  /**
-   * Enables numeric matrix detection feature when set to 'true'.
-   *
-   * During build phase each rectangular area of numbers will be treated as one matrix vertex in order to optimize further calculations.
-   *
-   * Some CRUD operations may break numeric matrices into individual vertices if needed.
-   *
-   * @default true
-   * 
-   * @category Engine
-   */
+  /** @inheritDoc */
   public readonly matrixDetection: boolean
-  /**
-   * Specifies whether punctuation should be ignored in string comparison.
-   *
-   * @default false
-   * 
-   * @category String
-   */
+  /** @inheritDoc */
   public readonly ignorePunctuation: boolean
-  /**
-   * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
-   *
-   * @default 'en'
-   * 
-   * @category String 
-   */
+  /** @inheritDoc */
   public readonly localeLang: string
-  /**
-   * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
-   *
-   * @default 100
-   * 
-   * @category Engine 
-   */
+  /** @inheritDoc */
   public readonly matrixDetectionThreshold: number
-  /**
-   * Two-digit values when interpreted as a year can be either 19xx or 20xx.
-   *
-   * If `xx <= nullYear` its latter, otherwise its former.
-   *
-   * @default 30
-   * 
-   * @category Date 
-   */
+  /** @inheritDoc */
   public readonly nullYear: number
-  /**
-   * Allows to provide a function that takes a string representing date and parses it into an actual date.
-   *
-   * @default parseDateFromFormats
-   * 
-   * @category Date 
-   */
+  /** @inheritDoc */
   public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
-  /**
-   * Allows to provide a function that takes date and prints it into string.
-   *
-   * @default defaultStringifyDate
-   * 
-   * @category Date 
-   */
+  /** @inheritDoc */
   public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
-  /**
-   * Controls how far two numerical values need to be from each other to be treated as non-equal.
-   *
-   * `a` and `b` are equal if they are of the same sign and:
-   *
-   * `abs(a) <= (1+precisionEpsilon) * abs(b)`
-   *
-   * and
-   *
-   * `abs(b) <= (1+precisionEpsilon) * abs(a)`
-   *
-   * It also controls snap-to-zero behavior for additions/subtractions:
-   *
-   * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
-   *
-   * @default 1e-13
-   * 
-   * @category Number 
-   */
+  /** @inheritDoc */
   public readonly precisionEpsilon: number
-  /**
-   * Sets how precise the calculation should be.
-   *
-   * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
-   *
-   * @default 14
-   * 
-   * @category Number
-   */
+  /** @inheritDoc */
   public readonly precisionRounding: number
-  /**
-   * Sets the rounding.
-   *
-   * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
-   *
-   * @default true
-   * 
-   * @category Number
-   */
+  /** @inheritDoc */
   public readonly smartRounding: boolean
-  /**
-   * Switches column search strategy from binary search to column index.
-   *
-   * Used by VLOOKUP and MATCH procedures.
-   *
-   * Using column index may improve time efficiency but it will increase memory usage.
-   *
-   * In some scenarios column index may fall back to binary search despite of this flag.
-   *
-   * @default false
-   * 
-   * @category Engine
-   */
+  /** @inheritDoc */
   public readonly useColumnIndex: boolean
-  /**
-   * Determines minimum number of elements a range must have in order to use binary search.
-   *
-   * Shorter ranges will be searched naively.
-   *
-   * Used by VLOOKUP and MATCH procedures.
-   *
-   * @default 20
-   * 
-   * @category Engine
-   */
+  /** @inheritDoc */
   public readonly vlookupThreshold: number
-  /**
-   * Allows to set a specific date from which the number of days will be counted.
-   *
-   * Dates are represented internally as a number of days that passed since this `nullDate`.
-   *
-   * @default {year: 1899, month: 12, day: 30}
-   *
-   * @category Date
-   */
+  /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /**
    * Built automatically based on translation package.
