@@ -154,15 +154,16 @@ describe('Undo', () => {
     }).toThrowError(new NoOperationToUndo())
   })
 
-  it('undo recomputes', () => {
+  it('undo recomputes and return changes', () => {
     const engine = HyperFormula.buildFromArray([
       ['3', '=A1'],
     ])
     engine.setCellContents(adr('A1'), '100')
 
-    engine.undo()
+    const changes = engine.undo()
 
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(changes.length).toBe(2)
   })
 })
 
