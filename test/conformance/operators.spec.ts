@@ -9,7 +9,7 @@ import { EmptyValue } from '../../src/Cell'
 
 
 const data =
-    ['=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
+    ['=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%', ]
 
 function createEngine(data: any[][]) {
   const engine = HyperFormula.buildFromArray(data)
@@ -52,7 +52,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('C1')).toEqual(false)  // EQUAL
     expect(engine.getCellValue('D1')).toEqual(true) // GT    
     expect(engine.getCellValue('E1')).toEqual(false) // LT   
-    expect(engine.getCellValue('F1')).toEqual(true) // GTE   //true
+    expect(engine.getCellValue('F1')).toEqual(true) // GTE   
     expect(engine.getCellValue('G1')).toEqual(false) // LTE  
     expect(engine.getCellValue('H1')).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue('I1')).toEqual(1) // ADD  
@@ -80,14 +80,14 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('M1')).toEqual(0) // EXP
   })
 
-  it('BLANK and FALSE should be supported by all comparison operators', () => { //pending for #194
+  it('BLANK and FALSE should be supported by all comparison operators', () => { 
     const engine = createEngine([
       [EmptyValue, false, ...data]
     ])
 
     expect(engine.getCellValue('D1')).toEqual(false) // GT    
-    //expect(engine.getCellValue('E1')).toEqual(false) // LT return true
-    //expect(engine.getCellValue('F1')).toEqual(true) // GTE return true
+    expect(engine.getCellValue('E1')).toEqual(false) // LT 
+    expect(engine.getCellValue('F1')).toEqual(true) // GTE 
     expect(engine.getCellValue('G1')).toEqual(true) // LTE  
     expect(engine.getCellValue('J1')).toEqual(0) // SUB  value
     expect(engine.getCellValue('M1')).toEqual(1) // EXP  value
@@ -99,8 +99,8 @@ describe('Quality assurance of operators', () => {
     ])
 
     expect(engine.getCellValue('D1')).toEqual(false) // GT    
-    //expect(engine.getCellValue('E1')).toEqual(false) // LT  return true
-    //expect(engine.getCellValue('F1')).toEqual(true) // GTE  return false 
+    expect(engine.getCellValue('E1')).toEqual(false) // LT  
+    expect(engine.getCellValue('F1')).toEqual(true) // GTE  
     expect(engine.getCellValue('G1')).toEqual(true) // LTE  
     expect(engine.getCellValue('J1')).toEqual(0) // SUB  value
     expect(engine.getCellValue('M1')).toEqual(1) // EXP  value
@@ -206,7 +206,6 @@ describe('Quality assurance of operators', () => {
   it('error #N/A! with every combination should be supported by all comparison operators', () => {
     const engine = createEngine([
       ['#N/A', '#N/A', ...data],
-
     ])
 
     expect(engine.getCellValue('C1')).toEqual(new DetailedCellError(new CellError(ErrorType.NA), '#N/A'))  // EQUAL
@@ -333,7 +332,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('L1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // DIV
     expect(engine.getCellValue('M1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // EXP
     expect(engine.getCellValue('N1')).toEqual('Liz') // CONCAT
-    expect(engine.getCellValue('O1')).toEqual('Liz') // UNARY PLUS pending for #212
+    expect(engine.getCellValue('O1')).toEqual('Liz') // UNARY PLUS 
     expect(engine.getCellValue('P1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // UNARY MINUS
     expect(engine.getCellValue('Q1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) // PERCENTAGE
   })
@@ -363,10 +362,10 @@ describe('Quality assurance of operators', () => {
     ])
 
     expect(engine.getCellValue('C1')).toEqual(false)  // EQUAL
-    expect(engine.getCellValue('D1')).toEqual(false) // GT true
-    //expect(engine.getCellValue('E1')).toEqual(true); // LT false
-    expect(engine.getCellValue('F1')).toEqual(false) // GTE true
-    expect(engine.getCellValue('G1')).toEqual(true); // LTE false
+    expect(engine.getCellValue('D1')).toEqual(false) // GT 
+    expect(engine.getCellValue('E1')).toEqual(true) // LT 
+    expect(engine.getCellValue('F1')).toEqual(false) // GTE 
+    expect(engine.getCellValue('G1')).toEqual(true) // LTE 
     expect(engine.getCellValue('H1')).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue('I1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //ADD
     expect(engine.getCellValue('J1')).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#VALUE!')) //SUB
@@ -416,7 +415,7 @@ describe('Quality assurance of operators', () => {
 
   it('Str Num and other Str Num be supported by all comparison operators', () => {
     const engine = createEngine([
-      [2.7, 3.54, ...data]
+      [2.7, 3.54, ...data],
     ])
 
     expect(engine.getCellValue('C1')).toEqual(false)  // EQUAL
@@ -433,7 +432,8 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('N1')).toEqual('2.73.54') // CONCAT    
     expect(engine.getCellValue('O1')).toEqual(2.7) // UNARY PLUS   
     expect(engine.getCellValue('P1')).toEqual(-2.7) // UNARY MINUS  
-    expect(engine.getCellValue('Q1')).toEqual(0.027) // PERCENTAGE  
+    expect(engine.getCellValue('Q1')).toEqual(0.027) // PERCENTAGE 
+
   })
 
   it('Integer and other Integer be supported by all comparison operators', () => {
@@ -576,6 +576,7 @@ describe('Quality assurance of operators', () => {
     expect(engine.getCellValue('M1')).toEqual(0) // EXP  
     expect(engine.getCellValue('N1')).toEqual('036192') // CONCAT     
   })
+
 
 })
 
