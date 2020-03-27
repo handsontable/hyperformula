@@ -1,6 +1,6 @@
 import {deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
-import {AbstractRange} from '../src/AbsoluteCellRange'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {
   EmptyCellVertex,
@@ -72,8 +72,8 @@ export class EngineComparator {
           throw Error('Different vertex types')
         }
 
-        const expectedAdjacentAddresses = new Set<SimpleCellAddress | AbstractRange>()
-        const actualAdjacentAddresses = new Set<SimpleCellAddress | AbstractRange>()
+        const expectedAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
+        const actualAdjacentAddresses = new Set<SimpleCellAddress | AbsoluteCellRange>()
 
         for (const adjacentNode of expectedGraph.adjacentNodes(expectedVertex)) {
           expectedAdjacentAddresses.add(this.getAddressOfVertex(this.expected, adjacentNode))
@@ -87,7 +87,7 @@ export class EngineComparator {
     }
   }
 
-  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbstractRange {
+  private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {
     if (vertex instanceof RangeVertex) {
       return vertex.range
     }

@@ -4,31 +4,8 @@ import {AstNodeType, CellAddress, CellRangeAst} from './parser'
 import {ColumnRangeAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
-export const INFINITE_CELL_RANGE = 'AbsoluteCellRange: Cannot instantiate cell range of infinite size'
 
-export abstract class AbstractRange {
-  abstract get start(): SimpleCellAddress
-  abstract get end(): SimpleCellAddress
-  abstract containsRange(range: AbstractRange): boolean
-  abstract doesOverlap(range: AbstractRange): boolean
-  abstract addressInRange(address: SimpleCellAddress): boolean
-  abstract includesRow(row: number): boolean
-  abstract includesColumn(col: number): boolean
-  abstract expandByRows(numberOfRows: number): void
-  abstract expandByColumns(numberOfColumns: number): void
-  abstract shiftByRows(numberOfRows: number): void
-  abstract shiftByColumns(numberOfColumns: number): void
-  abstract moveToSheet(sheet: number): void
-  abstract removeRows(rowStart: number, rowEnd: number): void
-  abstract removeColumns(columnStart: number, columnEnd: number): void
-  abstract shouldBeRemoved(): boolean
-  abstract subrangeWithSameWidth(startRow: number, numberOfRows: number): AbstractRange
-  abstract subrangeWithSameHeight(startCol: number, numberOfColumns: number): AbstractRange
-  abstract addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress>
-  abstract intersectionWith(other: AbstractRange): AbsoluteCellRange | null
-}
-
-export class AbsoluteCellRange extends AbstractRange {
+export class AbsoluteCellRange {
   public get sheet() {
     return this.start.sheet
   }
@@ -69,13 +46,12 @@ export class AbsoluteCellRange extends AbstractRange {
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,
   ) {
-    super()
     if (start.sheet !== end.sheet) {
       throw new Error(DIFFERENT_SHEETS_ERROR)
     }
   }
 
-  public doesOverlap(other: AbstractRange): boolean {
+  public doesOverlap(other: AbsoluteCellRange): boolean {
     if (this.start.sheet != other.start.sheet) {
       return false
     }
@@ -101,11 +77,11 @@ export class AbsoluteCellRange extends AbstractRange {
     return false
   }
 
-  public containsRange(range: AbstractRange): boolean {
+  public containsRange(range: AbsoluteCellRange): boolean {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
   }
 
-  public intersectionWith(other: AbstractRange): AbsoluteCellRange | null {
+  public intersectionWith(other: AbsoluteCellRange): AbsoluteCellRange | null {
     if (this.sheet !== other.start.sheet) {
       return null
     }
