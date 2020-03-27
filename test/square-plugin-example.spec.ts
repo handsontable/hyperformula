@@ -1,6 +1,6 @@
 import {HyperFormula} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {enGB, extendFunctions} from '../src/i18n'
+import {enGB} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'
@@ -41,16 +41,13 @@ class SquarePlugin extends FunctionPlugin {
 
 describe('Documentation example spec', () => {
   it('works', () => {
-    const enGBextended = extendFunctions(enGB, {
-      SQUARE: 'SQUARE',
-    })
-    HyperFormula.registerLanguage('enGBextended', enGBextended)
+    HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
     const engine = HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],
       ['=SQUARE(1/0)'],
-    ], { functionPlugins: [SquarePlugin], language: 'enGBextended' })
+    ], { functionPlugins: [SquarePlugin]})
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedError(ErrorType.VALUE))

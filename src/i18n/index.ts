@@ -31,14 +31,6 @@ export class TranslationPackage implements RawTranslationPackage {
 
 }
 
-export const extendFunctions = (pkg: RawTranslationPackage, additionalFunctionTranslations: TranslationSet): RawTranslationPackage => {
-  return {
-    functions: Object.assign({}, pkg.functions, additionalFunctionTranslations),
-    errors: pkg.errors,
-    ui: pkg.ui,
-  }
-}
-
 export const languages: Record<string, RawTranslationPackage> = {
   plPL,
   enGB,
