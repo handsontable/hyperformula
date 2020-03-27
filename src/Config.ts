@@ -4,7 +4,7 @@ import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {HyperFormula} from './index'
 import {defaultPrintDate} from './format/format'
-import {enGB, RawTranslationPackage} from './i18n'
+import {buildTranslationPackage, enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
@@ -429,7 +429,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly translationPackage: RawTranslationPackage
+  public readonly translationPackage: TranslationPackage
 
   constructor(
     {
@@ -481,8 +481,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.translationPackage = HyperFormula.getLanguage(this.language)
-    this.errorMapping = this.buildErrorMapping(this.translationPackage)
+    this.translationPackage = buildTranslationPackage(HyperFormula.getLanguage(this.language))
+    this.errorMapping = this.translationPackage.buildErrorMapping()
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
@@ -495,8 +495,12 @@ export class Config implements ConfigParams, ParserConfig {
     )
   }
 
+  public getConfig(): ConfigParams { //TODO: avoid pollution
+    return this
+  }
+
   public mergeConfig(init: Partial<ConfigParams>): Config {
-    const mergedConfig: ConfigParams = Object.assign({}, this as ConfigParams, init)
+    const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
   }
@@ -565,13 +569,6 @@ export class Config implements ConfigParams, ParserConfig {
       })
     }
     return ret
-  }
-
-  private buildErrorMapping(language: RawTranslationPackage): Record<string, ErrorType> {
-    return Object.keys(language.errors).reduce((ret, key) => {
-      ret[language.errors[key as ErrorType]] = key as ErrorType
-      return ret
-    }, {} as Record<string, ErrorType>)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

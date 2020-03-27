@@ -12,7 +12,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {enGB, RawTranslationPackage, TranslationPackage} from './i18n'
+import {buildTranslationPackage, enGB, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -185,7 +185,7 @@ export class HyperFormula implements TypedEmitter {
     if(this.registeredLanguages.has(code)) {
       throw new Error('Language already registered.')
     } else {
-      this.registeredLanguages.set(code, new TranslationPackage(lang.functions, lang.errors, lang.ui))
+      this.registeredLanguages.set(code, buildTranslationPackage(lang))
     }
   }
 
