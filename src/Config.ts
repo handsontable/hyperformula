@@ -426,6 +426,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly errorMapping: Record<string, ErrorType>
   /**
    * Built automatically based on language.
+   *
+   * @internal
    */
   public readonly translationPackage: TranslationPackage
 
