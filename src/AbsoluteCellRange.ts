@@ -25,6 +25,7 @@ export abstract class AbstractRange {
   abstract subrangeWithSameWidth(startRow: number, numberOfRows: number): AbstractRange
   abstract subrangeWithSameHeight(startCol: number, numberOfColumns: number): AbstractRange
   abstract addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress>
+  abstract intersectionWith(other: AbstractRange): AbsoluteCellRange | null
 }
 
 export class AbsoluteCellRange extends AbstractRange {
@@ -102,6 +103,24 @@ export class AbsoluteCellRange extends AbstractRange {
 
   public containsRange(range: AbstractRange): boolean {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
+  }
+
+  public intersectionWith(other: AbstractRange): AbsoluteCellRange | null {
+    if (this.sheet !== other.start.sheet) {
+      return null
+    }
+    const startRow = Math.max(this.start.row, other.start.row)
+    const endRow = Math.min(this.end.row, other.end.row)
+    const startCol = Math.max(this.start.col, other.start.col)
+    const endCol = Math.min(this.end.col, other.end.col)
+    if (startRow > endRow || startCol > endCol) {
+      return null
+    }
+
+    return new AbsoluteCellRange(
+      simpleCellAddress(this.sheet, startCol, startRow),
+      simpleCellAddress(this.sheet, endCol, endRow),
+    )
   }
 
   public includesRow(row: number): boolean {

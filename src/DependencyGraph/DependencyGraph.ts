@@ -138,6 +138,9 @@ export class DependencyGraph {
         }
 
         this.graph.addNode(rangeVertex)
+        if (range instanceof AbsoluteColumnRange) {
+          this.graph.markNodeAsColumnRange(rangeVertex)
+        }
 
         const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
         if (smallerRangeVertex) {
@@ -156,10 +159,27 @@ export class DependencyGraph {
           }
         }
         this.graph.addEdge(rangeVertex, endVertex)
+
+        if (!(range instanceof AbsoluteColumnRange)) {
+          this.correctInfiniteRangesDependencies(rangeVertex)
+        }
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
       }
     })
+  }
+
+  private correctInfiniteRangesDependencies(vertex: RangeVertex) {
+    for (const columnRange of this.graph.columnRanges) {
+      const columnVertex = (columnRange as RangeVertex)
+      const intersection = vertex.range.intersectionWith(columnVertex.range)
+      if (intersection === null) {
+        continue
+      }
+      for (const address of intersection.addresses(this)) {
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), columnRange)
+      }
+    }
   }
 
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {

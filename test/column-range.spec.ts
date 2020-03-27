@@ -11,6 +11,25 @@ describe('Column ranges', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
   })
 
+  it('should create correct edges for infinite range when building graph', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)', '=SUM(C5:D6)'],
+    ])
+
+
+    const cd = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))!
+
+    const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
+    const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
+    const d5 = engine.dependencyGraph.fetchCell(adr('D5'))
+    const d6 = engine.dependencyGraph.fetchCell(adr('D6'))
+
+    expect(engine.graph.existsEdge(c5, cd)).toBe(true)
+    expect(engine.graph.existsEdge(c6, cd)).toBe(true)
+    expect(engine.graph.existsEdge(d5, cd)).toBe(true)
+    expect(engine.graph.existsEdge(d6, cd)).toBe(true)
+  })
+
   it('should create correct edges for infinite range', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(C:E)'],
@@ -37,5 +56,15 @@ describe('Column ranges', () => {
     expect(engine.graph.existsEdge(f42, dg)).toBe(true)
     expect(engine.graph.existsEdge(g42, dg)).toBe(true)
     expect(engine.graph.existsEdge(h42, dg)).toBe(false)
+  })
+
+  it('should clear column range set in graph when removing column', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(B:B)']
+    ])
+
+    engine.removeColumns(0, [1, 1])
+
+    expect(engine.graph.columnRanges.size).toBe(0)
   })
 })

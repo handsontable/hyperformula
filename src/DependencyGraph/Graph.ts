@@ -22,6 +22,7 @@ export class Graph<T> {
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
+  public columnRanges: Set<T> = new Set()
 
   /** Nodes adjacency mapping. */
   private edges: Map<T, Set<T>> = new Map()
@@ -167,6 +168,10 @@ export class Graph<T> {
 
   public clearSpecialNodesRecentlyChanged() {
     this.specialNodesRecentlyChanged.clear()
+  }
+
+  public markNodeAsColumnRange(node: T) {
+    this.columnRanges.add(node)
   }
 
   /**
