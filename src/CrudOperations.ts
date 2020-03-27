@@ -40,6 +40,7 @@ import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransfor
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import { Serialization } from './Serialization'
 
 export class CrudOperations {
 
@@ -190,7 +191,7 @@ export class CrudOperations {
     this.columnSearch.removeSheet(sheetId)
   }
 
-  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
+  public setCellContents(serialization: Serialization, topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
     if (!(cellContents instanceof Array)) {
       cellContents = [[cellContents]]
     } else {
@@ -215,7 +216,9 @@ export class CrudOperations {
         }
         this.ensureItIsPossibleToChangeContent(address)
         this.clipboardOperations.abortCut()
+        const oldContent = serialization.getCellSerialized(address)
         this.operations.setCellContent(address, cellContents[i][j])
+        this.undoRedo.saveOperationSetCellContents([{ address, newContent: cellContents[i][j], oldContent }])
       }
     }
   }

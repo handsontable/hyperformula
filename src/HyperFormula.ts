@@ -571,7 +571,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cell
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
-    this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
+    this._crudOperations.setCellContents(this.serialization, topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 

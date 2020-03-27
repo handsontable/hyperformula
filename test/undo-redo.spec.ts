@@ -2,6 +2,7 @@ import {HyperFormula, NoOperationToUndo, NoOperationToRedo} from '../src'
 import './testConfig'
 import {
   expectEngineToBeTheSameAs,
+  adr
 } from './testUtils'
 
 describe('UndoRedo - removing rows', () => {
@@ -163,6 +164,44 @@ describe('UndoRedo', () => {
     engine.removeRows(0, [1, 1])
     engine.undo()
     engine.redo()
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
+describe('Undo - setting cell content', () => {
+  it('works for simple values', () => {
+    const sheet = [
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('A1'), '100')
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for empty values', () => {
+    const sheet = [
+      [null],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('A1'), '100')
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works for formula values', () => {
+    const sheet = [
+      ['=42'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('A1'), '100')
 
     engine.undo()
 

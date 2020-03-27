@@ -3,14 +3,16 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from './Cell'
+import {SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {ClipboardCellType} from './ClipboardOperations'
+import {RawCellContent} from './CellContentParser'
 import {RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
 
 enum UndoStackElementType {
   REMOVE_ROWS = 'REMOVE_ROWS',
   ADD_ROWS = 'ADD_ROWS',
+  SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
 }
 
 interface RemoveRowsUndoData {
@@ -25,9 +27,19 @@ interface AddRowsUndoData {
   rowsAdditions: RowsAddition[],
 }
 
+interface SetCellContentsUndoData {
+  type: UndoStackElementType.SET_CELL_CONTENTS,
+  cellContents: {
+    address: SimpleCellAddress,
+    newContent: RawCellContent,
+    oldContent: NoErrorCellValue,
+  }[],
+}
+
 type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
+  | SetCellContentsUndoData
 
 export class UndoRedo {
 
@@ -46,6 +58,10 @@ export class UndoRedo {
 
   public saveOperationAddRows(addRowsCommand: AddRowsCommand, rowsAdditions: RowsAddition[]) {
     this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: addRowsCommand.sheet, rowsAdditions })
+  }
+
+  public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[]) {
+    this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -77,6 +93,10 @@ export class UndoRedo {
       }
       case UndoStackElementType.ADD_ROWS: {
         this.undoAddRows(operation)
+        break
+      }
+      case UndoStackElementType.SET_CELL_CONTENTS: {
+        this.undoSetCellContents(operation)
         break
       }
     }
@@ -115,6 +135,12 @@ export class UndoRedo {
     for (let i = rowsAdditions.length - 1; i >= 0; --i) {
       const rowsAddition = rowsAdditions[i]
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
+    }
+  }
+
+  private undoSetCellContents(operation: SetCellContentsUndoData) {
+    for (const cellContentData of operation.cellContents) {
+      this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.oldContent)
     }
   }
 
