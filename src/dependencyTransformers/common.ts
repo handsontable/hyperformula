@@ -42,6 +42,7 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       }
     }
     case AstNodeType.ERROR:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING: {
       return ast

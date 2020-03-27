@@ -2,7 +2,7 @@ import {DetailedCellError, HyperFormula} from '../src'
 import {CellType, CellValueType, EmptyValue, ErrorType} from '../src/Cell'
 import {enGB, plPL} from '../src/i18n'
 import './testConfig.ts'
-import {adr, detailedError, expectReferenceToHaveRefError} from './testUtils'
+import {adr, detailedError} from './testUtils'
 
 describe('Integration', () => {
   it('#loadSheet load simple sheet', () => {
@@ -130,7 +130,8 @@ describe('Integration', () => {
   it('should be possible to build graph with reference to not existing sheet', () => {
     const engine = HyperFormula.buildFromArray([['=Sheet2!A2']])
 
-    expectReferenceToHaveRefError(engine, adr('A1'))
+    expect(engine.getCellFormula(adr('A1'))).toEqual('=Sheet2!A2')
+    expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
   })
 
   it('#getCellFormula returns formula when present', () => {

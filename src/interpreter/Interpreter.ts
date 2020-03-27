@@ -20,16 +20,7 @@ import {Ast, AstNodeType} from '../parser/Ast'
 import {Statistics} from '../statistics/Statistics'
 import {coerceBooleanToNumber, coerceEmptyToValue, coerceScalarToNumberOrError} from './coerce'
 import {InterpreterValue, SimpleRangeValue} from './InterpreterValue'
-import {
-  add,
-  divide,
-  floatCmp,
-  multiply, numberCmp,
-  percent,
-  power,
-  subtract,
-  unaryminus
-} from './scalar'
+import {add, divide, floatCmp, multiply, numberCmp, percent, power, subtract, unaryminus} from './scalar'
 import {concatenate} from './text'
 import Collator = Intl.Collator
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -246,6 +237,7 @@ export class Interpreter {
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, formulaAddress)
       }
+      case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
         return ast.error
       }
