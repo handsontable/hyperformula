@@ -226,6 +226,9 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
 export function defaultParseToTime(timeString: string, timeFormat: string): Maybe<SimpleTime> {
   const timeItems = timeString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(':')
   const formatItems = timeFormat.toLowerCase().split(':')
+  if(timeItems.length !== formatItems.length) {
+    return undefined
+  }
   const hourIndex = formatItems.indexOf('hh')
   const minuteIndex = formatItems.indexOf('mm')
   const secondIndex = formatItems.indexOf('ss')
@@ -254,6 +257,9 @@ export function defaultParseToTime(timeString: string, timeFormat: string): Mayb
 export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
   const dateItems = dateString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g )
+  if(dateItems.length !== formatItems.length) {
+    return undefined
+  }
   const monthIndex  = formatItems.indexOf('mm')
   const dayIndex    = formatItems.indexOf('dd')
   const yearIndexLong   = formatItems.indexOf('yyyy')
