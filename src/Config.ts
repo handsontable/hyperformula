@@ -1,5 +1,5 @@
 import {ErrorType} from './Cell'
-import {defaultParseToDateTime, instanceOfSimpleDate, SimpleDate} from './DateTime'
+import {DateTime, defaultParseToDateTime, instanceOfSimpleDate, SimpleDate} from './DateTime'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
@@ -84,13 +84,23 @@ export interface ConfigParams {
   /**
    * A list of date formats that are supported by date parsing functions.
    *
-   * The separator is ignored and it can be any non-alpha-numeric symbol.
+   * The separator is ignored and it can be any of '-',' ','/'.
    *
-   * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
+   * Any order of YY, MM, DD is accepted as a date, and YY can be replaced with YYYY.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    */
   dateFormats: string[],
+  /**
+   * A list of time formats that are supported by time parsing functions.
+   *
+   * The separator is ':'.
+   *
+   * Any configuration of at least two of hh, mm, ss is accepted as a time, and they can be put in any order.
+   *
+   * @default ['hh:mm', 'hh:mm:ss']
+   */
+  timeFormats: string[],
   /**
    * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
@@ -183,11 +193,11 @@ export interface ConfigParams {
    */
   nullYear: number,
   /**
-   * Allows to provide a function that takes a string representing date and parses it into an actual date.
+   * Allows to provide a function that takes a string representing date-time and parses it into an actual date-time.
    *
    * @default defaultParseToDateTime
    */
-  parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
+  parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
    * Controls how far two numerical values need to be from each other to be treated as non-equal.
    *
@@ -271,6 +281,7 @@ export class Config implements ConfigParams, ParserConfig {
     ignorePunctuation: false,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY'],
+    timeFormats: ['hh:mm', 'hh:mm:ss'],
     functionArgSeparator: ',',
     decimalSeparator: '.',
     thousandSeparator: '',
@@ -283,7 +294,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetection: true,
     matrixDetectionThreshold: 100,
     nullYear: 30,
-    parseDate: defaultParseToDateTime,
+    parseDateTime: defaultParseToDateTime,
     stringifyDate: defaultStringifyDate,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
@@ -339,6 +350,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly dateFormats: string[]
   /** @inheritDoc */
+  public readonly timeFormats: string[]
+  /** @inheritDoc */
   public readonly functionArgSeparator: string
   /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
@@ -364,7 +377,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
+  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
   /** @inheritDoc */
   public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
   /** @inheritDoc */
@@ -393,6 +406,7 @@ export class Config implements ConfigParams, ParserConfig {
       caseFirst,
       chooseAddressMappingPolicy,
       dateFormats,
+      timeFormats,
       functionArgSeparator,
       decimalSeparator,
       thousandSeparator,
@@ -406,7 +420,7 @@ export class Config implements ConfigParams, ParserConfig {
       matrixDetection,
       matrixDetectionThreshold,
       nullYear,
-      parseDate,
+      parseDateTime,
       stringifyDate,
       precisionEpsilon,
       precisionRounding,
@@ -421,6 +435,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.ignorePunctuation = this.valueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy || Config.defaultConfig.chooseAddressMappingPolicy
     this.dateFormats = this.valueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
+    this.timeFormats = this.valueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')
     this.functionArgSeparator = this.valueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = this.valueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.thousandSeparator = this.valueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
@@ -437,7 +452,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
-    this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
+    this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')

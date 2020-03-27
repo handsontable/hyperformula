@@ -18,6 +18,8 @@ export interface SimpleTime {
 
 export type SimpleDateTime = SimpleDate & SimpleTime
 
+export type DateTime = SimpleTime | SimpleDate | SimpleDateTime
+
 export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
@@ -44,7 +46,7 @@ export class DateHelper {
   private minDateValue: number
   private maxDateValue: number
   private epochYearZero: number
-  private parseDate: (dateString: string, dateFormat: string) => Maybe<SimpleDate>
+  private parseDateTime: (dateString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>
   constructor(private readonly config: Config) {
     this.config = config
     this.minDateValue = this.dateToNumber(config.nullDate)
@@ -59,42 +61,51 @@ export class DateHelper {
     } else {
       this.epochYearZero = this.numberToDate(1).year
     }
-    this.parseDate = config.parseDate
+    this.parseDateTime = config.parseDateTime
   }
 
   public getWithinBounds(dayNumber: number) {
     return (dayNumber <= this.maxDateValue) && (dayNumber >= this.minDateValue)
   }
 
-  public dateStringToDateNumber(dateString: string): Maybe<number> {
-    const date = this.parseDateFromFormats(dateString, this.config.dateFormats) // should point to parseDateFromFormats()
-    return date!==undefined ? this.dateToNumber(date) : undefined
-  }
-
-  private parseDateSingleFormat(dateString: string, dateFormat: string): Maybe<SimpleDate> {
-    const date = this.parseDate(dateString, dateFormat)
-    if(date === undefined) {
+  public dateStringToDateNumber(dateTimeString: string): Maybe<number> {
+    const dateTime = this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
+    if(dateTime === undefined) {
       return undefined
     }
-    if(date.year >=0 && date.year < 100) {
-      if (date.year < this.getNullYear()) {
-        date.year += 2000
-      } else {
-        date.year += 1900
-      }
-    }
-    return this.isValidDate(date) ? date : undefined
+    return (instanceOfSimpleTime(dateTime) ? this.timeToNumber(dateTime) : 0) +
+      (instanceOfSimpleDate(dateTime) ? this.dateToNumber(dateTime) : 0)
   }
 
-  private parseDateFromFormats(dateString: string, dateFormats: string[]): Maybe<SimpleDate> {
+  private parseSingleFormat(dateString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
+    const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
+    if(instanceOfSimpleDate(dateTime)) {
+      if(dateTime.year >=0 && dateTime.year < 100) {
+        if (dateTime.year < this.getNullYear()) {
+          dateTime.year += 2000
+        } else {
+          dateTime.year += 1900
+        }
+      }
+      if(!this.isValidDate(dateTime)) {
+        return undefined
+      }
+    }
+    return dateTime
+  }
+
+  private parseDateTimeFromFormats(dateString: string, dateFormats: string[], timeFormats: string[]): Maybe<DateTime> {
     for (const dateFormat of dateFormats) {
-      const date = this.parseDateSingleFormat(dateString, dateFormat)
-      if (date !== undefined) {
-        return date
+      for (const timeFormat of timeFormats) {
+        const dateTime = this.parseSingleFormat(dateString, dateFormat, timeFormat)
+        if (dateTime !== undefined) {
+          return dateTime
+        }
       }
     }
     return undefined
   }
+
   public getNullYear() {
     return this.config.nullYear
   }
@@ -123,6 +134,10 @@ export class DateHelper {
 
   public dateToNumber(date: SimpleDate): number {
     return this.dateToNumberFromZero(date) - this.dateToNumberFromZero(this.config.nullDate)
+  }
+
+  public timeToNumber(time: SimpleTime): number {
+    return ((time.second/60+time.minute)/60+time.hour)/24
   }
 
   public numberToDate(arg: number): SimpleDate {
@@ -188,6 +203,26 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
   return {year: Math.floor(totalM / 12), month: totalM % 12 + 1, day: date.day}
 }
 
+export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
+  const splitByDateSep = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
+  if(splitByDateSep.length === 1) {
+    return defaultParseToTime(dateTimeString, timeFormat)
+  }
+  const splitByTimeSep = splitByDateSep[splitByDateSep.length-1].split(':' )
+  if(splitByTimeSep.length === 1) {
+    return defaultParseToDate(dateTimeString, dateFormat)
+  }
+  const parsedDate = defaultParseToDate(splitByDateSep.slice(0, splitByDateSep.length-1).join('-'), dateFormat)
+  const parsedTime = defaultParseToTime(splitByDateSep[splitByDateSep.length-1], timeFormat)
+  if(parsedDate===undefined) {
+    return undefined
+  } else if(parsedTime===undefined) {
+    return undefined
+  } else {
+    return {...parsedDate, ...parsedTime}
+  }
+}
+
 export function defaultParseToTime(timeString: string, timeFormat: string): Maybe<SimpleTime> {
   const timeItems = timeString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(':')
   const formatItems = timeFormat.toLowerCase().split(':')
@@ -195,19 +230,19 @@ export function defaultParseToTime(timeString: string, timeFormat: string): Mayb
   const minuteIndex = formatItems.indexOf('mm')
   const secondIndex = formatItems.indexOf('ss')
 
-  const hourString = timeItems[hourIndex]
+  const hourString = hourIndex!==-1 ? timeItems[hourIndex] : '0'
   if(! /^\d+$/.test(hourString)) {
     return undefined
   }
   const hour = Number(hourString)
 
-  const minuteString = timeItems[minuteIndex]
+  const minuteString = minuteIndex!==-1 ? timeItems[minuteIndex] : '0'
   if(! /^\d+$/.test(minuteString)) {
     return undefined
   }
   const minute = Number(minuteString)
 
-  const secondString = timeItems[secondIndex]
+  const secondString = secondIndex!==-1 ? timeItems[secondIndex] : '0'
   if(! /^\d+$/.test(secondString)) {
     return undefined
   }
@@ -216,7 +251,7 @@ export function defaultParseToTime(timeString: string, timeFormat: string): Mayb
   return {hour, minute, second}
 }
 
-export function defaultParseToDateTime(dateString: string, dateFormat: string): Maybe<SimpleDate> {
+export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
   const dateItems = dateString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g )
   const monthIndex  = formatItems.indexOf('mm')
@@ -265,6 +300,3 @@ export function defaultParseToDateTime(dateString: string, dateFormat: string): 
   return {year, month, day}
 }
 
-export function isValidTime(time: SimpleTime) {
-
-}

@@ -120,7 +120,7 @@ describe('Custom date parsing', () => {
   }
 
   it( 'moment-based custom parsing', () => {
-    const config = new Config({parseDate: customParseDate, dateFormats: ['Do MMM YY', 'DDD YYYY']})
+    const config = new Config({parseDateTime: customParseDate, dateFormats: ['Do MMM YY', 'DDD YYYY']})
     const dateHelper = new DateHelper(config)
     expect(dateHelper.dateStringToDateNumber('31st Jan 00')).toBe(36556)
     expect(dateHelper.dateStringToDateNumber('365 1900')).toBe(366)
