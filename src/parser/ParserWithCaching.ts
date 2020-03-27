@@ -96,7 +96,7 @@ export class ParserWithCaching {
       if (tokenMatcher(token, CellReference)) {
         const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
         if (cellAddress === undefined) {
-          hash = hash.concat('!REF')
+          hash = hash.concat(token.image)
         } else {
           hash = hash.concat(referenceHashFromCellAddress(cellAddress, true))
         }
@@ -165,6 +165,9 @@ export class ParserWithCaching {
           image = this.config.getErrorTranslationFor(ErrorType.ERROR)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
+      }
+      case AstNodeType.ERROR_WITH_RAW_INPUT: {
+        return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)

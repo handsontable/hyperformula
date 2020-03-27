@@ -421,6 +421,14 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Serializes and deserializes whole engine, effectively reloading it.
+   *
+   */
+  public rebuildAndRecalculate(): void {
+    this.updateConfig({})
+  }
+
+  /**
    * Returns snapshot of a computation time statistics.
    * 
    * It returns a map with key-value pairs where keys are enums for stat type and time (number)

@@ -71,6 +71,12 @@ describe('computeHashFromTokens', () => {
     expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('="fdsaf\\"A5"')
   })
 
+  it('cell ref to not exsiting sheet', () => {
+    const code = '=Sheet3!A1'
+
+    expect(computeFunc(code, simpleCellAddress(0, 1, 1))).toEqual('=Sheet3!A1')
+  })
+
   it('cell range', () => {
     const code = '=A5:B16'
 
