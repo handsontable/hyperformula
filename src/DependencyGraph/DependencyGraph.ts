@@ -139,8 +139,7 @@ export class DependencyGraph {
 
         this.graph.addNode(rangeVertex)
 
-        const {smallerRangeVertex, restRanges} = findSmallerRange(this, [range])
-        const restRange = restRanges[0]
+        const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }

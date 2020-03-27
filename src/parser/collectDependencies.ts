@@ -1,4 +1,5 @@
-import {Ast, AstNodeType, CellAddress, RelativeDependency} from './'
+import {Ast, AstNodeType, RelativeDependency} from './'
+import {RelativeDependencyType} from './RelativeDependency'
 
 const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, dependenciesSet: RelativeDependency[]) => {
   switch (ast.type) {
@@ -7,12 +8,27 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
     case AstNodeType.ERROR:
       return
     case AstNodeType.CELL_REFERENCE: {
-      dependenciesSet.push(ast.reference)
+      dependenciesSet.push({
+        type: RelativeDependencyType.CellAddress,
+        dependency: ast.reference
+      })
       return
     }
     case AstNodeType.CELL_RANGE: {
       if (ast.start.sheet === ast.end.sheet) {
-        dependenciesSet.push([ast.start, ast.end])
+        dependenciesSet.push({
+          type: RelativeDependencyType.CellRange,
+          dependency: [ast.start, ast.end]
+        })
+      }
+      return
+    }
+    case AstNodeType.COLUMN_RANGE: {
+      if (ast.start.sheet === ast.end.sheet) {
+        dependenciesSet.push({
+          type: RelativeDependencyType.ColumnRange,
+          dependency: [ast.start, ast.end]
+        })
       }
       return
     }

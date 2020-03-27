@@ -59,7 +59,7 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   if (result[5] === '$') {
     return ColumnAddress.absolute(sheet, col)
   } else {
-    return ColumnAddress.relative(sheet, col)
+    return ColumnAddress.relative(sheet, col - baseAddress.col)
   }
 }
 

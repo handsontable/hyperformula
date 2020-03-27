@@ -1,9 +1,10 @@
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
-import {CellAddress} from './parser'
+import {AstNodeType, CellAddress, CellRangeAst} from './parser'
 import {ColumnRangeAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
+export const INFINITE_CELL_RANGE = 'AbsoluteCellRange: Cannot instantiate cell range of infinite size'
 
 export abstract class AbstractRange {
   abstract get start(): SimpleCellAddress
@@ -29,6 +30,15 @@ export abstract class AbstractRange {
 export class AbsoluteCellRange extends AbstractRange {
   public get sheet() {
     return this.start.sheet
+  }
+
+  public static fromAst(ast: CellRangeAst | ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+    if (ast.type === AstNodeType.CELL_RANGE) {
+      return AbsoluteCellRange.fromCellRange(ast, baseAddress)
+    } else if (ast.type === AstNodeType.COLUMN_RANGE) {
+      return AbsoluteColumnRange.fromColumnRange(ast, baseAddress)
+    }
+    throw new Error('Unsupported AST type')
   }
 
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
@@ -280,12 +290,12 @@ export class AbsoluteCellRange extends AbstractRange {
 export class AbsoluteColumnRange extends AbsoluteCellRange {
   public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     return new AbsoluteColumnRange(
-      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, 0),
-      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, Number.POSITIVE_INFINITY)
+      x.start.toSimpleCellAddress(baseAddress),
+      x.end.toSimpleCellAddress(baseAddress)
     )
   }
 
-  private constructor(
+  public constructor(
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,
   ) {
@@ -308,9 +318,9 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return
   }
 
-  // public shifted(byCols: number, byRows: number): AbsoluteCellRange {
-  //   return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, 0), this.width(), this.height())
-  // }
+  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+    return new AbsoluteColumnRange(simpleCellAddress(this.sheet, this.start.col + byCols, 0), simpleCellAddress(this.sheet, this.end.col + byCols, Number.POSITIVE_INFINITY))
+  }
 
   public removeRows(rowStart: number, rowEnd: number) {
     return

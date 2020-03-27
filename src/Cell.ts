@@ -1,5 +1,6 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
+import {ColumnAddress} from './parser/ColumnAddress'
 
 /**
  * Possible errors returned by our interpreter.
@@ -119,7 +120,7 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
-export const absoluteSheetReference = (address: CellAddress, baseAddress: SimpleCellAddress): number => {
+export const absoluteSheetReference = (address: CellAddress | ColumnAddress, baseAddress: SimpleCellAddress): number => {
   return address.sheet === null ? baseAddress.sheet : address.sheet
 }
 

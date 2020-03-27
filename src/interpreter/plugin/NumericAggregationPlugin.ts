@@ -11,6 +11,7 @@ import {SimpleRangeValue} from '../InterpreterValue'
 import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
+import {ColumnRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -293,7 +294,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
-      if (arg.type === AstNodeType.CELL_RANGE) {
+      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
@@ -337,10 +338,10 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
-      range = AbsoluteCellRange.fromCellRange(ast, formulaAddress)
+      range = AbsoluteCellRange.fromAst(ast, formulaAddress)
     } catch (err) {
       if (err.message === DIFFERENT_SHEETS_ERROR) {
         return mapFunction(new CellError(ErrorType.VALUE))
@@ -374,8 +375,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    */
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>): T[] {
     const rangeResult: T[] = []
-    const {smallerRangeVertex, restRanges} = findSmallerRange(this.dependencyGraph, [range])
-    const restRange = restRanges[0]
+    const {smallerRangeVertex, restRange} = findSmallerRange(this.dependencyGraph, range)
     const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     if (smallerRangeVertex && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       const cachedValue: T = smallerRangeVertex.getFunctionValue(functionName) as T
