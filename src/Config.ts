@@ -4,7 +4,7 @@ import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {HyperFormula} from './index'
 import {defaultPrintDate} from './format/format'
-import {enGB, TranslationPackage} from './i18n'
+import {enGB, RawTranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
@@ -429,7 +429,7 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public readonly translationPackage: TranslationPackage
+  public readonly translationPackage: RawTranslationPackage
 
   constructor(
     {
@@ -567,7 +567,7 @@ export class Config implements ConfigParams, ParserConfig {
     return ret
   }
 
-  private buildErrorMapping(language: TranslationPackage): Record<string, ErrorType> {
+  private buildErrorMapping(language: RawTranslationPackage): Record<string, ErrorType> {
     return Object.keys(language.errors).reduce((ret, key) => {
       ret[language.errors[key as ErrorType]] = key as ErrorType
       return ret

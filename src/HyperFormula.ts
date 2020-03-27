@@ -12,7 +12,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {enGB, TranslationPackage} from './i18n'
+import {enGB, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,
@@ -172,8 +172,8 @@ export class HyperFormula implements TypedEmitter {
 
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
 
-  public static getLanguage(name: string): TranslationPackage {
-    const val = this.registeredLanguages.get(name)
+  public static getLanguage(code: string): TranslationPackage {
+    const val = this.registeredLanguages.get(code)
     if(val === undefined) {
       throw new Error('Language not registered.')
     } else {
@@ -181,15 +181,15 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
-  public static registerLanguage(name: string, lang: TranslationPackage): void {
-    if(this.registeredLanguages.has(name)) {
+  public static registerLanguage(code: string, lang: RawTranslationPackage): void {
+    if(this.registeredLanguages.has(code)) {
       throw new Error('Language already registered.')
     } else {
-      this.registeredLanguages.set(name, lang)
+      this.registeredLanguages.set(code, new TranslationPackage(lang.functions, lang.errors, lang.ui))
     }
   }
 
-  public static getRegisteredLanguages(): string[] {
+  public static getRegisteredLanguagesCodes(): string[] {
     return Array.from(this.registeredLanguages.keys())
   }
 

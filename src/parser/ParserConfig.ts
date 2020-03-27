@@ -1,10 +1,10 @@
 import {ErrorType} from '../Cell'
-import {TranslationPackage} from '../i18n'
+import {RawTranslationPackage} from '../i18n'
 
 export interface ParserConfig {
   functionArgSeparator: string,
   decimalSeparator: '.' | ',',
-  translationPackage: TranslationPackage,
+  translationPackage: RawTranslationPackage,
   errorMapping: Record<string, ErrorType>,
   volatileFunctions(): Set<string>,
   structuralChangeFunctions(): Set<string>,

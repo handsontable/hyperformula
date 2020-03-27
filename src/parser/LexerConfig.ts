@@ -1,6 +1,6 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
-import {enGB, TranslationPackage} from '../i18n'
+import {enGB, RawTranslationPackage} from '../i18n'
 import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
@@ -172,7 +172,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   }
 }
 
-const buildFunctionMapping = (language: TranslationPackage): Record<string, string> => {
+const buildFunctionMapping = (language: RawTranslationPackage): Record<string, string> => {
   return Object.keys(language.functions).reduce((ret, key) => {
     ret[language.functions[key]] = key
     return ret

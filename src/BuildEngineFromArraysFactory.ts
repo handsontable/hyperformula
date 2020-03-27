@@ -74,7 +74,7 @@ export class BuildEngineFromArraysFactory {
 
   public buildFromSheet(sheet: Sheet, configInput?: Partial<ConfigParams>): HyperFormula {
     const config = new Config(configInput)
-    const newsheetprefix = (config.translationPackage?.interface?.NEW_SHEET_PREFIX ?? enGB.interface.NEW_SHEET_PREFIX) + '1'
+    const newsheetprefix = (config.translationPackage?.ui?.NEW_SHEET_PREFIX ?? enGB.ui.NEW_SHEET_PREFIX) + '1'
     return this.buildWithConfig({[newsheetprefix]: sheet}, config)
   }
 }
