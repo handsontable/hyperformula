@@ -153,6 +153,17 @@ describe('Undo', () => {
       engine.undo()
     }).toThrowError(new NoOperationToUndo())
   })
+
+  it('undo recomputes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3', '=A1'],
+    ])
+    engine.setCellContents(adr('A1'), '100')
+
+    engine.undo()
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+  })
 })
 
 describe('UndoRedo', () => {
