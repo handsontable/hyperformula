@@ -12,8 +12,12 @@ export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgum
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
-    /* TODO range intersection */
-    return [...vertex.range.addresses(dependencyGraph)].filter((d) => range.addressInRange(d))
+    const intersection = vertex.range.intersectionWith(range)
+    if (intersection !== null) {
+      return Array.from(intersection.addresses(dependencyGraph))
+    } else {
+      return []
+    }
   }
 
   let formula: Ast
