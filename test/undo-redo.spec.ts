@@ -364,4 +364,17 @@ describe('Redo', () => {
       engine.redo()
     }).toThrowError(new NoOperationToRedo())
   })
+
+  it('redo recomputes and return changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3', '=A1'],
+    ])
+    engine.setCellContents(adr('A1'), '100')
+    engine.undo()
+
+    const changes = engine.redo()
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(100)
+    expect(changes.length).toBe(2)
+  })
 })
