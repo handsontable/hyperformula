@@ -1,7 +1,8 @@
 import {CellAddress} from './'
 import {ColumnAddress} from './ColumnAddress'
 
-export type RelativeDependency = AddressDependency | CellRangeDependency | ColumnRangeDependency
+export type RangeDependency = CellRangeDependency | ColumnRangeDependency
+export type RelativeDependency = AddressDependency | RangeDependency
 
 export enum RelativeDependencyType {
   CellAddress,

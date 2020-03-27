@@ -2,7 +2,13 @@ import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {CellAddressTransformerFunction, CellRangeTransformerFunction, fixFormulaVertexColumn, transformAddressesInFormula} from './common'
+import {
+  CellAddressTransformerFunction,
+  CellRangeTransformerFunction,
+  columnRangeTransformer,
+  fixFormulaVertexColumn,
+  transformAddressesInFormula
+} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(removedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -16,7 +22,8 @@ export namespace RemoveColumnsDependencyTransformer {
 
   export function transformSingleAst(removedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = cellAddressTransformer(removedColumns)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(removedColumns, transformCellAddressFn))
+    const transformColumnAddressFn = columnRangeTransformer(transformCellAddressFn)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(removedColumns, transformCellAddressFn), transformColumnAddressFn)
     return [newAst, fixFormulaVertexColumn(nodeAddress, removedColumns.sheet, removedColumns.columnStart, -removedColumns.numberOfColumns)]
   }
 

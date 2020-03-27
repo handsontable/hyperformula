@@ -149,6 +149,7 @@ export class Graph<T> {
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
+    this.columnRanges.delete(node)
     this.removeDependencies(node)
   }
 

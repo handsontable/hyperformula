@@ -322,7 +322,7 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   }
 
   public shouldBeRemoved() {
-    return false
+    return this.width() <= 0
   }
 
   private effectiveHeight(dependencyGraph: DependencyGraph): number {
