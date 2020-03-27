@@ -27,7 +27,7 @@ describe('Plugins', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
-  it('cleanup',  () => {
+  xit('cleanup',  () => {
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
