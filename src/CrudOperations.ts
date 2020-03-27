@@ -192,18 +192,16 @@ export class CrudOperations {
 
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
     if (!(cellContents instanceof Array)) {
-      this.ensureItIsPossibleToChangeContent(topLeftCornerAddress)
-      this.clipboardOperations.abortCut()
-      this.operations.setCellContent(topLeftCornerAddress, cellContents)
-      return
-    }
-    for (let i = 0; i < cellContents.length; i++) {
-      if (!(cellContents[i] instanceof Array)) {
-        throw new InvalidArgumentsError('an array of arrays or a raw cell value')
-      }
-      for (let j = 0; j < cellContents[i].length; j++) {
-        if (isMatrix(cellContents[i][j])) {
-          throw new Error('Cant change matrices in batch operation')
+      cellContents = [[cellContents]]
+    } else {
+      for (let i = 0; i < cellContents.length; i++) {
+        if (!(cellContents[i] instanceof Array)) {
+          throw new InvalidArgumentsError('an array of arrays or a raw cell value')
+        }
+        for (let j = 0; j < cellContents[i].length; j++) {
+          if (isMatrix(cellContents[i][j])) {
+            throw new Error('Cant change matrices in batch operation')
+          }
         }
       }
     }
