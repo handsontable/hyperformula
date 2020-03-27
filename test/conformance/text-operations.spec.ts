@@ -18,7 +18,7 @@ function createEngine(data: any[][]) {
   }
 }
 
-describe('Text arithmetic and logical comparision', () => { //pending on PR #203
+describe('Text arithmetic and logical comparision', () => { 
   it('"Aaa", "Aaa" should be supported by all operators', () => {
     const engine = HyperFormula.buildFromArray([
       ['Aaa', 'Aaa', ...data],
@@ -107,16 +107,16 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
   })
 
-  it('"jaźŃ", "ąęćńóśżź" should be supported by all operators', () => { //pending on #225
+  it('"jaźŃ", "ąęćńóśżź" should be supported by all operators', () => { 
     const engine = HyperFormula.buildFromArray([
       ['jaźŃ', 'ąęćńóśżź', ...data],
     ], new Config({ caseSensitive : true, language: plPL}))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(false)  // EQUAL
-    //expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
-    //expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
-    //expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
-    //expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTEgs
+    expect(engine.getCellValue(adr('D1'))).toEqual(true) // GT
+    expect(engine.getCellValue(adr('E1'))).toEqual(false) // LT
+    expect(engine.getCellValue(adr('F1'))).toEqual(true) // GTE
+    expect(engine.getCellValue(adr('G1'))).toEqual(false) // LTE
     expect(engine.getCellValue(adr('H1'))).toEqual(true) // NOT EQUAL
     expect(engine.getCellValue(adr('I1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // ADD
     expect(engine.getCellValue(adr('J1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // SUB
@@ -343,7 +343,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('Q1'))).toEqual(new DetailedCellError(new CellError(ErrorType.VALUE), '#ARG!')) // PERCENTAGE
   })
 
-  it('Chinese characters compared among themselves ', () => { //based on E
+  it('Chinese characters compared among themselves ', () => { 
     const engine = HyperFormula.buildFromArray([
       ['人名', '發', ...data],
     ], new Config({ caseSensitive : false, language: plPL }))
@@ -362,7 +362,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('N1'))).toEqual('人名發') // CONCAT 
   })
 
-  it('Traditional Chinese character compared with a simplified one', () => { ////based on E
+  it('Traditional Chinese character compared with a simplified one', () => { 
     const engine = HyperFormula.buildFromArray([
       ['發', '发', ...data],
     ], new Config({ caseSensitive : false, language: plPL }))
@@ -441,7 +441,7 @@ describe('Text arithmetic and logical comparision', () => { //pending on PR #203
     expect(engine.getCellValue(adr('O1'))).toEqual('名人') // UNARY PLUS
   })
     
-  it('"名人" in Chinese compared to `Aa` without case sensetive ', () => { //pending on #225
+  it('"名人" in Chinese compared to `Aa` without case sensetive ', () => { 
     const engine = HyperFormula.buildFromArray([
       ['名人', 'Aa', ...data],
     ], new Config({ caseSensitive : false }))
