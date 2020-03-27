@@ -1,6 +1,7 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
 import {ColumnAddress} from './parser/ColumnAddress'
+import {Address} from './dependencyTransformers/common'
 
 /**
  * Possible errors returned by our interpreter.
@@ -108,6 +109,21 @@ export class CellError {
   }
 }
 
+export interface SimpleRowAddress {
+  row: number,
+  sheet: number,
+}
+
+export const simpleRowAddress = (sheet: number, row: number): SimpleRowAddress => ({sheet, row})
+
+export interface SimpleColumnAddress {
+  col: number,
+  sheet: number,
+}
+
+export const simpleColumnAddress = (sheet: number, col: number): SimpleColumnAddress => ({sheet, col})
+
+
 export interface SimpleCellAddress {
   col: number,
   row: number,
@@ -120,7 +136,7 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
-export const absoluteSheetReference = (address: CellAddress | ColumnAddress, baseAddress: SimpleCellAddress): number => {
+export const absoluteSheetReference = (address: Address, baseAddress: SimpleCellAddress): number => {
   return address.sheet === null ? baseAddress.sheet : address.sheet
 }
 
@@ -128,8 +144,6 @@ export interface SheetCellAddress {
   col: number,
   row: number,
 }
-
-export const sheetCellAddress = (col: number, row: number): SheetCellAddress => ({col, row})
 
 export interface CellRange {
   start: CellAddress,

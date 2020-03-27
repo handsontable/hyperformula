@@ -1,8 +1,14 @@
-import {absoluteSheetReference, SimpleCellAddress} from '../Cell'
+import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
-import {Ast, CellAddress, ParserWithCaching} from '../parser'
-import {CellAddressTransformerFunction, cellRangeTransformer, fixFormulaVertexColumn, transformAddressesInFormula} from './common'
+import {Ast, ParserWithCaching} from '../parser'
+import {
+  AddressWithColumn,
+  CellAddressTransformerFunction,
+  cellRangeTransformer,
+  fixFormulaVertexColumn,
+  transformAddressesInFormula
+} from './common'
 
 export namespace AddColumnsDependencyTransformer {
   export function transform(addedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -16,12 +22,12 @@ export namespace AddColumnsDependencyTransformer {
 
   export function transformSingleAst(addedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = cellAddressTransformer(addedColumns)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(transformCellAddressFn))
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer<AddressWithColumn>(transformCellAddressFn))
     return [newAst, fixFormulaVertexColumn(nodeAddress, addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)]
   }
 
-  function cellAddressTransformer(addedColumns: ColumnsSpan): CellAddressTransformerFunction {
-    return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+  function cellAddressTransformer(addedColumns: ColumnsSpan): CellAddressTransformerFunction<AddressWithColumn> {
+    return (dependencyAddress: AddressWithColumn, formulaAddress: SimpleCellAddress): false | AddressWithColumn | ErrorType.REF  => {
       const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
       // Case 4 and 5
       if ((absoluteDependencySheet !== addedColumns.sheet)
@@ -29,7 +35,7 @@ export namespace AddColumnsDependencyTransformer {
         return false
       }
 
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleColumnAddress(formulaAddress)
 
       // Case 3
       if ((absoluteDependencySheet === addedColumns.sheet)
@@ -63,7 +69,7 @@ export namespace AddColumnsDependencyTransformer {
           return dependencyAddress.shiftedByColumns(addedColumns.numberOfColumns)
         }
       } else {
-        const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+        const absolutizedDependencyAddress = dependencyAddress.toSimpleColumnAddress(formulaAddress)
         if (absolutizedDependencyAddress.col < addedColumns.columnStart) {
           if (formulaAddress.col < addedColumns.columnStart) { // Case Raa
             return false

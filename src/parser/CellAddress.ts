@@ -1,4 +1,10 @@
-import {absoluteSheetReference, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  absoluteSheetReference,
+  simpleCellAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress, simpleRowAddress, SimpleRowAddress
+} from '../Cell'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -57,6 +63,25 @@ export class CellAddress {
       return simpleCellAddress(sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
   }
+
+  public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let column = this.col
+    if (this.isColumnRelative()) {
+      column += baseAddress.col
+    }
+    return simpleColumnAddress(sheet, column)
+  }
+
+  public toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let row = this.row
+    if (this.isRowRelative()) {
+      row += baseAddress.row
+    }
+    return simpleRowAddress(sheet, row)
+  }
+
 
   public isRowAbsolute(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)

@@ -17,7 +17,7 @@ describe('Column ranges', () => {
     ])
 
 
-    const cd = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))!
+    const cd = engine.rangeMapping.getRange(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))!
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
     const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
@@ -38,8 +38,8 @@ describe('Column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(D42:H42)')
 
-    const ce = engine.rangeMapping.getRange(simpleCellAddress(0, 2, 0), simpleCellAddress(0, 4, Number.POSITIVE_INFINITY))!
-    const dg = engine.rangeMapping.getRange(simpleCellAddress(0, 3, 0), simpleCellAddress(0, 6, Number.POSITIVE_INFINITY))!
+    const ce = engine.rangeMapping.getRange(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 4, Number.POSITIVE_INFINITY))!
+    const dg = engine.rangeMapping.getRange(simpleCellAddress(0, 3, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 6, Number.POSITIVE_INFINITY))!
 
     const d42 = engine.dependencyGraph.fetchCell(adr('D42'))
     const e42 = engine.dependencyGraph.fetchCell(adr('E42'))

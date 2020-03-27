@@ -3,7 +3,7 @@ import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {MoveCellsTransformation} from '../LazilyTransformingAstService'
 import {Ast, AstNodeType, CellAddress, ParserWithCaching} from '../parser'
-import {CellAddressTransformerFunction, cellRangeTransformer, transformAddressesInFormula} from './common'
+import {Address, CellAddressTransformerFunction, cellRangeTransformer, transformAddressesInFormula} from './common'
 
 export namespace MoveCellsDependencyTransformer {
   export function transform(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -35,7 +35,7 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction {
+  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction<CellAddress> {
     return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       const targetRange = sourceRange.shifted(toRight, toBottom)
 

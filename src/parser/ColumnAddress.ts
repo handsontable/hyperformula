@@ -1,4 +1,11 @@
-import {absoluteSheetReference, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {
+  absoluteSheetReference,
+  simpleCellAddress,
+  SimpleCellAddress,
+  simpleColumnAddress,
+  SimpleColumnAddress
+} from '../Cell'
+import {CellReferenceType} from './CellAddress'
 
 
 export enum ColumnReferenceType {
@@ -26,6 +33,23 @@ export class ColumnAddress {
     return new ColumnAddress(sheet, column, ColumnReferenceType.COLUMN_RELATIVE)
   }
 
+  public isColumnAbsolute(): boolean {
+    return (this.type === ColumnReferenceType.COLUMN_ABSOLUTE)
+  }
+
+  public shiftedByColumns(numberOfColumns: number): ColumnAddress {
+    return new ColumnAddress(this.sheet, this.col + numberOfColumns, this.type)
+  }
+
+  public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
+    const sheet = absoluteSheetReference(this, baseAddress)
+    let column = this.col
+    if (this.type === ColumnReferenceType.COLUMN_RELATIVE) {
+      column = baseAddress.col + this.col
+    }
+    return simpleColumnAddress(sheet, column)
+  }
+
   public toSimpleAddress(baseAddress: SimpleCellAddress): SimpleRange {
     const sheet = absoluteSheetReference(this, baseAddress)
     let column = this.col
@@ -34,7 +58,7 @@ export class ColumnAddress {
     }
 
     return {
-      start: simpleCellAddress(sheet, column, 0),
+      start: simpleCellAddress(sheet, column, Number.NEGATIVE_INFINITY),
       end: simpleCellAddress(sheet, column, Number.POSITIVE_INFINITY)
     }
   }

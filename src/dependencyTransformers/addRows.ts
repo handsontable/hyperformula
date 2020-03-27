@@ -2,7 +2,14 @@ import {absoluteSheetReference, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, ParserWithCaching} from '../parser'
 import {RowsSpan} from '../RowsSpan'
-import {CellAddressTransformerFunction, cellRangeTransformer, fixFormulaVertexRow, transformAddressesInFormula} from './common'
+import {
+  AddressWithColumn,
+  AddressWithRow,
+  CellAddressTransformerFunction,
+  cellRangeTransformer,
+  fixFormulaVertexRow,
+  transformAddressesInFormula
+} from './common'
 
 export namespace AddRowsDependencyTransformer {
   export function transform(addedRows: RowsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -16,12 +23,12 @@ export namespace AddRowsDependencyTransformer {
 
   export function transformSingleAst(addedRows: RowsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = cellAddressTransformer(addedRows)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(transformCellAddressFn))
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer<AddressWithRow>(transformCellAddressFn))
     return [newAst, fixFormulaVertexRow(nodeAddress, addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)]
   }
 
-  function cellAddressTransformer(addedRows: RowsSpan): CellAddressTransformerFunction {
-    return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+  function cellAddressTransformer(addedRows: RowsSpan): CellAddressTransformerFunction<AddressWithRow> {
+    return (dependencyAddress: AddressWithRow, formulaAddress: SimpleCellAddress) => {
       const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
       // Case 4 and 5
       if ((absoluteDependencySheet !== addedRows.sheet)
@@ -29,7 +36,7 @@ export namespace AddRowsDependencyTransformer {
         return false
       }
 
-      const absolutizedDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+      const absolutizedDependencyAddress = dependencyAddress.toSimpleRowAddress(formulaAddress)
 
       // Case 3
       if ((absoluteDependencySheet === addedRows.sheet)
