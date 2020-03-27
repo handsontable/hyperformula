@@ -5,7 +5,7 @@ import {
   adr
 } from './testUtils'
 
-describe('UndoRedo - removing rows', () => {
+describe('Undo - removing rows', () => {
   it('works for empty row', () => {
     const sheet = [
       ['1'],
@@ -104,7 +104,7 @@ describe('UndoRedo - removing rows', () => {
   })
 })
 
-describe('UndoRedo - adding rows', () => {
+describe('Undo - adding rows', () => {
   it('works', () => {
     const sheet = [
       ['1'], // add after that
@@ -145,7 +145,7 @@ describe('UndoRedo - adding rows', () => {
   })
 })
 
-describe('UndoRedo', () => {
+describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -153,7 +153,9 @@ describe('UndoRedo', () => {
       engine.undo()
     }).toThrowError(new NoOperationToUndo())
   })
+})
 
+describe('UndoRedo', () => {
   it('redo operation is pushed back on undo stack (undo-redo-undo)', () => {
     const sheet = [
       ['1'],
