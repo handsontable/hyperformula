@@ -315,6 +315,47 @@ describe('Redo - removing rows', () => {
   })
 })
 
+describe('Redo - setting cell content', () => {
+  it('works for simple values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3'],
+    ])
+    engine.setCellContents(adr('A1'), '100')
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for empty values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3'],
+    ])
+    engine.setCellContents(adr('A1'), null)
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for formula values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3'],
+    ])
+    engine.setCellContents(adr('A1'), '=42')
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()

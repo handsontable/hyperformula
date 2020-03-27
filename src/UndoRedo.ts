@@ -156,6 +156,10 @@ export class UndoRedo {
         this.redoRemoveRows(operation)
         break
       }
+      case UndoStackElementType.SET_CELL_CONTENTS: {
+        this.redoSetCellContents(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -165,6 +169,12 @@ export class UndoRedo {
     const { sheet, rowsRemovals } = operation
     for (const rowsRemoval of rowsRemovals) {
       this.crudOperations!.operations.removeRows(new RemoveRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
+    }
+  }
+
+  private redoSetCellContents(operation: SetCellContentsUndoData) {
+    for (const cellContentData of operation.cellContents) {
+      this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.newContent)
     }
   }
 }
