@@ -79,6 +79,7 @@ describe('#coerceScalarToNumberOrError', () => {
     expect(coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO), dateHelper, numberLiteralsHelper)).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
     expect(coerceScalarToNumberOrError('12/31/1899', dateHelper, numberLiteralsHelper)).toEqual(1)
+    expect(coerceScalarToNumberOrError('00:00:00', dateHelper, numberLiteralsHelper)).toEqual(0)
     expect(coerceScalarToNumberOrError(true, dateHelper, numberLiteralsHelper)).toEqual(1)
 
     expect(coerceScalarToNumberOrError('foo42', dateHelper, numberLiteralsHelper)).toEqual(new CellError(ErrorType.VALUE))
