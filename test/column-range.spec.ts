@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {adr} from './testUtils'
+import {adr, extractColumnRange, extractRange} from './testUtils'
 import {simpleCellAddress} from '../src/Cell'
 
 describe('Column ranges', () => {
@@ -66,5 +66,16 @@ describe('Column ranges', () => {
     engine.removeColumns(0, [1, 1])
 
     expect(engine.graph.columnRanges.size).toBe(0)
+  })
+
+  it('should transform relative column references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
+
+    const range = extractColumnRange(engine, adr('A2'))
+    console.log()
   })
 })

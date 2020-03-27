@@ -8,9 +8,9 @@ import {
 import {CellReferenceType} from './CellAddress'
 
 
-export enum ColumnReferenceType {
-  COLUMN_RELATIVE = 'COLUMN_RELATIVE',
-  COLUMN_ABSOLUTE = 'COLUMN_ABSOLUTE',
+export enum ReferenceType {
+  RELATIVE = 'RELATIVE',
+  ABSOLUTE = 'ABSOLUTE',
 }
 
 export interface SimpleRange {
@@ -22,19 +22,22 @@ export class ColumnAddress {
   private constructor(
     public readonly sheet: number | null,
     public readonly col: number,
-    public readonly type: ColumnReferenceType
+    public readonly type: ReferenceType
   ) {}
 
   public static absolute(sheet: number | null, column: number) {
-    return new ColumnAddress(sheet, column, ColumnReferenceType.COLUMN_ABSOLUTE)
+    return new ColumnAddress(sheet, column, ReferenceType.ABSOLUTE)
   }
 
   public static relative(sheet: number | null, column: number) {
-    return new ColumnAddress(sheet, column, ColumnReferenceType.COLUMN_RELATIVE)
+    return new ColumnAddress(sheet, column, ReferenceType.RELATIVE)
   }
 
   public isColumnAbsolute(): boolean {
-    return (this.type === ColumnReferenceType.COLUMN_ABSOLUTE)
+    return (this.type === ReferenceType.ABSOLUTE)
+  }
+  public isColumnRelative(): boolean {
+    return (this.type === ReferenceType.RELATIVE)
   }
 
   public shiftedByColumns(numberOfColumns: number): ColumnAddress {
@@ -44,7 +47,7 @@ export class ColumnAddress {
   public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
     const sheet = absoluteSheetReference(this, baseAddress)
     let column = this.col
-    if (this.type === ColumnReferenceType.COLUMN_RELATIVE) {
+    if (this.type === ReferenceType.RELATIVE) {
       column = baseAddress.col + this.col
     }
     return simpleColumnAddress(sheet, column)
@@ -53,13 +56,35 @@ export class ColumnAddress {
   public toSimpleAddress(baseAddress: SimpleCellAddress): SimpleRange {
     const sheet = absoluteSheetReference(this, baseAddress)
     let column = this.col
-    if (this.type === ColumnReferenceType.COLUMN_RELATIVE) {
+    if (this.type === ReferenceType.RELATIVE) {
       column = baseAddress.col + this.col
     }
 
     return {
       start: simpleCellAddress(sheet, column, Number.NEGATIVE_INFINITY),
       end: simpleCellAddress(sheet, column, Number.POSITIVE_INFINITY)
+    }
+  }
+
+  public shiftRelativeDimensions(toRight: number, toBottom: number): ColumnAddress {
+    const col = this.isColumnRelative() ? this.col : this.col + toRight
+    return new ColumnAddress(this.sheet, col, this.type)
+  }
+
+  public shiftAbsoluteDimensions(toRight: number, toBottom: number): ColumnAddress {
+    const col = this.isColumnAbsolute() ? this.col : this.col + toRight
+    return new ColumnAddress(this.sheet, col, this.type)
+  }
+
+  public hash(withSheet: boolean): string {
+    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    switch (this.type) {
+      case ReferenceType.RELATIVE: {
+        return `${sheetPart}#COLR${this.col}`
+      }
+      case ReferenceType.ABSOLUTE: {
+        return `${sheetPart}#COLA${this.col}`
+      }
     }
   }
 }

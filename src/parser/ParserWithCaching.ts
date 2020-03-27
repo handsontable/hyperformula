@@ -10,6 +10,7 @@ import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
 import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
+import {ColumnAddress} from './ColumnAddress'
 
 export interface ParsingResult {
   ast: Ast,
@@ -98,7 +99,7 @@ export class ParserWithCaching {
         if (cellAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
-          hash = hash.concat(referenceHashFromCellAddress(cellAddress, true))
+          hash = hash.concat(cellAddress.hash(true))
         }
         idx++
       } else if (tokenMatcher(token, ProcedureName)) {
@@ -141,15 +142,13 @@ export class ParserWithCaching {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.CELL_REFERENCE: {
-        return imageWithWhitespace(referenceHashFromCellAddress(ast.reference, true), ast.leadingWhitespace)
+        return imageWithWhitespace(ast.reference.hash(true), ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE:
       case AstNodeType.CELL_RANGE: {
-        const start = referenceHashFromCellAddress(ast.start, ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-        const end = referenceHashFromCellAddress(ast.end, ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
+        const start = ast.start.hash(ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+        const end = ast.end.hash(ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE)
         return imageWithWhitespace(start + ':' + end, ast.leadingWhitespace)
-      }
-      case AstNodeType.COLUMN_RANGE: {
-        throw Error("TODO")
       }
       case AstNodeType.MINUS_UNARY_OP: {
         return imageWithWhitespace('-' + this.computeHashOfAstNode(ast.value), ast.leadingWhitespace)
@@ -177,24 +176,6 @@ export class ParserWithCaching {
       default: {
         return this.computeHashOfAstNode(ast.left) + imageWithWhitespace(binaryOpTokenMap[ast.type], ast.leadingWhitespace) + this.computeHashOfAstNode(ast.right)
       }
-    }
-  }
-}
-
-export const referenceHashFromCellAddress = (cellAddress: CellAddress, withSheet: boolean): string => {
-  const sheetPart = withSheet && cellAddress.sheet !== null ? `#${cellAddress.sheet}` : ''
-  switch (cellAddress.type) {
-    case CellReferenceType.CELL_REFERENCE_RELATIVE: {
-      return `${sheetPart}#${cellAddress.row}R${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
-      return `${sheetPart}#${cellAddress.row}A${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
-      return `${sheetPart}#${cellAddress.row}AC${cellAddress.col}`
-    }
-    case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
-      return `${sheetPart}#${cellAddress.row}AR${cellAddress.col}`
     }
   }
 }

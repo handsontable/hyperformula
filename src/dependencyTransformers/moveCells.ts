@@ -35,16 +35,17 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction<CellAddress> {
-    return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
+  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction<Address> {
+    return (dependencyAddress: Address, formulaAddress: SimpleCellAddress) => {
       const targetRange = sourceRange.shifted(toRight, toBottom)
 
-      const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
-
-      if (sourceRange.addressInRange(absoluteDependencyAddress)) { // If dependency is internal, move only absolute dimensions
-        return dependencyAddress.shiftAbsoluteDimensions(toRight, toBottom)
-      } else if (targetRange.addressInRange(absoluteDependencyAddress)) {  // If dependency is external and moved range overrides it return REF
-        return ErrorType.REF
+      if (dependencyAddress instanceof CellAddress) {
+        const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
+        if (sourceRange.addressInRange(absoluteDependencyAddress)) { // If dependency is internal, move only absolute dimensions
+          return dependencyAddress.shiftAbsoluteDimensions(toRight, toBottom)
+        } else if (targetRange.addressInRange(absoluteDependencyAddress)) {  // If dependency is external and moved range overrides it return REF
+          return ErrorType.REF
+        }
       }
 
       return dependencyAddress.shiftRelativeDimensions(-toRight, -toBottom)

@@ -82,7 +82,6 @@ export class CellAddress {
     return simpleRowAddress(sheet, row)
   }
 
-
   public isRowAbsolute(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
@@ -126,5 +125,23 @@ export class CellAddress {
     const col = this.isColumnRelative() ? this.col : this.col + toRight
     const row = this.isRowRelative() ? this.row : this.row + toBottom
     return new CellAddress(this.sheet, col, row, this.type)
+  }
+
+  public hash(withSheet: boolean): string {
+    const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
+    switch (this.type) {
+      case CellReferenceType.CELL_REFERENCE_RELATIVE: {
+        return `${sheetPart}#${this.row}R${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE: {
+        return `${sheetPart}#${this.row}A${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL: {
+        return `${sheetPart}#${this.row}AC${this.col}`
+      }
+      case CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW: {
+        return `${sheetPart}#${this.row}AR${this.col}`
+      }
+    }
   }
 }
