@@ -51,6 +51,8 @@ export interface ConfigParams {
    * Applies to comparison operators only.
    *
    * @default false
+   * 
+   * @category String
    */
   accentSensitive: boolean,
   /**
@@ -59,6 +61,8 @@ export interface ConfigParams {
    * Applies to comparison operators only.
    *
    * @default false
+   * 
+   * @category String
    */
   caseSensitive: boolean,
   /**
@@ -67,6 +71,8 @@ export interface ConfigParams {
    * When set to `false` uses the locale's default.
    *
    * @default 'lower'
+   * 
+   * @category String
    */
   caseFirst: 'upper' | 'lower' | 'false',
   /**
@@ -89,12 +95,16 @@ export interface ConfigParams {
    * Any configuration of YYYY, YY, MM, DD is accepted as a date, they can be put in any order, and any subset of those.
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
+   * 
+   * @category Date
    */
   dateFormats: string[],
   /**
    * A separator character used to separate arguments of procedures in formulas. Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
+   * 
+   * @category Syntax
    */
   functionArgSeparator: string,
   /**
@@ -103,6 +113,8 @@ export interface ConfigParams {
    * Can be either '.' or ',' and must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
+   * 
+   * @category Number
    */
   decimalSeparator: '.' | ',',
   /**
@@ -111,18 +123,24 @@ export interface ConfigParams {
    * Can be either empty, ',' or ' ' and must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
+   * 
+   * @category Number
    */
   thousandSeparator: '' | ',' | ' ' | '.',
   /**
    * Translation package with translations of function and error names.
    *
    * @default enGB
+   * 
+   * @category Syntax
    */
   language: TranslationPackage,
   /**
    * A list of additional function plugins to use by formula interpreter.
    *
    * @default []
+   * 
+   * @category Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
@@ -134,6 +152,8 @@ export interface ConfigParams {
    * Other values should be used for debugging purposes only. More info can be found in GPU.js documentation.
    *
    * @default 'gpu'
+   * 
+   * @category Engine
    */
   gpuMode: GPUMode,
   /**
@@ -150,6 +170,8 @@ export interface ConfigParams {
    * Set to `true` for compatibility with Lotus 1-2-3 and Excel. See [[nullDate]] for complete solution.
    *
    * @default false
+   * 
+   * @category Date
    */
   leapYear1900: boolean,
   /**
@@ -166,12 +188,16 @@ export interface ConfigParams {
    * Some CRUD operations may break numeric matrices into individual vertices if needed.
    *
    * @default true
+   * 
+   * @category Engine
    */
   matrixDetection: boolean,
   /**
    * Specifies how many cells an area must have in order to be treated as a matrix. Relevant only if [[matrixDetection]] is set to `true`.
    *
    * @default 100
+   * 
+   * @category Engine 
    */
   matrixDetectionThreshold: number,
   /**
@@ -180,6 +206,8 @@ export interface ConfigParams {
    * If `xx <= nullYear` its latter, otherwise its former.
    *
    * @default 30
+   * 
+   * @category Date 
    */
   nullYear: number,
   /**
@@ -204,6 +232,8 @@ export interface ConfigParams {
    * for `c=a+b` or `c=a-b`, if `abs(c) <= precisionEpsilon * abs(a)`, then `c` is set to `0`
    *
    * @default 1e-13
+   * 
+   * @category Number 
    */
   precisionEpsilon: number,
   /**
@@ -212,6 +242,8 @@ export interface ConfigParams {
    * Numerical outputs are rounded to `precisionRounding` many digits after the decimal.
    *
    * @default 14
+   * 
+   * @category Number
    */
   precisionRounding: number,
   /**
@@ -226,6 +258,8 @@ export interface ConfigParams {
    * If `false`, no rounding happens, and numbers are equal if and only if they are truly identical value (see: [[precisionEpsilon]]).
    *
    * @default true
+   * 
+   * @category Number
    */
   smartRounding: boolean,
   /**
@@ -238,6 +272,8 @@ export interface ConfigParams {
    * In some scenarios column index may fall back to binary search despite of this flag.
    *
    * @default false
+   * 
+   * @category Engine
    */
   useColumnIndex: boolean,
   /**
@@ -248,6 +284,8 @@ export interface ConfigParams {
    * Used by VLOOKUP and MATCH procedures.
    *
    * @default 20
+   * 
+   * @category Engine
    */
   vlookupThreshold: number,
   /**
@@ -256,6 +294,8 @@ export interface ConfigParams {
    * Dates are represented internally as a number of days that passed since this `nullDate`.
    *
    * @default {year: 1899, month: 12, day: 30}
+   *
+   * @category Date
    */
   nullDate: SimpleDate,
 }
