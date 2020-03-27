@@ -67,12 +67,12 @@ export class ColumnAddress {
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): ColumnAddress {
-    const col = this.isColumnRelative() ? this.col : this.col + toRight
+    const col = this.isColumnRelative() ? this.col + toRight : this.col
     return new ColumnAddress(this.sheet, col, this.type)
   }
 
   public shiftAbsoluteDimensions(toRight: number, toBottom: number): ColumnAddress {
-    const col = this.isColumnAbsolute() ? this.col : this.col + toRight
+    const col = this.isColumnAbsolute() ? this.col + toRight : this.col
     return new ColumnAddress(this.sheet, col, this.type)
   }
 

@@ -75,7 +75,8 @@ describe('Column ranges', () => {
 
     engine.moveCells(adr('A1'), 1, 1, adr('B2'))
 
-    const range = extractColumnRange(engine, adr('A2'))
-    console.log()
+    const range = extractColumnRange(engine, adr('B2'))
+    expect(range.start).toEqual(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY))
+    expect(range.end).toEqual(simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))
   })
 })

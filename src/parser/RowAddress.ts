@@ -57,12 +57,12 @@ export class RowAddress {
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): RowAddress {
-    const row = this.isRowRelative() ? this.row : this.row + toRight
+    const row = this.isRowRelative() ? this.row + toBottom : this.row
     return new RowAddress(this.sheet, row, this.type)
   }
 
   public shiftAbsoluteDimensions(toRight: number, toBottom: number): RowAddress {
-    const row = this.isRowAbsolute() ? this.row : this.row + toRight
+    const row = this.isRowAbsolute() ? this.row + toBottom : this.row
     return new RowAddress(this.sheet, row, this.type)
   }
 
