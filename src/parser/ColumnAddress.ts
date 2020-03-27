@@ -6,6 +6,11 @@ export enum ColumnReferenceType {
   COLUMN_ABSOLUTE = 'COLUMN_ABSOLUTE',
 }
 
+export interface SimpleRange {
+  start: SimpleCellAddress,
+  end: SimpleCellAddress,
+}
+
 export class ColumnAddress {
   private constructor(
     public readonly sheet: number | null,
@@ -21,12 +26,16 @@ export class ColumnAddress {
     return new ColumnAddress(sheet, column, ColumnReferenceType.COLUMN_RELATIVE)
   }
 
-  public toSimpleCellAddress(baseAddress: SimpleCellAddress): SimpleCellAddress {
+  public toSimpleAddress(baseAddress: SimpleCellAddress): SimpleRange {
     const sheet = absoluteSheetReference(this, baseAddress)
-    if (this.type === ColumnReferenceType.COLUMN_ABSOLUTE) {
-      return simpleCellAddress(sheet, this.col, Number.POSITIVE_INFINITY)
-    } else {
-      return simpleCellAddress(sheet, baseAddress.col + this.col, Number.POSITIVE_INFINITY)
+    let column = this.col
+    if (this.type === ColumnReferenceType.COLUMN_RELATIVE) {
+      column = baseAddress.col + this.col
+    }
+
+    return {
+      start: simpleCellAddress(sheet, column, 0),
+      end: simpleCellAddress(sheet, column, Number.POSITIVE_INFINITY)
     }
   }
 }

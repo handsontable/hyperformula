@@ -290,8 +290,8 @@ export class AbsoluteCellRange extends AbstractRange {
 export class AbsoluteColumnRange extends AbsoluteCellRange {
   public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     return new AbsoluteColumnRange(
-      x.start.toSimpleCellAddress(baseAddress),
-      x.end.toSimpleCellAddress(baseAddress)
+      x.start.toSimpleAddress(baseAddress).start,
+      x.end.toSimpleAddress(baseAddress).end,
     )
   }
 

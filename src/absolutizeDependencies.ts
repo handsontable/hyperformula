@@ -16,8 +16,8 @@ export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: 
       return new AbsoluteCellRange(dep.dependency[0].toSimpleCellAddress(baseAddress), dep.dependency[1].toSimpleCellAddress(baseAddress))
     } else if (dep.type === RelativeDependencyType.ColumnRange) {
       return new AbsoluteColumnRange(
-        dep.dependency[0].toSimpleCellAddress(baseAddress),
-        dep.dependency[1].toSimpleCellAddress(baseAddress),
+        dep.dependency[0].toSimpleAddress(baseAddress).start,
+        dep.dependency[1].toSimpleAddress(baseAddress).end,
       )
     } else {
       return dep.dependency.toSimpleCellAddress(baseAddress)
