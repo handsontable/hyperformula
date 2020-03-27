@@ -140,7 +140,7 @@ export class Condition {
 }
 
 function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<InternalCellValue> {
-  for (const cellFromRange of cellRange.addresses()) {
+  for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield dependencyGraph.getCellValue(cellFromRange)
   }
 }

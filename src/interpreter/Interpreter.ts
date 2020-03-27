@@ -249,7 +249,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.COLUMN_RANGE: {
-        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress, this.dependencyGraph)
+        const range = AbsoluteColumnRange.fromColumnRange(ast, formulaAddress)
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.PARENTHESIS: {

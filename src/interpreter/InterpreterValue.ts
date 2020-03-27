@@ -109,7 +109,7 @@ export class OnlyRangeData {
 
     let i = 0
     let row = []
-    for (const cellFromRange of this._range.addresses()) {
+    for (const cellFromRange of this._range.addresses(this.dependencyGraph)) {
       const value = this.dependencyGraph.getCellValue(cellFromRange)
       if (typeof value === 'number') {
         row.push(value)

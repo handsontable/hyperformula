@@ -6,13 +6,14 @@ import {FormulaCellVertex} from './FormulaCellVertex'
 import {MatrixVertex} from './MatrixVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
+import {DependencyGraph} from './DependencyGraph'
 
-export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService): SimpleCellAddress[] => {
+export const collectAddressesDependentToMatrix = (functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>, vertex: Vertex, matrix: MatrixVertex, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   const range = matrix.getRange()
 
   if (vertex instanceof RangeVertex) {
     /* TODO range intersection */
-    return [...vertex.range.addresses()].filter((d) => range.addressInRange(d))
+    return [...vertex.range.addresses(dependencyGraph)].filter((d) => range.addressInRange(d))
   }
 
   let formula: Ast

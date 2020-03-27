@@ -23,7 +23,7 @@ export abstract class AbstractRange {
   abstract shouldBeRemoved(): boolean
   abstract subrangeWithSameWidth(startRow: number, numberOfRows: number): AbstractRange
   abstract subrangeWithSameHeight(startCol: number, numberOfColumns: number): AbstractRange
-  abstract addresses(): IterableIterator<SimpleCellAddress>
+  abstract addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress>
 }
 
 export class AbsoluteCellRange extends AbstractRange {
@@ -209,7 +209,7 @@ export class AbsoluteCellRange extends AbstractRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
-  public* addresses(): IterableIterator<SimpleCellAddress> {
+  public* addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {
     let currentRow = this.start.row
     while (currentRow <= this.end.row) {
       let currentColumn = this.start.col
@@ -278,18 +278,16 @@ export class AbsoluteCellRange extends AbstractRange {
 }
 
 export class AbsoluteColumnRange extends AbsoluteCellRange {
-  public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress, dependencyGraph: DependencyGraph): AbsoluteColumnRange {
+  public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     return new AbsoluteColumnRange(
       simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, 0),
-      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, Number.POSITIVE_INFINITY),
-      dependencyGraph
+      simpleCellAddress(x.start.sheet === null ? baseAddress.sheet : x.start.sheet, x.start.col, Number.POSITIVE_INFINITY)
     )
   }
 
   private constructor(
     public readonly start: SimpleCellAddress,
     public readonly end: SimpleCellAddress,
-    public readonly dependencyGraph: DependencyGraph
   ) {
     super(start, end)
   }
@@ -298,12 +296,8 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return false
   }
 
-  public height(): number {
-    return this.dependencyGraph.getSheetHeight(this.sheet)
-  }
-
-  public width(): number {
-    return this.end.col - this.start.col + 1
+  private effectiveHeight(dependencyGraph: DependencyGraph): number {
+    return dependencyGraph.getSheetHeight(this.sheet)
   }
 
   public shiftByRows(numberOfRows: number) {
@@ -314,17 +308,25 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return
   }
 
-  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
-    return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, 0), this.width(), this.height())
-  }
+  // public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+  //   return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, 0), this.width(), this.height())
+  // }
 
   public removeRows(rowStart: number, rowEnd: number) {
     return
   }
 
-  public* addresses(): IterableIterator<SimpleCellAddress> {
+  public height(): number {
+    return Number.POSITIVE_INFINITY
+  }
+
+  public size(): number {
+    return Number.POSITIVE_INFINITY
+  }
+
+  public* addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {
     let currentRow = 0
-    while (currentRow <= this.height() - 1) {
+    while (currentRow <= this.effectiveHeight(dependencyGraph) - 1) {
       let currentColumn = this.start.col
       while (currentColumn <= this.end.col) {
         yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)

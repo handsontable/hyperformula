@@ -106,9 +106,9 @@ export class CrudOperations {
     const toBottom = destinationLeftCorner.row - sourceLeftCorner.row
     const toSheet = destinationLeftCorner.sheet
 
-    const valuesToRemove = this.dependencyGraph.addressMapping.valuesFromRange(targetRange)
+    const valuesToRemove = this.dependencyGraph.valuesFromRange(targetRange)
     this.columnSearch.removeValues(valuesToRemove)
-    const valuesToMove = this.dependencyGraph.addressMapping.valuesFromRange(sourceRange)
+    const valuesToMove = this.dependencyGraph.valuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
