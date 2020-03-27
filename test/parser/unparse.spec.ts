@@ -337,6 +337,22 @@ describe('Unparse', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('#unparse column range', () => {
+    const formula = '=A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
+
+  it('#unparse absolute column range', () => {
+    const formula = '=$A:B'
+    const ast = parser.parse(formula, simpleCellAddress(1, 0, 0)).ast
+    const unparsed = unparser.unparse(ast, adr('A1', 1))
+
+    expect(unparsed).toEqual(formula)
+  })
 })
 
 describe('whitespaces', () => {

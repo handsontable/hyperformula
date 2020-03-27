@@ -6,6 +6,7 @@ import {
   SimpleColumnAddress
 } from '../Cell'
 import {CellReferenceType} from './CellAddress'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 
 export enum ReferenceType {
@@ -86,5 +87,12 @@ export class ColumnAddress {
         return `${sheetPart}#COLA${this.col}`
       }
     }
+  }
+
+  public unparse(baseAddress: SimpleCellAddress): string {
+    const simpleAddress = this.toSimpleColumnAddress(baseAddress)
+    const column = columnIndexToLabel(simpleAddress.col)
+    const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
+    return `${dollar}${column}`
   }
 }

@@ -5,6 +5,7 @@ import {
   simpleColumnAddress,
   SimpleColumnAddress, simpleRowAddress, SimpleRowAddress
 } from '../Cell'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -143,5 +144,13 @@ export class CellAddress {
         return `${sheetPart}#${this.row}AR${this.col}`
       }
     }
+  }
+
+  public unparse(baseAddress: SimpleCellAddress): string {
+    const simpleAddress = this.toSimpleCellAddress(baseAddress)
+    const column = columnIndexToLabel(simpleAddress.col)
+    const rowDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+    const colDollar = this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
+    return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
   }
 }

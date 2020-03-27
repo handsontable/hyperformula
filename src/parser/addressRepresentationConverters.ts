@@ -63,7 +63,7 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   }
 }
 
-export const cellAddressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
+export const addressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
   const simpleAddress = address.toSimpleCellAddress(baseAddress)
   const column = columnIndexToLabel(simpleAddress.col)
   const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
@@ -147,7 +147,7 @@ function columnLabelToIndex(columnStringRepresentation: string): number {
  * @param column - address to convert
  * @returns string representation, e.g. 'AAB'
  */
-function columnIndexToLabel(column: number) {
+export function columnIndexToLabel(column: number) {
   let result = ''
 
   while (column >= 0) {

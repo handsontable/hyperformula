@@ -6,6 +6,7 @@ import {
   SimpleRowAddress,
 } from '../Cell'
 import {ReferenceType, SimpleRange} from './ColumnAddress'
+import {columnIndexToLabel} from './addressRepresentationConverters'
 
 export class RowAddress {
   private constructor(
@@ -76,5 +77,11 @@ export class RowAddress {
         return `${sheetPart}#ROWA${this.row}`
       }
     }
+  }
+
+  public unparse(baseAddress: SimpleCellAddress): string {
+    const simpleAddress = this.toSimpleRowAddress(baseAddress)
+    const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''
+    return `${dollar}${simpleAddress.row + 1}`
   }
 }

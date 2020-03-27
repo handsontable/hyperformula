@@ -1,6 +1,5 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {cellAddressToString} from './addressRepresentationConverters'
-import {Ast, AstNodeType, CellRangeAst, imageWithWhitespace, RangeSheetReferenceType} from './Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, imageWithWhitespace, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -36,17 +35,15 @@ export class Unparser {
       case AstNodeType.CELL_REFERENCE: {
         let image
         if (ast.reference.sheet !== null) {
-          image = this.unparseSheetName(ast.reference.sheet) + '!' + cellAddressToString(ast.reference, address)
+          image = this.unparseSheetName(ast.reference.sheet) + '!' + ast.reference.unparse(address)
         } else {
-          image = cellAddressToString(ast.reference, address)
+          image = ast.reference.unparse(address)
         }
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
+      case AstNodeType.COLUMN_RANGE:
       case AstNodeType.CELL_RANGE: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
-      }
-      case AstNodeType.COLUMN_RANGE: {
-        throw Error('TODO')
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const unparsedExpr = this.unparseAst(ast.value, address)
@@ -90,7 +87,7 @@ export class Unparser {
     }
   }
 
-  private formatRange(ast: CellRangeAst, baseAddress: SimpleCellAddress): string {
+  private formatRange(ast: CellRangeAst | ColumnRangeAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
 
@@ -102,7 +99,7 @@ export class Unparser {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 
-    return `${startSheeet}${cellAddressToString(ast.start, baseAddress)}:${endSheet}${cellAddressToString(ast.end, baseAddress)}`
+    return `${startSheeet}${ast.start.unparse(baseAddress)}:${endSheet}${ast.end.unparse(baseAddress)}`
   }
 }
 
