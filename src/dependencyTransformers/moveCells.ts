@@ -83,7 +83,7 @@ export namespace MoveCellsDependencyTransformer {
         }
       }
       case AstNodeType.COLUMN_RANGE: {
-        throw Error("TODO")
+        return ast
       }
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:

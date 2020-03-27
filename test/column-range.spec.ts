@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {adr, extractColumnRange, extractRange} from './testUtils'
+import {adr, extractColumnRange} from './testUtils'
 import {simpleCellAddress} from '../src/Cell'
 
 describe('Column ranges', () => {
@@ -70,13 +70,29 @@ describe('Column ranges', () => {
 
   it('should transform relative column references', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(C:D)']
+      ['=SUM(C:D)', '', '1', '2']
     ])
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
 
     engine.moveCells(adr('A1'), 1, 1, adr('B2'))
 
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
     const range = extractColumnRange(engine, adr('B2'))
     expect(range.start).toEqual(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY))
     expect(range.end).toEqual(simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))
+  })
+
+  it('should not move infinite range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '', '', '=SUM(A:B)']
+    ])
+    expect(engine.getCellValue(adr('E1'))).toEqual(3)
+
+    engine.moveCells(adr('A1'), 2, 1, adr('C1'))
+
+    expect(engine.getCellValue(adr('E1'))).toEqual(0)
+    const range = extractColumnRange(engine, adr('E1'))
+    expect(range.start).toEqual(simpleCellAddress(0, 0, Number.NEGATIVE_INFINITY))
+    expect(range.end).toEqual(simpleCellAddress(0, 1, Number.POSITIVE_INFINITY))
   })
 })
