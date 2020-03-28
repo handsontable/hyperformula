@@ -1,14 +1,8 @@
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnsSpan} from '../ColumnsSpan'
 import {DependencyGraph} from '../DependencyGraph'
-import {Ast, ParserWithCaching} from '../parser'
-import {
-  AddressWithColumn,
-  CellAddressTransformerFunction,
-  CellRangeTransformerFunction,
-  fixFormulaVertexColumn,
-  transformAddressesInFormula
-} from './common'
+import {Ast, CellAddress, ParserWithCaching} from '../parser'
+import {CellAddressTransformerFunction, CellRangeTransformerFunction, fixFormulaVertexColumn, transformAddressesInFormula} from './common'
 
 export namespace RemoveColumnsDependencyTransformer {
   export function transform(removedColumns: ColumnsSpan, graph: DependencyGraph, parser: ParserWithCaching) {
@@ -22,21 +16,20 @@ export namespace RemoveColumnsDependencyTransformer {
 
   export function transformSingleAst(removedColumns: ColumnsSpan, ast: Ast, nodeAddress: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const transformCellAddressFn = cellAddressTransformer(removedColumns)
-    const transformCellRangeFn = cellRangeTransformer(removedColumns, transformCellAddressFn)
-    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, transformCellRangeFn)
+    const newAst = transformAddressesInFormula(ast, nodeAddress, transformCellAddressFn, cellRangeTransformer(removedColumns, transformCellAddressFn))
     return [newAst, fixFormulaVertexColumn(nodeAddress, removedColumns.sheet, removedColumns.columnStart, -removedColumns.numberOfColumns)]
   }
 
-  const cellRangeTransformer = (removedColumns: ColumnsSpan, transformCellAddressFn: CellAddressTransformerFunction<AddressWithColumn>): CellRangeTransformerFunction<AddressWithColumn> => {
-    return (dependencyRangeStart: AddressWithColumn, dependencyRangeEnd: AddressWithColumn, address: SimpleCellAddress): ([AddressWithColumn, AddressWithColumn] | ErrorType.REF | false) => {
+  const cellRangeTransformer = (removedColumns: ColumnsSpan, transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
+    return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
       const dependencyRangeStartSheet = absoluteSheetReference(dependencyRangeStart, address)
 
       let actualStart = dependencyRangeStart
       let actualEnd = dependencyRangeEnd
 
       if (removedColumns.sheet === dependencyRangeStartSheet) {
-        const dependencyRangeStartSCA = dependencyRangeStart.toSimpleColumnAddress(address)
-        const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleColumnAddress(address)
+        const dependencyRangeStartSCA = dependencyRangeStart.toSimpleCellAddress(address)
+        const dependencyRangeEndSCA = dependencyRangeEnd.toSimpleCellAddress(address)
 
         if (removedColumns.columnStart <= dependencyRangeStartSCA.col && removedColumns.columnEnd >= dependencyRangeEndSCA.col) {
           return ErrorType.REF
@@ -63,8 +56,8 @@ export namespace RemoveColumnsDependencyTransformer {
     }
   }
 
-  function cellAddressTransformer(removedColumns: ColumnsSpan): CellAddressTransformerFunction<AddressWithColumn> {
-    return (dependencyAddress: AddressWithColumn, formulaAddress: SimpleCellAddress) => {
+  function cellAddressTransformer(removedColumns: ColumnsSpan): CellAddressTransformerFunction {
+    return (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => {
       const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
       // Case 4
       if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet !== absoluteDependencySheet) {
@@ -73,7 +66,7 @@ export namespace RemoveColumnsDependencyTransformer {
 
       // Case 3 -- removed column in same sheet where dependency is but formula in different
       if (removedColumns.sheet !== formulaAddress.sheet && removedColumns.sheet === absoluteDependencySheet) {
-        const absoluteDependencyAddress = dependencyAddress.toSimpleColumnAddress(formulaAddress)
+        const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
         if (absoluteDependencyAddress.col < removedColumns.columnStart) { // 3.ARa
           return false
         } else if (absoluteDependencyAddress.col > removedColumns.columnEnd) { // 3.ARb
@@ -103,7 +96,7 @@ export namespace RemoveColumnsDependencyTransformer {
             return dependencyAddress.shiftedByColumns(-removedColumns.numberOfColumns)
           }
         } else {
-          const absoluteDependencyAddress = dependencyAddress.toSimpleColumnAddress(formulaAddress)
+          const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
           if (absoluteDependencyAddress.col < removedColumns.columnStart) {
             if (formulaAddress.col < removedColumns.columnStart) { // 1.Raa
               return false

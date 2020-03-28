@@ -7,6 +7,7 @@ import {
 } from '../Cell'
 import {CellReferenceType} from './CellAddress'
 import {columnIndexToLabel} from './addressRepresentationConverters'
+import {AddressWithColumn} from '../dependencyTransformers/common'
 
 
 export enum ReferenceType {
@@ -19,8 +20,8 @@ export interface SimpleRange {
   end: SimpleCellAddress,
 }
 
-export class ColumnAddress {
-  private constructor(
+export class ColumnAddress implements AddressWithColumn {
+  public constructor(
     public readonly sheet: number | null,
     public readonly col: number,
     public readonly type: ReferenceType

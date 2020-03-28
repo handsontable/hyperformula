@@ -35,7 +35,7 @@ export namespace MoveCellsDependencyTransformer {
     }
   }
 
-  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): CellAddressTransformerFunction<Address> {
+  function fixDependenciesInMovedCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number): any {
     return (dependencyAddress: Address, formulaAddress: SimpleCellAddress) => {
       const targetRange = sourceRange.shifted(toRight, toBottom)
 

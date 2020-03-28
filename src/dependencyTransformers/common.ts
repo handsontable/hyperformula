@@ -1,18 +1,32 @@
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress, SimpleColumnAddress} from '../Cell'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
-import {ColumnAddress} from '../parser/ColumnAddress'
-import {RowAddress} from '../parser/RowAddress'
 
-export type Address = CellAddress | ColumnAddress | RowAddress
-export type AddressWithColumn = CellAddress | ColumnAddress
-export type AddressWithRow = CellAddress | RowAddress
+export interface Address extends AddressWithColumn, AddressWithRow {}
 
-export type CellAddressTransformerFunction<T> = (dependencyAddress: T, formulaAddress: SimpleCellAddress) => T | ErrorType.REF | false
+export interface AddressWithSheet {
+  sheet: number | null,
+  shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet
+}
 
-export type CellRangeTransformerFunction<T> = (dependencyRangeStart: T, dependencyRangeEnd: T, formulaAddress: SimpleCellAddress) => [T, T] | ErrorType.REF | false
+export interface AddressWithColumn extends AddressWithSheet {
+  col: number,
+  isColumnAbsolute(): boolean,
+  isColumnRelative(): boolean,
+  shiftedByColumns(columns: number): AddressWithColumn,
+  toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress,
+}
 
-export const cellRangeTransformer = <T>(transformCellAddressFn: CellAddressTransformerFunction<T>): CellRangeTransformerFunction<T> => {
-  return (dependencyRangeStart: T, dependencyRangeEnd: T, address: SimpleCellAddress): ([T, T] | ErrorType.REF | false) => {
+export interface AddressWithRow extends AddressWithSheet{
+  col: number,
+  shiftedByRows(rows: number): AddressWithColumn,
+}
+
+export type CellAddressTransformerFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
+
+export type CellRangeTransformerFunction = (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, formulaAddress: SimpleCellAddress) => [CellAddress, CellAddress] | ErrorType.REF | false
+
+export const cellRangeTransformer = (transformCellAddressFn: CellAddressTransformerFunction): CellRangeTransformerFunction => {
+  return (dependencyRangeStart: CellAddress, dependencyRangeEnd: CellAddress, address: SimpleCellAddress): ([CellAddress, CellAddress] | ErrorType.REF | false) => {
     const newStart = transformCellAddressFn(dependencyRangeStart, address)
     const newEnd = transformCellAddressFn(dependencyRangeEnd, address)
     if (newStart === ErrorType.REF || newEnd === ErrorType.REF) {
@@ -25,11 +39,7 @@ export const cellRangeTransformer = <T>(transformCellAddressFn: CellAddressTrans
   }
 }
 
-/* TODO any */
-export function transformAddressesInFormula<T extends Address>(ast: Ast,
-                                            address: SimpleCellAddress,
-                                            transformCellAddressFn: any,
-                                            transformCellRangeFn: any): Ast {
+export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress, transformCellAddressFn: CellAddressTransformerFunction, transformCellRangeFn: CellRangeTransformerFunction): Ast {
   switch (ast.type) {
     case AstNodeType.CELL_REFERENCE: {
       const newCellAddress = transformCellAddressFn(ast.reference, address)
@@ -41,7 +51,6 @@ export function transformAddressesInFormula<T extends Address>(ast: Ast,
         return ast
       }
     }
-    case AstNodeType.COLUMN_RANGE:
     case AstNodeType.CELL_RANGE: {
       const newRange = transformCellRangeFn(ast.start, ast.end, address)
       if (Array.isArray(newRange)) {
@@ -52,6 +61,7 @@ export function transformAddressesInFormula<T extends Address>(ast: Ast,
         return ast
       }
     }
+    case AstNodeType.COLUMN_RANGE:
     case AstNodeType.ERROR:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING: {

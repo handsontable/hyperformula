@@ -3,9 +3,12 @@ import {
   simpleCellAddress,
   SimpleCellAddress,
   simpleColumnAddress,
-  SimpleColumnAddress, simpleRowAddress, SimpleRowAddress
+  SimpleColumnAddress,
+  simpleRowAddress,
+  SimpleRowAddress
 } from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
+import {Address, AddressWithColumn} from '../dependencyTransformers/common'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -22,7 +25,7 @@ export enum CellReferenceType {
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
-export class CellAddress {
+export class CellAddress implements Address {
 
   public static relative(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)

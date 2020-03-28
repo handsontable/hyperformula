@@ -4,7 +4,7 @@ import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
-import {Address} from '../dependencyTransformers/common'
+import {Address, AddressWithSheet} from '../dependencyTransformers/common'
 
 export type Ast =
   NumberAst
@@ -384,7 +384,7 @@ function extractImage(token: Maybe<IToken>): Maybe<string> {
   return token !== undefined ? token.image : undefined
 }
 
-function assertRangeConsistency(start: Address, end: Address, sheetReferenceType: RangeSheetReferenceType) {
+function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
   if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
     throw new Error('Start address inconsistent with end address')
   }

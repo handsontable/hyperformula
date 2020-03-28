@@ -1,9 +1,15 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
-import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
+import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
-import {Operations, RemoveRowsCommand, normalizeRemovedIndexes, normalizeAddedIndexes, AddRowsCommand} from './Operations'
+import {
+  AddRowsCommand,
+  normalizeAddedIndexes,
+  normalizeRemovedIndexes,
+  Operations,
+  RemoveRowsCommand
+} from './Operations'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {ColumnsSpan} from './ColumnsSpan'
 import {Config} from './Config'
@@ -12,24 +18,23 @@ import {
   AddressMapping,
   DependencyGraph,
   MatrixVertex,
+  ParsingErrorVertex,
   SheetMapping,
   ValueCellVertex,
-  ParsingErrorVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {AddColumnsDependencyTransformer} from './dependencyTransformers/addColumns'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
-import {IBatchExecutor} from './IBatchExecutor'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
+import {AddColumnsTransformer} from './dependencyTransformers/transformer'
 
 export class CrudOperations {
 
@@ -528,7 +533,8 @@ export class CrudOperations {
     this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddColumnsDependencyTransformer.transform(addedColumns, this.dependencyGraph, this.parser)
+      const transformer = new AddColumnsTransformer(addedColumns)
+      transformer.transform(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
     })
   }
