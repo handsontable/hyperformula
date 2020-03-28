@@ -1,13 +1,13 @@
 import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
-import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
+import {cellAddressFromString, columnAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
 import {Ast, AstNodeType, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
-import {buildLexerConfig, CellReference, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
+import {buildLexerConfig, CellReference, ColumnRange, ILexerConfig, ProcedureName, WhiteSpace} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
 import {ColumnAddress} from './ColumnAddress'
@@ -101,16 +101,23 @@ export class ParserWithCaching {
         } else {
           hash = hash.concat(cellAddress.hash(true))
         }
-        idx++
       } else if (tokenMatcher(token, ProcedureName)) {
         const procedureName = token.image.toUpperCase().slice(0, -1)
         const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] || procedureName
         hash = hash.concat(canonicalProcedureName, '(')
-        idx++
+      } else if (tokenMatcher(token, ColumnRange)){
+        const [start, end] = token.image.split(':')
+        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
+        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
+        if (startAddress === undefined || endAddress === undefined) {
+          hash = hash.concat('!REF')
+        } else {
+          hash = hash.concat(startAddress.hash(true), ':', endAddress.hash(true))
+        }
       } else {
         hash = hash.concat(token.image)
-        idx++
       }
+      idx++
     }
     return hash
   }
