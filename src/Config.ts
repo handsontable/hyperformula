@@ -180,6 +180,8 @@ export interface ConfigParams {
    * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
    *
    * @default 'en'
+   *
+   * @category String
    */
   localeLang: string,
   /**
@@ -216,6 +218,8 @@ export interface ConfigParams {
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
    * @default defaultParseToDate
+   *
+   * @category Date
    */
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   /**
@@ -252,6 +256,8 @@ export interface ConfigParams {
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
    * @default defaultStringifyDate
+   *
+   * @category Date
    */
   stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>,
   /**
