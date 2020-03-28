@@ -513,10 +513,10 @@ export class HyperFormula implements TypedEmitter {
    * @category UndoRedo
    */
   public redo(): ExportedChange[] {
-    if (this.undoRedo.isRedoStackEmpty()) {
+    if (this._undoRedo.isRedoStackEmpty()) {
       throw new NoOperationToRedo()
     }
-    this.undoRedo.redo()
+    this._undoRedo.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
@@ -525,7 +525,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   public isThereSomethingToRedo() {
-    return !this.undoRedo.isRedoStackEmpty()
+    return !this._undoRedo.isRedoStackEmpty()
   }
 
   /**
@@ -572,7 +572,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cell
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
-    this._crudOperations.setCellContents(this.serialization, topLeftCornerAddress, cellContents)
+    this._crudOperations.setCellContents(this._serialization, topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
