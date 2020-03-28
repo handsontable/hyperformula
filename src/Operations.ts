@@ -1,4 +1,4 @@
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {SimpleCellAddress} from './Cell'
 import {RowsSpan} from './RowsSpan'
