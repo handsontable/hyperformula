@@ -42,7 +42,7 @@ import {
   AdditionOp,
   BooleanOp,
   CellReference,
-  ColumnReference,
+  ColumnRange,
   ConcatenateOp,
   DivOp,
   EqualsOp,
@@ -453,22 +453,30 @@ export class FormulaParser extends EmbeddedActionsParser {
   * Rule for column cell range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
   * */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
-    const start = this.CONSUME(ColumnReference) as IExtendedToken
-    this.CONSUME2(RangeSeparator)
-    const end = this.CONSUME3(ColumnReference)
+    const range = this.CONSUME(ColumnRange) as IExtendedToken
+    const [startImage, endImage] = range.image.split(':')
 
-    const columnStart = this.ACTION(() => {
-      return columnAddressFromString(this.sheetMapping, start.image, this.formulaAddress!)
+    const start = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress!)
     })
-    const columnEnd = this.ACTION(() => {
-      return columnAddressFromString(this.sheetMapping, end.image, this.formulaAddress!)
+    let end = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress!)
     })
 
-    if (columnStart === undefined || columnEnd === undefined) {
+    if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+    if (start.sheet === null && end.sheet !== null) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+    }
 
-    return buildColumnRangeAst(columnStart, columnEnd, RangeSheetReferenceType.RELATIVE, start.leadingWhitespace)
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+
+    if (start.sheet !== null && end.sheet === null) {
+      end = end.withAbsoluteSheet(start.sheet)
+    }
+
+    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
 
   /**
@@ -535,14 +543,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    let sheetReferenceType: RangeSheetReferenceType
-    if (startSheet === null) {
-      sheetReferenceType = RangeSheetReferenceType.RELATIVE
-    } else if (end.sheet === null) {
-      sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-    } else {
-      sheetReferenceType = RangeSheetReferenceType.BOTH_ABSOLUTE
-    }
+    const sheetReferenceType = this.rangeSheetReferenceType(startSheet, end.sheet)
 
     if (startSheet !== null && end.sheet === null) {
       end = end.withAbsoluteSheet(startSheet)
@@ -661,6 +662,16 @@ export class FormulaParser extends EmbeddedActionsParser {
   private parsingError(type: ParsingErrorType, message: string): ErrorAst {
     this.customParsingError = parsingError(type, message)
     return buildParsingErrorAst()
+  }
+
+  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
+    if (start === null) {
+      return RangeSheetReferenceType.RELATIVE
+    } else if (end === null) {
+      return RangeSheetReferenceType.START_ABSOLUTE
+    } else {
+      return RangeSheetReferenceType.BOTH_ABSOLUTE
+    }
   }
 
   public numericStringToNumber = (input: string): number => {

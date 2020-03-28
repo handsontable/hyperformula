@@ -527,14 +527,14 @@ describe('Parsing errors', () => {
 
     const { ast, errors } = parser.parse('=A', simpleCellAddress(0, 0, 0))
     expect(ast.type).toBe(AstNodeType.ERROR)
-    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
   it('parsing error - column name in procedure without whole range', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 
     const { errors } = parser.parse('=SUM(A)', simpleCellAddress(0, 0, 0))
-    expect(errors[0].type).toBe(ParsingErrorType.ParserError)
+    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
   it('parsing error - not all input parsed', () => {

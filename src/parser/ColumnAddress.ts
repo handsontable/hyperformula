@@ -77,6 +77,10 @@ export class ColumnAddress {
     return new ColumnAddress(this.sheet, col, this.type)
   }
 
+  public withAbsoluteSheet(sheet: number): ColumnAddress {
+    return new ColumnAddress(sheet, this.col, this.type)
+  }
+
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {

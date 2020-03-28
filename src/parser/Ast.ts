@@ -4,6 +4,7 @@ import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
+import {Address} from '../dependencyTransformers/common'
 
 export type Ast =
   NumberAst
@@ -139,13 +140,7 @@ export interface CellRangeAst extends AstWithWhitespace {
 }
 
 export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: string): CellRangeAst => {
-  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
-    throw new Error('Start address inconsistent with end address')
-  }
-  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-      || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
-    throw new Error('Sheet address inconsistent with sheet reference type')
-  }
+  assertRangeConsistency(start, end, sheetReferenceType)
   return {
     type: AstNodeType.CELL_RANGE,
     start,
@@ -155,7 +150,6 @@ export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetRef
   }
 }
 
-
 export interface ColumnRangeAst extends AstWithWhitespace{
   type: AstNodeType.COLUMN_RANGE,
   start: ColumnAddress,
@@ -163,13 +157,16 @@ export interface ColumnRangeAst extends AstWithWhitespace{
   sheetReferenceType: RangeSheetReferenceType,
 }
 
-export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): ColumnRangeAst => ({
-  type: AstNodeType.COLUMN_RANGE,
-  start,
-  end,
-  sheetReferenceType,
-  leadingWhitespace: extractImage(leadingWhitespace)
-})
+export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): ColumnRangeAst => {
+  assertRangeConsistency(start, end, sheetReferenceType)
+  return {
+    type: AstNodeType.COLUMN_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace: extractImage(leadingWhitespace)
+  }
+}
 
 export interface BinaryOpAst extends AstWithWhitespace {
   left: Ast,
@@ -385,6 +382,16 @@ export const buildParsingErrorAst = (): ErrorAst => ({
 
 function extractImage(token: Maybe<IToken>): Maybe<string> {
   return token !== undefined ? token.image : undefined
+}
+
+function assertRangeConsistency(start: Address, end: Address, sheetReferenceType: RangeSheetReferenceType) {
+  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+    throw new Error('Start address inconsistent with end address')
+  }
+  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+    || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+    throw new Error('Sheet address inconsistent with sheet reference type')
+  }
 }
 
 export function imageWithWhitespace(image: string, leadingWhitespace?: string) {
