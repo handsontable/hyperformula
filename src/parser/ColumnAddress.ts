@@ -62,7 +62,7 @@ export class ColumnAddress {
     }
 
     return {
-      start: simpleCellAddress(sheet, column, Number.NEGATIVE_INFINITY),
+      start: simpleCellAddress(sheet, column, 0),
       end: simpleCellAddress(sheet, column, Number.POSITIVE_INFINITY)
     }
   }

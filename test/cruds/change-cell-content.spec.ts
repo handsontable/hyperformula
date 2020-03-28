@@ -226,7 +226,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(7)
   })
 
-  it('#loadSheet - changing value inside range', () => {
+  it('changing value inside range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
@@ -236,6 +236,18 @@ describe('changing cell content', () => {
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, '3')
     expect(engine.getCellValue(adr('B3'))).toEqual(8)
+  })
+
+  it('changing value inside column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['3', '0', '=SUM(A:B)'],
+    ])
+    expect(engine.getCellValue(adr('C3'))).toEqual(6)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('C3'))).toEqual(9)
   })
 
   it('set formula for the first time', () => {

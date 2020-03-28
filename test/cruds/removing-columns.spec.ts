@@ -7,7 +7,7 @@ import {simpleCellAddress} from '../../src/Cell'
 import '../testConfig'
 import {
   adr,
-  expectArrayWithSameContent,
+  expectArrayWithSameContent, expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,
@@ -776,5 +776,43 @@ describe('Removing columns - column index', () => {
 
     const index = (engine.columnSearch as ColumnIndex)
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
+  })
+})
+
+describe('Removing columns - column range', () => {
+  it('removing column in the middle of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the start of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['2', '3', '=SUM(A:B)']
+    ]))
+  })
+
+  it('removing column in at the end of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '=SUM(A:C)']
+    ])
+
+    engine.removeColumns(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:B)']
+    ]))
   })
 })

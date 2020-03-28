@@ -170,11 +170,11 @@ export class AbsoluteCellRange {
     return this.width() <= 0 || this.height() <= 0
   }
 
-  public subrangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
+  public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col, startRow), this.width(), numberOfRows)
   }
 
-  public subrangeWithSameHeight(startColumn: number, numebrOfColumns: number): AbsoluteCellRange {
+  public rangeWithSameHeight(startColumn: number, numebrOfColumns: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, startColumn, this.start.row), numebrOfColumns, this.height())
   }
 
@@ -327,6 +327,13 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
 
   public size(): number {
     return Number.POSITIVE_INFINITY
+  }
+
+  public rangeWithSameHeight(startColumn: number, numebrOfColumns: number): AbsoluteCellRange {
+    return new AbsoluteColumnRange(
+      simpleCellAddress(this.sheet, startColumn, this.start.row),
+      simpleCellAddress(this.sheet, startColumn + numebrOfColumns - 1, this.end.row)
+    )
   }
 
   public* addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {

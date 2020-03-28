@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {adr, extractColumnRange} from './testUtils'
+import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
 import {simpleCellAddress} from '../src/Cell'
 
 describe('Column ranges', () => {
@@ -17,7 +17,7 @@ describe('Column ranges', () => {
     ])
 
 
-    const cd = engine.rangeMapping.getRange(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))!
+    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D'))!
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
     const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
@@ -38,8 +38,8 @@ describe('Column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(D42:H42)')
 
-    const ce = engine.rangeMapping.getRange(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 4, Number.POSITIVE_INFINITY))!
-    const dg = engine.rangeMapping.getRange(simpleCellAddress(0, 3, Number.NEGATIVE_INFINITY), simpleCellAddress(0, 6, Number.POSITIVE_INFINITY))!
+    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E'))!
+    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G'))!
 
     const d42 = engine.dependencyGraph.fetchCell(adr('D42'))
     const e42 = engine.dependencyGraph.fetchCell(adr('E42'))
@@ -78,8 +78,8 @@ describe('Column ranges', () => {
 
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
     const range = extractColumnRange(engine, adr('B2'))
-    expect(range.start).toEqual(simpleCellAddress(0, 2, Number.NEGATIVE_INFINITY))
-    expect(range.end).toEqual(simpleCellAddress(0, 3, Number.POSITIVE_INFINITY))
+    expect(range.start).toEqual(colStart('C'))
+    expect(range.end).toEqual(colEnd('D'))
   })
 
   it('should not move infinite range', () => {
@@ -92,7 +92,7 @@ describe('Column ranges', () => {
 
     expect(engine.getCellValue(adr('E1'))).toEqual(0)
     const range = extractColumnRange(engine, adr('E1'))
-    expect(range.start).toEqual(simpleCellAddress(0, 0, Number.NEGATIVE_INFINITY))
-    expect(range.end).toEqual(simpleCellAddress(0, 1, Number.POSITIVE_INFINITY))
+    expect(range.start).toEqual(colStart('A'))
+    expect(range.end).toEqual(colEnd('B'))
   })
 })

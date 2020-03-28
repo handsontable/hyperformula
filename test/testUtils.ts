@@ -57,7 +57,7 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
 export const colStart = (input: string, sheet: number = 0): SimpleCellAddress => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = /^(\$?)([A-Za-z]+)/.exec(input)!
-  return simpleCellAddress(sheet, colNumber(result[2]), Number.NEGATIVE_INFINITY)
+  return simpleCellAddress(sheet, colNumber(result[2]), 0)
 }
 
 export const colEnd = (input: string, sheet: number = 0): SimpleCellAddress => {

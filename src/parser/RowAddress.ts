@@ -6,7 +6,6 @@ import {
   SimpleRowAddress,
 } from '../Cell'
 import {ReferenceType, SimpleRange} from './ColumnAddress'
-import {columnIndexToLabel} from './addressRepresentationConverters'
 
 export class RowAddress {
   private constructor(
@@ -52,7 +51,7 @@ export class RowAddress {
     }
 
     return {
-      start: simpleCellAddress(sheet, Number.NEGATIVE_INFINITY, row),
+      start: simpleCellAddress(sheet, 0, row),
       end: simpleCellAddress(sheet, Number.POSITIVE_INFINITY, row)
     }
   }

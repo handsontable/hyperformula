@@ -7,7 +7,7 @@ import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
 import {
-  adr, expectArrayWithSameContent,
+  adr, expectArrayWithSameContent, expectEngineToBeTheSameAs,
   expectFunctionToHaveRefError,
   expectReferenceToHaveRefError,
   extractMatrixRange,
@@ -841,5 +841,52 @@ describe('Removing rows - column index', () => {
 
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
     expectArrayWithSameContent([1], index.getValueIndex(0, 0, 2).index)
+  })
+})
+
+describe('Removing rows - column range', () => {
+  it('removing rows - start of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2'],
+      ['1', '2', '=SUM(A:C)']
+    ])
+
+    engine.removeRows(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2', '=SUM(A:C)']
+    ]))
+  })
+
+  it('removing rows - middle of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2'],
+      ['1', '2', '=SUM(A:C)']
+    ])
+
+    engine.removeRows(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2', '=SUM(A:C)']
+    ]))
+  })
+
+  it('removing rows - end of column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:C)'],
+      ['1', '2'],
+      ['1', '2']
+    ])
+
+    engine.removeRows(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '=SUM(A:C)'],
+      ['1', '2']
+    ]))
   })
 })

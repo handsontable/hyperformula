@@ -2,7 +2,7 @@ import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
-import {adr, detailedError, expectArrayWithSameContent, extractReference} from '../testUtils'
+import {adr, colEnd, colStart, detailedError, expectArrayWithSameContent, extractReference} from '../testUtils'
 
 describe('Copy - paste integration', () => {
   it('copy should return values', () => {
@@ -134,22 +134,20 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedError(ErrorType.REF))
   })
 
-  it('should create new range vertix', () => {
+  it('should create new range vertex', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '3'],
-      ['2', '4'],
-      ['=SUM(A1:A2)']
+      ['1', '3', '5', '=SUM(A:B)'],
+      ['2', '4', '6', null],
     ])
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
 
-    engine.copy(adr('A3'), 1, 1)
-    engine.paste(adr('B3'))
+    engine.copy(adr('D1'), 1, 1)
+    engine.paste(adr('E1'))
 
-    expect(engine.getCellValue(adr('B3'))).toEqual(7)
+    expect(engine.getCellValue(adr('E1'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
-    expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
+    expect(engine.dependencyGraph.getRange(colStart('B'), colEnd('C'))).not.toBeNull()
   })
-
 
   it('paste should return newly pasted values', () => {
     const engine = HyperFormula.buildFromArray([

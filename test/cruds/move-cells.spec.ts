@@ -12,7 +12,7 @@ import {
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, extractColumnRange, colStart, colEnd,
 } from '../testUtils'
 
 describe('Moving rows - checking if its possible', () => {
@@ -912,5 +912,32 @@ describe('move cells with matrices', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(EmptyValue)
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
     expect(engine.getCellValue(adr('B3'))).toEqual(2)
+  })
+})
+
+describe('column ranges', () => {
+  it('should not update range when only part of it is moved', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '3', '=SUM(A:B)'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('C2'))
+
+    const range = extractColumnRange(engine, adr('C1'))
+    expect(range.start).toEqual(colStart('A'))
+    expect(range.end).toEqual(colEnd('B'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(3)
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1, ab)).toBe(true)
+    expect(engine.graph.existsEdge(a2, ab)).toBe(true)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [null, '3', '=SUM(A:B)'],
+      [null, null, 1]
+    ]))
   })
 })
