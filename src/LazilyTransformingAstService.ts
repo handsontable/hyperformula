@@ -9,7 +9,7 @@ import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRo
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import {UndoRedo} from './UndoRedo'
 
 export enum TransformationType {
