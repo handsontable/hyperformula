@@ -160,6 +160,8 @@ export interface ConfigParams {
    * Specifies whether punctuation should be ignored in string comparison.
    *
    * @default false
+   *
+   * @category String
    */
   ignorePunctuation: boolean,
   /**
@@ -280,6 +282,8 @@ export interface ConfigParams {
    * Enables gathering engine statistics and timings. Useful for testing and benchmarking.
    *
    * @default false
+   *
+   * @category Engine
    */
   useStats: boolean,
   /**

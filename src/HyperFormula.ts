@@ -438,6 +438,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Serializes and deserializes whole engine, effectively reloading it.
    *
+   * @category Instance
    */
   public rebuildAndRecalculate(): void {
     this.updateConfig({})
