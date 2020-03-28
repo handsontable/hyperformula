@@ -1308,7 +1308,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Suspends the dependency graph recalculation.
    * 
-   * @category Batch operation
+   * @category Batch
    */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
@@ -1319,7 +1319,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * It also triggers the recalculation.
    *
-   * @category Batch operation
+   * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
@@ -1329,7 +1329,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if the dependency graph recalculation process is suspended or not.
    *
-   * @category Batch operation
+   * @category Batch
    */
   public isEvaluationSuspended(): boolean {
     return this._evaluationSuspended
