@@ -237,6 +237,18 @@ describe('Undo - setting cell content', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('setting multiple cell contents is one operation', () => {
+    const sheet = [
+      ['3', '4'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.setCellContents(adr('A1'), [['5', '6']])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
 })
 
 describe('UndoRedo - #isThereSomethingToUndo', () => {
@@ -407,6 +419,19 @@ describe('Redo - setting cell content', () => {
       ['3'],
     ])
     engine.setCellContents(adr('A1'), '=42')
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('setting multiple cell contents is one operation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3', '4'],
+    ])
+    engine.setCellContents(adr('A1'), [['5', '6']])
     const snapshot = engine.getAllSheetsSerialized()
     engine.undo()
 

@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {EmptyValue, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
 import {CellContent, CellContentParser, isMatrix, RawCellContent} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
 import {
@@ -207,6 +207,7 @@ export class CrudOperations {
       }
     }
 
+    const modifiedCellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[] = []
     for (let i = 0; i < cellContents.length; i++) {
       for (let j = 0; j < cellContents[i].length; j++) {
         const address = {
@@ -218,9 +219,10 @@ export class CrudOperations {
         this.clipboardOperations.abortCut()
         const oldContent = serialization.getCellSerialized(address)
         this.operations.setCellContent(address, cellContents[i][j])
-        this.undoRedo.saveOperationSetCellContents([{ address, newContent: cellContents[i][j], oldContent }])
+        modifiedCellContents.push({ address, newContent: cellContents[i][j], oldContent })
       }
     }
+    this.undoRedo.saveOperationSetCellContents(modifiedCellContents)
   }
 
   public setSheetContent(sheetName: string, values: RawCellContent[][]): void {
