@@ -331,6 +331,50 @@ describe('Redo - removing rows', () => {
   })
 })
 
+describe('Redo - adding rows', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'], // add after that
+      ['3'],
+    ])
+    engine.addRows(0, [1, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('dummy operation should also be redoable', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+    ])
+    engine.addRows(0, [1000, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for more addition segments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['2'],
+      ['3'],
+    ])
+    engine.addRows(0, [1, 1], [2, 1])
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo - setting cell content', () => {
   it('works for simple values', () => {
     const engine = HyperFormula.buildFromArray([

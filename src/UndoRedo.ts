@@ -158,6 +158,10 @@ export class UndoRedo {
         this.redoRemoveRows(operation)
         break
       }
+      case UndoStackElementType.ADD_ROWS: {
+        this.redoAddRows(operation)
+        break
+      }
       case UndoStackElementType.SET_CELL_CONTENTS: {
         this.redoSetCellContents(operation)
         break
@@ -177,6 +181,13 @@ export class UndoRedo {
   private redoSetCellContents(operation: SetCellContentsUndoData) {
     for (const cellContentData of operation.cellContents) {
       this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.newContent)
+    }
+  }
+
+  private redoAddRows(operation: AddRowsUndoData) {
+    const { sheet, rowsAdditions } = operation
+    for (const rowsAddition of rowsAdditions) {
+      this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsAddition.afterRow, rowsAddition.rowCount]]))
     }
   }
 }
