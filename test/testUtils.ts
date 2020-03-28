@@ -54,23 +54,35 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual).toEqual(expect.arrayContaining(expected))
 }
 
+export const colStart = (input: string, sheet: number = 0): SimpleCellAddress => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const result = /^(\$?)([A-Za-z]+)/.exec(input)!
+  return simpleCellAddress(sheet, colNumber(result[2]), Number.NEGATIVE_INFINITY)
+}
+
+export const colEnd = (input: string, sheet: number = 0): SimpleCellAddress => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const result = /^(\$?)([A-Za-z]+)/.exec(input)!
+  return simpleCellAddress(sheet, colNumber(result[2]), Number.POSITIVE_INFINITY)
+}
+
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
+  const row = Number(result[6]) - 1
+  return simpleCellAddress(sheet, colNumber(result[4]), row)
+}
 
-  let col
-  if (result[4].length === 1) {
-    col = result[4].toUpperCase().charCodeAt(0) - 65
+const colNumber = (input: string): number => {
+  if (input.length === 1) {
+    return input.toUpperCase().charCodeAt(0) - 65
   } else {
-    col = result[4].split('').reduce((currentColumn, nextLetter) => {
+    return input.split('').reduce((currentColumn, nextLetter) => {
       return currentColumn * 26 + (nextLetter.toUpperCase().charCodeAt(0) - 64)
     }, 0) - 1
   }
-
-  const row = Number(result[6]) - 1
-
-  return simpleCellAddress(sheet, col, row)
 }
+
 
 export function detailedError(errorType: ErrorType, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)

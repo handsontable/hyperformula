@@ -1,11 +1,7 @@
 import {HyperFormula} from '../src'
-import {
-  EmptyCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-} from '../src/DependencyGraph'
+import {EmptyCellVertex, MatrixVertex, ValueCellVertex,} from '../src/DependencyGraph'
 import './testConfig.ts'
-import {adr} from './testUtils'
+import {adr, colEnd, colStart} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -50,6 +46,20 @@ describe('GraphBuilder', () => {
     expect(engine.graph.adjacentNodes(a1)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(b1)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
+  })
+
+  it('#buildGraph works with column ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=A:B'],
+    ])
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const c1 = engine.addressMapping.fetchCell(adr('C1'))
+    expect(engine.graph.adjacentNodes(a1)).toContain(ab)
+    expect(engine.graph.adjacentNodes(b1)).toContain(ab)
+    expect(engine.graph.adjacentNodes(ab)).toContain(c1)
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
