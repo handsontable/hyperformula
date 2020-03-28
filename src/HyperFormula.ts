@@ -1308,8 +1308,6 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Suspends the dependency graph recalculation.
    * 
-   * Meaning, the `_evaluationSuspended` is set to `true`.
-   * 
    * @category Batch operation
    */
   public suspendEvaluation(): void {
@@ -1318,9 +1316,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Resumes the dependency graph recalculation.
-   *
-   * Meaning, the `_evaluationSuspended` is set to `false`.
    * 
+   * It also triggers the recalculation.
+   *
    * @category Batch operation
    */
   public resumeEvaluation(): ExportedChange[] {
@@ -1331,8 +1329,6 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if the dependency graph recalculation process is suspended or not.
    *
-   * @returns `true` if evaluation is suspended, `false` if not
-   * 
    * @category Batch operation
    */
   public isEvaluationSuspended(): boolean {
@@ -1527,9 +1523,9 @@ export class HyperFormula implements TypedEmitter {
    * A method that subscribes to an event.
    * 
    * @param {Event} event the name of the event to subscribe to
-   * @param {Listeners[Event]} listener to be called when event is emitted
+   * @param {Listener} listener to be called when event is emitted
    * 
-   * @category Event
+   * @category Events
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.on(event, listener)
@@ -1539,9 +1535,9 @@ export class HyperFormula implements TypedEmitter {
    * A method that subscribes to an event once.
    * 
    * @param {Event} event the name of the event to subscribe to
-   * @param {Listeners[Event]} listener to be called when event is emitted
+   * @param {Listener} listener to be called when event is emitted
    * 
-   * @category Event
+   * @category Events
    */
   public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.once(event, listener)
@@ -1551,9 +1547,9 @@ export class HyperFormula implements TypedEmitter {
    * A method that unsubscribe from an event or all events.
    * 
    * @param {Event} event the name of the event to subscribe to
-   * @param {Listeners[Event]} listener to be called when event is emitted
+   * @param {Listener} listener to be called when event is emitted
    * 
-   * @category Event
+   * @category Events
    */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.off(event, listener)
