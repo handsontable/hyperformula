@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
 import {plPL} from '../src/i18n'
+import {adr} from './testUtils'
 
 describe('Building empty engine', () => {
   it('works', () => {
@@ -52,5 +53,16 @@ describe('Building engine from arrays', () => {
     const engine = HyperFormula.buildFromArray([], config)
 
     expect(engine.getConfig().dateFormats[0]).toBe('MM')
+  })
+
+  it('should allow to create sheets with a delay', () => {
+    const engine1 = HyperFormula.buildFromArray([['=Sheet2!A1']])
+
+    engine1.addSheet('Sheet2')
+    engine1.setSheetContent('Sheet2', [['1']])
+    engine1.rebuildAndRecalculate()
+
+    expect(engine1.getCellValue(adr('A1', 1))).toBe(1)
+    expect(engine1.getCellValue(adr('A1', 0))).toBe(1)
   })
 })

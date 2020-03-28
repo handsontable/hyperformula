@@ -205,7 +205,6 @@ describe('remove sheet - adjust formula dependencies', () => {
     engine.removeSheet('Sheet2')
 
     expectReferenceToHaveRefError(engine, adr('A1'))
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['=Sheet2!A1']]))
   })
 
   it('should return changed values', () => {

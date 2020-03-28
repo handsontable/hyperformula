@@ -160,7 +160,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * The engine is created with a single sheet.
    * 
-   * Can be configured with the optional second parameter that represents a [[Config]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -178,7 +178,7 @@ export class HyperFormula implements TypedEmitter {
    * 
    * The engine is created with one or more sheets.
    * 
-   * Can be configured with the optional second parameter that represents a [[Config]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -194,7 +194,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Builds an empty engine instance.
    * 
-   * Can be configured with the optional parameter that represents a [[Config]].
+   * Can be configured with the optional parameter that represents a [[ConfigParams]].
    * 
    * If not specified the engine will be built with the default configuration.
    *
@@ -433,6 +433,14 @@ export class HyperFormula implements TypedEmitter {
    */
   public getConfig(): ConfigParams {
     return this._config.getConfig()
+  }
+
+  /**
+   * Serializes and deserializes whole engine, effectively reloading it.
+   *
+   */
+  public rebuildAndRecalculate(): void {
+    this.updateConfig({})
   }
 
   /**

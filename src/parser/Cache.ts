@@ -50,6 +50,7 @@ export const doesContainFunctions = (ast: Ast, interestingFunctions: Set<string>
     case AstNodeType.NUMBER:
     case AstNodeType.STRING:
     case AstNodeType.ERROR:
+    case AstNodeType.ERROR_WITH_RAW_INPUT:
     case AstNodeType.CELL_REFERENCE:
     case AstNodeType.CELL_RANGE:
       return false
