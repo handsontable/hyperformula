@@ -1305,15 +1305,36 @@ export class HyperFormula implements TypedEmitter {
     return this.resumeEvaluation()
   }
 
+  /**
+   * Suspends the dependency graph recalculation.
+   * 
+   * Meaning, the `_evaluationSuspended` is set to `true`.
+   * 
+   * @category Batch operation
+   */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
   }
 
+  /**
+   * Resumes the dependency graph recalculation.
+   *
+   * Meaning, the `_evaluationSuspended` is set to `false`.
+   * 
+   * @category Batch operation
+   */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Checks if the dependency graph recalculation process is suspended or not.
+   *
+   * @returns `true` if evaluation is suspended, `false` if not
+   * 
+   * @category Batch operation
+   */
   public isEvaluationSuspended(): boolean {
     return this._evaluationSuspended
   }
@@ -1503,19 +1524,37 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that listens on events.
+   * A method that subscribes to an event.
    * 
-   * @param {Event} event to listen on
-   * @param {Listener} handler to be called on event
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listeners[Event]} listener to be called when event is emitted
+   * 
+   * @category Event
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.on(event, listener)
   }
 
+  /**
+   * A method that subscribes to an event once.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listeners[Event]} listener to be called when event is emitted
+   * 
+   * @category Event
+   */
   public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.once(event, listener)
   }
 
+  /**
+   * A method that unsubscribe from an event or all events.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listeners[Event]} listener to be called when event is emitted
+   * 
+   * @category Event
+   */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.off(event, listener)
   }
