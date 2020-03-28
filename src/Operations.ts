@@ -320,6 +320,10 @@ export class Operations {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
+
+  public forceApplyPostponedTransformations(): void {
+    this.dependencyGraph.forceApplyPostponedTransformations()
+  }
 }
 
 export function normalizeRemovedIndexes(indexes: Index[]): Index[] {

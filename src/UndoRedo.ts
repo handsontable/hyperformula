@@ -104,6 +104,8 @@ export class UndoRedo {
   }
 
   private undoRemoveRows(operation: RemoveRowsUndoData) {
+    this.crudOperations!.operations.forceApplyPostponedTransformations()
+
     const { sheet, rowsRemovals } = operation
     for (let i = rowsRemovals.length - 1; i >= 0; --i) {
       const rowsRemoval = rowsRemovals[i]

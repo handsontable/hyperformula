@@ -62,6 +62,22 @@ describe('Undo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const sheet = [
+      ['=A2'],
+      ['42'], // remove
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.suspendEvaluation()
+    engine.removeRows(0, [1, 1])
+
+    engine.undo()
+    engine.resumeEvaluation()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
   it('restores ranges when removing rows', () => {
     const sheet = [
       ['=SUM(A2:A3)'],
