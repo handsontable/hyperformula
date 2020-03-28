@@ -161,46 +161,6 @@ describe('Undo - adding rows', () => {
   })
 })
 
-describe('Undo', () => {
-  it('when there is no operation to undo', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => {
-      engine.undo()
-    }).toThrowError(new NoOperationToUndo())
-  })
-
-  it('undo recomputes and return changes', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['3', '=A1'],
-    ])
-    engine.setCellContents(adr('A1'), '100')
-
-    const changes = engine.undo()
-
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(changes.length).toBe(2)
-  })
-})
-
-describe('UndoRedo', () => {
-  it('redo operation is pushed back on undo stack (undo-redo-undo)', () => {
-    const sheet = [
-      ['1'],
-      ['2', '=A1'], // remove
-      ['3'],
-    ]
-    const engine = HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
-    engine.undo()
-    engine.redo()
-
-    engine.undo()
-
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
-  })
-})
-
 describe('Undo - setting cell content', () => {
   it('works for simple values', () => {
     const sheet = [
@@ -244,6 +204,46 @@ describe('Undo - setting cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.setCellContents(adr('A1'), [['5', '6']])
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
+describe('Undo', () => {
+  it('when there is no operation to undo', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.undo()
+    }).toThrowError(new NoOperationToUndo())
+  })
+
+  it('undo recomputes and return changes', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['3', '=A1'],
+    ])
+    engine.setCellContents(adr('A1'), '100')
+
+    const changes = engine.undo()
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(changes.length).toBe(2)
+  })
+})
+
+describe('UndoRedo', () => {
+  it('redo operation is pushed back on undo stack (undo-redo-undo)', () => {
+    const sheet = [
+      ['1'],
+      ['2', '=A1'], // remove
+      ['3'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeRows(0, [1, 1])
+    engine.undo()
+    engine.redo()
 
     engine.undo()
 
