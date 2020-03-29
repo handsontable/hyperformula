@@ -1,7 +1,7 @@
 import {ColumnsSpan} from '../ColumnsSpan'
 import {Ast, buildCellErrorAst, CellRangeAst, ErrorAst} from '../parser'
 import {absoluteSheetReference, CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst} from '../parser/Ast'
+import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {AddressWithRow} from './common'
 import {Transformer} from './Transformer'
 import {RowsSpan} from '../RowsSpan'
@@ -28,7 +28,7 @@ export class RemoveRowsTransformer extends Transformer {
     return ast
   }
 
-  protected transformRowRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
+  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 

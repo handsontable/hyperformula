@@ -1,7 +1,7 @@
 import {CellRange, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {AstNodeType, CellAddress, CellRangeAst} from './parser'
-import {ColumnRangeAst} from './parser/Ast'
+import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
 
 export const DIFFERENT_SHEETS_ERROR = 'AbsoluteCellRange: Start and end are in different sheets'
 
@@ -10,11 +10,13 @@ export class AbsoluteCellRange {
     return this.start.sheet
   }
 
-  public static fromAst(ast: CellRangeAst | ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
+  public static fromAst(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     if (ast.type === AstNodeType.CELL_RANGE) {
       return AbsoluteCellRange.fromCellRange(ast, baseAddress)
     } else if (ast.type === AstNodeType.COLUMN_RANGE) {
       return AbsoluteColumnRange.fromColumnRange(ast, baseAddress)
+    } else if (ast.type === AstNodeType.ROW_RANGE) {
+      return AbsoluteRowRange.fromRowRange(ast, baseAddress)
     }
     throw new Error('Unsupported AST type')
   }
@@ -341,6 +343,73 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     while (currentRow <= this.effectiveHeight(dependencyGraph) - 1) {
       let currentColumn = this.start.col
       while (currentColumn <= this.end.col) {
+        yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
+        currentColumn++
+      }
+      currentRow++
+    }
+  }
+}
+
+export class AbsoluteRowRange extends AbsoluteCellRange {
+  public static fromRowRange(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
+    return new AbsoluteRowRange(
+      x.start.toSimpleAddress(baseAddress).start,
+      x.end.toSimpleAddress(baseAddress).end,
+    )
+  }
+
+  public constructor(
+    public readonly start: SimpleCellAddress,
+    public readonly end: SimpleCellAddress,
+  ) {
+    super(start, end)
+  }
+
+  public shouldBeRemoved() {
+    return this.height() <= 0
+  }
+
+  private effectiveWidth(dependencyGraph: DependencyGraph): number {
+    return dependencyGraph.getSheetWidth(this.sheet)
+  }
+
+  public shiftByColumns(numberOfColumns: number) {
+    return
+  }
+
+  public expandByColumns(numberOfColumns: number) {
+    return
+  }
+
+  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+    return new AbsoluteRowRange(simpleCellAddress(this.sheet, 0, this.start.row + byRows), simpleCellAddress(this.sheet, Number.POSITIVE_INFINITY, this.end.row + byRows))
+  }
+
+  public removeColumns(columnStart: number, columnEnd: number) {
+    return
+  }
+
+  public width(): number {
+    return Number.POSITIVE_INFINITY
+  }
+
+  public size(): number {
+    return Number.POSITIVE_INFINITY
+  }
+
+  public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
+    return new AbsoluteRowRange(
+      simpleCellAddress(this.sheet, this.start.col, startRow),
+      simpleCellAddress(this.sheet, this.end.col, startRow + numberOfRows - 1)
+    )
+  }
+
+  public* addresses(dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {
+    let currentRow = this.start.row
+    while (currentRow <= this.end.row) {
+      let currentColumn = 0
+      while (currentColumn <= this.effectiveWidth(dependencyGraph) - 1) {
         yield simpleCellAddress(this.start.sheet, currentColumn, currentRow)
         currentColumn++
       }

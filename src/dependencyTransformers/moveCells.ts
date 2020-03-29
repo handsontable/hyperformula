@@ -85,6 +85,9 @@ export namespace MoveCellsDependencyTransformer {
       case AstNodeType.COLUMN_RANGE: {
         return ast
       }
+      case AstNodeType.ROW_RANGE: {
+        return ast
+      }
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {

@@ -11,7 +11,7 @@ import {SimpleRangeValue} from '../InterpreterValue'
 import {max, maxa, min, mina, nonstrictadd} from '../scalar'
 import {FunctionPlugin} from './FunctionPlugin'
 import {findSmallerRange} from './SumprodPlugin'
-import {ColumnRangeAst} from '../../parser/Ast'
+import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -294,7 +294,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
   private reduce<T>(ast: ProcedureAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coerceFunction: (arg: InternalCellValue) => InternalCellValue): T {
     return ast.args.reduce((acc: T, arg) => {
       let value
-      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE) {
+      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         value = this.evaluateRange(arg, formulaAddress, acc, functionName, reducingFunction, mapFunction)
       } else {
         value = this.evaluateAst(arg, formulaAddress)
@@ -338,7 +338,7 @@ export class NumericAggregationPlugin extends FunctionPlugin {
    * @param functionName - function name to use as cache key
    * @param reducingFunction - reducing function
    */
-  private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
+  private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, formulaAddress: SimpleCellAddress, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>): T {
     let range
     try {
       range = AbsoluteCellRange.fromAst(ast, formulaAddress)

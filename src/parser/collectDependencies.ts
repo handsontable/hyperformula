@@ -32,6 +32,15 @@ const collectDependenciesFn = (ast: Ast, functionsWhichDoesNotNeedArgumentsToBeC
       }
       return
     }
+    case AstNodeType.ROW_RANGE: {
+      if (ast.start.sheet === ast.end.sheet) {
+        dependenciesSet.push({
+          type: RelativeDependencyType.RowRange,
+          dependency: [ast.start, ast.end]
+        })
+      }
+      return
+    }
     case AstNodeType.PERCENT_OP:
     case AstNodeType.PLUS_UNARY_OP:
     case AstNodeType.MINUS_UNARY_OP: {

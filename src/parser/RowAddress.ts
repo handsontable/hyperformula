@@ -24,11 +24,11 @@ export class RowAddress implements AddressWithRow {
   }
 
   public isRowAbsolute(): boolean {
-    return (this.type === ReferenceType.RELATIVE)
+    return (this.type === ReferenceType.ABSOLUTE)
   }
 
   public isRowRelative(): boolean {
-    return (this.type === ReferenceType.ABSOLUTE)
+    return (this.type === ReferenceType.RELATIVE)
   }
 
   public shiftedByRows(numberOfColumns: number): RowAddress {
@@ -74,10 +74,10 @@ export class RowAddress implements AddressWithRow {
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {
-      case ReferenceType.ABSOLUTE: {
+      case ReferenceType.RELATIVE: {
         return `${sheetPart}#ROWR${this.row}`
       }
-      case ReferenceType.RELATIVE: {
+      case ReferenceType.ABSOLUTE: {
         return `${sheetPart}#ROWA${this.row}`
       }
     }

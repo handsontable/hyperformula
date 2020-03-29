@@ -9,7 +9,7 @@ import {
   CellReferenceAst,
   ParserWithCaching
 } from '../parser'
-import {ColumnRangeAst} from '../parser/Ast'
+import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {DependencyGraph} from '../DependencyGraph'
 
 export abstract class Transformer {
@@ -38,6 +38,9 @@ export abstract class Transformer {
       }
       case AstNodeType.COLUMN_RANGE: {
         return this.transformColumnRangeAst(ast, address)
+      }
+      case AstNodeType.ROW_RANGE: {
+        return this.transformRowRangeAst(ast, address)
       }
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
@@ -93,7 +96,7 @@ export abstract class Transformer {
 
   protected abstract transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast
   protected abstract transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast
-  protected abstract transformRowRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast
+  protected abstract transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast
   protected abstract transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false
   protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
 

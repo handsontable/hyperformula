@@ -65,6 +65,7 @@ export function transformAddressesInFormula(ast: Ast, address: SimpleCellAddress
       }
     }
     case AstNodeType.COLUMN_RANGE:
+    case AstNodeType.ROW_RANGE:
     case AstNodeType.ERROR:
     case AstNodeType.NUMBER:
     case AstNodeType.STRING: {

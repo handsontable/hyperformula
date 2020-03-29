@@ -54,6 +54,14 @@ export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
   expect(actual).toEqual(expect.arrayContaining(expected))
 }
 
+export const rowStart = (input: number, sheet: number = 0): SimpleCellAddress => {
+  return simpleCellAddress(sheet, 0, input - 1)
+}
+
+export const rowEnd = (input: number, sheet: number = 0): SimpleCellAddress => {
+  return simpleCellAddress(sheet, Number.POSITIVE_INFINITY, input - 1)
+}
+
 export const colStart = (input: string, sheet: number = 0): SimpleCellAddress => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const result = /^(\$?)([A-Za-z]+)/.exec(input)!

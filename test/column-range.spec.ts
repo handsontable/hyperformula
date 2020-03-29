@@ -65,7 +65,7 @@ describe('Column ranges', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    expect(engine.graph.columnRanges.size).toBe(0)
+    expect(engine.graph.infiniteRanges.size).toBe(0)
   })
 
   it('should transform relative column references', () => {

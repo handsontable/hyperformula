@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {AbsoluteCellRange, AbsoluteColumnRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
@@ -129,7 +129,7 @@ export class DependencyGraph {
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
     cellDependencies.forEach((absStartCell: CellDependency) => {
-      if (absStartCell instanceof AbsoluteCellRange || absStartCell instanceof AbsoluteColumnRange) {
+      if (absStartCell instanceof AbsoluteCellRange) {
         const range = absStartCell
         let rangeVertex = this.rangeMapping.getRange(range.start, range.end)
         if (rangeVertex === null) {
@@ -138,9 +138,10 @@ export class DependencyGraph {
         }
 
         this.graph.addNode(rangeVertex)
-        if (range instanceof AbsoluteColumnRange) {
-          this.graph.markNodeAsColumnRange(rangeVertex)
+        if (range instanceof AbsoluteColumnRange || range instanceof AbsoluteRowRange) {
+          this.graph.markNodeAsInfiniteRange(rangeVertex)
         }
+
 
         const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
         if (smallerRangeVertex) {
@@ -160,7 +161,7 @@ export class DependencyGraph {
         }
         this.graph.addEdge(rangeVertex, endVertex)
 
-        if (!(range instanceof AbsoluteColumnRange)) {
+        if (!(range instanceof AbsoluteColumnRange || range instanceof AbsoluteRowRange)) {
           this.correctInfiniteRangesDependencies(rangeVertex)
         }
       } else {
@@ -170,14 +171,14 @@ export class DependencyGraph {
   }
 
   private correctInfiniteRangesDependencies(vertex: RangeVertex) {
-    for (const columnRange of this.graph.columnRanges) {
-      const columnVertex = (columnRange as RangeVertex)
-      const intersection = vertex.range.intersectionWith(columnVertex.range)
+    for (const range of this.graph.infiniteRanges) {
+      const infiniteRangeVertex = (range as RangeVertex)
+      const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
       if (intersection === null) {
         continue
       }
       for (const address of intersection.addresses(this)) {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), columnRange)
+        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
       }
     }
   }
