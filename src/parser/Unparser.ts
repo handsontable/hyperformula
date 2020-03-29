@@ -1,5 +1,13 @@
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, imageWithWhitespace, RangeSheetReferenceType} from './Ast'
+import {
+  Ast,
+  AstNodeType,
+  CellRangeAst,
+  ColumnRangeAst,
+  imageWithWhitespace,
+  RangeSheetReferenceType,
+  RowRangeAst
+} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {additionalCharactersAllowedInQuotes, ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
@@ -42,6 +50,7 @@ export class Unparser {
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
         return imageWithWhitespace(this.formatRange(ast, address), ast.leadingWhitespace)
       }
@@ -87,7 +96,7 @@ export class Unparser {
     }
   }
 
-  private formatRange(ast: CellRangeAst | ColumnRangeAst, baseAddress: SimpleCellAddress): string {
+  private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
 

@@ -16,11 +16,11 @@ export class RowAddress implements AddressWithRow {
   ) {}
 
   public static absolute(sheet: number | null, row: number) {
-    return new RowAddress(sheet, row, ReferenceType.RELATIVE)
+    return new RowAddress(sheet, row, ReferenceType.ABSOLUTE)
   }
 
   public static relative(sheet: number | null, row: number) {
-    return new RowAddress(sheet, row, ReferenceType.ABSOLUTE)
+    return new RowAddress(sheet, row, ReferenceType.RELATIVE)
   }
 
   public isRowAbsolute(): boolean {
