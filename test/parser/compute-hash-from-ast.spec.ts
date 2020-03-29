@@ -1,5 +1,4 @@
 import {Config} from '../../src/Config'
-import {simpleCellAddress} from '../../src/Cell'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {enGB, plPL} from '../../src/i18n'
 import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parser'
@@ -86,6 +85,21 @@ describe('Compute hash from ast', () => {
 
   it('column range with sheet on both sides', () => {
     const formula = '=Sheet1!A:Sheet2!B'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range',  () => {
+    const formula = '=$1:2'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range with sheet on the left', () => {
+    const formula = '=Sheet1!1:2'
+    expectHashFromAstMatchHashFromTokens(formula)
+  })
+
+  it('row range with sheet on both sides', () => {
+    const formula = '=Sheet1!1:Sheet2!2'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
