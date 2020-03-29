@@ -3,10 +3,10 @@ Prism.languages.hf = Prism.languages['excel-formula'];
 Prism.languages.formula = Prism.languages['excel-formula'];
 
 module.exports = {
-  title: 'HyperFormula',
-  description: '⚡️ HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
+  title: 'HyperFormula (v' + HyperFormula.version + ')',
+  description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
-    ['meta', { name: 'robots', content: 'noindex,nofollow' }]
+    ['meta', { name: 'robots', content: 'noindex,nofollow' }],
   ],
   base: '/hyperformula/',
   plugins: [
@@ -16,6 +16,7 @@ module.exports = {
     ['@vuepress/active-header-links']
   ],
   themeConfig: {
+    logo: '/logo.png',
     nextLinks: true,
     prevLinks: true,
     repo: 'handsontable/hyperformula',
