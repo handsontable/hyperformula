@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
 

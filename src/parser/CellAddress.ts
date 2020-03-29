@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absoluteSheetReference, simpleCellAddress, SimpleCellAddress} from '../Cell'
 
 /** Possible kinds of cell references */

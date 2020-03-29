@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {StatType} from './StatType'
 import {Statistics} from './Statistics'
 

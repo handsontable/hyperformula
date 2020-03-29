@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {SimpleCellAddress, simpleCellAddress, InternalCellValue} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'

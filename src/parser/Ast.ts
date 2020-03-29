@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
 import {Maybe} from '../Maybe'

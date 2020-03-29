@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import assert from 'assert'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'

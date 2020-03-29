@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright (c) 2020 Handsoncode. All rights reserved.
+ */
+
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
