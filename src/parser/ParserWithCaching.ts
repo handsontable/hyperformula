@@ -1,4 +1,4 @@
-import {IToken, tokenMatcher} from 'chevrotain'
+import {ISerializedGast, IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {buildParsingErrorAst, RelativeDependency} from './'
 import {cellAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
@@ -37,6 +37,13 @@ export class ParserWithCaching {
     this.lexer = new FormulaLexer(this.lexerConfig)
     this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
     this.cache = new Cache(this.config.volatileFunctions(), this.config.structuralChangeFunctions(), this.config.functionsWhichDoesNotNeedArgumentsToBeComputed())
+  }
+
+  /**
+   * Get serialized AST top nodes for chevrotain diagram generator.
+   */
+  public getSerializedGastProductions(): ISerializedGast[] {
+    return this.formulaParser.getSerializedGastProductions()
   }
 
   /**

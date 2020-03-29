@@ -106,6 +106,7 @@ module.exports = {
           title: 'Contributtor guide',
           collapsable: false,
           children: [
+            ['/guide/graph', 'Graph'],
             ['/guide/working-with-documentation', 'Working with the documentation'],
             ['/guide/writing-tests', 'Writing testst for HF'],
             ['https://github.com/handsontable/hyperformula/blob/develop/CONTRIBUTING.md', 'CONTRIBUTING.md'],

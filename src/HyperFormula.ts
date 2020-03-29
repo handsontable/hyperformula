@@ -136,6 +136,11 @@ export class HyperFormula implements TypedEmitter {
     return this._lazilyTransformingAstService
   }
 
+  /** @internal */
+  public get parser() {
+    return this._parser
+  }
+
   private static buildFromEngineState(engine: EngineState): HyperFormula {
     return new HyperFormula(
       engine.config,
@@ -438,7 +443,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Serializes and deserializes whole engine, effectively reloading it.
    *
-   * @category Instance
+   * @category Batch
    */
   public rebuildAndRecalculate(): void {
     this.updateConfig({})
@@ -1292,7 +1297,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {(e: IBatchExecutor) => void} batchOperations
    * @fires [[valuesUpdated]]
    *
-   * @category Instance
+   * @category Batch
    */
   public batch(batchOperations: (e: IBatchExecutor) => void): ExportedChange[] {
     this.suspendEvaluation()
@@ -1307,7 +1312,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    *
-   * @category Instance
+   * @category Batch
    */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
@@ -1315,7 +1320,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    *
-   * @category Instance
+   * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
@@ -1324,7 +1329,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    *
-   * @category Instance
+   * @category Batch
    */
   public isEvaluationSuspended(): boolean {
     return this._evaluationSuspended
