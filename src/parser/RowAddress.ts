@@ -67,6 +67,10 @@ export class RowAddress implements AddressWithRow {
     return new RowAddress(this.sheet, row, this.type)
   }
 
+  public withAbsoluteSheet(sheet: number): RowAddress {
+    return new RowAddress(sheet, this.row, this.type)
+  }
+
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== null ? `#${this.sheet}` : ''
     switch (this.type) {

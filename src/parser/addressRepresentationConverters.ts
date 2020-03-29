@@ -3,12 +3,14 @@ import {Maybe} from '../Maybe'
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {additionalCharactersAllowedInQuotes} from './LexerConfig'
+import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
 const addressRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)\$`)
 const columnRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([A-Za-z]+)`)
+const rowRegex = new RegExp(`^((([A-Za-z0-9_\u00C0-\u02AF]+)|'([A-Za-z0-9${additionalCharactersAllowedInQuotes}_\u00C0-\u02AF]+)')!)?(\\$?)([0-9]+)`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -63,12 +65,29 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   }
 }
 
+export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
+  const result = rowRegex.exec(stringAddress)!
+
+  const sheet = extractColumnNumber(result, sheetMapping)
+  if (sheet === undefined) {
+    return undefined
+  }
+
+  const row = Number(result[6]) - 1
+
+  if (result[5] === '$') {
+    return RowAddress.absolute(sheet, row)
+  } else {
+    return RowAddress.relative(sheet, row - baseAddress.row)
+  }
+}
+
 export const addressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
   const simpleAddress = address.toSimpleCellAddress(baseAddress)
   const column = columnIndexToLabel(simpleAddress.col)
-  const rowDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
-  const colDolar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
-  return `${colDolar}${column}${rowDolar}${simpleAddress.row + 1}`
+  const rowDollar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
+  const colDollar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
+  return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
 }
 
 /**

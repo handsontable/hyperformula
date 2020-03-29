@@ -5,6 +5,7 @@ import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
 import {Address, AddressWithSheet} from '../dependencyTransformers/common'
+import {RowAddress} from './RowAddress'
 
 export type Ast =
   NumberAst
@@ -12,6 +13,7 @@ export type Ast =
   | CellReferenceAst
   | CellRangeAst
   | ColumnRangeAst
+  | RowRangeAst
   | ConcatenateOpAst
   | MinusUnaryOpAst
   | PlusUnaryOpAst
@@ -80,6 +82,7 @@ export enum AstNodeType {
 
   CELL_RANGE = 'CELL_RANGE',
   COLUMN_RANGE = 'COLUMN_RANGE',
+  ROW_RANGE = 'ROW_RANGE',
 
   ERROR = 'ERROR',
   PARSING_ERROR = 'PARSING_ERROR',
@@ -161,6 +164,24 @@ export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sh
   assertRangeConsistency(start, end, sheetReferenceType)
   return {
     type: AstNodeType.COLUMN_RANGE,
+    start,
+    end,
+    sheetReferenceType,
+    leadingWhitespace: extractImage(leadingWhitespace)
+  }
+}
+
+export interface RowRangeAst extends AstWithWhitespace{
+  type: AstNodeType.ROW_RANGE,
+  start: RowAddress,
+  end: RowAddress,
+  sheetReferenceType: RangeSheetReferenceType,
+}
+
+export const buildRowRangeAst = (start: RowAddress, end: RowAddress, sheetReferenceType: RangeSheetReferenceType, leadingWhitespace?: IToken): RowRangeAst => {
+  assertRangeConsistency(start, end, sheetReferenceType)
+  return {
+    type: AstNodeType.ROW_RANGE,
     start,
     end,
     sheetReferenceType,

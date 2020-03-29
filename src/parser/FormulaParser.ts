@@ -2,7 +2,12 @@ import {EmbeddedActionsParser, ILexingResult, IOrAlt, IToken, Lexer, OrMethodOpt
 
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
-import {cellAddressFromString, columnAddressFromString, SheetMappingFn} from './addressRepresentationConverters'
+import {
+  cellAddressFromString,
+  columnAddressFromString,
+  rowAddressFromString,
+  SheetMappingFn
+} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -27,7 +32,7 @@ import {
   buildPlusOpAst,
   buildPlusUnaryOpAst,
   buildPowerOpAst,
-  buildProcedureAst,
+  buildProcedureAst, buildRowRangeAst,
   buildStringAst,
   buildTimesOpAst,
   CellReferenceAst,
@@ -60,7 +65,7 @@ import {
   PlusOp,
   PowerOp,
   ProcedureName,
-  RangeSeparator,
+  RangeSeparator, RowRange,
   RParen,
   StringLiteral,
   TimesOp,
@@ -342,6 +347,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.columnRangeExpression),
       },
       {
+        ALT: () => this.SUBRULE(this.rowRangeExpression),
+      },
+      {
         ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
@@ -450,7 +458,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /*
-  * Rule for column cell range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+  * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
   * */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as IExtendedToken
@@ -477,6 +485,36 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+  })
+
+  /*
+* Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
+* */
+  private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
+    const range = this.CONSUME(RowRange) as IExtendedToken
+    const [startImage, endImage] = range.image.split(':')
+
+    const start = this.ACTION(() => {
+      return rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress!)
+    })
+    let end = this.ACTION(() => {
+      return rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress!)
+    })
+
+    if (start === undefined || end === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    }
+    if (start.sheet === null && end.sheet !== null) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+    }
+
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+
+    if (start.sheet !== null && end.sheet === null) {
+      end = end.withAbsoluteSheet(start.sheet)
+    }
+
+    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
 
   /**
