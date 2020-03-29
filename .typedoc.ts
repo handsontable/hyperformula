@@ -22,7 +22,7 @@ module.exports = {
   "stripInternal": true,
   "plugin": "none",
   "name": "HyperFormula API",
-  "disableSources": true,
+  "disableSources": false,
   "categoryOrder": [
     "Factory",
     "Instance",
