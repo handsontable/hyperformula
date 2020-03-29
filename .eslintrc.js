@@ -2,7 +2,8 @@ module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
     plugins: [
-        '@typescript-eslint',
+      '@typescript-eslint',
+      'license-header',
     ],
     parserOptions: {
         tsconfigRootDir: __dirname,
@@ -15,7 +16,8 @@ module.exports = {
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
     ],
     "rules": {
-        // Automatic fixers
+      // Automatic fixers
+        "license-header/header": [ 'error', './.config/license-header.js' ],
         "@typescript-eslint/member-delimiter-style": ["error", {
             multiline: {
                 delimiter: "comma",
