@@ -2,6 +2,9 @@
 Prism.languages.hf = Prism.languages['excel-formula'];
 Prism.languages.formula = Prism.languages['excel-formula'];
 
+const regexPlugin = require('markdown-it-regex').default;
+const HyperFormula = require('../../dist/hyperformula');
+
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
@@ -10,11 +13,29 @@ module.exports = {
   ],
   base: '/hyperformula/',
   plugins: [
-    ['@vuepress/search', {
-      searchMaxSuggestions: 10
-    }],
-    ['@vuepress/active-header-links']
+    {
+      extendPageData ($page) {
+        // inject current HF version as {{ $page.version }} variable
+        $page.version = HyperFormula.version
+        // inject current HF buildDate as {{ $page.buildDate }} variable
+        $page.buildDate = HyperFormula.buildDate
+      }
+    },
   ],
+  markdown: {
+    extendMarkdown: md => {
+      md.use(regexPlugin, {
+        name: 'Replace HT_BUILD_DATE',
+        regex: /\(process\.env\.HT_BUILD_DATE/,
+        replace: () => `'${HyperFormula.buildDate}'`
+      })
+      md.use(regexPlugin, {
+        name: 'Replace HT_VERSION',
+        regex: /\(process\.env\.HT_VERSION/,
+        replace: () => `'${HyperFormula.version}'`
+      })
+    }
+  },
   themeConfig: {
     logo: '/logo.png',
     nextLinks: true,
@@ -60,7 +81,7 @@ module.exports = {
             ['/guide/working-with-events', 'Working with Events'],
             ['/guide/handling-errors', 'Handling Errors'],
             ['/guide/license-key', 'License Key'],
-            ['/guide/release-notes', 'https://github.com/handsontable/hyperformula/releases'],
+            ['https://github.com/handsontable/hyperformula/releases', 'Release Notes'],
             ['/guide/support', 'Support'],
           ]
         },
