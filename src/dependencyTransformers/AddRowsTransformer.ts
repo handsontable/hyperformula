@@ -1,6 +1,6 @@
 import {Ast, buildCellErrorAst, CellRangeAst, ErrorAst} from '../parser'
 import {absoluteSheetReference, CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst} from '../parser/Ast'
+import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {AddressWithRow} from './common'
 import {Transformer} from './Transformer'
 import {RowsSpan} from '../RowsSpan'
@@ -27,16 +27,15 @@ export class AddRowsTransformer extends Transformer {
     return ast
   }
 
-  protected transformRowRangeAst(ast: Ast, formulaAddress: SimpleCellAddress): Ast {
-    return ast
-    // const newRange = this.transformRange(ast.start, ast.end, formulaAddress)
-    // if (Array.isArray(newRange)) {
-    //   return {...ast, start: newRange[0], end: newRange[1]}
-    // } else if (newRange === ErrorType.REF) {
-    //   return buildCellErrorAst(new CellError(ErrorType.REF))
-    // } else {
-    //   return ast
-    // }
+  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformRange(ast.start, ast.end, formulaAddress)
+    if (Array.isArray(newRange)) {
+      return {...ast, start: newRange[0], end: newRange[1]}
+    } else if (newRange === ErrorType.REF) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return ast
+    }
   }
 
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {

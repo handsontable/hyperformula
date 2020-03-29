@@ -2,7 +2,7 @@ import { HyperFormula} from '../../src'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {CellAddress} from '../../src/parser'
 import '../testConfig'
-import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference} from '../testUtils'
+import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference, rowEnd, rowStart} from '../testUtils'
 
 describe('Adding column, fixing dependency', () => {
   describe('all in same sheet (case 1)', () => {
@@ -496,6 +496,24 @@ describe('Adding column, fixing column ranges', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2', '3', null, '=SUM(A:C)'],
+    ]))
+  })
+})
+
+describe('Adding column, row range', () => {
+  it('row range should not be affected', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', /*new column */ '2', '3'],
+      ['4', /*new column */ '5', '6', '=SUM(1:2)'],
+    ])
+
+    engine.addColumns(0, [1, 1])
+
+    expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(2))).not.toBe(null)
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', null, '2', '3'],
+      ['4', null, '5', '6', '=SUM(1:2)'],
     ]))
   })
 })

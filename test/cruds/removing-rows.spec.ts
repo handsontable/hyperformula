@@ -844,40 +844,40 @@ describe('Removing rows - column index', () => {
   })
 })
 
-describe('Removing rows - column range', () => {
-  it('removing rows - start of column range', () => {
+describe('Removing rows - row range', () => {
+  it('removing rows - start of row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(A:C)']
+      ['1', '2', '=SUM(1:3)']
     ])
 
     engine.removeRows(0, [0, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(A:C)']
+      ['1', '2', '=SUM(1:2)']
     ]))
   })
 
-  it('removing rows - middle of column range', () => {
+  it('removing rows - middle of row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(A:C)']
+      ['1', '2', '=SUM(1:3)']
     ])
 
     engine.removeRows(0, [1, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(A:C)']
+      ['1', '2', '=SUM(1:2)']
     ]))
   })
 
-  it('removing rows - end of column range', () => {
+  it('removing rows - end of row range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(A:C)'],
+      ['1', '2', '=SUM(1:3)'],
       ['1', '2'],
       ['1', '2']
     ])
@@ -885,8 +885,25 @@ describe('Removing rows - column range', () => {
     engine.removeRows(0, [2, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(A:C)'],
+      ['1', '2', '=SUM(1:2)'],
       ['1', '2']
+    ]))
+  })
+})
+
+describe('Removing rows - column range', () => {
+  it('should not affect column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2'],
+      ['1', '2', '=SUM(A:B)'],
+    ])
+
+    engine.removeRows(0, [0, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['1', '2', '=SUM(A:B)'],
     ]))
   })
 })

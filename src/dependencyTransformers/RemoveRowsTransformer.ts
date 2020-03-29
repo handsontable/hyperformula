@@ -29,7 +29,14 @@ export class RemoveRowsTransformer extends Transformer {
   }
 
   protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    return ast
+    const newRange = this.transformRange(ast.start, ast.end, formulaAddress)
+    if (Array.isArray(newRange)) {
+      return {...ast, start: newRange[0], end: newRange[1]}
+    } else if (newRange === ErrorType.REF) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return ast
+    }
   }
 
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {

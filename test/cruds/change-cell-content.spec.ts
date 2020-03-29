@@ -250,6 +250,18 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('C3'))).toEqual(9)
   })
 
+  it('changing value inside row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '0'],
+      ['2', '0'],
+      ['=SUM(1:2)'],
+    ])
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
+    expect(engine.getCellValue(adr('A3'))).toEqual(6)
+  })
+
   it('set formula for the first time', () => {
     const sheet = [
       ['42', ''],
