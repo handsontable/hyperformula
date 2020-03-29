@@ -42,7 +42,7 @@
   "typings": "./typings/index.d.ts",
   "private": true,
   "scripts": {
-    "docs": "npm run docs:api && npm run docs:build",
+    "docs": "npm run bundle-all && npm run docs:api && npm run docs:build",
     "docs:api": "npx typedoc --options .typedoc.md.ts",
     "docs:dev": "vuepress dev docs --silent --no-clear-screen",
     "docs:build": "vuepress build docs",
