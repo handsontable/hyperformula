@@ -3,14 +3,14 @@ import {SimpleCellAddress} from './Cell'
 import {ColumnsSpan} from './ColumnsSpan'
 import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
-import {AddColumnsTransformer} from './dependencyTransformers/transformer'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -133,7 +133,7 @@ export class LazilyTransformingAstService {
           break
         }
         case TransformationType.REMOVE_COLUMNS: {
-          const [newAst, newAddress] = RemoveColumnsDependencyTransformer.transformSingleAst(transformation.removedColumns, ast, address)
+          const [newAst, newAddress] = new RemoveColumnsTransformer(transformation.removedColumns).transformSingleAst(ast, address)
           ast = newAst
           address = newAddress
           break

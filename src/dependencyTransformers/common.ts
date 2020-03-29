@@ -124,14 +124,3 @@ export function fixFormulaVertexRow(nodeAddress: SimpleCellAddress, sheet: numbe
     return nodeAddress
   }
 }
-
-export function fixFormulaVertexColumn(nodeAddress: SimpleCellAddress, sheet: number, column: number, numberOfColumns: number): SimpleCellAddress {
-  if (sheet === nodeAddress.sheet && column <= nodeAddress.col) {
-    return {
-      ...nodeAddress,
-      col: nodeAddress.col + numberOfColumns,
-    }
-  } else {
-    return nodeAddress
-  }
-}

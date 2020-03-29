@@ -24,7 +24,6 @@ import {
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveColumnsDependencyTransformer} from './dependencyTransformers/removeColumns'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
@@ -34,7 +33,8 @@ import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
-import {AddColumnsTransformer} from './dependencyTransformers/transformer'
+import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 
 export class CrudOperations {
 
@@ -558,7 +558,7 @@ export class CrudOperations {
     this.columnSearch.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveColumnsDependencyTransformer.transform(removedColumns, this.dependencyGraph, this.parser)
+      new RemoveColumnsTransformer(removedColumns).transform(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
     })
   }
