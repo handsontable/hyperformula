@@ -1,9 +1,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {ColumnsSpan} from './ColumnsSpan'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
 import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
@@ -11,6 +9,8 @@ import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -127,7 +127,7 @@ export class LazilyTransformingAstService {
           break
         }
         case TransformationType.ADD_ROWS: {
-          const [newAst, newAddress] = AddRowsDependencyTransformer.transformSingleAst(transformation.addedRows, ast, address)
+          const [newAst, newAddress] = new AddRowsTransformer(transformation.addedRows).transformSingleAst(ast, address)
           ast = newAst
           address = newAddress
           break
@@ -139,7 +139,7 @@ export class LazilyTransformingAstService {
           break
         }
         case TransformationType.REMOVE_ROWS: {
-          const [newAst, newAddress] = RemoveRowsDependencyTransformer.transformSingleAst(transformation.removedRows, ast, address)
+          const [newAst, newAddress] = new RemoveRowsTransformer(transformation.removedRows).transformSingleAst(ast, address)
           this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
           ast = newAst
           address = newAddress

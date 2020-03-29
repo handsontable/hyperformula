@@ -4,16 +4,11 @@ import {SimpleCellAddress} from './Cell'
 import {RowsSpan} from './RowsSpan'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
-import {
-  DependencyGraph,
-  EmptyCellVertex,
-  FormulaCellVertex,
-  MatrixVertex,
-  ValueCellVertex,
-} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
 import {ParserWithCaching} from './parser'
-import {RemoveRowsDependencyTransformer} from './dependencyTransformers/removeRows'
-import {AddRowsDependencyTransformer} from './dependencyTransformers/addRows'
+import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
+import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 
 export class RemoveRowsCommand {
   constructor(
@@ -121,7 +116,7 @@ export class Operations {
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveRowsDependencyTransformer.transform(rowsToRemove, this.dependencyGraph, this.parser)
+      new RemoveRowsTransformer(rowsToRemove).transform(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addRemoveRowsTransformation(rowsToRemove)
     })
     return { version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows }
@@ -143,7 +138,7 @@ export class Operations {
     this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      AddRowsDependencyTransformer.transform(addedRows, this.dependencyGraph, this.parser)
+      new AddRowsTransformer(addedRows).transform(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addAddRowsTransformation(addedRows)
     })
 

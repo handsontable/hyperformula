@@ -6,8 +6,9 @@ import {
   SimpleRowAddress,
 } from '../Cell'
 import {ReferenceType, SimpleRange} from './ColumnAddress'
+import {AddressWithRow} from '../dependencyTransformers/common'
 
-export class RowAddress {
+export class RowAddress implements AddressWithRow {
   private constructor(
     public readonly sheet: number | null,
     public readonly row: number,

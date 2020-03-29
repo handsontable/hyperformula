@@ -5,7 +5,6 @@ import {
   simpleColumnAddress,
   SimpleColumnAddress
 } from '../Cell'
-import {CellReferenceType} from './CellAddress'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from '../dependencyTransformers/common'
 

@@ -1,11 +1,11 @@
-import {CellError, ErrorType, SimpleCellAddress, SimpleColumnAddress} from '../Cell'
+import {CellError, ErrorType, SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from '../Cell'
 import {Ast, AstNodeType, buildCellErrorAst, CellAddress} from '../parser'
 
 export interface Address extends AddressWithColumn, AddressWithRow {}
 
 export interface AddressWithSheet {
   sheet: number | null,
-  shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet
+  shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet,
 }
 
 export interface AddressWithColumn extends AddressWithSheet {
@@ -17,8 +17,11 @@ export interface AddressWithColumn extends AddressWithSheet {
 }
 
 export interface AddressWithRow extends AddressWithSheet{
-  col: number,
-  shiftedByRows(rows: number): AddressWithColumn,
+  row: number,
+  isRowAbsolute(): boolean,
+  isRowRelative(): boolean,
+  shiftedByRows(rows: number): AddressWithRow,
+  toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress,
 }
 
 export type CellAddressTransformerFunction = (dependencyAddress: CellAddress, formulaAddress: SimpleCellAddress) => CellAddress | ErrorType.REF | false
