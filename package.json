@@ -58,7 +58,7 @@
     "test": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:ci": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --maxWorkers=2",
     "typedoc:build": "npx typedoc --options .typedoc.ts",
-    "typedoc:serve": "http-server doc -p 5005",
+    "typedoc:serve": "npm run typedoc:build && http-server typedoc -p 5005",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "typings:generate": "tsc --emitDeclarationOnly -d --outDir typings",
