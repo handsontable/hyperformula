@@ -78,4 +78,8 @@ const myEngine = HyperFormula.buildFromArray();
 const myEngine = HyperFormula.buildFromSheets();
 ```
 
+### getCellFormula
+
+### getCellValue
+
 

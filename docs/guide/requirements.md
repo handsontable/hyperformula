@@ -1,37 +1,15 @@
-## System requirements
-**HyperFormula** should run on all the latest operating systems.
-
-It was tested on:
-
-macOS... + version
-
-Linux... + distro with version
-
-Windows... + version
-
-
 ## Environment 
 
-The engine requires **node.js** to be installed, make sure you have version **10.x or above**, LTS version is recommended for most of the users.
+The engine requires **node.js** to be installed, the recommended **version is 13**. The minimal version is 10.
 
 ::: tip Recommendation
-Minimal recommended version of node.js is 10.x however, for a for full string comparison support you should consider using version 13.x
+The minimal required version of node is v10 but any version lower than 13 will need additional package or build that handles Node full-ICU therefore, 13 is highly recommended.
 :::
 
 ## Supported browsers and GPU support
 
-**HyperFormula** should achieve full compatibility with all modern browsers and it was tested on:
+**HyperFormula** should achieve full compatibility with the 2 latest releases of evergreen browsers such as Chrome, Firefox, Safari, and Edge.
 
-| Browser       | Version  |
-| ------------- |:--------:|
-| Chrome        |   abc    |
-| Firefox       |   abc    |
-| Safari        |   abc    |
-| ...           |   abc    |
-
-Known limitations:
-
-Due to the fact that **HyperFormula** utilizes the gpu acceleration for calculations on matrices, it can expose limited performance in older browsers such as IE 10.
 
 ## Dependencies
 
