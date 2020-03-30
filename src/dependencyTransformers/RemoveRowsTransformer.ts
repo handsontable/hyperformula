@@ -9,9 +9,13 @@ import {RowAddress} from '../parser/RowAddress'
 
 export class RemoveRowsTransformer extends Transformer {
   constructor(
-    private rowsSpan: RowsSpan
+    public readonly rowsSpan: RowsSpan
   ) {
     super()
+  }
+
+  public get sheet(): number {
+    return this.rowsSpan.sheet
   }
 
   protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {

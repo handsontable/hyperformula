@@ -3,21 +3,28 @@ import {Ast, CellAddress} from '../parser'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Address} from './common'
-import {MoveCellsTransformation} from '../LazilyTransformingAstService'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 export class MoveCellsTransformer extends Transformer {
   private dependentFormulaTransformer: DependentFormulaTransformer
   constructor(
-    private transformation: MoveCellsTransformation,
+    public readonly sourceRange: AbsoluteCellRange,
+    public readonly toRight: number,
+    public readonly toBottom: number,
+    public readonly toSheet: number
   ) {
     super()
-    this.dependentFormulaTransformer = new DependentFormulaTransformer(transformation)
+    this.dependentFormulaTransformer = new DependentFormulaTransformer(sourceRange, toRight, toBottom, toSheet)
+  }
+
+  public get sheet(): number {
+    return this.sourceRange.sheet
   }
 
   transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    if (this.transformation.sourceRange.addressInRange(address)) {
+    if (this.sourceRange.addressInRange(address)) {
       const newAst = this.transformAst(ast, address)
       return [newAst, this.fixNodeAddress(address)]
     } else {
@@ -26,24 +33,24 @@ export class MoveCellsTransformer extends Transformer {
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
-    return simpleCellAddress(address.sheet, address.col + this.transformation.toRight, address.row + this.transformation.toBottom)
+    return simpleCellAddress(address.sheet, address.col + this.toRight, address.row + this.toBottom)
   }
 
   protected transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
-    const sourceRange = this.transformation.sourceRange
-    const targetRange = sourceRange.shifted(this.transformation.toRight, this.transformation.toBottom)
+    const sourceRange = this.sourceRange
+    const targetRange = sourceRange.shifted(this.toRight, this.toBottom)
 
     if (dependencyAddress instanceof CellAddress) {
       const absoluteDependencyAddress = dependencyAddress.toSimpleCellAddress(formulaAddress)
       if (sourceRange.addressInRange(absoluteDependencyAddress)) { // If dependency is internal, move only absolute dimensions
-        return dependencyAddress.shiftAbsoluteDimensions(this.transformation.toRight, this.transformation.toBottom) as T
+        return dependencyAddress.shiftAbsoluteDimensions(this.toRight, this.toBottom) as T
 
       } else if (targetRange.addressInRange(absoluteDependencyAddress)) {  // If dependency is external and moved range overrides it return REF
         return ErrorType.REF
       }
     }
 
-    return dependencyAddress.shiftRelativeDimensions(-this.transformation.toRight, -this.transformation.toBottom) as T
+    return dependencyAddress.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T
   }
 
   protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
@@ -77,9 +84,16 @@ export class MoveCellsTransformer extends Transformer {
 
 class DependentFormulaTransformer extends Transformer {
   constructor(
-    private transformation: MoveCellsTransformation
+    public readonly sourceRange: AbsoluteCellRange,
+    public readonly toRight: number,
+    public readonly toBottom: number,
+    public readonly toSheet: number
   ) {
     super()
+  }
+
+  public get sheet(): number {
+    return this.sourceRange.sheet
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
@@ -87,10 +101,10 @@ class DependentFormulaTransformer extends Transformer {
   }
 
   protected transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | false {
-    const sourceRange = this.transformation.sourceRange
+    const sourceRange = this.sourceRange
     if (dependencyAddress instanceof CellAddress) {
       if (sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))) {
-        return dependencyAddress.moved(this.transformation.toSheet, this.transformation.toRight, this.transformation.toBottom) as T
+        return dependencyAddress.moved(this.toSheet, this.toRight, this.toBottom) as T
       }
       return false
     }

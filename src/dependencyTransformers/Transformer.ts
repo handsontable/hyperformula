@@ -15,11 +15,15 @@ import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 
 export interface FormulaTransformer {
+  sheet: number,
   transform(graph: DependencyGraph, parser: ParserWithCaching): void,
   transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress],
 }
 
-export abstract class Transformer implements FormulaTransformer{
+export abstract class Transformer implements FormulaTransformer {
+  protected constructor(
+  ) {}
+
   public transform(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = this.transformSingleAst(node.getFormula()!, node.getAddress())
@@ -150,4 +154,5 @@ export abstract class Transformer implements FormulaTransformer{
   protected abstract transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false
   protected abstract transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false
   protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
+  public abstract get sheet(): number
 }

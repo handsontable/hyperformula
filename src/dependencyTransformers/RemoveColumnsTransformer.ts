@@ -9,9 +9,13 @@ import {ColumnAddress} from '../parser/ColumnAddress'
 
 export class RemoveColumnsTransformer extends Transformer {
   constructor(
-    private columnsSpan: ColumnsSpan
+    public readonly columnsSpan: ColumnsSpan
   ) {
     super()
+  }
+
+  public get sheet(): number {
+    return this.columnsSpan.sheet
   }
 
   protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {

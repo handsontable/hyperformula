@@ -117,15 +117,9 @@ export class CrudOperations {
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      new MoveCellsTransformer({
-        type: TransformationType.MOVE_CELLS,
-        sourceRange,
-        toRight,
-        toBottom,
-        toSheet,
-        sheet: sourceRange.sheet,
-      }).transform(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
+      const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
+      transformation.transform(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.dependencyGraph.moveCells(sourceRange, toRight, toBottom, toSheet)
@@ -197,8 +191,9 @@ export class CrudOperations {
     this.dependencyGraph.removeSheet(sheetId)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      new RemoveSheetTransformer(sheetId).transform(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveSheetTransformation(sheetId)
+      const transformation = new RemoveSheetTransformer(sheetId)
+      transformation.transform(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
     this.sheetMapping.removeSheet(sheetId)
@@ -540,9 +535,9 @@ export class CrudOperations {
     this.columnSearch.addColumns(addedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformer = new AddColumnsTransformer(addedColumns)
-      transformer.transform(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addAddColumnsTransformation(addedColumns)
+      const transformation = new AddColumnsTransformer(addedColumns)
+      transformation.transform(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }
 
@@ -565,8 +560,9 @@ export class CrudOperations {
     this.columnSearch.removeColumns(removedColumns)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      new RemoveColumnsTransformer(removedColumns).transform(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addRemoveColumnsTransformation(removedColumns)
+      const transformation = new RemoveColumnsTransformer(removedColumns)
+      transformation.transform(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
     })
   }
 

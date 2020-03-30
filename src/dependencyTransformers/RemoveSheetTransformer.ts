@@ -1,15 +1,15 @@
-import {FormulaTransformer, Transformer} from './Transformer'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {Address, cellRangeTransformer, transformAddressesInFormula} from './common'
+import {Transformer} from './Transformer'
+import {ErrorType, SimpleCellAddress} from '../Cell'
+import {Address} from './common'
 import {DependencyGraph} from '../DependencyGraph'
-import {Ast, buildCellErrorAst, CellAddress, CellRangeAst, CellReferenceAst, ParserWithCaching} from '../parser'
+import {Ast, CellAddress, CellRangeAst, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 import {ColumnRangeAst} from '../parser/Ast'
 
 export class RemoveSheetTransformer extends Transformer {
   constructor(
-    private removedSheet: number
+    public readonly sheet: number
   ) {
     super()
   }
@@ -26,7 +26,7 @@ export class RemoveSheetTransformer extends Transformer {
   }
 
   protected transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
-    if (dependencyAddress.sheet === this.removedSheet) {
+    if (dependencyAddress.sheet === this.sheet) {
       return ErrorType.REF
     }
     return false
