@@ -44,7 +44,7 @@
   "scripts": {
     "docs": "npm run bundle-all && npm run docs:api && npm run docs:build",
     "docs:api": "npx typedoc --options .typedoc.md.ts",
-    "docs:dev": "vuepress dev docs --silent --no-clear-screen",
+    "docs:dev": "vuepress dev docs --silent --no-clear-screen --no-cache",
     "docs:build": "vuepress build docs",
     "bundle-all": "npm-run-all compile bundle:** typings:generate verify-bundles",
     "bundle:es": "cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-dir es",
@@ -103,6 +103,7 @@
     "typedoc-plugin-markdown": "^2.2.17",
     "typescript": "^3.2",
     "vuepress": "^1.3.1",
+    "vuepress-plugin-clean-urls": "^1.1.1",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
     "webpackbar": "^4.0.0"

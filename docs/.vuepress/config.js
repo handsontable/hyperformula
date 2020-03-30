@@ -4,6 +4,8 @@ Prism.languages.formula = Prism.languages['excel-formula'];
 
 const regexPlugin = require('markdown-it-regex').default;
 const HyperFormula = require('../../dist/hyperformula.full');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
@@ -13,6 +15,14 @@ module.exports = {
   ],
   base: '/hyperformula/',
   plugins: [
+    [
+      'vuepress-plugin-clean-urls',
+      {
+        normalSuffix: '',
+        indexSuffix: '/',
+        notFoundPath: '/404.html',
+      },
+    ],
     {
       extendPageData ($page) {
         // inject current HF version as {{ $page.version }} variable
@@ -116,48 +126,47 @@ module.exports = {
       ],
       '/api/': [
         {
+          title: 'Introduction',
+          path: '/api/',
+        },
+        {
           title: 'HyperFormula',
-          path: '/api/classes/_hyperformula_.hyperformula',
+          path: '/api/classes/hyperformula',
           collapsable: true,
         },
         {
           title: 'Events',
-          path: '/api/interfaces/_emitter_.listeners',
+          path: '/api/interfaces/listeners',
           collapsable: true,
         },
         {
           title: 'Options',
-          path: '/api/interfaces/_config_.configparams',
+          path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
           title: 'Errors',
           collapsable: true,
-          sidebarDepth: 0,
-          children: [
-            ['/api/classes/_errors_.expectedoneofvalues', 'ExpectedOneOfValues'],
-            ['/api/classes/_errors_.expectedvalueoftype', 'ExpectedValueOfType'],
-            ['/api/classes/_errors_.invalidaddresserror', 'InvalidAddressError'],
-            ['/api/classes/_errors_.invalidargumentserror', 'InvalidArgumentsError'],
-            ['/api/classes/_errors_.namedexpressiondoesnotexist', 'NamedExpressionDoesNotExist'],
-            ['/api/classes/_errors_.namedexpressionnameisalreadytaken', 'NamedExpressionNameIsAlreadyTaken'],
-            ['/api/classes/_errors_.namedexpressionnameisinvalid', 'NamedExpressionNameIsInvalid'],
-            ['/api/classes/_errors_.nooperationtoundo', 'NoOperationToUndo'],
-            ['/api/classes/_errors_.nosheetwithiderror', 'NoSheetWithIdError'],
-            ['/api/classes/_errors_.nosheetwithnameerror', 'NoSheetWithNameError'],
-            ['/api/classes/_errors_.unabletoparse', 'UnableToParse'],
-          ]
+          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
+            .filter((n) => n.match(/.*error\.md$/))
+            .map(f => `/api/classes/${f}`)
         },
         {
-          title: 'Values',
+          title: 'Enumerations',
           collapsable: true,
-          sidebarDepth: 0,
-          children: [
-            ['/api/classes/_cellvalue_.detailedcellerror', 'DetailedCellError'],
-            ['/api/classes/_hyperformula_.hyperformula', 'EmptyValue'],
-            ['/api/classes/_cellvalue_.exportedcellchange', 'ExportedCellChange'],
-            ['/api/classes/_cellvalue_.exportednamedexpressionchange', 'ExportedNamedExpressionChange'],
-          ]
+          children: fs.readdirSync(path.join(__dirname, '../api/enums'))
+            .map(f => `/api/enums/${f}`)
+        },
+        {
+          title: 'Interfaces',
+          collapsable: true,
+          children: fs.readdirSync(path.join(__dirname, '../api/interfaces'))
+            .filter((n) => !n.match(/.*configparams.*/))
+            .map(f => `/api/interfaces/${f}`)
+        },
+        {
+          title: 'Globals',
+          path: '/api/globals',
         },
       ],
     },

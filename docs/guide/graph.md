@@ -1,3 +1,1 @@
-<ClientOnly>
-  <graph></graph>
-</ClientOnly>
+<ClientOnly><graph></graph></ClientOnly>

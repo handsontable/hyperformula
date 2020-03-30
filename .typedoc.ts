@@ -13,7 +13,7 @@ module.exports = {
     "./src/DependencyGraph/**",
     "./src/ColumnSearch/**",
   ],
-  "mode": "modules",
+  "mode": "file",
   "out": "./typedoc",
   "excludeExternals": true,
   "excludeProtected": true,
