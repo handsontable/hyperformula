@@ -14,8 +14,13 @@ import {DependencyGraph} from '../DependencyGraph'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 
-export abstract class Transformer {
-  public transform(graph: DependencyGraph, parser: ParserWithCaching) {
+export interface FormulaTransformer {
+  transform(graph: DependencyGraph, parser: ParserWithCaching): void,
+  transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress],
+}
+
+export abstract class Transformer implements FormulaTransformer{
+  public transform(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst, newAddress] = this.transformSingleAst(node.getFormula()!, node.getAddress())
       const cachedAst = parser.rememberNewAst(newAst)

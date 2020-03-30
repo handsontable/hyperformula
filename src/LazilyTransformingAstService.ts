@@ -1,7 +1,6 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {ColumnsSpan} from './ColumnsSpan'
-import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {Ast, ParserWithCaching} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
@@ -11,6 +10,7 @@ import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTr
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 
 export enum TransformationType {
   ADD_ROWS,
@@ -152,7 +152,8 @@ export class LazilyTransformingAstService {
           break
         }
         case TransformationType.REMOVE_SHEET: {
-          ast = RemoveSheetDependencyTransformer.transformSingleAst(transformation.sheet, ast, address)
+          const [newAst, newAddress] = new RemoveSheetTransformer(transformation.sheet).transformSingleAst(ast, address)
+          ast = newAst
           break
         }
       }

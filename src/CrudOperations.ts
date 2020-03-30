@@ -23,7 +23,6 @@ import {
   ValueCellVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
@@ -35,6 +34,7 @@ import {UndoRedo} from './UndoRedo'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 
 export class CrudOperations {
 
@@ -197,7 +197,7 @@ export class CrudOperations {
     this.dependencyGraph.removeSheet(sheetId)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      RemoveSheetDependencyTransformer.transform(sheetId, this.dependencyGraph)
+      new RemoveSheetTransformer(sheetId).transform(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addRemoveSheetTransformation(sheetId)
     })
 
