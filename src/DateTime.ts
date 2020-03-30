@@ -236,8 +236,8 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
 
 export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
   timeFormat = timeFormat.toLowerCase()
-  if(timeFormat.length >= 1 && timeFormat.substring(timeFormat.length-1)==='a') {
-    timeFormat = timeFormat.substring(0,timeFormat.length-1).trim()
+  if(timeFormat.length >= 1 && timeFormat.endsWith('a')) {
+    timeFormat = timeFormat.substring(0, timeFormat.length-1).trim()
   }
   const formatItems = timeFormat.split(':')
   let ampm = undefined
