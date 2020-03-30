@@ -8,7 +8,7 @@ import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, Va
 import {GraphBuilderMatrixHeuristic} from './GraphBuilderMatrixHeuristic'
 import {checkMatrixSize} from './Matrix'
 import {ParserWithCaching, ProcedureAst} from './parser'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 
 /**
  * Two-dimenstional array representation of sheet
@@ -40,7 +40,7 @@ export class GraphBuilder {
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
     private readonly config: Config,
-    private readonly stats: Statistics = new Statistics(),
+    private readonly stats: Statistics,
   ) {
     if (this.config.matrixDetection) {
       this.buildStrategy = new MatrixDetectionStrategy(this.dependencyGraph, this.columnSearch, this.parser, this.stats, config.matrixDetectionThreshold, this.cellContentParser)

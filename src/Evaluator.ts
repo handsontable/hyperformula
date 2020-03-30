@@ -9,7 +9,7 @@ import {SimpleRangeValue} from './interpreter/InterpreterValue'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/scalar'
 import {Matrix} from './Matrix'
 import {Ast} from './parser'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics, StatType} from './statistics'
 import Collator = Intl.Collator
 import {NumberLiteralHelper} from './NumberLiteralHelper'
 

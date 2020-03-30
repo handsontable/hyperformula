@@ -15,7 +15,7 @@ describe('Disable matrix optimizatoins', () => {
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(MatrixVertex)
 
-    engine.disableNumericMatrices()
+    engine.dependencyGraph.disableNumericMatrices()
 
     expect(engine.addressMapping.fetchCell(adr('A1'))).toBeInstanceOf(ValueCellVertex)
     expect(engine.addressMapping.fetchCell(adr('B1'))).toBeInstanceOf(ValueCellVertex)
@@ -37,7 +37,7 @@ describe('Disable matrix optimizatoins', () => {
     expect(engine.graph.getDependencies(range).length).toBe(1)
     expect(engine.dependencyGraph.getMatrix(AbsoluteCellRange.fromCoordinates(0, 0, 0, 1, 1))).not.toBe(undefined)
 
-    engine.disableNumericMatrices()
+    engine.dependencyGraph.disableNumericMatrices()
     const a1 = engine.dependencyGraph.fetchCell(adr('A1')) as ValueCellVertex
     const b1 = engine.dependencyGraph.fetchCell(adr('B1')) as ValueCellVertex
     expect(a1).toBeInstanceOf(ValueCellVertex)
@@ -61,7 +61,7 @@ describe('Disable matrix optimizatoins', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const matrix = engine.matrixMapping.getMatrix(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))!
 
-    engine.disableNumericMatrices()
+    engine.dependencyGraph.disableNumericMatrices()
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1')) as ValueCellVertex
     const b1 = engine.dependencyGraph.fetchCell(adr('B1')) as ValueCellVertex
@@ -87,7 +87,7 @@ describe('Disable matrix optimizatoins', () => {
     expect(b2).toBeInstanceOf(MatrixVertex)
     expect(a1).toBe(b2)
 
-    engine.disableNumericMatrices()
+    engine.dependencyGraph.disableNumericMatrices()
 
     const a1AfterUpdate = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
     const b2AfterUpdate = engine.addressMapping.fetchCell(adr('B2')) as ValueCellVertex
@@ -116,7 +116,7 @@ describe('Disable matrix optimizatoins', () => {
     expect(c1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(c1, a3)).toBe(true)
 
-    engine.disableNumericMatrices()
+    engine.dependencyGraph.disableNumericMatrices()
 
     const a1AfterUpdate = engine.addressMapping.fetchCell(adr('A1')) as ValueCellVertex
     const c1AfterUpdate = engine.addressMapping.fetchCell(adr('C1')) as EmptyCellVertex

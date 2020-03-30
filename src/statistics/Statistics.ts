@@ -1,39 +1,35 @@
-export enum StatType {
-  /* build engine */
-  BUILD_ENGINE_TOTAL = 'BUILD_ENGINE_TOTAL',
-  PARSER = 'PARSER',
-  GRAPH_BUILD = 'GRAPH_BUILD',
-  TOP_SORT = 'TOP_SORT',
-  MATRIX_DETECTION = 'MATRIX_DETECTION',
-  BUILD_COLUMN_INDEX = 'BUILD_COLUMN_INDEX',
-  EVALUATION = 'EVALUATION',
-  VLOOKUP = 'VLOOKUP',
-  /* crud adjustments */
-  TRANSFORM_ASTS = 'TRANSFORM_ASTS',
-  TRANSFORM_ASTS_POSTPONED = 'TRANSFORM_ASTS_POSTPONED',
-  ADJUSTING_ADDRESS_MAPPING = 'ADJUSTING_ADDRESS_MAPPING',
-  ADJUSTING_MATRIX_MAPPING = 'ADJUSTING_MATRIX_MAPPING',
-  ADJUSTING_RANGES = 'ADJUSTING_RANGES',
-  ADJUSTING_GRAPH = 'ADJUSTING_GRAPH',
-}
+import {StatType} from './StatType'
 
 /**
  * Provides tracking performance statistics to the engine
  */
 export class Statistics {
-  public criterionFunctionFullCacheUsed = 0
-  public criterionFunctionPartialCacheUsed = 0
-  private readonly stats: Map<StatType, number> = new Map<StatType, number>()
-  private readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
+  protected readonly stats: Map<StatType, number> = new Map<StatType, number>([
+    [StatType.CRITERION_FUNCTION_FULL_CACHE_USED, 0],
+    [StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, 0],
+  ])
+  protected readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
+
+  public incrementCriterionFunctionFullCacheUsed() {
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED) || 0) + 1
+
+    this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, newValue)
+  }
+
+  public incrementCriterionFunctionPartialCacheUsed() {
+    const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED) || 0) + 1
+
+    this.stats.set(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, newValue)
+  }
 
   /**
    * Resets statistics
    */
   public reset(): void {
-    this.criterionFunctionFullCacheUsed = 0
-    this.criterionFunctionPartialCacheUsed = 0
     this.stats.clear()
     this.startTimes.clear()
+    this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, 0)
+    this.stats.set(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, 0)
   }
 
   /**
@@ -92,5 +88,6 @@ export class Statistics {
 
   public destroy() {
     this.stats.clear()
+    this.startTimes.clear()
   }
 }

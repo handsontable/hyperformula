@@ -26,8 +26,8 @@ export class EngineComparator {
       throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)
     }
 
-    this.expected.forceApplyPostponedTransformations()
-    this.actual.forceApplyPostponedTransformations()
+    this.expected.dependencyGraph.forceApplyPostponedTransformations()
+    this.actual.dependencyGraph.forceApplyPostponedTransformations()
 
     for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
       this.compareSheets(sheet)
