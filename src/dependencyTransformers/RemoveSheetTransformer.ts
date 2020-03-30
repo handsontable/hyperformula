@@ -1,10 +1,9 @@
 import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {Ast, CellAddress, CellRangeAst, ParserWithCaching} from '../parser'
+import {CellAddress, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
-import {ColumnRangeAst} from '../parser/Ast'
 import {Address} from '../parser/Address'
 
 export class RemoveSheetTransformer extends Transformer {
@@ -32,14 +31,6 @@ export class RemoveSheetTransformer extends Transformer {
     return false
   }
 
-  protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    return ast
-  }
-
-  protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    return ast
-  }
-
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
     const newStart = this.transformCellAddress(start, formulaAddress)
     const newEnd = this.transformCellAddress(end, formulaAddress)
@@ -53,10 +44,16 @@ export class RemoveSheetTransformer extends Transformer {
   }
 
   protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
-    throw Error('Not implemented')
+    if (start.sheet === this.sheet || start.sheet === this.sheet) {
+      return ErrorType.REF
+    }
+    return false
   }
 
   protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
-    throw Error('Not implemented')
+    if (start.sheet === this.sheet || start.sheet === this.sheet) {
+      return ErrorType.REF
+    }
+    return false
   }
 }
