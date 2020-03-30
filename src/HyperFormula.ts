@@ -1305,15 +1305,42 @@ export class HyperFormula implements TypedEmitter {
     return this.resumeEvaluation()
   }
 
+  /**
+   * Suspends the dependency graph recalculation.
+   * 
+   * It allows optimizing the performance.
+   * 
+   * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
+   * 
+   * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
+   * 
+   * To resume the evaluation use [[resumeEvaluation]].
+   * 
+   * @category Batch
+   */
   public suspendEvaluation(): void {
     this._evaluationSuspended = true
   }
 
+  /**
+   * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
+   * 
+   * It also triggers the recalculation and returns changes that are a result of all batched operations.
+   * 
+   * @fires [[valuesUpdated]]
+   *
+   * @category Batch
+   */
   public resumeEvaluation(): ExportedChange[] {
     this._evaluationSuspended = false
     return this.recomputeIfDependencyGraphNeedsIt()
   }
 
+  /**
+   * Checks if the dependency graph recalculation process is suspended or not.
+   *
+   * @category Batch
+   */
   public isEvaluationSuspended(): boolean {
     return this._evaluationSuspended
   }
@@ -1503,19 +1530,37 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * A method that listens on events.
+   * A method that subscribes to an event.
    * 
-   * @param {Event} event to listen on
-   * @param {Listener} handler to be called on event
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
    */
   public on<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.on(event, listener)
   }
 
+  /**
+   * A method that subscribes to an event once.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
+   */
   public once<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.once(event, listener)
   }
 
+  /**
+   * A method that unsubscribe from an event or all events.
+   * 
+   * @param {Event} event the name of the event to subscribe to
+   * @param {Listener} listener to be called when event is emitted
+   * 
+   * @category Events
+   */
   public off<Event extends keyof Listeners>(event: Event, listener: Listeners[Event]): void {
     this._emitter.off(event, listener)
   }
