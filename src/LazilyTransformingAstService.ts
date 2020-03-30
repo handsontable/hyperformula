@@ -1,9 +1,10 @@
 import {SimpleCellAddress} from './Cell'
 import {Ast, ParserWithCaching} from './parser'
-import {Statistics, StatType} from './statistics/Statistics'
+import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
+import {StatType} from './statistics'
 
 export class LazilyTransformingAstService {
 

@@ -21,8 +21,8 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(coerceNonDateScalarToMaybeNumber(' 42', numberLiteralsHelper)).toBe(42)
     expect(coerceNonDateScalarToMaybeNumber('42 ', numberLiteralsHelper)).toBe(42)
     expect(coerceNonDateScalarToMaybeNumber('0000042', numberLiteralsHelper)).toBe(42)
-    expect(coerceNonDateScalarToMaybeNumber('42foo', numberLiteralsHelper)).toEqual(null)
-    expect(coerceNonDateScalarToMaybeNumber('foo42', numberLiteralsHelper)).toEqual(null)
+    expect(coerceNonDateScalarToMaybeNumber('42foo', numberLiteralsHelper)).toEqual(undefined)
+    expect(coerceNonDateScalarToMaybeNumber('foo42', numberLiteralsHelper)).toEqual(undefined)
     expect(coerceNonDateScalarToMaybeNumber(true, numberLiteralsHelper)).toBe(1)
     expect(coerceNonDateScalarToMaybeNumber(false, numberLiteralsHelper)).toBe(0)
     expect(coerceNonDateScalarToMaybeNumber(EmptyValue, numberLiteralsHelper)).toBe(0)
@@ -249,5 +249,27 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(false)
     expect(engine.getCellValue(adr('E1'))).toEqual(true)
     expect(engine.getCellValue(adr('F1'))).toEqual(true)
+  })
+
+  it( 'order operations, 0 vs false', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ 0, false, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
+    ])
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)
+    expect(engine.getCellValue(adr('D1'))).toEqual(true)
+    expect(engine.getCellValue(adr('E1'))).toEqual(false)
+    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+    expect(engine.getCellValue(adr('G1'))).toEqual(false)
+  })
+
+  it( 'order operations, 1 vs true', () => {
+    const engine = HyperFormula.buildFromArray([
+      [ 1, true, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
+    ])
+    expect(engine.getCellValue(adr('C1'))).toEqual(false)
+    expect(engine.getCellValue(adr('D1'))).toEqual(true)
+    expect(engine.getCellValue(adr('E1'))).toEqual(false)
+    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+    expect(engine.getCellValue(adr('G1'))).toEqual(false)
   })
 })

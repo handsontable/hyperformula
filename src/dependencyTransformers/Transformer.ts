@@ -55,6 +55,7 @@ export abstract class Transformer implements FormulaTransformer {
       }
       case AstNodeType.ERROR:
       case AstNodeType.NUMBER:
+      case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.STRING: {
         return ast
       }

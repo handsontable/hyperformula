@@ -9,7 +9,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
-import {Statistics, StatType} from '../statistics/Statistics'
+import {Statistics, StatType} from '../statistics'
 import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex, Vertex} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
@@ -47,7 +47,7 @@ export class DependencyGraph {
     public readonly graph: Graph<Vertex>,
     public readonly sheetMapping: SheetMapping,
     public readonly matrixMapping: MatrixMapping,
-    public readonly stats: Statistics = new Statistics(),
+    public readonly stats: Statistics,
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
     public readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string>,
   ) {

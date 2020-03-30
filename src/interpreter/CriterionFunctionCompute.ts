@@ -53,7 +53,7 @@ export class CriterionFunctionCompute<T> {
       const fullCriterionString = conditions.map((c) => c.criterionPackage.raw).join(',')
       const cachedResult = this.findAlreadyComputedValueInCache(valuesRangeVertex, this.cacheKey(conditions), fullCriterionString)
       if (cachedResult) {
-        this.interpreter.stats.criterionFunctionFullCacheUsed++
+        this.interpreter.stats.incrementCriterionFunctionFullCacheUsed()
         return cachedResult
       }
 
@@ -123,7 +123,7 @@ export class CriterionFunctionCompute<T> {
     smallerCache.forEach(([value, criterionLambdas]: [T, CriterionLambda[]], key: string) => {
       const filteredValues = ifFilter(criterionLambdas, restConditionRanges.map((rcr) => getRangeValues(this.dependencyGraph, rcr)), Array.from(getRangeValues(this.dependencyGraph, restValuesRange)).map(this.mapFunction)[Symbol.iterator]())
       const newCacheValue = this.composeFunction(value, this.reduceFunction(filteredValues))
-      this.interpreter.stats.criterionFunctionPartialCacheUsed++
+      this.interpreter.stats.incrementCriterionFunctionPartialCacheUsed()
       newCache.set(key, [newCacheValue, criterionLambdas])
     })
 

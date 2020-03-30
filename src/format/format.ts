@@ -1,16 +1,17 @@
 import {InternalCellValue} from '../Cell'
 import {Config} from '../Config'
-import {DateHelper} from '../DateHelper'
+import {DateHelper, SimpleDate} from '../DateHelper'
+import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateHelper): InternalCellValue {
-  const tryString = config.stringifyDate(value, formatArg, dateHelper) // default points to defaultStringifyDate()
-  if (tryString != null) {
+  const tryString = config.stringifyDate(dateHelper.numberToDate(value), formatArg) // default points to defaultStringifyDate()
+  if (tryString !== undefined) {
     return tryString
   } else {
     const expression = parseForNumberFormat(formatArg)
 
-    if (expression !== null) {
+    if (expression !== undefined) {
       return numberFormat(expression.tokens, value)
     } else {
       return formatArg
@@ -72,14 +73,13 @@ function numberFormat(tokens: FormatToken[], value: number): InternalCellValue {
   return result
 }
 
-export function defaultStringifyDate(value: number, formatArg: string, dateHelper: DateHelper): string | null {
+export function defaultPrintDate(date: SimpleDate, formatArg: string): Maybe<string> {
   const expression = parseForDateFormat(formatArg)
-  if (expression === null) {
-    return null
+  if (expression === undefined) {
+    return undefined
   }
   const tokens = expression.tokens
   let result = ''
-  const date = dateHelper.numberToDate(value)
   //  let minutes: boolean = false
 
   for (let i = 0; i < tokens.length; ++i) {
@@ -171,3 +171,4 @@ export function defaultStringifyDate(value: number, formatArg: string, dateHelpe
 
   return result
 }
+

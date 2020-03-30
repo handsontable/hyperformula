@@ -32,6 +32,7 @@ export type Ast =
   | ProcedureAst
   | ParenthesisAst
   | ErrorAst
+  | ErrorWithRawInputAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -85,7 +86,8 @@ export enum AstNodeType {
   ROW_RANGE = 'ROW_RANGE',
 
   ERROR = 'ERROR',
-  PARSING_ERROR = 'PARSING_ERROR',
+
+  ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT'
 }
 
 export enum RangeSheetReferenceType {
@@ -393,6 +395,19 @@ export interface ErrorAst extends AstWithWhitespace {
 export const buildCellErrorAst = (error: CellError, leadingWhitespace?: IToken): ErrorAst => ({
   type: AstNodeType.ERROR,
   error,
+  leadingWhitespace: extractImage(leadingWhitespace),
+})
+
+export interface ErrorWithRawInputAst extends AstWithWhitespace {
+  type: AstNodeType.ERROR_WITH_RAW_INPUT,
+  rawInput: string,
+  error: CellError,
+}
+
+export const buildErrorWithRawInputAst = (rawInput: string, error: CellError, leadingWhitespace?: IToken): ErrorWithRawInputAst => ({
+  type: AstNodeType.ERROR_WITH_RAW_INPUT,
+  error,
+  rawInput,
   leadingWhitespace: extractImage(leadingWhitespace),
 })
 
