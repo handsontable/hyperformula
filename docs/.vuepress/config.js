@@ -3,7 +3,7 @@ Prism.languages.hf = Prism.languages['excel-formula'];
 Prism.languages.formula = Prism.languages['excel-formula'];
 
 const regexPlugin = require('markdown-it-regex').default;
-const HyperFormula = require('../../dist/hyperformula');
+const HyperFormula = require('../../dist/hyperformula.full');
 
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',

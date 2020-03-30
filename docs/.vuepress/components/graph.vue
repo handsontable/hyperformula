@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import HyperFormula from '../../../dist/hyperformula'
+  import HyperFormula from '../../../dist/hyperformula.full'
   import DiagramsBehavior from 'chevrotain/diagrams/src/diagrams_behavior'
   import DiagramsBuilder from 'chevrotain/diagrams/src/diagrams_builder'
 
