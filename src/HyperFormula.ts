@@ -1308,6 +1308,14 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Suspends the dependency graph recalculation.
    * 
+   * It allows optimizing the performance.
+   * 
+   * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
+   * 
+   * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
+   * 
+   * To resume the evaluation use [[resumeEvaluation]].
+   * 
    * @category Batch
    */
   public suspendEvaluation(): void {
@@ -1315,9 +1323,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Resumes the dependency graph recalculation.
+   * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
    * 
-   * It also triggers the recalculation.
+   * It also triggers the recalculation and returns changes that are a result of all batched operations.
+   * 
+   * @fires [[valuesUpdated]]
    *
    * @category Batch
    */
