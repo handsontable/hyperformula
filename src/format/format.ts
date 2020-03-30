@@ -84,7 +84,7 @@ export function defaultStringifyDate(date: SimpleDateTime, formatArg: string): M
 
   const ampm = tokens.some( (token) => token.type === TokenType.FORMAT && (token.value === 'a' || token.value === 'A') )
 
-  for (let token of tokens){
+  for (const token of tokens){
     if (token.type === TokenType.FREE_TEXT) {
       result += token.value
       continue

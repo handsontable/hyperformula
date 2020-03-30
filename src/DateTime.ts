@@ -161,7 +161,7 @@ export class DateHelper {
     let second = Math.round(arg*60*60*24)
     let minute = Math.floor(second / 60)
     second = second % 60
-    let hour = Math.floor(minute / 60)
+    const hour = Math.floor(minute / 60)
     minute = minute % 60
     return {hour, minute, second}
   }

@@ -1,7 +1,7 @@
 import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
-import {SimpleDate, SimpleDateTime} from '../../src/DateTime'
+import {SimpleDateTime} from '../../src/DateTime'
 import {defaultStringifyDate} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
