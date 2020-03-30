@@ -157,6 +157,19 @@ export class DateHelper {
     return {year, month: month + 1, day: day + 1}
   }
 
+  public numberToTime(arg: number): SimpleTime {
+    let second = Math.round(arg*60*60*24)
+    let minute = Math.floor(second / 60)
+    second = second % 60
+    let hour = Math.floor(minute / 60)
+    minute = minute % 60
+    return {hour, minute, second}
+  }
+
+  public numberToDateTime(arg: number): SimpleDateTime {
+    return {...this.numberToDate(Math.floor(arg)), ...this.numberToTime(arg%1)}
+  }
+
   private leapYearsCount(year: number): number {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }

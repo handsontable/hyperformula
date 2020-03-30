@@ -1,5 +1,5 @@
 import {ErrorType} from './Cell'
-import {DateTime, defaultParseToDateTime, instanceOfSimpleDate, SimpleDate} from './DateTime'
+import {DateTime, defaultParseToDateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTime'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {defaultStringifyDate} from './format/format'
@@ -269,7 +269,7 @@ export interface ConfigParams {
    *
    * @category Date
    */
-  stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
+  stringifyDate: (date: SimpleDateTime, dateFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    *
