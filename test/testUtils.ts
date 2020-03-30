@@ -81,7 +81,7 @@ export function dateNumberToString(dateNumber: CellValue, config: Config): strin
     return dateNumber
   }
   const dateHelper = new DateHelper(config)
-  const dateString = defaultStringifyDate(dateHelper.numberToDate(dateNumber as number), config.dateFormats[0])
+  const dateString = defaultStringifyDate(dateHelper.numberToDateTime(dateNumber as number), config.dateFormats[0])
   return dateString ? dateString : ''
 }
 
