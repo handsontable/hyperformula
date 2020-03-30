@@ -1,9 +1,11 @@
-import {Ast, buildCellErrorAst, CellRangeAst, ErrorAst} from '../parser'
-import {absoluteSheetReference, CellError, ErrorType, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, CellAddress} from '../parser'
+import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
+import {ColumnRangeAst} from '../parser/Ast'
 import {AddressWithRow} from './common'
 import {Transformer} from './Transformer'
 import {RowsSpan} from '../RowsSpan'
+import {RowAddress} from '../parser/RowAddress'
+import {ColumnAddress} from '../parser/ColumnAddress'
 
 export class AddRowsTransformer extends Transformer {
   constructor(
@@ -12,30 +14,20 @@ export class AddRowsTransformer extends Transformer {
     super()
   }
 
-  protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): CellRangeAst | ErrorAst {
-    const newRange = this.transformRange(ast.start, ast.end, formulaAddress)
-    if (Array.isArray(newRange)) {
-      return {...ast, start: newRange[0], end: newRange[1]}
-    } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
-    } else {
-      return ast
-    }
-  }
-
   protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 
-  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
-    const newRange = this.transformRange(ast.start, ast.end, formulaAddress)
-    if (Array.isArray(newRange)) {
-      return {...ast, start: newRange[0], end: newRange[1]}
-    } else if (newRange === ErrorType.REF) {
-      return buildCellErrorAst(new CellError(ErrorType.REF))
-    } else {
-      return ast
-    }
+  protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
+    return this.transformRange(start, end, formulaAddress)
+  }
+
+  protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
+    return this.transformRange(start, end, formulaAddress)
+  }
+
+  protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
+    throw Error('Not implemented')
   }
 
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {

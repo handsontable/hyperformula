@@ -31,6 +31,11 @@ export class RowAddress implements AddressWithRow {
     return (this.type === ReferenceType.RELATIVE)
   }
 
+  public moved(toSheet: number, toRight: number, toBottom: number): RowAddress {
+    const newSheet = this.sheet === null ? null : toSheet
+    return new RowAddress(newSheet, this.row + toBottom, this.type)
+  }
+
   public shiftedByRows(numberOfColumns: number): RowAddress {
     return new RowAddress(this.sheet, this.row + numberOfColumns, this.type)
   }

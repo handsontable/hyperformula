@@ -6,6 +6,8 @@ export interface Address extends AddressWithColumn, AddressWithRow {}
 export interface AddressWithSheet {
   sheet: number | null,
   shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet,
+  shiftAbsoluteDimensions(toRight: number, toBottom: number): AddressWithSheet,
+  moved(toSheet: number, toRight: number, toBottom: number): AddressWithSheet,
 }
 
 export interface AddressWithColumn extends AddressWithSheet {

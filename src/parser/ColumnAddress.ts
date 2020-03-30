@@ -41,6 +41,11 @@ export class ColumnAddress implements AddressWithColumn {
     return (this.type === ReferenceType.RELATIVE)
   }
 
+  public moved(toSheet: number, toRight: number, toBottom: number): ColumnAddress {
+    const newSheet = this.sheet === null ? null : toSheet
+    return new ColumnAddress(newSheet, this.col + toRight, this.type)
+  }
+
   public shiftedByColumns(numberOfColumns: number): ColumnAddress {
     return new ColumnAddress(this.sheet, this.col + numberOfColumns, this.type)
   }

@@ -11,6 +11,8 @@ import {
 } from '../parser'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {DependencyGraph} from '../DependencyGraph'
+import {ColumnAddress} from '../parser/ColumnAddress'
+import {RowAddress} from '../parser/RowAddress'
 
 export abstract class Transformer {
   public transform(graph: DependencyGraph, parser: ParserWithCaching) {
@@ -28,7 +30,7 @@ export abstract class Transformer {
     return [newAst, newAddress]
   }
 
-  private transformAst(ast: Ast, address: SimpleCellAddress): Ast {
+  protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
         return this.transformCellReferenceAst(ast, address)
@@ -94,13 +96,7 @@ export abstract class Transformer {
     }
   }
 
-  protected abstract transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast
-  protected abstract transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast
-  protected abstract transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast
-  protected abstract transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false
-  protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
-
-  protected transformCellReferenceAst<T extends Address>(ast: CellReferenceAst, formulaAddress: SimpleCellAddress): Ast {
+  protected transformCellReferenceAst(ast: CellReferenceAst, formulaAddress: SimpleCellAddress): Ast {
     const newCellAddress = this.transformCellAddress(ast.reference, formulaAddress)
     if (newCellAddress instanceof CellAddress) {
       return {...ast, reference: newCellAddress}
@@ -110,4 +106,43 @@ export abstract class Transformer {
       return ast
     }
   }
+
+  protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformCellRange(ast.start, ast.end, formulaAddress)
+    if (Array.isArray(newRange)) {
+      return {...ast, start: newRange[0], end: newRange[1]}
+    } else if (newRange === ErrorType.REF) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return ast
+    }
+  }
+
+  protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformColumnRange(ast.start, ast.end, formulaAddress)
+    if (Array.isArray(newRange)) {
+      return {...ast, start: newRange[0], end: newRange[1]}
+    } else if (newRange === ErrorType.REF) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return ast
+    }
+  }
+
+  protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
+    const newRange = this.transformRowRange(ast.start, ast.end, formulaAddress)
+    if (Array.isArray(newRange)) {
+      return {...ast, start: newRange[0], end: newRange[1]}
+    } else if (newRange === ErrorType.REF) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
+    } else {
+      return ast
+    }
+  }
+
+  protected abstract transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false
+  protected abstract transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false
+  protected abstract transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false
+  protected abstract transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false
+  protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
 }
