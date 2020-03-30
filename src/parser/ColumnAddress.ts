@@ -6,7 +6,7 @@ import {
   SimpleColumnAddress
 } from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
-import {AddressWithColumn} from '../dependencyTransformers/common'
+import {AddressWithColumn} from './Address'
 
 
 export enum ReferenceType {

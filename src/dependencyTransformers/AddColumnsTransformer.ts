@@ -2,10 +2,10 @@ import {ColumnsSpan} from '../ColumnsSpan'
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {RowRangeAst} from '../parser/Ast'
-import {AddressWithColumn} from './common'
 import {Transformer} from './Transformer'
 import {RowAddress} from '../parser/RowAddress'
 import {ColumnAddress} from '../parser/ColumnAddress'
+import {AddressWithColumn} from '../parser/Address'
 
 export class AddColumnsTransformer extends Transformer {
   constructor(

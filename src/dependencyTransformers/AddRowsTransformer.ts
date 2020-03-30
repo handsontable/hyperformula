@@ -1,11 +1,11 @@
 import {Ast, CellAddress} from '../parser'
 import {absoluteSheetReference, ErrorType, SimpleCellAddress} from '../Cell'
 import {ColumnRangeAst} from '../parser/Ast'
-import {AddressWithRow} from './common'
 import {Transformer} from './Transformer'
 import {RowsSpan} from '../RowsSpan'
 import {RowAddress} from '../parser/RowAddress'
 import {ColumnAddress} from '../parser/ColumnAddress'
+import {AddressWithRow} from '../parser/Address'
 
 export class AddRowsTransformer extends Transformer {
   constructor(

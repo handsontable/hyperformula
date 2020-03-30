@@ -1,7 +1,7 @@
 import {CellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {CellAddress} from './parser'
 import {ColumnAddress} from './parser/ColumnAddress'
-import {Address, AddressWithSheet} from './dependencyTransformers/common'
+import {Address, AddressWithSheet} from './parser/Address'
 
 /**
  * Possible errors returned by our interpreter.

@@ -1,4 +1,3 @@
-import {Address} from './common'
 import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
 import {
   Ast,
@@ -13,6 +12,7 @@ import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {DependencyGraph} from '../DependencyGraph'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {Address} from '../parser/Address'
 
 export interface FormulaTransformer {
   sheet: number,

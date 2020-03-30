@@ -6,7 +6,7 @@ import {
   SimpleRowAddress,
 } from '../Cell'
 import {ReferenceType, SimpleRange} from './ColumnAddress'
-import {AddressWithRow} from '../dependencyTransformers/common'
+import {AddressWithRow} from './Address'
 
 export class RowAddress implements AddressWithRow {
   private constructor(

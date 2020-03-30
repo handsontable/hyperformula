@@ -4,8 +4,8 @@ import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {IExtendedToken} from './FormulaParser'
-import {Address, AddressWithSheet} from '../dependencyTransformers/common'
 import {RowAddress} from './RowAddress'
+import {Address, AddressWithSheet} from './Address'
 
 export type Ast =
   NumberAst

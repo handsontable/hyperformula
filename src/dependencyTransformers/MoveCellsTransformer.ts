@@ -2,10 +2,10 @@ import {Transformer} from './Transformer'
 import {Ast, CellAddress} from '../parser'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
-import {Address} from './common'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {Address} from '../parser/Address'
 
 export class MoveCellsTransformer extends Transformer {
   private dependentFormulaTransformer: DependentFormulaTransformer

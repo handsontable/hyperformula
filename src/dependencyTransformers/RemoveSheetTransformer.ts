@@ -1,11 +1,11 @@
 import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import {Address} from './common'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, CellAddress, CellRangeAst, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 import {ColumnRangeAst} from '../parser/Ast'
+import {Address} from '../parser/Address'
 
 export class RemoveSheetTransformer extends Transformer {
   constructor(

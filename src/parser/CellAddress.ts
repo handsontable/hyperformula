@@ -8,7 +8,7 @@ import {
   SimpleRowAddress
 } from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
-import {Address, AddressWithColumn} from '../dependencyTransformers/common'
+import {Address, AddressWithColumn} from './Address'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
