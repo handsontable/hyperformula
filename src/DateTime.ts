@@ -204,16 +204,27 @@ export function offsetMonth(date: SimpleDate, offset: number): SimpleDate {
 }
 
 export function defaultParseToDateTime(dateTimeString: string, dateFormat: string, timeFormat: string): Maybe<DateTime> {
-  const splitByDateSep = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
-  if(splitByDateSep.length === 1) {
-    return defaultParseToTime(dateTimeString, timeFormat)
+  dateTimeString = dateTimeString.replace(/\s\s+/g, ' ').trim().toLowerCase()
+  let ampmtoken: string | undefined = dateTimeString.substring(dateTimeString.length-2)
+  if(ampmtoken === 'am' || ampmtoken === 'pm') {
+    dateTimeString = dateTimeString.substring(0, dateTimeString.length-2).trim()
+  } else {
+    ampmtoken = undefined
   }
-  const splitByTimeSep = splitByDateSep[splitByDateSep.length-1].split(':' )
-  if(splitByTimeSep.length === 1) {
-    return defaultParseToDate(dateTimeString, dateFormat)
+  const dateItems = dateTimeString.split(/[ /.-]/g )
+  const timeItems = dateItems[dateItems.length - 1].split(':')
+  if(ampmtoken !== undefined) {
+    timeItems.push(ampmtoken)
   }
-  const parsedDate = defaultParseToDate(splitByDateSep.slice(0, splitByDateSep.length-1).join('-'), dateFormat)
-  const parsedTime = defaultParseToTime(splitByDateSep[splitByDateSep.length-1], timeFormat)
+
+  if(dateItems.length === 1) {
+    return defaultParseToTime(timeItems, timeFormat)
+  }
+  if(timeItems.length === 1) {
+    return defaultParseToDate(dateItems, dateFormat)
+  }
+  const parsedDate = defaultParseToDate(dateItems.slice(0, dateItems.length-1), dateFormat)
+  const parsedTime = defaultParseToTime(timeItems, timeFormat)
   if(parsedDate===undefined) {
     return undefined
   } else if(parsedTime===undefined) {
@@ -223,9 +234,20 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat: strin
   }
 }
 
-export function defaultParseToTime(timeString: string, timeFormat: string): Maybe<SimpleTime> {
-  const timeItems = timeString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(':')
-  const formatItems = timeFormat.toLowerCase().split(':')
+export function defaultParseToTime(timeItems: string[], timeFormat: string): Maybe<SimpleTime> {
+  timeFormat = timeFormat.toLowerCase()
+  if(timeFormat.length >= 1 && timeFormat.substring(timeFormat.length-1)==='a') {
+    timeFormat = timeFormat.substring(0,timeFormat.length-1).trim()
+  }
+  const formatItems = timeFormat.split(':')
+  let ampm = undefined
+  if(timeItems[timeItems.length-1] === 'am') {
+    ampm = false
+    timeItems.pop()
+  } else if(timeItems[timeItems.length-1] === 'pm') {
+    ampm = true
+    timeItems.pop()
+  }
   if(timeItems.length !== formatItems.length) {
     return undefined
   }
@@ -237,7 +259,16 @@ export function defaultParseToTime(timeString: string, timeFormat: string): Mayb
   if(! /^\d+$/.test(hourString)) {
     return undefined
   }
-  const hour = Number(hourString)
+  let hour = Number(hourString)
+  if(ampm !== undefined) {
+    if(hour < 0 || hour > 12) {
+      return undefined
+    }
+    hour = hour % 12
+    if(ampm) {
+      hour = hour + 12
+    }
+  }
 
   const minuteString = minuteIndex!==-1 ? timeItems[minuteIndex] : '0'
   if(! /^\d+$/.test(minuteString)) {
@@ -254,8 +285,7 @@ export function defaultParseToTime(timeString: string, timeFormat: string): Mayb
   return {hour, minute, second}
 }
 
-export function defaultParseToDate(dateString: string, dateFormat: string): Maybe<SimpleDate> {
-  const dateItems = dateString.replace(/\s\s+/g, ' ').trim().toLowerCase().split(/[ /.-]/g )
+export function defaultParseToDate(dateItems: string[], dateFormat: string): Maybe<SimpleDate> {
   const formatItems = dateFormat.toLowerCase().split(/[ /.-]/g )
   if(dateItems.length !== formatItems.length) {
     return undefined

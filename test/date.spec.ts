@@ -49,6 +49,24 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('00:179:60')).toBe(0.125)
   })
 
+  it('#stringToDateNumber am/pm', () => {
+    const dateHelper = new DateHelper(new Config())
+    expect(dateHelper.dateStringToDateNumber('03:00 am')).toBe(0.125)
+    expect(dateHelper.dateStringToDateNumber('03:00 pm')).toBe(0.625)
+    expect(dateHelper.dateStringToDateNumber('12:00 pm')).toBe(0.5)
+    expect(dateHelper.dateStringToDateNumber('00:00 pm')).toBe(0.5)
+    expect(dateHelper.dateStringToDateNumber('12:59 pm')).toBe(0.5409722222222222)
+    expect(dateHelper.dateStringToDateNumber('12:00 am')).toBe(0.0)
+    expect(dateHelper.dateStringToDateNumber('00:00 am')).toBe(0.0)
+    expect(dateHelper.dateStringToDateNumber('12:59 am')).toBe(0.04097222222222222)
+    expect(dateHelper.dateStringToDateNumber('13:00 am')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('13:00 pm')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('pm')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('02/02/2020 pm')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('02/02/2020 12:00pm')).toBe(43863.5)
+    expect(dateHelper.dateStringToDateNumber('02/02/2020 12:9999pm')).toBe(43870.44375)
+  })
+
   it('#stringToDateNumber - tests expected to return not null, dates + times', () => {
     const dateHelper = new DateHelper(new Config())
     expect(dateHelper.dateStringToDateNumber('08/16/1985 03:40')).toBe(31275.152777777777)
@@ -105,6 +123,8 @@ describe('Date helpers', () => {
     expect(dateHelper.dateStringToDateNumber('12//31/2999 0:0')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('12/31/2999 0:0:0:0')).toBe(undefined)
     expect(dateHelper.dateStringToDateNumber('12:00 12/31/2999')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber(' ')).toBe(undefined)
+    expect(dateHelper.dateStringToDateNumber('')).toBe(undefined)
   })
 
 })
