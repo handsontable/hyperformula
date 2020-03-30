@@ -283,11 +283,11 @@ export interface ConfigParams {
   /**
    * Switches column search strategy from binary search to column index.
    *
-   * Used by VLOOKUP and MATCH procedures.
+   * Used by VLOOKUP and MATCH functions.
    *
    * Using column index may improve time efficiency but it will increase memory usage.
    *
-   * In some scenarios column index may fall back to binary search despite of this flag.
+   * In some scenarios column index may fall back to binary search despite this flag.
    *
    * @default false
    * 
@@ -307,7 +307,7 @@ export interface ConfigParams {
    *
    * Shorter ranges will be searched naively.
    *
-   * Used by VLOOKUP and MATCH procedures.
+   * Used by VLOOKUP and MATCH functions.
    *
    * @default 20
    * 
