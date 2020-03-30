@@ -1,8 +1,20 @@
 import {HyperFormula} from '../src'
 import './testConfig.ts'
-import {Config} from '../src/Config'
 import {plPL} from '../src/i18n'
 import {adr} from './testUtils'
+
+describe('Building empty engine', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine).toBeInstanceOf(HyperFormula)
+  })
+
+  it('accepts config params', () => {
+    const config = { dateFormats: ['MM'] }
+    const engine = HyperFormula.buildEmpty(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
+  })
+})
 
 describe('Building engine from arrays', () => {
   it('works', () => {
@@ -27,21 +39,21 @@ describe('Building engine from arrays', () => {
     expect(engine.getAllSheetsDimensions()).toEqual({'Arkusz1': {'height': 0, 'width': 0}})
   })
 
-  xit('#buildFromSheets accepts config', () => {
-    const config = new Config()
+  it('#buildFromSheets accepts config', () => {
+    const config = { dateFormats: ['MM'] }
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [],
       Sheet2: [],
     }, config)
 
-    expect(engine.config).toBe(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 
-  xit('#buildFromSheet accepts config', () => {
-    const config = new Config()
+  it('#buildFromSheet accepts config', () => {
+    const config = { dateFormats: ['MM'] }
     const engine = HyperFormula.buildFromArray([], config)
 
-    expect(engine.config).toBe(config)
+    expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 
   it('should allow to create sheets with a delay', () => {

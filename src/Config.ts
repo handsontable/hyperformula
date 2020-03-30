@@ -159,6 +159,8 @@ export interface ConfigParams {
    * Specifies whether punctuation should be ignored in string comparison.
    *
    * @default false
+   *
+   * @category String
    */
   ignorePunctuation: boolean,
   /**
@@ -177,6 +179,8 @@ export interface ConfigParams {
    * Sets the locale using a BCP 47 code language tag for language sensitive string comparison.
    *
    * @default 'en'
+   *
+   * @category String
    */
   localeLang: string,
   /**
@@ -213,6 +217,8 @@ export interface ConfigParams {
    * Allows to provide a function that takes a string representing date and parses it into an actual date.
    *
    * @default defaultParseToDate
+   *
+   * @category Date
    */
   parseDate: (dateString: string, dateFormats: string) => Maybe<SimpleDate>,
   /**
@@ -249,6 +255,8 @@ export interface ConfigParams {
    * Allows to provide a function that takes date (represented as a number) and prints it into string.
    *
    * @default defaultStringifyDate
+   *
+   * @category Date
    */
   stringifyDate: (date: SimpleDate, dateFormat: string) => Maybe<string>,
   /**
@@ -264,11 +272,11 @@ export interface ConfigParams {
   /**
    * Switches column search strategy from binary search to column index.
    *
-   * Used by VLOOKUP and MATCH procedures.
+   * Used by VLOOKUP and MATCH functions.
    *
    * Using column index may improve time efficiency but it will increase memory usage.
    *
-   * In some scenarios column index may fall back to binary search despite of this flag.
+   * In some scenarios column index may fall back to binary search despite this flag.
    *
    * @default false
    * 
@@ -276,11 +284,19 @@ export interface ConfigParams {
    */
   useColumnIndex: boolean,
   /**
+   * Enables gathering engine statistics and timings. Useful for testing and benchmarking.
+   *
+   * @default false
+   *
+   * @category Engine
+   */
+  useStats: boolean,
+  /**
    * Determines minimum number of elements a range must have in order to use binary search.
    *
    * Shorter ranges will be searched naively.
    *
-   * Used by VLOOKUP and MATCH procedures.
+   * Used by VLOOKUP and MATCH functions.
    *
    * @default 20
    * 
@@ -327,6 +343,7 @@ export class Config implements ConfigParams, ParserConfig {
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
+    useStats: false,
     vlookupThreshold: 20,
     nullDate: {year: 1899, month: 12, day: 30},
   }
@@ -415,6 +432,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly useColumnIndex: boolean
   /** @inheritDoc */
+  public readonly useStats: boolean
+  /** @inheritDoc */
   public readonly vlookupThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
@@ -458,6 +477,7 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       vlookupThreshold,
       nullDate,
+      useStats
     }: Partial<ConfigParams> = {},
   ) {
     this.accentSensitive = this.valueFromParam(accentSensitive, 'boolean', 'accentSensitive')
@@ -480,6 +500,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.precisionRounding = this.valueFromParam(precisionRounding, 'number', 'precisionRounding')
     this.precisionEpsilon = this.valueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
+    this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.translationPackage = buildTranslationPackage(HyperFormula.getLanguage(this.language))
     this.errorMapping = this.translationPackage.buildErrorMapping()

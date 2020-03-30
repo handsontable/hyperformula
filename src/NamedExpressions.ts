@@ -63,13 +63,12 @@ export class NamedExpressions {
   private workbookStore = new NamedExpressionsStore()
 
   constructor(
-    addressMapping: AddressMapping,
     private readonly cellContentParser: CellContentParser,
     private readonly dependencyGraph: DependencyGraph,
     private readonly parser: ParserWithCaching,
     private readonly crudOperations: CrudOperations,
   ) {
-    addressMapping.addSheet(-1, new SparseStrategy(0, 0))
+    dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
   }
 
   public doesNamedExpressionExist(expressionName: string): boolean {
