@@ -23,18 +23,18 @@ import {
   ValueCellVertex,
 } from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
-import {MoveCellsDependencyTransformer} from './dependencyTransformers/moveCells'
 import {RemoveSheetDependencyTransformer} from './dependencyTransformers/removeSheet'
 import {InvalidAddressError, InvalidArgumentsError, NoSheetWithIdError, NoSheetWithNameError} from './errors'
 import {buildMatrixVertex} from './GraphBuilder'
 import {Index} from './HyperFormula'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {LazilyTransformingAstService, TransformationType} from './LazilyTransformingAstService'
 import {ParserWithCaching, ProcedureAst} from './parser'
 import {RowsSpan} from './RowsSpan'
 import {Statistics, StatType} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
+import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
 
 export class CrudOperations {
 
@@ -117,7 +117,14 @@ export class CrudOperations {
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      MoveCellsDependencyTransformer.transform(sourceRange, toRight, toBottom, toSheet, this.dependencyGraph, this.parser)
+      new MoveCellsTransformer({
+        type: TransformationType.MOVE_CELLS,
+        sourceRange,
+        toRight,
+        toBottom,
+        toSheet,
+        sheet: sourceRange.sheet,
+      }).transform(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addMoveCellsTransformation(sourceRange, toRight, toBottom, toSheet)
     })
 
