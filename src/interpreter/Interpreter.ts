@@ -209,7 +209,8 @@ export class Interpreter {
       }
       case AstNodeType.FUNCTION_CALL: {
         const pluginEntry = this.pluginCache.get(ast.procedureName)
-        if (pluginEntry) {
+        const procedureName = this.config.translationPackage.getFunctionsElement(ast.procedureName)
+        if (pluginEntry && procedureName!==undefined) {
           const [pluginInstance, pluginFunction] = pluginEntry
           return pluginInstance[pluginFunction](ast, formulaAddress)
         } else {

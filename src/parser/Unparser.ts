@@ -29,12 +29,7 @@ export class Unparser {
       }
       case AstNodeType.FUNCTION_CALL: {
         const args = ast.args.map((arg) => this.unparseAst(arg, address)).join(this.config.functionArgSeparator)
-        let procedureName
-        try {
-          procedureName = this.config.getFunctionTranslationFor(ast.procedureName)
-        } catch(e) {
-          procedureName = ast.procedureName
-        }
+        const procedureName = this.config.translationPackage.getFunctionsElement(ast.procedureName) ?? ast.procedureName
         const rightPart = procedureName + '(' + args + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
