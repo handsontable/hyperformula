@@ -1,4 +1,4 @@
-import {enGB, RawTranslationPackage} from '../i18n'
+import {enGB, RawTranslationPackage, TranslationPackage} from '../i18n'
 import {Maybe} from '../Maybe'
 
 function canonicalize(sheetDisplayName: string): string {
@@ -25,8 +25,12 @@ export class SheetMapping {
   private readonly sheetNamePrefix: string
   private lastSheetId = -1
 
-  constructor(private languages: RawTranslationPackage) {
-    this.sheetNamePrefix = languages?.ui?.NEW_SHEET_PREFIX ?? enGB.ui.NEW_SHEET_PREFIX
+  constructor(private languages: TranslationPackage) {
+    const sheetNamePrefix = languages.getUITranslation('NEW_SHEET_PREFIX')
+    if(sheetNamePrefix===undefined) {
+      throw new Error('No translation for sheet prefix.')
+    }
+    this.sheetNamePrefix = sheetNamePrefix
   }
 
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
