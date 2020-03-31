@@ -157,19 +157,7 @@ export class CrudOperations {
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
     this.clipboardOperations.abortCut()
-
-    const sheetId = this.sheetMapping.fetch(sheetName)
-
-    this.dependencyGraph.removeSheet(sheetId)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveSheetTransformer(sheetId)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.sheetMapping.removeSheet(sheetId)
-    this.columnSearch.removeSheet(sheetId)
+    this.operations.removeSheet(sheetName)
   }
 
   public clearSheet(sheetName: string): void {

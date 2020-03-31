@@ -21,6 +21,7 @@ import {ParserWithCaching, ProcedureAst} from './parser'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransformer'
+import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 
 export class RemoveRowsCommand {
@@ -109,6 +110,21 @@ export class Operations {
       }
     }
     return rowsAdditions
+  }
+
+  public removeSheet(sheetName: string) {
+    const sheetId = this.sheetMapping.fetch(sheetName)
+
+    this.dependencyGraph.removeSheet(sheetId)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveSheetTransformer(sheetId)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.sheetMapping.removeSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
