@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {CellError, ErrorType, SimpleCellAddress} from '../src/Cell'
-import {enGB} from '../src/i18n'
 import {FunctionPlugin} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import './testConfig.ts'

@@ -1,6 +1,5 @@
 import {ErrorType} from '../Cell'
 import {TranslationPackage} from '../i18n'
-import {Maybe} from '../Maybe'
 
 export interface ParserConfig {
   functionArgSeparator: string,

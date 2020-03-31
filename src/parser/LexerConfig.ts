@@ -1,6 +1,5 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
-import {enGB} from '../i18n'
 import {ParserConfig} from './ParserConfig'
 
 /* arithmetic */
