@@ -58,6 +58,5 @@ describe('detailed error', () => {
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
     expect(error).toEqual(detailedError(ErrorType.VALUE, undefined, config))
     expect(error.value).toEqual('#ARG!')
-    HyperFormula.unregisterLanguage('plPL')
   })
 })

@@ -18,11 +18,9 @@ describe('Unparse', () => {
 
 
   beforeEach(() => {
+    HyperFormula.unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
-  })
-
-  afterEach( () => {
-    HyperFormula.unregisterLanguage('plPL')
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
   it('#unparse', () => {

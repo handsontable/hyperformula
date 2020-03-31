@@ -1,15 +1,14 @@
 import {EmptyValue, HyperFormula} from '../src'
 import {Config} from '../src/Config'
-import {plPL} from '../src/i18n'
+import {enGB, plPL} from '../src/i18n'
 
 describe('Config', () => {
   beforeEach(() => {
+    HyperFormula.unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
-  afterEach( () => {
-    HyperFormula.unregisterLanguage('plPL')
-  })
   it('works', () => {
     const config = new Config({language: 'plPL'})
 

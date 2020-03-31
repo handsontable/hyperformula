@@ -10,9 +10,6 @@ describe('i18n', () => {
     HyperFormula.registerLanguage('plPL', plPL)
   })
 
-  afterEach( () => {
-    HyperFormula.unregisterLanguage('plPL')
-  })
   it('using functions in different languages', () => {
     const enginePL = HyperFormula.buildFromArray([
       ['=SUMA(42)'],

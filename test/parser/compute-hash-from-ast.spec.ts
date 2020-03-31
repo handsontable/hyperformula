@@ -7,12 +7,11 @@ import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
   beforeEach(() => {
+    HyperFormula.unregisterAllLanguages()
     HyperFormula.registerLanguage('plPL', plPL)
+    HyperFormula.registerLanguage('enGB', enGB)
   })
 
-  afterEach( () => {
-    HyperFormula.unregisterLanguage('plPL')
-  })
   const config = new Config()
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')

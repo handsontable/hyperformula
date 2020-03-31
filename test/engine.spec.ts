@@ -434,7 +434,6 @@ describe('Integration', () => {
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error.type).toEqual(ErrorType.VALUE)
     expect(error.value).toEqual('#ARG!')
-    HyperFormula.unregisterLanguage('plPL')
   })
 
   it('should correctly parse all JS types', () => {

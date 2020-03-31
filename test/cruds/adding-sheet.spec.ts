@@ -58,7 +58,6 @@ describe('add sheet to engine', () => {
 
     expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
     expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Arkusz1'])
-    HyperFormula.unregisterLanguage('plPL')
   })
 
   it('should add sheet with given name', function() {

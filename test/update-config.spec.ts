@@ -53,6 +53,5 @@ describe('update config', () => {
     expect(engine.getCellFormula(adr('C1'))).toBe('=SUMA()')
     expect(engine.getCellFormula(adr('D1'))).toBe(undefined)
     expect(engine.getCellFormula(adr('E1'))).toBe('=SUM(')
-    HyperFormula.unregisterLanguage('plPL')
   })
 })
