@@ -158,7 +158,7 @@ describe('Copy - paste integration', () => {
     expect(engine.dependencyGraph.getRange(adr('B1'), adr('B2'))).not.toBeNull()
   })
 
-  it('should create new range vertex column range', () => {
+  it('should create new range vertex - column range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '3', '5', '=SUM(A:B)'],
       ['2', '4', '6', null],
@@ -188,6 +188,24 @@ describe('Copy - paste integration', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
     expect(engine.dependencyGraph.getRange(rowStart(2), rowEnd(3))).not.toBeNull()
+  })
+
+  it('should update edges between infinite range and pasted values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)', '1', '=SUM(1,2)']
+    ])
+
+    engine.copy(adr('B1'), 1, 1)
+    engine.paste(adr('A2'))
+    engine.copy(adr('C1'), 1, 1)
+    engine.paste(adr('A3'))
+
+    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a3 = engine.addressMapping.fetchCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2, range))
+    expect(engine.graph.existsEdge(a3, range))
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('paste should return newly pasted values', () => {
