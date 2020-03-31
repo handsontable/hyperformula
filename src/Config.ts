@@ -5,6 +5,7 @@ import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMappin
 import {HyperFormula} from './index'
 import {defaultPrintDate} from './format/format'
 import {buildTranslationPackage, enGB, TranslationPackage} from './i18n'
+import {coerceToRangeNumbersOrError} from './interpreter/coerce'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
 import {BitwiseLogicOperationsPlugin} from './interpreter/plugin/BitwiseLogicOperationsPlugin'
@@ -527,11 +528,19 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
-    return this.translationPackage.functions[functionTranslationKey]
+    const translation = this.translationPackage.getFunctionsElement(functionTranslationKey)
+    if(translation === undefined) {
+      throw new Error('No translation for function.')
+    }
+    return translation
   }
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
-    return this.translationPackage.errors[functionTranslationKey]
+    const translation = this.translationPackage.getErrorsElement(functionTranslationKey)
+    if(translation === undefined) {
+      throw new Error('No translation for error.')
+    }
+    return translation
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

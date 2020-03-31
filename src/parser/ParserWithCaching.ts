@@ -158,12 +158,9 @@ export class ParserWithCaching {
         return this.computeHashOfAstNode(ast.value) + imageWithWhitespace('%', ast.leadingWhitespace)
       }
       case AstNodeType.ERROR: {
-        let image
-        if (ast.error) {
-          image = this.config.getErrorTranslationFor(ast.error.type)
-        } else {
-          image = this.config.getErrorTranslationFor(ErrorType.ERROR)
-        }
+        const image = this.config.getErrorTranslationFor(
+          ast.error ? ast.error.type : ErrorType.ERROR
+        )
         return imageWithWhitespace(image, ast.leadingWhitespace)
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {

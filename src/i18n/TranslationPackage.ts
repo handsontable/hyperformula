@@ -1,5 +1,6 @@
 import {ErrorType} from '../Cell'
-import {ErrorTranslationSet, TranslationSet} from './index'
+import {Maybe} from '../Maybe'
+import {enGB, ErrorTranslationSet, TranslationSet} from './index'
 
 export interface RawTranslationPackage {
   functions: TranslationSet,
@@ -35,8 +36,22 @@ export class TranslationPackage implements RawTranslationPackage {
       return ret
     }, {} as Record<string, ErrorType>)
   }
+
+  public getFunctionsElement(key: string): Maybe<string> {
+    return this.functions[key]
+  }
+  public getErrorsElement(key: ErrorType): Maybe<string> {
+    return this.errors[key]
+  }
+  public getUIElement(key: string): Maybe<string> {
+    return this.ui[key]
+  }
 }
 
 export function buildTranslationPackage(rawTranslationPackage: RawTranslationPackage): TranslationPackage {
-  return new TranslationPackage(rawTranslationPackage.functions, rawTranslationPackage.errors, rawTranslationPackage.ui)
+  return new TranslationPackage(
+    Object.assign({}, enGB.functions, rawTranslationPackage.functions),
+    Object.assign({}, enGB.errors, rawTranslationPackage.errors),
+    Object.assign({}, enGB.ui, rawTranslationPackage.ui)
+  )
 }
