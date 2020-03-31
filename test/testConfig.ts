@@ -16,5 +16,5 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 
 beforeEach(() => {
   HyperFormula.unregisterAllLanguages()
-  HyperFormula.registerLanguage('enGB', enGB);
+  HyperFormula.registerLanguage('enGB', enGB)
 })
