@@ -1,8 +1,5 @@
 import {SimpleCellAddress, SimpleColumnAddress, SimpleRowAddress} from '../Cell'
 
-export interface Address extends AddressWithColumn, AddressWithRow {
-}
-
 export interface AddressWithSheet {
   sheet: number | null,
   shiftRelativeDimensions(toRight: number, toBottom: number): AddressWithSheet,

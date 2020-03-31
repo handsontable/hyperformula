@@ -8,7 +8,7 @@ import {
   SimpleRowAddress
 } from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
-import {Address, AddressWithColumn} from './Address'
+import {AddressWithColumn, AddressWithRow} from './Address'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -25,7 +25,7 @@ export enum CellReferenceType {
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
-export class CellAddress implements Address {
+export class CellAddress implements AddressWithColumn, AddressWithRow {
 
   public static relative(sheet: number | null, col: number, row: number) {
     return new CellAddress(sheet, col, row, CellReferenceType.CELL_REFERENCE_RELATIVE)

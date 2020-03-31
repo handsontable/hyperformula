@@ -12,7 +12,7 @@ import {
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
-  extractReference, extractColumnRange, colStart, colEnd,
+  extractReference, extractColumnRange, colStart, colEnd, rowStart, rowEnd,
 } from '../testUtils'
 
 describe('Moving rows - checking if its possible', () => {
@@ -935,4 +935,58 @@ describe('column ranges', () => {
     expect(engine.graph.existsEdge(a1, ab)).toBe(true)
     expect(engine.graph.existsEdge(b1, ab)).toBe(true)
   })
+
+  it('should transform relative column references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)', '', '1', '2']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
+
+    const range = extractColumnRange(engine, adr('B2'))
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(range.start).toEqual(colStart('C'))
+    expect(range.end).toEqual(colEnd('D'))
+  })
 })
+
+describe('row ranges', () => {
+  it('should not update range when only part of it is moved', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['3'],
+      ['=SUM(1:2)'],
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B3'))
+
+    const range = extractColumnRange(engine, adr('A3'))
+    expect(range.start).toEqual(rowStart(1))
+    expect(range.end).toEqual(rowEnd(2))
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const ab = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
+    expect(a1).toBeInstanceOf(EmptyCellVertex)
+    expect(engine.graph.existsEdge(a1, ab)).toBe(true)
+    expect(engine.graph.existsEdge(a2, ab)).toBe(true)
+  })
+
+  it('should transform relative column references', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(3:4)'],
+      [null],
+      ['1'],
+      ['2']
+    ])
+
+    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
+
+    const range = extractColumnRange(engine, adr('B2'))
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    expect(range.start).toEqual(rowStart(3))
+    expect(range.end).toEqual(rowEnd(4))
+  })
+})
+

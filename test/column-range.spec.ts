@@ -68,20 +68,6 @@ describe('Column ranges', () => {
     expect(engine.graph.infiniteRanges.size).toBe(0)
   })
 
-  it('should transform relative column references', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=SUM(C:D)', '', '1', '2']
-    ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-
-    engine.moveCells(adr('A1'), 1, 1, adr('B2'))
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(3)
-    const range = extractColumnRange(engine, adr('B2'))
-    expect(range.start).toEqual(colStart('C'))
-    expect(range.end).toEqual(colEnd('D'))
-  })
-
   it('should not move infinite range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '', '', '=SUM(A:B)']

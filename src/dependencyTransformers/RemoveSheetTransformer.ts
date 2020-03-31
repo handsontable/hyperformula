@@ -4,7 +4,6 @@ import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
-import {Address} from '../parser/Address'
 
 export class RemoveSheetTransformer extends Transformer {
   constructor(
@@ -24,7 +23,7 @@ export class RemoveSheetTransformer extends Transformer {
     return address
   }
 
-  protected transformCellAddress<T extends Address>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
+  protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
     if (dependencyAddress.sheet === this.sheet) {
       return ErrorType.REF
     }
