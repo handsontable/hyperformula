@@ -929,15 +929,10 @@ describe('column ranges', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(3)
 
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const b1 = engine.addressMapping.fetchCell(adr('B1'))
     const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, ab)).toBe(true)
-    expect(engine.graph.existsEdge(a2, ab)).toBe(true)
-
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      [null, '3', '=SUM(A:B)'],
-      [null, null, 1]
-    ]))
+    expect(engine.graph.existsEdge(b1, ab)).toBe(true)
   })
 })
