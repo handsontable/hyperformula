@@ -5,7 +5,7 @@
 
 import {Statistics, StatType} from './statistics'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
-import {SimpleCellAddress, EmptyValue, invalidSimpleCellAddress} from './Cell'
+import {SimpleCellAddress, EmptyValue, simpleCellAddress, invalidSimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent, isMatrix} from './CellContentParser'
 import {RowsSpan} from './RowsSpan'
 import {ContentChanges} from './ContentChanges'
@@ -109,6 +109,21 @@ export class Operations {
       }
     }
     return rowsAdditions
+  }
+
+  public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+    const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
+    this.doAddRows(rowsToAdd)
+
+    if (targetRow < startRow) {
+      startRow += numberOfRows
+    }
+
+    const startAddress = simpleCellAddress(sheet, 0, startRow)
+    const targetAddress = simpleCellAddress(sheet, 0, targetRow)
+    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
+    const rowsToRemove = RowsSpan.fromNumberOfRows(sheet, startRow, numberOfRows)
+    this.doRemoveRows(rowsToRemove)
   }
 
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
