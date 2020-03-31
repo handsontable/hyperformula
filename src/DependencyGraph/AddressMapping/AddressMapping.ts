@@ -7,6 +7,7 @@ import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import { NoSheetWithIdError } from '../../errors'
 
 /**
  * Returns actual width, height and fill ratio of a sheet
@@ -131,7 +132,7 @@ export class AddressMapping {
   public getHeight(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getHeight()
   }
@@ -140,7 +141,7 @@ export class AddressMapping {
   public getWidth(sheetId: number): number {
     const sheetMapping = this.mapping.get(sheetId)
     if (!sheetMapping) {
-      throw Error('Sheet does not exist')
+      throw new NoSheetWithIdError(sheetId)
     }
     return sheetMapping.getWidth()
   }
