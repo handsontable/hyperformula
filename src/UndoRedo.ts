@@ -12,6 +12,7 @@ import {CrudOperations} from './CrudOperations'
 enum UndoStackElementType {
   REMOVE_ROWS = 'REMOVE_ROWS',
   ADD_ROWS = 'ADD_ROWS',
+  MOVE_ROWS = 'MOVE_ROWS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
 }
 
@@ -27,6 +28,14 @@ interface AddRowsUndoData {
   rowsAdditions: RowsAddition[],
 }
 
+interface MoveRowsUndoData {
+  type: UndoStackElementType.MOVE_ROWS,
+  sheet: number,
+  startRow: number,
+  numberOfRows: number,
+  targetRow: number,
+}
+
 interface SetCellContentsUndoData {
   type: UndoStackElementType.SET_CELL_CONTENTS,
   cellContents: {
@@ -39,6 +48,7 @@ interface SetCellContentsUndoData {
 type UndoStackElement
   = RemoveRowsUndoData
   | AddRowsUndoData
+  | MoveRowsUndoData
   | SetCellContentsUndoData
 
 export class UndoRedo {
@@ -58,6 +68,10 @@ export class UndoRedo {
 
   public saveOperationAddRows(addRowsCommand: AddRowsCommand, rowsAdditions: RowsAddition[]) {
     this.undoStack.push({ type: UndoStackElementType.ADD_ROWS, sheet: addRowsCommand.sheet, rowsAdditions })
+  }
+
+  public saveOperationMoveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
+    this.undoStack.push({ type: UndoStackElementType.MOVE_ROWS, sheet, startRow, numberOfRows, targetRow })
   }
 
   public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[]) {
@@ -98,6 +112,9 @@ export class UndoRedo {
       case UndoStackElementType.SET_CELL_CONTENTS: {
         this.undoSetCellContents(operation)
         break
+      }
+      case UndoStackElementType.MOVE_ROWS: {
+        this.undoMoveRows(operation)
       }
     }
     this.redoStack.push(operation)
@@ -144,6 +161,11 @@ export class UndoRedo {
     for (const cellContentData of operation.cellContents) {
       this.crudOperations!.operations.setCellContent(cellContentData.address, cellContentData.oldContent)
     }
+  }
+
+  private undoMoveRows(operation: MoveRowsUndoData) {
+    const { sheet } = operation
+    this.crudOperations!.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
   }
 
   public redo() {

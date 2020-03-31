@@ -161,6 +161,22 @@ describe('Undo - adding rows', () => {
   })
 })
 
+describe('Undo - moving rows', () => {
+  it('works', () => {
+    const sheet = [
+      ['1'],
+      ['2'],
+      ['3'], // move first row before this one
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.moveRows(0, 0, 1, 2)
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - setting cell content', () => {
   it('works for simple values', () => {
     const sheet = [

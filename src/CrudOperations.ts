@@ -111,6 +111,7 @@ export class CrudOperations {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
     this.clipboardOperations.abortCut()
     this.operations.moveRows(sheet, startRow, numberOfRows, targetRow)
+    this.undoRedo.saveOperationMoveRows(sheet, startRow, numberOfRows, targetRow)
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
