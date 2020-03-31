@@ -33,6 +33,7 @@ describe('Parsing error literals', () => {
     const ast = parser.parse('=#ARG!', simpleCellAddress(0, 0, 0)).ast as ErrorAst
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.VALUE)
+    HyperFormula.unregisterLanguage('plPL')
   })
 
   it('should parse #DIV/0!', () => {

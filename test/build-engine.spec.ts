@@ -37,6 +37,7 @@ describe('Building engine from arrays', () => {
     const engine = HyperFormula.buildFromArray([], { language: 'plPL' })
 
     expect(engine.getAllSheetsDimensions()).toEqual({'Arkusz1': {'height': 0, 'width': 0}})
+    HyperFormula.unregisterLanguage('plPL')
   })
 
   it('#buildFromSheets accepts config', () => {

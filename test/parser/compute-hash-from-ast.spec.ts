@@ -6,7 +6,13 @@ import {buildLexerConfig, FormulaLexer, ParserWithCaching} from '../../src/parse
 import {adr} from '../testUtils'
 
 describe('Compute hash from ast', () => {
-  HyperFormula.registerLanguage('plPL', plPL)
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
+  afterEach( () => {
+    HyperFormula.unregisterLanguage('plPL')
+  })
   const config = new Config()
   const sheetMapping = new SheetMapping(enGB)
   sheetMapping.addSheet('Sheet1')

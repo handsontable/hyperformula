@@ -22,7 +22,13 @@ import {
 import {ErrorWithRawInputAst, ParenthesisAst} from '../../src/parser/Ast'
 
 describe('ParserWithCaching', () => {
-  HyperFormula.registerLanguage('plPL', plPL)
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
+  afterEach( () => {
+    HyperFormula.unregisterLanguage('plPL')
+  })
   it('integer literal', () => {
     const parser = new ParserWithCaching(new Config(), new SheetMapping(enGB).get)
 

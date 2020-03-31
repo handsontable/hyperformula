@@ -15,7 +15,15 @@ describe('Unparse', () => {
   sheetMapping.addSheet('Sheet with spaces')
   const parser = new ParserWithCaching(config, sheetMapping.get)
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName)
-  HyperFormula.registerLanguage('plPL', plPL)
+
+
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
+  afterEach( () => {
+    HyperFormula.unregisterLanguage('plPL')
+  })
 
   it('#unparse', () => {
     const formula = '=1+SUM(1,2,3)*3'

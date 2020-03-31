@@ -15,7 +15,13 @@ describe('computeHashFromTokens', () => {
     const tokens = new FormulaLexer(buildLexerConfig(config)).tokenizeFormula(code).tokens
     return parser.computeHashFromTokens(tokens, address)
   }
-  HyperFormula.registerLanguage('plPL', plPL)
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
+  afterEach( () => {
+    HyperFormula.unregisterLanguage('plPL')
+  })
 
   it('simple case', () => {
     const code = '=42'

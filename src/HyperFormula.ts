@@ -220,6 +220,14 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  public static unregisterLanguage(code: string): void {
+    if(this.registeredLanguages.has(code)) {
+      this.registeredLanguages.delete(code)
+    } else {
+      throw new Error('Language not registered.')
+    }
+  }
+
   /**
    * Returns all registered languages codes.
    */

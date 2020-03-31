@@ -3,7 +3,13 @@ import {Config} from '../src/Config'
 import {plPL} from '../src/i18n'
 
 describe('Config', () => {
-  HyperFormula.registerLanguage('plPL', plPL)
+  beforeEach(() => {
+    HyperFormula.registerLanguage('plPL', plPL)
+  })
+
+  afterEach( () => {
+    HyperFormula.unregisterLanguage('plPL')
+  })
   it('works', () => {
     const config = new Config({language: 'plPL'})
 
