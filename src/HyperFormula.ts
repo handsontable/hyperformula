@@ -1309,8 +1309,6 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the number of existing sheets.
    * 
-   * @returns which is a number of sheets
-   *
    * @category Sheet
    */
   public countSheets(): number {
@@ -1428,10 +1426,10 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Gets specified named expression value.
+   * 
+   * Returns a [[CellValue]] or null if the given named expression does not exists
    *
    * @param {string} expressionName - expression name, case insensitive.
-   * 
-   * @returns a [[CellValue]] or null if the given named expression does not exists
    *
    * @category Named Expression
    */
