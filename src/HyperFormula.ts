@@ -1656,4 +1656,3 @@ export class HyperFormula implements TypedEmitter {
   }
 }
 
-HyperFormula.registerLanguage('enGB', enGB)

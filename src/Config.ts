@@ -527,7 +527,7 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public getFunctionTranslationFor = (functionTranslationKey: string): string => {
-    const translation = this.translationPackage.getFunctionsElement(functionTranslationKey)
+    const translation = this.translationPackage.getFunctionTranslation(functionTranslationKey)
     if(translation === undefined) {
       throw new Error('No translation for function.')
     }
@@ -535,7 +535,7 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public getErrorTranslationFor = (functionTranslationKey: ErrorType): string => {
-    const translation = this.translationPackage.getErrorsElement(functionTranslationKey)
+    const translation = this.translationPackage.getErrorTranslation(functionTranslationKey)
     if(translation === undefined) {
       throw new Error('No translation for error.')
     }

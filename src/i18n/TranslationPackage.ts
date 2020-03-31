@@ -37,13 +37,13 @@ export class TranslationPackage implements RawTranslationPackage {
     }, {} as Record<string, ErrorType>)
   }
 
-  public getFunctionsElement(key: string): Maybe<string> {
+  public getFunctionTranslation(key: string): Maybe<string> {
     return this.functions[key]
   }
-  public getErrorsElement(key: ErrorType): Maybe<string> {
+  public getErrorTranslation(key: ErrorType): Maybe<string> {
     return this.errors[key]
   }
-  public getUIElement(key: string): Maybe<string> {
+  public getUITranslation(key: string): Maybe<string> {
     return this.ui[key]
   }
 }
