@@ -69,6 +69,7 @@ export class DependencyGraph {
     if (hasStructuralChangeFunction) {
       this.markAsDependentOnStructureChange(newVertex)
     }
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setParsingErrorToCell(address: SimpleCellAddress, errorVertex: ParsingErrorVertex) {
@@ -77,6 +78,7 @@ export class DependencyGraph {
     this.graph.exchangeOrAddNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(errorVertex)
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setValueToCell(address: SimpleCellAddress, newValue: ValueCellVertexValue) {
@@ -95,6 +97,8 @@ export class DependencyGraph {
       this.addressMapping.setCell(address, newVertex)
       this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
     }
+
+    this.correctInfiniteRangesDependency(address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
@@ -162,7 +166,7 @@ export class DependencyGraph {
         this.graph.addEdge(rangeVertex, endVertex)
 
         if (!(range instanceof AbsoluteColumnRange || range instanceof AbsoluteRowRange)) {
-          this.correctInfiniteRangesDependencies(rangeVertex)
+          this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
       } else {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(absStartCell), endVertex)
@@ -170,7 +174,7 @@ export class DependencyGraph {
     })
   }
 
-  private correctInfiniteRangesDependencies(vertex: RangeVertex) {
+  private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
     for (const range of this.graph.infiniteRanges) {
       const infiniteRangeVertex = (range as RangeVertex)
       const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
@@ -179,6 +183,17 @@ export class DependencyGraph {
       }
       for (const address of intersection.addresses(this)) {
         this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
+      }
+    }
+  }
+
+  public correctInfiniteRangesDependency(address: SimpleCellAddress) {
+    let vertex: Vertex | null = null
+    for (const range of this.graph.infiniteRanges) {
+      const infiniteRangeVertex = (range as RangeVertex)
+      if (infiniteRangeVertex.range.addressInRange(address)) {
+        vertex = vertex || this.fetchCellOrCreateEmpty(address)
+        this.graph.addEdge(vertex, infiniteRangeVertex)
       }
     }
   }
