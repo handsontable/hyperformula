@@ -249,6 +249,17 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(0)
   })
 
+  it('precision', () => {
+    const engine = HyperFormula.buildFromArray([
+        ['1.0000000001', '1'],
+        ['1.00000000000005', '2'],
+        ['1.00000000000005', '3'],
+        ['=SUMIF(A1:A3, "=1", B1:B3)']
+      ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+  })
+
   it('ignore errors', () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '3'],
