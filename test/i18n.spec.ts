@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
+import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
-import {languages, plPL} from '../src/i18n'
+import {languages, plPL, TranslationPackage} from '../src/i18n'
 import {CellAddress} from '../src/parser'
 import './testConfig.ts'
 import {adr, extractReference} from './testUtils'
@@ -69,5 +70,10 @@ describe('i18n', () => {
       const translatedFunctionsInLang = new Set(Object.keys(languages[lang].functions))
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     }
+  })
+
+  it('translation package sanitization', () => {
+    // @ts-ignore
+    expect(() => new TranslationPackage({},{},{})).toThrow()
   })
 })
