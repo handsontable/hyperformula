@@ -127,6 +127,11 @@ export class Operations {
     this.columnSearch.removeSheet(sheetId)
   }
 
+  public clearSheet(sheetId: number) {
+    this.dependencyGraph.clearSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
+  }
+
   public addSheet(name?: string) {
     const sheetId = this.sheetMapping.addSheet(name)
     this.dependencyGraph.addressMapping.autoAddSheet(sheetId, [])

@@ -167,12 +167,8 @@ export class CrudOperations {
   public clearSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
     this.clipboardOperations.abortCut()
-
     const sheetId = this.sheetMapping.fetch(sheetName)
-
-    this.dependencyGraph.clearSheet(sheetId)
-
-    this.columnSearch.removeSheet(sheetId)
+    this.operations.clearSheet(sheetId)
   }
 
   public setCellContents(serialization: Serialization, topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {
