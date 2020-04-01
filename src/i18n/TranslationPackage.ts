@@ -1,19 +1,21 @@
 import {ErrorType} from '../Cell'
 import {Maybe} from '../Maybe'
-import {ErrorTranslationSet, TranslationSet} from './index'
+import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
 
 export interface RawTranslationPackage {
   functions: TranslationSet,
   errors: ErrorTranslationSet,
-  ui: TranslationSet,
+  ui: UITranslationSet,
 }
 
 export class TranslationPackage {
   constructor(
     private functions: TranslationSet,
     private errors: ErrorTranslationSet,
-    private ui: TranslationSet,
+    private ui: UITranslationSet,
   ) {
+    this.checkUI()
+    this.checkErrors()
   }
 
   public extendFunctions(additionalFunctionTranslations: TranslationSet): void {
@@ -40,8 +42,23 @@ export class TranslationPackage {
   public getErrorTranslation(key: ErrorType): Maybe<string> {
     return this.errors[key]
   }
-  public getUITranslation(key: string): Maybe<string> {
+  public getUITranslation(key: UIElement): Maybe<string> {
     return this.ui[key]
+  }
+
+  private checkUI(): void {
+    for(const err of Object.values(UIElement)){
+      if(! (err in this.ui)){
+        throw new Error('No translation for error.')
+      }
+    }
+  }
+  private checkErrors(): void {
+    for(const err of Object.values(ErrorType)){
+      if(! (err in this.errors)){
+        throw new Error('No translation for error.')
+      }
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import {TranslationPackage} from '../i18n'
+import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
 
 function canonicalize(sheetDisplayName: string): string {
@@ -26,7 +26,7 @@ export class SheetMapping {
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
-    const sheetNamePrefix = languages.getUITranslation('NEW_SHEET_PREFIX')
+    const sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
     if(sheetNamePrefix===undefined) {
       throw new Error('No translation for sheet prefix.')
     }
