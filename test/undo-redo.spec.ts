@@ -282,6 +282,41 @@ describe('Undo - adding sheet', () => {
   })
 })
 
+describe('Undo - clearing sheet', () => {
+  it('works for empty sheet', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.clearSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
+  })
+
+  it('works with restoring simple values', () => {
+    const sheet = [
+      ['1'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.clearSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works with restoring formulas', () => {
+    const sheet = [
+      ['=42'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.clearSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()

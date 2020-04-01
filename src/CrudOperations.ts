@@ -168,7 +168,9 @@ export class CrudOperations {
     this.ensureSheetExists(sheetName)
     this.clipboardOperations.abortCut()
     const sheetId = this.sheetMapping.fetch(sheetName)
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.clearSheet(sheetId)
+    this.undoRedo.saveOperationClearSheet(sheetId, oldSheetContent)
   }
 
   public setCellContents(serialization: Serialization, topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): void {

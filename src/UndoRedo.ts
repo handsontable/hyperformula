@@ -16,6 +16,7 @@ enum UndoStackElementType {
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
   ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
+  CLEAR_SHEET = 'CLEAR_SHEET',
 }
 
 interface RemoveRowsUndoData {
@@ -50,6 +51,12 @@ interface RemoveSheetUndoData {
   oldSheetContent: ClipboardCell[][],
 }
 
+interface ClearSheetUndoData {
+  type: UndoStackElementType.CLEAR_SHEET,
+  sheetId: number,
+  oldSheetContent: ClipboardCell[][],
+}
+
 interface SetCellContentsUndoData {
   type: UndoStackElementType.SET_CELL_CONTENTS,
   cellContents: {
@@ -66,6 +73,7 @@ type UndoStackElement
   | SetCellContentsUndoData
   | AddSheetUndoData
   | RemoveSheetUndoData
+  | ClearSheetUndoData
 
 export class UndoRedo {
 
@@ -100,6 +108,10 @@ export class UndoRedo {
 
   public saveOperationAddSheet(sheetName: string): void {
     this.undoStack.push({ type: UndoStackElementType.ADD_SHEET, sheetName })
+  }
+
+  public saveOperationClearSheet(sheetId: number, oldSheetContent: ClipboardCell[][]) {
+    this.undoStack.push({ type: UndoStackElementType.CLEAR_SHEET, sheetId, oldSheetContent })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -147,6 +159,10 @@ export class UndoRedo {
       }
       case UndoStackElementType.REMOVE_SHEET: {
         this.undoRemoveSheet(operation)
+        break
+      }
+      case UndoStackElementType.CLEAR_SHEET: {
+        this.undoClearSheet(operation)
         break
       }
     }
@@ -200,6 +216,18 @@ export class UndoRedo {
   private undoRemoveSheet(operation: RemoveSheetUndoData) {
     const { oldSheetContent, sheetId } = operation
     this.crudOperations!.operations.addSheet(operation.sheetName)
+    for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
+      const row = oldSheetContent[rowIndex]
+      for (let col = 0; col < row.length; col++) {
+        const cellType = row[col]
+        const address = simpleCellAddress(sheetId, col, rowIndex)
+        this.crudOperations!.operations.restoreCell(address, cellType)
+      }
+    }
+  }
+
+  private undoClearSheet(operation: ClearSheetUndoData) {
+    const { oldSheetContent, sheetId } = operation
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
