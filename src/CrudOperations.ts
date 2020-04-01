@@ -128,7 +128,6 @@ export class CrudOperations {
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     this.ensureItIsPossibleToMoveRows(sheet, startRow, numberOfRows, targetRow)
 
-    const width = this.dependencyGraph.getSheetWidth(sheet)
     this.addRows(sheet, [targetRow, numberOfRows])
 
     if (targetRow < startRow) {
@@ -137,14 +136,13 @@ export class CrudOperations {
 
     const startAddress = simpleCellAddress(sheet, 0, startRow)
     const targetAddress = simpleCellAddress(sheet, 0, targetRow)
-    this.moveCells(startAddress, width, numberOfRows, targetAddress)
+    this.moveCells(startAddress, Number.POSITIVE_INFINITY, numberOfRows, targetAddress)
     this.removeRows(sheet, [startRow, numberOfRows])
   }
 
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): void {
     this.ensureItIsPossibleToMoveColumns(sheet, startColumn, numberOfColumns, targetColumn)
 
-    const height = this.dependencyGraph.getSheetHeight(sheet)
     this.addColumns(sheet, [targetColumn, numberOfColumns])
 
     if (targetColumn < startColumn) {
@@ -153,7 +151,7 @@ export class CrudOperations {
 
     const startAddress = simpleCellAddress(sheet, startColumn, 0)
     const targetAddress = simpleCellAddress(sheet, targetColumn, 0)
-    this.moveCells(startAddress, numberOfColumns, height, targetAddress)
+    this.moveCells(startAddress, numberOfColumns, Number.POSITIVE_INFINITY, targetAddress)
     this.removeColumns(sheet, [startColumn, numberOfColumns])
   }
 
@@ -416,8 +414,7 @@ export class CrudOperations {
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
       invalidSimpleCellAddress(sourceLeftCorner) ||
-      !isPositiveInteger(width) ||
-      !isPositiveInteger(height) ||
+      !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
       invalidSimpleCellAddress(destinationLeftCorner) ||
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
@@ -584,6 +581,11 @@ export class CrudOperations {
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
+}
+
+function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
+  return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
+    || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)
 }
 
 function isPositiveInteger(x: number): boolean {

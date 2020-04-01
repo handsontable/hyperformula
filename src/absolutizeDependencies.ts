@@ -15,15 +15,13 @@ export const absolutizeDependencies = (deps: RelativeDependency[], baseAddress: 
     if (dep.type === RelativeDependencyType.CellRange) {
       return new AbsoluteCellRange(dep.dependency[0].toSimpleCellAddress(baseAddress), dep.dependency[1].toSimpleCellAddress(baseAddress))
     } else if (dep.type === RelativeDependencyType.ColumnRange) {
-      return new AbsoluteColumnRange(
-        dep.dependency[0].toSimpleAddress(baseAddress).start,
-        dep.dependency[1].toSimpleAddress(baseAddress).end,
-      )
+      const start = dep.dependency[0].toSimpleColumnAddress(baseAddress)
+      const end = dep.dependency[1].toSimpleColumnAddress(baseAddress)
+      return new AbsoluteColumnRange(start.sheet, start.col, end.col)
     } else if (dep.type === RelativeDependencyType.RowRange) {
-      return new AbsoluteRowRange(
-        dep.dependency[0].toSimpleAddress(baseAddress).start,
-        dep.dependency[1].toSimpleAddress(baseAddress).end,
-      )
+      const start = dep.dependency[0].toSimpleRowAddress(baseAddress)
+      const end = dep.dependency[1].toSimpleRowAddress(baseAddress)
+      return new AbsoluteRowRange(start.sheet, start.row, end.row)
     } else {
       return dep.dependency.toSimpleCellAddress(baseAddress)
     }

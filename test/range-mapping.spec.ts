@@ -26,7 +26,7 @@ describe('RangeMapping', () => {
     const mapping = new RangeMapping()
     const start = colStart('A')
     const end = colEnd('U')
-    const vertex = new RangeVertex(new AbsoluteColumnRange(start, end))
+    const vertex = new RangeVertex(new AbsoluteColumnRange(start.sheet, start.col, end.col))
 
     mapping.setRange(vertex)
 

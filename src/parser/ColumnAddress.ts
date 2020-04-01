@@ -1,10 +1,4 @@
-import {
-  absoluteSheetReference,
-  simpleCellAddress,
-  SimpleCellAddress,
-  simpleColumnAddress,
-  SimpleColumnAddress
-} from '../Cell'
+import {absoluteSheetReference, SimpleCellAddress, simpleColumnAddress, SimpleColumnAddress} from '../Cell'
 import {columnIndexToLabel} from './addressRepresentationConverters'
 import {AddressWithColumn} from './Address'
 
@@ -12,11 +6,6 @@ import {AddressWithColumn} from './Address'
 export enum ReferenceType {
   RELATIVE = 'RELATIVE',
   ABSOLUTE = 'ABSOLUTE',
-}
-
-export interface SimpleRange {
-  start: SimpleCellAddress,
-  end: SimpleCellAddress,
 }
 
 export class ColumnAddress implements AddressWithColumn {
@@ -57,19 +46,6 @@ export class ColumnAddress implements AddressWithColumn {
       column = baseAddress.col + this.col
     }
     return simpleColumnAddress(sheet, column)
-  }
-
-  public toSimpleAddress(baseAddress: SimpleCellAddress): SimpleRange {
-    const sheet = absoluteSheetReference(this, baseAddress)
-    let column = this.col
-    if (this.type === ReferenceType.RELATIVE) {
-      column = baseAddress.col + this.col
-    }
-
-    return {
-      start: simpleCellAddress(sheet, column, 0),
-      end: simpleCellAddress(sheet, column, Number.POSITIVE_INFINITY)
-    }
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): ColumnAddress {

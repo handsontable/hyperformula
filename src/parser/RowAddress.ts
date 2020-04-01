@@ -1,11 +1,5 @@
-import {
-  absoluteSheetReference,
-  SimpleCellAddress,
-  simpleCellAddress,
-  simpleRowAddress,
-  SimpleRowAddress,
-} from '../Cell'
-import {ReferenceType, SimpleRange} from './ColumnAddress'
+import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress,} from '../Cell'
+import {ReferenceType} from './ColumnAddress'
 import {AddressWithRow} from './Address'
 
 export class RowAddress implements AddressWithRow {
@@ -47,19 +41,6 @@ export class RowAddress implements AddressWithRow {
       row = baseAddress.row + this.row
     }
     return simpleRowAddress(sheet, row)
-  }
-
-  public toSimpleAddress(baseAddress: SimpleCellAddress): SimpleRange {
-    const sheet = absoluteSheetReference(this, baseAddress)
-    let row = this.row
-    if (this.isRowRelative()) {
-      row = baseAddress.row + this.row
-    }
-
-    return {
-      start: simpleCellAddress(sheet, 0, row),
-      end: simpleCellAddress(sheet, Number.POSITIVE_INFINITY, row)
-    }
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): RowAddress {

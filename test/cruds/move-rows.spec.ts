@@ -2,7 +2,16 @@ import {EmptyValue, HyperFormula, ExportedCellChange} from '../../src'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {InvalidArgumentsError} from '../../src'
 import {CellAddress} from '../../src/parser'
-import {adr, detailedError, extractRange, extractReference} from '../testUtils'
+import {
+  adr,
+  detailedError,
+  extractColumnRange,
+  extractRange,
+  extractReference,
+  extractRowRange,
+  rowEnd,
+  rowStart
+} from '../testUtils'
 
 describe('Ensure it is possible to move rows', () => {
   it('should return false when target makes no sense', () => {
@@ -219,5 +228,22 @@ describe('Move rows', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A5'))).toEqual(detailedError(ErrorType.CYCLE))
+  })
+})
+
+describe('Move rows - Column ranges', () => {
+  it('should adjust relative references of dependent formulas', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(2:3)'],
+      ['1'],
+      ['2']
+    ])
+
+    engine.moveRows(0, 1, 2, 4)
+
+    const range = extractRowRange(engine, adr('A1'))
+    expect(range.start).toEqual(rowStart(3))
+    expect(range.end).toEqual(rowEnd(4))
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })
