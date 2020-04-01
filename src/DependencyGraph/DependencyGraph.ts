@@ -142,20 +142,16 @@ export class DependencyGraph {
         }
 
         this.graph.addNode(rangeVertex)
-        if (range instanceof AbsoluteColumnRange || range instanceof AbsoluteRowRange) {
+        if (!range.isFinite()) {
           this.graph.markNodeAsInfiniteRange(rangeVertex)
         }
-
 
         const {smallerRangeVertex, restRange} = findSmallerRange(this, range)
         if (smallerRangeVertex) {
           this.graph.addEdge(smallerRangeVertex, rangeVertex)
         }
 
-        let matrix
-        if (restRange instanceof AbsoluteCellRange) {
-          matrix = this.matrixMapping.getMatrix(restRange)
-        }
+        const matrix = this.matrixMapping.getMatrix(restRange)
         if (matrix !== undefined) {
           this.graph.addEdge(matrix, rangeVertex)
         } else {
@@ -165,7 +161,7 @@ export class DependencyGraph {
         }
         this.graph.addEdge(rangeVertex, endVertex)
 
-        if (!(range instanceof AbsoluteColumnRange || range instanceof AbsoluteRowRange)) {
+        if (range.isFinite()) {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
       } else {
