@@ -162,16 +162,7 @@ export class UndoRedo {
       this.crudOperations!.operations.addRows(new AddRowsCommand(sheet, [[rowsRemoval.rowFrom, rowsRemoval.rowCount]]))
 
       for (const { address, cellType } of rowsRemoval.removedCells) {
-        switch (cellType.type) {
-          case ClipboardCellType.VALUE: {
-            this.crudOperations!.operations.setValueToCell(cellType.value, address)
-            break
-          }
-          case ClipboardCellType.FORMULA: {
-            this.crudOperations!.operations.setFormulaToCellFromCache(cellType.hash, address)
-            break
-          }
-        }
+        this.crudOperations!.operations.restoreCell(address, cellType)
       }
 
       const oldDataToRestore = this.oldData.get(rowsRemoval.version - 1) || []
@@ -214,16 +205,7 @@ export class UndoRedo {
       for (let col = 0; col < row.length; col++) {
         const cellType = row[col]
         const address = simpleCellAddress(sheetId, col, rowIndex)
-        switch (cellType.type) {
-          case ClipboardCellType.VALUE: {
-            this.crudOperations!.operations.setValueToCell(cellType.value, address)
-            break
-          }
-          case ClipboardCellType.FORMULA: {
-            this.crudOperations!.operations.setFormulaToCellFromCache(cellType.hash, address)
-            break
-          }
-        }
+        this.crudOperations!.operations.restoreCell(address, cellType)
       }
     }
   }

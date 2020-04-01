@@ -198,6 +198,19 @@ export class Operations {
     }
   }
 
+  public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
+    switch (clipboardCell.type) {
+      case ClipboardCellType.VALUE: {
+        this.setValueToCell(clipboardCell.value, address)
+        break
+      }
+      case ClipboardCellType.FORMULA: {
+        this.setFormulaToCellFromCache(clipboardCell.hash, address)
+        break
+      }
+    }
+  }
+
   /**
    * Removes multiple rows from sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
