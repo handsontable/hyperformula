@@ -8,15 +8,12 @@ export interface RawTranslationPackage {
   ui: TranslationSet,
 }
 
-export class TranslationPackage implements RawTranslationPackage {
+export class TranslationPackage {
   constructor(
-    public functions: TranslationSet,
-    public errors: ErrorTranslationSet,
-    public ui: TranslationSet,
+    private functions: TranslationSet,
+    private errors: ErrorTranslationSet,
+    private ui: TranslationSet,
   ) {
-    Object.assign(this.functions, functions)
-    Object.assign(this.errors, errors)
-    Object.assign(this.ui, ui)
   }
 
   public extendFunctions(additionalFunctionTranslations: TranslationSet): void {
@@ -50,8 +47,8 @@ export class TranslationPackage implements RawTranslationPackage {
 
 export function buildTranslationPackage(rawTranslationPackage: RawTranslationPackage): TranslationPackage {
   return new TranslationPackage(
-    Object.assign({}, enGB.functions, rawTranslationPackage.functions),
-    Object.assign({}, enGB.errors, rawTranslationPackage.errors),
-    Object.assign({}, enGB.ui, rawTranslationPackage.ui)
+    Object.assign({}, rawTranslationPackage.functions),
+    Object.assign({}, rawTranslationPackage.errors),
+    Object.assign({}, rawTranslationPackage.ui)
   )
 }

@@ -27,7 +27,7 @@ describe('Plugins', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
-  xit('cleanup - broken',  () => { //TODO: loading plugin automatically adds translation to plugin cache
+  it('cleanup - broken',  () => { //TODO: loading plugin automatically adds translation to plugin cache
     const engine = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
