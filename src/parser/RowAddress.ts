@@ -1,4 +1,4 @@
-import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress,} from '../Cell'
+import {absoluteSheetReference, SimpleCellAddress, simpleRowAddress, SimpleRowAddress} from '../Cell'
 import {ReferenceType} from './ColumnAddress'
 import {AddressWithRow} from './Address'
 

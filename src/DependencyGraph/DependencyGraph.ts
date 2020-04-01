@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {EmptyValue, InternalCellValue, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {CellDependency} from '../CellDependency'
 import {ColumnsSpan} from '../ColumnsSpan'
@@ -10,7 +10,16 @@ import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {RowsSpan} from '../RowsSpan'
 import {Statistics, StatType} from '../statistics'
-import {CellVertex, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex, Vertex} from './'
+import {
+  CellVertex,
+  EmptyCellVertex,
+  FormulaCellVertex,
+  MatrixVertex,
+  ParsingErrorVertex,
+  RangeVertex,
+  ValueCellVertex,
+  Vertex
+} from './'
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {collectAddressesDependentToMatrix} from './collectAddressesDependentToMatrix'
 import {GetDependenciesQuery} from './GetDependenciesQuery'

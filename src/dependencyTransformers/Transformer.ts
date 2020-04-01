@@ -20,8 +20,7 @@ export interface FormulaTransformer {
 }
 
 export abstract class Transformer implements FormulaTransformer {
-  protected constructor(
-  ) {}
+  public abstract get sheet(): number
 
   public transform(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
@@ -154,5 +153,4 @@ export abstract class Transformer implements FormulaTransformer {
   protected abstract transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false
   protected abstract transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false
   protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
-  public abstract get sheet(): number
 }

@@ -18,7 +18,7 @@ export class RemoveRowsTransformer extends Transformer {
     return this.rowsSpan.sheet
   }
 
-  protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
+  protected transformColumnRangeAst(ast: ColumnRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 
@@ -90,7 +90,7 @@ export class RemoveRowsTransformer extends Transformer {
     return this.transformRange(start, end, formulaAddress)
   }
 
-  protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
+  protected transformColumnRange(_start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
     throw Error('Not implemented')
   }
 

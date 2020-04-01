@@ -319,11 +319,11 @@ export class AbsoluteCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
-  protected effectiveEndColumn(dependencyGraph: DependencyGraph): number {
+  protected effectiveEndColumn(_dependencyGraph: DependencyGraph): number {
     return this.end.col
   }
 
-  protected effectiveEndRow(dependencyGraph: DependencyGraph): number {
+  protected effectiveEndRow(_dependencyGraph: DependencyGraph): number {
     return this.end.row
   }
 }
@@ -347,24 +347,24 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   }
 
 
-  public shiftByRows(numberOfRows: number) {
+  public shiftByRows(_numberOfRows: number) {
     return
   }
 
-  public expandByRows(numberOfRows: number) {
+  public expandByRows(_numberOfRows: number) {
     return
   }
 
-  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+  public shifted(byCols: number, _byRows: number): AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, this.start.col + byCols, this.end.col + byCols)
   }
 
-  public removeRows(rowStart: number, rowEnd: number) {
+  public removeRows(_rowStart: number, _rowEnd: number) {
     return
   }
 
-  public rangeWithSameHeight(startColumn: number, numebrOfColumns: number): AbsoluteCellRange {
-    return new AbsoluteColumnRange(this.sheet, startColumn, startColumn + numebrOfColumns - 1)
+  public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
+    return new AbsoluteColumnRange(this.sheet, startColumn, startColumn + numberOfColumns - 1)
   }
 
   protected effectiveEndRow(dependencyGraph: DependencyGraph): number {
@@ -390,11 +390,11 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return this.height() <= 0
   }
 
-  public shiftByColumns(numberOfColumns: number) {
+  public shiftByColumns(_numberOfColumns: number) {
     return
   }
 
-  public expandByColumns(numberOfColumns: number) {
+  public expandByColumns(_numberOfColumns: number) {
     return
   }
 
@@ -402,7 +402,7 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
-  public removeColumns(columnStart: number, columnEnd: number) {
+  public removeColumns(_columnStart: number, _columnEnd: number) {
     return
   }
 

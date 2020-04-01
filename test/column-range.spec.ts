@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
-import {simpleCellAddress} from '../src/Cell'
 
 describe('Column ranges', () => {
   it('should work', () => {

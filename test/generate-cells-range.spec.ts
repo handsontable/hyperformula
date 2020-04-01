@@ -1,10 +1,9 @@
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import { SimpleCellAddress} from '../src/Cell'
+import {SimpleCellAddress} from '../src/Cell'
 import {adr} from './testUtils'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {LazilyTransformingAstService} from '../src'
 import {Config} from '../src/Config'
-import {UndoRedo} from '../src/UndoRedo'
 import {Statistics} from '../src/statistics/Statistics'
 
 describe('generateCellsFromRange', () => {

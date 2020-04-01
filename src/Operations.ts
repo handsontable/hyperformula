@@ -4,10 +4,9 @@ import {SimpleCellAddress} from './Cell'
 import {RowsSpan} from './RowsSpan'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Index} from './HyperFormula'
-import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex,} from './DependencyGraph'
+import {DependencyGraph, EmptyCellVertex, FormulaCellVertex, MatrixVertex, ValueCellVertex} from './DependencyGraph'
 import {ParserWithCaching} from './parser'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
-import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 
 export class RemoveRowsCommand {
@@ -108,7 +107,7 @@ export class Operations {
     }
 
     const removedCells: ChangedCell[] = []
-    for (const [address, vertex] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
+    for (const [address] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
       removedCells.push({ address, cellType: this.getClipboardCell(address) })
     }
 

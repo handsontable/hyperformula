@@ -12,7 +12,7 @@ export class RemoveSheetTransformer extends Transformer {
     super()
   }
 
-  transform(graph: DependencyGraph, parser: ParserWithCaching): void {
+  public transform(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.matrixFormulaNodes()) {
       const [newAst] = this.transformSingleAst(node.getFormula()!, node.getAddress())
       node.setFormula(newAst)
@@ -23,7 +23,7 @@ export class RemoveSheetTransformer extends Transformer {
     return address
   }
 
-  protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
+  protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, _formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
     if (dependencyAddress.sheet === this.sheet) {
       return ErrorType.REF
     }
@@ -42,14 +42,14 @@ export class RemoveSheetTransformer extends Transformer {
     }
   }
 
-  protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
+  protected transformColumnRange(start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
     if (start.sheet === this.sheet || start.sheet === this.sheet) {
       return ErrorType.REF
     }
     return false
   }
 
-  protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
+  protected transformRowRange(start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
     if (start.sheet === this.sheet || start.sheet === this.sheet) {
       return ErrorType.REF
     }

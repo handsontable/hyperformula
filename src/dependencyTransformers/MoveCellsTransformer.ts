@@ -1,7 +1,6 @@
 import {Transformer} from './Transformer'
 import {Ast, CellAddress} from '../parser'
 import {ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -22,7 +21,7 @@ export class MoveCellsTransformer extends Transformer {
     return this.sourceRange.sheet
   }
 
-  transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
+  public transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
     if (this.sourceRange.addressInRange(address)) {
       const newAst = this.transformAst(ast, address)
       return [newAst, this.fixNodeAddress(address)]

@@ -30,7 +30,7 @@ export class ColumnAddress implements AddressWithColumn {
     return (this.type === ReferenceType.RELATIVE)
   }
 
-  public moved(toSheet: number, toRight: number, toBottom: number): ColumnAddress {
+  public moved(toSheet: number, toRight: number, _toBottom: number): ColumnAddress {
     const newSheet = this.sheet === null ? null : toSheet
     return new ColumnAddress(newSheet, this.col + toRight, this.type)
   }
@@ -48,12 +48,12 @@ export class ColumnAddress implements AddressWithColumn {
     return simpleColumnAddress(sheet, column)
   }
 
-  public shiftRelativeDimensions(toRight: number, toBottom: number): ColumnAddress {
+  public shiftRelativeDimensions(toRight: number, _toBottom: number): ColumnAddress {
     const col = this.isColumnRelative() ? this.col + toRight : this.col
     return new ColumnAddress(this.sheet, col, this.type)
   }
 
-  public shiftAbsoluteDimensions(toRight: number, toBottom: number): ColumnAddress {
+  public shiftAbsoluteDimensions(toRight: number, _toBottom: number): ColumnAddress {
     const col = this.isColumnAbsolute() ? this.col + toRight : this.col
     return new ColumnAddress(this.sheet, col, this.type)
   }

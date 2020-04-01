@@ -1,6 +1,6 @@
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
-import {CellAddress, CellReferenceType} from './CellAddress'
+import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
 import {additionalCharactersAllowedInQuotes} from './LexerConfig'
 import {RowAddress} from './RowAddress'
@@ -80,14 +80,6 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
   } else {
     return RowAddress.relative(sheet, row - baseAddress.row)
   }
-}
-
-export const addressToString = (address: CellAddress, baseAddress: SimpleCellAddress): string => {
-  const simpleAddress = address.toSimpleCellAddress(baseAddress)
-  const column = columnIndexToLabel(simpleAddress.col)
-  const rowDollar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW ? '$' : ''
-  const colDollar = address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || address.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL ? '$' : ''
-  return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
 }
 
 /**
