@@ -30,11 +30,11 @@ export class EngineComparator {
     this.actual.dependencyGraph.forceApplyPostponedTransformations()
 
     for (let sheet = 0; sheet < numberOfSheets; ++sheet) {
-      this.compareSheets(sheet)
+      this.compareSheet(sheet)
     }
   }
 
-  private compareSheets(sheet: number = 0) {
+  private compareSheet(sheet: number = 0) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
