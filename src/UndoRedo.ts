@@ -226,6 +226,10 @@ export class UndoRedo {
         this.redoAddRows(operation)
         break
       }
+      case UndoStackElementType.MOVE_ROWS: {
+        this.redoMoveRows(operation)
+        break
+      }
       case UndoStackElementType.SET_CELL_CONTENTS: {
         this.redoSetCellContents(operation)
         break
@@ -271,5 +275,10 @@ export class UndoRedo {
   private redoAddSheet(operation: AddSheetUndoData) {
     const { sheetName } = operation
     this.crudOperations!.operations.addSheet(sheetName)
+  }
+
+  private redoMoveRows(operation: MoveRowsUndoData) {
+    const { sheet } = operation
+    this.crudOperations!.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
   }
 }
