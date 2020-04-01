@@ -7,7 +7,7 @@ import {MatrixVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
-import { NoSheetWithIdError } from '../../errors'
+import {NoSheetWithIdError} from '../../errors'
 
 /**
  * Returns actual width, height and fill ratio of a sheet
