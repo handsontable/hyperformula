@@ -262,6 +262,17 @@ describe('Undo - setting cell content', () => {
   })
 })
 
+describe('Undo - adding sheet', () => {
+  it('works for basic case', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addSheet("SomeSheet")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
+  })
+})
+
 describe('Undo', () => {
   it('when there is no operation to undo', () => {
     const engine = HyperFormula.buildEmpty()

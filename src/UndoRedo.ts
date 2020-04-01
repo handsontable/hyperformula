@@ -14,6 +14,7 @@ enum UndoStackElementType {
   ADD_ROWS = 'ADD_ROWS',
   MOVE_ROWS = 'MOVE_ROWS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
+  ADD_SHEET = 'ADD_SHEET',
   REMOVE_SHEET = 'REMOVE_SHEET',
 }
 
@@ -37,6 +38,11 @@ interface MoveRowsUndoData {
   targetRow: number,
 }
 
+interface AddSheetUndoData {
+  type: UndoStackElementType.ADD_SHEET,
+  sheetName: string,
+}
+
 interface RemoveSheetUndoData {
   type: UndoStackElementType.REMOVE_SHEET,
   sheetName: string,
@@ -58,6 +64,7 @@ type UndoStackElement
   | AddRowsUndoData
   | MoveRowsUndoData
   | SetCellContentsUndoData
+  | AddSheetUndoData
   | RemoveSheetUndoData
 
 export class UndoRedo {
@@ -89,6 +96,10 @@ export class UndoRedo {
 
   public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][]): void {
     this.undoStack.push({ type: UndoStackElementType.REMOVE_SHEET, sheetName, sheetId, oldSheetContent })
+  }
+
+  public saveOperationAddSheet(sheetName: string): void {
+    this.undoStack.push({ type: UndoStackElementType.ADD_SHEET, sheetName })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -128,6 +139,10 @@ export class UndoRedo {
       }
       case UndoStackElementType.MOVE_ROWS: {
         this.undoMoveRows(operation)
+        break
+      }
+      case UndoStackElementType.ADD_SHEET: {
+        this.undoAddSheet(operation)
         break
       }
       case UndoStackElementType.REMOVE_SHEET: {
@@ -184,6 +199,11 @@ export class UndoRedo {
   private undoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+  }
+
+  private undoAddSheet(operation: AddSheetUndoData) {
+    const { sheetName } = operation
+    this.crudOperations!.operations.removeSheet(sheetName)
   }
 
   private undoRemoveSheet(operation: RemoveSheetUndoData) {

@@ -149,7 +149,9 @@ export class CrudOperations {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
     }
-    return this.operations.addSheet(name)
+    const addedSheetName = this.operations.addSheet(name)
+    this.undoRedo.saveOperationAddSheet(addedSheetName)
+    return addedSheetName
   }
 
   public removeSheet(sheetName: string): void {
