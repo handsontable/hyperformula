@@ -230,6 +230,10 @@ export class UndoRedo {
         this.redoSetCellContents(operation)
         break
       }
+      case UndoStackElementType.ADD_SHEET: {
+        this.redoAddSheet(operation)
+        break
+      }
       case UndoStackElementType.REMOVE_SHEET: {
         this.redoRemoveSheet(operation)
         break
@@ -262,5 +266,10 @@ export class UndoRedo {
   private redoRemoveSheet(operation: RemoveSheetUndoData) {
     const { sheetName } = operation
     this.crudOperations!.operations.removeSheet(sheetName)
+  }
+
+  private redoAddSheet(operation: AddSheetUndoData) {
+    const { sheetName } = operation
+    this.crudOperations!.operations.addSheet(sheetName)
   }
 }

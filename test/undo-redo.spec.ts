@@ -527,6 +527,32 @@ describe('Redo - removing sheet', () => {
   })
 })
 
+describe('Redo - adding sheet', () => {
+  it('works for basic case', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addSheet("SomeSheet")
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(1)).toEqual("SomeSheet")
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+
+  it('works for automatic naming', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addSheet()
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(1)).toEqual("Sheet2")
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()
