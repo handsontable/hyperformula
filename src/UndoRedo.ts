@@ -270,6 +270,10 @@ export class UndoRedo {
         this.redoRemoveSheet(operation)
         break
       }
+      case UndoStackElementType.CLEAR_SHEET: {
+        this.redoClearSheet(operation)
+        break
+      }
     }
 
     this.undoStack.push(operation)
@@ -308,5 +312,10 @@ export class UndoRedo {
   private redoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveRows(sheet, operation.startRow, operation.numberOfRows, operation.targetRow)
+  }
+
+  private redoClearSheet(operation: ClearSheetUndoData) {
+    const { sheetId } = operation
+    this.crudOperations!.operations.clearSheet(sheetId)
   }
 }

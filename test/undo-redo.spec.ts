@@ -605,6 +605,21 @@ describe('Redo - adding sheet', () => {
   })
 })
 
+describe('Redo - clearing sheet', () => {
+  it('works', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1']
+    ])
+    engine.clearSheet("Sheet1")
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+
+    engine.redo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
+  })
+})
+
 describe('Redo', () => {
   it('when there is no operation to redo', () => {
     const engine = HyperFormula.buildEmpty()
