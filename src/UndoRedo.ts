@@ -3,8 +3,8 @@
  * Copyright (c) 2020 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress, NoErrorCellValue} from './Cell'
-import {ClipboardCellType} from './ClipboardOperations'
+import {simpleCellAddress, SimpleCellAddress, NoErrorCellValue} from './Cell'
+import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {RawCellContent} from './CellContentParser'
 import {RowsRemoval, RemoveRowsCommand, RowsAddition, AddRowsCommand} from './Operations'
 import {CrudOperations} from './CrudOperations'
@@ -14,6 +14,7 @@ enum UndoStackElementType {
   ADD_ROWS = 'ADD_ROWS',
   MOVE_ROWS = 'MOVE_ROWS',
   SET_CELL_CONTENTS = 'SET_CELL_CONTENTS',
+  REMOVE_SHEET = 'REMOVE_SHEET',
 }
 
 interface RemoveRowsUndoData {
@@ -36,6 +37,13 @@ interface MoveRowsUndoData {
   targetRow: number,
 }
 
+interface RemoveSheetUndoData {
+  type: UndoStackElementType.REMOVE_SHEET,
+  sheetName: string,
+  sheetId: number,
+  oldSheetContent: ClipboardCell[][],
+}
+
 interface SetCellContentsUndoData {
   type: UndoStackElementType.SET_CELL_CONTENTS,
   cellContents: {
@@ -50,6 +58,7 @@ type UndoStackElement
   | AddRowsUndoData
   | MoveRowsUndoData
   | SetCellContentsUndoData
+  | RemoveSheetUndoData
 
 export class UndoRedo {
 
@@ -76,6 +85,10 @@ export class UndoRedo {
 
   public saveOperationSetCellContents(cellContents: { address: SimpleCellAddress, newContent: RawCellContent, oldContent: NoErrorCellValue }[]) {
     this.undoStack.push({ type: UndoStackElementType.SET_CELL_CONTENTS, cellContents })
+  }
+
+  public saveOperationRemoveSheet(sheetName: string, sheetId: number, oldSheetContent: ClipboardCell[][]): void {
+    this.undoStack.push({ type: UndoStackElementType.REMOVE_SHEET, sheetName, sheetId, oldSheetContent })
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
@@ -115,6 +128,11 @@ export class UndoRedo {
       }
       case UndoStackElementType.MOVE_ROWS: {
         this.undoMoveRows(operation)
+        break
+      }
+      case UndoStackElementType.REMOVE_SHEET: {
+        this.undoRemoveSheet(operation)
+        break
       }
     }
     this.redoStack.push(operation)
@@ -166,6 +184,28 @@ export class UndoRedo {
   private undoMoveRows(operation: MoveRowsUndoData) {
     const { sheet } = operation
     this.crudOperations!.operations.moveRows(sheet, operation.targetRow - operation.numberOfRows, operation.numberOfRows, operation.startRow)
+  }
+
+  private undoRemoveSheet(operation: RemoveSheetUndoData) {
+    const { oldSheetContent, sheetId } = operation
+    this.crudOperations!.operations.addSheet(operation.sheetName)
+    for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
+      const row = oldSheetContent[rowIndex]
+      for (let col = 0; col < row.length; col++) {
+        const cellType = row[col]
+        const address = simpleCellAddress(sheetId, col, rowIndex)
+        switch (cellType.type) {
+          case ClipboardCellType.VALUE: {
+            this.crudOperations!.operations.setValueToCell(cellType.value, address)
+            break
+          }
+          case ClipboardCellType.FORMULA: {
+            this.crudOperations!.operations.setFormulaToCellFromCache(cellType.hash, address)
+            break
+          }
+        }
+      }
+    }
   }
 
   public redo() {

@@ -177,6 +177,41 @@ describe('Undo - moving rows', () => {
   })
 })
 
+describe('Undo - removing sheet', () => {
+  it('works for empty sheet', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
+  })
+
+  it('works with restoring simple values', () => {
+    const sheet = [
+      ['1'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+
+  it('works with restoring formulas', () => {
+    const sheet = [
+      ['=42'],
+    ]
+    const engine = HyperFormula.buildFromArray(sheet)
+    engine.removeSheet("Sheet1")
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
+  })
+})
+
 describe('Undo - setting cell content', () => {
   it('works for simple values', () => {
     const sheet = [

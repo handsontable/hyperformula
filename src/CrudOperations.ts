@@ -149,15 +149,16 @@ export class CrudOperations {
     if (name) {
       this.ensureItIsPossibleToAddSheet(name)
     }
-    const sheetId = this.sheetMapping.addSheet(name)
-    this.addressMapping.autoAddSheet(sheetId, [])
-    return this.sheetMapping.fetchDisplayName(sheetId)
+    return this.operations.addSheet(name)
   }
 
   public removeSheet(sheetName: string): void {
     this.ensureSheetExists(sheetName)
     this.clipboardOperations.abortCut()
+    const sheetId = this.sheetMapping.fetch(sheetName)
+    const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     this.operations.removeSheet(sheetName)
+    this.undoRedo.saveOperationRemoveSheet(sheetName, sheetId, oldSheetContent)
   }
 
   public clearSheet(sheetName: string): void {

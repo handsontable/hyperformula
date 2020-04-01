@@ -127,6 +127,12 @@ export class Operations {
     this.columnSearch.removeSheet(sheetId)
   }
 
+  public addSheet(name?: string) {
+    const sheetId = this.sheetMapping.addSheet(name)
+    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, [])
+    return this.sheetMapping.fetchDisplayName(sheetId)
+  }
+
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): void {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.doAddRows(rowsToAdd)
@@ -260,6 +266,22 @@ export class Operations {
     }
 
     throw Error('Trying to copy unsupported type')
+  }
+
+  public getSheetClipboardCells(sheet: number): ClipboardCell[][] {
+    const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
+    const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
+
+    const arr: ClipboardCell[][] = new Array(sheetHeight)
+    for (let i = 0; i < sheetHeight; i++) {
+      arr[i] = new Array(sheetWidth)
+
+      for (let j = 0; j < sheetWidth; j++) {
+        const address = simpleCellAddress(sheet, j, i)
+        arr[i][j] = this.getClipboardCell(address)
+      }
+    }
+    return arr
   }
 
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
