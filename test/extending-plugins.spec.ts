@@ -1,6 +1,5 @@
 import {HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
-import {enGB} from '../src/i18n'
 import {FunctionPlugin, PluginFunctionType} from '../src/interpreter/plugin/FunctionPlugin'
 import './testConfig.ts'
 import {adr, detailedError} from './testUtils'

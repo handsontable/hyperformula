@@ -11,7 +11,7 @@ import {CellValue, ExportedChange, Exporter} from './CellValue'
 import {ColumnSearchStrategy} from './ColumnSearch/ColumnSearchStrategy'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
-import {buildTranslationPackage, enGB, RawTranslationPackage, TranslationPackage} from './i18n'
+import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {normalizeRemovedIndexes, normalizeAddedIndexes} from './Operations'
 import {
   AddressMapping,

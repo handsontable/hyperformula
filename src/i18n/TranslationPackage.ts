@@ -1,6 +1,6 @@
 import {ErrorType} from '../Cell'
 import {Maybe} from '../Maybe'
-import {enGB, ErrorTranslationSet, TranslationSet} from './index'
+import {ErrorTranslationSet, TranslationSet} from './index'
 
 export interface RawTranslationPackage {
   functions: TranslationSet,
