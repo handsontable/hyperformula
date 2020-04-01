@@ -34,7 +34,7 @@ export class EngineComparator {
     }
   }
 
-  private compareSheet(sheet: number = 0) {
+  private compareSheet(sheet: number) {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
