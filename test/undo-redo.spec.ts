@@ -210,6 +210,15 @@ describe('Undo - removing sheet', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
+
+  it('restores original sheet name', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeSheet("shEEt1")
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual("Sheet1")
+  })
 })
 
 describe('Undo - setting cell content', () => {
