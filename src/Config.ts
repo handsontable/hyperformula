@@ -502,7 +502,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.useColumnIndex = this.valueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = this.valueFromParam(useStats, 'boolean', 'useStats')
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
-    this.translationPackage = buildTranslationPackage(HyperFormula.getLanguage(this.language))
+    this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.parseDate = this.valueFromParam(parseDate, 'function', 'parseDate')
     this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
