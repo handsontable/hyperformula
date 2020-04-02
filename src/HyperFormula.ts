@@ -21,7 +21,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
-import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError} from './errors'
+import { NamedExpressionDoesNotExist, NamedExpressionNameIsAlreadyTaken, NamedExpressionNameIsInvalid, NoOperationToUndo, EvaluationSuspendedError, NotAFormulaError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Sheet, Sheets} from './GraphBuilder'
 import {IBatchExecutor} from './IBatchExecutor'
@@ -468,6 +468,10 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Undo the previous operation.
+   * 
+   * Note that this method may trigger dependency graph recalculation.
+   * 
+   * @fires [[valuesUpdated]]
    * 
    * @throws [[NoOperationToUndo]] when there is no operation running that can be undone
    * 
@@ -1505,25 +1509,26 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    *
-   * @throws an error if the provided string is not a valid formula, i.e does not start with "="
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
    *
    * @category Helper
    */
   public normalizeFormula(formulaString: string): string {
     const [ast, address] = this.extractTemporaryFormula(formulaString)
     if (!ast) {
-      throw new Error('This is not a formula')
+      throw new NotAFormulaError()
     }
     return this._unparser.unparse(ast, address)
   }
 
   /**
-   * Calculates fire-and-forget formula, returns a value of the formula.
+   * Calculates fire-and-forget formula, returns the calculated value.
    *
    * @param {string} formulaString - a formula, ex. "=SUM(Sheet1!A1:A100)"
    * @param {string} sheetName - a name of the sheet in context of which we evaluate formula, case insensitive.
    * 
-   * @throws an error if the provided string is not a valid formula, i.e does not start with "="
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
+   * @throws [[NoSheetWithNameError]] when the given sheet name does not exists
    *
    * @category Helper
    */
@@ -1532,7 +1537,7 @@ export class HyperFormula implements TypedEmitter {
     const sheetId = this.sheetMapping.fetch(sheetName)
     const [ast, address] = this.extractTemporaryFormula(formulaString, sheetId)
     if (!ast) {
-      throw new Error('This is not a formula')
+      throw new NotAFormulaError()
     }
     const internalCellValue = this.evaluator.runAndForget(ast, address)
     return this._exporter.exportValue(internalCellValue)

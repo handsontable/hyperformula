@@ -20,6 +20,15 @@ export class NoSheetWithNameError extends Error {
 }
 
 /**
+ * Error thrown when the the provided string is not a valid formula, i.e does not start with "="
+ */
+export class NotAFormulaError extends Error {
+  constructor() {
+    super('This is not a formula')
+  }
+}
+
+/**
  * Error thrown when the given address is invalid. 
  */
 export class InvalidAddressError extends Error {
