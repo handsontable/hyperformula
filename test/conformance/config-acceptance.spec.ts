@@ -7,7 +7,7 @@ describe('Config', () => {
     it('has default settings', () => {
       const config = new Config({language: enGB})
   
-      expect(config.getConfig().accentSensitive).toEqual(Config.defaultConfig.accentSensitive)
+      expect(config.getConfig().accentSensitive).toBe(Config.defaultConfig.accentSensitive)
       expect(config.getConfig().caseSensitive).toBe(Config.defaultConfig.caseSensitive)
       expect(config.getConfig().caseFirst).toBe(Config.defaultConfig.caseFirst)
       expect(config.getConfig().chooseAddressMappingPolicy).toBe(Config.defaultConfig.chooseAddressMappingPolicy)
@@ -35,10 +35,10 @@ describe('Config', () => {
       expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
     })
 
-    it('has default settings and and the accent sensitive change works', () => {
+    it('has default settings and and the accent sensitive change is possible', () => {
         const config = new Config({accentSensitive: true })
     
-        expect(config.getConfig().accentSensitive).toEqual(true)
+        expect(config.getConfig().accentSensitive).toBe(true)
         expect(config.getConfig().caseSensitive).toBe(Config.defaultConfig.caseSensitive)
         expect(config.getConfig().caseFirst).toBe(Config.defaultConfig.caseFirst)
         expect(config.getConfig().chooseAddressMappingPolicy).toBe(Config.defaultConfig.chooseAddressMappingPolicy)
@@ -66,10 +66,10 @@ describe('Config', () => {
         expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
       })
 
-      it('has default settings and and the case sensitive change works', () => {
+      it('has default settings and and the case sensitive change is possible', () => {
         const config = new Config({caseSensitive: true})
     
-        expect(config.getConfig().accentSensitive).toEqual(Config.defaultConfig.accentSensitive)
+        expect(config.getConfig().accentSensitive).toBe(Config.defaultConfig.accentSensitive)
         expect(config.getConfig().caseSensitive).toBe(true)
         expect(config.getConfig().caseFirst).toBe(Config.defaultConfig.caseFirst)
         expect(config.getConfig().chooseAddressMappingPolicy).toBe(Config.defaultConfig.chooseAddressMappingPolicy)
@@ -96,7 +96,38 @@ describe('Config', () => {
         expect(config.getConfig().nullDate).toBe(Config.defaultConfig.nullDate)
         expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
       })
-  
+
+      it('has default settings and and the case first is possible', () => {
+        const config = new Config({caseFirst: 'upper'})
+    
+        expect(config.getConfig().accentSensitive).toBe(Config.defaultConfig.accentSensitive)
+        expect(config.getConfig().caseSensitive).toBe(Config.defaultConfig.caseSensitive)
+        expect(config.getConfig().caseFirst).toBe('upper')
+        expect(config.getConfig().chooseAddressMappingPolicy).toBe(Config.defaultConfig.chooseAddressMappingPolicy)
+        expect(config.getConfig().dateFormats).toBe(Config.defaultConfig.dateFormats)
+        expect(config.getConfig().functionArgSeparator).toBe(Config.defaultConfig.functionArgSeparator)
+        expect(config.getConfig().decimalSeparator).toBe(Config.defaultConfig.decimalSeparator)
+        expect(config.getConfig().thousandSeparator).toBe(Config.defaultConfig.thousandSeparator)
+        expect(config.getConfig().language).toBe(Config.defaultConfig.language)
+        expect(config.getConfig().functionPlugins).toBe(Config.defaultConfig.functionPlugins)
+        expect(config.getConfig().gpuMode).toBe(Config.defaultConfig.gpuMode)
+        expect(config.getConfig().ignorePunctuation).toBe(Config.defaultConfig.ignorePunctuation)
+        expect(config.getConfig().leapYear1900).toBe(Config.defaultConfig.leapYear1900)
+        expect(config.getConfig().localeLang).toBe(Config.defaultConfig.localeLang)
+        expect(config.getConfig().smartRounding).toBe(Config.defaultConfig.smartRounding)
+        expect(config.getConfig().matrixDetection).toBe(Config.defaultConfig.matrixDetection)
+        expect(config.getConfig().matrixDetectionThreshold).toBe(Config.defaultConfig.matrixDetectionThreshold)
+        expect(config.getConfig().nullYear).toBe(Config.defaultConfig.nullYear)
+        expect(config.getConfig().parseDate).toBe(Config.defaultConfig.parseDate)
+        expect(config.getConfig().stringifyDate).toBe(Config.defaultConfig.stringifyDate)
+        expect(config.getConfig().precisionEpsilon).toBe(Config.defaultConfig.precisionEpsilon)
+        expect(config.getConfig().precisionRounding).toBe(Config.defaultConfig.precisionRounding)
+        expect(config.getConfig().useColumnIndex).toBe(Config.defaultConfig.useColumnIndex)
+        expect(config.getConfig().vlookupThreshold).toBe(Config.defaultConfig.vlookupThreshold)
+        expect(config.getConfig().nullDate).toBe(Config.defaultConfig.nullDate)
+        expect(config.getConfig().useStats).toBe(Config.defaultConfig.useStats)
+      })
+ 
     
 
 })
