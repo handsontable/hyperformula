@@ -3,7 +3,7 @@ import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime} from './DateTimeHelper'
 import {ExpectedOneOfValues, ExpectedValueOfType} from './errors'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {defaultStringifyDate} from './format/format'
+import {defaultStringifyDateTime} from './format/format'
 import {enGB, TranslationPackage} from './i18n'
 import {AbsPlugin} from './interpreter/plugin/AbsPlugin'
 import {BitShiftPlugin} from './interpreter/plugin/BitShiftPlugin'
@@ -97,7 +97,7 @@ export interface ConfigParams {
    *
    * @default ['MM/DD/YYYY', 'MM/DD/YY']
    * 
-   * @category Date
+   * @category DateTime
    */
   dateFormats: string[],
   /**
@@ -184,7 +184,7 @@ export interface ConfigParams {
    *
    * @default false
    * 
-   * @category Date
+   * @category DateTime
    */
   leapYear1900: boolean,
   /**
@@ -222,7 +222,7 @@ export interface ConfigParams {
    *
    * @default 30
    * 
-   * @category Date 
+   * @category DateTime
    */
   nullYear: number,
   /**
@@ -230,7 +230,7 @@ export interface ConfigParams {
    *
    * @default defaultParseToDateTime
    *
-   * @category Date
+   * @category DateTime
    */
   parseDateTime: (dateTimeString: string, dateFormat: string, timeFormat: string) => Maybe<DateTime>,
   /**
@@ -266,11 +266,11 @@ export interface ConfigParams {
   /**
    * Allows to provide a function that takes date and prints it into string.
    *
-   * @default defaultStringifyDate
+   * @default defaultStringifyDateTime
    *
-   * @category Date
+   * @category DateTime
    */
-  stringifyDate: (date: SimpleDateTime, dateFormat: string) => Maybe<string>,
+  stringifyDateTime: (date: SimpleDateTime, dateFormat: string) => Maybe<string>,
   /**
    * Sets the rounding.
    *
@@ -322,7 +322,7 @@ export interface ConfigParams {
    *
    * @default {year: 1899, month: 12, day: 30}
    *
-   * @category Date
+   * @category DateTime
    */
   nullDate: SimpleDate,
 }
@@ -352,7 +352,7 @@ export class Config implements ConfigParams, ParserConfig {
     matrixDetectionThreshold: 100,
     nullYear: 30,
     parseDateTime: defaultParseToDateTime,
-    stringifyDate: defaultStringifyDate,
+    stringifyDateTime: defaultStringifyDateTime,
     precisionEpsilon: 1e-13,
     precisionRounding: 14,
     useColumnIndex: false,
@@ -435,9 +435,9 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDate>
+  public readonly parseDateTime: (dateString: string, dateFormats: string) => Maybe<SimpleDateTime>
   /** @inheritDoc */
-  public readonly stringifyDate: (date: SimpleDate, formatArg: string) => Maybe<string>
+  public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
@@ -481,7 +481,7 @@ export class Config implements ConfigParams, ParserConfig {
       matrixDetectionThreshold,
       nullYear,
       parseDateTime,
-      stringifyDate,
+      stringifyDateTime,
       precisionEpsilon,
       precisionRounding,
       useColumnIndex,
@@ -515,7 +515,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.vlookupThreshold = this.valueFromParam(vlookupThreshold, 'number', 'vlookupThreshold')
     this.errorMapping = this.buildErrorMapping(this.language)
     this.parseDateTime = this.valueFromParam(parseDateTime, 'function', 'parseDateTime')
-    this.stringifyDate = this.valueFromParam(stringifyDate, 'function', 'stringifyDate')
+    this.stringifyDateTime = this.valueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.nullDate = this.valueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = this.valueFromParam(leapYear1900, 'boolean', 'leapYear1900')
 

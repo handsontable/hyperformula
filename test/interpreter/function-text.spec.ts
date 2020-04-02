@@ -2,7 +2,7 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import '../testConfig'
 import {SimpleDateTime} from '../../src/DateTimeHelper'
-import {defaultStringifyDate} from '../../src/format/format'
+import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
@@ -138,7 +138,7 @@ describe('Text', () => {
 
 describe( 'Custom date printing', () => {
   function customPrintDate(date: SimpleDateTime, dateFormat: string): Maybe<string> {
-    const str = defaultStringifyDate(date, dateFormat)
+    const str = defaultStringifyDateTime(date, dateFormat)
     if(str === undefined) {
       return undefined
     } else {
@@ -149,7 +149,7 @@ describe( 'Custom date printing', () => {
     const engine =  HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
-    ]], {stringifyDate: customPrintDate})
+    ]], {stringifyDateTime: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('fancy 01/01/1900 fancy')
   })
@@ -159,7 +159,7 @@ describe( 'Custom date printing', () => {
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',
-    ]], {stringifyDate: customPrintDate})
+    ]], {stringifyDateTime: customPrintDate})
 
     expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
